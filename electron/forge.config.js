@@ -3,9 +3,9 @@ const fs = require('fs');
 
 module.exports = {
   packagerConfig: {
-    executableName: 'grandprod',
-    appBundleId: 'com.grandprod.game',
-    appCopyright: 'Grandprod Team',
+    executableName: 'blunderdark',
+    appBundleId: 'com.felfhenor.blunderdark',
+    appCopyright: 'Blunderdark Team',
     appCategoryType: 'public.app-category.games',
     icon: './icons/icon',
   },
@@ -16,7 +16,7 @@ module.exports = {
       config: {
         icon: './icons/icon.ico',
         setupIcon: './icons/icon.ico',
-        setupExe: 'grandprod.exe',
+        setupExe: 'blunderdark.exe',
       },
     },
     {
