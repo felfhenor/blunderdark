@@ -1,7 +1,7 @@
 {
-  "name": "grandprod",
-  "description": "Grandprod is a game where you lead a hero to infinite victory.",
-  "author": "Grandprod Team <hi@grandprod.com>",
+  "name": "blunderdark",
+  "description": "Blunderdark is a game where you build and optimize a dungeon.",
+  "author": "Blunderdark Team <hi@felfhenor.com>",
   "license": "UNLICENSED",
   "version": "0.1.0",
   "main": "src/index.js",

@@ -1,5 +1,5 @@
 {
-  "name": "grandprod",
+  "name": "blunderdark",
   "version": "0.0.1",
   "scripts": {
     "start": "concurrently \"npm run start:app\" \"npm run gamedata:watch\"",
