@@ -9,6 +9,7 @@ export * from './content-trinket';
 export * from './content-weapon';
 export * from './discord';
 export * from './droppable';
+export * from './floor';
 export * from './grid';
 export * from './hallway';
 export * from './identifiable';
