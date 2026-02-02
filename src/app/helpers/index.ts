@@ -15,6 +15,7 @@ export * from './migrate';
 export * from './notify';
 export * from './resources';
 export * from './rng';
+export * from './room-shapes';
 export * from './scheduler';
 export * from './setup';
 export * from './sfx';
