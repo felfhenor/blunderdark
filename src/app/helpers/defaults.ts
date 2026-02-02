@@ -18,6 +18,7 @@ export function defaultGameState(): GameState {
     world: {
       grid: createEmptyGrid(),
       resources: defaultResources(),
+      inhabitants: [],
     },
   };
 }

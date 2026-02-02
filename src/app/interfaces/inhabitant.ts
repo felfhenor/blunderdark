@@ -26,3 +26,13 @@ export type InhabitantDefinition = {
   stats: InhabitantStats;
   traits: InhabitantTrait[];
 };
+
+export type InhabitantState = 'normal' | 'scared' | 'hungry';
+
+export type InhabitantInstance = {
+  instanceId: string;
+  definitionId: string;
+  name: string;
+  state: InhabitantState;
+  assignedRoomId: string | null;
+};
