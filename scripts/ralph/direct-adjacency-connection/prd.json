@@ -1,0 +1,73 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/direct-adjacency-connection",
+  "description": "Direct Adjacency Connection - Allows players to logically link two rooms sharing an edge with a free bidirectional connection represented by a doorway icon, enabling adjacency bonuses and inhabitant movement.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define connection data model and helper functions",
+      "description": "As a developer, I want a connection data structure that stores bidirectional room links so that other systems can query connected rooms.",
+      "acceptanceCriteria": [
+        "A Connection type is defined in src/app/interfaces/ with fields: roomAId (string), roomBId (string), edgeTiles (array of tile coordinates)",
+        "Connections are stored in game state and persist across save/load via IndexedDB",
+        "A helper function getConnectedRooms(roomId: string): string[] returns all connected room IDs",
+        "A helper function areRoomsConnected(roomAId: string, roomBId: string): boolean exists",
+        "Types use type keyword, not interface, per project conventions",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement connection validation logic",
+      "description": "As a developer, I want connection creation to validate adjacency so that invalid connections cannot exist.",
+      "acceptanceCriteria": [
+        "Attempting to connect non-adjacent rooms returns false or throws an error",
+        "Attempting to connect already-connected rooms is a no-op",
+        "Attempting to connect a room to itself is rejected",
+        "Unit tests in src/app/helpers/ cover all validation cases: non-adjacent, already connected, self-connection",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement connect and disconnect UI actions",
+      "description": "As a dungeon builder, I want to connect and disconnect adjacent rooms via the UI so that I can manage room links and reorganize my dungeon.",
+      "acceptanceCriteria": [
+        "A 'Connect' button appears when selecting a room that has adjacent unconnected neighbors",
+        "Clicking the button shows a list of adjacent rooms available for connection",
+        "Selecting a room creates a bidirectional connection stored in game state",
+        "A 'Disconnect' option appears when selecting a room with active connections",
+        "Disconnecting removes the bidirectional link from both rooms",
+        "Adjacency bonuses are recalculated after connect or disconnect",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Render doorway icons on connected edges",
+      "description": "As a dungeon builder, I want to see a doorway icon on the shared edge of connected rooms so that I can visually identify linked rooms.",
+      "acceptanceCriteria": [
+        "A doorway sprite renders on the grid at the shared edge between two connected rooms",
+        "The icon is centered on the shared edge or appears on both sides",
+        "The icon is removed when the connection is severed",
+        "Multiple connections from one room each show their own doorway icon",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

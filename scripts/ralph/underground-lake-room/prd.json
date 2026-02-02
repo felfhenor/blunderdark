@@ -1,0 +1,129 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/underground-lake-room",
+  "description": "Underground Lake room - a Tier 2 T-shaped food production room providing 5 Food/min, +20% humidity aura for adjacent rooms, and three upgrade paths",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Underground Lake Room Definition",
+      "description": "As a developer, I want the Underground Lake defined in YAML gamedata so that it is available through the content pipeline",
+      "acceptanceCriteria": [
+        "An underground-lake.yaml file exists in the appropriate gamedata/ directory",
+        "Fields include: id, name, description, shape (T-shaped tile offsets within 3x3 bounding box), baseProduction, humidityAura, maxInhabitants, baseFearLevel, upgradePaths, adjacencyBonuses",
+        "The YAML compiles to valid JSON via npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "T-Shaped Room Placement",
+      "description": "As a dungeon builder, I want to place the Underground Lake as a T-shaped room on the grid with rotation support",
+      "acceptanceCriteria": [
+        "The Underground Lake occupies a T-shaped set of tiles within a 3x3 area",
+        "The room can be rotated (4 orientations) during placement",
+        "Placement validates that all T-shaped tiles are unoccupied",
+        "The room renders correctly on the grid in all orientations",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Base Food Production via Fishing",
+      "description": "As a dungeon builder, I want the Underground Lake to produce 5 Food per minute so that I can feed my inhabitants",
+      "acceptanceCriteria": [
+        "The Lake produces 5 Food per minute when at least 1 inhabitant is assigned",
+        "Production is added to the Food resource pool via ResourceManager",
+        "Production scales with the number of assigned inhabitants",
+        "Production is visible in the resource display",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Humidity Aura Production Bonus",
+      "description": "As a dungeon builder, I want the Underground Lake to provide a +20% production bonus to adjacent rooms for strategic placement",
+      "acceptanceCriteria": [
+        "All directly adjacent rooms receive a +20% production modifier",
+        "The modifier applies to all production types (Food, Crystals, Gold, etc.)",
+        "The modifier is removed if the Lake is demolished or the adjacency is broken",
+        "The humidity bonus is visible in the affected room's production breakdown",
+        "Multiple Lakes do not stack humidity on the same room",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Inhabitant Capacity and Fear Level",
+      "description": "As a developer, I want the Underground Lake to support 3 inhabitants (5 upgraded) with no base fear",
+      "acceptanceCriteria": [
+        "Base capacity is 3 inhabitants",
+        "After the capacity upgrade, the limit increases to 5",
+        "Base fear level is None (0)",
+        "Current/max inhabitant count is displayed on the room UI",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Upgrade Paths",
+      "description": "As a dungeon builder, I want three mutually exclusive upgrade paths for the Underground Lake",
+      "acceptanceCriteria": [
+        "Deep Fishing: increases base Food production from 5 to 8 per minute, may unlock rare fish catches for bonus resources",
+        "Expanded Lake: increases max inhabitants from 3 to 5, extends humidity aura to rooms 2 tiles away at +10%",
+        "Dark Waters: increases fear level to Low (1), allows the Lake to spawn temporary aquatic defenders during invasions",
+        "Each upgrade has a defined resource cost",
+        "Choosing one path locks out alternatives",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Adjacency Bonuses",
+      "description": "As a dungeon builder, I want the Underground Lake to receive adjacency bonuses from specific room types",
+      "acceptanceCriteria": [
+        "Lake + Mushroom Grove adjacency: +40% Food production for both rooms",
+        "Lake + Alchemy Lab adjacency: +15% conversion speed for the Lab",
+        "Bonuses are defined in gamedata and activate via the adjacency bonus system",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Humidity Aura Visual Indicator",
+      "description": "As a dungeon builder, I want to see which rooms are affected by the humidity aura so I can optimize placement",
+      "acceptanceCriteria": [
+        "Rooms affected by humidity have a visual indicator (e.g., water droplet icon or blue tint)",
+        "Hovering over the Lake highlights all affected adjacent rooms",
+        "The production breakdown for affected rooms shows the humidity bonus as a line item",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

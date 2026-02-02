@@ -1,0 +1,139 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/trap-system",
+  "description": "Trap system for placing traps in hallways to damage, slow, and demoralize invaders with 5+ trap types, crafting, and trigger mechanics",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Trap Data Model",
+      "description": "As a developer, I want a trap data model so that traps can be defined, placed, and tracked",
+      "acceptanceCriteria": [
+        "Create TrapType type with fields: id, name, description, effectType, damage, duration, charges, craftCost, triggerChance, sprite",
+        "Create TrapInstance type with fields: trapTypeId, hallwayId, position, remainingCharges, isArmed",
+        "Trap instances are stored in game state and persisted through save/load",
+        "Types defined in src/app/interfaces/trap.ts",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define Trap Types in YAML",
+      "description": "As a developer, I want 5 trap types defined in YAML gamedata",
+      "acceptanceCriteria": [
+        "Pit Trap: moderate physical damage, 80% trigger, 3 charges, slows for 1 turn",
+        "Arrow Trap: moderate physical damage, 70% trigger, 5 charges",
+        "Rune Trap: magic damage bypassing physical defense, 90% trigger, 2 charges, cannot be disarmed",
+        "Magic Trap: reduces Attack by 30% for 3 turns, 75% trigger, 4 charges",
+        "Fear Glyph: minor damage + -10 morale to invading party, 85% trigger, 3 charges",
+        "All traps defined in gamedata/traps/ YAML files",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Trap Trigger During Invasion",
+      "description": "As a developer, I want traps to trigger when invaders walk over them during an invasion",
+      "acceptanceCriteria": [
+        "When an invader enters a hallway tile with an armed trap, roll trigger chance",
+        "On success: apply trap effects (damage, debuff, morale penalty) and decrement charges",
+        "When charges reach 0, the trap is destroyed and removed from the map",
+        "On failure: trap is not revealed",
+        "Rogue invaders get a 60% chance to disarm instead of trigger (except Rune Traps)",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Trap Crafting in Workshop",
+      "description": "As a player, I want to craft traps in the Trap Workshop room so that I can stock my defenses",
+      "acceptanceCriteria": [
+        "The Trap Workshop room provides a Craft Trap action",
+        "Crafting requires resources defined in the trap's craftCost",
+        "Crafting takes time proportional to trap complexity",
+        "Crafted traps are added to the player's trap inventory",
+        "Workshop inhabitants increase crafting speed",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Trap Inventory Management",
+      "description": "As a player, I want to manage my trap inventory so that I can decide where to place them",
+      "acceptanceCriteria": [
+        "A trap inventory tracks unplaced traps by type and count",
+        "Inventory is displayed in the trap placement UI",
+        "Traps removed from hallways return to inventory",
+        "Inventory persists through save/load",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Trap Placement in Hallways",
+      "description": "As a player, I want to place traps in hallway segments so that invaders encounter them while traversing my dungeon",
+      "acceptanceCriteria": [
+        "Traps can only be placed in hallway tiles, not in rooms",
+        "Each hallway tile supports at most 1 trap",
+        "A placement UI allows selecting a hallway tile and choosing a trap from inventory",
+        "Placed traps are visible on the dungeon map with a trap icon",
+        "Traps can be removed/replaced outside of invasions",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Trap Trigger Visual Feedback",
+      "description": "As a player, I want to see when traps trigger so that I feel rewarded for placing them",
+      "acceptanceCriteria": [
+        "When a trap triggers, show a visual effect on the hallway tile",
+        "Display damage numbers on the affected invader",
+        "Show trap name in the combat/event log",
+        "Destroyed traps show a Trap Destroyed message",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Trap System Unit Tests",
+      "description": "As a developer, I want comprehensive tests for the trap system",
+      "acceptanceCriteria": [
+        "Test: Trap triggers at correct probability",
+        "Test: Trap damage is applied correctly",
+        "Test: Charges decrement on trigger and trap destroyed at 0",
+        "Test: Rogue disarm chance works correctly",
+        "Test: Rune Trap cannot be disarmed by Rogues",
+        "Test: Fear Glyph applies additional morale penalty",
+        "Tests placed in src/app/helpers/trap.spec.ts",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

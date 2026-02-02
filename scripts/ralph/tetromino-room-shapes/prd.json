@@ -1,0 +1,81 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/tetromino-room-shapes",
+  "description": "Room shape data structures defining spatial footprints as relative tile coordinates for 6 shape variants (Square 2x2, 3x3, 4x4, L-shape, T-shape, I-shape)",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define RoomShape Type",
+      "description": "As a developer, I want a RoomShape type that represents a room's spatial footprint so that the placement system can use it for validation and rendering",
+      "acceptanceCriteria": [
+        "A RoomShape type is defined in src/app/interfaces/ with fields: id, name, tiles (Array of {x, y} relative coordinates)",
+        "Relative coordinates use (0,0) as the top-left anchor tile",
+        "The type includes width and height computed from the tiles array for bounding box calculations",
+        "Uses type keyword per project conventions",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define Shape Variants in Gamedata YAML",
+      "description": "As a designer, I want room shapes defined in YAML gamedata so that shapes can be modified without code changes",
+      "acceptanceCriteria": [
+        "A YAML file in gamedata/room/shapes.yml defines all 6 shape variants",
+        "Square 2x2, Square 3x3, Square 4x4, L-shape, T-shape, and I-shape are all defined",
+        "Each shape specifies its relative tile coordinates",
+        "YAML compiles to JSON via npm run gamedata:build without errors",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Load Room Shapes via ContentService",
+      "description": "As a developer, I want room shapes loaded through the existing ContentService so that they are available at runtime",
+      "acceptanceCriteria": [
+        "The build pipeline processes room shape YAML into the compiled JSON output",
+        "ContentService exposes a method or signal to access room shapes (getRoomShape, allRoomShapes)",
+        "Room shapes are available after app initialization completes",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "RoomShape Helper Functions",
+      "description": "As a developer, I want utility functions for working with room shapes so that placement and rendering code is clean and reusable",
+      "acceptanceCriteria": [
+        "A helper function getAbsoluteTiles(shape, anchorX, anchorY) returns absolute grid coordinates",
+        "A helper function getShapeBounds(shape) returns {width, height} of the bounding box",
+        "A helper function shapeFitsInGrid(shape, anchorX, anchorY, gridSize) checks if all tiles are within grid bounds",
+        "Helpers are in src/app/helpers/room-shapes.ts",
+        "Unit tests cover all helpers in src/app/helpers/room-shapes.spec.ts",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Shape Serialization for Save/Load",
+      "description": "As a developer, I want room shapes referenced by ID in save data so that saved dungeons correctly reconstruct room footprints",
+      "acceptanceCriteria": [
+        "Placed rooms in game state store the shapeId not the full shape data",
+        "On load, the shape is resolved from the content data using the stored ID",
+        "If a shape ID is not found, a graceful fallback or error is produced",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

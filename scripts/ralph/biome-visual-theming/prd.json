@@ -1,0 +1,147 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/biome-visual-theming",
+  "description": "Biome Visual Theming - Give each biome a unique visual identity with floor tilesets, color palettes, ambient particles, and UI indicators.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define biome visual data in YAML",
+      "description": "As a content designer, I want each biome's visual properties defined in YAML so that biome visuals are data-driven.",
+      "acceptanceCriteria": [
+        "Biome YAML schema includes: id, name, displayName, colorPalette (primary, secondary, accent, background), tilesetId, ambientParticleType",
+        "At least 4 biomes defined: Volcanic, Flooded, Crystalline, Fungal",
+        "YAML compiles successfully via npm run gamedata:build",
+        "TypeScript types generated via npm run schemas:generate",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create biome tileset assets",
+      "description": "As a developer, I want floor/background tile images for each biome so that the dungeon floor visually represents the biome.",
+      "acceptanceCriteria": [
+        "Tile images created for each biome (at least 1 base tile per biome)",
+        "Tiles placed in gameassets/ and included in sprite atlas generation",
+        "Tiles are seamlessly tileable",
+        "Sprite atlas builds successfully via npm run gamedata:art:spritesheets",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Render biome floor tiles in dungeon view",
+      "description": "As a player, I want the dungeon floor to use biome-specific tilesets so I can visually distinguish biome areas.",
+      "acceptanceCriteria": [
+        "Dungeon rendering reads the biome's tilesetId from content data",
+        "Floor tiles rendered using AtlasImageComponent or equivalent",
+        "Tiles tile seamlessly across the dungeon grid",
+        "Different biome areas show their respective floor tiles",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Apply biome color palette to room UI",
+      "description": "As a player, I want rooms in different biomes to use the biome's color palette for borders, backgrounds, and accents.",
+      "acceptanceCriteria": [
+        "Room components read the biome's color palette from content data",
+        "Room borders use biome primary color, backgrounds use biome background color",
+        "Colors applied via CSS custom properties scoped to biome containers",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Display biome name in game UI",
+      "description": "As a player, I want the current biome name displayed in the game UI so I always know which biome I'm viewing.",
+      "acceptanceCriteria": [
+        "Biome display name shown in a visible location (navbar, sidebar, or breadcrumb)",
+        "Name updates when navigating to a different biome area",
+        "Biome name uses the biome's accent color",
+        "Display is readable at all text scale levels",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement biome ambient particles",
+      "description": "As a player, I want each biome to have subtle ambient particles so environments feel alive.",
+      "acceptanceCriteria": [
+        "Volcanic: orange/red floating embers drifting upward",
+        "Flooded: blue water droplets/bubbles drifting downward",
+        "Crystalline: white/cyan sparkle particles with stationary twinkle",
+        "Fungal: green/yellow spores with slow random drift",
+        "Particles only active for biomes currently visible on screen",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement biome transition visuals",
+      "description": "As a player, I want a smooth visual transition when moving between biome areas.",
+      "acceptanceCriteria": [
+        "Floor tiles crossfade or slide transition when navigating between biomes",
+        "Color palette shifts smoothly via CSS transition on custom properties",
+        "Ambient particles fade out/in between biomes",
+        "Transition duration is 300-500ms",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Ensure biome visuals work with accessibility options",
+      "description": "As a player using colorblind mode or high contrast, I want biome visuals to remain distinguishable.",
+      "acceptanceCriteria": [
+        "Biome color palettes remain distinguishable under all 3 colorblind modes",
+        "Biome names (text labels) provide non-color method of identification",
+        "Floor tilesets have distinct patterns (not just colors)",
+        "High contrast mode does not wash out biome coloring",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Add unit tests for biome content loading",
+      "description": "As a developer, I want tests verifying that biome visual data loads correctly from compiled JSON.",
+      "acceptanceCriteria": [
+        "Test verifies ContentService loads biome data with all required visual fields",
+        "Test verifies each biome has a valid colorPalette with primary, secondary, accent, background",
+        "Test verifies each biome has a tilesetId referencing a valid atlas entry",
+        "Tests pass via npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/merchant-system",
+  "description": "Merchant System - A visiting trader appearing during Harvest season for 3 game days, offering resource trades, rare items, and blueprints from a configurable rotating inventory.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define merchant data types and trade pool in YAML",
+      "description": "As a developer, I want merchant data structures and trade pool defined so that the system is well-typed and data-driven.",
+      "acceptanceCriteria": [
+        "MerchantState type with: isPresent, arrivalDay, departureDayRemaining, inventory (TradeOffer[])",
+        "TradeOffer type with: id, name, description, cost, reward, stock, type ('buy'|'sell'|'special')",
+        "MerchantState added to GameStateWorld for persistence",
+        "Trade pool defined in gamedata/merchant/trades.yaml compiled through pipeline",
+        "Types use type keyword per project conventions",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement merchant arrival, departure, and inventory generation",
+      "description": "As a developer, I want the merchant to arrive at Harvest, generate inventory, and depart after 3 days.",
+      "acceptanceCriteria": [
+        "Merchant arrives when Harvest season begins; isPresent set to true",
+        "Inventory generated: 5-10 trades randomly selected (seeded RNG) with at least 2 resource trades, 2 rare items, 1 special",
+        "Departure countdown set to 3 game days; decrements each day",
+        "When countdown reaches 0, merchant departs and inventory cleared",
+        "Notifications for arrival and departure",
+        "Unit tests verify arrival at Harvest, departure after 3 days",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Create merchant trade UI and transaction execution",
+      "description": "As a player, I want to browse trades and complete transactions with the merchant.",
+      "acceptanceCriteria": [
+        "Merchant UI panel accessible when merchant present, showing trades by category (Buy/Sell/Special)",
+        "Each trade shows name, description, cost, stock; sold-out trades greyed out",
+        "Clicking and confirming deducts cost, grants reward, decrements stock",
+        "Disabled trade button when player lacks resources",
+        "Merchant icon in HUD shows remaining days; clicking opens UI",
+        "Component standalone with OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

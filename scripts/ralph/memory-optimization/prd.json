@@ -1,0 +1,58 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/memory-optimization",
+  "description": "Memory Optimization - Reduces memory footprint via floor data unloading, object pooling, save compression, event history pruning, memory monitoring, and signal cleanup.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement floor data unloading and object pooling",
+      "description": "As a developer, I want unused floor data unloaded and an object pool for frequently created objects to reduce memory usage.",
+      "acceptanceCriteria": [
+        "When player switches floors, previous floor's detailed data serialized to compact format",
+        "Only active floor and one above/below fully loaded; floor summary data remains in memory",
+        "Re-hydration completes in under 100ms per floor",
+        "Generic ObjectPool<T> class in src/app/helpers/object-pool.ts with acquire(), release(), configurable max size",
+        "Pools created for: pathfinding nodes, event objects, particle data",
+        "Unit tests verify unload/reload data integrity and pool behavior",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement save data compression and event history pruning",
+      "description": "As a developer, I want save data compressed and event history bounded to minimize storage and prevent memory growth.",
+      "acceptanceCriteria": [
+        "Save data compressed using LZ-string or pako before IndexedDB storage",
+        "Compression transparent to save/load API; 50%+ size reduction",
+        "Compression adds <100ms to save, decompression <50ms to load",
+        "Event history capped at configurable max (e.g., 1000 entries) with FIFO pruning",
+        "Important events (invasions, victories) flagged and retained longer",
+        "Unit tests verify compression round-trip and pruning behavior",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement memory monitoring and signal cleanup",
+      "description": "As a developer, I want memory monitoring and proper signal cleanup to verify optimization and prevent leaks.",
+      "acceptanceCriteria": [
+        "Memory monitor utility samples performance.memory periodically (Chrome detection for availability)",
+        "Memory growth rate computed and logged in debug mode",
+        "Alert triggers if memory exceeds configurable threshold (e.g., 500MB)",
+        "Components using effect() use DestroyRef for automatic cleanup",
+        "Services clean up intervals/timeouts on destroy",
+        "Route transitions leave no orphaned signal subscriptions",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

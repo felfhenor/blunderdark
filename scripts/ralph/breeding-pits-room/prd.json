@@ -1,0 +1,137 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/breeding-pits-room",
+  "description": "Breeding Pits Room - 3x3 room for hybrid creature creation and mutation experimentation with high fear and adjacency bonuses.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Breeding Pits YAML gamedata",
+      "description": "As a developer, I want the Breeding Pits defined in YAML gamedata.",
+      "acceptanceCriteria": [
+        "A breeding-pits.yaml file exists in gamedata/rooms/",
+        "Fields include: id, name, description, shape (3x3 square), fearLevel (4), maxInhabitants (4), upgradeMaxInhabitants (6), sprite reference",
+        "Room type tag includes: biological, corruption",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define hybrid recipe data in YAML",
+      "description": "As a developer, I want hybrid recipes defined in YAML so that combinations are data-driven.",
+      "acceptanceCriteria": [
+        "A hybrid-recipes.yaml file defines valid creature combinations",
+        "Each recipe specifies: parent1Type, parent2Type, resultType, statBonuses, inheritedTraits",
+        "Invalid combinations (no recipe) are rejected with a message",
+        "At least 5 hybrid recipes are defined",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement hybrid creature creation logic",
+      "description": "As a player, I want to combine two inhabitants to create a hybrid creature.",
+      "acceptanceCriteria": [
+        "Player selects two inhabitants currently assigned to the room",
+        "Hybrid creation consumes both parent inhabitants",
+        "Resulting hybrid has stats derived from both parents (average + bonus)",
+        "Hybrid creature receives one trait from each parent",
+        "Creation takes 5 game-minutes",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement mutation experimentation logic",
+      "description": "As a player, I want to mutate a single inhabitant for random stat changes.",
+      "acceptanceCriteria": [
+        "Player selects one inhabitant assigned to the room",
+        "Mutation outcomes: positive (60%), neutral (25%), negative (15%)",
+        "Positive: +20% to a random stat; Neutral: no change; Negative: -15% to a random stat",
+        "Mutation takes 3 game-minutes",
+        "Each inhabitant can only be mutated once",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Display mutation results",
+      "description": "As a player, I want to see mutation results clearly so I understand the outcome.",
+      "acceptanceCriteria": [
+        "After mutation completes, a result popup shows outcome, stat changed, old/new values",
+        "Mutated inhabitants have a visual indicator (mutation icon)",
+        "Mutation history stored on inhabitant instance",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement adjacency bonuses",
+      "description": "As a developer, I want adjacency bonuses for Spawning Pool, corruption sources, and Library.",
+      "acceptanceCriteria": [
+        "Spawning Pool adjacency: hybrid creation time reduced by 25%",
+        "Corruption adjacency: positive mutation chance increases to 70%, negative decreases to 10%",
+        "Library adjacency: each mutation grants +5 research points, hybrid creation +10 research points",
+        "Bonuses recalculated when rooms are added or removed",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement Breeding Pits UI",
+      "description": "As a player, I want a clear UI for the Breeding Pits showing available actions.",
+      "acceptanceCriteria": [
+        "Clicking the room shows: current inhabitants, available actions (Create Hybrid, Mutate)",
+        "Hybrid creation shows valid combinations from assigned inhabitants",
+        "Invalid combinations grayed out with tooltip",
+        "Active experiments show progress bar and time remaining",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Add Breeding Pits unit tests",
+      "description": "As a developer, I want comprehensive tests for the Breeding Pits mechanics.",
+      "acceptanceCriteria": [
+        "Test: Hybrid creation consumes both parents",
+        "Test: Hybrid stats correctly calculated from parents",
+        "Test: Invalid hybrid combination rejected",
+        "Test: Mutation rates match expectations",
+        "Test: Each inhabitant can only be mutated once",
+        "Test: Adjacency bonuses apply correctly",
+        "Tests in src/app/helpers/rooms/breeding-pits.spec.ts",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/background-music-system",
+  "description": "Background Music System - Expand BGM to support 3-5 tracks tied to game states with seamless looping, crossfading, and volume controls.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define game state to BGM mapping",
+      "description": "As a developer, I want a clear mapping between game states and BGM tracks so that BGMService can automatically select the appropriate music.",
+      "acceptanceCriteria": [
+        "A mapping type/constant defines which BGM track plays for each game state: menu, game-casual, game-threatened, game-explore, and victory",
+        "The BGM type in src/app/interfaces/sfx.ts includes all required track identifiers",
+        "The mapping is documented in code comments",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement game state detection for BGM triggers",
+      "description": "As a developer, I want BGMService to reactively detect the current game state from signals so that it triggers the correct BGM.",
+      "acceptanceCriteria": [
+        "BGMService reads relevant game state signals (invasion active, exploration mode, victory condition)",
+        "Menu/pause state plays menu BGM",
+        "Normal gameplay plays game-casual",
+        "Invasion event plays game-threatened",
+        "Exploration plays game-explore",
+        "Transitions happen via the existing crossfade mechanism",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Improve crossfade implementation",
+      "description": "As a player, I want music transitions to be smooth and seamless so that track changes do not produce jarring audio jumps.",
+      "acceptanceCriteria": [
+        "Crossfade duration is configurable via a constant (default 2 seconds)",
+        "Outgoing track fades out while incoming track fades in simultaneously (true crossfade)",
+        "No audio pops or clicks during transitions",
+        "If the same track is already playing, no crossfade occurs",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Ensure seamless loop points",
+      "description": "As a player, I want background music to loop without audible gaps so that the music feels continuous.",
+      "acceptanceCriteria": [
+        "All BGM tracks are loaded as AudioBuffer and played with loop = true",
+        "Loop points are at the natural start/end of the audio buffer (no silence padding)",
+        "Audio files verified to have clean loop boundaries (no clicks at wrap point)",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Expose volume control in options panel",
+      "description": "As a player, I want a volume slider for background music in the options panel.",
+      "acceptanceCriteria": [
+        "The existing bgmVolume option is exposed as a slider in PanelOptionsUIComponent",
+        "Slider range is 0 to 1 with reasonable step increments",
+        "Changing the slider updates BGM volume in real-time without restarting the track",
+        "A mute toggle (bgmPlay option) is available alongside the volume slider",
+        "Volume setting persists across sessions",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add victory music sting",
+      "description": "As a player, I want a special music track to play when I achieve a victory condition.",
+      "acceptanceCriteria": [
+        "A victory BGM identifier is added to the BGM type",
+        "The victory track plays once (not looping) when a victory condition is met",
+        "After the victory track ends, music returns to the appropriate state BGM",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Add unit tests for BGM state mapping",
+      "description": "As a developer, I want tests verifying the game state to BGM mapping logic.",
+      "acceptanceCriteria": [
+        "Test verifies that menu state maps to menu BGM",
+        "Test verifies that normal gameplay maps to game-casual",
+        "Test verifies that invasion state maps to game-threatened",
+        "Tests pass via npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

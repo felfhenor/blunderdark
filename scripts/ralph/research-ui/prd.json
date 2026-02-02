@@ -1,0 +1,123 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/research-ui",
+  "description": "Research UI providing a visual tech-tree interface to browse, select, and initiate research across three branches (Dark, Arcane, Engineering)",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Research Page Shell",
+      "description": "As a player, I want a dedicated Research page accessible from the game UI so that I can manage my research",
+      "acceptanceCriteria": [
+        "A Research page/component exists at src/app/pages/game-research/",
+        "The page is accessible via a route /game/research with appropriate guards",
+        "The page has a header displaying Research and navigation back to the main game",
+        "The component is standalone with OnPush change detection",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Branch Tab Navigation",
+      "description": "As a player, I want tabs to switch between the three research branches so that I can focus on one branch at a time",
+      "acceptanceCriteria": [
+        "Three tabs are displayed: Dark, Arcane, Engineering",
+        "Clicking a tab switches the displayed research tree to that branch",
+        "The active tab is visually highlighted",
+        "Default tab is the first branch with available research",
+        "Uses Angular Signals for the selected branch state",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Research Node Rendering",
+      "description": "As a player, I want to see research nodes displayed as a visual tree graph so that I understand the research structure",
+      "acceptanceCriteria": [
+        "Each research node is rendered as a card/box with name and icon",
+        "Nodes are positioned in a tree layout with root at top and children below",
+        "Lines/connectors are drawn between parent and child nodes",
+        "Nodes are arranged by tier (depth in the tree)",
+        "The tree is scrollable if it exceeds the viewport",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Node State Visualization",
+      "description": "As a player, I want nodes to be visually distinct based on their state so that I can quickly identify what is available",
+      "acceptanceCriteria": [
+        "Completed nodes have a distinct style with green border and checkmark icon",
+        "Available nodes (prerequisites met) have a highlighted/glowing style",
+        "Locked nodes (prerequisites not met) are dimmed/grayed out",
+        "The active research node has a pulsing or animated border",
+        "Node state is derived from the research state signal using computed()",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Node Detail Panel",
+      "description": "As a player, I want to click a node and see its details so that I can make informed research decisions",
+      "acceptanceCriteria": [
+        "Clicking a node opens a detail panel showing name, description, cost, prerequisites, and unlock effects",
+        "If the node is available, a Start Research button is displayed",
+        "If the node is locked, the panel explains which prerequisites are missing",
+        "If the node is completed, the panel shows Completed with unlock effects active",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Start Research Action",
+      "description": "As a player, I want to click Start Research on an available node so that research begins",
+      "acceptanceCriteria": [
+        "Clicking Start Research deducts the required resources",
+        "The node transitions to in-progress state with a progress bar",
+        "If resources are insufficient, the button is disabled with a tooltip explaining why",
+        "If another research is already active, the button is disabled with a message",
+        "The action updates the research state signal",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Active Research Progress Bar",
+      "description": "As a player, I want to see a progress bar for my current active research so that I know how long until it completes",
+      "acceptanceCriteria": [
+        "A progress bar is displayed on the active research node",
+        "The progress bar shows percentage complete and estimated time remaining",
+        "A summary bar at the top of the Research page shows current research name and progress",
+        "Progress updates reactively as the game tick advances",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

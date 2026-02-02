@@ -1,0 +1,64 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/lich-inhabitant",
+  "description": "Lich Inhabitant - A Tier 2 undead spellcaster with Scholarly (+40% Research), Undead Master, Fearless, and Ancient Knowledge traits, plus special room interactions for Throne Room, Soul Well, and Library.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Lich YAML data with stats and traits",
+      "description": "As a developer, I want the Lich defined in YAML gamedata with complete stats, traits, and room interactions.",
+      "acceptanceCriteria": [
+        "Lich entry in gamedata/inhabitants/ YAML with: id, name, description, sprite reference, tier 2",
+        "Stats: HP (medium), Attack (high magic), Defense (low physical), Speed (low)",
+        "Traits: Scholarly (researchBonus: 0.4), Undead Master, Fearless, Ancient Knowledge",
+        "Scared behavior: unreachable due to Fearless (documented as Arcane Shield)",
+        "Hungry behavior: drains life force from nearby living inhabitants",
+        "Special room interactions: Throne Room (+10% dungeon-wide Research), Soul Well (double Soul Essence), Library (+20% additional Research)",
+        "At least 2 fusion recipes involving the Lich defined",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement Lich trait effects and room bonuses",
+      "description": "As a developer, I want Lich traits to apply their gameplay effects when assigned to rooms.",
+      "acceptanceCriteria": [
+        "Scholarly trait: +40% Research output when assigned to research-producing rooms, stacks additively with other modifiers",
+        "Undead Master: undead inhabitants in same or adjacent rooms gain +1 Attack and +1 Defense, recalculated on assignment changes",
+        "Fearless: Lich never enters Scared state",
+        "Ancient Knowledge: having a Lich reveals one hidden research node per branch in the research tree",
+        "Throne Room assignment provides dungeon-wide +10% Research",
+        "Soul Well assignment doubles Soul Essence generation",
+        "Library assignment grants +20% additional Research (total +60% with Scholarly)",
+        "Effects use computed() signals that recalculate on assignment changes",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Write Lich trait unit tests",
+      "description": "As a developer, I want tests verifying all Lich trait effects.",
+      "acceptanceCriteria": [
+        "Test: 40% research bonus applied in research room",
+        "Test: Undead Master aura applies to undead only in same/adjacent rooms",
+        "Test: Lich never enters Scared state (Fearless)",
+        "Test: Ancient Knowledge reveals hidden research nodes",
+        "Test: Throne Room dungeon-wide +10% Research",
+        "Test: Library total +60% Research (Scholarly + room interaction)",
+        "Tests in src/app/helpers/ spec file",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

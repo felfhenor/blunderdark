@@ -1,3 +1,10 @@
 # Ralph Progress Log
 Started: Mon, Feb  2, 2026  2:24:22 PM
 ---
+
+## resource-manager US-001: Define Resource Types and State [DONE]
+- Created `src/app/interfaces/resource.ts` with `ResourceType`, `ResourceState`, and `ResourceMap` types
+- Expanded `gamedata/currency/base.yml` with all 7 resource types (crystals, food, gold, flux, research, essence, corruption) including UUIDs and default max values
+- Added resource export to interfaces barrel file
+- All tests pass (66/66), no new typecheck errors
+- Commit: 27f7f8a

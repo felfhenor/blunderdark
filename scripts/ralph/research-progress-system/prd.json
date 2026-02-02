@@ -1,0 +1,106 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/research-progress-system",
+  "description": "Research progress system managing tick-based advancement of active research, including speed modifiers, completion, and cancellation",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Start Research",
+      "description": "As a player, I want to start research on an available node so that I can progress through the tech tree",
+      "acceptanceCriteria": [
+        "Starting research requires all prerequisite nodes to be completed",
+        "Starting research deducts the node's cost from the player's resources",
+        "The research state updates to set the active research node ID and progress to 0",
+        "Only one research can be active at a time; starting a new one is blocked if one is already active",
+        "If the player lacks sufficient resources, the start action fails with an error message",
+        "Unit tests verify resource deduction and state update",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Research Tick Advancement",
+      "description": "As a developer, I want research progress to advance with each game tick so that research takes time to complete",
+      "acceptanceCriteria": [
+        "A research progress handler is integrated into the game loop in gameloop.ts",
+        "Each tick advances the active research progress by a calculated amount",
+        "Progress is stored as a number from 0 to the required total, not a percentage",
+        "The base research rate is configurable per node via requiredTicks",
+        "Progress does not advance when the game is paused",
+        "Unit tests verify progress advancement per tick",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Research Speed Modifiers",
+      "description": "As a player, I want Library upgrades and inhabitant bonuses to speed up research so that I can optimize my research strategy",
+      "acceptanceCriteria": [
+        "Research speed is a computed() signal derived from base rate plus modifiers",
+        "Library rooms add a flat research speed bonus (e.g. +10% per Library level)",
+        "Inhabitants with Scholar/Scholarly traits add their research bonus to the modifier",
+        "Modifiers stack additively: base * (1 + sum of bonuses)",
+        "The computed speed updates reactively when modifiers change",
+        "Unit tests verify modifier stacking",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Research Completion",
+      "description": "As a developer, I want research to complete automatically when progress reaches the required amount",
+      "acceptanceCriteria": [
+        "When progress >= requiredTicks, the research is marked as completed",
+        "The node ID is added to the completedNodes array in research state",
+        "The activeResearch is set to null and progress is reset to 0",
+        "A completion event/notification is triggered for the UI",
+        "Unit tests verify completion logic",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Cancel Active Research",
+      "description": "As a player, I want to cancel active research so that I can change my research priorities, accepting that progress is lost",
+      "acceptanceCriteria": [
+        "A cancel action sets activeResearch to null and progress to 0",
+        "Resources spent to start the research are NOT refunded",
+        "Progress is lost entirely with no partial credit",
+        "The node returns to available state and can be researched again",
+        "Unit tests verify cancellation resets state",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Persist Research Progress",
+      "description": "As a player, I want my research progress to be saved so that it survives page reloads and app restarts",
+      "acceptanceCriteria": [
+        "Research state (active node, progress, completed list) is part of GameStateWorld",
+        "State is saved to IndexedDB via indexedDbSignal",
+        "On load, active research resumes from the saved progress",
+        "Completed nodes are restored and reflected in the UI",
+        "Unit tests verify save/load round-trip",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

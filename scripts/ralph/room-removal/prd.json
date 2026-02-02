@@ -1,0 +1,99 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/room-removal",
+  "description": "Room removal system allowing players to demolish placed rooms with partial refund, inhabitant displacement, and altar protection",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Altar Cannot Be Removed",
+      "description": "As a player, I want the altar to be permanently placed so that the core of my dungeon is always present",
+      "acceptanceCriteria": [
+        "The altar room type is flagged as non-removable in its gamedata definition",
+        "The removal validation function checks for this flag and returns an error",
+        "Even if the button is somehow triggered, the backend validation rejects removal",
+        "Unit tests verify altar cannot be removed",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Resource Refund on Removal",
+      "description": "As a developer, I want room removal to refund 50% of the room's original cost so that players recover some resources",
+      "acceptanceCriteria": [
+        "When removal is confirmed, 50% of each resource type used to build the room is added back",
+        "Refund amounts are rounded down (floor) for fractional values",
+        "Refund does not exceed storage limits (excess is lost)",
+        "Unit tests verify correct refund calculation for various room costs",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Clear Grid Tiles on Removal",
+      "description": "As a developer, I want all tiles occupied by a removed room to be cleared so that the space is available for new rooms",
+      "acceptanceCriteria": [
+        "All tiles belonging to the removed room have occupied set to false and roomId set to null",
+        "The room is removed from the GameStateWorld placed rooms list",
+        "The grid visually updates to show the tiles as empty",
+        "Unit tests verify grid state is clean after removal",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Inhabitant Displacement on Removal",
+      "description": "As a developer, I want inhabitants from a removed room to be unassigned so that they return to the available pool",
+      "acceptanceCriteria": [
+        "All inhabitants assigned to the removed room are unassigned and moved to unassigned pool",
+        "Inhabitants are not deleted, only their assignment is cleared",
+        "Production calculations update to reflect the lost assignments",
+        "A notification lists the displaced inhabitants by name",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Room Selection for Removal UI",
+      "description": "As a player, I want to select a placed room and see a removal option so that I can demolish rooms I no longer want",
+      "acceptanceCriteria": [
+        "Clicking on a placed room when not in placement mode opens a room context panel",
+        "The context panel shows room details: name, type, assigned inhabitants",
+        "A Remove Room button is visible in the context panel",
+        "The remove button is disabled for the altar room with tooltip 'Altar cannot be removed'",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Removal Confirmation Dialog",
+      "description": "As a player, I want a confirmation dialog before removing a room so that I don't accidentally demolish important rooms",
+      "acceptanceCriteria": [
+        "Clicking Remove Room shows a confirmation dialog",
+        "Dialog shows: room name, refund amount (50% of cost), and number of displaced inhabitants",
+        "Dialog has Confirm and Cancel buttons",
+        "Pressing Escape or clicking Cancel closes the dialog without removing the room",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

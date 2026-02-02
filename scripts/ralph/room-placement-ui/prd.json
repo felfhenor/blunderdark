@@ -1,0 +1,107 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/room-placement-ui",
+  "description": "Room placement UI allowing players to select room types, preview shapes on the grid, and place rooms with click-to-build interaction",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Room State in Game State",
+      "description": "As a developer, I want placed rooms tracked in the game state so that room data persists across save/load",
+      "acceptanceCriteria": [
+        "A PlacedRoom type is defined with: id, roomTypeId, shapeId, anchorX, anchorY, assignedInhabitants",
+        "Game state (GameStateWorld) includes an array/record of placed rooms",
+        "Placing a room adds it to the game state",
+        "Grid tile roomId references match the placed room IDs",
+        "Save/load correctly preserves and restores all placed rooms",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Room Selection Menu",
+      "description": "As a player, I want a menu showing available room types so that I can choose which room to build",
+      "acceptanceCriteria": [
+        "A room selection panel/sidebar is displayed on the game-play page",
+        "Each room type shows its name, shape preview, and resource cost",
+        "Rooms the player cannot afford are visually dimmed but still visible",
+        "Clicking a room type enters placement mode for that room",
+        "The selected room type is highlighted in the menu",
+        "Component uses OnPush change detection and standalone pattern",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Room Shape Preview on Grid",
+      "description": "As a player, I want to see a ghost preview of the room shape on the grid as I move my mouse so that I can see exactly where the room will be placed",
+      "acceptanceCriteria": [
+        "When in placement mode, a translucent preview of the room shape follows the mouse on the grid",
+        "The preview snaps to tile positions not pixel-level",
+        "Preview uses the validation system: green for valid placement, red for invalid",
+        "Preview is not shown when the mouse is outside the grid area",
+        "Preview updates smoothly without flicker as the mouse moves",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Click to Place Room",
+      "description": "As a player, I want to click to place a room at the previewed location so that I can build my dungeon",
+      "acceptanceCriteria": [
+        "Left-clicking while the preview is green places the room at that position",
+        "Left-clicking while the preview is red shows an error notification and does not place",
+        "Placing a room deducts the resource cost from the player's resources",
+        "Placed room tiles are marked as occupied in the grid state with the room's ID",
+        "After placing, the player remains in placement mode for the same room type for rapid building",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Cancel Placement Mode",
+      "description": "As a player, I want to cancel room placement with Escape or right-click so that I can back out without placing",
+      "acceptanceCriteria": [
+        "Pressing Escape exits placement mode and returns to normal grid interaction",
+        "Right-clicking anywhere exits placement mode",
+        "The ghost preview disappears when placement mode is exited",
+        "The room selection menu deselects the previously selected room type",
+        "No resources are deducted when cancelling",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Placed Room Visual Representation",
+      "description": "As a player, I want placed rooms to be visually distinct on the grid so that I can see my dungeon layout clearly",
+      "acceptanceCriteria": [
+        "Placed rooms are rendered with a distinct fill color or pattern on their tiles",
+        "Room tiles belonging to the same room share a uniform appearance",
+        "Room name or icon is displayed on the room centered on its tiles",
+        "Rooms are visually distinct from empty tiles and from each other",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

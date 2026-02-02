@@ -1,0 +1,117 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/throne-room",
+  "description": "Throne Room - a unique 4x4 room housing a single powerful ruler creature that provides dungeon-wide bonuses based on the seated ruler",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Throne Room YAML Definition",
+      "description": "As a developer, I want the Throne Room defined in YAML gamedata with the unique constraint",
+      "acceptanceCriteria": [
+        "A throne-room.yaml file exists in gamedata/rooms/",
+        "Fields include: id, name, description, shape (4x4 square), maxInhabitants (1), isUnique (true)",
+        "Inhabitant restriction: only creatures tagged as Unique tier can be assigned",
+        "Fear level field is set to variable (derived from ruler)",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Unique Room Enforcement",
+      "description": "As a developer, I want only one Throne Room per dungeon so that it feels special",
+      "acceptanceCriteria": [
+        "The room placement system checks for existing Throne Rooms before allowing placement",
+        "If a Throne Room already exists, the build option is grayed out with an explanatory tooltip",
+        "The uniqueness check is enforced at the data level, not just UI",
+        "Unit test verifies placement is rejected when a Throne Room already exists",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Unique Creature Restriction",
+      "description": "As a player, I want only Unique creatures assignable to the Throne so that the ruler is always exceptional",
+      "acceptanceCriteria": [
+        "The inhabitant assignment UI only shows Unique-tier creatures for the Throne Room",
+        "Non-Unique creatures cannot be assigned even programmatically",
+        "If the current ruler is removed, the Throne Room provides no bonuses",
+        "An empty Throne Room displays a No Ruler state",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Dungeon-Wide Ruler Bonuses",
+      "description": "As a developer, I want ruler-specific dungeon-wide bonuses applied when a creature sits on the throne",
+      "acceptanceCriteria": [
+        "Dragon ruler grants: +10% Attack to all defenders, +5% Fear in all rooms",
+        "Lich ruler grants: +20% research speed, +15% Flux production",
+        "Demon Lord ruler grants: +25% corruption generation, +10% Fear, -10% invader morale",
+        "Bonuses are applied as computed modifiers to relevant signals",
+        "Bonuses are removed when ruler is unassigned",
+        "Unit tests verify each ruler's bonus application and removal",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Variable Fear Level",
+      "description": "As a developer, I want the Throne Room's fear level to depend on the seated ruler",
+      "acceptanceCriteria": [
+        "Empty Throne Room: fear level 1 (low)",
+        "Dragon ruler: fear level 4, Lich ruler: fear level 3, Demon Lord ruler: fear level 5",
+        "Fear level is a computed() signal derived from the current ruler",
+        "Fear integrates with the fear propagation system",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Adjacency Bonuses",
+      "description": "As a developer, I want the Throne Room to benefit from Vault adjacency and central placement",
+      "acceptanceCriteria": [
+        "When adjacent to a Vault, grants additional +5% gold production dungeon-wide",
+        "Central placement (within 5 tiles of floor center) grants +10% to all ruler bonuses",
+        "Bonuses are recalculated when rooms are added or removed",
+        "Unit tests verify adjacency and centrality bonuses",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Throne Room UI",
+      "description": "As a player, I want the Throne Room to have a distinct UI showing the current ruler and bonuses",
+      "acceptanceCriteria": [
+        "Clicking the Throne Room shows: current ruler (or Empty), active bonuses, fear level",
+        "Ruler portrait/sprite is displayed prominently",
+        "Dungeon-wide bonuses are listed with their values",
+        "An Assign Ruler button allows selecting from eligible Unique creatures",
+        "Component uses OnPush change detection",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
