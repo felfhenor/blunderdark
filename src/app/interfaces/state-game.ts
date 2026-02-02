@@ -2,7 +2,11 @@ import type { Branded } from '@interfaces/identifiable';
 
 export type GameId = Branded<string, 'GameId'>;
 
-export interface GameStateWorld {}
+import type { GridState } from '@interfaces/grid';
+
+export interface GameStateWorld {
+  grid: GridState;
+}
 
 export interface GameStateClock {
   numTicks: number;

@@ -7,6 +7,7 @@ export * from './defaults';
 export * from './discord';
 export * from './game-init';
 export * from './gameloop';
+export * from './grid';
 export * from './icons';
 export * from './logging';
 export * from './migrate';

@@ -1,0 +1,35 @@
+:host {
+  @apply block;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  gap: 1px;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1;
+}
+
+.grid-tile {
+  background-color: var(--b3, #2a2a3a);
+  border: 1px solid var(--b2, #1a1a2a);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+
+  &:hover {
+    background-color: var(--p, #4a4a6a);
+    opacity: 0.7;
+  }
+
+  &.occupied {
+    background-color: var(--s, #5a5a8a);
+  }
+
+  &.selected {
+    background-color: var(--p, #4a4a6a);
+    outline: 2px solid var(--pf, #6a6a9a);
+    outline-offset: -2px;
+  }
+}

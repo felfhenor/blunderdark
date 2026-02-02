@@ -1,0 +1,12 @@
+<div class="grid-container">
+  @for (row of grid(); track rowIdx; let rowIdx = $index) {
+    @for (tile of row; track colIdx; let colIdx = $index) {
+      <div
+        class="grid-tile"
+        [class.occupied]="tile.occupied"
+        [class.selected]="isSelected(colIdx, rowIdx)"
+        (click)="onTileClick(colIdx, rowIdx)"
+      ></div>
+    }
+  }
+</div>

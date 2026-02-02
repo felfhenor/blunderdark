@@ -1,3 +1,4 @@
+import { createEmptyGrid } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import type { GameId, GameState, StatBlock } from '@interfaces';
 
@@ -14,7 +15,9 @@ export function defaultGameState(): GameState {
       numTicks: 0,
       lastSaveTick: 0,
     },
-    world: {},
+    world: {
+      grid: createEmptyGrid(),
+    },
   };
 }
 

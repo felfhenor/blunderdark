@@ -8,6 +8,7 @@ export * from './content-trinket';
 export * from './content-weapon';
 export * from './discord';
 export * from './droppable';
+export * from './grid';
 export * from './identifiable';
 export * from './meta';
 export * from './sfx';
