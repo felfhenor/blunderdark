@@ -40,3 +40,14 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added 8 unit tests covering: low below/above threshold, low at zero, low reactivity, full at max, full below max, full at zero, full reactivity
 - All tests pass (90/90), lint passes, no new typecheck errors
 - Commit: e580da0
+
+## resource-manager US-006: Resource Save and Load [DONE]
+- Added `migrateResources(saved)` to `src/app/helpers/resources.ts` — takes a partial ResourceMap from saved state and fills missing resource types with defaults
+- Updated `src/app/helpers/migrate.ts` to call `migrateResources()` during game state migration, ensuring new resource types added in updates get initialized
+- Added 4 unit tests covering: round-trip preservation, missing resource initialization, empty saved state, input immutability
+- All tests pass (94/94), lint passes, no new typecheck errors
+- **Learnings for future iterations:**
+  - `migrateGameState()` uses `merge()` from es-toolkit for general field migration, but resource migration needs explicit handling since `merge()` alone doesn't guarantee the full ResourceMap shape
+  - The `indexedDbSignal` in signal.ts auto-persists on `set()`/`update()` — no manual save needed for normal operations
+  - Resource persistence is already wired via `GameStateWorld.resources` field added in US-002
+- Commit: a78cb81
