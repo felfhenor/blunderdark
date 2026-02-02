@@ -8,3 +8,12 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added resource export to interfaces barrel file
 - All tests pass (66/66), no new typecheck errors
 - Commit: 27f7f8a
+
+## resource-manager US-002: Resource State Signal [DONE]
+- Created `src/app/helpers/resources.ts` with `getResource(type)` and `allResources()` computed signal accessors
+- Added `resources: ResourceMap` field to `GameStateWorld` interface in `src/app/interfaces/state-game.ts`
+- Added `defaultResources()` factory to `src/app/helpers/defaults.ts` with starting values matching currency YAML (all start at 0 current)
+- Updated `worldgenGenerateWorld()` in `worldgen.ts` to include default resources
+- Exported resources helper from barrel file
+- All tests pass (66/66), lint passes, no new typecheck errors
+- Commit: 0b26811
