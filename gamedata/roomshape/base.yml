@@ -1,0 +1,77 @@
+- id: 2af760d1-77ce-4eb7-b045-acad573f8ec2
+  name: Square 2x2
+  width: 2
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+
+- id: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  name: Square 3x3
+  width: 3
+  height: 3
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+
+- id: 635a07d9-11f9-445c-a626-dacd9fbb16bc
+  name: Square 4x4
+  width: 4
+  height: 4
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 3, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 3, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+    - { x: 3, y: 2 }
+    - { x: 0, y: 3 }
+    - { x: 1, y: 3 }
+    - { x: 2, y: 3 }
+    - { x: 3, y: 3 }
+
+- id: 5634b24d-d5dd-4a8f-9877-4393cdc05ffb
+  name: L-Shape
+  width: 3
+  height: 3
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+
+- id: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  name: T-Shape
+  width: 3
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 1, y: 1 }
+
+- id: 9b17bc0c-1b9a-48f2-95e7-cc5b2090c614
+  name: I-Shape
+  width: 1
+  height: 4
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 0, y: 3 }
