@@ -83,3 +83,38 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Created `src/app/helpers/inhabitants.spec.ts` with 9 unit tests covering: add, remove, get all, get by id, get nonexistent, round-trip single, round-trip multiple, missing fields, immutability
 - All tests pass (103/103), lint passes, no new typecheck errors
 - Commit: 639c6af
+
+## tetromino-room-shapes US-001: Define RoomShape Type [DONE]
+- Created `src/app/interfaces/room-shape.ts` with `TileOffset`, `RoomShape` types
+- `RoomShape` has: id, name, tiles (array of `{x, y}` relative coordinates), width, height
+- Exported via barrel at `@interfaces`
+- Commit: 11d68c5
+
+## tetromino-room-shapes US-002: Define Shape Variants in Gamedata YAML [DONE]
+- Created `gamedata/roomshape/base.yml` with 6 shapes: Square 2x2, Square 3x3, Square 4x4, L-Shape, T-Shape, I-Shape
+- Each shape has UUID, name, width, height, and relative tile coordinates
+- Compiles via `npm run gamedata:build` — 6 entries loaded
+- **Learnings:** Created separate `gamedata/roomshape/` folder rather than putting in `gamedata/room/` to avoid mixing with future room definitions (build script merges all files per folder)
+- Commit: 2effb63
+
+## tetromino-room-shapes US-003: Load Room Shapes via ContentService [DONE]
+- Added `'roomshape'` to `ContentType` union in `src/app/interfaces/identifiable.ts`
+- Added `ensureRoomShape` initializer in `src/app/helpers/content-initializers.ts`
+- Created `src/app/helpers/room-shapes.ts` with `allRoomShapes()` and `getRoomShape()` content accessors
+- **Learnings:** ContentType union must include the type for the initializer to work; `ensureContent()` is called during `unfurlAssets()` and crashes if the type is not registered
+- Commit: 318a764
+
+## tetromino-room-shapes US-004: RoomShape Helper Functions [DONE]
+- Added `getAbsoluteTiles(shape, anchorX, anchorY)` — converts relative tiles to absolute grid coordinates
+- Added `getShapeBounds(shape)` — returns width/height bounding box from tiles
+- Added `shapeFitsInGrid(shape, anchorX, anchorY, gridSize)` — checks all tiles within grid bounds
+- Created `src/app/helpers/room-shapes.spec.ts` with 16 unit tests covering all helpers
+- All tests pass (119/119), lint passes
+- Commit: 05e25e3
+
+## tetromino-room-shapes US-005: Shape Serialization for Save/Load [DONE]
+- Added `PlacedRoom` type to `src/app/interfaces/room-shape.ts` with: id, shapeId, anchorX, anchorY
+- Added `resolveRoomShape(placedRoom)` — resolves shape from content by shapeId, returns 1x1 fallback if not found
+- Added 3 tests: JSON round-trip, shapeId-not-full-data verification, fallback on missing shape
+- All tests pass (122/122), lint passes
+- Commit: 485e96a
