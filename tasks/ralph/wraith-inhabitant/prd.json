@@ -1,0 +1,114 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/wraith-inhabitant",
+  "description": "Wraith - a Tier 2 spectral inhabitant with Fearless, Terrifying (+2 Fear), Intangible (50% physical evasion), and Scholar (+20% Research) traits",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Wraith YAML Data",
+      "description": "As a developer, I want the Wraith defined in a YAML data file so that it is compiled into the game content pipeline",
+      "acceptanceCriteria": [
+        "A Wraith entry exists in gamedata/inhabitants/wraith.yaml",
+        "Stats are defined: HP (low), Attack (medium), Defense (low), Speed (high)",
+        "Tier is set to 2",
+        "The entry includes display name, description, and sprite reference",
+        "Traits listed: Inappetent, Fearless, Terrifying, Intangible, Scholar",
+        "Scared and Hungry behaviors are defined (effectively unreachable due to Fearless and Inappetent)",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement Fearless Trait",
+      "description": "As a developer, I want the Fearless trait so that the Wraith is immune to fear effects and never enters the Scared behavior state",
+      "acceptanceCriteria": [
+        "A Fearless trait is defined in the trait system",
+        "Inhabitants with Fearless are immune to all fear-inducing effects",
+        "The Scared behavior state is never entered for Fearless inhabitants",
+        "Unit tests verify Fearless inhabitants ignore fear triggers",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement Terrifying Trait",
+      "description": "As a developer, I want the Terrifying trait to add +2 Fear to any room the Wraith occupies so that invaders are deterred",
+      "acceptanceCriteria": [
+        "A Terrifying trait is defined with a fearBonus: 2 property",
+        "The room's fear level increases by 2 when a Wraith is assigned to it",
+        "The bonus is removed when the Wraith is unassigned from the room",
+        "Unit tests verify the fear bonus is applied and removed correctly",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement Intangible Trait",
+      "description": "As a developer, I want the Intangible trait so that the Wraith has a 50% chance to evade physical attacks during combat",
+      "acceptanceCriteria": [
+        "An Intangible trait is defined with an evadePhysicalChance: 0.5 property",
+        "During combat, physical attacks against the Wraith have a 50% chance to miss",
+        "Magical attacks are not affected by Intangible",
+        "Unit tests verify the evasion logic with mocked random values",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Scholar Trait",
+      "description": "As a developer, I want the Scholar trait to boost Research output by 20% so that Wraiths accelerate research progress",
+      "acceptanceCriteria": [
+        "A Scholar trait is defined with a researchBonus: 0.2 property",
+        "When a Wraith is assigned to a research-producing room, output is multiplied by 1.2",
+        "The bonus stacks correctly with other research modifiers",
+        "Unit tests verify the 20% research bonus",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Special Room Interactions",
+      "description": "As a player, I want Wraiths to provide bonuses in Libraries, Soul Wells, and at night so I can optimize their placement",
+      "acceptanceCriteria": [
+        "When assigned to a Library, the Wraith gains an additional +10% Research bonus (stacks with Scholar for 30% total)",
+        "When assigned to a Soul Well, the Wraith generates bonus Soul Essence",
+        "During night cycles, the Wraith gains +1 Attack and +1 Speed",
+        "Room interaction data is defined in the YAML file",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Define Fusion Options",
+      "description": "As a developer, I want fusion recipes involving the Wraith defined so that players can create hybrid creatures",
+      "acceptanceCriteria": [
+        "At least 2 fusion recipes involving the Wraith are defined in YAML",
+        "Each recipe specifies partner, result, and cost",
+        "Fusion data compiles correctly with npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

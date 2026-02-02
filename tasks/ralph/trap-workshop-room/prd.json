@@ -1,0 +1,113 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/trap-workshop-room",
+  "description": "Trap Workshop room - a Tier 2 2x2 crafting room for creating traps with crafting queue, adjacency bonuses, and three upgrade paths",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Trap Workshop Room Definition",
+      "description": "As a developer, I want the Trap Workshop defined in YAML gamedata so that it is available through the content pipeline",
+      "acceptanceCriteria": [
+        "A trap-workshop.yaml file exists in the appropriate gamedata/ directory",
+        "Fields include: id, name, description, shape (2x2), maxInhabitants, baseFearLevel, trapRecipes, upgradePaths, adjacencyBonuses",
+        "The YAML compiles to valid JSON via npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "2x2 Room Placement",
+      "description": "As a dungeon builder, I want to place the Trap Workshop as a 2x2 square on the grid",
+      "acceptanceCriteria": [
+        "The Trap Workshop occupies a 2x2 square of tiles",
+        "Placement validates all 4 tiles are unoccupied",
+        "Renders correctly on the grid",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Basic Trap Creation",
+      "description": "As a dungeon builder, I want to craft basic traps so that I can defend my dungeon",
+      "acceptanceCriteria": [
+        "At least 3 basic trap types are available (e.g. Spike Trap, Pit Trap, Alarm Trap)",
+        "Each trap has a defined resource cost",
+        "Crafting requires at least 1 inhabitant assigned to the Workshop",
+        "Crafted traps are added to a trap inventory for later placement",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Trap Crafting Queue",
+      "description": "As a dungeon builder, I want to queue multiple trap crafting jobs and see progress",
+      "acceptanceCriteria": [
+        "Multiple trap crafting jobs can be queued",
+        "Each job shows a progress bar or percentage",
+        "Completed traps are automatically added to the trap inventory",
+        "More inhabitants reduce crafting time per trap",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Inhabitant Capacity and Fear Level",
+      "description": "As a developer, I want the Workshop to support 2 inhabitants (4 upgraded) with medium fear",
+      "acceptanceCriteria": [
+        "Base capacity is 2 inhabitants",
+        "After capacity upgrade, limit increases to 4",
+        "Base fear level is Medium (2)",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Upgrade Paths",
+      "description": "As a dungeon builder, I want three mutually exclusive upgrade paths for the Trap Workshop",
+      "acceptanceCriteria": [
+        "Master Trapper: increases capacity to 4 and unlocks 2+ advanced trap types",
+        "Efficient Assembly: reduces all trap crafting costs by 25% and time by 30%",
+        "Enchanted Traps: adds bonus elemental damage to all crafted traps",
+        "Each upgrade has a defined resource cost",
+        "Choosing one path locks out alternatives",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Adjacency Bonuses",
+      "description": "As a dungeon builder, I want the Trap Workshop to receive adjacency bonuses from specific room types",
+      "acceptanceCriteria": [
+        "Workshop + Forge adjacency: +20% trap durability",
+        "Workshop + Alchemy Lab adjacency: traps gain poison effect",
+        "Workshop + Summoning Circle adjacency: unlocks magical trap variants",
+        "Bonuses are defined in gamedata and activate via the adjacency bonus system",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

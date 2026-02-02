@@ -1,0 +1,99 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/time-of-day-system",
+  "description": "24-hour day/night cycle with phases (day, night, dawn, dusk), speed controls, event scheduling, and UI display",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Core Time Signal",
+      "description": "As a developer, I want a time-tracking signal that maintains the current game hour so that other systems can react to time changes",
+      "acceptanceCriteria": [
+        "Create TimeService in src/app/services/ with providedIn: 'root'",
+        "Track currentHour as a signal (0-23, wrapping)",
+        "Track currentDay as a signal (incrementing integer)",
+        "Track currentPhase as a computed signal ('day' | 'night' | 'dawn' | 'dusk')",
+        "Day phase: hours 7-17, Night: 19-5, Dawn: 6, Dusk: 18",
+        "Default speed: 1 real minute = 1 game hour",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Time Progression Integration with Game Loop",
+      "description": "As a developer, I want the time system to advance based on the existing game loop so that time progresses consistently",
+      "acceptanceCriteria": [
+        "Hook into the existing tick-based game loop in gameloop.ts",
+        "Accumulate elapsed real time and convert to game hours based on speed multiplier",
+        "Advance hour when threshold reached, increment day when hour wraps past 23",
+        "Pause time when game loop is paused",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Time Speed Control",
+      "description": "As a player, I want to adjust the speed of time progression so that I can speed through uneventful periods",
+      "acceptanceCriteria": [
+        "Add timeSpeed signal to TimeService with values: 1, 2, 4",
+        "Speed multiplier affects how quickly real time converts to game hours",
+        "At 1x: 1 real minute = 1 game hour; at 4x: 15 real seconds = 1 game hour",
+        "Expose setTimeSpeed(speed) method",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Time Event Scheduler",
+      "description": "As a developer, I want to register callbacks that fire at specific game hours so that other systems can trigger events at particular times",
+      "acceptanceCriteria": [
+        "Add onHour(hour, callback) method that returns an unsubscribe function",
+        "Add onPhaseChange(callback) method",
+        "Callbacks fire when the game clock reaches the specified hour",
+        "Multiple callbacks can be registered for the same hour",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Time Persistence",
+      "description": "As a player, I want the time of day to be saved and restored so that my game continues at the correct time after reloading",
+      "acceptanceCriteria": [
+        "Persist currentHour, currentDay, and timeSpeed to IndexedDB via game state",
+        "Restore time state on game load",
+        "Handle missing time data gracefully (default to hour 0, day 1)",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Time Display in UI",
+      "description": "As a player, I want to see the current time of day displayed in the game UI so I can plan around the day/night cycle",
+      "acceptanceCriteria": [
+        "Time display component showing current hour in 24h format",
+        "Show current phase label (Day, Night, Dawn, Dusk)",
+        "Show current day number",
+        "Component uses OnPush change detection",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

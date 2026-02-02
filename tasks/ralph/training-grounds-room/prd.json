@@ -1,0 +1,114 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/training-grounds-room",
+  "description": "Training Grounds room - a Tier 2 T-shaped combat preparation room granting +1 defense to trained inhabitants with adjacency bonuses",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Training Grounds Room Definition",
+      "description": "As a developer, I want the Training Grounds defined in YAML gamedata so that it is available through the content pipeline",
+      "acceptanceCriteria": [
+        "A training-grounds.yaml file exists in the appropriate gamedata/ directory",
+        "Fields include: id, name, description, shape (T-shaped), trainingEffect, maxInhabitants, baseFearLevel, upgradePaths, adjacencyBonuses",
+        "The YAML compiles to valid JSON via npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "T-Shaped Room Placement",
+      "description": "As a dungeon builder, I want to place the Training Grounds as a T-shaped room on the grid",
+      "acceptanceCriteria": [
+        "The Training Grounds occupies a T-shaped set of tiles",
+        "The room can be rotated (4 orientations) during placement",
+        "Placement validates that all tiles are unoccupied",
+        "Renders correctly on the grid in all orientations",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Combat Training Effect",
+      "description": "As a dungeon builder, I want inhabitants assigned to Training Grounds to gain +1 defense level after training",
+      "acceptanceCriteria": [
+        "Inhabitants assigned gain +1 defense level after a defined training period (e.g. 5 minutes)",
+        "Training progress is visible per inhabitant (progress bar or percentage)",
+        "The defense bonus persists when the inhabitant is reassigned to another room",
+        "Training is one-time per inhabitant and cannot stack",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Training Completion and Queue Management",
+      "description": "As a dungeon builder, I want to see training progress and be notified when training completes",
+      "acceptanceCriteria": [
+        "A notification appears when training completes",
+        "Trained inhabitants show a trained badge or status marker",
+        "Room UI shows assigned inhabitants with training progress",
+        "Already-trained inhabitants are marked differently from those in training",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Inhabitant Capacity and Fear Level",
+      "description": "As a developer, I want the Training Grounds to support 4 inhabitants (6 upgraded) with low fear",
+      "acceptanceCriteria": [
+        "Base capacity is 4 inhabitants",
+        "After capacity upgrade, limit increases to 6",
+        "Base fear level is Low (1)",
+        "Fear level integrates with the fear tracking system",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Upgrade Paths",
+      "description": "As a dungeon builder, I want three mutually exclusive upgrade paths for the Training Grounds",
+      "acceptanceCriteria": [
+        "Elite Training: grants +1 attack in addition to +1 defense, with slightly increased training time",
+        "Mass Training: increases capacity from 4 to 6 and reduces training time by 30%",
+        "Specialized Drills: grants a random bonus trait from a defined pool to trained inhabitants",
+        "Each upgrade has a defined resource cost",
+        "Choosing one path locks out alternatives",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Adjacency Bonuses",
+      "description": "As a dungeon builder, I want the Training Grounds to receive adjacency bonuses from specific room types",
+      "acceptanceCriteria": [
+        "Training Grounds + Barracks adjacency: -20% training time",
+        "Training Grounds + Forge adjacency: trained inhabitants gain +1 equipment slot",
+        "Training Grounds + Altar adjacency: +1 bonus to all trained stats",
+        "Bonuses are defined in gamedata and activate via the adjacency bonus system",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

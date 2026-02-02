@@ -1,0 +1,126 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/soul-well-room",
+  "description": "Soul Well room - a 3x3 Tier 1 advanced room with dual modes (Skeleton production or Corruption-to-Essence conversion), high fear, and Corruption spread",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Soul Well Room Definition",
+      "description": "As a developer, I want the Soul Well defined in YAML gamedata so that it is available through the content pipeline",
+      "acceptanceCriteria": [
+        "A soul-well.yaml file exists in the appropriate gamedata/ directory",
+        "Fields include: id, name, description, shape (3x3), productionModes, maxInhabitants, baseFearLevel, upgradePaths, adjacencyEffects",
+        "The YAML compiles to valid JSON via npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "3x3 Room Placement",
+      "description": "As a dungeon builder, I want to place the Soul Well as a 3x3 square on the grid",
+      "acceptanceCriteria": [
+        "The Soul Well occupies a 3x3 square of tiles (9 tiles total)",
+        "Placement validates all 9 tiles are unoccupied",
+        "Renders correctly on the grid with the Soul Well sprite",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Skeleton Production Mode",
+      "description": "As a dungeon builder, I want the Soul Well to produce Skeletons periodically so that I can grow my undead workforce",
+      "acceptanceCriteria": [
+        "In Skeleton mode, produces 1 Skeleton every 3 minutes",
+        "Skeleton is created as a full inhabitant entity with undead type",
+        "A countdown timer is visible on the room",
+        "Skeletons appear in the unassigned inhabitant pool",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Corruption-to-Essence Conversion Mode",
+      "description": "As a dungeon builder, I want the Soul Well to convert Corruption into Essence as an alternative production mode",
+      "acceptanceCriteria": [
+        "In Conversion mode, consumes Corruption resource and produces Essence",
+        "Conversion rate is defined in gamedata (e.g. 10 Corruption = 1 Essence per min)",
+        "Mode requires at least 1 inhabitant assigned",
+        "If Corruption runs out, conversion pauses",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Production Mode Toggle",
+      "description": "As a dungeon builder, I want to switch between Skeleton and Conversion modes so that I can adapt to my current needs",
+      "acceptanceCriteria": [
+        "The room UI shows the current mode and a toggle button",
+        "Switching modes resets any in-progress timer/conversion",
+        "Only one mode is active at a time",
+        "Mode persists across save/load",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "High Fear Level and Corruption Spread",
+      "description": "As a developer, I want the Soul Well to have high base fear and spread Corruption to adjacent rooms",
+      "acceptanceCriteria": [
+        "Base fear level is High (3)",
+        "Fear affects inhabitant willingness to work nearby",
+        "Adjacent rooms gain a Corruption modifier when the Soul Well is active",
+        "Corruption spread amount is defined in gamedata",
+        "Spread updates when the Soul Well is placed or removed",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Upgrade Path - Necrotic Enhancement",
+      "description": "As a dungeon builder, I want an upgrade that improves Skeleton production",
+      "acceptanceCriteria": [
+        "Upgrade reduces Skeleton spawn time (e.g. 3 min to 2 min)",
+        "May also increase inhabitant capacity from 2 to 3",
+        "Mutually exclusive with other path",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Upgrade Path - Essence Mastery",
+      "description": "As a dungeon builder, I want an upgrade that improves Corruption-to-Essence conversion",
+      "acceptanceCriteria": [
+        "Upgrade increases conversion rate or efficiency",
+        "May reduce Corruption spread as a side effect",
+        "Mutually exclusive with other path",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/tutorial-sequence",
+  "description": "Interactive tutorial sequence guiding new players through room placement, resources, inhabitants, and connections with skip and replay support",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Tutorial State Management",
+      "description": "As a developer, I want tutorial state tracked so that the game knows whether to show the tutorial and which step the player is on",
+      "acceptanceCriteria": [
+        "A TutorialState type tracks: isComplete, isSkipped, currentStep, hasSeenTutorial",
+        "Tutorial state is persisted via localStorageSignal",
+        "On first launch, hasSeenTutorial is false",
+        "Completing or skipping sets isComplete or isSkipped to true",
+        "Unit tests verify state transitions",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Tutorial Trigger on First Launch",
+      "description": "As a new player, I want the tutorial to start automatically when I first play the game",
+      "acceptanceCriteria": [
+        "When the player reaches the game-play page with hasSeenTutorial: false, the tutorial starts",
+        "The tutorial overlay appears with a welcome message and Start Tutorial / Skip buttons",
+        "Choosing Start Tutorial begins Step 1",
+        "Choosing Skip marks the tutorial as skipped and proceeds to free play",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Step 1 - Room Placement",
+      "description": "As a new player, I want to learn how to place a room so that I can start building my dungeon",
+      "acceptanceCriteria": [
+        "A tooltip highlights the room placement button/area",
+        "Tutorial text explains how to select and place a room",
+        "The player must place at least one room to advance",
+        "Other UI elements are dimmed or disabled during this step",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Step 2 - Resource Generation",
+      "description": "As a new player, I want to learn about resource generation so that I understand how rooms produce resources",
+      "acceptanceCriteria": [
+        "A tooltip points to the resource display",
+        "The player must wait for at least one resource tick to see generation",
+        "After a resource tick, the tutorial highlights changed values and advances",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Step 3 - Inhabitants",
+      "description": "As a new player, I want to learn about inhabitants so that I understand dungeon population",
+      "acceptanceCriteria": [
+        "The tutorial provides a free starting inhabitant",
+        "A tooltip highlights the inhabitant assignment area",
+        "The player must assign the inhabitant to a room to advance",
+        "After assignment, the tutorial shows the production increase",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Step 4 - Connections",
+      "description": "As a new player, I want to learn about room connections so that I understand how rooms link together",
+      "acceptanceCriteria": [
+        "The tutorial prompts the player to place a second room",
+        "A tooltip highlights the hallway/connection tool",
+        "The player must create a connection between two rooms to advance",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Tutorial Completion, Skip, and Replay",
+      "description": "As a player, I want to complete, skip, or replay the tutorial at any time",
+      "acceptanceCriteria": [
+        "After completing all steps, a summary overlay recaps key concepts with a Start Playing button",
+        "A Skip Tutorial button is visible during all tutorial steps",
+        "A Replay Tutorial button exists in the settings/options menu",
+        "Replay resets tutorial state and starts from Step 1 without affecting game state",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

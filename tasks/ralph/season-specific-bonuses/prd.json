@@ -1,0 +1,117 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/season-specific-bonuses",
+  "description": "Season-specific global bonuses affecting resource production, recruitment, and generation rates for each of the four seasons",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Season Bonus Data",
+      "description": "As a developer, I want season bonuses defined in a data structure so that they are configurable and data-driven",
+      "acceptanceCriteria": [
+        "A SeasonBonus type is defined with fields: season, modifiers (array of stat/production modifiers), description",
+        "Season bonuses are defined in YAML in gamedata/seasons/bonuses.yaml",
+        "Each season has its specific modifiers listed",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Season Bonus Modifier Integration",
+      "description": "As a developer, I want season bonuses to integrate with the global modifier system so that they stack correctly with other bonuses",
+      "acceptanceCriteria": [
+        "Season bonuses are applied through a centralized modifier aggregation system",
+        "Season bonuses stack additively with other modifiers (inhabitant traits, room upgrades)",
+        "When a season ends, its bonuses are cleanly removed from the modifier system",
+        "No residual bonuses carry over between seasons",
+        "The modifier system uses computed() signals for reactive updates",
+        "Unit tests verify correct stacking behavior",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement Growth Season Bonuses",
+      "description": "As a player, I want Growth season to boost my food production and reduce recruitment costs",
+      "acceptanceCriteria": [
+        "During Growth, all Food production rooms output 50% more Food",
+        "During Growth, inhabitant recruitment costs are reduced by 25%",
+        "Bonuses activate at the start of Growth and deactivate at the end",
+        "Unit tests verify the +50% Food modifier is applied",
+        "Unit tests verify the -25% recruitment cost modifier is applied",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement Harvest Season Bonuses",
+      "description": "As a player, I want Harvest season to boost all production and enable merchant visits",
+      "acceptanceCriteria": [
+        "During Harvest, all resource production is increased by 20%",
+        "The merchant visit flag is set to true during Harvest",
+        "Bonuses activate at the start of Harvest and deactivate at the end",
+        "Unit tests verify the +20% all-production modifier",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Darkness Season Bonuses",
+      "description": "As a player, I want Darkness season to amplify Corruption generation and dark creature spawning",
+      "acceptanceCriteria": [
+        "During Darkness, Corruption generation is increased by 100% (doubled)",
+        "During Darkness, dark creature spawn rates increase by 50%",
+        "Bonuses activate at the start of Darkness and deactivate at the end",
+        "Unit tests verify the +100% Corruption modifier",
+        "Unit tests verify the +50% dark creature spawn modifier",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement Storms Season Bonuses",
+      "description": "As a player, I want Storms season to boost Flux generation and enable random events",
+      "acceptanceCriteria": [
+        "During Storms, Flux generation is increased by 80%",
+        "The random events flag is set to true during Storms",
+        "Bonuses activate at the start of Storms and deactivate at the end",
+        "Unit tests verify the +80% Flux modifier",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Display Active Bonuses in UI",
+      "description": "As a player, I want to see what bonuses the current season provides so that I can make strategic decisions",
+      "acceptanceCriteria": [
+        "The season indicator shows active bonuses when hovered or clicked",
+        "Each bonus is displayed with its effect (e.g. +50% Food Production)",
+        "Bonuses use color coding (green for positive, red for negative/costs)",
+        "The tooltip or panel updates when the season changes",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

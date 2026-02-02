@@ -1,0 +1,134 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/victory-path-implementation",
+  "description": "Five distinct victory paths with specific conditions, evaluation engine, victory screen, and YAML gamedata definitions",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Victory Path Data Types",
+      "description": "As a developer, I want victory path data types so that conditions, progress, and completion are well-typed",
+      "acceptanceCriteria": [
+        "A VictoryPath type is defined with: id, name, description, conditions: VictoryCondition[]",
+        "A VictoryCondition type is defined with: id, description, checkType (resource threshold, flag, duration, count), target, currentValue",
+        "A VictoryProgress type maps each path ID to its condition progress",
+        "Types use type keyword per project conventions",
+        "Types are defined in src/app/interfaces/",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Victory Gamedata Definitions",
+      "description": "As a developer, I want victory paths defined in YAML so that conditions can be tuned without code changes",
+      "acceptanceCriteria": [
+        "A victory/ directory in gamedata/ contains YAML definitions for all 5 paths",
+        "Each path defines: id, name, description, conditions with check types and target values",
+        "The build pipeline compiles and validates victory YAML via npm run gamedata:build",
+        "TypeScript schemas are generated for victory data",
+        "ContentService loads victory path data at app init",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Terror Lord Victory Path",
+      "description": "As a player pursuing the Terror Lord path, I want to win by amassing Corruption, defending invasions, reaching deep floors, and summoning a Demon Lord",
+      "acceptanceCriteria": [
+        "Conditions: 500+ Corruption, 10+ successful invasion defenses, Floor 10+ reached, Demon Lord inhabitant present",
+        "Each condition is independently tracked and updates in real time",
+        "Condition check functions correctly evaluate game state",
+        "Unit tests verify each condition check at boundary values",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Dragon's Hoard Victory Path",
+      "description": "As a player pursuing the Dragon's Hoard path, I want to win by hoarding Gold, building key rooms, recruiting a Dragon, and maintaining peace",
+      "acceptanceCriteria": [
+        "Conditions: 10,000+ Gold, Throne Room + Dragon Lair built, Dragon inhabitant present, 30+ consecutive peaceful days",
+        "Consecutive peaceful days resets to 0 on any invasion",
+        "Peaceful day counter increments at each day transition",
+        "Unit tests verify Gold threshold, room checks, Dragon check, and peaceful day tracking",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Mad Scientist Victory Path",
+      "description": "As a player pursuing the Mad Scientist path, I want to win by completing all research, creating hybrids, building Breeding Pits, and creating a Perfect Creature",
+      "acceptanceCriteria": [
+        "Conditions: All research completed, 5+ hybrid creatures, 3+ Breeding Pit rooms, Perfect Creature created",
+        "Research completion checks against the total research tree",
+        "Hybrid creature count tracks unique hybrids created",
+        "Perfect Creature is a special hybrid requiring specific ingredients defined in gamedata",
+        "Unit tests verify each condition check",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Harmonious Kingdom and Eternal Empire Victory Paths",
+      "description": "As a developer, I want the remaining two victory paths implemented with their condition checks",
+      "acceptanceCriteria": [
+        "Harmonious Kingdom conditions: 0 Corruption for 30+ consecutive days, 50+ inhabitants, 7+ floors, Legendary Harmony reputation",
+        "Zero Corruption days resets if Corruption rises above 0",
+        "Eternal Empire conditions: Day 365+ reached, all resource types positive, 3+ Unique inhabitants, 100+ rooms",
+        "All resources positive checks every resource type is above 0 at evaluation time",
+        "Unit tests verify each condition check for both paths",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Victory Condition Evaluation Engine",
+      "description": "As a developer, I want a centralized engine that evaluates all victory conditions so that victory is detected promptly",
+      "acceptanceCriteria": [
+        "A VictoryService evaluates all paths' conditions at a regular interval (every 60 ticks)",
+        "The service exposes isPathComplete(pathId) and getProgress(pathId) methods",
+        "When any path is complete, a victoryAchieved signal is set with the winning path",
+        "Evaluation is efficient (no redundant state scans)",
+        "Unit tests verify detection of victory when all conditions are met",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Victory Screen",
+      "description": "As a player, I want to see a victory screen when I complete a victory path so that the achievement is celebrated",
+      "acceptanceCriteria": [
+        "When victoryAchieved signal fires, the game pauses and navigates to a victory screen",
+        "The victory screen shows: path name, path description, all conditions with checkmarks",
+        "The screen shows total play time and key statistics",
+        "Options: Continue Playing (return to game) or Return to Menu",
+        "The victory is recorded in game state (can view past victories)",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

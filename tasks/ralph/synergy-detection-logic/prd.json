@@ -1,0 +1,92 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/synergy-detection-logic",
+  "description": "Synergy detection system evaluating complex multi-factor conditions involving rooms, inhabitants, and connections with caching and reactive updates",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Synergy Condition Definitions",
+      "description": "As a developer, I want synergy conditions defined as data so that new synergies can be added declaratively",
+      "acceptanceCriteria": [
+        "A Synergy type is defined with id, name, conditions, effects, and description fields",
+        "Conditions support: room type check, inhabitant type check, adjacency check, connection check",
+        "A registry of all synergies exists (data-driven, in YAML or constants)",
+        "At least 5 example synergies are defined",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Active Synergy Tracking",
+      "description": "As a developer, I want active synergies tracked per room so that the UI and production systems can easily access them",
+      "acceptanceCriteria": [
+        "Each room in the game state has an activeSynergies: string[] field",
+        "A function getActiveSynergies(roomId) returns full synergy objects",
+        "Active synergies persist across save/load",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Synergy Evaluation on Room Placement",
+      "description": "As the system, I want synergies evaluated whenever a room is placed so that new synergies activate immediately",
+      "acceptanceCriteria": [
+        "When a room is placed, all synergies involving that room type are checked",
+        "Synergies that now meet all conditions are activated and stored in game state",
+        "Adjacent rooms are also re-evaluated for synergies that involve the new room",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Synergy Evaluation on Inhabitant Assignment",
+      "description": "As the system, I want synergies re-evaluated when inhabitants are assigned or removed so that inhabitant-dependent synergies stay accurate",
+      "acceptanceCriteria": [
+        "Assigning an inhabitant triggers synergy re-evaluation for that room",
+        "Removing an inhabitant triggers synergy re-evaluation for that room",
+        "Synergies requiring specific inhabitant types activate/deactivate correctly",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Synergy Evaluation on Connection Changes",
+      "description": "As the system, I want synergies re-evaluated when rooms are connected or disconnected",
+      "acceptanceCriteria": [
+        "Connecting two rooms triggers synergy re-evaluation for both rooms",
+        "Disconnecting rooms triggers synergy re-evaluation for both rooms",
+        "Synergies requiring connected rooms activate/deactivate correctly",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Synergy Result Caching",
+      "description": "As a developer, I want synergy evaluation results cached so that repeated queries do not re-evaluate conditions unnecessarily",
+      "acceptanceCriteria": [
+        "Synergy results are cached per room",
+        "Cache is invalidated when relevant state changes (room placement, inhabitant change, connection change)",
+        "Cache invalidation is scoped: only affected rooms are re-evaluated, not the entire dungeon",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/shadow-library-room",
+  "description": "Shadow Library room - a Tier 1 L-shaped research room producing Research points with 3 upgrade paths and adjacency bonuses",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Shadow Library Room Definition",
+      "description": "As a developer, I want the Shadow Library defined in YAML gamedata so that it is available through the content pipeline",
+      "acceptanceCriteria": [
+        "A shadow-library.yaml file exists in the appropriate gamedata/ directory",
+        "Fields include: id, name, description, shape, baseTiles, baseProduction, maxInhabitants, baseFearLevel, upgradePaths",
+        "The shape is L-shaped",
+        "Base fear level is Medium (2)",
+        "The YAML compiles to valid JSON via npm run gamedata:build",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "L-Shaped Room Placement",
+      "description": "As a dungeon builder, I want to place the Shadow Library as an L-shaped room on the grid",
+      "acceptanceCriteria": [
+        "The Shadow Library occupies an L-shaped set of tiles",
+        "The room can be rotated (4 orientations) during placement",
+        "Placement validates that all tiles are unoccupied",
+        "Renders correctly on the grid",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Base Research Production",
+      "description": "As a dungeon builder, I want the Shadow Library to produce 3 Research per minute so that I can unlock upgrades",
+      "acceptanceCriteria": [
+        "The Library produces 3 Research per minute when 1 inhabitant is assigned",
+        "Production is added to the Research resource pool via ResourceManager",
+        "Production is visible in the resource display",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Limited Inhabitant Capacity",
+      "description": "As a dungeon builder, I want the Shadow Library to hold only 1 inhabitant (3 when upgraded) reflecting its specialized nature",
+      "acceptanceCriteria": [
+        "Base capacity is 1 inhabitant",
+        "Attempting to assign a 2nd inhabitant is rejected with feedback",
+        "After capacity upgrade, limit increases to 3",
+        "Current/max count displayed on room UI",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Medium Fear Level",
+      "description": "As a developer, I want the Shadow Library to have medium base fear reflecting its dark scholarly atmosphere",
+      "acceptanceCriteria": [
+        "Base fear level is Medium (2)",
+        "Fear level is included in the gamedata definition",
+        "Some inhabitants may refuse to work here due to fear threshold",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Upgrade Path - Arcane Focus",
+      "description": "As a dungeon builder, I want a research-boosting upgrade path for the Shadow Library",
+      "acceptanceCriteria": [
+        "Upgrade significantly increases Research production (e.g. +75%)",
+        "Upgrade has a defined resource cost",
+        "Mutually exclusive with other paths at this tier",
+        "Effect applies immediately",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Upgrade Path - Expanded Archives",
+      "description": "As a dungeon builder, I want a capacity upgrade for the Shadow Library",
+      "acceptanceCriteria": [
+        "Upgrade increases max inhabitants from 1 to 3",
+        "Upgrade has a defined resource cost",
+        "Mutually exclusive with other paths at this tier",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Upgrade Path - Forbidden Knowledge",
+      "description": "As a dungeon builder, I want a specialization upgrade with unique effects for the Shadow Library",
+      "acceptanceCriteria": [
+        "Upgrade provides a unique effect such as increased fear with greatly boosted production",
+        "Upgrade has a defined resource cost",
+        "Mutually exclusive with other paths at this tier",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Adjacency Bonuses",
+      "description": "As a dungeon builder, I want the Shadow Library to benefit from adjacency with complementary rooms",
+      "acceptanceCriteria": [
+        "Library + Mine adjacency provides a defined bonus (e.g. +15% to both)",
+        "Library + Library adjacency provides a defined bonus (e.g. +20% Research each)",
+        "Bonuses activate via the adjacency bonus system",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

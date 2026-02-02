@@ -1,0 +1,90 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/visual-time-indicators",
+  "description": "Visual time-of-day feedback with clock UI, phase-based background styling, sun/moon icons, time speed controls, and accessibility text",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Clock UI Component",
+      "description": "As a player, I want to see a clock displaying the current game hour so I always know what time it is in the game",
+      "acceptanceCriteria": [
+        "Create TimeClockComponent displaying the current hour (0-23) in a readable format",
+        "Show the hour as a circular or linear clock face",
+        "Update in real time as the game clock advances",
+        "Position in a consistent, non-obstructive location in the game UI",
+        "Component uses OnPush change detection",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Phase-Based Background Styling",
+      "description": "As a player, I want the game background to change based on the time of day so I can visually distinguish day from night",
+      "acceptanceCriteria": [
+        "Day phase: Bright, warm-toned background or overlay",
+        "Night phase: Dark, cool-toned background or overlay",
+        "Dawn: Gradual transition from dark to bright (warm orange tint)",
+        "Dusk: Gradual transition from bright to dark (purple/red tint)",
+        "Transitions use CSS animations for smoothness (no abrupt changes)",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Sun/Moon Icon Display",
+      "description": "As a player, I want to see a sun or moon icon reflecting the current time of day for an at-a-glance phase indicator",
+      "acceptanceCriteria": [
+        "Show sun icon during day phase",
+        "Show moon icon during night phase",
+        "Show transitional icon (half sun/moon) during dawn and dusk",
+        "Icon positioned near the clock UI",
+        "Icon changes smoothly (fade or morph transition)",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Time Speed Indicator and Controls",
+      "description": "As a player, I want to see the current time speed and have controls to change it so I can control the pace of the game",
+      "acceptanceCriteria": [
+        "Display current speed multiplier (1x, 2x, 4x) near the clock",
+        "Provide clickable buttons or toggle to cycle through speed options",
+        "Active speed is visually highlighted",
+        "Speed change takes effect immediately",
+        "Component uses OnPush change detection",
+        "Verify in browser using dev-browser skill",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Accessibility Considerations",
+      "description": "As a player with visual impairments, I want time information conveyed through text as well as visual effects",
+      "acceptanceCriteria": [
+        "Clock displays numeric hour alongside any visual clock face",
+        "Phase name is displayed as text (not just color changes)",
+        "Speed indicator uses text labels alongside icons",
+        "All interactive elements have appropriate ARIA labels",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
