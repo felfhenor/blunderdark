@@ -14,6 +14,7 @@ export * from './inhabitants';
 export * from './logging';
 export * from './migrate';
 export * from './notify';
+export * from './reputation';
 export * from './resources';
 export * from './rng';
 export * from './room-placement';

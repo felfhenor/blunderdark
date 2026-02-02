@@ -15,6 +15,7 @@ export * from './hallway';
 export * from './identifiable';
 export * from './inhabitant';
 export * from './meta';
+export * from './reputation';
 export * from './research';
 export * from './resource';
 export * from './room-shape';

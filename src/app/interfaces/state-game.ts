@@ -6,6 +6,7 @@ import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { ResearchState } from '@interfaces/research';
+import type { ReputationState } from '@interfaces/reputation';
 import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
 
@@ -16,6 +17,7 @@ export interface GameStateWorld {
   hallways: Hallway[];
   season: SeasonState;
   research: ResearchState;
+  reputation: ReputationState;
 }
 
 export interface GameStateClock {

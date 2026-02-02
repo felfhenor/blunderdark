@@ -3,6 +3,7 @@ import { rngUuid } from '@helpers/rng';
 import type {
   GameId,
   GameState,
+  ReputationState,
   ResearchState,
   ResourceMap,
   SeasonState,
@@ -29,6 +30,7 @@ export function defaultGameState(): GameState {
       hallways: [],
       season: defaultSeasonState(),
       research: defaultResearchState(),
+      reputation: defaultReputationState(),
     },
   };
 }
@@ -38,6 +40,16 @@ export function defaultSeasonState(): SeasonState {
     currentSeason: 'growth',
     dayInSeason: 1,
     totalSeasonCycles: 0,
+  };
+}
+
+export function defaultReputationState(): ReputationState {
+  return {
+    terror: 0,
+    wealth: 0,
+    knowledge: 0,
+    harmony: 0,
+    chaos: 0,
   };
 }
 
