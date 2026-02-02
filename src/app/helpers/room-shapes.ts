@@ -2,6 +2,7 @@ import { getEntriesByType, getEntry } from '@helpers/content';
 import type {
   GRID_SIZE,
   IsContentItem,
+  PlacedRoom,
   RoomShape,
   TileOffset,
 } from '@interfaces';
@@ -56,4 +57,16 @@ export function shapeFitsInGrid(
     (tile) =>
       tile.x >= 0 && tile.x < gridSize && tile.y >= 0 && tile.y < gridSize,
   );
+}
+
+const FALLBACK_SHAPE: RoomShape = {
+  id: 'fallback',
+  name: 'Fallback',
+  tiles: [{ x: 0, y: 0 }],
+  width: 1,
+  height: 1,
+};
+
+export function resolveRoomShape(placedRoom: PlacedRoom): RoomShape {
+  return getRoomShape(placedRoom.shapeId) ?? FALLBACK_SHAPE;
 }

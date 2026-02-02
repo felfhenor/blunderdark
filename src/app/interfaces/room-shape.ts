@@ -10,3 +10,10 @@ export type RoomShape = {
   width: number;
   height: number;
 };
+
+export type PlacedRoom = {
+  id: string;
+  shapeId: string;
+  anchorX: number;
+  anchorY: number;
+};

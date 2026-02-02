@@ -1,9 +1,10 @@
-import type { RoomShape } from '@interfaces';
+import type { PlacedRoom, RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import {
   getAbsoluteTiles,
   getShapeBounds,
+  resolveRoomShape,
   shapeFitsInGrid,
 } from '@helpers/room-shapes';
 
@@ -141,5 +142,52 @@ describe('shapeFitsInGrid', () => {
   it('should handle L-shape at corner', () => {
     expect(shapeFitsInGrid(lShape, 17, 17, gridSize)).toBe(true);
     expect(shapeFitsInGrid(lShape, 18, 18, gridSize)).toBe(false);
+  });
+});
+
+describe('PlacedRoom serialization', () => {
+  it('should be JSON-serializable and round-trip correctly', () => {
+    const placed: PlacedRoom = {
+      id: 'room-001',
+      shapeId: 'test-2x2',
+      anchorX: 5,
+      anchorY: 3,
+    };
+
+    const json = JSON.stringify(placed);
+    const parsed = JSON.parse(json) as PlacedRoom;
+
+    expect(parsed.id).toBe('room-001');
+    expect(parsed.shapeId).toBe('test-2x2');
+    expect(parsed.anchorX).toBe(5);
+    expect(parsed.anchorY).toBe(3);
+  });
+
+  it('should store shapeId not full shape data', () => {
+    const placed: PlacedRoom = {
+      id: 'room-001',
+      shapeId: 'test-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+
+    const json = JSON.stringify(placed);
+    expect(json).not.toContain('tiles');
+    expect(json).toContain('shapeId');
+  });
+});
+
+describe('resolveRoomShape', () => {
+  it('should return fallback shape when shape ID is not found in content', () => {
+    const placed: PlacedRoom = {
+      id: 'room-001',
+      shapeId: 'nonexistent-shape-id',
+      anchorX: 0,
+      anchorY: 0,
+    };
+
+    const shape = resolveRoomShape(placed);
+    expect(shape.id).toBe('fallback');
+    expect(shape.tiles).toHaveLength(1);
   });
 });
