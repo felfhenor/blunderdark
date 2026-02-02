@@ -182,3 +182,13 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - **Learnings for future iterations:**
   - Floor type references all major game state subtypes — a good integration point
   - The current GameStateWorld has a single grid/hallways/inhabitants; multi-floor will require refactoring to use Floor[] instead
+
+## research-tree-data-structure US-001, US-002: Types and State [DONE]
+- Created `src/app/interfaces/research.ts` with `ResearchBranch`, `ResearchNode`, `ResearchTree`, `ResearchState`
+- Added `ResearchState` to `GameStateWorld`, `defaultResearchState()` to defaults.ts
+- Cost uses existing `ResourceCost` type from resource.ts
+- All tests pass (166/166), lint passes
+- Commit: 232d244
+- **Learnings for future iterations:**
+  - `ResearchNode.cost` reuses `ResourceCost` (Partial<Record<ResourceType, number>>) — good for consistency across systems
+  - `ResearchState.activeResearchProgress` is 0-1 float, not percentage — convert for UI display

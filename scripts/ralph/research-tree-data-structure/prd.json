@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ResearchBranch, ResearchNode, ResearchTree types in src/app/interfaces/research.ts; cost uses ResourceCost from resource.ts"
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ResearchState added to GameStateWorld, defaultResearchState() in defaults.ts, JSON-serializable (plain arrays and primitives)"
     },
     {
       "id": "US-003",
