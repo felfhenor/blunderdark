@@ -120,3 +120,20 @@ export async function payCost(costs: ResourceCost): Promise<boolean> {
 
   return true;
 }
+
+export function isResourceLow(
+  type: ResourceType,
+  threshold: number,
+): Signal<boolean> {
+  return computed(() => {
+    const resource = gamestate().world.resources[type];
+    return resource.current / resource.max < threshold;
+  });
+}
+
+export function isResourceFull(type: ResourceType): Signal<boolean> {
+  return computed(() => {
+    const resource = gamestate().world.resources[type];
+    return resource.current === resource.max;
+  });
+}

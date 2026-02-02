@@ -20,9 +20,14 @@ vi.mock('@helpers/state-game', () => {
 });
 
 // Must import after mock setup
-const { addResource, subtractResource, canAfford, payCost } = await import(
-  '@helpers/resources'
-);
+const {
+  addResource,
+  subtractResource,
+  canAfford,
+  payCost,
+  isResourceLow,
+  isResourceFull,
+} = await import('@helpers/resources');
 
 describe('addResource', () => {
   beforeEach(() => {
@@ -153,5 +158,70 @@ describe('payCost', () => {
     expect(result).toBe(false);
     expect(mockResources.gold.current).toBe(500);
     expect(mockResources.food.current).toBe(10);
+  });
+});
+
+describe('isResourceLow', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+  });
+
+  it('should return true when resource is below threshold percentage', () => {
+    mockResources.gold.current = 50;
+    // 50/1000 = 0.05, which is below 0.1 (10%)
+    const low = isResourceLow('gold', 0.1);
+    expect(low()).toBe(true);
+  });
+
+  it('should return false when resource is above threshold percentage', () => {
+    mockResources.gold.current = 500;
+    // 500/1000 = 0.5, which is above 0.1 (10%)
+    const low = isResourceLow('gold', 0.1);
+    expect(low()).toBe(false);
+  });
+
+  it('should return true when resource is at zero', () => {
+    const low = isResourceLow('gold', 0.1);
+    expect(low()).toBe(true);
+  });
+
+  it('should react to resource changes', async () => {
+    mockResources.gold.current = 50;
+    const low = isResourceLow('gold', 0.1);
+    expect(low()).toBe(true);
+
+    mockResources.gold.current = 500;
+    expect(low()).toBe(false);
+  });
+});
+
+describe('isResourceFull', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+  });
+
+  it('should return true when resource equals its max', () => {
+    mockResources.gold.current = 1000;
+    const full = isResourceFull('gold');
+    expect(full()).toBe(true);
+  });
+
+  it('should return false when resource is below max', () => {
+    mockResources.gold.current = 999;
+    const full = isResourceFull('gold');
+    expect(full()).toBe(false);
+  });
+
+  it('should return false when resource is at zero', () => {
+    const full = isResourceFull('gold');
+    expect(full()).toBe(false);
+  });
+
+  it('should react to resource changes', async () => {
+    const full = isResourceFull('crystals');
+    expect(full()).toBe(false);
+
+    mockResources.crystals.current = 500;
+    expect(full()).toBe(true);
   });
 });
