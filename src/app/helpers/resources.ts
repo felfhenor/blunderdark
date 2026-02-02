@@ -1,4 +1,5 @@
 import { computed, type Signal } from '@angular/core';
+import { defaultResources } from '@helpers/defaults';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   ResourceCost,
@@ -136,4 +137,19 @@ export function isResourceFull(type: ResourceType): Signal<boolean> {
     const resource = gamestate().world.resources[type];
     return resource.current === resource.max;
   });
+}
+
+export function migrateResources(
+  saved: Partial<ResourceMap>,
+): ResourceMap {
+  const defaults = defaultResources();
+  const result = { ...defaults };
+
+  for (const key of Object.keys(defaults) as ResourceType[]) {
+    if (saved[key]) {
+      result[key] = { ...saved[key] };
+    }
+  }
+
+  return result;
 }

@@ -1,4 +1,5 @@
 import { defaultGameState } from '@helpers/defaults';
+import { migrateResources } from '@helpers/resources';
 import {
   gamestate,
   gamestateTickEnd,
@@ -12,6 +13,7 @@ import { merge } from 'es-toolkit/compat';
 export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
+  newState.world.resources = migrateResources(state.world.resources);
   setGameState(newState);
   gamestateTickStart();
   gamestateTickEnd();

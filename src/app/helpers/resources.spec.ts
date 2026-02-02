@@ -27,6 +27,7 @@ const {
   payCost,
   isResourceLow,
   isResourceFull,
+  migrateResources,
 } = await import('@helpers/resources');
 
 describe('addResource', () => {
@@ -223,5 +224,59 @@ describe('isResourceFull', () => {
 
     mockResources.crystals.current = 500;
     expect(full()).toBe(true);
+  });
+});
+
+describe('migrateResources', () => {
+  it('should preserve saved resource values in a round-trip', () => {
+    const original = defaultResources();
+    original.gold.current = 750;
+    original.crystals.current = 300;
+    original.corruption.current = 42;
+
+    const migrated = migrateResources(original);
+
+    expect(migrated.gold.current).toBe(750);
+    expect(migrated.gold.max).toBe(1000);
+    expect(migrated.crystals.current).toBe(300);
+    expect(migrated.crystals.max).toBe(500);
+    expect(migrated.corruption.current).toBe(42);
+    expect(migrated.corruption.max).toBe(100);
+  });
+
+  it('should initialize missing resource types to defaults', () => {
+    const partial = {
+      gold: { current: 500, max: 1000 },
+      food: { current: 100, max: 500 },
+    } as Partial<ResourceMap>;
+
+    const migrated = migrateResources(partial);
+
+    expect(migrated.gold.current).toBe(500);
+    expect(migrated.food.current).toBe(100);
+    expect(migrated.crystals.current).toBe(0);
+    expect(migrated.crystals.max).toBe(500);
+    expect(migrated.flux.current).toBe(0);
+    expect(migrated.flux.max).toBe(200);
+    expect(migrated.research.current).toBe(0);
+    expect(migrated.essence.current).toBe(0);
+    expect(migrated.corruption.current).toBe(0);
+  });
+
+  it('should return full defaults when given empty object', () => {
+    const migrated = migrateResources({});
+    const defaults = defaultResources();
+
+    for (const key of Object.keys(defaults) as Array<keyof ResourceMap>) {
+      expect(migrated[key].current).toBe(defaults[key].current);
+      expect(migrated[key].max).toBe(defaults[key].max);
+    }
+  });
+
+  it('should not mutate the saved input', () => {
+    const saved = { gold: { current: 500, max: 1000 } } as Partial<ResourceMap>;
+    migrateResources(saved);
+    expect(saved.gold!.current).toBe(500);
+    expect(saved.crystals).toBeUndefined();
   });
 });
