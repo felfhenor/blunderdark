@@ -9,6 +9,7 @@ export * from './game-init';
 export * from './gameloop';
 export * from './grid';
 export * from './icons';
+export * from './inhabitants';
 export * from './logging';
 export * from './migrate';
 export * from './notify';
