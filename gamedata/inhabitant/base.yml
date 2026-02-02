@@ -1,0 +1,105 @@
+- id: 7f716f6e-3742-496b-8277-875c180b0d94
+  name: Goblin
+  type: creature
+  tier: 1
+  description: A scrappy green-skinned worker with a knack for extracting crystals from rock.
+  cost:
+    gold: 50
+    food: 20
+  stats:
+    hp: 30
+    attack: 10
+    defense: 8
+    speed: 12
+    workerEfficiency: 1.0
+  traits:
+    - id: trait-goblin-miner
+      name: Miner
+      description: Increases crystal production by 20% when assigned to a crystal-producing room.
+      effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: crystals
+
+- id: 2d14f731-95fc-49ce-8d8a-ec1b2078cb5d
+  name: Kobold
+  type: creature
+  tier: 1
+  description: A swift, cunning reptilian that excels at setting traps for intruders.
+  cost:
+    gold: 40
+    food: 15
+  stats:
+    hp: 20
+    attack: 8
+    defense: 5
+    speed: 18
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-kobold-trapper
+      name: Trapper
+      description: Skilled at laying traps that slow and damage invaders.
+      effectType: trap_bonus
+      effectValue: 0.25
+
+- id: 14c65d94-3a77-4b7a-a33e-dee9cf320787
+  name: Skeleton
+  type: undead
+  tier: 1
+  description: A tireless undead guardian that never needs food or rest.
+  cost:
+    gold: 60
+    essence: 15
+  stats:
+    hp: 40
+    attack: 12
+    defense: 15
+    speed: 6
+    workerEfficiency: 0.7
+  traits:
+    - id: trait-skeleton-guardian
+      name: Guardian
+      description: Increases room defense effectiveness against invaders.
+      effectType: defense_bonus
+      effectValue: 0.3
+
+- id: ab1957eb-67cb-401d-a745-a7c7081b0cc9
+  name: Myconid
+  type: fungal
+  tier: 1
+  description: A sentient mushroom creature that thrives in dark, damp environments.
+  cost:
+    gold: 45
+    food: 25
+  stats:
+    hp: 25
+    attack: 5
+    defense: 10
+    speed: 8
+    workerEfficiency: 1.3
+  traits:
+    - id: trait-myconid-farmer
+      name: Farmer
+      description: Increases food production by 15% when assigned to a food-producing room.
+      effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: food
+
+- id: e62e86b6-da7c-4c91-8c0a-8d42a24829c8
+  name: Slime
+  type: ooze
+  tier: 1
+  description: A cheap, adaptable blob that can fill any role poorly but costs almost nothing to recruit.
+  cost:
+    gold: 15
+  stats:
+    hp: 15
+    attack: 3
+    defense: 3
+    speed: 5
+    workerEfficiency: 0.6
+  traits:
+    - id: trait-slime-adaptable
+      name: Adaptable
+      description: Can be assigned to any room type without penalty.
+      effectType: versatility
+      effectValue: 1.0
