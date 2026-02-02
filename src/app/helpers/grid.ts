@@ -6,7 +6,9 @@ export function createEmptyGrid(): GridState {
   return Array.from({ length: GRID_SIZE }, () =>
     Array.from({ length: GRID_SIZE }, () => ({
       occupied: false,
+      occupiedBy: 'empty' as const,
       roomId: null,
+      hallwayId: null,
       connectionType: null,
     })),
   );

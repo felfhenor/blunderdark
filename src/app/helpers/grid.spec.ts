@@ -59,7 +59,9 @@ describe('Grid Helpers', () => {
       const tile = getTile(grid, 5, 10);
       expect(tile).toEqual({
         occupied: false,
+        occupiedBy: 'empty',
         roomId: null,
+        hallwayId: null,
         connectionType: null,
       });
     });

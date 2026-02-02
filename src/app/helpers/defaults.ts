@@ -19,6 +19,7 @@ export function defaultGameState(): GameState {
       grid: createEmptyGrid(),
       resources: defaultResources(),
       inhabitants: [],
+      hallways: [],
     },
   };
 }
