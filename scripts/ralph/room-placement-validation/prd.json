@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "validateBounds() in src/app/helpers/room-placement.ts with 9 unit tests covering (0,0), (18,18), (19,19), negative coords, L-shape and I-shape edges"
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "validateNoOverlap() returns conflictingTiles array, 4 unit tests"
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "validatePlacement() collects all errors, 4 unit tests including dual-error scenario"
     },
     {
       "id": "US-004",

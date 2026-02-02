@@ -132,3 +132,16 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `GameStateWorld` already includes `grid: GridState` — no migration needed
   - Grid component uses `(document:keydown.escape)` in host bindings for keyboard shortcuts
   - CSS uses `var(--b3)`, `var(--p)`, `var(--s)`, `var(--pf)` theme variables from DaisyUI
+
+## room-placement-validation US-001 through US-003: Validation Functions [DONE]
+- Created `src/app/helpers/room-placement.ts` with three validation functions:
+  - `validateBounds(shape, anchorX, anchorY, gridSize)` — returns `{valid, error?}`
+  - `validateNoOverlap(shape, anchorX, anchorY, grid)` — returns `{valid, error?, conflictingTiles?}`
+  - `validatePlacement(shape, anchorX, anchorY, grid)` — combined check returning `{valid, errors: string[]}`
+- Created `src/app/helpers/room-placement.spec.ts` with 17 unit tests covering bounds edges, overlap scenarios, and combined validation
+- All tests pass (139/139), lint passes
+- Commit: cd57d94
+- **Learnings for future iterations:**
+  - Lint rule `typescript-paths/absolute-import` requires `@helpers/room-placement` not `./room-placement` in test imports
+  - `getAbsoluteTiles()` from room-shapes.ts is reusable for converting shape-relative tiles to grid-absolute coordinates
+  - Grid tiles use `[y][x]` indexing (row-major) — be careful with coordinate order
