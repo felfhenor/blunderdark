@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ReputationType, ReputationLevel, ReputationState, REPUTATION_THRESHOLDS in src/app/interfaces/reputation.ts"
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pure function helpers + 17 tests covering boundaries, accumulation, immutability, serialization; ReputationState in GameStateWorld"
     },
     {
       "id": "US-003",

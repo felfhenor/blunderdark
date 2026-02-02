@@ -192,3 +192,15 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - **Learnings for future iterations:**
   - `ResearchNode.cost` reuses `ResourceCost` (Partial<Record<ResourceType, number>>) — good for consistency across systems
   - `ResearchState.activeResearchProgress` is 0-1 float, not percentage — convert for UI display
+
+## reputation-tracking US-001, US-002: Types and State Management [DONE]
+- Created `src/app/interfaces/reputation.ts` with `ReputationType`, `ReputationLevel`, `ReputationState`, `REPUTATION_THRESHOLDS`
+- Created `src/app/helpers/reputation.ts` with: `addReputation`, `getReputation`, `getReputationLevel`, `resetReputation`, `getReputationLevelLabel`
+- Added `ReputationState` to `GameStateWorld`, `defaultReputationState()` to defaults.ts
+- Created `src/app/helpers/reputation.spec.ts` with 17 unit tests
+- All tests pass (183/183), lint passes
+- Commit: bace3b3
+- **Learnings for future iterations:**
+  - Reputation uses pure functions taking state as input (not signal-based) — consistent with grid/hallway pattern
+  - `addReputation` floors at 0 with `Math.max(0, ...)` to prevent negative reputation
+  - Threshold lookup descends from highest to lowest — order matters in `getReputationLevel`
