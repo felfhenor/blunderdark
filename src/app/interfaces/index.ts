@@ -1,4 +1,5 @@
 export * from './artable';
+export * from './biome';
 export * from './content-hero';
 export * from './content-item';
 export * from './content-monster';
