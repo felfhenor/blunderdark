@@ -3,6 +3,7 @@ import { rngUuid } from '@helpers/rng';
 import type {
   GameId,
   GameState,
+  ResearchState,
   ResourceMap,
   SeasonState,
   StatBlock,
@@ -27,6 +28,7 @@ export function defaultGameState(): GameState {
       inhabitants: [],
       hallways: [],
       season: defaultSeasonState(),
+      research: defaultResearchState(),
     },
   };
 }
@@ -36,6 +38,15 @@ export function defaultSeasonState(): SeasonState {
     currentSeason: 'growth',
     dayInSeason: 1,
     totalSeasonCycles: 0,
+  };
+}
+
+export function defaultResearchState(): ResearchState {
+  return {
+    completedNodes: [],
+    activeResearch: null,
+    activeResearchProgress: 0,
+    activeResearchStartTick: 0,
   };
 }
 

@@ -5,6 +5,7 @@ export type GameId = Branded<string, 'GameId'>;
 import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
+import type { ResearchState } from '@interfaces/research';
 import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
 
@@ -14,6 +15,7 @@ export interface GameStateWorld {
   inhabitants: InhabitantInstance[];
   hallways: Hallway[];
   season: SeasonState;
+  research: ResearchState;
 }
 
 export interface GameStateClock {
