@@ -158,3 +158,15 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - When adding new fields to `GridTile`, update `createEmptyGrid()` in grid.ts and fix any `toEqual` assertions in grid.spec.ts
   - Hallway helpers follow the same pure-function pattern as grid helpers (take state in, return new state)
   - `removeHallwayFromGrid` checks `hallwayId` matches before clearing — prevents accidental deletion of overlapping structures
+
+## seasonal-cycle-system US-001 through US-005: Data Layer Complete [DONE]
+- Created `src/app/interfaces/season.ts` with `Season` union, `SeasonState`, `SEASON_ORDER`, `DAYS_PER_SEASON`
+- Created `src/app/helpers/season.ts` with: `advanceDay()` pure function, `advanceGameDay()` signal updater, computed signals (`currentSeason`, `dayInSeason`, `seasonProgress`, `totalSeasonCycles`), `isSeason()` helper, `getSeasonLabel()`, `seasonTransition$` RxJS observable
+- Added `SeasonState` to `GameStateWorld`, `defaultSeasonState()` to defaults.ts
+- Created `src/app/helpers/season.spec.ts` with 10 unit tests
+- All tests pass (166/166), lint passes
+- Commit: fe6e770
+- **Learnings for future iterations:**
+  - `advanceDay()` is a pure function for testability; `advanceGameDay()` wraps it with signal updates
+  - Season transition event uses RxJS Subject (same pattern as notify.ts) — fires only on actual season change
+  - `seasonProgress` computes percentage as `(dayInSeason - 1) / DAYS_PER_SEASON * 100` (day 1 = 0%, day 7 = ~85.7%)

@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Season type, SeasonState, SEASON_ORDER, DAYS_PER_SEASON in src/app/interfaces/season.ts"
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "advanceDay() pure function + advanceGameDay() signal-based updater in src/app/helpers/season.ts; 6 advancement tests"
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "currentSeason, dayInSeason, seasonProgress, totalSeasonCycles computed signals + isSeason() helper in season.ts"
     },
     {
       "id": "US-004",
@@ -64,8 +64,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "seasonTransition$ RxJS Subject with SeasonTransitionEvent type (previousSeason, newSeason) emitted from advanceGameDay()"
     },
     {
       "id": "US-005",
@@ -80,8 +80,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SeasonState in GameStateWorld, defaultSeasonState() returns Day 1 Growth, JSON round-trip test passes"
     },
     {
       "id": "US-006",
