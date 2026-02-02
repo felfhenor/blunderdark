@@ -17,3 +17,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Exported resources helper from barrel file
 - All tests pass (66/66), lint passes, no new typecheck errors
 - Commit: 0b26811
+
+## resource-manager US-003: Add Resources with Cap Validation [DONE]
+- Added `addResource(type, amount)` function to `src/app/helpers/resources.ts`
+- Returns the actual amount added after capping at max; rejects negative amounts
+- Created `src/app/helpers/resources.spec.ts` with 6 unit tests covering: normal add, add exceeding cap, add zero, add negative, resource already at max, different resource types
+- All tests pass (72/72), lint passes, no new typecheck errors
+- Commit: a3c044c
+
+## resource-manager US-004: Subtract Resources with Floor Validation [DONE]
+- Added `ResourceCost` type to `src/app/interfaces/resource.ts` as `Partial<Record<ResourceType, number>>`
+- Added `subtractResource(type, amount)` to `src/app/helpers/resources.ts` — returns false if would go below 0, no partial subtraction
+- Added `canAfford(costs)` — checks if all costs in a `ResourceCost` can be paid
+- Added `payCost(costs)` — atomically subtracts multiple resources (all-or-nothing via canAfford check before update)
+- Added 10 unit tests covering: normal subtract, subtract more than available, subtract zero, subtract negative, exact amount, canAfford true/false/empty, payCost success, payCost failure
+- All tests pass (82/82), lint passes, no new typecheck errors
+- Commit: b59eb52
