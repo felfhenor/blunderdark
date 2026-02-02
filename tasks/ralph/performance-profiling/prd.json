@@ -1,0 +1,60 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/performance-profiling",
+  "description": "Performance Profiling - Systematic measurement of frame times, system-level bottlenecks, memory usage, and stress-testing with large dungeons to establish performance baselines.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create performance testing harness and timing utilities",
+      "description": "As a developer, I want performance testing utilities so that I can consistently measure frame time and system performance.",
+      "acceptanceCriteria": [
+        "src/app/helpers/performance.ts utility with: measureFrameTime(), measureFunctionTime(fn), startPerfMark(name), endPerfMark(name)",
+        "Utilities use performance.now() and performance.mark() APIs",
+        "Results can be logged to console or collected in an array for analysis",
+        "Debug mode flag enables per-frame timing in the game loop",
+        "Each frame logs duration to rolling buffer (last 300 frames)",
+        "Average, min, max, and 95th percentile frame times computed",
+        "Frames exceeding 16ms flagged as slow frames",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create large dungeon test scenario generator",
+      "description": "As a developer, I want a helper that generates large dungeons so that I can stress-test performance.",
+      "acceptanceCriteria": [
+        "generateTestDungeon(roomCount, floorCount) helper creates populated game state",
+        "Generated dungeon has rooms, hallways, inhabitants, and active production",
+        "Default: 100+ rooms across 5+ floors",
+        "Generator produces deterministic output for reproducible tests",
+        "Callable from dev-tools console or test file",
+        "Unit tests verify generator produces valid game state",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement system-level profiling and memory measurement",
+      "description": "As a developer, I want to profile individual game systems and measure memory usage to identify bottlenecks.",
+      "acceptanceCriteria": [
+        "Each major system tick (production, inhabitant AI, pathfinding, rendering) wrapped with performance marks",
+        "Profiling report breaks down frame time by system and identifies top 3 slowest",
+        "Profiling enabled/disabled via feature flag or debug signal without code changes",
+        "Memory utility reads performance.memory (Chrome) with fallback for other browsers",
+        "Memory sampled periodically (every 30s) during profiling session",
+        "Memory growth over time logged to detect leaks",
+        "Profiling overhead under 1ms per frame when enabled",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

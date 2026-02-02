@@ -1,0 +1,119 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/contextual-tooltips",
+  "description": "Contextual Tooltips - Hover-based information overlays on all interactive UI elements explaining stats, bonuses, costs, and shortcuts.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement reusable tooltip directive",
+      "description": "As a developer, I want a reusable tooltip directive so that tooltips can be added to any element.",
+      "acceptanceCriteria": [
+        "A TooltipDirective is implemented as a standalone Angular directive",
+        "Supports string content and TemplateRef for rich content",
+        "Tooltip appears on mouseenter after 300ms delay",
+        "Tooltip disappears on mouseleave",
+        "Tooltip positioning avoids viewport edges (auto-repositions)",
+        "Unit tests verify tooltip show/hide behavior",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement tooltip styling and consistency",
+      "description": "As a developer, I want a consistent tooltip style so that all tooltips feel cohesive.",
+      "acceptanceCriteria": [
+        "All tooltips use a shared CSS class with consistent background, border, font, shadow",
+        "Tooltips support a title line (bold) and body text",
+        "Rich tooltips support sections with dividers",
+        "Tooltip max width prevents overly wide tooltips",
+        "Tooltips readable against all game backgrounds",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Add resource tooltips with production breakdown",
+      "description": "As a player, I want tooltips on resource displays showing production rates and sources.",
+      "acceptanceCriteria": [
+        "Hovering a resource shows: current amount, max storage, net production per minute",
+        "Production breakdown lists each source room and its contribution",
+        "Consumption sources listed",
+        "Net positive in green, net negative in red",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Add room tooltips",
+      "description": "As a player, I want tooltips on rooms showing stats without opening a detail panel.",
+      "acceptanceCriteria": [
+        "Hovering a room shows: name, type, level, inhabitant count/capacity",
+        "Production values with modifiers displayed",
+        "Fear and Corruption values shown",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add inhabitant tooltips",
+      "description": "As a player, I want tooltips on inhabitants showing stats and assignment.",
+      "acceptanceCriteria": [
+        "Hovering an inhabitant shows: name, type, level, HP, assigned room",
+        "Combat stats displayed if applicable",
+        "Current activity (working, idle, fighting) shown",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add cost tooltips with affordability",
+      "description": "As a player, I want tooltips on cost displays showing affordability status.",
+      "acceptanceCriteria": [
+        "Hovering a cost indicator shows each resource required and current availability",
+        "Resources player has enough of shown in green",
+        "Resources player lacks shown in red with deficit amount",
+        "Total affordability clearly indicated",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Add keyboard shortcut tooltips",
+      "description": "As a player, I want tooltips on buttons to include keyboard shortcuts.",
+      "acceptanceCriteria": [
+        "Buttons with keyboard shortcuts show the shortcut in tooltip",
+        "Shortcut text styled distinctly (monospace or badge)",
+        "Shortcuts are accurate and match actual key bindings",
+        "Tooltips without shortcuts don't show empty shortcut areas",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/help-menu",
+  "description": "Help Menu - In-game reference organized by topic (Rooms, Inhabitants, Combat, Resources, Victory) with search function, tutorial replay link, and data-driven content.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create Help menu component with section navigation",
+      "description": "As a player, I want to access a Help menu with organized sections so that I can browse game information by topic.",
+      "acceptanceCriteria": [
+        "A 'Help' button exists on the main menu screen and during gameplay (toolbar or pause menu)",
+        "Clicking opens the Help menu as an overlay/panel that can be closed",
+        "Help sections: Rooms, Inhabitants, Combat, Resources, Victory accessible via tabs or sidebar",
+        "Sections are collapsible/expandable with brief overview followed by detailed subsections",
+        "Component uses OnPush change detection and standalone conventions",
+        "Uses @for native control flow to render sections dynamically",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create help content for all sections",
+      "description": "As a player, I want comprehensive help content covering rooms, inhabitants, combat, resources, and victory conditions.",
+      "acceptanceCriteria": [
+        "Rooms section covers: room types and functions, placement rules, feature attachment, room connections; room descriptions loaded from gamedata where possible",
+        "Inhabitants section covers: types with key stats, recruitment, assignment, stats, leveling, combat roles",
+        "Combat section covers: invasion mechanics, defense strategies, combat stats, Fear effects, turn-based flow",
+        "Resources section covers: all resource types, production, consumption, storage, Corruption and Fear mechanics",
+        "Victory section covers: all five victory paths with exact threshold conditions",
+        "Help content stored as structured data (YAML or JSON) for easy editing",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement help search and tutorial replay link",
+      "description": "As a player, I want to search help content and replay the tutorial so that I can quickly find information or refresh basics.",
+      "acceptanceCriteria": [
+        "Search bar at the top of the Help menu filters content to matching sections/subsections",
+        "Search matches against titles, body text, and keywords",
+        "Results highlight matching text; clearing search restores full section list",
+        "A 'Replay Tutorial' button exists in the Help menu",
+        "Clicking it closes the Help menu and starts the tutorial from Step 1",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/mimic-inhabitant",
+  "description": "Mimic Inhabitant - A Tier 2 shapeshifting creature with Shapeshifter (surprise attack), Treasure Guardian (+2 Defense in Vault), and Versatile (80% efficiency anywhere) traits, plus living trap mechanics.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define Mimic YAML data with stats and traits",
+      "description": "As a developer, I want the Mimic defined in YAML with stats, traits, behaviors, and fusion options.",
+      "acceptanceCriteria": [
+        "Mimic entry in gamedata/inhabitants/ YAML: id, name, description, sprite, tier 2",
+        "Stats: HP (medium), Attack (medium), Defense (medium), Speed (low)",
+        "Traits: Shapeshifter, TreasureGuardian (vaultDefenseBonus: 2), Versatile (efficiencyMultiplier: 0.8)",
+        "Scared behavior: Lockdown (transforms to inert object, untargetable but cannot act)",
+        "Hungry behavior: Consume (eats nearby small objects, reduces room inventory)",
+        "At least 2 fusion recipes defined",
+        "npm run gamedata:build compiles without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement Mimic trait effects",
+      "description": "As a developer, I want Mimic traits to provide gameplay effects when assigned to rooms.",
+      "acceptanceCriteria": [
+        "Shapeshifter: Mimic appears as room object to invaders; on reveal gets +100% damage on first hit",
+        "Treasure Guardian: +2 Defense only when assigned to Treasure Vault room; removed when reassigned",
+        "Versatile: 80% efficiency in any room type, applied as final multiplier after other bonuses",
+        "Mimic in hallway/room entrance functions as pseudo-trap dealing damage with slow effect",
+        "Living trap does not consume trap charges; can coexist with regular traps",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Write Mimic trait unit tests",
+      "description": "As a developer, I want tests verifying all Mimic trait effects.",
+      "acceptanceCriteria": [
+        "Test: 80% efficiency applies universally across all room types",
+        "Test: +2 Defense in Vault only, removed when reassigned",
+        "Test: Surprise attack bonus +100% on first hit",
+        "Test: Living trap interaction with invaders",
+        "Tests in src/app/helpers/ spec file",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

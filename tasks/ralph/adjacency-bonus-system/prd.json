@@ -1,0 +1,81 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/adjacency-bonus-system",
+  "description": "Adjacency Bonus System - Reward strategic room placement with production bonuses when complementary rooms are adjacent and connected.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define adjacency bonus data structure and registry",
+      "description": "As a developer, I want adjacency bonuses defined in a data structure so that new bonuses can be added without code changes.",
+      "acceptanceCriteria": [
+        "An AdjacencyBonus type is defined with roomTypeA, roomTypeB, bonusPercent, and description fields",
+        "A registry/map of all adjacency bonuses exists in YAML gamedata or constants file",
+        "Bonuses are bidirectional: Mine+Forge is the same as Forge+Mine",
+        "Example bonuses defined: Mine+Forge (+30%), Grove+Lake (+40%)",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement bonus activation detection",
+      "description": "As the system, I want to detect when an adjacency bonus should activate so that production is enhanced when conditions are met.",
+      "acceptanceCriteria": [
+        "A function checks if two rooms satisfy a bonus condition: same types as a defined bonus, adjacent, and connected",
+        "The check runs when rooms are placed, connected, or disconnected",
+        "Active bonuses are stored in the game state per room",
+        "Unit tests verify activation for valid pairs and non-activation for invalid pairs",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Apply adjacency bonus to production calculation",
+      "description": "As the system, I want active adjacency bonuses to modify room production so that players see tangible benefits from good placement.",
+      "acceptanceCriteria": [
+        "Production calculation includes adjacency bonus as a percentage modifier",
+        "Formula: base production * (1 + sum of bonus percentages) = modified production",
+        "Example: Mine (5 Crystals/min base) adjacent to Forge (+30%) produces 6.5 Crystals/min",
+        "Production updates immediately when bonuses activate or deactivate",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement stacking of multiple adjacency bonuses",
+      "description": "As a dungeon builder, I want bonuses from multiple adjacent rooms to stack so that I am rewarded for complex layouts.",
+      "acceptanceCriteria": [
+        "If a Mine is adjacent to both a Forge (+30%) and another Mine (+10%), the Mine gets +40% total",
+        "Each qualifying adjacent room contributes its bonus independently",
+        "Stacking behavior is documented and tested with unit tests",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement bonus deactivation on disconnect or removal",
+      "description": "As the system, I want bonuses to deactivate when conditions are no longer met so that the system stays accurate.",
+      "acceptanceCriteria": [
+        "Disconnecting two rooms removes their adjacency bonus",
+        "Removing a room removes all bonuses it was providing to neighbors",
+        "Production recalculates immediately after bonus deactivation",
+        "Unit tests verify deactivation scenarios",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

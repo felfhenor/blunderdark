@@ -1,0 +1,61 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/load-time-optimization",
+  "description": "Load Time Optimization - Fast async loading of saved games with progress bar, lazy asset loading, phased state hydration, and under 10 second target for large dungeons.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement async save loading with phased state hydration",
+      "description": "As a developer, I want save loading to be asynchronous and phased so the game becomes playable quickly.",
+      "acceptanceCriteria": [
+        "Save deserialization runs in async chunks using requestIdleCallback or setTimeout batching",
+        "Main thread not blocked for more than 50ms at a time during load",
+        "Phase 1: Load meta and clock state (instant, basic UI visible)",
+        "Phase 2: Load current floor grid and rooms",
+        "Phase 3: Load inhabitants and assignments (game playable after this phase)",
+        "Phase 4: Load remaining floors in background",
+        "Phase 5: Load event history, victory progress, non-critical data",
+        "Load can be canceled if player navigates away; partial state cleaned up on failure",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create loading progress bar and failure recovery UI",
+      "description": "As a player, I want a progress bar during load and graceful error handling.",
+      "acceptanceCriteria": [
+        "Loading screen appears when save load begins with progress bar (0-100%)",
+        "Progress updates based on load stages: IndexedDB read, decompression, deserialization, hydration, assets",
+        "Current stage name displayed; progress bar animates smoothly",
+        "If load exceeds 30 seconds, 'Taking longer than expected' message appears",
+        "Cancel button available on loading screen",
+        "Load failure shows error message with 'Return to Menu' option",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement lazy asset loading and performance budgeting",
+      "description": "As a developer, I want assets lazy loaded and load time measured per phase for optimization.",
+      "acceptanceCriteria": [
+        "Spritesheet atlases loaded on demand when a floor is first viewed",
+        "Audio files loaded when first needed, not at app init",
+        "Missing assets show placeholder while loading",
+        "Each load phase timed using performance marks; logged in debug mode",
+        "Warning logged if any phase exceeds budget (e.g., deserialization > 3s)",
+        "Total load time for 100+ room dungeon under 10 seconds",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

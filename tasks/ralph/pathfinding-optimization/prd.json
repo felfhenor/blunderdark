@@ -1,0 +1,77 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/pathfinding-optimization",
+  "description": "Pathfinding Optimization - Caching results with smart invalidation, hierarchical pathfinding for multi-floor dungeons, per-frame budget limiting, and A* algorithm optimization with binary heap.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement pathfinding result cache with LRU eviction",
+      "description": "As a developer, I want pathfinding results cached so that repeated identical queries return instantly.",
+      "acceptanceCriteria": [
+        "Pathfinding cache stores results keyed by (start, destination) pairs as string hash",
+        "Cache entries include computed path and staleness flag",
+        "Cache hit returns path in O(1) time",
+        "Maximum cache size of 500 entries with LRU eviction",
+        "Full cache clear available as fallback",
+        "Unit tests verify cache hit, miss, and eviction",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement smart cache invalidation on dungeon changes",
+      "description": "As a developer, I want smart cache invalidation so that only affected paths are cleared when the dungeon changes.",
+      "acceptanceCriteria": [
+        "When a room is added/removed, only cache entries passing through that area are invalidated",
+        "When a hallway is added/removed, only entries using that hallway are invalidated",
+        "Cache invalidated when dungeon layout changes (room added/removed, hallway changed)",
+        "Invalidation runs in under 1ms for typical cache sizes",
+        "Unit tests verify selective invalidation",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Optimize A* algorithm with binary heap and per-frame budget",
+      "description": "As a developer, I want the A* algorithm optimized and pathfinding calls budgeted per frame.",
+      "acceptanceCriteria": [
+        "A* uses binary heap (priority queue) for the open set instead of array scanning",
+        "Heuristic uses Manhattan distance for the grid",
+        "Neighbor lookup is O(1) using pre-computed adjacency data",
+        "Algorithm terminates early if destination unreachable (bounded search)",
+        "Single floor (20x20 grid) pathfinding completes in under 0.5ms",
+        "Per-frame budget limits new pathfinding calculations (max 5 per tick)",
+        "Excess requests queued and processed in subsequent frames",
+        "High-priority requests (combat, invasion) bypass budget limit",
+        "Unit tests verify path correctness, performance, and budget enforcement",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement hierarchical pathfinding for cross-floor routes",
+      "description": "As a developer, I want hierarchical pathfinding so that cross-floor routes are computed efficiently.",
+      "acceptanceCriteria": [
+        "Dungeon divided into zones (one per floor or cluster of rooms)",
+        "High-level pathfinding determines which zones to traverse",
+        "Low-level pathfinding resolves detailed path within each zone",
+        "Cross-floor paths use stairway/connection nodes between zones",
+        "Hierarchical pathfinding produces correct paths matching non-hierarchical results",
+        "Unit tests verify cross-floor pathfinding correctness",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

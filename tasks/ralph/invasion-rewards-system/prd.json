@@ -1,0 +1,96 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/invasion-rewards-system",
+  "description": "Invasion Rewards System - Defines consequences of invasions: successful defense yields reputation, loot, prisoners, and experience; failed defense causes room damage, resource loss, and reputation loss. Includes prisoner handling with 5 options.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define reward and penalty types and calculation functions",
+      "description": "As a developer, I want typed reward/penalty structures and pure calculation functions for invasion outcomes.",
+      "acceptanceCriteria": [
+        "DefenseRewards type with: reputationGain, lootedEquipment[], prisoners[], experienceGain, goldGain",
+        "DefensePenalties type with: roomDamage, resourceLoss, reputationLoss, killedInhabitants",
+        "calculateDefenseRewards(invasion, profile): DefenseRewards helper function",
+        "calculateDefensePenalties(invasion): DefensePenalties helper function",
+        "Reputation gain: +5 base, +1 per invader killed, +3 if all secondaries prevented, +2 for morale break",
+        "Failed defense: rooms along path lose 25% durability, 20% gold looted, -3 reputation",
+        "Altar destroyed: must rebuild at 100 Stone + 50 Gold + 20 Flux",
+        "Types in src/app/interfaces/; helpers in src/app/helpers/invasion-rewards.ts",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement loot tables and prisoner capture",
+      "description": "As a developer, I want defeated invaders to drop class-based loot and retreating invaders to become capturable prisoners.",
+      "acceptanceCriteria": [
+        "Each invader class has a loot table defined in YAML: Warriors drop weapons/armor, Rogues drop daggers/poison, Mages drop scrolls, Clerics drop holy water/herbs, Paladins drop blessed items, Rangers drop arrows/cloaks",
+        "Loot added to player's inventory after invasion",
+        "Retreating invaders have 30% chance of capture",
+        "Prisoners stored with: original class, stats, name, capture date",
+        "Prisoners require a Prison room (max capacity based on size); no Prison = prisoners escape",
+        "Prisoner data persisted in game state IndexedDB",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement prisoner handling options",
+      "description": "As a player, I want 5 prisoner handling options so that I can make meaningful post-invasion decisions.",
+      "acceptanceCriteria": [
+        "Execute: removes prisoner, +2 dungeon fear for 5 min, +1 reputation, -5 future invader morale",
+        "Ransom: removes after 2 min delay, gold scales with class tier, -1 reputation",
+        "Convert: takes 10 min, success rate by class (Rogue 50%, Warrior 30%, Cleric 10%, Paladin 5%), success = Tier 1 inhabitant, failure = escape, costs corruption",
+        "Sacrifice: requires Altar room, grants random boon (Flux/buff/corruption), +5 corruption, +2 reputation",
+        "Experiment: requires Breeding Pits, grants research points scaled by tier, +3 corruption, consumes prisoner",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create prisoner management UI",
+      "description": "As a player, I want a UI for managing prisoners so that I can choose handling options.",
+      "acceptanceCriteria": [
+        "Prisoner list accessible from Prison room showing class, stats, name, capture date",
+        "Action buttons for each handling option (Execute, Ransom, Convert, Sacrifice, Experiment)",
+        "Actions requiring specific rooms disabled if room does not exist",
+        "Confirmation dialog before irreversible actions",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Write invasion rewards and penalties unit tests",
+      "description": "As a developer, I want comprehensive tests for rewards, penalties, and prisoner handling.",
+      "acceptanceCriteria": [
+        "Test: Reputation gain scales with invasion difficulty",
+        "Test: Loot tables produce valid items per invader class",
+        "Test: Prisoner capture rate ~30% for retreating invaders",
+        "Test: Execute grants fear bonus; Ransom provides gold scaled by class",
+        "Test: Convert success rates match per-class percentages",
+        "Test: Failed defense applies room damage and resource loss",
+        "Test: Altar rebuild cost is correct",
+        "Tests in src/app/helpers/invasion-rewards.spec.ts",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/corruption-resource",
+  "description": "Corruption Resource - Track Corruption as a special resource with threshold levels, spending, and UI display.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add Corruption to resource tracking system",
+      "description": "As a developer, I want Corruption tracked as a resource so it can be generated, spent, and queried.",
+      "acceptanceCriteria": [
+        "Add corruption to the resource system",
+        "Corruption starts at 0 with no hard cap",
+        "Support addCorruption(amount) and spendCorruption(amount) methods",
+        "Corruption cannot go below 0",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Expose Corruption as reactive signals",
+      "description": "As a developer, I want Corruption exposed as signals so that UI and other systems react to changes.",
+      "acceptanceCriteria": [
+        "corruption signal available from the resource service",
+        "corruptionLevel computed signal returning 'low' | 'medium' | 'high' | 'critical'",
+        "Low: 0-49, Medium: 50-99, High: 100-199, Critical: 200+",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Display Corruption in resource UI",
+      "description": "As a player, I want to see my Corruption level in the resource panel.",
+      "acceptanceCriteria": [
+        "Show Corruption value in the resource display area",
+        "Color-coded: green (low), yellow (medium), orange (high), red (critical)",
+        "Warning icon when Corruption reaches medium or above",
+        "Tooltip explains effects at current level",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Persist Corruption with game state",
+      "description": "As a developer, I want Corruption to persist across sessions.",
+      "acceptanceCriteria": [
+        "Corruption value persisted to IndexedDB as part of resource state",
+        "Restored on game load",
+        "Default to 0 for new games or missing data",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Corruption spending interface",
+      "description": "As a player, I want to spend Corruption on dark upgrades.",
+      "acceptanceCriteria": [
+        "Dark upgrades/features list Corruption as a cost",
+        "Spending Corruption reduces the current level",
+        "Cannot spend more than currently available",
+        "Spending UI shows current Corruption and cost",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

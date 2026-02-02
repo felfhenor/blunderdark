@@ -1,0 +1,97 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/colorblind-modes",
+  "description": "Colorblind Modes - Add selectable colorblind accessibility modes (Deuteranopia, Protanopia, Tritanopia) with CSS filter transforms.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add colorblindMode option to GameOptions",
+      "description": "As a developer, I want to extend GameOptions to include a colorblindMode setting.",
+      "acceptanceCriteria": [
+        "GameOption type extended with colorblindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia'",
+        "Default value is 'none'",
+        "Option persisted via localStorageSignal",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create SVG color matrix filters",
+      "description": "As a developer, I want accurate SVG feColorMatrix definitions for each colorblind type.",
+      "acceptanceCriteria": [
+        "Inline SVG with filter definitions injected into the DOM or stored in assets/",
+        "Deuteranopia matrix based on established research",
+        "Protanopia matrix based on established research",
+        "Tritanopia matrix based on established research",
+        "Filters referenced by CSS filter: url(#filter-id)",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Apply CSS filter reactively via ThemeService",
+      "description": "As a developer, I want ThemeService to apply an SVG/CSS filter based on the selected colorblind mode.",
+      "acceptanceCriteria": [
+        "ThemeService reads the colorblindMode option via getOption",
+        "An effect() applies a CSS filter on document.documentElement based on the mode",
+        "When mode is 'none', no filter is applied",
+        "Switching modes at runtime updates the filter immediately without page reload",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Add colorblind mode selector to options UI",
+      "description": "As a player, I want a selector in the options panel to choose my preferred colorblind mode.",
+      "acceptanceCriteria": [
+        "PanelOptionsUIComponent displays a labeled selector for colorblind mode",
+        "Options listed: None, Deuteranopia, Protanopia, Tritanopia",
+        "Selecting an option updates the signal and persists the choice",
+        "Current selection is visually indicated",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Verify icon and sprite distinguishability",
+      "description": "As a player with color vision deficiency, I want all game icons and sprites to remain distinguishable.",
+      "acceptanceCriteria": [
+        "Atlas sprites are affected by the applied filter",
+        "Resource icons remain distinguishable under all three modes",
+        "No two semantically different UI elements collapse to the same apparent color",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add unit tests for colorblind option persistence",
+      "description": "As a developer, I want tests confirming the colorblind mode option is correctly managed.",
+      "acceptanceCriteria": [
+        "Test verifies default value is 'none'",
+        "Test verifies setting and retrieving each mode value",
+        "Tests pass via npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

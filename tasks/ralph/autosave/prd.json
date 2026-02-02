@@ -1,0 +1,100 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/autosave",
+  "description": "Autosave - Automatically save game progress at intervals, before critical events, and on quit without blocking gameplay.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement periodic autosave timer",
+      "description": "As a player, I want the game to automatically save every 5 minutes so that I do not lose significant progress.",
+      "acceptanceCriteria": [
+        "The autosave timer starts when the game-play page loads",
+        "Every 5 minutes of real time, an autosave triggers",
+        "The autosave writes to a dedicated autosave slot in IndexedDB",
+        "The timer resets after each autosave",
+        "The 5-minute interval is configurable via a constant",
+        "Unit tests verify timer logic",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement pre-invasion autosave",
+      "description": "As a player, I want the game to autosave before an invasion begins so that I can retry if it goes badly.",
+      "acceptanceCriteria": [
+        "When an invasion event is about to start, an autosave triggers first",
+        "The autosave completes before the invasion sequence begins",
+        "If autosave fails, the invasion proceeds anyway (non-blocking on failure)",
+        "The periodic autosave timer resets after a pre-invasion save",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement quit autosave",
+      "description": "As a player, I want the game to autosave when I close the application so that my latest progress is preserved.",
+      "acceptanceCriteria": [
+        "The beforeunload browser event triggers an autosave",
+        "In Electron, the window close event triggers an autosave before quitting",
+        "If the save cannot complete (browser closes too fast), no crash occurs",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement autosave indicator UI",
+      "description": "As a player, I want to see a brief, non-intrusive indicator when autosave occurs.",
+      "acceptanceCriteria": [
+        "A small save icon appears in a corner of the game UI when autosave starts",
+        "The indicator disappears when autosave completes",
+        "The indicator does not block any gameplay interactions",
+        "The indicator shows for at least 1 second even if save is instant",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement autosave error handling",
+      "description": "As a player, I want to be notified if autosave fails so that I can manually save.",
+      "acceptanceCriteria": [
+        "If autosave fails (IndexedDB error, storage full), a warning notification appears",
+        "The notification suggests the player manually save",
+        "Failed autosaves do not crash the game or interrupt gameplay",
+        "The autosave timer retries after the normal interval",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add autosave settings to options menu",
+      "description": "As a player, I want to configure autosave behavior in the options menu.",
+      "acceptanceCriteria": [
+        "Options menu includes an autosave toggle (on/off, default: on)",
+        "Options menu includes autosave interval selection (1, 3, 5, 10 minutes)",
+        "Settings persist via localStorageSignal in the options state",
+        "Changing interval takes effect immediately (resets the timer)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

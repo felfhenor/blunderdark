@@ -1,0 +1,119 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/comprehensive-save-system",
+  "description": "Comprehensive Save System - Serialize and deserialize complete game state to/from JSON in IndexedDB with manual save/load UI.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define complete save schema types",
+      "description": "As a developer, I want a comprehensive save schema so that every piece of game state is captured.",
+      "acceptanceCriteria": [
+        "A SaveData type is defined encompassing all game state subsystems",
+        "Includes: meta (version, timestamp, playtime), world, inhabitants, resources, research, reputation, clock, invasions, victory",
+        "All nested types are JSON-serializable (no functions, signals, or class instances)",
+        "Types use type keyword per project conventions",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement save serialization",
+      "description": "As a developer, I want a serialization function that converts live game state signals into a plain JSON save object.",
+      "acceptanceCriteria": [
+        "A serializeGameState() function reads all relevant signals and produces a SaveData object",
+        "The function handles nested signal values (unwrapping computed signals)",
+        "Output is valid JSON (JSON.stringify/parse round-trip)",
+        "Unit tests verify serialization produces expected structure",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement save deserialization",
+      "description": "As a developer, I want a deserialization function that restores game state from a save object.",
+      "acceptanceCriteria": [
+        "A deserializeGameState(saveData) function populates all game state signals",
+        "All subsystems (rooms, inhabitants, resources, etc.) are correctly restored",
+        "Derived/computed signals recalculate correctly after deserialization",
+        "Game loop resumes from the saved tick count",
+        "Unit tests verify deserialization produces identical state to what was serialized",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement save data validation",
+      "description": "As a developer, I want save data validated on load so that corrupt saves are handled gracefully.",
+      "acceptanceCriteria": [
+        "A validateSaveData(data) function checks the save structure against the schema",
+        "Missing fields are detected and reported",
+        "Invalid data types are detected",
+        "Validation returns a list of errors or a success result",
+        "Unit tests verify detection of various corruption scenarios",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement save integrity checksum",
+      "description": "As a developer, I want save files to include a checksum so that tampering or corruption is detectable.",
+      "acceptanceCriteria": [
+        "A checksum (hash) is computed from the serialized save data",
+        "The checksum is stored alongside the save data",
+        "On load, the checksum is recomputed and compared",
+        "Mismatched checksums trigger a warning but allow the player to proceed",
+        "Unit tests verify checksum computation and mismatch detection",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement manual save UI",
+      "description": "As a player, I want to manually save my game via a UI button.",
+      "acceptanceCriteria": [
+        "A Save Game button is accessible from the game UI",
+        "Clicking Save serializes and writes to IndexedDB",
+        "A success confirmation appears after save completes",
+        "If save fails, an error message is displayed",
+        "Save operation does not freeze the game for more than 200ms",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement manual load UI",
+      "description": "As a player, I want to load a previously saved game to resume from a saved point.",
+      "acceptanceCriteria": [
+        "A Load Game button is accessible from main menu and pause menu",
+        "Clicking Load reads from IndexedDB and deserializes",
+        "Game transitions to game-play page with all state restored",
+        "A loading indicator is shown during deserialization",
+        "If save is corrupted, a user-friendly error is shown",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

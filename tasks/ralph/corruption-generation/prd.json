@@ -1,0 +1,85 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/corruption-generation",
+  "description": "Corruption Generation - Define sources and rates of automatic Corruption generation from dark rooms and creatures.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define room-based Corruption generation rates",
+      "description": "As a developer, I want dark rooms to generate Corruption automatically.",
+      "acceptanceCriteria": [
+        "Soul Well generates +2 Corruption per game minute",
+        "Torture Chamber generates +3 Corruption per game minute",
+        "Generation only occurs when the room is operational",
+        "Generation rate defined in room data (YAML or config)",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define inhabitant-based Corruption generation",
+      "description": "As a developer, I want dark creatures to generate Corruption when stationed.",
+      "acceptanceCriteria": [
+        "Skeleton generates +1 Corruption per game minute when stationed",
+        "Demon Lord generates +10 Corruption per game minute when stationed",
+        "Unstationed inhabitants do not generate Corruption",
+        "Generation rate defined in inhabitant data",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Integrate Corruption accumulation with production tick",
+      "description": "As a developer, I want Corruption to accumulate during the normal production tick.",
+      "acceptanceCriteria": [
+        "Calculate total Corruption generation per tick from all active sources",
+        "Add generated Corruption to the global pool each tick",
+        "Generation respects time-of-day modifiers (Night: +50%)",
+        "Generation respects biome modifiers (Corrupted: +100% dark room Corruption)",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Display Corruption source summary in UI",
+      "description": "As a player, I want to see what is generating Corruption so I can manage it.",
+      "acceptanceCriteria": [
+        "Show Corruption generation rate (per minute) in the resource panel",
+        "Tooltip breaks down generation by source (rooms, inhabitants)",
+        "Show modifier effects on generation rate",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add Corruption generation unit tests",
+      "description": "As a developer, I want tests for Corruption generation calculations.",
+      "acceptanceCriteria": [
+        "Test: Soul Well generates 2 Corruption per minute",
+        "Test: Torture Chamber generates 3 Corruption per minute",
+        "Test: Stationed Skeleton adds 1 Corruption per minute",
+        "Test: Night modifier increases generation by 50%",
+        "Tests in src/app/helpers/corruption.spec.ts",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

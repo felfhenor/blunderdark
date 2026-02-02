@@ -1,0 +1,107 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/feature-attachment-system",
+  "description": "Feature Attachment System - Allows players to enhance rooms by purchasing and attaching features to designated slots (2-3 per room based on size), with bonus application, removal with destruction, and persistence.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define feature data types and slot allocation",
+      "description": "As a developer, I want feature-related data types and slot allocation logic so that the system is well-typed and rooms get the correct number of slots.",
+      "acceptanceCriteria": [
+        "A RoomFeature type is defined with: id, name, description, cost (resource costs), bonuses (array of bonus effects), category",
+        "A FeatureSlot type is defined with: slotIndex, attachedFeatureId: string | null",
+        "A RoomFeatureState type tracks feature slots for a room: slots: FeatureSlot[]",
+        "Small rooms (1-2 tiles) receive 2 feature slots; large rooms (3+ tiles) receive 3 slots",
+        "A helper function getFeatureSlotCount(roomSize) returns the correct count",
+        "Types defined in src/app/interfaces/ using type keyword",
+        "Unit tests verify slot counts for various room sizes",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define features in YAML gamedata",
+      "description": "As a developer, I want features defined in YAML gamedata so that designers can add and tune features without code changes.",
+      "acceptanceCriteria": [
+        "A feature/ directory exists in gamedata/ with YAML files for feature definitions",
+        "Each feature YAML includes: id, name, description, cost, bonuses, category, slot requirements",
+        "The build pipeline compiles feature YAML to JSON via npm run gamedata:build",
+        "TypeScript schemas are generated for feature data",
+        "ContentService loads compiled feature data at app init",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement feature bonus application and removal logic",
+      "description": "As a developer, I want attached features to apply their bonuses to rooms and revert them on removal so that features have tangible gameplay effects.",
+      "acceptanceCriteria": [
+        "When a feature is attached, its bonuses are applied to the room's production/stats",
+        "When a feature is removed, its bonuses are reverted",
+        "Bonuses support types: flat production increase, percentage modifier, stat modifier",
+        "Multiple features on the same room stack their bonuses",
+        "A helper function computes total bonuses for a room from all attached features",
+        "Unit tests verify bonus application, removal, and stacking",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement feature purchase, attachment, and removal UI",
+      "description": "As a player, I want to purchase features, attach them to room slots, and remove them so that I can customize my rooms.",
+      "acceptanceCriteria": [
+        "Clicking an empty feature slot opens a feature selection panel listing available features with name, description, cost, and bonuses",
+        "Features the player cannot afford are shown but disabled with cost highlighting",
+        "Selecting and confirming a feature deducts resources and attaches it to the slot",
+        "A remove action on an occupied slot shows a confirmation dialog warning the feature will be destroyed",
+        "Confirming removal clears the slot and removes all associated bonuses",
+        "A feature cannot be attached to a slot that already has a feature",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add feature visual representation and tooltips",
+      "description": "As a player, I want to see visual indicators of attached features on rooms so that I can quickly identify enhanced rooms.",
+      "acceptanceCriteria": [
+        "Rooms with features display small icons or markers for each occupied slot",
+        "Feature icons are distinct per feature category",
+        "Hovering a feature icon shows a tooltip with feature name and bonuses",
+        "Empty slots show a subtle '+' indicator when the room is selected",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement feature state persistence",
+      "description": "As a player, I want my room features to be saved and restored so that customizations persist across sessions.",
+      "acceptanceCriteria": [
+        "Room feature state is included in the room data within GameState",
+        "On save, all feature slots and attachments are serialized to IndexedDB",
+        "On load, features are restored and bonuses reapplied",
+        "Unit tests verify feature state serialization round-trip",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

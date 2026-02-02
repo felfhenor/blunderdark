@@ -1,0 +1,120 @@
+{
+  "project": "Blunderdark",
+  "branchName": "ralph/basic-combat-resolution",
+  "description": "Basic Combat Resolution - d20-based attack roll system with damage calculation, HP tracking, death handling, and visual feedback.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Define combat types",
+      "description": "As a developer, I want combat-related types defined so that the combat system has a clear API.",
+      "acceptanceCriteria": [
+        "CombatUnit type defined in src/app/interfaces/ with fields: attack, defense, hp, maxHp",
+        "CombatResult type defined with fields: hit, roll, damage, defenderDead",
+        "Types use type keyword, not interface",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement attack roll system",
+      "description": "As a developer, I want a d20-based attack roll system so that combat has controlled randomness.",
+      "acceptanceCriteria": [
+        "Attack roll: roll d20 + attacker's Attack stat",
+        "Hit threshold: roll must meet or exceed target's Defense stat + 10",
+        "Natural 20 always hits; natural 1 always misses",
+        "Roll result and hit/miss outcome are returned from the combat function",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement damage calculation and HP reduction",
+      "description": "As a developer, I want damage calculated based on Attack vs Defense with HP tracking and death.",
+      "acceptanceCriteria": [
+        "On hit: damage = attacker's Attack stat - defender's Defense stat",
+        "Minimum damage on hit is 1 (a hit always deals at least 1 damage)",
+        "On miss: damage is 0",
+        "HP cannot go below 0",
+        "When HP reaches 0, unit is marked as dead",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create pure combat resolution function",
+      "description": "As a developer, I want a single combat resolution function so that attack actions can delegate to a clean API.",
+      "acceptanceCriteria": [
+        "Create resolveCombat(attacker, defender, rng) in src/app/helpers/combat.ts",
+        "Function returns CombatResult with hit, roll, damage, defenderDead",
+        "Function is pure (no side effects) for testability; caller applies results",
+        "RNG function is injectable for testability",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add combat unit tests",
+      "description": "As a developer, I want unit tests for combat resolution so that the math is verified.",
+      "acceptanceCriteria": [
+        "Test: Attack roll hits when roll + attack >= defense + 10",
+        "Test: Attack roll misses when roll + attack < defense + 10",
+        "Test: Natural 20 always hits regardless of stats",
+        "Test: Natural 1 always misses regardless of stats",
+        "Test: Damage is attack - defense (minimum 1 on hit)",
+        "Test: Defender death at 0 HP",
+        "Tests placed in src/app/helpers/combat.spec.ts",
+        "All tests pass with npm run test",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement floating damage number display",
+      "description": "As a player, I want to see damage numbers when attacks land so that I understand the combat outcome.",
+      "acceptanceCriteria": [
+        "Show floating damage number above the damaged unit",
+        "Damage number animates upward and fades out over ~1 second",
+        "Miss displays 'Miss' text instead of a number",
+        "Different colors for damage (red) and miss (gray)",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement health bar display",
+      "description": "As a player, I want to see health bars on units during invasions so I can assess the battle state.",
+      "acceptanceCriteria": [
+        "Show health bar above each unit during invasion mode",
+        "Health bar shows current HP as proportion of max HP",
+        "Color changes: green (>50%), yellow (25-50%), red (<25%)",
+        "Health bar updates immediately when damage is applied",
+        "Component uses OnPush change detection",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
