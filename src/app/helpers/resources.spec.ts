@@ -20,7 +20,9 @@ vi.mock('@helpers/state-game', () => {
 });
 
 // Must import after mock setup
-const { addResource } = await import('@helpers/resources');
+const { addResource, subtractResource, canAfford, payCost } = await import(
+  '@helpers/resources'
+);
 
 describe('addResource', () => {
   beforeEach(() => {
@@ -64,5 +66,92 @@ describe('addResource', () => {
     const added = await addResource('corruption', 50);
     expect(added).toBe(50);
     expect(mockResources.corruption.current).toBe(50);
+  });
+});
+
+describe('subtractResource', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+  });
+
+  it('should subtract a normal amount and return true', async () => {
+    mockResources.gold.current = 500;
+    const result = await subtractResource('gold', 100);
+    expect(result).toBe(true);
+    expect(mockResources.gold.current).toBe(400);
+  });
+
+  it('should fail and not change state when subtracting more than available', async () => {
+    mockResources.gold.current = 50;
+    const result = await subtractResource('gold', 100);
+    expect(result).toBe(false);
+    expect(mockResources.gold.current).toBe(50);
+  });
+
+  it('should return true when subtracting zero', async () => {
+    mockResources.gold.current = 500;
+    const result = await subtractResource('gold', 0);
+    expect(result).toBe(true);
+    expect(mockResources.gold.current).toBe(500);
+  });
+
+  it('should return false when subtracting a negative amount', async () => {
+    mockResources.gold.current = 500;
+    const result = await subtractResource('gold', -10);
+    expect(result).toBe(false);
+    expect(mockResources.gold.current).toBe(500);
+  });
+
+  it('should succeed when subtracting exact current amount', async () => {
+    mockResources.crystals.current = 200;
+    const result = await subtractResource('crystals', 200);
+    expect(result).toBe(true);
+    expect(mockResources.crystals.current).toBe(0);
+  });
+});
+
+describe('canAfford', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+  });
+
+  it('should return true when resources are sufficient', () => {
+    mockResources.gold.current = 500;
+    mockResources.crystals.current = 100;
+    expect(canAfford({ gold: 200, crystals: 50 })).toBe(true);
+  });
+
+  it('should return false when any resource is insufficient', () => {
+    mockResources.gold.current = 500;
+    mockResources.crystals.current = 10;
+    expect(canAfford({ gold: 200, crystals: 50 })).toBe(false);
+  });
+
+  it('should return true for empty costs', () => {
+    expect(canAfford({})).toBe(true);
+  });
+});
+
+describe('payCost', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+  });
+
+  it('should subtract multiple resources atomically', async () => {
+    mockResources.gold.current = 500;
+    mockResources.food.current = 200;
+    const result = await payCost({ gold: 100, food: 50 });
+    expect(result).toBe(true);
+    expect(mockResources.gold.current).toBe(400);
+    expect(mockResources.food.current).toBe(150);
+  });
+
+  it('should fail and not change any resource if one is insufficient', async () => {
+    mockResources.gold.current = 500;
+    mockResources.food.current = 10;
+    const result = await payCost({ gold: 100, food: 50 });
+    expect(result).toBe(false);
+    expect(mockResources.gold.current).toBe(500);
+    expect(mockResources.food.current).toBe(10);
   });
 });

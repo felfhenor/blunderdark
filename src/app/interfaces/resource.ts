@@ -13,3 +13,5 @@ export type ResourceState = {
 };
 
 export type ResourceMap = Record<ResourceType, ResourceState>;
+
+export type ResourceCost = Partial<Record<ResourceType, number>>;
