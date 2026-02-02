@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Hallway and HallwayUpgrade types in src/app/interfaces/hallway.ts, uses TileOffset from room-shape.ts"
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TileOccupant union type added to GridTile; addHallwayToGrid/removeHallwayFromGrid/isTileBlockedForHallway in hallways.ts"
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "hallways: Hallway[] added to GameStateWorld; getHallwaysBetween, addHallway, serializeHallways/deserializeHallways in hallways.ts"
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "removeHallway, removeHallwayFromGrid, addUpgradeToHallway, removeUpgradeFromHallway in hallways.ts with 17 tests"
     }
   ]
 }

@@ -145,3 +145,16 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Lint rule `typescript-paths/absolute-import` requires `@helpers/room-placement` not `./room-placement` in test imports
   - `getAbsoluteTiles()` from room-shapes.ts is reusable for converting shape-relative tiles to grid-absolute coordinates
   - Grid tiles use `[y][x]` indexing (row-major) — be careful with coordinate order
+
+## hallway-data-structure US-001 through US-004: All Stories [DONE]
+- Created `src/app/interfaces/hallway.ts` with `Hallway` and `HallwayUpgrade` types
+- Added `TileOccupant` union (`'empty' | 'room' | 'hallway'`) and `hallwayId` field to `GridTile`
+- Added `hallways: Hallway[]` to `GameStateWorld` in state-game.ts
+- Created `src/app/helpers/hallways.ts` with: `addHallwayToGrid`, `removeHallwayFromGrid`, `isTileBlockedForHallway`, `getHallwaysBetween`, `addHallway`, `removeHallway`, `addUpgradeToHallway`, `removeUpgradeFromHallway`, `serializeHallways`, `deserializeHallways`
+- Created `src/app/helpers/hallways.spec.ts` with 17 unit tests
+- All tests pass (156/156), lint passes
+- Commit: 3ce7f87
+- **Learnings for future iterations:**
+  - When adding new fields to `GridTile`, update `createEmptyGrid()` in grid.ts and fix any `toEqual` assertions in grid.spec.ts
+  - Hallway helpers follow the same pure-function pattern as grid helpers (take state in, return new state)
+  - `removeHallwayFromGrid` checks `hallwayId` matches before clearing — prevents accidental deletion of overlapping structures
