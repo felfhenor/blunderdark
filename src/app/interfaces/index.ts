@@ -10,6 +10,7 @@ export * from './discord';
 export * from './droppable';
 export * from './grid';
 export * from './identifiable';
+export * from './inhabitant';
 export * from './meta';
 export * from './resource';
 export * from './sfx';
