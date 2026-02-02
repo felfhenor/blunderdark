@@ -1,6 +1,6 @@
 import { createEmptyGrid } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
-import type { GameId, GameState, StatBlock } from '@interfaces';
+import type { GameId, GameState, ResourceMap, StatBlock } from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -17,7 +17,20 @@ export function defaultGameState(): GameState {
     },
     world: {
       grid: createEmptyGrid(),
+      resources: defaultResources(),
     },
+  };
+}
+
+export function defaultResources(): ResourceMap {
+  return {
+    crystals: { current: 0, max: 500 },
+    food: { current: 0, max: 500 },
+    gold: { current: 0, max: 1000 },
+    flux: { current: 0, max: 200 },
+    research: { current: 0, max: 300 },
+    essence: { current: 0, max: 200 },
+    corruption: { current: 0, max: 100 },
   };
 }
 

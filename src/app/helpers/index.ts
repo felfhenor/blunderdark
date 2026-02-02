@@ -12,6 +12,7 @@ export * from './icons';
 export * from './logging';
 export * from './migrate';
 export * from './notify';
+export * from './resources';
 export * from './rng';
 export * from './scheduler';
 export * from './setup';

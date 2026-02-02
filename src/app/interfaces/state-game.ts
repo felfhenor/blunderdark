@@ -3,9 +3,11 @@ import type { Branded } from '@interfaces/identifiable';
 export type GameId = Branded<string, 'GameId'>;
 
 import type { GridState } from '@interfaces/grid';
+import type { ResourceMap } from '@interfaces/resource';
 
 export interface GameStateWorld {
   grid: GridState;
+  resources: ResourceMap;
 }
 
 export interface GameStateClock {

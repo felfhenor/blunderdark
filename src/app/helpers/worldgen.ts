@@ -1,5 +1,7 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
+import { defaultResources } from '@helpers/defaults';
+import { createEmptyGrid } from '@helpers/grid';
 import type { GameStateWorld } from '@interfaces';
 import { Subject } from 'rxjs';
 
@@ -18,6 +20,8 @@ export async function worldgenGenerateWorld(): Promise<
 > {
   //
   return {
+    grid: createEmptyGrid(),
+    resources: defaultResources(),
     didFinish: true,
   };
 }
