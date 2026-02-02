@@ -51,3 +51,35 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - The `indexedDbSignal` in signal.ts auto-persists on `set()`/`update()` — no manual save needed for normal operations
   - Resource persistence is already wired via `GameStateWorld.resources` field added in US-002
 - Commit: a78cb81
+
+## inhabitant-data-model US-001: Define InhabitantDefinition, InhabitantStats, and InhabitantTrait types [DONE]
+- Created `src/app/interfaces/inhabitant.ts` with `InhabitantTrait`, `InhabitantStats`, `InhabitantDefinition` types
+- `InhabitantDefinition.cost` uses `Partial<Record<ResourceType, number>>` to match `ResourceCost`
+- `InhabitantStats` includes: hp, attack, defense, speed, workerEfficiency
+- Exported via barrel at `@interfaces`
+- All tests pass (94/94), lint passes, no new typecheck errors
+- **Learnings:** Interfaces directory uses `@interfaces/resource` alias for internal imports (lint rule: `typescript-paths/absolute-import`)
+- Commit: 9e5a466
+
+## inhabitant-data-model US-002: Define InhabitantInstance and conditional states [DONE]
+- Added `InhabitantState` union type (`'normal' | 'scared' | 'hungry'`) to `src/app/interfaces/inhabitant.ts`
+- Added `InhabitantInstance` type with instanceId, definitionId, name, state, assignedRoomId
+- Added `inhabitants: InhabitantInstance[]` to `GameStateWorld` in `src/app/interfaces/state-game.ts`
+- Updated `defaultGameState()` in `src/app/helpers/defaults.ts` to include `inhabitants: []`
+- All tests pass (94/94), lint passes, no new typecheck errors
+- Commit: 4c26b3b
+
+## inhabitant-data-model US-003: Define Tier 1 inhabitants in YAML gamedata [DONE]
+- Populated `gamedata/inhabitant/base.yml` with 5 Tier 1 inhabitants: Goblin, Kobold, Skeleton, Myconid, Slime
+- Each entry has: UUID, name, type, tier, description, cost, stats, traits matching `InhabitantDefinition` type
+- Goblin: Miner trait (+20% crystals), Kobold: Trapper trait, Skeleton: Guardian trait, Myconid: Farmer trait (+15% food), Slime: Adaptable trait
+- YAML compiles via `npm run gamedata:build` — 5 entries loaded, JSON generated
+- **Learnings:** `public/json/` is gitignored (generated output), only commit YAML source files. Other empty YAML files (room, decoration, pet, invader) cause non-fatal "doc is not iterable" errors in the build script — pre-existing issue.
+- Commit: 176ab28
+
+## inhabitant-data-model US-004: Implement inhabitant serialization for save/load [DONE]
+- Created `src/app/helpers/inhabitants.ts` with: `allInhabitants()`, `getInhabitant()`, `addInhabitant()`, `removeInhabitant()`, `serializeInhabitants()`, `deserializeInhabitants()`
+- `deserializeInhabitants()` handles missing optional fields (defaults state to 'normal', assignedRoomId to null)
+- Created `src/app/helpers/inhabitants.spec.ts` with 9 unit tests covering: add, remove, get all, get by id, get nonexistent, round-trip single, round-trip multiple, missing fields, immutability
+- All tests pass (103/103), lint passes, no new typecheck errors
+- Commit: 639c6af

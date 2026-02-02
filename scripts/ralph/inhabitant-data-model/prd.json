@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in commit 9e5a466"
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in commit 4c26b3b"
     },
     {
       "id": "US-003",
@@ -52,8 +52,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in commit 176ab28"
     },
     {
       "id": "US-004",
@@ -68,8 +68,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in commit 639c6af"
     }
   ]
 }
