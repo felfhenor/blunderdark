@@ -11,6 +11,7 @@ export * from './droppable';
 export * from './grid';
 export * from './identifiable';
 export * from './meta';
+export * from './resource';
 export * from './sfx';
 export * from './stat';
 export * from './state-game';
