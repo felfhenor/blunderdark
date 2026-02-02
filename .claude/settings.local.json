@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(xargs -I {} sh -c 'echo \"\"=== {} ===\"\" && head -5 \"\"{}\"\"')",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run test)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nadd 20x20 tile grid system for dungeon building\n\nImplements the foundational grid system \\(PRD grid-system, US-001 through US-005\\):\ngrid types, state helpers, tile selection, CSS grid component, and integration\ninto the game-play page with 15 unit tests.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
