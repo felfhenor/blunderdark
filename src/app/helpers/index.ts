@@ -19,6 +19,7 @@ export * from './rng';
 export * from './room-placement';
 export * from './room-shapes';
 export * from './scheduler';
+export * from './season';
 export * from './setup';
 export * from './sfx';
 export * from './signal';

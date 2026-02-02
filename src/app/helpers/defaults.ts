@@ -1,6 +1,12 @@
 import { createEmptyGrid } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
-import type { GameId, GameState, ResourceMap, StatBlock } from '@interfaces';
+import type {
+  GameId,
+  GameState,
+  ResourceMap,
+  SeasonState,
+  StatBlock,
+} from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -20,7 +26,16 @@ export function defaultGameState(): GameState {
       resources: defaultResources(),
       inhabitants: [],
       hallways: [],
+      season: defaultSeasonState(),
     },
+  };
+}
+
+export function defaultSeasonState(): SeasonState {
+  return {
+    currentSeason: 'growth',
+    dayInSeason: 1,
+    totalSeasonCycles: 0,
   };
 }
 

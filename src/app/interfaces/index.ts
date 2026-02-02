@@ -15,6 +15,7 @@ export * from './inhabitant';
 export * from './meta';
 export * from './resource';
 export * from './room-shape';
+export * from './season';
 export * from './sfx';
 export * from './stat';
 export * from './state-game';

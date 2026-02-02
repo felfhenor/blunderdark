@@ -6,12 +6,14 @@ import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { ResourceMap } from '@interfaces/resource';
+import type { SeasonState } from '@interfaces/season';
 
 export interface GameStateWorld {
   grid: GridState;
   resources: ResourceMap;
   inhabitants: InhabitantInstance[];
   hallways: Hallway[];
+  season: SeasonState;
 }
 
 export interface GameStateClock {
