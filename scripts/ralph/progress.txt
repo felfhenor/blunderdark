@@ -33,3 +33,10 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added 10 unit tests covering: normal subtract, subtract more than available, subtract zero, subtract negative, exact amount, canAfford true/false/empty, payCost success, payCost failure
 - All tests pass (82/82), lint passes, no new typecheck errors
 - Commit: b59eb52
+
+## resource-manager US-005: Resource Change Callbacks [DONE]
+- Added `isResourceLow(type, threshold)` computed signal to `src/app/helpers/resources.ts` — returns true when current/max is below threshold percentage
+- Added `isResourceFull(type)` computed signal — returns true when current equals max
+- Added 8 unit tests covering: low below/above threshold, low at zero, low reactivity, full at max, full below max, full at zero, full reactivity
+- All tests pass (90/90), lint passes, no new typecheck errors
+- Commit: e580da0
