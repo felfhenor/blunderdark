@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing: GridTile and GridState types in src/app/interfaces/grid.ts with GRID_SIZE constant"
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing: grid.ts helpers + grid.spec.ts with 15 tests (122 total passing)"
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing: GridComponent (OnPush) in src/app/components/grid/ with 20x20 CSS grid, .occupied/.selected classes, displayed on game-play page"
     },
     {
       "id": "US-004",
@@ -65,8 +65,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing: selectedTile signal, selectTile/deselectTile in grid.ts, Escape key handler via host binding, hover/selected CSS styles in grid.component.scss"
     },
     {
       "id": "US-005",
@@ -81,8 +81,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing: GridState in GameStateWorld, JSON round-trip test in grid.spec.ts, createEmptyGrid() used in defaults.ts"
     }
   ]
 }

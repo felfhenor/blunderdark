@@ -118,3 +118,17 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added 3 tests: JSON round-trip, shapeId-not-full-data verification, fallback on missing shape
 - All tests pass (122/122), lint passes
 - Commit: 485e96a
+
+## grid-system US-001 through US-005: All Stories [DONE]
+- All grid-system user stories were already implemented in prior work
+- US-001: `GridTile`, `GridState` types and `GRID_SIZE` constant in `src/app/interfaces/grid.ts`
+- US-002: `createEmptyGrid`, `isInBounds`, `getTile`, `setTile`, `resetGrid` in `src/app/helpers/grid.ts` with 15 unit tests in `grid.spec.ts`
+- US-003: `GridComponent` (OnPush) in `src/app/components/grid/` with 20x20 CSS grid layout, `.occupied`/`.selected` classes, rendered on game-play page
+- US-004: `selectedTile` signal, `selectTile`/`deselectTile` helpers, Escape key handler via host binding, hover and selected CSS styles
+- US-005: `GridState` in `GameStateWorld`, JSON round-trip test, `createEmptyGrid()` used in `defaults.ts` for new games
+- All tests pass (122/122), lint passes
+- **Learnings for future iterations:**
+  - Grid helpers use pure functions (take grid as param, return new grid) rather than signal-based mutation — consistent immutable pattern
+  - `GameStateWorld` already includes `grid: GridState` — no migration needed
+  - Grid component uses `(document:keydown.escape)` in host bindings for keyboard shortcuts
+  - CSS uses `var(--b3)`, `var(--p)`, `var(--s)`, `var(--pf)` theme variables from DaisyUI
