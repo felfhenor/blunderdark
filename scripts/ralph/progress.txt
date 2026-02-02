@@ -170,3 +170,15 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `advanceDay()` is a pure function for testability; `advanceGameDay()` wraps it with signal updates
   - Season transition event uses RxJS Subject (same pattern as notify.ts) — fires only on actual season change
   - `seasonProgress` computes percentage as `(dayInSeason - 1) / DAYS_PER_SEASON * 100` (day 1 = 0%, day 7 = ~85.7%)
+
+## biome-system US-001: Define Biome Types [DONE]
+- Created `src/app/interfaces/biome.ts` with `BiomeType` union (volcanic, flooded, crystal, corrupted, fungal, neutral), `Biome` type, and `BIOME_DATA` constant
+- Commit: 1663833
+
+## floor-creation-system US-001: Define Floor Data Model [DONE]
+- Created `src/app/interfaces/floor.ts` with `Floor` type (id, name, depth, biome, grid, rooms, hallways, inhabitants) and `MAX_FLOORS` constant
+- Floor type integrates BiomeType, GridState, PlacedRoom, Hallway, and InhabitantInstance
+- Commit: 2e33c27
+- **Learnings for future iterations:**
+  - Floor type references all major game state subtypes — a good integration point
+  - The current GameStateWorld has a single grid/hallways/inhabitants; multi-floor will require refactoring to use Floor[] instead
