@@ -1,0 +1,44 @@
+.floor-entry {
+  position: relative;
+  overflow: hidden;
+
+  .biome-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--floor-biome-color);
+  }
+
+  &.btn-active {
+    .biome-indicator {
+      width: 6px;
+    }
+  }
+}
+
+.biome-badge {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.effects-summary {
+  padding: 0.5rem;
+  background: var(--b2, oklch(var(--b2)));
+  border-radius: 0.25rem;
+}
+
+.floor-detail {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

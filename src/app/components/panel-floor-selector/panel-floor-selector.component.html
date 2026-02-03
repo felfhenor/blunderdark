@@ -1,0 +1,63 @@
+<div class="card bg-base-100 shadow-xl">
+  <div class="card-body p-4">
+    <h3 class="card-title text-sm">Floors</h3>
+
+    <div class="floor-list flex flex-col gap-2">
+      @for (floor of floors(); track trackByFloorId($index, floor); let i = $index) {
+        <button
+          class="floor-entry btn btn-sm justify-start gap-2"
+          [class.btn-active]="isSelected(i)"
+          [style.--floor-biome-color]="getBiomeData(floor.biome).color"
+          (click)="selectFloor(i)"
+        >
+          <span class="biome-indicator"></span>
+          <span class="biome-icon">{{ getBiomeIcon(floor.biome) }}</span>
+          <span class="floor-name flex-1 text-left truncate">{{ floor.name }}</span>
+          <span class="biome-name text-xs opacity-70">{{ getBiomeData(floor.biome).name }}</span>
+        </button>
+      }
+    </div>
+
+    @if (selectedFloor(); as floor) {
+      <div class="divider my-2"></div>
+
+      <div class="floor-detail">
+        <div class="flex items-center gap-2 mb-2">
+          <span
+            class="biome-badge badge badge-lg"
+            [style.background-color]="selectedFloorBiome().color"
+            [style.color]="'white'"
+          >
+            {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome().name }}
+          </span>
+          <span class="text-xs opacity-70">Depth {{ floor.depth }}</span>
+        </div>
+
+        <p class="text-sm opacity-80 mb-2">{{ selectedFloorBiome().description }}</p>
+
+        <div class="effects-summary text-xs opacity-60">
+          @switch (floor.biome) {
+            @case ('volcanic') {
+              <p>Effects: +Fire damage, -Water creatures</p>
+            }
+            @case ('flooded') {
+              <p>Effects: +Water creatures, slower movement</p>
+            }
+            @case ('crystal') {
+              <p>Effects: +Crystal production, light bonus</p>
+            }
+            @case ('corrupted') {
+              <p>Effects: +Corruption gain, +Dark energy</p>
+            }
+            @case ('fungal') {
+              <p>Effects: +Food production, spore hazards</p>
+            }
+            @case ('neutral') {
+              <p>Effects: No special modifiers</p>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

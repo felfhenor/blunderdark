@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { BiomeType, Floor } from '@interfaces';
 
 /**
@@ -40,4 +40,45 @@ export function getFloor(floorId: string): Floor | undefined {
 export function getFloorBiome(floorId: string): BiomeType {
   const floor = getFloor(floorId);
   return floor?.biome ?? 'neutral';
+}
+
+/**
+ * Get the current floor index.
+ */
+export const currentFloorIndex = computed<number>(() => {
+  return gamestate().world.currentFloorIndex;
+});
+
+/**
+ * Set the current floor by index.
+ * Returns false if index is out of bounds.
+ */
+export async function setCurrentFloorByIndex(index: number): Promise<boolean> {
+  const floors = gamestate().world.floors;
+  if (index < 0 || index >= floors.length) {
+    return false;
+  }
+
+  await updateGamestate((state) => ({
+    ...state,
+    world: {
+      ...state.world,
+      currentFloorIndex: index,
+    },
+  }));
+  return true;
+}
+
+/**
+ * Set the current floor by floor ID.
+ * Returns false if floor not found.
+ */
+export async function setCurrentFloorById(floorId: string): Promise<boolean> {
+  const floors = gamestate().world.floors;
+  const index = floors.findIndex((f) => f.id === floorId);
+  if (index === -1) {
+    return false;
+  }
+
+  return setCurrentFloorByIndex(index);
 }
