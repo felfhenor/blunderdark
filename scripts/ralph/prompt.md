@@ -82,6 +82,7 @@ Only update AGENTS.md if you have **genuinely reusable knowledge** that would he
 - Do NOT commit broken code
 - Keep changes focused and minimal
 - Follow existing code patterns
+- Fix type checking even if your current changes didn't break it
 
 ## Browser Testing (Required for Frontend Stories)
 
