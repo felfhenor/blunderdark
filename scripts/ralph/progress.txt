@@ -246,3 +246,21 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Build script auto-discovers new folders in gamedata/ — no script changes needed
   - `reputationRewards` uses `Partial<Record<ReputationType, number>>` allowing any subset of reputation types
   - Some actions have negative reputation effects (e.g., torture chamber gives -5 harmony)
+
+## reputation-tracking US-004: Reputation Award Integration [DONE]
+- Added `ReputationAwardEvent` and `ReputationLevelUpEvent` types to `src/app/helpers/reputation.ts`
+- Added `reputationAward$` and `reputationLevelUp$` RxJS observables (Subject-based, same pattern as notify.ts)
+- Added `awardReputationForAction(actionId)` async function:
+  - Looks up action via `getEntry<ReputationAction>(actionId)`
+  - Applies all reputation rewards via `addReputation()`
+  - Detects level-up transitions by comparing before/after levels
+  - Emits `reputationAward$` for UI feedback
+  - Emits `reputationLevelUp$` for each type that crosses a threshold
+- Added `getReputationAction(actionIdOrName)` helper for direct lookups
+- Added 7 unit tests covering: level-up detection at thresholds, no level-up within tier, multi-tier jumps, observable exports, action lookup
+- All tests pass (208/208), lint passes
+- Commit: 46db7a4
+- **Learnings for future iterations:**
+  - Level-up detection compares `getReputationLevel(previousPoints)` vs `getReputationLevel(newPoints)` — simple and effective
+  - `updateGamestate()` is async and handles both tick-mode and direct signal updates
+  - The awardReputationForAction function returns `false` if action not found or has no rewards — callers should check

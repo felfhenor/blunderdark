@@ -64,8 +64,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "awardReputationForAction() + reputationAward$/reputationLevelUp$ observables + 7 tests"
     },
     {
       "id": "US-005",
