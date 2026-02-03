@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Floor type had biome field; added floors[] to GameStateWorld, defaultFloor() with neutral biome"
     },
     {
       "id": "US-003",

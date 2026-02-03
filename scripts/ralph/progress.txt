@@ -309,3 +309,16 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - ngx-toastr supports `tapToDismiss: true` for click-to-dismiss
   - ToastrService methods accept an optional config object as third parameter
   - Subscribing to RxJS observables in service `init()` method is the pattern for cross-cutting concerns
+
+## biome-system US-002: Add biome field to floor data [DONE]
+- Added `floors: Floor[]` and `currentFloorIndex: number` to `GameStateWorld` in state-game.ts
+- Added `defaultFloor(depth)` function in defaults.ts creating floor with 'neutral' biome
+- Updated `defaultGameState()` to initialize with one default floor at depth 1
+- Updated `worldgen.ts` to include floors array and currentFloorIndex
+- Floor biome persists automatically via game state indexedDbSignal
+- All tests pass (208/208), lint passes, build compiles
+- Commit: f412793
+- **Learnings for future iterations:**
+  - Floor type already had `biome: BiomeType` field from US-001 implementation
+  - GameStateWorld uses single grid/hallways/inhabitants for current floor; the floors array provides multi-floor capability
+  - `defaultFloor()` uses `rngUuid()` for floor ID generation — consistent with game ID pattern
