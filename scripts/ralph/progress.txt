@@ -355,3 +355,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - World setup settings like `worldSeed` and now `startingBiome` are stored in module-level signals before worldgen runs
   - The `rngChoice()` helper in `@helpers/rng` provides simple equal-probability selection from an array
   - Use `signal<BiomeType | 'random'>` to allow 'random' as a valid selection value alongside actual biome types
+
+## biome-system US-005: Display biome information in floor UI [DONE]
+- Created `src/app/components/panel-floor-selector/` with component, template, and SCSS
+- Floor selector shows all floors in a list with biome icons, names, and color indicators
+- Each floor entry has a colored left border matching the biome color via CSS variable `--floor-biome-color`
+- Selected floor shows detail panel with biome badge, description, and effects summary
+- Added `setCurrentFloorByIndex()` and `setCurrentFloorById()` to `src/app/helpers/floor.ts` for floor navigation
+- Added `currentFloorIndex` computed signal for tracking selection
+- Added component to game-play page sidebar alongside reputation panel
+- Component uses OnPush change detection
+- All tests pass (213/213), lint passes, build compiles
+- Commit: 4293f1d
+- **Learnings for future iterations:**
+  - Use CSS custom properties (e.g., `--floor-biome-color`) on elements to pass colors from template to SCSS for dynamic styling
+  - The game-play page sidebar is a flex column with gap-4; new panels stack naturally
+  - Floor selection via `updateGamestate()` follows async pattern consistent with other state updates

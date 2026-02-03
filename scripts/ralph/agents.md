@@ -91,3 +91,26 @@ Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selectio
 ## Biome Data
 
 `BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering.
+
+## Creating Panel Components
+
+When creating new panel components for the game-play sidebar:
+
+1. Create component in `src/app/components/panel-[name]/` with `.ts`, `.html`, `.scss` files
+2. Use `ChangeDetectionStrategy.OnPush` in the component decorator
+3. Import and add to `game-play.component.ts` imports array
+4. Add `<app-panel-[name] />` to the sidebar div in `game-play.component.html`
+5. Use DaisyUI card structure: `card > card-body > card-title` for consistent styling
+
+## Dynamic Styling with CSS Variables
+
+Pass colors from templates to SCSS using CSS custom properties:
+
+```html
+<div [style.--my-color]="getColor()"></div>
+```
+```scss
+.element {
+  border-color: var(--my-color);
+}
+```
