@@ -338,3 +338,20 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Floor helpers follow same pattern as other helpers: computed signals + pure lookup functions
   - Using `??` operator to default to 'neutral' biome handles undefined floor case gracefully
   - The acceptance criteria asked for FloorService but helpers pattern is more consistent with codebase
+
+## biome-system US-003: Implement biome assignment at floor creation [DONE]
+- Added biome selection UI to `src/app/pages/game-setup-world/game-setup-world.component.ts` and `.html`
+- UI shows all 6 biomes (volcanic, flooded, crystal, corrupted, fungal, neutral) plus a "Random" option
+- Each biome option displays name, color indicator, and description
+- Added `setStartingBiome(biome)`, `getStartingBiome()`, `resolveStartingBiome()` helpers to `src/app/helpers/world.ts`
+- Updated `defaultFloor(depth, biome)` in `src/app/helpers/defaults.ts` to accept optional biome parameter
+- Updated `worldgenGenerateWorld()` in `src/app/helpers/worldgen.ts` to use resolved starting biome
+- Random selection picks from 5 non-neutral biomes with equal probability using `rngChoice()`
+- Added `OnPush` change detection to game-setup-world component
+- All tests pass (213/213), lint passes
+- Commit: 1a80c6e
+- **Learnings for future iterations:**
+  - The `BIOME_DATA` constant in `@interfaces/biome` provides display data (name, description, color) for each biome
+  - World setup settings like `worldSeed` and now `startingBiome` are stored in module-level signals before worldgen runs
+  - The `rngChoice()` helper in `@helpers/rng` provides simple equal-probability selection from an array
+  - Use `signal<BiomeType | 'random'>` to allow 'random' as a valid selection value alongside actual biome types

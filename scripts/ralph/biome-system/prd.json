@@ -47,8 +47,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Biome selection UI in game-setup-world with all 6 biomes + random; setStartingBiome/resolveStartingBiome helpers; defaultFloor accepts biome param"
     },
     {
       "id": "US-004",
