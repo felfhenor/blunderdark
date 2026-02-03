@@ -227,3 +227,22 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `AdjacencyMap` uses `Record<string, string[]>` instead of `Map<string, Set<string>>` for JSON serialization compatibility
   - `areRoomsAdjacent` uses a Set for O(1) neighbor lookup, iterating through tilesA and checking 4 neighbors each
   - The adjacency map is bidirectional — when A is adjacent to B, both entries are updated
+
+## reputation-tracking US-003: Map Game Actions to Reputation Points [DONE]
+- Created `src/app/interfaces/reputation.ts` `ReputationAction` type with id, name, description, reputationRewards
+- Added `'reputationaction'` to `ContentType` union in `src/app/interfaces/identifiable.ts`
+- Added `ensureReputationAction` initializer to `src/app/helpers/content-initializers.ts`
+- Created `gamedata/reputationaction/base.yml` with 15 distinct actions across all 5 reputation types:
+  - Terror (3): Place Torture Chamber, Defeat Invader, Summon Wraith
+  - Wealth (3): Build Treasure Vault, Complete Trade Deal, Mine Gold Vein
+  - Knowledge (3): Complete Research, Build Library, Discover Ancient Artifact
+  - Harmony (3): Build Mushroom Grove, Feed All Inhabitants, Peaceful Season Transition
+  - Chaos (3): Embrace Corruption, Summon Demon, Activate Ley Line Nexus
+- YAML compiles to JSON via `npm run gamedata:build` — ContentService loads automatically via all.json
+- All tests pass (201/201), lint passes
+- Commit: 2d5d1ee
+- **Learnings for future iterations:**
+  - New content types require: (1) add to ContentType union, (2) add ensureX initializer to content-initializers.ts, (3) create gamedata/[type]/ folder with YAML
+  - Build script auto-discovers new folders in gamedata/ — no script changes needed
+  - `reputationRewards` uses `Partial<Record<ReputationType, number>>` allowing any subset of reputation types
+  - Some actions have negative reputation effects (e.g., torture chamber gives -5 harmony)

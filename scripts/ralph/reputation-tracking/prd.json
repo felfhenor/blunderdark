@@ -49,8 +49,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ReputationAction type + gamedata/reputationaction/base.yml with 15 actions (3 per reputation type)"
     },
     {
       "id": "US-004",
