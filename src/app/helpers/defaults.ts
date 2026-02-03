@@ -1,6 +1,7 @@
 import { createEmptyGrid } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import type {
+  Floor,
   GameId,
   GameState,
   ReputationState,
@@ -31,6 +32,8 @@ export function defaultGameState(): GameState {
       season: defaultSeasonState(),
       research: defaultResearchState(),
       reputation: defaultReputationState(),
+      floors: [defaultFloor()],
+      currentFloorIndex: 0,
     },
   };
 }
@@ -59,6 +62,23 @@ export function defaultResearchState(): ResearchState {
     activeResearch: null,
     activeResearchProgress: 0,
     activeResearchStartTick: 0,
+  };
+}
+
+/**
+ * Creates a default floor with neutral biome.
+ * Used for the starting floor when a new game begins.
+ */
+export function defaultFloor(depth = 1): Floor {
+  return {
+    id: rngUuid(),
+    name: `Floor ${depth}`,
+    depth,
+    biome: 'neutral',
+    grid: createEmptyGrid(),
+    rooms: [],
+    hallways: [],
+    inhabitants: [],
   };
 }
 

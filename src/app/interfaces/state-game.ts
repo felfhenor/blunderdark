@@ -2,6 +2,7 @@ import type { Branded } from '@interfaces/identifiable';
 
 export type GameId = Branded<string, 'GameId'>;
 
+import type { Floor } from '@interfaces/floor';
 import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
@@ -18,6 +19,8 @@ export interface GameStateWorld {
   season: SeasonState;
   research: ResearchState;
   reputation: ReputationState;
+  floors: Floor[];
+  currentFloorIndex: number;
 }
 
 export interface GameStateClock {

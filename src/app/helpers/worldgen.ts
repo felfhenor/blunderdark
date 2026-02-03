@@ -1,6 +1,7 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
 import {
+  defaultFloor,
   defaultReputationState,
   defaultResearchState,
   defaultResources,
@@ -32,6 +33,8 @@ export async function worldgenGenerateWorld(): Promise<
     season: defaultSeasonState(),
     research: defaultResearchState(),
     reputation: defaultReputationState(),
+    floors: [defaultFloor()],
+    currentFloorIndex: 0,
     didFinish: true,
   };
 }
