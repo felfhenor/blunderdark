@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  IsContentItem,
   ReputationAction,
   ReputationLevel,
   ReputationState,
@@ -92,7 +93,7 @@ export function getReputationLevelLabel(level: ReputationLevel): string {
 export async function awardReputationForAction(
   actionId: string,
 ): Promise<boolean> {
-  const action = getEntry<ReputationAction>(actionId);
+  const action = getEntry<ReputationAction & IsContentItem>(actionId);
   if (!action) {
     return false;
   }
@@ -163,6 +164,6 @@ export async function awardReputationForAction(
  */
 export function getReputationAction(
   actionIdOrName: string,
-): ReputationAction | undefined {
-  return getEntry<ReputationAction>(actionIdOrName);
+): (ReputationAction & IsContentItem) | undefined {
+  return getEntry<ReputationAction & IsContentItem>(actionIdOrName);
 }

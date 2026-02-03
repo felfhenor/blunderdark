@@ -1,5 +1,8 @@
-<div class="game-container relative">
+<div class="game-container relative flex gap-4">
   <app-grid />
+  <div class="sidebar w-64">
+    <app-panel-reputation />
+  </div>
 </div>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>
