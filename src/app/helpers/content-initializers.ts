@@ -10,6 +10,7 @@ import type {
   MonsterId,
   PetContent,
   PetId,
+  ReputationAction,
   RoomShape,
   StageContent,
   StageId,
@@ -27,6 +28,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   item: ensureItem,
   monster: ensureMonster,
   pet: ensurePet,
+  reputationaction: ensureReputationAction,
   roomshape: ensureRoomShape,
   stage: ensureStage,
   trinket: ensureTrinket,
@@ -128,6 +130,18 @@ function ensureWeapon(weapon: Partial<WeaponContent>): Required<WeaponContent> {
     sprite: weapon.sprite ?? 'UNKNOWN',
     baseStats: ensureStats(weapon.baseStats),
     upgradeableStats: weapon.upgradeableStats ?? [],
+  };
+}
+
+function ensureReputationAction(
+  action: Partial<ReputationAction & IsContentItem>,
+): ReputationAction & IsContentItem {
+  return {
+    id: action.id ?? 'UNKNOWN',
+    name: action.name ?? 'UNKNOWN',
+    __type: 'reputationaction',
+    description: action.description ?? '',
+    reputationRewards: action.reputationRewards ?? {},
   };
 }
 

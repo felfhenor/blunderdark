@@ -21,3 +21,14 @@ export const REPUTATION_THRESHOLDS: Record<ReputationLevel, number> = {
   high: 350,
   legendary: 700,
 };
+
+/**
+ * Defines a game action that awards reputation points.
+ * Loaded from gamedata/reputationaction/ YAML files.
+ */
+export type ReputationAction = {
+  id: string;
+  name: string;
+  description: string;
+  reputationRewards: Partial<Record<ReputationType, number>>;
+};

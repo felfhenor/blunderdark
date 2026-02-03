@@ -3,6 +3,7 @@ export type ContentType =
   | 'item'
   | 'monster'
   | 'pet'
+  | 'reputationaction'
   | 'roomshape'
   | 'stage'
   | 'trinket'
