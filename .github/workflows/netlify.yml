@@ -3,7 +3,7 @@ name: Automatic Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
   workflow_dispatch: {}
 
@@ -37,7 +37,7 @@ jobs:
         uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: "./dist/blunderdark/browser"
-          production-branch: main
+          production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
           enable-pull-request-comment: false
