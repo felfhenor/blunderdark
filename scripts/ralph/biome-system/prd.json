@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "floor.ts helper with getFloorBiome(), currentFloorBiome computed signal, synchronous access via game state"
     },
     {
       "id": "US-005",

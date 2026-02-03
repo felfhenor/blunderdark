@@ -322,3 +322,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Floor type already had `biome: BiomeType` field from US-001 implementation
   - GameStateWorld uses single grid/hallways/inhabitants for current floor; the floors array provides multi-floor capability
   - `defaultFloor()` uses `rngUuid()` for floor ID generation — consistent with game ID pattern
+
+## biome-system US-004: Implement biome query API [DONE]
+- Created `src/app/helpers/floor.ts` with floor helper functions:
+  - `currentFloor` computed signal — returns current floor from floors[currentFloorIndex]
+  - `currentFloorBiome` computed signal — returns biome of current floor (defaults to 'neutral')
+  - `allFloors` computed signal — returns all floors array
+  - `getFloor(floorId)` — lookup floor by ID, returns undefined if not found
+  - `getFloorBiome(floorId)` — get biome by floor ID, returns 'neutral' if floor not found
+- All functions synchronous (no async loading) — data accessed directly from game state
+- Created `src/app/helpers/floor.spec.ts` with 5 unit tests
+- All tests pass (213/213), lint passes
+- Commit: a61d287
+- **Learnings for future iterations:**
+  - Floor helpers follow same pattern as other helpers: computed signals + pure lookup functions
+  - Using `??` operator to default to 'neutral' biome handles undefined floor case gracefully
+  - The acceptance criteria asked for FloorService but helpers pattern is more consistent with codebase
