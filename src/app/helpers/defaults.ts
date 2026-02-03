@@ -66,15 +66,17 @@ export function defaultResearchState(): ResearchState {
 }
 
 /**
- * Creates a default floor with neutral biome.
+ * Creates a default floor with the specified biome.
  * Used for the starting floor when a new game begins.
+ * @param depth Floor depth (defaults to 1)
+ * @param biome Floor biome (defaults to 'neutral')
  */
-export function defaultFloor(depth = 1): Floor {
+export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floor {
   return {
     id: rngUuid(),
     name: `Floor ${depth}`,
     depth,
-    biome: 'neutral',
+    biome,
     grid: createEmptyGrid(),
     rooms: [],
     hallways: [],

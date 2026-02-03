@@ -8,6 +8,7 @@ import {
   defaultSeasonState,
 } from '@helpers/defaults';
 import { createEmptyGrid } from '@helpers/grid';
+import { resolveStartingBiome } from '@helpers/world';
 import type { GameStateWorld } from '@interfaces';
 import { Subject } from 'rxjs';
 
@@ -24,7 +25,9 @@ export function cancelWorldGeneration(): void {
 export async function worldgenGenerateWorld(): Promise<
   GameStateWorld & { didFinish?: boolean }
 > {
-  //
+  // Resolve the starting biome (handles 'random' selection)
+  const startingBiome = resolveStartingBiome();
+
   return {
     grid: createEmptyGrid(),
     resources: defaultResources(),
@@ -33,7 +36,7 @@ export async function worldgenGenerateWorld(): Promise<
     season: defaultSeasonState(),
     research: defaultResearchState(),
     reputation: defaultReputationState(),
-    floors: [defaultFloor()],
+    floors: [defaultFloor(1, startingBiome)],
     currentFloorIndex: 0,
     didFinish: true,
   };
