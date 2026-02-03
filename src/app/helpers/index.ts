@@ -1,3 +1,4 @@
+export * from './adjacency';
 export * from './analytics';
 export * from './clipboard';
 export * from './content';
