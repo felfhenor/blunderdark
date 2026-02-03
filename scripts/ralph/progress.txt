@@ -264,3 +264,14 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Level-up detection compares `getReputationLevel(previousPoints)` vs `getReputationLevel(newPoints)` — simple and effective
   - `updateGamestate()` is async and handles both tick-mode and direct signal updates
   - The awardReputationForAction function returns `false` if action not found or has no rewards — callers should check
+
+## reputation-tracking US-005: Reputation Persistence [DONE - Already Implemented]
+- All acceptance criteria were already met by US-002 implementation:
+  - ReputationState is in GameStateWorld (state-game.ts:20)
+  - indexedDbSignal persists and restores game state to/from IndexedDB
+  - defaultReputationState() initializes all categories to 0 for new games
+  - migrateGameState() uses `merge(defaultGameState(), state)` to handle missing fields on load
+  - Serialization round-trip test exists in reputation.spec.ts
+- No additional code changes required
+- **Learnings for future iterations:**
+  - `migrateGameState()` uses `merge()` from es-toolkit to fill missing fields from defaults — ensures forward compatibility when new state fields are added
