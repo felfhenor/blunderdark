@@ -43,6 +43,14 @@ export function getFloorBiome(floorId: string): BiomeType {
 }
 
 /**
+ * Get a floor by its depth (1-based).
+ * Returns undefined if no floor exists at that depth.
+ */
+export function getFloorByDepth(depth: number): Floor | undefined {
+  return gamestate().world.floors.find((f) => f.depth === depth);
+}
+
+/**
  * Get the current floor index.
  */
 export const currentFloorIndex = computed<number>(() => {
