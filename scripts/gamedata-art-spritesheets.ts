@@ -33,7 +33,10 @@ const build = async () => {
 
     const unfilterableSpritesheets = ['hero', 'world-object', 'world-terrain'];
 
-    if (!unfilterableSpritesheets.includes(sheet)) {
+    if (
+      !unfilterableSpritesheets.includes(sheet) &&
+      fs.existsSync(`./public/json/${sheet}.json`)
+    ) {
       const content = await fs.readJSON(`./public/json/${sheet}.json`, 'utf-8');
       const isAnimated = !!content.find((c: any) => c.frames > 0);
       if (isAnimated) {
