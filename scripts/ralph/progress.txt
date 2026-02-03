@@ -204,3 +204,26 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Reputation uses pure functions taking state as input (not signal-based) — consistent with grid/hallway pattern
   - `addReputation` floors at 0 with `Math.max(0, ...)` to prevent negative reputation
   - Threshold lookup descends from highest to lowest — order matters in `getReputationLevel`
+
+## adjacency-detection US-001 through US-005: All Stories [DONE]
+- Created `src/app/helpers/adjacency.ts` with full adjacency detection system:
+  - `areRoomsAdjacent(tilesA, tilesB)` — pure function checking edge-sharing (horizontal/vertical, not diagonal)
+  - `getSharedEdges(tilesA, tilesB)` — returns all tile pairs that share an edge
+  - `AdjacencyMap` type (`Record<string, string[]>`) — JSON-serializable cache
+  - `createAdjacencyMap()` — factory for empty map
+  - `addRoomToAdjacencyMap(map, roomId, roomTiles, allRooms)` — incremental update on room placement
+  - `removeRoomFromAdjacencyMap(map, roomId)` — cleanup on room removal
+  - `getAdjacentRooms(map, roomId)` — O(1) query API
+- Created `src/app/helpers/adjacency.spec.ts` with 18 unit tests covering:
+  - Horizontal, vertical, diagonal, and non-touching adjacency
+  - Left/above adjacency directions
+  - Multi-tile room adjacency
+  - Shared edge detection with single and multiple edges
+  - AdjacencyMap CRUD operations
+  - Query API edge cases
+- All tests pass (201/201), lint passes
+- Commit: d146410
+- **Learnings for future iterations:**
+  - `AdjacencyMap` uses `Record<string, string[]>` instead of `Map<string, Set<string>>` for JSON serialization compatibility
+  - `areRoomsAdjacent` uses a Set for O(1) neighbor lookup, iterating through tilesA and checking 4 neighbors each
+  - The adjacency map is bidirectional — when A is adjacent to B, both entries are updated
