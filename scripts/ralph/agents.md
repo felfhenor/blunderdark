@@ -1,0 +1,93 @@
+# Ralph Agent Patterns
+
+Consolidated learnings from progress.txt for future iterations.
+
+## Adding New Content Types
+
+When adding a new content type (like `reputationaction`, `roomshape`, etc.):
+
+1. Add the type to `ContentType` union in `src/app/interfaces/identifiable.ts`
+2. Add `ensureX` initializer in `src/app/helpers/content-initializers.ts`
+3. Create `gamedata/[type]/base.yml` folder with YAML content
+
+Build script auto-discovers new folders in gamedata/ - no script changes needed.
+
+## Adding Fields to GameStateWorld
+
+When adding new fields to `GameStateWorld`:
+
+1. Add the field to the interface in `src/app/interfaces/state-game.ts`
+2. Add default factory in `src/app/helpers/defaults.ts` (e.g., `defaultSeasonState()`)
+3. Update `defaultGameState()` to include the new field
+4. Update `worldgenGenerateWorld()` in `worldgen.ts` to include the field
+5. Migration is handled automatically by `merge(defaultGameState(), state)` in `migrate.ts`
+
+## World Generation Configuration Pattern
+
+When adding pre-worldgen configuration (like world seed or starting biome):
+
+1. Create a module-level signal in `world.ts` to store the selection
+2. Create setter/getter functions (e.g., `setStartingBiome()`)
+3. If the option needs resolution (like 'random' -> actual value), add a resolve function
+4. Call the resolve function in `worldgenGenerateWorld()` and pass to relevant defaults
+
+## Helper Function Patterns
+
+- **Pure functions** for testability: take state as input, return new state (grid, hallway, reputation helpers all follow this)
+- **Computed signals** for derived state: `currentFloor`, `currentFloorBiome`, etc.
+- **Default to safe values**: use `??` operator (e.g., `floor?.biome ?? 'neutral'`)
+
+## Grid Coordinates
+
+Grid uses **row-major indexing**: `grid[y][x]` - be careful with coordinate order.
+
+## Content Retrieval Type Constraint
+
+When using `getEntry<T>()`, the type must satisfy `T & IsContentItem`:
+
+```typescript
+getEntry<ReputationAction & IsContentItem>(actionId)
+```
+
+## Persistence
+
+- `indexedDbSignal` auto-persists on `set()`/`update()` - no manual save needed
+- `migrateGameState()` uses `merge()` from es-toolkit to fill missing fields from defaults
+
+## RxJS Event Pattern
+
+For cross-cutting events (level-ups, season transitions, notifications):
+
+1. Create a `Subject` in the helper file
+2. Export a read-only observable (e.g., `reputationLevelUp$`)
+3. Subscribe in service `init()` method for UI reactions
+
+## Import Rules
+
+Lint rule `typescript-paths/absolute-import` requires `@helpers/x` not `./x` in test imports.
+
+## DaisyUI Theming
+
+- Theme variables: `var(--b3)`, `var(--p)`, `var(--s)`, `var(--pf)`
+- Progress bar colors: `progress-error`, `progress-warning`, `progress-info`, `progress-success`
+- OKLCH format: `oklch(var(--wa))` for warning color, etc.
+
+## Adding Fields to GridTile
+
+When adding new fields to `GridTile`:
+1. Update `createEmptyGrid()` in `grid.ts`
+2. Fix any `toEqual` assertions in `grid.spec.ts` that check tile structure
+
+## Gamedata Notes
+
+- `public/json/` is gitignored (generated output) - only commit YAML source files
+- Empty YAML files cause non-fatal "doc is not iterable" errors - pre-existing issue
+- Use separate folders for different content types to avoid build script merging issues
+
+## Random Selection
+
+Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection.
+
+## Biome Data
+
+`BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering.
