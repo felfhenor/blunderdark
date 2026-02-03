@@ -5,6 +5,7 @@ claude --permission-mode bypassPermissions "@progress.txt @prompt.md \
 2. Find the next incomplete task and implement it. \
 3. Commit your changes. \
 4. Update progress.txt with what you did. \
-5. Update the prd.json file in the task folder to reflect the completed task. \
-6. Commit your changes. \
+5. Update AGENTS.md with your learnings and findings (see @prompt.md for good conventions). \
+6. Update the prd.json file in the task folder to reflect the completed task. \
+7. Commit your changes. \
 ONLY DO ONE TASK AT A TIME."

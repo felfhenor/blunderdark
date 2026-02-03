@@ -54,8 +54,11 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   echo "  Ralph Iteration $i of $MAX_ITERATIONS ($TOOL)"
   echo "==============================================================="
 
+  # make output the output of the ralph-once script
+  OUTPUT=$(./ralph-once.sh --tool "$TOOL" 2>&1 | tee /dev/stderr) || true
+
   # Claude Code: use --dangerously-skip-permissions for autonomous operation, --print for output
-  OUTPUT=$(claude --dangerously-skip-permissions --print < "$SCRIPT_DIR/CLAUDE.md" 2>&1 | tee /dev/stderr) || true
+  # OUTPUT=$(claude --dangerously-skip-permissions --print < "$SCRIPT_DIR/CLAUDE.md" 2>&1 | tee /dev/stderr) || true
 
   # Check for completion signal
   if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then

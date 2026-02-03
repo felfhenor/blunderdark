@@ -61,3 +61,7 @@ TypeScript path aliases are configured in `tsconfig.json`: `@components/*`, `@se
 - **Images** — use `NgOptimizedImage` for all static images
 - **Inline templates** — preferred for small components
 - **Reactive forms** — preferred over template-driven forms
+
+### Art
+
+When faced with creating art assets, prefer simple geometric shapes and a limited color palette to maintain a cohesive visual style. Place your generated assets in the appropriate subfolder in `gameassets/` following existing naming conventions.
