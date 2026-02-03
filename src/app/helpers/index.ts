@@ -6,6 +6,7 @@ export * from './content-initializers';
 export * from './debug';
 export * from './defaults';
 export * from './discord';
+export * from './floor';
 export * from './game-init';
 export * from './gameloop';
 export * from './grid';
