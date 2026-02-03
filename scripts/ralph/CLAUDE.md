@@ -46,6 +46,7 @@ TypeScript path aliases are configured in `tsconfig.json`: `@components/*`, `@se
 ## Code Conventions
 
 - **Types over interfaces** — use `type` instead of `interface` in all cases
+- **Do not use enums** - use union types of string literals instead
 - **Standalone components only** — no NgModules. Do NOT set `standalone: true` in decorators (it's the default in Angular 20)
 - **Signals for state** — use `input()`/`output()` functions instead of decorators; use `computed()` for derived state; use `update`/`set` on signals, never `mutate`
 - **OnPush change detection** — set `changeDetection: ChangeDetectionStrategy.OnPush` on all components
