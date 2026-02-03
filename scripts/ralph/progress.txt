@@ -275,3 +275,23 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - No additional code changes required
 - **Learnings for future iterations:**
   - `migrateGameState()` uses `merge()` from es-toolkit to fill missing fields from defaults — ensures forward compatibility when new state fields are added
+
+## reputation-tracking US-006: Reputation Display Panel [DONE]
+- Created `src/app/components/panel-reputation/panel-reputation.component.ts` (standalone, OnPush)
+- Created template displaying all 5 reputation categories with:
+  - Icon and label per category (terror/wealth/knowledge/harmony/chaos)
+  - Current level name (None/Low/Medium/High/Legendary)
+  - Current points value
+  - Progress bar filling proportionally between current and next threshold
+  - Legendary level shows full bar with shimmer animation (CSS keyframes)
+- Added component to game-play page in a sidebar layout
+- Fixed TypeScript errors:
+  - `ReputationAction & IsContentItem` needed for `getEntry<>` calls (same pattern as RoomShape)
+  - `worldgen.ts` needed all GameStateWorld fields (inhabitants, hallways, season, research, reputation)
+- All tests pass (208/208), lint passes, build compiles
+- Commit: 2a95b2b
+- **Learnings for future iterations:**
+  - Content types retrieved via `getEntry<T>` must use `T & IsContentItem` to satisfy type constraint
+  - DaisyUI progress bars use classes like `progress-error`, `progress-warning`, `progress-info`, `progress-success`, `progress-secondary`
+  - When adding fields to GameStateWorld, also update worldgen.ts return value
+  - OKLCH color format used in DaisyUI theme variables: `oklch(var(--wa))` for warning, etc.

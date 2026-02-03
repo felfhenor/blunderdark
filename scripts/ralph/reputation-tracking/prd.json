@@ -96,8 +96,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelReputationComponent created with progress bars, legendary shimmer, added to game-play page sidebar"
     },
     {
       "id": "US-007",
