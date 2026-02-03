@@ -295,3 +295,17 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - DaisyUI progress bars use classes like `progress-error`, `progress-warning`, `progress-info`, `progress-success`, `progress-secondary`
   - When adding fields to GameStateWorld, also update worldgen.ts return value
   - OKLCH color format used in DaisyUI theme variables: `oklch(var(--wa))` for warning, etc.
+
+## reputation-tracking US-007: Reputation Level-Up Notification [DONE]
+- Extended `src/app/services/notify.service.ts` to subscribe to `reputationLevelUp$`
+- Added `showReputationLevelUp(event)` method displaying toast notification via ngx-toastr
+- Toast shows: category name, new level, flavor text per reputation type
+- Toast config: 5 second timeout, progress bar, tap-to-dismiss
+- Multiple level-ups stack naturally (ngx-toastr handles stacking)
+- Added REPUTATION_FLAVOR_TEXT and REPUTATION_LABELS constants for display
+- All tests pass (208/208), lint passes, build compiles
+- Commit: 6738405
+- **Learnings for future iterations:**
+  - ngx-toastr supports `tapToDismiss: true` for click-to-dismiss
+  - ToastrService methods accept an optional config object as third parameter
+  - Subscribing to RxJS observables in service `init()` method is the pattern for cross-cutting concerns
