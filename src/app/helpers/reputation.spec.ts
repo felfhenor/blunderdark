@@ -1,8 +1,11 @@
 import {
   addReputation,
   getReputation,
+  getReputationAction,
   getReputationLevel,
   getReputationLevelLabel,
+  reputationAward$,
+  reputationLevelUp$,
   resetReputation,
 } from '@helpers/reputation';
 import type { ReputationState } from '@interfaces';
@@ -128,5 +131,57 @@ describe('serialization', () => {
     expect(deserialized.terror).toBe(500);
     expect(deserialized.knowledge).toBe(200);
     expect(deserialized.wealth).toBe(0);
+  });
+});
+
+describe('level-up detection', () => {
+  it('should detect none to low transition at 50 points', () => {
+    const previousLevel = getReputationLevel(0);
+    const newLevel = getReputationLevel(50);
+    expect(previousLevel).toBe('none');
+    expect(newLevel).toBe('low');
+    expect(previousLevel !== newLevel).toBe(true);
+  });
+
+  it('should detect low to medium transition at 150 points', () => {
+    const previousLevel = getReputationLevel(100);
+    const newLevel = getReputationLevel(150);
+    expect(previousLevel).toBe('low');
+    expect(newLevel).toBe('medium');
+    expect(previousLevel !== newLevel).toBe(true);
+  });
+
+  it('should not trigger level-up within same tier', () => {
+    const previousLevel = getReputationLevel(100);
+    const newLevel = getReputationLevel(140);
+    expect(previousLevel).toBe('low');
+    expect(newLevel).toBe('low');
+    expect(previousLevel === newLevel).toBe(true);
+  });
+
+  it('should detect multi-tier jump from none to medium', () => {
+    const previousLevel = getReputationLevel(0);
+    const newLevel = getReputationLevel(200);
+    expect(previousLevel).toBe('none');
+    expect(newLevel).toBe('medium');
+  });
+});
+
+describe('reputation observables', () => {
+  it('should export reputationAward$ observable', () => {
+    expect(reputationAward$).toBeDefined();
+    expect(typeof reputationAward$.subscribe).toBe('function');
+  });
+
+  it('should export reputationLevelUp$ observable', () => {
+    expect(reputationLevelUp$).toBeDefined();
+    expect(typeof reputationLevelUp$.subscribe).toBe('function');
+  });
+});
+
+describe('getReputationAction', () => {
+  it('should return undefined for non-existent action', () => {
+    // Content not loaded in test environment
+    expect(getReputationAction('nonexistent-action')).toBeUndefined();
   });
 });
