@@ -371,3 +371,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Use CSS custom properties (e.g., `--floor-biome-color`) on elements to pass colors from template to SCSS for dynamic styling
   - The game-play page sidebar is a flex column with gap-4; new panels stack naturally
   - Floor selection via `updateGamestate()` follows async pattern consistent with other state updates
+
+## floor-creation-system US-002: Implement FloorService for floor state management [DONE]
+- Added `getFloorByDepth(depth)` function to `src/app/helpers/floor.ts` — returns floor at given depth or undefined
+- The codebase uses helper functions (not services) for state management; all PRD requirements are met via existing floor helpers:
+  - `allFloors` computed signal — array of all floors
+  - `currentFloor` computed signal — currently active floor
+  - `setCurrentFloorById(floorId)` — switch active floor
+  - `getFloorByDepth(depth)` — query floor by depth (NEW)
+  - First floor auto-created via `defaultGameState()` which includes `floors: [defaultFloor()]`
+- Added 5 unit tests in `src/app/helpers/floor.spec.ts` covering: depth 1/2/3 retrieval, non-existent depth, depth 0
+- All tests pass (218/218), lint passes
+- Commit: 7faa104
+- **Learnings for future iterations:**
+  - PRDs may specify "create a service" but codebase pattern uses helper functions — follow existing patterns
+  - Floor helpers use same pattern as other helpers: computed signals for derived state, pure functions for lookups
+  - All floor query functions already existed from prior work; only `getFloorByDepth` was missing

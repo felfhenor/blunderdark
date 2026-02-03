@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented via helper functions in src/app/helpers/floor.ts (codebase pattern). Added getFloorByDepth(). All floor query/update functions available: allFloors, currentFloor, currentFloorIndex, getFloor, getFloorBiome, getFloorByDepth, setCurrentFloorByIndex, setCurrentFloorById. First floor auto-created via defaultGameState()."
     },
     {
       "id": "US-003",
