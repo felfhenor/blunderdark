@@ -66,8 +66,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added migrateFloors(world) to floor.ts for save migration. Handles missing/empty floors by creating from top-level world data. Fills missing floor fields from defaults. Clamps currentFloorIndex. Wired into migrateGameState() in migrate.ts. 9 new tests (240 total)."
     },
     {
       "id": "US-005",

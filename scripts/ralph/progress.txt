@@ -402,3 +402,18 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - When testing functions that call other helper functions (e.g., `canAfford`, `payCost`), mock the helper module rather than setting up deep gamestate — keeps tests focused on the unit under test
   - `payCost()` is async and returns boolean — must await and check return value before proceeding
   - Floor creation uses `floors.length + 1` for next depth — assumes floors are always sequential (no gaps)
+
+## floor-creation-system US-004: Implement floor data persistence [DONE]
+- Added `migrateFloors(world)` to `src/app/helpers/floor.ts` — handles migration from old save formats to multi-floor format
+  - If `floors` is missing/empty in saved state, creates floor 1 from top-level `world.grid`/`world.hallways`/`world.inhabitants`
+  - If `floors` exists, ensures each floor has all required fields (fills missing from `defaultFloor()`)
+  - Clamps `currentFloorIndex` to valid range (0 to floors.length - 1)
+- Updated `src/app/helpers/migrate.ts` to call `migrateFloors()` after the `merge()` call, explicitly setting `floors` and `currentFloorIndex` on the new state
+- Floor data was already persisted via `indexedDbSignal` (GameState includes GameStateWorld which has floors[] and currentFloorIndex)
+- Added 9 unit tests covering: missing floors with world data, empty world, empty floors array, preserving existing floors, filling missing floor fields, clamping out-of-bounds/negative index, preserving valid index, input immutability
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: d38e954
+- **Learnings for future iterations:**
+  - `merge()` from es-toolkit merges arrays by index, which can corrupt floor data — explicit migration is needed (same pattern as `migrateResources`)
+  - `GameStateWorld` has both top-level grid/hallways/inhabitants AND floors[].grid/hallways/inhabitants — top-level fields are legacy; floors array is the primary source
+  - Migration functions should accept `Partial<GameStateWorld>` to handle incomplete saved data gracefully
