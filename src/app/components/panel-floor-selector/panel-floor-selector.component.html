@@ -18,6 +18,41 @@
       }
     </div>
 
+    @if (!isMaxFloors()) {
+      <div class="create-floor-section mt-2">
+        <button
+          class="btn btn-sm btn-primary btn-block"
+          [disabled]="!canCreate().canCreate"
+          [swal]="createFloorSwal"
+        >
+          + Create New Floor
+        </button>
+        <div class="text-xs opacity-60 mt-1 text-center">
+          Cost: {{ nextFloorCostLabel() }}
+        </div>
+        @if (!canCreate().canCreate && canCreate().reason) {
+          <div class="text-xs text-error mt-1 text-center">
+            {{ canCreate().reason }}
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-xs opacity-50 mt-2 text-center">
+        Maximum floors reached
+      </div>
+    }
+
+    <swal
+      #createFloorSwal
+      title="Create New Floor?"
+      [text]="'This will cost ' + nextFloorCostLabel() + '.'"
+      icon="question"
+      confirmButtonText="Yes, create floor"
+      cancelButtonText="Cancel"
+      [showCancelButton]="true"
+      (confirm)="onConfirmCreateFloor()"
+    ></swal>
+
     @if (selectedFloor(); as floor) {
       <div class="divider my-2"></div>
 
