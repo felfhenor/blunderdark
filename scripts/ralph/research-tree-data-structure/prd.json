@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created gamedata/research/dark.yml with 11 nodes (tiers 2-6). Tree branches from Dark Arts Fundamentals into Soul Manipulation, Shadow Magic, and Necromancy paths, converging at Dark Apotheosis (tier 6). Costs scale from 25 research+5 essence (tier 2) to 400 research+120 essence+60 corruption (tier 6)."
     },
     {
       "id": "US-005",
