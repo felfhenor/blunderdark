@@ -417,3 +417,22 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `merge()` from es-toolkit merges arrays by index, which can corrupt floor data — explicit migration is needed (same pattern as `migrateResources`)
   - `GameStateWorld` has both top-level grid/hallways/inhabitants AND floors[].grid/hallways/inhabitants — top-level fields are legacy; floors array is the primary source
   - Migration functions should accept `Partial<GameStateWorld>` to handle incomplete saved data gracefully
+
+## floor-creation-system US-005: Create floor creation UI with cost display [DONE]
+- Updated `src/app/components/panel-floor-selector/panel-floor-selector.component.ts`:
+  - Added `SweetAlert2Module` import for confirmation dialog
+  - Added computed signals: `nextFloorCost`, `canCreate`, `isMaxFloors`, `nextFloorCostLabel`
+  - Added `onConfirmCreateFloor()` handler that calls `createFloor()`
+- Updated `src/app/components/panel-floor-selector/panel-floor-selector.component.html`:
+  - Added "Create New Floor" button below floor list with `[disabled]` binding to `canCreate().canCreate`
+  - Shows cost label below button (e.g., "Cost: 100 Crystals + 60 Gold")
+  - Shows error reason when creation is not possible (e.g., "Insufficient resources")
+  - Shows "Maximum floors reached" text when at MAX_FLOORS
+  - SweetAlert2 confirmation dialog before spending resources
+- Browser verified: button renders correctly, disabled when resources insufficient, cost display accurate
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: c282f95
+- **Learnings for future iterations:**
+  - SweetAlert2 pattern: `[swal]="templateRef"` on button + `<swal>` element with `(confirm)` event handler
+  - Computed signals returning objects (like `canCreateFloor()`) need `.canCreate` property access in templates
+  - `MAX_FLOORS` must be imported from `@interfaces/floor` (not re-exported from barrel)
