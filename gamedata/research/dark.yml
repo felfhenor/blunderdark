@@ -1,0 +1,169 @@
+# Dark Branch research nodes (tier 2+)
+# Root node (Dark Arts Fundamentals) is in base.yml
+#
+# Tree structure:
+#   Dark Arts Fundamentals (T1)
+#   ├── Soul Manipulation (T2)
+#   │   └── Soul Well (T3)
+#   │       └── Soul Forge (T5) [+Dark Rituals]
+#   ├── Shadow Magic (T2)
+#   │   └── Corruption Control (T3)
+#   │       └── Shadow Weaving (T4) [+Shadow Magic]
+#   └── Necromancy (T2)
+#       └── Undead Mastery (T3)
+#           └── Dark Rituals (T4) [+Soul Well]
+#               ├── Abyssal Gateway (T5) [+Shadow Weaving]
+#               └── Soul Forge (T5) [+Soul Well→ already via Dark Rituals]
+#   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
+
+# --- TIER 2: Three paths branch from Dark Arts Fundamentals ---
+
+- id: aa000001-0002-4000-b001-000000000001
+  name: Soul Manipulation
+  description: Learn to harvest and channel soul energy, the fundamental currency of dark power.
+  branch: dark
+  cost:
+    research: 25
+    essence: 5
+  prerequisites:
+    - aa000001-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000001-0003-4000-b001-000000000001
+  name: Shadow Magic
+  description: Harness the power of shadows to conceal, deceive, and strike from darkness.
+  branch: dark
+  cost:
+    research: 25
+    essence: 5
+  prerequisites:
+    - aa000001-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000001-0004-4000-b001-000000000001
+  name: Necromancy
+  description: The art of animating the dead, turning fallen enemies into loyal servants.
+  branch: dark
+  cost:
+    research: 25
+    essence: 5
+  prerequisites:
+    - aa000001-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+# --- TIER 3: Specializations ---
+
+- id: aa000001-0005-4000-b001-000000000001
+  name: Undead Mastery
+  description: Exert absolute control over undead minions, increasing their strength and durability.
+  branch: dark
+  cost:
+    research: 50
+    essence: 15
+  prerequisites:
+    - aa000001-0004-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000001-0006-4000-b001-000000000001
+  name: Soul Well
+  description: Construct a reservoir for captured souls, providing a steady stream of dark energy.
+  branch: dark
+  cost:
+    research: 50
+    essence: 15
+  prerequisites:
+    - aa000001-0002-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000001-0007-4000-b001-000000000001
+  name: Corruption Control
+  description: Master the volatile forces of corruption, bending them to your will without self-destruction.
+  branch: dark
+  cost:
+    research: 50
+    essence: 15
+    corruption: 5
+  prerequisites:
+    - aa000001-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+# --- TIER 4: Advanced combinations ---
+
+- id: aa000001-0008-4000-b001-000000000001
+  name: Dark Rituals
+  description: Perform elaborate ceremonies combining necromancy and soul magic for devastating effects.
+  branch: dark
+  cost:
+    research: 100
+    essence: 30
+    corruption: 15
+  prerequisites:
+    - aa000001-0005-4000-b001-000000000001
+    - aa000001-0006-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+- id: aa000001-0009-4000-b001-000000000001
+  name: Shadow Weaving
+  description: Weave shadows into semi-physical constructs that serve as both shield and weapon.
+  branch: dark
+  cost:
+    research: 100
+    essence: 30
+    corruption: 15
+  prerequisites:
+    - aa000001-0003-4000-b001-000000000001
+    - aa000001-0007-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+# --- TIER 5: Pinnacle powers ---
+
+- id: aa000001-0010-4000-b001-000000000001
+  name: Abyssal Gateway
+  description: Tear open a rift to the abyss, summoning forth entities of immense dark power.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisites:
+    - aa000001-0008-4000-b001-000000000001
+    - aa000001-0009-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+- id: aa000001-0011-4000-b001-000000000001
+  name: Soul Forge
+  description: Forge captured souls into powerful artifacts and imbue minions with stolen life force.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisites:
+    - aa000001-0008-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+# --- TIER 6: Ultimate mastery ---
+
+- id: aa000001-0012-4000-b001-000000000001
+  name: Dark Apotheosis
+  description: Transcend mortal limitations through total mastery of dark forces, becoming an avatar of darkness itself.
+  branch: dark
+  cost:
+    research: 400
+    essence: 120
+    corruption: 60
+  prerequisites:
+    - aa000001-0010-4000-b001-000000000001
+    - aa000001-0011-4000-b001-000000000001
+  unlocks: []
+  tier: 6
