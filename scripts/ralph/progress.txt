@@ -468,3 +468,21 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Each research branch uses a different secondary resource: Dark=essence, Arcane=flux
   - UUID pattern per branch: dark=aa000001, arcane=aa000002, engineering=aa000003
   - Cost scaling pattern: T2=25/5, T3=50/15, T4=100/30/15, T5=200/60/30, T6=400/120/60
+
+## research-tree-data-structure US-006: Define Engineering Branch Nodes [DONE]
+- Created `gamedata/research/engineering.yml` with 12 Engineering branch nodes (tiers 2-6)
+- Tree structure mirrors Dark/Arcane branch pattern: 3 tier-2 paths branching from root, converging at tier 6
+  - Advanced Construction -> Master Architecture -> Siege Works
+  - Trap Design -> Automated Defenses -> Mechanical Sentinels
+  - Advanced Manufacturing -> Dark Forge -> Golem Assembly
+  - Tier 5: War Machines, Industrial Mastery
+  - Tier 6: Grand Artificer (capstone)
+- Costs scale from 25 research + 5 gold (tier 2) to 400 research + 120 gold + 60 crystals (tier 6)
+- Uses `gold` as secondary resource (engineering thematic) and `crystals` as tertiary (tier 4+)
+- `npm run gamedata:build` compiles successfully — 12 engineering entries loaded (38 total research)
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: e271bc0
+- **Learnings for future iterations:**
+  - All three research branches now complete: Dark=essence, Arcane=flux, Engineering=gold
+  - UUID pattern confirmed: dark=aa000001, arcane=aa000002, engineering=aa000003
+  - Cost scaling pattern consistent across all branches: T2=25/5, T3=50/15, T4=100/30/15, T5=200/60/30, T6=400/120/60

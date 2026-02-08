@@ -91,7 +91,7 @@ When adding new fields to `GridTile`:
 ## Research Tree YAML Conventions
 
 - UUID pattern per branch: dark=`aa000001`, arcane=`aa000002`, engineering=`aa000003`
-- Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=TBD
+- Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=gold
 - Cost scaling pattern across tiers: T1=10 research, T2=25/5, T3=50/15, T4=100/30/15 tertiary, T5=200/60/30, T6=400/120/60
 - Root nodes (tier 1) are defined in `base.yml`; branch-specific nodes (tier 2+) go in `dark.yml`, `arcane.yml`, `engineering.yml`
 - Tree structure: 3 paths from root at tier 2, specializations at tier 3, cross-path combinations at tier 4, convergence at tier 5-6

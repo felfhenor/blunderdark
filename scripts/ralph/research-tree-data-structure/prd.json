@@ -93,8 +93,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created gamedata/research/engineering.yml with 12 nodes (tiers 2-6). Tree branches from Basic Engineering into Advanced Construction, Trap Design, and Advanced Manufacturing paths, converging at Grand Artificer (tier 6). Uses gold as secondary resource and crystals as tertiary (tier 4+). Costs scale from 25 research+5 gold (tier 2) to 400 research+120 gold+60 crystals (tier 6)."
     },
     {
       "id": "US-007",
