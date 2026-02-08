@@ -8,6 +8,6 @@ claude --permission-mode bypassPermissions "@progress.txt @prompt.md @AGENTS.md 
 5. Update @AGENTS.md with your learnings and findings (see @prompt.md for good conventions). \
 6. Update the prd.json file in the task folder to reflect the completed task. \
 7. Update @tasks.md with the status of the task you just completed. \
-8. Commit your changes. \
-9. Merge your changes into the `master` branch. \
+8. Commit your changes as well as any outstanding changes (such as scripts or markdown files). \
+9. Merge your changes into the 'master' branch. \
 ONLY DO ONE TASK AT A TIME."

@@ -62,6 +62,15 @@ For cross-cutting events (level-ups, season transitions, notifications):
 2. Export a read-only observable (e.g., `reputationLevelUp$`)
 3. Subscribe in service `init()` method for UI reactions
 
+## Testing Helper Functions That Call Other Helpers
+
+When testing functions that depend on other helper modules (e.g., `createFloor` calling `canAfford`/`payCost`):
+
+1. Use `vi.fn()` wrappers instead of inline mock implementations for controllable return values per test
+2. Mock the dependency module: `vi.mock('@helpers/resources', () => ({ canAfford: (...args) => mockCanAfford(...args) }))`
+3. Use `beforeEach` to set default mock return values, override in individual tests as needed
+4. For `updateGamestate`, capture the updater function via `mockUpdateGamestate.mock.calls[0][0]` and execute it to verify state transformations
+
 ## Import Rules
 
 Lint rule `typescript-paths/absolute-import` requires `@helpers/x` not `./x` in test imports.
