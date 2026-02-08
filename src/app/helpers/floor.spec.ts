@@ -1,47 +1,74 @@
-import { getFloor, getFloorBiome, getFloorByDepth } from '@helpers/floor';
+import {
+  canCreateFloor,
+  createFloor,
+  getFloor,
+  getFloorBiome,
+  getFloorByDepth,
+  getFloorCreationCost,
+} from '@helpers/floor';
 import type { Floor } from '@interfaces';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock state-game to control game state
+const mockGamestate = vi.fn();
+const mockUpdateGamestate = vi.fn();
+const mockCanAfford = vi.fn();
+const mockPayCost = vi.fn();
+
 vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(() => ({
-    world: {
-      floors: [
-        {
-          id: 'floor-1',
-          name: 'Floor 1',
-          depth: 1,
-          biome: 'neutral',
-          grid: [],
-          rooms: [],
-          hallways: [],
-          inhabitants: [],
-        } as Floor,
-        {
-          id: 'floor-2',
-          name: 'Floor 2',
-          depth: 2,
-          biome: 'volcanic',
-          grid: [],
-          rooms: [],
-          hallways: [],
-          inhabitants: [],
-        } as Floor,
-        {
-          id: 'floor-3',
-          name: 'Floor 3',
-          depth: 3,
-          biome: 'crystal',
-          grid: [],
-          rooms: [],
-          hallways: [],
-          inhabitants: [],
-        } as Floor,
-      ],
-      currentFloorIndex: 0,
-    },
-  })),
+  gamestate: (...args: unknown[]) => mockGamestate(...args),
+  updateGamestate: (...args: unknown[]) => mockUpdateGamestate(...args),
 }));
+
+vi.mock('@helpers/resources', () => ({
+  canAfford: (...args: unknown[]) => mockCanAfford(...args),
+  payCost: (...args: unknown[]) => mockPayCost(...args),
+}));
+
+vi.mock('@helpers/defaults', () => ({
+  defaultFloor: (depth: number, biome: string) => ({
+    id: `new-floor-${depth}`,
+    name: `Floor ${depth}`,
+    depth,
+    biome: biome ?? 'neutral',
+    grid: [],
+    rooms: [],
+    hallways: [],
+    inhabitants: [],
+  }),
+}));
+
+function makeFloor(overrides: Partial<Floor> = {}): Floor {
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 1,
+    biome: 'neutral',
+    grid: [],
+    rooms: [],
+    hallways: [],
+    inhabitants: [],
+    ...overrides,
+  } as Floor;
+}
+
+const threeFloorState = () => ({
+  world: {
+    floors: [
+      makeFloor({ id: 'floor-1', name: 'Floor 1', depth: 1, biome: 'neutral' }),
+      makeFloor({ id: 'floor-2', name: 'Floor 2', depth: 2, biome: 'volcanic' }),
+      makeFloor({ id: 'floor-3', name: 'Floor 3', depth: 3, biome: 'crystal' }),
+    ],
+    currentFloorIndex: 0,
+  },
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockGamestate.mockReturnValue(threeFloorState());
+  mockUpdateGamestate.mockResolvedValue(undefined);
+  mockCanAfford.mockReturnValue(true);
+  mockPayCost.mockResolvedValue(true);
+});
 
 describe('getFloor', () => {
   it('should return floor by ID', () => {
@@ -103,5 +130,120 @@ describe('getFloorByDepth', () => {
 
   it('should return undefined for depth 0', () => {
     expect(getFloorByDepth(0)).toBeUndefined();
+  });
+});
+
+describe('getFloorCreationCost', () => {
+  it('should return cost scaling with depth 1', () => {
+    const cost = getFloorCreationCost(1);
+    expect(cost).toEqual({ crystals: 50, gold: 30 });
+  });
+
+  it('should return cost scaling with depth 5', () => {
+    const cost = getFloorCreationCost(5);
+    expect(cost).toEqual({ crystals: 250, gold: 150 });
+  });
+
+  it('should return cost scaling with depth 10', () => {
+    const cost = getFloorCreationCost(10);
+    expect(cost).toEqual({ crystals: 500, gold: 300 });
+  });
+});
+
+describe('canCreateFloor', () => {
+  it('should return canCreate true when under max and can afford', () => {
+    const result = canCreateFloor();
+    expect(result.canCreate).toBe(true);
+    expect(result.reason).toBeUndefined();
+  });
+
+  it('should return false when max floors reached', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: Array.from({ length: 10 }, (_, i) =>
+          makeFloor({ id: `floor-${i + 1}`, depth: i + 1 }),
+        ),
+        currentFloorIndex: 0,
+      },
+    });
+
+    const result = canCreateFloor();
+    expect(result.canCreate).toBe(false);
+    expect(result.reason).toBe('Maximum number of floors reached');
+  });
+
+  it('should return false when insufficient resources', () => {
+    mockCanAfford.mockReturnValue(false);
+
+    const result = canCreateFloor();
+    expect(result.canCreate).toBe(false);
+    expect(result.reason).toBe('Insufficient resources');
+  });
+
+  it('should check cost for next depth based on current floor count', () => {
+    canCreateFloor();
+    // 3 floors exist, so next depth is 4: 50*4=200 crystals, 30*4=120 gold
+    expect(mockCanAfford).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
+  });
+});
+
+describe('createFloor', () => {
+  it('should create floor at next depth with default neutral biome', async () => {
+    const floor = await createFloor();
+    expect(floor).not.toBeNull();
+    expect(floor?.depth).toBe(4);
+    expect(floor?.biome).toBe('neutral');
+    expect(floor?.rooms).toEqual([]);
+    expect(floor?.hallways).toEqual([]);
+    expect(floor?.inhabitants).toEqual([]);
+  });
+
+  it('should create floor with specified biome', async () => {
+    const floor = await createFloor('volcanic');
+    expect(floor).not.toBeNull();
+    expect(floor?.biome).toBe('volcanic');
+  });
+
+  it('should return null when max floors reached', async () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: Array.from({ length: 10 }, (_, i) =>
+          makeFloor({ id: `floor-${i + 1}`, depth: i + 1 }),
+        ),
+        currentFloorIndex: 0,
+      },
+    });
+
+    const floor = await createFloor();
+    expect(floor).toBeNull();
+    expect(mockPayCost).not.toHaveBeenCalled();
+  });
+
+  it('should return null when payCost fails', async () => {
+    mockPayCost.mockResolvedValue(false);
+
+    const floor = await createFloor();
+    expect(floor).toBeNull();
+    expect(mockUpdateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('should deduct resources before adding floor', async () => {
+    await createFloor();
+    // payCost should be called with cost for depth 4
+    expect(mockPayCost).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
+    expect(mockUpdateGamestate).toHaveBeenCalled();
+  });
+
+  it('should call updateGamestate to add the new floor', async () => {
+    await createFloor('crystal');
+    expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
+
+    // Execute the updater function to verify it appends the floor
+    const updaterFn = mockUpdateGamestate.mock.calls[0][0];
+    const state = threeFloorState();
+    const newState = updaterFn(state);
+    expect(newState.world.floors).toHaveLength(4);
+    expect(newState.world.floors[3].depth).toBe(4);
+    expect(newState.world.floors[3].biome).toBe('crystal');
   });
 });

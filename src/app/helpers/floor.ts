@@ -1,6 +1,12 @@
 import { computed } from '@angular/core';
+import { defaultFloor } from '@helpers/defaults';
+import { canAfford, payCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { BiomeType, Floor } from '@interfaces';
+import type { BiomeType, Floor, ResourceCost } from '@interfaces';
+import { MAX_FLOORS } from '@interfaces/floor';
+
+const CRYSTALS_PER_DEPTH = 50;
+const GOLD_PER_DEPTH = 30;
 
 /**
  * Get the current floor based on currentFloorIndex.
@@ -89,4 +95,70 @@ export async function setCurrentFloorById(floorId: string): Promise<boolean> {
   }
 
   return setCurrentFloorByIndex(index);
+}
+
+/**
+ * Calculate the resource cost to create a floor at the given depth.
+ * Costs scale linearly: 50 crystals + 30 gold per depth level.
+ */
+export function getFloorCreationCost(depth: number): ResourceCost {
+  return {
+    crystals: CRYSTALS_PER_DEPTH * depth,
+    gold: GOLD_PER_DEPTH * depth,
+  };
+}
+
+/**
+ * Check whether a new floor can be created.
+ * Returns an object with whether creation is possible and a reason if not.
+ */
+export function canCreateFloor(): { canCreate: boolean; reason?: string } {
+  const floors = gamestate().world.floors;
+
+  if (floors.length >= MAX_FLOORS) {
+    return { canCreate: false, reason: 'Maximum number of floors reached' };
+  }
+
+  const nextDepth = floors.length + 1;
+  const cost = getFloorCreationCost(nextDepth);
+
+  if (!canAfford(cost)) {
+    return { canCreate: false, reason: 'Insufficient resources' };
+  }
+
+  return { canCreate: true };
+}
+
+/**
+ * Create a new floor at the next available depth.
+ * Deducts resource costs and adds the floor to the game state.
+ * Returns the new floor on success, or null if creation failed.
+ */
+export async function createFloor(
+  biome: BiomeType = 'neutral',
+): Promise<Floor | null> {
+  const { canCreate } = canCreateFloor();
+  if (!canCreate) {
+    return null;
+  }
+
+  const nextDepth = gamestate().world.floors.length + 1;
+  const cost = getFloorCreationCost(nextDepth);
+
+  const paid = await payCost(cost);
+  if (!paid) {
+    return null;
+  }
+
+  const newFloor = defaultFloor(nextDepth, biome);
+
+  await updateGamestate((state) => ({
+    ...state,
+    world: {
+      ...state.world,
+      floors: [...state.world.floors, newFloor],
+    },
+  }));
+
+  return newFloor;
 }
