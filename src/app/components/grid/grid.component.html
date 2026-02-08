@@ -5,7 +5,10 @@
         class="grid-tile"
         [class.occupied]="tile.occupied"
         [class.selected]="isSelected(colIdx, rowIdx)"
+        [class.preview-valid]="isPreviewValid(colIdx, rowIdx)"
+        [class.preview-invalid]="isPreviewInvalid(colIdx, rowIdx)"
         (click)="onTileClick(colIdx, rowIdx)"
+        (mouseenter)="onTileHover(colIdx, rowIdx)"
       ></div>
     }
   }

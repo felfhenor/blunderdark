@@ -1,4 +1,6 @@
+import { computed, signal } from '@angular/core';
 import { getAbsoluteTiles } from '@helpers/room-shapes';
+import { gamestate } from '@helpers/state-game';
 import type { GridState, RoomShape, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
@@ -83,4 +85,50 @@ export function validatePlacement(
     valid: errors.length === 0,
     errors,
   };
+}
+
+// --- Placement preview state ---
+
+export type PreviewTile = TileOffset & {
+  inBounds: boolean;
+};
+
+export const placementPreviewShape = signal<RoomShape | null>(null);
+export const placementPreviewPosition = signal<TileOffset | null>(null);
+
+export const placementPreview = computed(() => {
+  const shape = placementPreviewShape();
+  const position = placementPreviewPosition();
+  if (!shape || !position) return null;
+
+  const grid = gamestate().world.grid;
+  const validation = validatePlacement(shape, position.x, position.y, grid);
+  const tiles = getAbsoluteTiles(shape, position.x, position.y);
+
+  return {
+    tiles: tiles.map((t) => ({
+      ...t,
+      inBounds: t.x >= 0 && t.x < GRID_SIZE && t.y >= 0 && t.y < GRID_SIZE,
+    })),
+    valid: validation.valid,
+    errors: validation.errors,
+  };
+});
+
+export function setPlacementPreview(
+  shape: RoomShape | null,
+  position?: TileOffset | null,
+): void {
+  placementPreviewShape.set(shape);
+  placementPreviewPosition.set(position ?? null);
+}
+
+export function updatePreviewPosition(x: number, y: number): void {
+  if (!placementPreviewShape()) return;
+  placementPreviewPosition.set({ x, y });
+}
+
+export function clearPlacementPreview(): void {
+  placementPreviewShape.set(null);
+  placementPreviewPosition.set(null);
 }
