@@ -11,6 +11,7 @@ import type {
   PetContent,
   PetId,
   ReputationAction,
+  ResearchNode,
   RoomShape,
   StageContent,
   StageId,
@@ -29,6 +30,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   monster: ensureMonster,
   pet: ensurePet,
   reputationaction: ensureReputationAction,
+  research: ensureResearch,
   roomshape: ensureRoomShape,
   stage: ensureStage,
   trinket: ensureTrinket,
@@ -142,6 +144,22 @@ function ensureReputationAction(
     __type: 'reputationaction',
     description: action.description ?? '',
     reputationRewards: action.reputationRewards ?? {},
+  };
+}
+
+function ensureResearch(
+  node: Partial<ResearchNode & IsContentItem>,
+): ResearchNode & IsContentItem {
+  return {
+    id: node.id ?? 'UNKNOWN',
+    name: node.name ?? 'UNKNOWN',
+    __type: 'research',
+    description: node.description ?? '',
+    branch: node.branch ?? 'dark',
+    cost: node.cost ?? {},
+    prerequisites: node.prerequisites ?? [],
+    unlocks: node.unlocks ?? [],
+    tier: node.tier ?? 1,
   };
 }
 

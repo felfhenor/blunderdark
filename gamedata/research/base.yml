@@ -1,0 +1,36 @@
+# Research nodes define the tech tree for dungeon advancement.
+# Three branches: dark, arcane, engineering
+# Each node has: id, name, description, branch, cost, prerequisites, unlocks, tier
+
+# --- DARK BRANCH: root node ---
+- id: aa000001-0001-4000-b001-000000000001
+  name: Dark Arts Fundamentals
+  description: The foundational study of dark magic, opening paths to necromancy and soul manipulation.
+  branch: dark
+  cost:
+    research: 10
+  prerequisites: []
+  unlocks: []
+  tier: 1
+
+# --- ARCANE BRANCH: root node ---
+- id: aa000002-0001-4000-b001-000000000001
+  name: Arcane Basics
+  description: Introduction to the fundamental principles of arcane magic and flux manipulation.
+  branch: arcane
+  cost:
+    research: 10
+  prerequisites: []
+  unlocks: []
+  tier: 1
+
+# --- ENGINEERING BRANCH: root node ---
+- id: aa000003-0001-4000-b001-000000000001
+  name: Basic Engineering
+  description: Foundational construction techniques for building stronger dungeon structures.
+  branch: engineering
+  cost:
+    research: 10
+  prerequisites: []
+  unlocks: []
+  tier: 1

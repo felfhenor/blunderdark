@@ -4,6 +4,7 @@ export type ContentType =
   | 'monster'
   | 'pet'
   | 'reputationaction'
+  | 'research'
   | 'roomshape'
   | 'stage'
   | 'trinket'
