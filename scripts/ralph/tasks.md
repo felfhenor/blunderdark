@@ -16,7 +16,7 @@ These features have some stories done. Complete them first.
 | Priority | Feature | Remaining | Depends On |
 |----------|---------|-----------|------------|
 | ~~1.1~~ | ~~`floor-creation-system`~~ | ~~COMPLETE~~ | ~~grid-system~~ |
-| 1.2 | `research-tree-data-structure` | US-003 through US-007 | none |
+| 1.2 | `research-tree-data-structure` | US-004 through US-007 | none |
 | 1.3 | `room-placement-validation` | US-004, US-005 | grid-system, tetromino-room-shapes |
 
 ---

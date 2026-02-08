@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created gamedata/research/base.yml with 3 root nodes (one per branch). Added 'research' to ContentType and ensureResearch initializer. Build and schema generation pass."
     },
     {
       "id": "US-004",

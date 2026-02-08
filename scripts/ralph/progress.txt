@@ -436,3 +436,17 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - SweetAlert2 pattern: `[swal]="templateRef"` on button + `<swal>` element with `(confirm)` event handler
   - Computed signals returning objects (like `canCreateFloor()`) need `.canCreate` property access in templates
   - `MAX_FLOORS` must be imported from `@interfaces/floor` (not re-exported from barrel)
+
+## research-tree-data-structure US-003: Define YAML Schema for Research Nodes [DONE]
+- Created `gamedata/research/base.yml` with 3 root research nodes (one per branch: dark, arcane, engineering)
+- Each node has all required fields: id (UUID), name, description, branch, cost (ResourceCost), prerequisites (string[]), unlocks (string[]), tier (number)
+- Added `'research'` to `ContentType` union in `src/app/interfaces/identifiable.ts`
+- Added `ensureResearch` initializer in `src/app/helpers/content-initializers.ts` with default values for all fields
+- `npm run gamedata:build` compiles successfully — 3 research entries loaded
+- `npm run schemas:generate` completes (pre-existing errors for other types unchanged)
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: 40b543f
+- **Learnings for future iterations:**
+  - Research YAML uses `prerequisites: []` and `unlocks: []` as empty arrays for root nodes
+  - The `cost` field uses ResourceCost-compatible YAML (e.g., `research: 10`) — the build script passes it through as-is since the keys don't match any content type folder name
+  - The build script's `rewriteDataIds` won't transform `prerequisites`/`unlocks` arrays since they use raw UUIDs, not content names
