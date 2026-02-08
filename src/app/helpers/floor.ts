@@ -1,8 +1,9 @@
 import { computed } from '@angular/core';
 import { defaultFloor } from '@helpers/defaults';
+import { createEmptyGrid } from '@helpers/grid';
 import { canAfford, payCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { BiomeType, Floor, ResourceCost } from '@interfaces';
+import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
 
 const CRYSTALS_PER_DEPTH = 50;
@@ -161,4 +162,53 @@ export async function createFloor(
   }));
 
   return newFloor;
+}
+
+/**
+ * Migrate floor data from a saved game state.
+ * Handles:
+ * - Missing floors array: creates floor 1 from top-level grid/hallways/inhabitants
+ * - Empty floors array: same as missing
+ * - Incomplete floor objects: fills missing fields from defaults
+ * - Invalid currentFloorIndex: clamps to valid range
+ */
+export function migrateFloors(world: Partial<GameStateWorld>): {
+  floors: Floor[];
+  currentFloorIndex: number;
+} {
+  const savedFloors = world.floors;
+
+  let floors: Floor[];
+
+  if (!savedFloors || savedFloors.length === 0) {
+    // Old save format or empty: create floor 1 from top-level world data
+    const floor: Floor = {
+      ...defaultFloor(1),
+      grid: world.grid ?? createEmptyGrid(),
+      hallways: world.hallways ?? [],
+      inhabitants: world.inhabitants ?? [],
+    };
+    floors = [floor];
+  } else {
+    // Ensure each floor has all required fields
+    floors = savedFloors.map((saved) => {
+      const base = defaultFloor(saved.depth ?? 1);
+      return {
+        id: saved.id ?? base.id,
+        name: saved.name ?? base.name,
+        depth: saved.depth ?? base.depth,
+        biome: saved.biome ?? base.biome,
+        grid: saved.grid ?? base.grid,
+        rooms: saved.rooms ?? base.rooms,
+        hallways: saved.hallways ?? base.hallways,
+        inhabitants: saved.inhabitants ?? base.inhabitants,
+      };
+    });
+  }
+
+  // Clamp currentFloorIndex to valid range
+  const savedIndex = world.currentFloorIndex ?? 0;
+  const currentFloorIndex = Math.max(0, Math.min(savedIndex, floors.length - 1));
+
+  return { floors, currentFloorIndex };
 }

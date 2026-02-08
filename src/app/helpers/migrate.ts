@@ -1,4 +1,5 @@
 import { defaultGameState } from '@helpers/defaults';
+import { migrateFloors } from '@helpers/floor';
 import { migrateResources } from '@helpers/resources';
 import {
   gamestate,
@@ -14,6 +15,9 @@ export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
   newState.world.resources = migrateResources(state.world.resources);
+  const { floors, currentFloorIndex } = migrateFloors(state.world);
+  newState.world.floors = floors;
+  newState.world.currentFloorIndex = currentFloorIndex;
   setGameState(newState);
   gamestateTickStart();
   gamestateTickEnd();
