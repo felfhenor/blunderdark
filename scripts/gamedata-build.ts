@@ -142,5 +142,100 @@ const rewriteDataIds = () => {
   fs.writeJsonSync('public/json/all.json', allData);
 };
 
+const validateResearchTree = () => {
+  const researchNodes = allData['research'];
+  if (!researchNodes || researchNodes.length === 0) {
+    return;
+  }
+
+  console.log(`\nValidating research tree (${researchNodes.length} nodes)...`);
+
+  const errors: string[] = [];
+  const nodeIds = new Set(researchNodes.map((n: any) => n.id));
+
+  // 1. Validate all prerequisite references point to valid node IDs
+  researchNodes.forEach((node: any) => {
+    if (!isArray(node.prerequisites)) return;
+    node.prerequisites.forEach((prereqId: string) => {
+      if (!nodeIds.has(prereqId)) {
+        errors.push(
+          `Node "${node.name}" (${node.id}) has invalid prerequisite "${prereqId}" — no matching research node exists`,
+        );
+      }
+    });
+  });
+
+  // 2. Check every branch has at least one root node (no prerequisites)
+  const branches = new Set(researchNodes.map((n: any) => n.branch));
+  branches.forEach((branch: string) => {
+    const branchNodes = researchNodes.filter((n: any) => n.branch === branch);
+    const rootNodes = branchNodes.filter(
+      (n: any) => !n.prerequisites || n.prerequisites.length === 0,
+    );
+    if (rootNodes.length === 0) {
+      errors.push(
+        `Branch "${branch}" has no root node (a node with empty prerequisites)`,
+      );
+    }
+  });
+
+  // 3. Circular dependency detection via DFS
+  const adjacency: Record<string, string[]> = {};
+  researchNodes.forEach((node: any) => {
+    adjacency[node.id] = isArray(node.prerequisites)
+      ? node.prerequisites.filter((id: string) => nodeIds.has(id))
+      : [];
+  });
+
+  const visited = new Set<string>();
+  const inStack = new Set<string>();
+  const nodeNameById: Record<string, string> = {};
+  researchNodes.forEach((n: any) => {
+    nodeNameById[n.id] = n.name;
+  });
+
+  const detectCycle = (nodeId: string, path: string[]): boolean => {
+    if (inStack.has(nodeId)) {
+      const cycleStart = path.indexOf(nodeId);
+      const cycle = path
+        .slice(cycleStart)
+        .map((id) => nodeNameById[id] || id)
+        .join(' -> ');
+      errors.push(
+        `Circular dependency detected: ${cycle} -> ${nodeNameById[nodeId] || nodeId}`,
+      );
+      return true;
+    }
+    if (visited.has(nodeId)) return false;
+
+    visited.add(nodeId);
+    inStack.add(nodeId);
+    path.push(nodeId);
+
+    for (const prereqId of adjacency[nodeId] || []) {
+      if (detectCycle(prereqId, path)) return true;
+    }
+
+    path.pop();
+    inStack.delete(nodeId);
+    return false;
+  };
+
+  for (const nodeId of nodeIds) {
+    if (!visited.has(nodeId)) {
+      detectCycle(nodeId, []);
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error(`\nResearch tree validation failed with ${errors.length} error(s):`);
+    errors.forEach((err) => console.error(`  - ${err}`));
+    process.exit(1);
+  }
+
+  console.log(`Research tree validation passed — ${researchNodes.length} nodes, ${branches.size} branches, no errors.`);
+};
+
 processFiles();
+validateResearchTree();
 rewriteDataIds();
