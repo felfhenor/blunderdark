@@ -4,7 +4,7 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 12 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, room-placement-validation partial, floor-creation-system partial, research-tree-data-structure partial)
+- **Complete:** 13 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, room-placement-validation partial, research-tree-data-structure partial)
 - **Remaining:** ~109 features
 
 ---
@@ -15,7 +15,7 @@ These features have some stories done. Complete them first.
 
 | Priority | Feature | Remaining | Depends On |
 |----------|---------|-----------|------------|
-| 1.1 | `floor-creation-system` | US-005 | grid-system |
+| ~~1.1~~ | ~~`floor-creation-system`~~ | ~~COMPLETE~~ | ~~grid-system~~ |
 | 1.2 | `research-tree-data-structure` | US-003 through US-007 | none |
 | 1.3 | `room-placement-validation` | US-004, US-005 | grid-system, tetromino-room-shapes |
 
