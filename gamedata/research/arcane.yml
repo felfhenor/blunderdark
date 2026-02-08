@@ -1,0 +1,183 @@
+# Arcane Branch research nodes (tier 2+)
+# Root node (Arcane Basics) is in base.yml
+#
+# Tree structure:
+#   Arcane Basics (T1)
+#   ├── Flux Manipulation (T2)
+#   │   └── Arcane Amplification (T3)
+#   │       └── Dimensional Studies (T4) [+Enchantment]
+#   ├── Ley Line Tapping (T2)
+#   │   └── Elemental Binding (T3)
+#   │       └── Ley Line Mastery (T4) [+Ley Line Tapping]
+#   └── Enchantment (T2)
+#       └── Warding (T3)
+#           └── Spellweave Lattice (T4) [+Arcane Amplification]
+#   Arcane Convergence (T5) [Dimensional Studies + Ley Line Mastery]
+#   Planar Nexus (T5) [Spellweave Lattice + Dimensional Studies]
+#   Grand Arcanum (T6) [Arcane Convergence + Planar Nexus]
+
+# --- TIER 2: Three paths branch from Arcane Basics ---
+
+- id: aa000002-0002-4000-b001-000000000001
+  name: Flux Manipulation
+  description: Master the flow of raw magical flux, learning to store and redirect arcane energy efficiently.
+  branch: arcane
+  cost:
+    research: 25
+    flux: 5
+  prerequisites:
+    - aa000002-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000002-0003-4000-b001-000000000001
+  name: Ley Line Tapping
+  description: Discover how to tap into the ley lines running beneath the dungeon for a steady supply of magical power.
+  branch: arcane
+  cost:
+    research: 25
+    flux: 5
+  prerequisites:
+    - aa000002-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000002-0004-4000-b001-000000000001
+  name: Enchantment
+  description: Imbue objects and rooms with persistent magical effects that enhance their function.
+  branch: arcane
+  cost:
+    research: 25
+    flux: 5
+  prerequisites:
+    - aa000002-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+# --- TIER 3: Specializations ---
+
+- id: aa000002-0005-4000-b001-000000000001
+  name: Arcane Amplification
+  description: Amplify the output of magical structures, increasing flux generation and spell potency across the dungeon.
+  branch: arcane
+  cost:
+    research: 50
+    flux: 15
+  prerequisites:
+    - aa000002-0002-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000002-0006-4000-b001-000000000001
+  name: Elemental Binding
+  description: Bind elemental forces to your dungeon, harnessing fire, ice, and lightning for defense and production.
+  branch: arcane
+  cost:
+    research: 50
+    flux: 15
+  prerequisites:
+    - aa000002-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000002-0007-4000-b001-000000000001
+  name: Warding
+  description: Create powerful protective wards that shield rooms and inhabitants from magical intrusion.
+  branch: arcane
+  cost:
+    research: 50
+    flux: 15
+  prerequisites:
+    - aa000002-0004-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+# --- TIER 4: Advanced combinations ---
+
+- id: aa000002-0008-4000-b001-000000000001
+  name: Dimensional Studies
+  description: Explore the boundaries between planes, unlocking the ability to bend space within your dungeon.
+  branch: arcane
+  cost:
+    research: 100
+    flux: 30
+    crystals: 15
+  prerequisites:
+    - aa000002-0005-4000-b001-000000000001
+    - aa000002-0004-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+- id: aa000002-0009-4000-b001-000000000001
+  name: Ley Line Mastery
+  description: Achieve total control over ley line networks, redirecting their flow to power entire dungeon floors.
+  branch: arcane
+  cost:
+    research: 100
+    flux: 30
+    crystals: 15
+  prerequisites:
+    - aa000002-0006-4000-b001-000000000001
+    - aa000002-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+- id: aa000002-0010-4000-b001-000000000001
+  name: Spellweave Lattice
+  description: Weave interconnected spell matrices that allow wards and enchantments to reinforce each other.
+  branch: arcane
+  cost:
+    research: 100
+    flux: 30
+    crystals: 15
+  prerequisites:
+    - aa000002-0007-4000-b001-000000000001
+    - aa000002-0005-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+# --- TIER 5: Pinnacle powers ---
+
+- id: aa000002-0011-4000-b001-000000000001
+  name: Arcane Convergence
+  description: Merge dimensional magic with ley line power to create zones of intensified magical energy.
+  branch: arcane
+  cost:
+    research: 200
+    flux: 60
+    crystals: 30
+  prerequisites:
+    - aa000002-0008-4000-b001-000000000001
+    - aa000002-0009-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+- id: aa000002-0012-4000-b001-000000000001
+  name: Planar Nexus
+  description: Establish a permanent connection to other planes, allowing the summoning of arcane constructs and exotic materials.
+  branch: arcane
+  cost:
+    research: 200
+    flux: 60
+    crystals: 30
+  prerequisites:
+    - aa000002-0010-4000-b001-000000000001
+    - aa000002-0008-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+# --- TIER 6: Ultimate mastery ---
+
+- id: aa000002-0013-4000-b001-000000000001
+  name: Grand Arcanum
+  description: Achieve the pinnacle of arcane knowledge, unifying all schools of magic into a single transcendent discipline.
+  branch: arcane
+  cost:
+    research: 400
+    flux: 120
+    crystals: 60
+  prerequisites:
+    - aa000002-0011-4000-b001-000000000001
+    - aa000002-0012-4000-b001-000000000001
+  unlocks: []
+  tier: 6
