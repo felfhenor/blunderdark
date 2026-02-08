@@ -387,3 +387,18 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - PRDs may specify "create a service" but codebase pattern uses helper functions — follow existing patterns
   - Floor helpers use same pattern as other helpers: computed signals for derived state, pure functions for lookups
   - All floor query functions already existed from prior work; only `getFloorByDepth` was missing
+
+## floor-creation-system US-003: Implement floor creation with resource costs [DONE]
+- Added `getFloorCreationCost(depth)` to `src/app/helpers/floor.ts` — returns `ResourceCost` with crystals (50 * depth) and gold (30 * depth)
+- Added `canCreateFloor()` — returns `{ canCreate, reason? }` checking MAX_FLOORS limit and resource affordability
+- Added `createFloor(biome?)` — creates floor at next depth, deducts costs via `payCost()`, appends to floors array via `updateGamestate()`
+- Uses existing `canAfford()` and `payCost()` from resources helper for atomic resource deduction
+- Uses existing `defaultFloor()` from defaults helper for floor initialization (empty 20x20 grid, no rooms/inhabitants)
+- Added 13 unit tests to `src/app/helpers/floor.spec.ts` covering: cost scaling at depths 1/5/10, canCreate success/max-reached/insufficient-resources/correct-cost-calculation, createFloor success/biome/max-reached/pay-failure/resource-deduction/state-update
+- Refactored existing floor test mocks to use `vi.fn()` for controllable mock return values across test cases
+- All tests pass (231/231), lint passes, no new typecheck errors
+- Commit: f24b6a7
+- **Learnings for future iterations:**
+  - When testing functions that call other helper functions (e.g., `canAfford`, `payCost`), mock the helper module rather than setting up deep gamestate — keeps tests focused on the unit under test
+  - `payCost()` is async and returns boolean — must await and check return value before proceeding
+  - Floor creation uses `floors.length + 1` for next depth — assumes floors are always sequential (no gaps)

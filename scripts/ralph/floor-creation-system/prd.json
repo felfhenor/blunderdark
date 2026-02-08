@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added getFloorCreationCost(depth), canCreateFloor(), createFloor(biome?) to src/app/helpers/floor.ts. Costs: 50 crystals + 30 gold per depth level. Uses canAfford/payCost for resource validation. 13 new tests in floor.spec.ts. All tests pass (231/231)."
     },
     {
       "id": "US-004",
