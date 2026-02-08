@@ -450,3 +450,21 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Research YAML uses `prerequisites: []` and `unlocks: []` as empty arrays for root nodes
   - The `cost` field uses ResourceCost-compatible YAML (e.g., `research: 10`) — the build script passes it through as-is since the keys don't match any content type folder name
   - The build script's `rewriteDataIds` won't transform `prerequisites`/`unlocks` arrays since they use raw UUIDs, not content names
+
+## research-tree-data-structure US-005: Define Arcane Branch Nodes [DONE]
+- Created `gamedata/research/arcane.yml` with 12 Arcane branch nodes (tiers 2-6)
+- Tree structure mirrors Dark branch pattern: 3 tier-2 paths branching from root, converging at tier 6
+  - Flux Manipulation → Arcane Amplification → Dimensional Studies
+  - Ley Line Tapping → Elemental Binding → Ley Line Mastery
+  - Enchantment → Warding → Spellweave Lattice
+  - Tier 5: Arcane Convergence, Planar Nexus
+  - Tier 6: Grand Arcanum (capstone)
+- Costs scale from 25 research + 5 flux (tier 2) to 400 research + 120 flux + 60 crystals (tier 6)
+- Uses `flux` as secondary resource (arcane thematic) and `crystals` as tertiary (tier 4+)
+- `npm run gamedata:build` compiles successfully — 12 arcane entries loaded (26 total research)
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: 930972d
+- **Learnings for future iterations:**
+  - Each research branch uses a different secondary resource: Dark=essence, Arcane=flux
+  - UUID pattern per branch: dark=aa000001, arcane=aa000002, engineering=aa000003
+  - Cost scaling pattern: T2=25/5, T3=50/15, T4=100/30/15, T5=200/60/30, T6=400/120/60

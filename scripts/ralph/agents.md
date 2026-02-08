@@ -53,6 +53,7 @@ getEntry<ReputationAction & IsContentItem>(actionId)
 
 - `indexedDbSignal` auto-persists on `set()`/`update()` - no manual save needed
 - `migrateGameState()` uses `merge()` from es-toolkit to fill missing fields from defaults
+- **Array fields need explicit migration** — `merge()` merges arrays by index (not replace), which corrupts multi-element data like `floors[]`. Add a dedicated `migrateX()` function (like `migrateResources`, `migrateFloors`) and call it after `merge()` in `migrateGameState()`
 
 ## RxJS Event Pattern
 
@@ -87,6 +88,14 @@ When adding new fields to `GridTile`:
 1. Update `createEmptyGrid()` in `grid.ts`
 2. Fix any `toEqual` assertions in `grid.spec.ts` that check tile structure
 
+## Research Tree YAML Conventions
+
+- UUID pattern per branch: dark=`aa000001`, arcane=`aa000002`, engineering=`aa000003`
+- Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=TBD
+- Cost scaling pattern across tiers: T1=10 research, T2=25/5, T3=50/15, T4=100/30/15 tertiary, T5=200/60/30, T6=400/120/60
+- Root nodes (tier 1) are defined in `base.yml`; branch-specific nodes (tier 2+) go in `dark.yml`, `arcane.yml`, `engineering.yml`
+- Tree structure: 3 paths from root at tier 2, specializations at tier 3, cross-path combinations at tier 4, convergence at tier 5-6
+
 ## Gamedata Notes
 
 - `public/json/` is gitignored (generated output) - only commit YAML source files
@@ -110,6 +119,15 @@ When creating new panel components for the game-play sidebar:
 3. Import and add to `game-play.component.ts` imports array
 4. Add `<app-panel-[name] />` to the sidebar div in `game-play.component.html`
 5. Use DaisyUI card structure: `card > card-body > card-title` for consistent styling
+
+## Confirmation Dialogs (SweetAlert2)
+
+Use `@sweetalert2/ngx-sweetalert2` for confirmation dialogs:
+
+1. Import `SweetAlert2Module` in the component's `imports` array
+2. Add `[swal]="mySwal"` directive on the trigger button
+3. Add `<swal #mySwal title="..." (confirm)="onConfirm()"></swal>` in the template
+4. The `(confirm)` event fires only when user clicks the confirm button
 
 ## Dynamic Styling with CSS Variables
 

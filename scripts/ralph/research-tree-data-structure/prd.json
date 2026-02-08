@@ -77,8 +77,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created gamedata/research/arcane.yml with 12 nodes (tiers 2-6). Tree branches from Arcane Basics into Flux Manipulation, Ley Line Tapping, and Enchantment paths, converging at Grand Arcanum (tier 6). Costs scale from 25 research+5 flux (tier 2) to 400 research+120 flux+60 crystals (tier 6)."
     },
     {
       "id": "US-006",
