@@ -503,3 +503,34 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Research prerequisites use raw UUIDs (not name references) because the `rewriteDataIds` function only transforms keys whose names contain a content type folder name
   - The `allData['research']` array contains all research nodes from all YAML files merged together — validation operates on the combined set
   - Cycle detection uses DFS with an "in-stack" set to detect back-edges; the path array tracks the traversal for clear error messages
+
+## room-placement-validation US-004: Visual Placement Feedback [DONE]
+- Added placement preview state to `src/app/helpers/room-placement.ts`:
+  - `placementPreviewShape` signal — the RoomShape being previewed (or null)
+  - `placementPreviewPosition` signal — current anchor position on grid (or null)
+  - `placementPreview` computed signal — returns tiles with inBounds flag, overall validity, and error messages
+  - `setPlacementPreview(shape, position?)` — set both shape and optional position
+  - `updatePreviewPosition(x, y)` — update position during mouse movement
+  - `clearPlacementPreview()` — reset all preview state
+  - `PreviewTile` type — TileOffset extended with inBounds flag
+- Updated `src/app/components/grid/grid.component.ts`:
+  - `previewTileSet` computed signal — builds a Set of "x,y" strings for O(1) preview tile lookup
+  - `isPreviewValid(x, y)` / `isPreviewInvalid(x, y)` — check if tile is in preview and whether placement is valid/invalid
+  - `onTileHover(x, y)` — updates preview position on mouseenter when a shape is being previewed
+  - Escape key now clears preview first, then falls back to deselecting tile
+- Updated `src/app/components/grid/grid.component.html`:
+  - Added `[class.preview-valid]` and `[class.preview-invalid]` bindings
+  - Added `(mouseenter)` event for hover tracking
+- Updated `src/app/components/grid/grid.component.scss`:
+  - `.preview-valid` — green overlay using `oklch(0.65 0.2 145)`, opacity 0.7
+  - `.preview-invalid` — red overlay using `oklch(0.55 0.25 25)`, opacity 0.7
+- All validation rules: if ANY tile is invalid, ALL preview tiles show red (per acceptance criteria)
+- Browser verified: CSS rules compile with Angular view encapsulation, green and red colors confirmed
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: 72a6a05
+- **Learnings for future iterations:**
+  - Angular view encapsulation adds attribute selectors (e.g., `[_ngcontent-ng-c2974652735]`) to CSS rules — manual class additions in browser console won't match scoped styles
+  - OKLCH color format works in Angular SCSS — the compiler converts to browser-compatible formats (e.g., `oklch(0.65 0.2 145)` → `rgb(17, 173, 50)`)
+  - For grid tile preview, using a Set of "x,y" strings provides O(1) lookup per tile vs O(n) array scan — important for 400 tiles
+  - Preview state is global (module-level signals) — consistent with selectedTile pattern in grid.ts
+  - The grid component is very small on the game-play page due to flex layout — sidebar takes priority; grid needs `flex-1` or similar to grow

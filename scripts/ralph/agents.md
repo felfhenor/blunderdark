@@ -151,3 +151,18 @@ Pass colors from templates to SCSS using CSS custom properties:
   border-color: var(--my-color);
 }
 ```
+
+## Placement Preview Pattern
+
+The room placement preview system uses module-level signals in `room-placement.ts`:
+
+1. `placementPreviewShape` signal — set to the RoomShape being placed (null when not placing)
+2. `placementPreviewPosition` signal — updated on mouse hover over grid tiles
+3. `placementPreview` computed — combines shape + position + grid state to produce validated tile list
+4. GridComponent uses a `previewTileSet` computed with a `Set<string>` of `"x,y"` keys for O(1) per-tile lookup
+5. If ANY tile in the shape is invalid, ALL tiles show red (all-or-nothing validity)
+6. Escape key clears preview before falling back to tile deselection
+
+## OKLCH Colors in Angular
+
+OKLCH color format works in SCSS files — the Angular compiler converts them to browser-compatible formats. Example: `oklch(0.65 0.2 145)` compiles to `rgb(17, 173, 50)`.

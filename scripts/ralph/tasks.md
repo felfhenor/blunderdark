@@ -17,7 +17,7 @@ These features have some stories done. Complete them first.
 |----------|---------|-----------|------------|
 | ~~1.1~~ | ~~`floor-creation-system`~~ | ~~COMPLETE~~ | ~~grid-system~~ |
 | ~~1.2~~ | ~~`research-tree-data-structure`~~ | ~~COMPLETE~~ | ~~none~~ |
-| 1.3 | `room-placement-validation` | US-004, US-005 | grid-system, tetromino-room-shapes |
+| 1.3 | `room-placement-validation` | US-005 | grid-system, tetromino-room-shapes |
 
 ---
 
