@@ -1,0 +1,183 @@
+# Engineering Branch research nodes (tier 2+)
+# Root node (Basic Engineering) is in base.yml
+#
+# Tree structure:
+#   Basic Engineering (T1)
+#   ├── Advanced Construction (T2)
+#   │   └── Master Architecture (T3)
+#   │       └── Siege Works (T4) [+Trap Design]
+#   ├── Trap Design (T2)
+#   │   └── Automated Defenses (T3)
+#   │       └── Mechanical Sentinels (T4) [+Trap Design]
+#   └── Advanced Manufacturing (T2)
+#       └── Dark Forge (T3)
+#           └── Golem Assembly (T4) [+Master Architecture]
+#   War Machines (T5) [Siege Works + Mechanical Sentinels]
+#   Industrial Mastery (T5) [Golem Assembly + Siege Works]
+#   Grand Artificer (T6) [War Machines + Industrial Mastery]
+
+# --- TIER 2: Three paths branch from Basic Engineering ---
+
+- id: aa000003-0002-4000-b001-000000000001
+  name: Advanced Construction
+  description: Develop superior building techniques that allow for larger and more resilient dungeon structures.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisites:
+    - aa000003-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000003-0003-4000-b001-000000000001
+  name: Trap Design
+  description: Study the fundamentals of mechanical trap construction, from simple pitfalls to pressure plates.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisites:
+    - aa000003-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+- id: aa000003-0004-4000-b001-000000000001
+  name: Advanced Manufacturing
+  description: Establish efficient production lines for crafting materials, weapons, and dungeon components.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisites:
+    - aa000003-0001-4000-b001-000000000001
+  unlocks: []
+  tier: 2
+
+# --- TIER 3: Specializations ---
+
+- id: aa000003-0005-4000-b001-000000000001
+  name: Master Architecture
+  description: Design complex multi-room structures with reinforced walls and optimized layouts for maximum efficiency.
+  branch: engineering
+  cost:
+    research: 50
+    gold: 15
+  prerequisites:
+    - aa000003-0002-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000003-0006-4000-b001-000000000001
+  name: Automated Defenses
+  description: Create self-resetting traps and automated defense systems that require no inhabitant intervention.
+  branch: engineering
+  cost:
+    research: 50
+    gold: 15
+  prerequisites:
+    - aa000003-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+- id: aa000003-0007-4000-b001-000000000001
+  name: Dark Forge
+  description: Construct a forge powered by dungeon energy, capable of smelting exotic materials into powerful equipment.
+  branch: engineering
+  cost:
+    research: 50
+    gold: 15
+  prerequisites:
+    - aa000003-0004-4000-b001-000000000001
+  unlocks: []
+  tier: 3
+
+# --- TIER 4: Advanced combinations ---
+
+- id: aa000003-0008-4000-b001-000000000001
+  name: Siege Works
+  description: Build massive defensive installations and siege equipment to repel even the largest invasion forces.
+  branch: engineering
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisites:
+    - aa000003-0005-4000-b001-000000000001
+    - aa000003-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+- id: aa000003-0009-4000-b001-000000000001
+  name: Mechanical Sentinels
+  description: Construct autonomous mechanical guardians that patrol hallways and defend key positions.
+  branch: engineering
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisites:
+    - aa000003-0006-4000-b001-000000000001
+    - aa000003-0003-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+- id: aa000003-0010-4000-b001-000000000001
+  name: Golem Assembly
+  description: Assemble powerful golems from forged materials, combining architectural precision with manufacturing might.
+  branch: engineering
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisites:
+    - aa000003-0007-4000-b001-000000000001
+    - aa000003-0005-4000-b001-000000000001
+  unlocks: []
+  tier: 4
+
+# --- TIER 5: Pinnacle powers ---
+
+- id: aa000003-0011-4000-b001-000000000001
+  name: War Machines
+  description: Engineer devastating war machines that combine siege weaponry with automated defense systems.
+  branch: engineering
+  cost:
+    research: 200
+    gold: 60
+    crystals: 30
+  prerequisites:
+    - aa000003-0008-4000-b001-000000000001
+    - aa000003-0009-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+- id: aa000003-0012-4000-b001-000000000001
+  name: Industrial Mastery
+  description: Achieve peak manufacturing efficiency, producing golems and siege equipment at unprecedented scale.
+  branch: engineering
+  cost:
+    research: 200
+    gold: 60
+    crystals: 30
+  prerequisites:
+    - aa000003-0010-4000-b001-000000000001
+    - aa000003-0008-4000-b001-000000000001
+  unlocks: []
+  tier: 5
+
+# --- TIER 6: Ultimate mastery ---
+
+- id: aa000003-0013-4000-b001-000000000001
+  name: Grand Artificer
+  description: Attain the ultimate mastery of engineering, creating wonders that blur the line between construction and creation.
+  branch: engineering
+  cost:
+    research: 400
+    gold: 120
+    crystals: 60
+  prerequisites:
+    - aa000003-0011-4000-b001-000000000001
+    - aa000003-0012-4000-b001-000000000001
+  unlocks: []
+  tier: 6
