@@ -96,6 +96,16 @@ When adding new fields to `GridTile`:
 - Root nodes (tier 1) are defined in `base.yml`; branch-specific nodes (tier 2+) go in `dark.yml`, `arcane.yml`, `engineering.yml`
 - Tree structure: 3 paths from root at tier 2, specializations at tier 3, cross-path combinations at tier 4, convergence at tier 5-6
 
+## Gamedata Build-Time Validation
+
+When adding build-time validation for a content type:
+
+1. Add a validation function (e.g., `validateResearchTree()`) to `scripts/gamedata-build.ts`
+2. Call it between `processFiles()` and `rewriteDataIds()` — data is loaded but IDs haven't been rewritten
+3. Access data via `allData['contenttype']` — contains all entries from all YAML files merged
+4. On failure: `console.error()` + `process.exit(1)` to halt the build
+5. Research prerequisites use raw UUIDs (not name references) because `rewriteDataIds` only transforms keys matching content type folder names
+
 ## Gamedata Notes
 
 - `public/json/` is gitignored (generated output) - only commit YAML source files

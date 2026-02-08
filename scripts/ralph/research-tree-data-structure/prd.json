@@ -109,8 +109,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added validateResearchTree() to scripts/gamedata-build.ts. Validates: (1) all prerequisite IDs reference valid research nodes, (2) every branch has at least one root node, (3) no circular dependencies via DFS. Runs between processFiles() and rewriteDataIds(). Exits with error code 1 and clear messages on failure."
     }
   ]
 }

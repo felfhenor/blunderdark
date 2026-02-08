@@ -486,3 +486,20 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - All three research branches now complete: Dark=essence, Arcane=flux, Engineering=gold
   - UUID pattern confirmed: dark=aa000001, arcane=aa000002, engineering=aa000003
   - Cost scaling pattern consistent across all branches: T2=25/5, T3=50/15, T4=100/30/15, T5=200/60/30, T6=400/120/60
+
+## research-tree-data-structure US-007: Research Tree Validation [DONE]
+- Added `validateResearchTree()` function to `scripts/gamedata-build.ts`
+- Validates three things:
+  1. All prerequisite references point to valid research node IDs
+  2. Every branch has at least one root node (empty prerequisites)
+  3. No circular dependencies (DFS-based cycle detection with path tracking)
+- Runs automatically as part of `npm run gamedata:build`, between `processFiles()` and `rewriteDataIds()`
+- On failure: exits with code 1 and prints clear error messages (node name, ID, and specific issue)
+- On success: prints summary (node count, branch count)
+- All tests pass (240/240), lint passes, no new typecheck errors
+- Commit: d6493b4
+- **Learnings for future iterations:**
+  - Build-time validation for content types should be added to `gamedata-build.ts` between `processFiles()` and `rewriteDataIds()` — data is loaded but IDs haven't been rewritten yet
+  - Research prerequisites use raw UUIDs (not name references) because the `rewriteDataIds` function only transforms keys whose names contain a content type folder name
+  - The `allData['research']` array contains all research nodes from all YAML files merged together — validation operates on the combined set
+  - Cycle detection uses DFS with an "in-stack" set to detect back-edges; the path array tracks the traversal for clear error messages
