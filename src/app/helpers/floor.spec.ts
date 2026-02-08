@@ -5,6 +5,7 @@ import {
   getFloorBiome,
   getFloorByDepth,
   getFloorCreationCost,
+  migrateFloors,
 } from '@helpers/floor';
 import type { Floor } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -30,11 +31,15 @@ vi.mock('@helpers/defaults', () => ({
     name: `Floor ${depth}`,
     depth,
     biome: biome ?? 'neutral',
-    grid: [],
+    grid: [['empty-grid']],
     rooms: [],
     hallways: [],
     inhabitants: [],
   }),
+}));
+
+vi.mock('@helpers/grid', () => ({
+  createEmptyGrid: () => [['empty-grid']],
 }));
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
@@ -245,5 +250,95 @@ describe('createFloor', () => {
     expect(newState.world.floors).toHaveLength(4);
     expect(newState.world.floors[3].depth).toBe(4);
     expect(newState.world.floors[3].biome).toBe('crystal');
+  });
+});
+
+describe('migrateFloors', () => {
+  it('should create floor from top-level world data when floors is missing', () => {
+    const world = {
+      grid: [['saved-grid']] as unknown as Floor['grid'],
+      hallways: [{ id: 'h1' }] as unknown as Floor['hallways'],
+      inhabitants: [{ instanceId: 'i1' }] as unknown as Floor['inhabitants'],
+    };
+
+    const result = migrateFloors(world);
+    expect(result.floors).toHaveLength(1);
+    expect(result.floors[0].depth).toBe(1);
+    expect(result.floors[0].grid).toEqual([['saved-grid']]);
+    expect(result.floors[0].hallways).toEqual([{ id: 'h1' }]);
+    expect(result.floors[0].inhabitants).toEqual([{ instanceId: 'i1' }]);
+    expect(result.currentFloorIndex).toBe(0);
+  });
+
+  it('should create floor with empty grid when no world data exists', () => {
+    const result = migrateFloors({});
+    expect(result.floors).toHaveLength(1);
+    expect(result.floors[0].depth).toBe(1);
+    expect(result.floors[0].grid).toEqual([['empty-grid']]);
+    expect(result.floors[0].hallways).toEqual([]);
+    expect(result.floors[0].inhabitants).toEqual([]);
+  });
+
+  it('should create floor from empty floors array', () => {
+    const result = migrateFloors({ floors: [] });
+    expect(result.floors).toHaveLength(1);
+    expect(result.floors[0].depth).toBe(1);
+  });
+
+  it('should preserve existing floors when present', () => {
+    const floors = [
+      makeFloor({ id: 'f1', depth: 1, biome: 'volcanic' }),
+      makeFloor({ id: 'f2', depth: 2, biome: 'crystal' }),
+    ];
+
+    const result = migrateFloors({ floors });
+    expect(result.floors).toHaveLength(2);
+    expect(result.floors[0].id).toBe('f1');
+    expect(result.floors[0].biome).toBe('volcanic');
+    expect(result.floors[1].id).toBe('f2');
+    expect(result.floors[1].biome).toBe('crystal');
+  });
+
+  it('should fill missing fields on saved floors with defaults', () => {
+    const partialFloor = { id: 'f1', depth: 2 } as unknown as Floor;
+    const result = migrateFloors({ floors: [partialFloor] });
+    expect(result.floors[0].id).toBe('f1');
+    expect(result.floors[0].depth).toBe(2);
+    expect(result.floors[0].name).toBe('Floor 2');
+    expect(result.floors[0].biome).toBe('neutral');
+    expect(result.floors[0].rooms).toEqual([]);
+  });
+
+  it('should clamp currentFloorIndex to valid range', () => {
+    const floors = [makeFloor({ id: 'f1', depth: 1 })];
+    const result = migrateFloors({ floors, currentFloorIndex: 5 });
+    expect(result.currentFloorIndex).toBe(0);
+  });
+
+  it('should clamp negative currentFloorIndex to 0', () => {
+    const floors = [makeFloor({ id: 'f1', depth: 1 })];
+    const result = migrateFloors({ floors, currentFloorIndex: -1 });
+    expect(result.currentFloorIndex).toBe(0);
+  });
+
+  it('should preserve valid currentFloorIndex', () => {
+    const floors = [
+      makeFloor({ id: 'f1', depth: 1 }),
+      makeFloor({ id: 'f2', depth: 2 }),
+      makeFloor({ id: 'f3', depth: 3 }),
+    ];
+    const result = migrateFloors({ floors, currentFloorIndex: 2 });
+    expect(result.currentFloorIndex).toBe(2);
+  });
+
+  it('should not mutate input data', () => {
+    const original = {
+      floors: [makeFloor({ id: 'f1', depth: 1 })],
+      currentFloorIndex: 0,
+    };
+    const floorsCopy = JSON.parse(JSON.stringify(original));
+
+    migrateFloors(original);
+    expect(original).toEqual(floorsCopy);
   });
 });
