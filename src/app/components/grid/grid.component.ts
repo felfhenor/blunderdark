@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  attemptPlacement,
   clearPlacementPreview,
   clearPreviewPosition,
   deselectTile,
+  executeRoomPlacement,
   gamestate,
   notifyError,
   placementPreview,
@@ -54,11 +54,11 @@ export class GridComponent {
     return data !== null && !data.valid && data.set.has(`${x},${y}`);
   }
 
-  public onTileClick(x: number, y: number): void {
+  public async onTileClick(x: number, y: number): Promise<void> {
     if (placementPreviewShape()) {
-      const result = attemptPlacement(x, y);
-      if (!result.placed && result.message) {
-        notifyError(result.message);
+      const result = await executeRoomPlacement(x, y);
+      if (!result.success && result.error) {
+        notifyError(result.error);
       }
       return;
     }

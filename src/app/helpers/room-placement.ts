@@ -1,11 +1,15 @@
 import { computed, signal } from '@angular/core';
+import { getEntry } from '@helpers/content';
+import { canAfford, payCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { getAbsoluteTiles, getRoomShape } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
   GridState,
+  IsContentItem,
   PlacedRoom,
+  RoomDefinition,
   RoomShape,
   TileOffset,
 } from '@interfaces';
@@ -197,6 +201,39 @@ export function attemptPlacement(
   }
 
   return { placed: true, errors: [], message: '' };
+}
+
+export async function executeRoomPlacement(
+  x: number,
+  y: number,
+): Promise<{ success: boolean; error?: string }> {
+  const shape = placementPreviewShape();
+  const roomTypeId = selectedRoomTypeId();
+  if (!shape || !roomTypeId) return { success: false };
+
+  const grid = gamestate().world.grid;
+  const validation = validatePlacement(shape, x, y, grid);
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: formatPlacementErrors(validation.errors),
+    };
+  }
+
+  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  if (!roomDef) return { success: false, error: 'Unknown room type' };
+
+  if (!canAfford(roomDef.cost)) {
+    return { success: false, error: 'Not enough resources' };
+  }
+
+  const paid = await payCost(roomDef.cost);
+  if (!paid) return { success: false, error: 'Not enough resources' };
+
+  const placed = await placeRoom(roomTypeId, roomDef.shapeId, x, y);
+  if (!placed) return { success: false, error: 'Failed to place room' };
+
+  return { success: true };
 }
 
 // --- Room placement on floor ---
