@@ -598,3 +598,17 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `GameSpeed` is a union type `1 | 2 | 4`, not a generic number — keeps the type safe
   - Speed multiplies alongside `debugTickMultiplier` (both are factors in tick calculation)
   - `@ngneat/hotkeys` accepts string hotkey like `'1'`, `'2'`, `'3'` for number keys
+
+## time-system US-004: Time Display in UI [DONE]
+- Created `src/app/components/display-game-time/display-game-time.component.ts` (standalone, OnPush, inline template)
+- Displays `formattedGameTime()` signal output ("Day X - HH:MM") in monospace font
+- Shows `[Paused]` indicator (text-warning) when game is paused
+- Shows `[Nx]` speed indicator (text-info) when speed > 1x
+- Added component to navbar's `navbar-start` section with `appRequireSetup` directive
+- Replaced empty disabled `<li>` with the time display
+- All tests pass (255/255), lint passes, no new typecheck errors
+- Commit: dd4cc5b
+- **Learnings for future iterations:**
+  - The navbar `navbar-start` section was empty — good place for status displays
+  - Small display components with only computed signals are ideal for inline templates
+  - `appRequireSetup` on the wrapper `<div>` hides the time display until game is set up
