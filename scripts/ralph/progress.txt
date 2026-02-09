@@ -816,3 +816,22 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - The function returns `{ success, error? }` rather than calling notifyError directly — follows the "return data from helpers, let components notify" pattern from AGENTS.md
   - Importing `canAfford`/`payCost` from `@helpers/resources` and `getEntry` from `@helpers/content` in room-placement.ts causes no circular dependencies
   - After placement, the player remains in placement mode (same room type selected) for rapid building — no need to call exitPlacementMode()
+
+## room-placement-ui US-005: Cancel Placement Mode [DONE]
+- Updated GridComponent `onEscapeKey()` to call `exitPlacementMode()` instead of `clearPlacementPreview()`:
+  - `exitPlacementMode()` clears `selectedRoomTypeId` + `placementPreviewShape` + `placementPreviewPosition`
+  - `clearPlacementPreview()` only cleared shape + position, leaving the room selection panel still highlighted
+- Added `onRightClick(event)` handler to GridComponent:
+  - Calls `event.preventDefault()` to suppress the browser context menu when in placement mode
+  - Calls `exitPlacementMode()` to exit placement mode
+  - Only acts when `placementPreviewShape()` is truthy (placement mode is active)
+- Added `(contextmenu)="onRightClick($event)"` to the grid container div
+- Replaced `clearPlacementPreview` import with `exitPlacementMode` import
+- No resources are deducted when cancelling — neither Escape nor right-click triggers `executeRoomPlacement()`
+- The room selection panel automatically deselects because it checks `selectedRoomTypeId()` via `isSelected(roomId)`
+- All tests pass (323/323), lint passes, no new typecheck errors
+- Commit: 5412780
+- **Learnings for future iterations:**
+  - Use `exitPlacementMode()` (not `clearPlacementPreview()`) when the user wants to fully leave placement mode — the former also clears `selectedRoomTypeId`
+  - `(contextmenu)` event in Angular templates handles right-click; call `event.preventDefault()` to suppress the browser context menu
+  - Only prevent default context menu when in placement mode — outside placement mode, the context menu behavior is unchanged

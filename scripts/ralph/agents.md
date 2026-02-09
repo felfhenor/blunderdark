@@ -163,9 +163,10 @@ The room placement preview system uses module-level signals in `room-placement.t
 3. `placementPreview` computed — combines shape + position + grid state to produce validated tile list
 4. GridComponent uses a `previewTileSet` computed with a `Set<string>` of `"x,y"` keys for O(1) per-tile lookup
 5. If ANY tile in the shape is invalid, ALL tiles show red (all-or-nothing validity)
-6. Escape key clears preview before falling back to tile deselection
-7. `(mouseleave)` on grid container calls `clearPreviewPosition()` — clears position only (not shape), so preview reappears on re-entry
-8. `clearPreviewPosition()` vs `clearPlacementPreview()` — position-only vs full clear (shape + position + selectedRoomTypeId)
+6. Escape key calls `exitPlacementMode()` (clears selectedRoomTypeId + shape + position), then falls back to tile deselection
+7. Right-click (`(contextmenu)`) on grid calls `exitPlacementMode()` + `event.preventDefault()` to suppress context menu
+8. `(mouseleave)` on grid container calls `clearPreviewPosition()` — clears position only (not shape), so preview reappears on re-entry
+9. Three levels of clearing: `clearPreviewPosition()` (position only) vs `clearPlacementPreview()` (shape + position) vs `exitPlacementMode()` (selectedRoomTypeId + shape + position)
 
 ## OKLCH Colors in Angular
 
