@@ -4,12 +4,18 @@
       <div
         class="grid-tile"
         [class.occupied]="tile.occupied"
+        [class.room-tile]="tile.roomId"
         [class.selected]="isSelected(colIdx, rowIdx)"
         [class.preview-valid]="isPreviewValid(colIdx, rowIdx)"
         [class.preview-invalid]="isPreviewInvalid(colIdx, rowIdx)"
+        [style.--room-color]="getRoomColor(tile.roomId)"
         (click)="onTileClick(colIdx, rowIdx)"
         (mouseenter)="onTileHover(colIdx, rowIdx)"
-      ></div>
+      >
+        @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
+          <span class="room-label">{{ getRoomName(tile.roomId) }}</span>
+        }
+      </div>
     }
   }
 </div>

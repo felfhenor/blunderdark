@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { getEntry } from '@helpers/content';
+import { currentFloor } from '@helpers/floor';
 import { canAfford, payCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { getAbsoluteTiles, getRoomShape } from '@helpers/room-shapes';
@@ -128,7 +129,10 @@ export const placementPreview = computed(() => {
   const position = placementPreviewPosition();
   if (!shape || !position) return null;
 
-  const grid = gamestate().world.grid;
+  const floor = currentFloor();
+  if (!floor) return null;
+
+  const grid = floor.grid;
   const validation = validatePlacement(shape, position.x, position.y, grid);
   const tiles = getAbsoluteTiles(shape, position.x, position.y);
 
@@ -211,8 +215,10 @@ export async function executeRoomPlacement(
   const roomTypeId = selectedRoomTypeId();
   if (!shape || !roomTypeId) return { success: false };
 
-  const grid = gamestate().world.grid;
-  const validation = validatePlacement(shape, x, y, grid);
+  const floor = currentFloor();
+  if (!floor) return { success: false, error: 'No active floor' };
+
+  const validation = validatePlacement(shape, x, y, floor.grid);
   if (!validation.valid) {
     return {
       success: false,
