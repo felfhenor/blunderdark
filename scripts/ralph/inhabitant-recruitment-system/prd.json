@@ -29,7 +29,7 @@
       "acceptanceCriteria": [
         "A 'Recruit' button shown for each inhabitant type, disabled when player cannot afford",
         "Clicking 'Recruit' atomically deducts resource cost using payCost() from resource manager",
-        "A new InhabitantInstance created with unique ID (crypto.randomUUID()), definitionId, state 'normal', assignedRoomId null",
+        "A new InhabitantInstance created with unique ID (rngUuid()), definitionId, state 'normal', assignedRoomId null",
         "New inhabitant added to GameStateWorld.inhabitants",
         "Success notification shown: 'Recruited [Name]!'",
         "Disabled button shows tooltip listing missing resources: 'Need: 30 more Gold, 10 more Crystals'",

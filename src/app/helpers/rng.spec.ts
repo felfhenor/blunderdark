@@ -1,7 +1,6 @@
 import {
   rngChoice,
   rngChoiceIdentifiable,
-  rngGame,
   rngNumber,
   rngNumberRange,
   rngSeeded,
@@ -47,13 +46,6 @@ describe('RNG Helper Functions', () => {
       const rng2 = rngSeeded('test-seed-2');
 
       expect(rng1()).not.toBe(rng2());
-    });
-  });
-
-  describe('gamerng', () => {
-    it('should use game id as seed', () => {
-      const rng = rngGame();
-      expect(rng).toBeInstanceOf(Function);
     });
   });
 

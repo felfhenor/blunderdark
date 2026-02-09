@@ -1,4 +1,5 @@
 import { computed, signal } from '@angular/core';
+import { rngUuid } from '@helpers/rng';
 import { getAbsoluteTiles, getRoomShape } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -225,7 +226,12 @@ export function removeRoomFromFloor(
   const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
 
   for (const t of tiles) {
-    if (t.y >= 0 && t.y < newGrid.length && t.x >= 0 && t.x < newGrid[0].length) {
+    if (
+      t.y >= 0 &&
+      t.y < newGrid.length &&
+      t.x >= 0 &&
+      t.x < newGrid[0].length
+    ) {
       const gridTile = newGrid[t.y][t.x];
       if (gridTile.roomId === roomId) {
         newGrid[t.y][t.x] = {
@@ -261,7 +267,7 @@ export async function placeRoom(
   if (!floor) return null;
 
   const room: PlacedRoom = {
-    id: crypto.randomUUID(),
+    id: rngUuid(),
     roomTypeId,
     shapeId,
     anchorX,

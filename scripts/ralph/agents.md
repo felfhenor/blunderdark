@@ -46,7 +46,7 @@ Grid uses **row-major indexing**: `grid[y][x]` - be careful with coordinate orde
 When using `getEntry<T>()`, the type must satisfy `T & IsContentItem`:
 
 ```typescript
-getEntry<ReputationAction & IsContentItem>(actionId)
+getEntry<ReputationAction & IsContentItem>(actionId);
 ```
 
 ## Persistence
@@ -85,6 +85,7 @@ Lint rule `typescript-paths/absolute-import` requires `@helpers/x` not `./x` in 
 ## Adding Fields to GridTile
 
 When adding new fields to `GridTile`:
+
 1. Update `createEmptyGrid()` in `grid.ts`
 2. Fix any `toEqual` assertions in `grid.spec.ts` that check tile structure
 
@@ -116,8 +117,6 @@ When adding build-time validation for a content type:
 
 Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection.
 
-**CAUTION:** `rng.ts` imports `worldGameId` from `@helpers/world` → `world.ts` imports from `@helpers/state-game` → `state-game.ts` imports `defaults.ts` → `defaults.ts` imports `rng.ts`. This creates a circular dependency. **Do NOT import `rngUuid` from `@helpers/rng` in any file that also imports from `@helpers/state-game`** (like `room-placement.ts`). Use `crypto.randomUUID()` instead for UUID generation in those files.
-
 ## Biome Data
 
 `BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering.
@@ -148,6 +147,7 @@ Pass colors from templates to SCSS using CSS custom properties:
 ```html
 <div [style.--my-color]="getColor()"></div>
 ```
+
 ```scss
 .element {
   border-color: var(--my-color);

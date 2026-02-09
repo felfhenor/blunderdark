@@ -1,6 +1,10 @@
-import { DecimalPipe, TitleCasePipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { gamestate, getReputationLevel, getReputationLevelLabel } from '@helpers';
+import {
+  gamestate,
+  getReputationLevel,
+  getReputationLevelLabel,
+} from '@helpers';
 import type { ReputationLevel, ReputationType } from '@interfaces';
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
 
@@ -21,7 +25,7 @@ const REPUTATION_CATEGORIES: ReputationCategory[] = [
 
 @Component({
   selector: 'app-panel-reputation',
-  imports: [TitleCasePipe, DecimalPipe],
+  imports: [DecimalPipe],
   templateUrl: './panel-reputation.component.html',
   styleUrl: './panel-reputation.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
