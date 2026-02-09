@@ -632,3 +632,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `gameTimeToMinutes()` uses `(day - 1) * 24 * 60` because Day 1 is the first day (not Day 0)
   - During tick mode, `gamestate()` returns the tick-local copy which has the updated clock — safe to read after `updateGamestate`
   - `processScheduledEvents` separates events into toFire/remaining before executing callbacks — prevents issues if callbacks schedule new events
+
+## production-calculation-system US-001: Base Production per Room Type [DONE]
+- Created `src/app/interfaces/room.ts` with `RoomProduction`, `AdjacencyBonus`, `RoomDefinition` types
+- Added `'room'` to `ContentType` union in `src/app/interfaces/identifiable.ts`
+- Added `ensureRoom` initializer in `src/app/helpers/content-initializers.ts` with defaults for all fields
+- Created `gamedata/room/base.yml` with 7 room types: Throne Room, Crystal Mine, Mushroom Grove, Shadow Library, Soul Well, Dark Forge, Barracks
+  - Each room has UUID, name, description, shapeId, cost, production rates, requiresWorkers flag, adjacencyBonuses
+  - Crystal Mine and Dark Forge have adjacency bonuses to each other (+10% and +15%)
+- Added `roomTypeId` field to `PlacedRoom` type in `src/app/interfaces/room-shape.ts`
+- Created `src/app/helpers/production.ts` with:
+  - `getBaseProduction(roomTypeId)` — returns base production rates for a room type (or empty object if not found)
+  - `getRoomDefinition(roomTypeId)` — returns full room definition (or undefined)
+- Created `src/app/helpers/production.spec.ts` with 6 unit tests covering: production retrieval for producing rooms, throne room passive production, no-production rooms, non-existent room types, room definition lookup
+- Fixed 3 typecheck errors in `room-shapes.spec.ts` caused by adding `roomTypeId` to `PlacedRoom`
+- All tests pass (276/276), lint passes, no new typecheck errors
+- Commit: dabccba

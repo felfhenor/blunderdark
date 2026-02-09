@@ -38,6 +38,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `getAbsoluteTiles()` from room-shapes.ts converts shape-relative tiles to grid-absolute coordinates
 - For grid tile lookup in templates, use a `Set<string>` of "x,y" keys for O(1) lookup vs O(n) array scan
 
+## Room & Production System
+
+- `PlacedRoom` type in `room-shape.ts` includes `roomTypeId` linking to the content definition — when adding fields to this type, update all test PlacedRoom literals in `room-shapes.spec.ts`
+- `RoomDefinition` type in `room.ts` includes `production: RoomProduction` (Partial<Record<string, number>>), `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`
+- `getBaseProduction(roomTypeId)` returns `{}` for rooms with no production or non-existent room types — callers don't need to handle undefined
+- `getRoomDefinition(roomTypeId)` returns `undefined` for non-existent types — callers must check
+- Room YAML lives in `gamedata/room/base.yml` — 7 base rooms defined with varying production rates, costs, and adjacency bonuses
+
 ## Testing
 
 - Pre-existing typecheck errors exist in `scripts/` files and some older components — these are expected
