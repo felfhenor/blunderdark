@@ -648,3 +648,20 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Fixed 3 typecheck errors in `room-shapes.spec.ts` caused by adding `roomTypeId` to `PlacedRoom`
 - All tests pass (276/276), lint passes, no new typecheck errors
 - Commit: dabccba
+
+## production-calculation-system US-002: Inhabitant Efficiency Bonuses [DONE]
+- Added `'inhabitant'` to `ContentType` union in `src/app/interfaces/identifiable.ts` (was missing — inhabitants couldn't load via ContentService)
+- Added `ensureInhabitant` initializer in `src/app/helpers/content-initializers.ts` with defaults for all InhabitantDefinition fields
+- Added to `src/app/helpers/production.ts`:
+  - `InhabitantBonusResult` type: `{ bonus: number; hasWorkers: boolean }`
+  - `getInhabitantDefinition(definitionId)` — looks up inhabitant content definition
+  - `calculateInhabitantBonus(placedRoom, inhabitants)` — sums efficiency bonuses from assigned inhabitants
+    - Each inhabitant contributes `(workerEfficiency - 1.0)` plus any `production_bonus` trait effectValues
+    - Returns `hasWorkers: false` when no inhabitants are assigned to the room
+- Added 8 unit tests covering: no inhabitants, inhabitants on other rooms, one with production_bonus, two identical (additive), mixed efficiency values, workerEfficiency below 1.0, non-production traits ignored, unknown definitions skipped
+- All tests pass (284/284), lint passes, no new typecheck errors
+- Commit: 31a66f3
+- **Learnings for future iterations:**
+  - The `'inhabitant'` content type was missing from ContentType union and content-initializers — the YAML compiled but entries couldn't load at runtime via ContentService
+  - `workerEfficiency` of 1.0 = no bonus (0%), 1.3 = +30%, 0.7 = -30% — the formula is `(workerEfficiency - 1.0)` for the bonus contribution
+  - `production_bonus` traits have effectValue that adds directly to the bonus — non-production traits (defense_bonus, trap_bonus, versatility) are ignored by calculateInhabitantBonus
