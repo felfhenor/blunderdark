@@ -1,6 +1,9 @@
+import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
+import { TICKS_PER_MINUTE } from '@helpers/game-time';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
+import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   GameState,
@@ -181,15 +184,84 @@ export function calculateTotalProduction(floors: Floor[]): RoomProduction {
   return totalProduction;
 }
 
+export function calculateSingleRoomProduction(
+  room: PlacedRoom,
+  floor: Floor,
+): RoomProduction {
+  const roomDef = getRoomDefinition(room.roomTypeId);
+  if (!roomDef) return {};
+
+  const base = roomDef.production;
+  if (!base || Object.keys(base).length === 0) return {};
+
+  const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+    room,
+    floor.inhabitants,
+  );
+
+  if (roomDef.requiresWorkers && !hasWorkers) return {};
+
+  const roomTiles = new Map<string, TileOffset[]>();
+  for (const r of floor.rooms) {
+    const shape = resolveRoomShape(r);
+    roomTiles.set(r.id, getAbsoluteTiles(shape, r.anchorX, r.anchorY));
+  }
+
+  const thisTiles = roomTiles.get(room.id) ?? [];
+  const adjacentRoomIds: string[] = [];
+  for (const other of floor.rooms) {
+    if (other.id === room.id) continue;
+    const otherTiles = roomTiles.get(other.id) ?? [];
+    if (areRoomsAdjacent(thisTiles, otherTiles)) {
+      adjacentRoomIds.push(other.id);
+    }
+  }
+
+  const adjacencyBonus = calculateAdjacencyBonus(
+    room,
+    adjacentRoomIds,
+    floor.rooms,
+  );
+  const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+
+  const production: RoomProduction = {};
+  for (const [resourceType, baseAmount] of Object.entries(base)) {
+    if (!baseAmount) continue;
+    production[resourceType] =
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * modifier;
+  }
+
+  return production;
+}
+
+export const productionRates = computed<RoomProduction>(() => {
+  return calculateTotalProduction(gamestate().world.floors);
+});
+
+export function productionPerMinute(perTickRate: number): number {
+  return perTickRate * TICKS_PER_MINUTE;
+}
+
+export function getRoomProductionRates(roomId: string): RoomProduction {
+  const floors = gamestate().world.floors;
+  for (const floor of floors) {
+    const room = floor.rooms.find((r) => r.id === roomId);
+    if (room) {
+      return calculateSingleRoomProduction(room, floor);
+    }
+  }
+  return {};
+}
+
 export function processProduction(state: GameState): void {
   const production = calculateTotalProduction(state.world.floors);
 
   for (const [type, amount] of Object.entries(production)) {
-    if (amount <= 0) continue;
+    if (!amount || amount <= 0) continue;
     const resourceType = type as ResourceType;
     const resource = state.world.resources[resourceType];
     if (!resource) continue;
     const available = resource.max - resource.current;
-    resource.current += Math.min(amount, available);
+    resource.current += Math.min(amount as number, available);
   }
 }

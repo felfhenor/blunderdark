@@ -158,10 +158,12 @@ import {
   calculateAdjacencyBonus,
   calculateConditionalModifiers,
   calculateInhabitantBonus,
+  calculateSingleRoomProduction,
   calculateTotalProduction,
   getBaseProduction,
   getRoomDefinition,
   processProduction,
+  productionPerMinute,
 } from '@helpers/production';
 
 describe('getBaseProduction', () => {
@@ -802,5 +804,114 @@ describe('processProduction', () => {
     processProduction(state);
     expect(state.world.resources.gold.current).toBe(0);
     expect(state.world.resources.crystals.current).toBe(0);
+  });
+});
+
+describe('calculateSingleRoomProduction', () => {
+  it('should return production for a passive room', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const production = calculateSingleRoomProduction(throne, floor);
+    expect(production['gold']).toBeCloseTo(0.5);
+  });
+
+  it('should return empty for worker room with no inhabitants', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([mine]);
+    const production = calculateSingleRoomProduction(mine, floor);
+    expect(production).toEqual({});
+  });
+
+  it('should include inhabitant bonus for worker room', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = calculateSingleRoomProduction(mine, floor);
+    // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 = 1.2
+    expect(production['crystals']).toBeCloseTo(1.2);
+  });
+
+  it('should include adjacency bonus when adjacent rooms exist', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const forge: PlacedRoom = {
+      id: 'placed-forge',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const production = calculateSingleRoomProduction(mine, floor);
+    // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
+    expect(production['crystals']).toBeCloseTo(1.3);
+  });
+
+  it('should return empty for non-existent room type', () => {
+    const unknown: PlacedRoom = {
+      id: 'placed-unknown',
+      roomTypeId: 'room-nonexistent',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([unknown]);
+    const production = calculateSingleRoomProduction(unknown, floor);
+    expect(production).toEqual({});
+  });
+});
+
+describe('productionPerMinute', () => {
+  it('should convert per-tick rate to per-minute', () => {
+    // TICKS_PER_MINUTE = 5
+    expect(productionPerMinute(1.0)).toBe(5.0);
+  });
+
+  it('should handle zero rate', () => {
+    expect(productionPerMinute(0)).toBe(0);
+  });
+
+  it('should handle fractional rates', () => {
+    expect(productionPerMinute(0.5)).toBeCloseTo(2.5);
   });
 });
