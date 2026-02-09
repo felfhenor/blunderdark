@@ -47,6 +47,23 @@
         </button>
       </li>
 
+      <li class="action-button flex flex-row gap-0" appRequireSetup>
+        @for (speed of gameSpeeds; track speed; let idx = $index) {
+          <button
+            class="btn btn-xs"
+            [class.btn-primary]="gameSpeed() === speed"
+            [class.btn-ghost]="gameSpeed() !== speed"
+            [tp]="speed + 'x Speed [' + (idx + 1) + ']'"
+            (click)="setSpeed(speed)"
+            [hotkeys]="'' + (idx + 1)"
+            (hotkey)="setSpeed(speed)"
+            isGlobal
+          >
+            {{ speed }}x
+          </button>
+        }
+      </li>
+
       <li class="action-button" appRequireNotSetup>
         <a
           class="btn btn-xs btn-warning"

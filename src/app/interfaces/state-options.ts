@@ -19,10 +19,13 @@ export interface OptionsTabLink {
   showIf: Signal<boolean>;
 }
 
+export type GameSpeed = 1 | 2 | 4;
+
 export type GameOptions = Record<GameOption, boolean> & {
   uiTheme: string;
   sfxVolume: number;
   bgmVolume: number;
+  gameSpeed: GameSpeed;
   debugTickMultiplier: number;
   debugSaveInterval: number;
   optionsTab: OptionsTab;

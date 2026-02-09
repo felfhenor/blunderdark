@@ -10,14 +10,17 @@ import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   closeAllMenus,
+  GAME_SPEEDS,
+  gameSpeed,
   getOption,
   isSetup,
   isShowingAnyMenu,
   saveGameState,
+  setGameSpeed,
   setOption,
   showOptionsMenu,
 } from '@helpers';
-import type { Icon } from '@interfaces';
+import type { GameSpeed, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
 import { MetaService } from '@services/meta.service';
@@ -53,6 +56,8 @@ export class NavbarComponent {
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
 
   public isPaused = computed(() => getOption('gameloopPaused'));
+  public gameSpeed = gameSpeed;
+  public gameSpeeds = GAME_SPEEDS;
 
   public readonly panelConfigs: Array<{
     name: string;
@@ -74,6 +79,10 @@ export class NavbarComponent {
   public togglePause() {
     if (this.showPauseMenu()) return;
     setOption('gameloopPaused', !this.isPaused());
+  }
+
+  public setSpeed(speed: GameSpeed) {
+    setGameSpeed(speed);
   }
 
   public goToHome() {

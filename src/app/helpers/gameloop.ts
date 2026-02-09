@@ -30,7 +30,8 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
   gamestateTickStart();
 
-  const ticksToCalculate = totalTicks * getOption('debugTickMultiplier');
+  const ticksToCalculate =
+    totalTicks * getOption('gameSpeed') * getOption('debugTickMultiplier');
   const numTicks = clamp(ticksToCalculate, 1, 3600);
 
   const timer = new LoggerTimer({

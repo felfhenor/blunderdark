@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { gamestate } from '@helpers/state-game';
-import type { GameStateClock } from '@interfaces';
+import { getOption, setOption } from '@helpers/state-options';
+import type { GameSpeed, GameStateClock } from '@interfaces';
 
 export const MINUTES_PER_HOUR = 60;
 export const HOURS_PER_DAY = 24;
@@ -54,3 +55,11 @@ export const formattedGameTime = computed(() => {
   const mm = String(m).padStart(2, '0');
   return `Day ${d} - ${hh}:${mm}`;
 });
+
+export const GAME_SPEEDS: GameSpeed[] = [1, 2, 4];
+
+export const gameSpeed = computed(() => getOption('gameSpeed'));
+
+export function setGameSpeed(speed: GameSpeed): void {
+  setOption('gameSpeed', speed);
+}

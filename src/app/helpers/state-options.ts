@@ -21,6 +21,7 @@ export function defaultOptions(): GameOptions {
     bgmVolume: 0.1,
 
     gameloopPaused: false,
+    gameSpeed: 1,
     optionsTab: 'UI',
   };
 }
