@@ -5,6 +5,7 @@ export type ContentType =
   | 'pet'
   | 'reputationaction'
   | 'research'
+  | 'room'
   | 'roomshape'
   | 'stage'
   | 'trinket'

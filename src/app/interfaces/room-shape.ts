@@ -13,6 +13,7 @@ export type RoomShape = {
 
 export type PlacedRoom = {
   id: string;
+  roomTypeId: string;
   shapeId: string;
   anchorX: number;
   anchorY: number;

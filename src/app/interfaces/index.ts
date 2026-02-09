@@ -18,6 +18,7 @@ export * from './meta';
 export * from './reputation';
 export * from './research';
 export * from './resource';
+export * from './room';
 export * from './room-shape';
 export * from './season';
 export * from './sfx';
