@@ -687,3 +687,26 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added 7 unit tests covering: no inhabitants, all normal, scared only, hungry only, scared+hungry combination (0.375), duplicate states not double-counted, inhabitants on other rooms ignored
 - All tests pass (298/298), lint passes, no new typecheck errors
 - Commit: 686c99e
+
+## production-calculation-system US-005: Per-Tick Production Update [DONE]
+- Added `calculateTotalProduction(floors: Floor[])` to `src/app/helpers/production.ts`:
+  - Iterates all floors and rooms, resolving room shapes and computing adjacency per floor
+  - For each room with production: applies inhabitant bonus, adjacency bonus, and conditional modifiers
+  - Formula: `Final = Base * (1 + inhabitantBonus + adjacencyBonus) * conditionalModifier`
+  - Skips rooms with `requiresWorkers` when no workers are assigned
+  - Returns aggregated `RoomProduction` across all rooms and floors
+- Added `processProduction(state: GameState)` to `src/app/helpers/production.ts`:
+  - Calls `calculateTotalProduction(state.world.floors)` to get total production
+  - Applies production to `state.world.resources` with cap validation (min of amount and available space)
+  - Skips resources with zero or negative production
+- Updated `src/app/helpers/gameloop.ts` to call `processProduction(state)` inside the `updateGamestate` callback each tick
+- Added `makeFloor()` and `makeGameState()` test helpers to production.spec.ts
+- Added 9 new tests: calculateTotalProduction (no rooms, single producing room, requiresWorkers without workers, requiresWorkers with workers, adjacency bonus integration, multiple rooms aggregation) and processProduction (adds to resources, respects cap, ignores non-existent resources)
+- All tests pass (307/307), lint passes, no new typecheck errors
+- Commit: 6ec7e5d
+- **Learnings for future iterations:**
+  - `processProduction()` mutates state.world.resources in-place within the `updateGamestate` callback — safe in tick mode (same pattern as clock mutation)
+  - `calculateTotalProduction()` builds adjacency maps on-the-fly per floor using resolveRoomShape + getAbsoluteTiles + areRoomsAdjacent
+  - TypeScript requires bracket notation for `Partial<Record<string, number>>` index access: `production['crystals']` not `production.crystals`
+  - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring')
+  - ResearchState fields: `completedNodes`, `activeResearch`, `activeResearchProgress`, `activeResearchStartTick`
