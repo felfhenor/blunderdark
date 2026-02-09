@@ -151,6 +151,10 @@ export function updatePreviewPosition(x: number, y: number): void {
   placementPreviewPosition.set({ x, y });
 }
 
+export function clearPreviewPosition(): void {
+  placementPreviewPosition.set(null);
+}
+
 export function clearPlacementPreview(): void {
   placementPreviewShape.set(null);
   placementPreviewPosition.set(null);

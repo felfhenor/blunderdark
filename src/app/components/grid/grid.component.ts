@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   attemptPlacement,
   clearPlacementPreview,
+  clearPreviewPosition,
   deselectTile,
   gamestate,
   notifyError,
@@ -67,6 +68,12 @@ export class GridComponent {
   public onTileHover(x: number, y: number): void {
     if (placementPreviewShape()) {
       updatePreviewPosition(x, y);
+    }
+  }
+
+  public onGridLeave(): void {
+    if (placementPreviewShape()) {
+      clearPreviewPosition();
     }
   }
 
