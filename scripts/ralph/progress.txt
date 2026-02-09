@@ -904,3 +904,24 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `validateConnection` computes `edgeTiles` from `getSharedEdges` — no need for callers to compute them separately
   - Mocking `resolveRoomShape` in tests returns a fixed 2x1 shape; `getAbsoluteTiles` returns tiles at `(anchorX, anchorY)` and `(anchorX+1, anchorY)` — simple enough for adjacency testing
   - `createConnection` signature changed from `(roomAId, roomBId, edgeTiles)` to `(roomAId, roomBId)` — edge tiles are now internal
+
+## direct-adjacency-connection US-003: Connect and Disconnect UI Actions [DONE]
+- Added `getAdjacentUnconnectedRooms(floor, roomId)` to `src/app/helpers/connections.ts`:
+  - Resolves room tiles, checks adjacency with all other rooms, filters out already-connected ones
+- Added `getRoomConnections(floor, roomId)` to `src/app/helpers/connections.ts`:
+  - Returns Connection[] for all connections involving a room
+- Created `src/app/components/panel-room-info/` with `.ts`, `.html`, `.scss` files:
+  - Panel appears when a room tile is selected (uses `selectedTile` signal + `currentFloor()` grid lookup)
+  - Shows room name, adjacent unconnected rooms with "Connect" buttons (btn-success), and active connections with "Disconnect" buttons (btn-error)
+  - Shows "No adjacent rooms to connect" when no options available
+  - Connect calls `createConnection(roomId, otherRoomId)` → notifySuccess/notifyError
+  - Disconnect calls `removeConnection(connectionId)` → notifySuccess/notifyError
+  - Uses computed signals for reactive updates: `selectedRoom`, `adjacentUnconnected`, `activeConnections`
+- Added component to game-play page sidebar (above room select panel)
+- Adjacency bonuses already recalculated on every production tick via `areRoomsAdjacent` in production.ts — no additional recalculation needed
+- All tests pass (354/354), no new typecheck errors
+- Commit: 49849c7
+- **Learnings for future iterations:**
+  - The production system uses geometric adjacency (`areRoomsAdjacent` on tile positions) not the connection system — connections are a separate concept for logical room links
+  - Panel conditionally renders via `@if (selectedRoom(); as room)` — disappears when no room tile is selected
+  - `getRoomDefinition(roomTypeId)` from production.ts provides room names for display

@@ -172,6 +172,46 @@ export function removeRoomConnectionsFromFloor(
 }
 
 /**
+ * Get adjacent rooms that are NOT yet connected to the given room on a floor.
+ * Returns room IDs of adjacent but unconnected rooms.
+ */
+export function getAdjacentUnconnectedRooms(
+  floor: Floor,
+  roomId: string,
+): string[] {
+  const room = floor.rooms.find((r) => r.id === roomId);
+  if (!room) return [];
+
+  const roomTiles = getRoomTiles(room);
+  const adjacent: string[] = [];
+
+  for (const other of floor.rooms) {
+    if (other.id === roomId) continue;
+    const otherTiles = getRoomTiles(other);
+    if (areRoomsAdjacent(roomTiles, otherTiles)) {
+      if (!findConnection(floor, roomId, other.id)) {
+        adjacent.push(other.id);
+      }
+    }
+  }
+
+  return adjacent;
+}
+
+/**
+ * Get connections involving a specific room on a floor.
+ * Returns the connection objects (not just IDs).
+ */
+export function getRoomConnections(
+  floor: Floor,
+  roomId: string,
+): Connection[] {
+  return floor.connections.filter(
+    (c) => c.roomAId === roomId || c.roomBId === roomId,
+  );
+}
+
+/**
  * Create a validated connection between two rooms on the current floor.
  * Validates adjacency, rejects self-connections and duplicates.
  * Edge tiles are computed automatically from shared edges.
