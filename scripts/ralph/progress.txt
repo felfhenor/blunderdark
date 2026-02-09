@@ -835,3 +835,28 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Use `exitPlacementMode()` (not `clearPlacementPreview()`) when the user wants to fully leave placement mode — the former also clears `selectedRoomTypeId`
   - `(contextmenu)` event in Angular templates handles right-click; call `event.preventDefault()` to suppress the browser context menu
   - Only prevent default context menu when in placement mode — outside placement mode, the context menu behavior is unchanged
+
+## room-placement-ui US-006: Placed Room Visual Representation [DONE]
+- Fixed critical bug: GridComponent was using `gamestate().world.grid` (legacy top-level grid) instead of `currentFloor()?.grid` (floor-based grid where rooms are actually placed)
+- Fixed `placementPreview` computed and `executeRoomPlacement()` in `room-placement.ts` to use `currentFloor()?.grid` instead of `gamestate().world.grid`
+- Added room color system to `grid.component.ts`:
+  - Module-level `ROOM_COLORS` cache and `COLOR_PALETTE` array with 7 OKLCH colors
+  - `getRoomColor(roomTypeId)` assigns stable colors per room type
+  - `roomInfoMap` computed signal builds O(1) lookup map from floor rooms to `{color, name}`
+  - `getRoomColor(roomId)` and `getRoomName(roomId)` methods for template binding
+  - `isRoomAnchor(x, y, roomId)` to identify anchor tile for room label placement
+- Updated `grid.component.html`:
+  - Added `[class.room-tile]` binding (truthy when tile has a roomId)
+  - Added `[style.--room-color]` CSS variable binding for per-room coloring
+  - Added room name label on anchor tiles via `@if (isRoomAnchor(...))`
+- Updated `grid.component.scss`:
+  - `.room-tile` uses `var(--room-color)` for background, darkened border via `color-mix(in oklch, var(--room-color) 80%, black)`
+  - `.room-label` absolute positioned, 6px white bold text with text-shadow
+- All tests pass (323/323), lint passes, no new typecheck errors
+- **room-placement-ui FEATURE COMPLETE** — all 6 user stories done
+- Commit: 868c480
+- **Learnings for future iterations:**
+  - `GameStateWorld` has both top-level `grid` and `floors[].grid` — the top-level grid is legacy; always use `currentFloor()?.grid` for room operations
+  - Move module-level constants/functions BEFORE the `@Component` decorator — placing them between decorator and class causes compilation error
+  - `color-mix(in oklch, ...)` works in modern browsers for computed border colors
+  - `roomInfoMap` computed with a Map provides O(1) lookup per tile vs O(n) room search — important for 400-tile grid

@@ -226,7 +226,17 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 }
 ```
 
+## Room Visual Representation
+
+- Room colors assigned per `roomTypeId` (not per room instance) — all rooms of the same type share a color
+- `roomInfoMap` computed signal maps room instance IDs to `{color, name}` for O(1) lookup per tile
+- Room name label rendered only on the anchor tile (first tile of the room shape) via `isRoomAnchor(x, y, roomId)`
+- CSS custom property `--room-color` passed from template to SCSS for per-room dynamic coloring
+- `color-mix(in oklch, var(--room-color) 80%, black)` creates a darker border from the room color
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
 - ResearchState fields: `completedNodes`, `activeResearch`, `activeResearchProgress`, `activeResearchStartTick` (NOT `unlockedNodeIds`/`activeResearchId`)
+- `GameStateWorld` has both top-level `grid` and `floors[].grid` — the top-level grid is **legacy**; always use `currentFloor()?.grid` for room operations
+- Module-level constants/functions must be placed BEFORE the `@Component` decorator — placing them between decorator and class causes compilation error
