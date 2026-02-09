@@ -62,3 +62,31 @@ export function calculateInhabitantBonus(
 
   return { bonus: totalBonus, hasWorkers: true };
 }
+
+export function calculateAdjacencyBonus(
+  placedRoom: PlacedRoom,
+  adjacentRoomIds: string[],
+  allPlacedRooms: PlacedRoom[],
+): number {
+  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  if (!roomDef) return 0;
+
+  const bonusRules = roomDef.adjacencyBonuses;
+  if (bonusRules.length === 0) return 0;
+
+  const adjacentRoomTypeIds = new Map<string, number>();
+  for (const adjId of adjacentRoomIds) {
+    const adjRoom = allPlacedRooms.find((r) => r.id === adjId);
+    if (!adjRoom) continue;
+    const count = adjacentRoomTypeIds.get(adjRoom.roomTypeId) ?? 0;
+    adjacentRoomTypeIds.set(adjRoom.roomTypeId, count + 1);
+  }
+
+  let totalBonus = 0;
+  for (const rule of bonusRules) {
+    const matchCount = adjacentRoomTypeIds.get(rule.adjacentRoomType) ?? 0;
+    totalBonus += rule.bonus * matchCount;
+  }
+
+  return totalBonus;
+}

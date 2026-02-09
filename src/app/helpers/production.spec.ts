@@ -11,7 +11,9 @@ vi.mock('@helpers/content', () => {
     cost: {},
     production: { crystals: 1.0 },
     requiresWorkers: true,
-    adjacencyBonuses: [],
+    adjacencyBonuses: [
+      { adjacentRoomType: 'room-dark-forge', bonus: 0.1 },
+    ],
   });
   entries.set('room-throne', {
     id: 'room-throne',
@@ -34,6 +36,20 @@ vi.mock('@helpers/content', () => {
     production: {},
     requiresWorkers: false,
     adjacencyBonuses: [],
+  });
+
+  entries.set('room-dark-forge', {
+    id: 'room-dark-forge',
+    name: 'Dark Forge',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { gold: 1.2 },
+    requiresWorkers: true,
+    adjacencyBonuses: [
+      { adjacentRoomType: 'room-crystal-mine', bonus: 0.15 },
+    ],
   });
 
   entries.set('def-goblin', {
@@ -121,6 +137,7 @@ vi.mock('@helpers/content', () => {
 
 import type { InhabitantInstance, PlacedRoom } from '@interfaces';
 import {
+  calculateAdjacencyBonus,
   calculateInhabitantBonus,
   getBaseProduction,
   getRoomDefinition,
@@ -302,5 +319,115 @@ describe('calculateInhabitantBonus', () => {
     // Unknown definition is skipped, but inhabitant was assigned so hasWorkers is true
     expect(result.bonus).toBe(0);
     expect(result.hasWorkers).toBe(true);
+  });
+});
+
+describe('calculateAdjacencyBonus', () => {
+  const crystalMine: PlacedRoom = {
+    id: 'placed-mine-1',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const darkForge: PlacedRoom = {
+    id: 'placed-forge-1',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  const throne: PlacedRoom = {
+    id: 'placed-throne-1',
+    roomTypeId: 'room-throne',
+    shapeId: 'shape-1',
+    anchorX: 4,
+    anchorY: 0,
+  };
+
+  const barracks: PlacedRoom = {
+    id: 'placed-barracks-1',
+    roomTypeId: 'room-barracks',
+    shapeId: 'shape-1',
+    anchorX: 6,
+    anchorY: 0,
+  };
+
+  const allRooms = [crystalMine, darkForge, throne, barracks];
+
+  it('should return 0 when room has no adjacency bonus rules', () => {
+    const bonus = calculateAdjacencyBonus(throne, ['placed-mine-1'], allRooms);
+    expect(bonus).toBe(0);
+  });
+
+  it('should return 0 when room has no adjacent rooms', () => {
+    const bonus = calculateAdjacencyBonus(crystalMine, [], allRooms);
+    expect(bonus).toBe(0);
+  });
+
+  it('should return bonus when adjacent to a matching room type', () => {
+    // Crystal Mine gets +10% when adjacent to Dark Forge
+    const bonus = calculateAdjacencyBonus(
+      crystalMine,
+      ['placed-forge-1'],
+      allRooms,
+    );
+    expect(bonus).toBeCloseTo(0.1);
+  });
+
+  it('should return 0 when adjacent rooms do not match bonus rules', () => {
+    // Crystal Mine only has bonus for Dark Forge, not Throne Room
+    const bonus = calculateAdjacencyBonus(
+      crystalMine,
+      ['placed-throne-1'],
+      allRooms,
+    );
+    expect(bonus).toBe(0);
+  });
+
+  it('should stack bonuses additively for multiple matching adjacent rooms', () => {
+    const secondForge: PlacedRoom = {
+      id: 'placed-forge-2',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 2,
+    };
+    const rooms = [...allRooms, secondForge];
+    // Crystal Mine adjacent to two Dark Forges: 0.1 + 0.1 = 0.2
+    const bonus = calculateAdjacencyBonus(
+      crystalMine,
+      ['placed-forge-1', 'placed-forge-2'],
+      rooms,
+    );
+    expect(bonus).toBeCloseTo(0.2);
+  });
+
+  it('should work for Dark Forge adjacent to Crystal Mine', () => {
+    // Dark Forge gets +15% when adjacent to Crystal Mine
+    const bonus = calculateAdjacencyBonus(
+      darkForge,
+      ['placed-mine-1'],
+      allRooms,
+    );
+    expect(bonus).toBeCloseTo(0.15);
+  });
+
+  it('should return 0 for non-existent room type definition', () => {
+    const unknownRoom: PlacedRoom = {
+      id: 'placed-unknown-1',
+      roomTypeId: 'room-nonexistent',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const bonus = calculateAdjacencyBonus(
+      unknownRoom,
+      ['placed-forge-1'],
+      allRooms,
+    );
+    expect(bonus).toBe(0);
   });
 });
