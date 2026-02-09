@@ -166,3 +166,15 @@ The room placement preview system uses module-level signals in `room-placement.t
 ## OKLCH Colors in Angular
 
 OKLCH color format works in SCSS files — the Angular compiler converts them to browser-compatible formats. Example: `oklch(0.65 0.2 145)` compiles to `rgb(17, 173, 50)`.
+
+## Production System Integration
+
+- `processProduction(state)` mutates `state.world.resources` in-place within the `updateGamestate` callback — safe in tick mode (same pattern as clock mutation)
+- `calculateTotalProduction(floors)` builds adjacency maps on-the-fly per floor using `resolveRoomShape` + `getAbsoluteTiles` + `areRoomsAdjacent`
+- Production formula: `Final = Base * (1 + inhabitantBonus + adjacencyBonus) * conditionalModifier`
+- TypeScript requires bracket notation for `Partial<Record<string, number>>` index access: `production['crystals']` not `production.crystals`
+
+## GameState Type Gotchas
+
+- Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
+- ResearchState fields: `completedNodes`, `activeResearch`, `activeResearchProgress`, `activeResearchStartTick` (NOT `unlockedNodeIds`/`activeResearchId`)
