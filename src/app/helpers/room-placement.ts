@@ -94,6 +94,22 @@ export function validatePlacement(
   };
 }
 
+// --- Placement mode state ---
+
+export const selectedRoomTypeId = signal<string | null>(null);
+
+export function enterPlacementMode(roomTypeId: string, shape: RoomShape): void {
+  selectedRoomTypeId.set(roomTypeId);
+  placementPreviewShape.set(shape);
+  placementPreviewPosition.set(null);
+}
+
+export function exitPlacementMode(): void {
+  selectedRoomTypeId.set(null);
+  placementPreviewShape.set(null);
+  placementPreviewPosition.set(null);
+}
+
 // --- Placement preview state ---
 
 export type PreviewTile = TileOffset & {

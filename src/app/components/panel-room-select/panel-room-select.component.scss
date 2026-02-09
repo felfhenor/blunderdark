@@ -1,0 +1,28 @@
+.room-entry {
+  &.room-unaffordable {
+    opacity: 0.45;
+  }
+
+  &.btn-active {
+    border-color: oklch(var(--p));
+  }
+}
+
+.shape-preview {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), 8px);
+  grid-template-rows: repeat(var(--grid-size), 8px);
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.shape-tile {
+  width: 8px;
+  height: 8px;
+  background-color: oklch(var(--p));
+  border-radius: 1px;
+}
+
+.cost-row {
+  flex-wrap: wrap;
+}
