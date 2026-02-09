@@ -676,3 +676,14 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - Added 7 unit tests covering: no adjacency rules, no adjacent rooms, one matching adjacent, non-matching adjacent, multiple matching (additive stacking), reverse direction (Forge→Mine), non-existent room definition
 - All tests pass (291/291), lint passes, no new typecheck errors
 - Commit: e4fcce3
+
+## production-calculation-system US-004: Conditional Modifiers [DONE]
+- Added `calculateConditionalModifiers(placedRoom, inhabitants)` to `src/app/helpers/production.ts`:
+  - Finds assigned inhabitants and collects unique states
+  - Applies multiplicative modifiers: scared=0.5, hungry=0.75, normal=1.0
+  - Uses `STATE_MODIFIERS` Record keyed by `InhabitantState` for clean lookup
+  - Same state from multiple inhabitants only applies once (Set deduplication)
+  - No assigned inhabitants = 1.0 (no penalty)
+- Added 7 unit tests covering: no inhabitants, all normal, scared only, hungry only, scared+hungry combination (0.375), duplicate states not double-counted, inhabitants on other rooms ignored
+- All tests pass (298/298), lint passes, no new typecheck errors
+- Commit: 686c99e
