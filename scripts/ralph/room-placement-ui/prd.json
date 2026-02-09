@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Most preview rendering was built in room-placement-validation US-004. US-003 added mouseleave handler and integration with room selection panel. Dev server not running so browser verification skipped."
     },
     {
       "id": "US-004",

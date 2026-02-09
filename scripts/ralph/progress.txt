@@ -776,3 +776,22 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `Object.entries()` on `ResourceCost` (Partial<Record<ResourceType, number>>) returns `[string, number | undefined][]` — filter out undefined/zero values before display
   - CSS grid with `--grid-size` custom property works well for dynamic shape previews: `grid-template-columns: repeat(var(--grid-size), 8px)`
   - Placement mode state is centralized in `room-placement.ts` — `selectedRoomTypeId` tracks which room type is selected, `placementPreviewShape` tracks the shape for grid preview
+
+## room-placement-ui US-003: Room Shape Preview on Grid [DONE]
+- Most preview functionality was already built during room-placement-validation US-004:
+  - `placementPreview` computed signal combines shape + position + grid validation
+  - `previewTileSet` in GridComponent for O(1) per-tile lookup
+  - `isPreviewValid()`/`isPreviewInvalid()` methods with green/red CSS classes
+  - `onTileHover()` calling `updatePreviewPosition()` via `(mouseenter)` events
+  - SCSS with `.preview-valid` (green, oklch) and `.preview-invalid` (red, oklch) at 0.7 opacity
+- US-002's `enterPlacementMode()` already connects room selection to the preview shape signal
+- **New in US-003:** Added `clearPreviewPosition()` to `room-placement.ts` — clears only the position signal (not the shape), keeping placement mode active
+- Added `onGridLeave()` to GridComponent — calls `clearPreviewPosition()` when mouse exits the grid container
+- Added `(mouseleave)="onGridLeave()"` on the grid container div in the template
+- This ensures the preview disappears when the mouse leaves the grid and reappears when it re-enters
+- All tests pass (323/323), lint passes, no new typecheck errors
+- Commit: 7c93cf5
+- **Learnings for future iterations:**
+  - When clearing preview on mouse leave, only clear the position (not the shape) — this keeps placement mode active so the preview reappears on re-entry
+  - The grid container's `(mouseleave)` event fires when the mouse exits the entire grid area, not individual tiles
+  - Most of the preview rendering was already done in room-placement-validation US-004 — US-003 just needed the mouse-leave handler and the integration with the room selection panel
