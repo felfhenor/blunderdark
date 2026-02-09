@@ -198,8 +198,11 @@ OKLCH color format works in SCSS files — the Angular compiler converts them to
 - `selectedRoomTypeId` signal — tracks which room type is selected for placement (null when not in placement mode)
 - `enterPlacementMode(roomTypeId, shape)` — sets selectedRoomTypeId + placementPreviewShape
 - `exitPlacementMode()` — clears selectedRoomTypeId + preview signals
+- `executeRoomPlacement(x, y)` — full async flow: validate → check cost → pay → place → returns `{ success, error? }`
 - Panel component uses `isSelected(roomId)` to highlight the active room type
 - Clicking an already-selected room toggles off placement mode (same click to deselect)
+- After successful placement, player stays in placement mode for rapid building (no auto-exit)
+- Importing `canAfford`/`payCost` from `@helpers/resources` and `getEntry` from `@helpers/content` in room-placement.ts is safe (no circular deps)
 
 ## Shape Preview in Panels
 

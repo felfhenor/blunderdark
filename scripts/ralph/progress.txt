@@ -795,3 +795,24 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - When clearing preview on mouse leave, only clear the position (not the shape) — this keeps placement mode active so the preview reappears on re-entry
   - The grid container's `(mouseleave)` event fires when the mouse exits the entire grid area, not individual tiles
   - Most of the preview rendering was already done in room-placement-validation US-004 — US-003 just needed the mouse-leave handler and the integration with the room selection panel
+
+## room-placement-ui US-004: Click to Place Room [DONE]
+- Added `executeRoomPlacement(x, y)` async function to `src/app/helpers/room-placement.ts`:
+  - Reads `selectedRoomTypeId` and `placementPreviewShape` signals for active placement context
+  - Validates placement via `validatePlacement()` — returns formatted error on failure
+  - Looks up room definition via `getEntry<RoomDefinition & IsContentItem>(roomTypeId)` for cost
+  - Checks affordability via `canAfford(roomDef.cost)` — returns "Not enough resources" error
+  - Deducts cost via `payCost(roomDef.cost)` — atomic all-or-nothing resource deduction
+  - Places room via `placeRoom(roomTypeId, shapeId, x, y)` — marks grid tiles as occupied
+  - Returns `{ success, error? }` — component handles notification
+- Updated GridComponent `onTileClick` to be async, calls `executeRoomPlacement()` instead of `attemptPlacement()`
+- On success: room placed, resources deducted, player stays in placement mode (no `exitPlacementMode()` call)
+- On failure: `notifyError(result.error)` shows player-friendly message
+- Added imports in room-placement.ts: `getEntry` from content, `canAfford`/`payCost` from resources, `RoomDefinition`/`IsContentItem` types
+- All tests pass (323/323), lint passes, no new typecheck errors
+- Commit: 9bbc433
+- **Learnings for future iterations:**
+  - `executeRoomPlacement` combines validation, payment, and placement in one async flow — keeps the grid component thin
+  - The function returns `{ success, error? }` rather than calling notifyError directly — follows the "return data from helpers, let components notify" pattern from AGENTS.md
+  - Importing `canAfford`/`payCost` from `@helpers/resources` and `getEntry` from `@helpers/content` in room-placement.ts causes no circular dependencies
+  - After placement, the player remains in placement mode (same room type selected) for rapid building — no need to call exitPlacementMode()
