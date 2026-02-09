@@ -20,6 +20,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `updateGamestate()` is async and handles both tick-mode and direct signal updates
 - `migrateGameState()` uses `merge()` from es-toolkit, but complex state (resources, floors) needs explicit migration functions
 - When adding fields to `GameStateWorld`, also update `worldgen.ts` return value and `defaults.ts`
+- When adding fields to `GameStateClock`, also update `defaults.ts` clock section
+- The gameloop mutates `state.clock` in-place within the `updateGamestate` callback — safe because it operates on the tick-local copy
+
+## Game Time
+
+- `TICKS_PER_MINUTE = 5` — each tick = 12 seconds of game time; at 1x speed (~1 tick/sec), 1 real minute ≈ 12 game minutes
+- `advanceTime()` is a pure function in `game-time.ts` — takes `GameTime` and numTicks, returns new `GameTime` with correct rollover
+- Computed signals (`gameDay`, `gameHour`, `gameMinute`, `formattedGameTime`) read directly from `gamestate().clock`
 
 ## Grid System
 

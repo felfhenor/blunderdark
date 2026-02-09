@@ -550,3 +550,21 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Avoid importing from `@helpers/notify` in helper files that are tested — it triggers circular dependency through barrel exports (notify.ts imports `isPageVisible` from `@helpers` barrel). Instead, return data from helpers and let components call `notifyError()`
   - `attemptPlacement()` returns a result object rather than calling notify directly — decouples validation from notification, avoids circular deps, and is more testable
   - The grid component handles both preview-mode clicks (attempt placement) and normal clicks (tile selection) — check `placementPreviewShape()` to determine mode
+
+## time-system US-001: Game Time Tracking [DONE]
+- Extended `GameStateClock` in `src/app/interfaces/state-game.ts` with `day`, `hour`, `minute` fields
+- Created `src/app/helpers/game-time.ts` with:
+  - Constants: `TICKS_PER_MINUTE = 5`, `MINUTES_PER_HOUR = 60`, `HOURS_PER_DAY = 24`
+  - `GameTime` type: `{ day, hour, minute }`
+  - `advanceTime(clock, numTicks)` — pure function advancing time with correct rollover
+  - `advanceClockTime(clock, numTicks)` — wrapper that works with `GameStateClock`
+  - Computed signals: `gameDay`, `gameHour`, `gameMinute`, `formattedGameTime` (returns "Day X - HH:MM")
+- Updated `src/app/helpers/defaults.ts` — clock defaults to `day: 1, hour: 0, minute: 0`
+- Updated `src/app/helpers/gameloop.ts` — calls `advanceClockTime()` during tick to advance game time
+- Created `src/app/helpers/game-time.spec.ts` with 10 unit tests covering: sub-minute ticks, exact minute, multiple minutes, hour rollover, day rollover, multi-day, mixed rollover, accumulation from non-zero start, zero ticks, cascade rollover (23:59 → 00:00 next day)
+- All tests pass (255/255), lint passes, no new typecheck errors
+- Commit: caaf036
+- **Learnings for future iterations:**
+  - `TICKS_PER_MINUTE = 5` means each tick is 12 seconds of game time — at 1x speed the game loop runs ~1 tick/second, so 1 real minute ≈ 12 game minutes
+  - `advanceTime()` uses integer division (`Math.floor`) for tick-to-minute conversion — fractional ticks are discarded (no sub-minute precision needed)
+  - The gameloop mutates `state.clock` in-place within the `updateGamestate` callback — this is safe because it operates on the tick-local copy
