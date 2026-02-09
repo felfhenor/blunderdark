@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Connection type in connection.ts, stored in Floor.connections array. 23 unit tests in connections.spec.ts."
     },
     {
       "id": "US-002",

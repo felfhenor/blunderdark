@@ -234,6 +234,14 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 - CSS custom property `--room-color` passed from template to SCSS for per-room dynamic coloring
 - `color-mix(in oklch, var(--room-color) 80%, black)` creates a darker border from the room color
 
+## Connection System
+
+- Connections stored per-floor in `Floor.connections: Connection[]` — bidirectional links between adjacent rooms
+- `Connection` type: `{ id, roomAId, roomBId, edgeTiles: TileOffset[] }`
+- Query functions use `currentFloor()` and iterate connections — no adjacency map needed for connections (they're explicit, not geometric)
+- When adding fields to `Floor` type, update: (1) `defaultFloor()`, (2) `migrateFloors()`, (3) all `makeFloor()` test helpers in spec files (production.spec.ts, room-placement.spec.ts, floor.spec.ts)
+- `addConnectionToFloor` returns null for duplicates — always check return value
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

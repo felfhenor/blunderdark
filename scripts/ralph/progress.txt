@@ -860,3 +860,29 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Move module-level constants/functions BEFORE the `@Component` decorator — placing them between decorator and class causes compilation error
   - `color-mix(in oklch, ...)` works in modern browsers for computed border colors
   - `roomInfoMap` computed with a Map provides O(1) lookup per tile vs O(n) room search — important for 400-tile grid
+
+## direct-adjacency-connection US-001: Define Connection Data Model and Helper Functions [DONE]
+- Created `src/app/interfaces/connection.ts` with `Connection` type: `{ id, roomAId, roomBId, edgeTiles: TileOffset[] }`
+- Added `connections: Connection[]` to `Floor` type in `src/app/interfaces/floor.ts`
+- Updated `defaultFloor()` in `defaults.ts` to include `connections: []`
+- Updated `migrateFloors()` in `floor.ts` to preserve/default `connections` field on migration
+- Created `src/app/helpers/connections.ts` with:
+  - `getFloorConnections()` — returns all connections on current floor
+  - `getConnectedRooms(roomId)` — returns all room IDs connected to given room
+  - `areRoomsConnected(roomAId, roomBId)` — checks if two rooms are connected (bidirectional)
+  - `findConnection(floor, roomAId, roomBId)` — finds a connection between two rooms on a floor
+  - `addConnectionToFloor(floor, roomAId, roomBId, edgeTiles)` — pure function, returns null for duplicates
+  - `removeConnectionFromFloor(floor, connectionId)` — pure function, returns null if not found
+  - `removeRoomConnectionsFromFloor(floor, roomId)` — removes all connections involving a room
+  - `createConnection(roomAId, roomBId, edgeTiles)` — async wrapper with gamestate update
+  - `removeConnection(connectionId)` — async wrapper with gamestate update
+- Fixed `makeFloor()` in `production.spec.ts` and `room-placement.spec.ts` to include `connections: []` (new required field)
+- Updated `defaultFloor` mock in `floor.spec.ts` to include `connections: []`
+- Created `src/app/helpers/connections.spec.ts` with 23 unit tests covering: getFloorConnections, getConnectedRooms, areRoomsConnected, findConnection, addConnectionToFloor, removeConnectionFromFloor, removeRoomConnectionsFromFloor
+- All tests pass (346/346), no new typecheck errors beyond pre-existing ones
+- Commit: f8f7850
+- **Learnings for future iterations:**
+  - Connections are stored per-floor (like rooms, hallways, inhabitants) — not at the top-level GameStateWorld
+  - When adding fields to `Floor` type, update: (1) `defaultFloor()` in defaults.ts, (2) `migrateFloors()` in floor.ts, (3) all `makeFloor()` test helpers in spec files
+  - `findConnection()` checks both A→B and B→A orders — connections are bidirectional regardless of storage order
+  - `addConnectionToFloor` rejects duplicates (returns null) — callers must check the return value
