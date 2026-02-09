@@ -1,7 +1,61 @@
+import { areRoomsAdjacent, getSharedEdges } from '@helpers/adjacency';
 import { currentFloor } from '@helpers/floor';
 import { rngUuid } from '@helpers/rng';
+import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Connection, Floor, TileOffset } from '@interfaces';
+import type { Connection, Floor, PlacedRoom, TileOffset } from '@interfaces';
+
+export type ConnectionValidationResult = {
+  valid: boolean;
+  error?: string;
+  edgeTiles?: TileOffset[];
+};
+
+/**
+ * Get the absolute tiles for a placed room by resolving its shape.
+ */
+function getRoomTiles(room: PlacedRoom): TileOffset[] {
+  const shape = resolveRoomShape(room);
+  return getAbsoluteTiles(shape, room.anchorX, room.anchorY);
+}
+
+/**
+ * Validate whether a connection can be created between two rooms on a floor.
+ * Checks: self-connection, room existence, adjacency, and duplicate connection.
+ */
+export function validateConnection(
+  floor: Floor,
+  roomAId: string,
+  roomBId: string,
+): ConnectionValidationResult {
+  if (roomAId === roomBId) {
+    return { valid: false, error: 'Cannot connect a room to itself' };
+  }
+
+  const roomA = floor.rooms.find((r) => r.id === roomAId);
+  const roomB = floor.rooms.find((r) => r.id === roomBId);
+
+  if (!roomA || !roomB) {
+    return { valid: false, error: 'One or both rooms not found on this floor' };
+  }
+
+  const tilesA = getRoomTiles(roomA);
+  const tilesB = getRoomTiles(roomB);
+
+  if (!areRoomsAdjacent(tilesA, tilesB)) {
+    return { valid: false, error: 'Rooms are not adjacent' };
+  }
+
+  const existing = findConnection(floor, roomAId, roomBId);
+  if (existing) {
+    return { valid: false, error: 'Rooms are already connected' };
+  }
+
+  const edges = getSharedEdges(tilesA, tilesB);
+  const edgeTiles = edges.map(([tileA]) => tileA);
+
+  return { valid: true, edgeTiles };
+}
 
 /**
  * Get all connections on the current floor.
@@ -118,21 +172,27 @@ export function removeRoomConnectionsFromFloor(
 }
 
 /**
- * Create a connection between two rooms on the current floor.
- * Returns the connection on success, or null on failure.
+ * Create a validated connection between two rooms on the current floor.
+ * Validates adjacency, rejects self-connections and duplicates.
+ * Edge tiles are computed automatically from shared edges.
+ * Returns `{ connection }` on success, or `{ error }` on failure.
  */
 export async function createConnection(
   roomAId: string,
   roomBId: string,
-  edgeTiles: TileOffset[],
-): Promise<Connection | null> {
+): Promise<{ connection: Connection; error?: undefined } | { connection?: undefined; error: string }> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
-  if (!floor) return null;
+  if (!floor) return { error: 'No active floor' };
 
-  const result = addConnectionToFloor(floor, roomAId, roomBId, edgeTiles);
-  if (!result) return null;
+  const validation = validateConnection(floor, roomAId, roomBId);
+  if (!validation.valid) {
+    return { error: validation.error! };
+  }
+
+  const result = addConnectionToFloor(floor, roomAId, roomBId, validation.edgeTiles!);
+  if (!result) return { error: 'Failed to create connection' };
 
   await updateGamestate((s) => {
     const newFloors = [...s.world.floors];
@@ -146,7 +206,7 @@ export async function createConnection(
     };
   });
 
-  return result.connection;
+  return { connection: result.connection };
 }
 
 /**

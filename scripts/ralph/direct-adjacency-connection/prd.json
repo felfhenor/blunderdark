@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "validateConnection() checks all cases. 8 new tests. createConnection() now validates internally and auto-computes edge tiles."
     },
     {
       "id": "US-003",
