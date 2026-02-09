@@ -2,6 +2,7 @@ import { createEmptyGrid, setTile } from '@helpers/grid';
 import type { RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 import {
+  formatPlacementErrors,
   validateBounds,
   validateNoOverlap,
   validatePlacement,
@@ -195,5 +196,38 @@ describe('validatePlacement', () => {
     expect(result.errors).toContain('Room extends beyond grid boundary');
     expect(result.errors).toContain('Tiles already occupied');
     expect(result.errors).toHaveLength(2);
+  });
+});
+
+describe('formatPlacementErrors', () => {
+  it('should return empty string for no errors', () => {
+    expect(formatPlacementErrors([])).toBe('');
+  });
+
+  it('should format a single bounds error as player-friendly message', () => {
+    const message = formatPlacementErrors(['Room extends beyond grid boundary']);
+    expect(message).toBe(
+      'Cannot place room: room extends beyond the grid boundary',
+    );
+  });
+
+  it('should format a single overlap error as player-friendly message', () => {
+    const message = formatPlacementErrors(['Tiles already occupied']);
+    expect(message).toBe('Cannot place room: tiles are already occupied');
+  });
+
+  it('should combine multiple errors into a single message', () => {
+    const message = formatPlacementErrors([
+      'Room extends beyond grid boundary',
+      'Tiles already occupied',
+    ]);
+    expect(message).toBe(
+      'Cannot place room: room extends beyond the grid boundary, tiles are already occupied',
+    );
+  });
+
+  it('should lowercase unknown error messages', () => {
+    const message = formatPlacementErrors(['Some Unknown Error']);
+    expect(message).toBe('Cannot place room: some unknown error');
   });
 });

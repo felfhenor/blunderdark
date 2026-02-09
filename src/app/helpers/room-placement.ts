@@ -132,3 +132,42 @@ export function clearPlacementPreview(): void {
   placementPreviewShape.set(null);
   placementPreviewPosition.set(null);
 }
+
+// --- Placement error messages ---
+
+const PLAYER_FRIENDLY_ERRORS: Record<string, string> = {
+  'Room extends beyond grid boundary': 'room extends beyond the grid boundary',
+  'Tiles already occupied': 'tiles are already occupied',
+};
+
+function toPlayerFriendlyError(error: string): string {
+  return PLAYER_FRIENDLY_ERRORS[error] ?? error.toLowerCase();
+}
+
+export function formatPlacementErrors(errors: string[]): string {
+  if (errors.length === 0) return '';
+
+  const friendly = errors.map(toPlayerFriendlyError);
+  return `Cannot place room: ${friendly.join(', ')}`;
+}
+
+export function attemptPlacement(
+  x: number,
+  y: number,
+): { placed: boolean; errors: string[]; message: string } {
+  const shape = placementPreviewShape();
+  if (!shape) return { placed: false, errors: [], message: '' };
+
+  const grid = gamestate().world.grid;
+  const result = validatePlacement(shape, x, y, grid);
+
+  if (!result.valid) {
+    return {
+      placed: false,
+      errors: result.errors,
+      message: formatPlacementErrors(result.errors),
+    };
+  }
+
+  return { placed: true, errors: [], message: '' };
+}

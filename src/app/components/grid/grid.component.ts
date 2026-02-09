@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
+  attemptPlacement,
   clearPlacementPreview,
   deselectTile,
   gamestate,
+  notifyError,
   placementPreview,
   placementPreviewShape,
   selectedTile,
@@ -52,6 +54,13 @@ export class GridComponent {
   }
 
   public onTileClick(x: number, y: number): void {
+    if (placementPreviewShape()) {
+      const result = attemptPlacement(x, y);
+      if (!result.placed && result.message) {
+        notifyError(result.message);
+      }
+      return;
+    }
     selectTile(x, y);
   }
 
