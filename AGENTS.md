@@ -48,3 +48,6 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - OKLCH color format works in Angular SCSS
 - SweetAlert2 pattern: `[swal]="templateRef"` on button + `<swal>` element with `(confirm)` event handler
 - Angular view encapsulation adds attribute selectors — manual class additions in browser console won't match scoped styles
+- `@ngneat/hotkeys` provides global keyboard shortcuts: `[hotkeys]="'SPACE'"` with `isGlobal` directive attr, `(hotkey)` event handler
+- `appRequireSetup` / `appRequireNotSetup` directives show/hide elements based on setup state
+- Navbar component already has pause button, pause menu (ESC), Space bar toggle — check before re-implementing

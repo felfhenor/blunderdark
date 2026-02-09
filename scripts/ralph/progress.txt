@@ -568,3 +568,16 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `TICKS_PER_MINUTE = 5` means each tick is 12 seconds of game time — at 1x speed the game loop runs ~1 tick/second, so 1 real minute ≈ 12 game minutes
   - `advanceTime()` uses integer division (`Math.floor`) for tick-to-minute conversion — fractional ticks are discarded (no sub-minute precision needed)
   - The gameloop mutates `state.clock` in-place within the `updateGamestate` callback — this is safe because it operates on the tick-local copy
+
+## time-system US-002: Pause and Resume [DONE - Already Implemented]
+- All acceptance criteria were already met by existing navbar implementation:
+  - Pause button in navbar top bar (navbar.component.html:30-48) with play/pause icon toggle
+  - `togglePause()` uses `setOption('gameloopPaused', ...)` (navbar.component.ts:74-77)
+  - Gameloop returns early when paused: `if (isGameloopPaused()) return;` (gameloop.ts:28)
+  - Visual indicator: icon swaps between `gamePauseButton`/`gamePlayButton`, tooltip changes
+  - Space bar hotkey via `[hotkeys]="'SPACE'"` with `@ngneat/hotkeys`
+- No additional code changes required
+- **Learnings for future iterations:**
+  - The navbar component already has a full pause system with pause menu, resume, and ESC key handling
+  - `@ngneat/hotkeys` is used for global keyboard shortcuts (e.g., `[hotkeys]="'SPACE'"` with `isGlobal`)
+  - `appRequireSetup` directive hides elements until setup is complete — the pause button is only visible in-game
