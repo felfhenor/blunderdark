@@ -7,6 +7,7 @@ export * from './debug';
 export * from './defaults';
 export * from './discord';
 export * from './floor';
+export * from './game-events';
 export * from './game-init';
 export * from './game-time';
 export * from './gameloop';
