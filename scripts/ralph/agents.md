@@ -173,6 +173,12 @@ OKLCH color format works in SCSS files — the Angular compiler converts them to
 - `calculateTotalProduction(floors)` builds adjacency maps on-the-fly per floor using `resolveRoomShape` + `getAbsoluteTiles` + `areRoomsAdjacent`
 - Production formula: `Final = Base * (1 + inhabitantBonus + adjacencyBonus) * conditionalModifier`
 - TypeScript requires bracket notation for `Partial<Record<string, number>>` index access: `production['crystals']` not `production.crystals`
+- `Object.entries()` on `Partial<Record<string, number>>` returns `[string, number | undefined][]` — must check `!amount` before comparisons
+- `productionRates` computed signal — aggregate per-tick rates, reactively updates from `gamestate().world.floors`
+- `productionPerMinute(perTickRate)` — multiply by `TICKS_PER_MINUTE` (5) for display
+- `calculateSingleRoomProduction(room, floor)` — per-room production with all bonuses/modifiers
+- `getRoomProductionRates(roomId)` — finds room across floors, returns its individual production
+- Importing `gamestate` from `@helpers/state-game` in helper files is safe — no circular dependency with the production module chain
 
 ## GameState Type Gotchas
 

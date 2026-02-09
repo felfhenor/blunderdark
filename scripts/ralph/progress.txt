@@ -710,3 +710,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - TypeScript requires bracket notation for `Partial<Record<string, number>>` index access: `production['crystals']` not `production.crystals`
   - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring')
   - ResearchState fields: `completedNodes`, `activeResearch`, `activeResearchProgress`, `activeResearchStartTick`
+
+## production-calculation-system US-006: Production Summary Signal [DONE]
+- Added `productionRates` computed signal to `src/app/helpers/production.ts`:
+  - Returns aggregate `RoomProduction` per tick by calling `calculateTotalProduction(gamestate().world.floors)`
+  - Reactively updates when game state changes (rooms, inhabitants, modifiers)
+- Added `productionPerMinute(perTickRate)` — converts per-tick rate to per-minute by multiplying by `TICKS_PER_MINUTE` (5)
+- Added `calculateSingleRoomProduction(room, floor)` — extracts single-room production logic with all bonuses/modifiers
+- Added `getRoomProductionRates(roomId)` — looks up room across all floors and returns its individual production
+- Added 8 new tests: calculateSingleRoomProduction (passive room, worker room no inhabitants, worker room with inhabitants, adjacency bonus, non-existent type) and productionPerMinute (normal rate, zero, fractional)
+- All tests pass (315/315), lint passes, no new typecheck errors
+- **production-calculation-system FEATURE COMPLETE** — all 6 user stories done
+- Commit: 56c3ef2
+- **Learnings for future iterations:**
+  - `computed()` signals in helper files work fine when importing `gamestate` from `@helpers/state-game` — no circular dependency issues
+  - `Object.entries()` on `Partial<Record<string, number>>` returns `[string, number | undefined][]` — must check for undefined before comparisons
+  - Per-room production uses the same floor context (adjacency, inhabitants) as total production — extracted to `calculateSingleRoomProduction` to avoid duplicating logic
