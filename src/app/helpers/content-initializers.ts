@@ -3,6 +3,7 @@ import type {
   ContentType,
   HeroContent,
   HeroId,
+  InhabitantDefinition,
   IsContentItem,
   ItemContent,
   ItemId,
@@ -27,6 +28,7 @@ import type {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
   hero: ensureHero,
+  inhabitant: ensureInhabitant,
   item: ensureItem,
   monster: ensureMonster,
   pet: ensurePet,
@@ -178,6 +180,28 @@ function ensureRoom(
     production: room.production ?? {},
     requiresWorkers: room.requiresWorkers ?? false,
     adjacencyBonuses: room.adjacencyBonuses ?? [],
+  };
+}
+
+function ensureInhabitant(
+  inhabitant: Partial<InhabitantDefinition & IsContentItem>,
+): InhabitantDefinition & IsContentItem {
+  return {
+    id: inhabitant.id ?? 'UNKNOWN',
+    name: inhabitant.name ?? 'UNKNOWN',
+    __type: 'inhabitant',
+    type: inhabitant.type ?? '',
+    tier: inhabitant.tier ?? 1,
+    description: inhabitant.description ?? '',
+    cost: inhabitant.cost ?? {},
+    stats: inhabitant.stats ?? {
+      hp: 0,
+      attack: 0,
+      defense: 0,
+      speed: 0,
+      workerEfficiency: 1.0,
+    },
+    traits: inhabitant.traits ?? [],
   };
 }
 

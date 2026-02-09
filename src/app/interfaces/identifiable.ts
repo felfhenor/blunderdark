@@ -1,5 +1,6 @@
 export type ContentType =
   | 'hero'
+  | 'inhabitant'
   | 'item'
   | 'monster'
   | 'pet'
