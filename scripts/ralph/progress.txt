@@ -886,3 +886,21 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - When adding fields to `Floor` type, update: (1) `defaultFloor()` in defaults.ts, (2) `migrateFloors()` in floor.ts, (3) all `makeFloor()` test helpers in spec files
   - `findConnection()` checks both A→B and B→A orders — connections are bidirectional regardless of storage order
   - `addConnectionToFloor` rejects duplicates (returns null) — callers must check the return value
+
+## direct-adjacency-connection US-002: Implement Connection Validation Logic [DONE]
+- Added `validateConnection(floor, roomAId, roomBId)` to `src/app/helpers/connections.ts`:
+  - Returns `{ valid, error?, edgeTiles? }` — edgeTiles computed automatically from shared edges
+  - Validates: self-connection rejection, room existence on floor, adjacency check, duplicate connection check
+  - Uses `resolveRoomShape` + `getAbsoluteTiles` to get room tiles, `areRoomsAdjacent` for adjacency, `getSharedEdges` for edge tiles
+- Updated `createConnection(roomAId, roomBId)` to use `validateConnection` internally:
+  - No longer requires `edgeTiles` parameter — computes them automatically
+  - Returns `{ connection }` on success or `{ error }` on failure (discriminated union)
+- Added `ConnectionValidationResult` type exported from connections.ts
+- Added mocks for `@helpers/room-shapes` in connections.spec.ts (`resolveRoomShape`, `getAbsoluteTiles`)
+- Added 8 new validation tests: self-connection, room A not found, room B not found, non-adjacent rooms, already connected (both orders), valid adjacent unconnected, edge tiles returned
+- All tests pass (354/354), no new typecheck errors
+- Commit: 5b2ddbf
+- **Learnings for future iterations:**
+  - `validateConnection` computes `edgeTiles` from `getSharedEdges` — no need for callers to compute them separately
+  - Mocking `resolveRoomShape` in tests returns a fixed 2x1 shape; `getAbsoluteTiles` returns tiles at `(anchorX, anchorY)` and `(anchorX+1, anchorY)` — simple enough for adjacency testing
+  - `createConnection` signature changed from `(roomAId, roomBId, edgeTiles)` to `(roomAId, roomBId)` — edge tiles are now internal

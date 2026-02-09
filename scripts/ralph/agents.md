@@ -241,6 +241,9 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 - Query functions use `currentFloor()` and iterate connections — no adjacency map needed for connections (they're explicit, not geometric)
 - When adding fields to `Floor` type, update: (1) `defaultFloor()`, (2) `migrateFloors()`, (3) all `makeFloor()` test helpers in spec files (production.spec.ts, room-placement.spec.ts, floor.spec.ts)
 - `addConnectionToFloor` returns null for duplicates — always check return value
+- `validateConnection(floor, roomAId, roomBId)` checks: self-connection, room existence, adjacency, duplicates — returns `{ valid, error?, edgeTiles? }`
+- `createConnection(roomAId, roomBId)` validates internally and auto-computes edge tiles — no `edgeTiles` param needed
+- Edge tiles are computed via `getSharedEdges(tilesA, tilesB)` from adjacency.ts — returns `[tileFromA, tileFromB]` pairs
 
 ## GameState Type Gotchas
 
