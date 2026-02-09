@@ -3,6 +3,7 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { processScheduledEvents } from '@helpers/game-events';
 import { advanceClockTime } from '@helpers/game-time';
+import { processProduction } from '@helpers/production';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
@@ -50,6 +51,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
   updateGamestate((state) => {
     state.clock.numTicks += numTicks;
     state.clock = advanceClockTime(state.clock, numTicks);
+    processProduction(state);
     return state;
   });
 

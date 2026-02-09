@@ -128,20 +128,40 @@ vi.mock('@helpers/content', () => {
     ],
   });
 
+  entries.set('shape-1', {
+    id: 'shape-1',
+    name: 'Test 2x1',
+    __type: 'roomshape',
+    tiles: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    width: 2,
+    height: 1,
+  });
+
   return {
     getEntry: vi.fn((id: string) => entries.get(id)),
+    getEntriesByType: vi.fn(() => []),
     getEntries: vi.fn(),
     allIdsByName: vi.fn(() => new Map()),
   };
 });
 
-import type { InhabitantInstance, PlacedRoom } from '@interfaces';
+import type {
+  Floor,
+  GameState,
+  InhabitantInstance,
+  PlacedRoom,
+} from '@interfaces';
 import {
   calculateAdjacencyBonus,
   calculateConditionalModifiers,
   calculateInhabitantBonus,
+  calculateTotalProduction,
   getBaseProduction,
   getRoomDefinition,
+  processProduction,
 } from '@helpers/production';
 
 describe('getBaseProduction', () => {
@@ -552,5 +572,235 @@ describe('calculateConditionalModifiers', () => {
     ];
     const result = calculateConditionalModifiers(placedRoom, inhabitants);
     expect(result).toBe(1.0);
+  });
+});
+
+function makeFloor(
+  rooms: PlacedRoom[],
+  inhabitants: InhabitantInstance[] = [],
+): Floor {
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 1,
+    biome: 'neutral',
+    grid: { tiles: [] } as unknown as Floor['grid'],
+    rooms,
+    hallways: [],
+    inhabitants,
+  };
+}
+
+function makeGameState(
+  floors: Floor[],
+  resources?: Partial<GameState['world']['resources']>,
+): GameState {
+  const defaultResource = { current: 0, max: 1000 };
+  return {
+    meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
+    gameId: 'test' as GameState['gameId'],
+    clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
+    world: {
+      grid: { tiles: [] } as unknown as GameState['world']['grid'],
+      resources: {
+        crystals: { ...defaultResource },
+        food: { ...defaultResource },
+        gold: { ...defaultResource },
+        flux: { ...defaultResource },
+        research: { ...defaultResource },
+        essence: { ...defaultResource },
+        corruption: { ...defaultResource },
+        ...resources,
+      },
+      inhabitants: [],
+      hallways: [],
+      season: {
+        currentSeason: 'growth',
+        dayInSeason: 1,
+        totalSeasonCycles: 0,
+      },
+      research: {
+        completedNodes: [],
+        activeResearch: null,
+        activeResearchProgress: 0,
+        activeResearchStartTick: 0,
+      },
+      reputation: {
+        terror: 0,
+        wealth: 0,
+        knowledge: 0,
+        harmony: 0,
+        chaos: 0,
+      },
+      floors,
+      currentFloorIndex: 0,
+    },
+  };
+}
+
+describe('calculateTotalProduction', () => {
+  it('should return empty production when no floors have rooms', () => {
+    const floor = makeFloor([]);
+    const production = calculateTotalProduction([floor]);
+    expect(production).toEqual({});
+  });
+
+  it('should return base production for a passive room with no workers', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const production = calculateTotalProduction([floor]);
+    expect(production).toEqual({ gold: 0.5 });
+  });
+
+  it('should return 0 for worker room with no inhabitants', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([mine]);
+    const production = calculateTotalProduction([floor]);
+    expect(production).toEqual({});
+  });
+
+  it('should produce for worker room with assigned inhabitant', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = calculateTotalProduction([floor]);
+    // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 modifier = 1.2
+    expect(production['crystals']).toBeCloseTo(1.2);
+  });
+
+  it('should sum production across multiple rooms', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const throne2: PlacedRoom = {
+      id: 'placed-throne-2',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 4,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne, throne2]);
+    const production = calculateTotalProduction([floor]);
+    // Two thrones: 0.5 + 0.5 = 1.0 gold
+    expect(production['gold']).toBeCloseTo(1.0);
+  });
+
+  it('should apply adjacency bonus when rooms are adjacent', () => {
+    // Place mine at (0,0) and forge at (2,0) — shape-1 is 2x1
+    // Mine tiles: (0,0),(1,0); Forge tiles: (2,0),(3,0)
+    // Mine tile (1,0) is adjacent to Forge tile (2,0)
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const forge: PlacedRoom = {
+      id: 'placed-forge',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-skeleton',
+        name: 'Skeleton',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-skeleton',
+        name: 'Skeleton 2',
+        state: 'normal',
+        assignedRoomId: 'placed-forge',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const production = calculateTotalProduction([floor]);
+    // Mine: base 1.0 * (1 + (-0.3 skeleton) + 0.1 adj) * 1.0 = 1.0 * 0.8 = 0.8
+    // Forge: base 1.2 * (1 + (-0.3 skeleton) + 0.15 adj) * 1.0 = 1.2 * 0.85 = 1.02
+    expect(production['crystals']).toBeCloseTo(0.8);
+    expect(production['gold']).toBeCloseTo(1.02);
+  });
+});
+
+describe('processProduction', () => {
+  it('should add production to resources', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const state = makeGameState([floor]);
+    processProduction(state);
+    // Throne produces 0.5 gold
+    expect(state.world.resources.gold.current).toBeCloseTo(0.5);
+  });
+
+  it('should cap resources at max', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const state = makeGameState([floor], { gold: { current: 999.8, max: 1000 } });
+    processProduction(state);
+    // Should cap at 1000, not 1000.3
+    expect(state.world.resources.gold.current).toBe(1000);
+  });
+
+  it('should not modify resources for rooms with no production', () => {
+    const barracks: PlacedRoom = {
+      id: 'placed-barracks',
+      roomTypeId: 'room-barracks',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([barracks]);
+    const state = makeGameState([floor]);
+    processProduction(state);
+    expect(state.world.resources.gold.current).toBe(0);
+    expect(state.world.resources.crystals.current).toBe(0);
   });
 });

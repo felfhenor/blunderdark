@@ -1,12 +1,18 @@
+import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
+import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import type {
+  Floor,
+  GameState,
   InhabitantDefinition,
   InhabitantInstance,
   InhabitantState,
   IsContentItem,
   PlacedRoom,
+  ResourceType,
   RoomDefinition,
   RoomProduction,
+  TileOffset,
 } from '@interfaces';
 
 export type InhabitantBonusResult = {
@@ -116,4 +122,74 @@ export function calculateConditionalModifiers(
   }
 
   return multiplier;
+}
+
+export function calculateTotalProduction(floors: Floor[]): RoomProduction {
+  const totalProduction: RoomProduction = {};
+
+  for (const floor of floors) {
+    const roomTiles = new Map<string, TileOffset[]>();
+    for (const room of floor.rooms) {
+      const shape = resolveRoomShape(room);
+      roomTiles.set(
+        room.id,
+        getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+      );
+    }
+
+    for (const room of floor.rooms) {
+      const roomDef = getRoomDefinition(room.roomTypeId);
+      if (!roomDef) continue;
+
+      const base = roomDef.production;
+      if (!base || Object.keys(base).length === 0) continue;
+
+      const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+        room,
+        floor.inhabitants,
+      );
+
+      if (roomDef.requiresWorkers && !hasWorkers) continue;
+
+      const thisTiles = roomTiles.get(room.id) ?? [];
+      const adjacentRoomIds: string[] = [];
+      for (const other of floor.rooms) {
+        if (other.id === room.id) continue;
+        const otherTiles = roomTiles.get(other.id) ?? [];
+        if (areRoomsAdjacent(thisTiles, otherTiles)) {
+          adjacentRoomIds.push(other.id);
+        }
+      }
+
+      const adjacencyBonus = calculateAdjacencyBonus(
+        room,
+        adjacentRoomIds,
+        floor.rooms,
+      );
+      const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+
+      for (const [resourceType, baseAmount] of Object.entries(base)) {
+        if (!baseAmount) continue;
+        const final =
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * modifier;
+        totalProduction[resourceType] =
+          (totalProduction[resourceType] ?? 0) + final;
+      }
+    }
+  }
+
+  return totalProduction;
+}
+
+export function processProduction(state: GameState): void {
+  const production = calculateTotalProduction(state.world.floors);
+
+  for (const [type, amount] of Object.entries(production)) {
+    if (amount <= 0) continue;
+    const resourceType = type as ResourceType;
+    const resource = state.world.resources[resourceType];
+    if (!resource) continue;
+    const available = resource.max - resource.current;
+    resource.current += Math.min(amount, available);
+  }
 }
