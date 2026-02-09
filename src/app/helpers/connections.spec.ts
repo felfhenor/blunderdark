@@ -6,8 +6,9 @@ import {
   getFloorConnections,
   removeConnectionFromFloor,
   removeRoomConnectionsFromFloor,
+  validateConnection,
 } from '@helpers/connections';
-import type { Connection, Floor } from '@interfaces';
+import type { Connection, Floor, PlacedRoom } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGamestate = vi.fn();
@@ -19,6 +20,20 @@ vi.mock('@helpers/state-game', () => ({
 
 vi.mock('@helpers/rng', () => ({
   rngUuid: () => 'test-uuid',
+}));
+
+vi.mock('@helpers/room-shapes', () => ({
+  resolveRoomShape: (room: PlacedRoom) => ({
+    id: room.shapeId,
+    name: 'Test Shape',
+    tiles: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+    width: 2,
+    height: 1,
+  }),
+  getAbsoluteTiles: (_shape: unknown, anchorX: number, anchorY: number) => [
+    { x: anchorX, y: anchorY },
+    { x: anchorX + 1, y: anchorY },
+  ],
 }));
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
@@ -42,6 +57,17 @@ function makeConnection(overrides: Partial<Connection> = {}): Connection {
     roomAId: 'room-a',
     roomBId: 'room-b',
     edgeTiles: [{ x: 2, y: 0 }],
+    ...overrides,
+  };
+}
+
+function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
+  return {
+    id: 'room-a',
+    roomTypeId: 'room-type-1',
+    shapeId: 'shape-2x1',
+    anchorX: 0,
+    anchorY: 0,
     ...overrides,
   };
 }
@@ -237,5 +263,101 @@ describe('removeRoomConnectionsFromFloor', () => {
     });
     removeRoomConnectionsFromFloor(floor, 'room-a');
     expect(floor.connections).toHaveLength(1);
+  });
+});
+
+describe('validateConnection', () => {
+  it('should reject self-connection', () => {
+    const floor = makeFloor({
+      rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-a');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('Cannot connect a room to itself');
+  });
+
+  it('should reject when room A not found', () => {
+    const floor = makeFloor({
+      rooms: [makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 })],
+    });
+    const result = validateConnection(floor, 'room-x', 'room-b');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('One or both rooms not found on this floor');
+  });
+
+  it('should reject when room B not found', () => {
+    const floor = makeFloor({
+      rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-y');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('One or both rooms not found on this floor');
+  });
+
+  it('should reject non-adjacent rooms', () => {
+    // Room A at (0,0)-(1,0), Room B at (5,0)-(6,0) — not adjacent
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 5, anchorY: 0 }),
+      ],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-b');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('Rooms are not adjacent');
+  });
+
+  it('should reject already connected rooms', () => {
+    // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — adjacent
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+      ],
+      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-b');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('Rooms are already connected');
+  });
+
+  it('should reject already connected rooms in reverse order', () => {
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+      ],
+      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+    });
+    const result = validateConnection(floor, 'room-b', 'room-a');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('Rooms are already connected');
+  });
+
+  it('should accept valid adjacent unconnected rooms', () => {
+    // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — adjacent at x=1/x=2
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+      ],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-b');
+    expect(result.valid).toBe(true);
+    expect(result.edgeTiles).toBeDefined();
+    expect(result.edgeTiles!.length).toBeGreaterThan(0);
+  });
+
+  it('should return edge tiles for valid connection', () => {
+    // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — shared edge at (1,0)↔(2,0)
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+      ],
+    });
+    const result = validateConnection(floor, 'room-a', 'room-b');
+    expect(result.valid).toBe(true);
+    expect(result.edgeTiles).toEqual([{ x: 1, y: 0 }]);
   });
 });
