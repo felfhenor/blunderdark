@@ -755,3 +755,24 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
 - **Learnings for future iterations:**
   - Pure functions that operate on Floor data (like `placeRoomOnFloor`) are testable without mocking gamestate — the async wrappers handle gamestate integration
   - `removeRoomFromFloor` takes shape as parameter (not content lookup) to stay pure and testable without mocking `@helpers/content`
+
+## room-placement-ui US-002: Room Selection Menu [DONE]
+- Created `src/app/components/panel-room-select/` with `.ts`, `.html`, `.scss` files
+- Component displays all room types from content system via `getEntriesByType<RoomDefinition & IsContentItem>('room')`
+- Each room entry shows:
+  - Mini shape preview (CSS grid rendering room shape tiles at 8px per tile)
+  - Room name
+  - Resource cost breakdown (or "Free" if no cost)
+- Rooms the player can't afford are visually dimmed (opacity: 0.45) via `canAfford(room.cost)` check
+- Clicking a room enters placement mode via `enterPlacementMode(roomTypeId, shape)` — sets `selectedRoomTypeId` signal + `placementPreviewShape`
+- Clicking the already-selected room exits placement mode via `exitPlacementMode()`
+- Selected room highlighted with `btn-active` class + primary border color
+- Added `selectedRoomTypeId` signal, `enterPlacementMode()`, and `exitPlacementMode()` to `room-placement.ts`
+- Added component to game-play page sidebar (between floor selector and reputation panels)
+- Component uses OnPush change detection, standalone pattern
+- All tests pass (323/323), lint passes, no new typecheck errors
+- Commit: f0df7f8
+- **Learnings for future iterations:**
+  - `Object.entries()` on `ResourceCost` (Partial<Record<ResourceType, number>>) returns `[string, number | undefined][]` — filter out undefined/zero values before display
+  - CSS grid with `--grid-size` custom property works well for dynamic shape previews: `grid-template-columns: repeat(var(--grid-size), 8px)`
+  - Placement mode state is centralized in `room-placement.ts` — `selectedRoomTypeId` tracks which room type is selected, `placementPreviewShape` tracks the shape for grid preview

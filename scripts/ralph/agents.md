@@ -191,6 +191,35 @@ OKLCH color format works in SCSS files — the Angular compiler converts them to
 - Pure functions are testable without mocking gamestate or content — keep data manipulation separate from signal/state access
 - Grid tiles use `[y][x]` indexing — `newGrid[t.y][t.x]` not `newGrid[t.x][t.y]`
 
+## Room Placement Mode
+
+- `selectedRoomTypeId` signal — tracks which room type is selected for placement (null when not in placement mode)
+- `enterPlacementMode(roomTypeId, shape)` — sets selectedRoomTypeId + placementPreviewShape
+- `exitPlacementMode()` — clears selectedRoomTypeId + preview signals
+- Panel component uses `isSelected(roomId)` to highlight the active room type
+- Clicking an already-selected room toggles off placement mode (same click to deselect)
+
+## Shape Preview in Panels
+
+For small shape preview icons in UI panels, use CSS grid with dynamic size:
+
+```html
+<div class="shape-preview" [style.--grid-size]="getShapeGridSize(room)">
+  @for (tile of getShapeTiles(room); track tile.key) {
+    <div class="shape-tile" [style.grid-column]="tile.x + 1" [style.grid-row]="tile.y + 1"></div>
+  }
+</div>
+```
+
+```scss
+.shape-preview {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), 8px);
+  grid-template-rows: repeat(var(--grid-size), 8px);
+  gap: 1px;
+}
+```
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
