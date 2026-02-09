@@ -23,11 +23,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - When adding fields to `GameStateClock`, also update `defaults.ts` clock section
 - The gameloop mutates `state.clock` in-place within the `updateGamestate` callback — safe because it operates on the tick-local copy
 
-## Game Time
+## Game Time & Events
 
 - `TICKS_PER_MINUTE = 5` — each tick = 12 seconds of game time; at 1x speed (~1 tick/sec), 1 real minute ≈ 12 game minutes
 - `advanceTime()` is a pure function in `game-time.ts` — takes `GameTime` and numTicks, returns new `GameTime` with correct rollover
 - Computed signals (`gameDay`, `gameHour`, `gameMinute`, `formattedGameTime`) read directly from `gamestate().clock`
+- `scheduleEvent(triggerTime, callback)` in `game-events.ts` registers one-shot time triggers; recurring events re-register in their callback
+- `gameTimeToMinutes()` converts `GameTime` to total minutes for comparison (Day 1 = minute 0)
+- `processScheduledEvents()` separates toFire/remaining before executing — safe if callbacks schedule new events
 
 ## Grid System
 

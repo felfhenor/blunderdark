@@ -612,3 +612,23 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - The navbar `navbar-start` section was empty — good place for status displays
   - Small display components with only computed signals are ideal for inline templates
   - `appRequireSetup` on the wrapper `<div>` hides the time display until game is set up
+
+## time-system US-005: Time-Based Event Triggers [DONE]
+- Created `src/app/helpers/game-events.ts` with:
+  - `ScheduledEvent` type: id, triggerTime (GameTime), callback
+  - `gameTimeToMinutes(time)` — converts GameTime to total minutes for comparison
+  - `scheduleEvent(triggerTime, callback)` — registers one-shot event, returns id
+  - `cancelEvent(id)` — removes a scheduled event
+  - `processScheduledEvents(currentTime)` — fires events whose trigger time <= current time, removes fired events
+  - `getScheduledEvents()` — returns read-only list for inspection
+  - `clearAllEvents()` — resets all events (for testing)
+- Updated `src/app/helpers/gameloop.ts` — calls `processScheduledEvents(gamestate().clock)` after advancing time
+- Events don't fire when paused because the gameloop returns early when `isGameloopPaused()` is true
+- Recurring events supported by re-calling `scheduleEvent()` inside the callback
+- Created `src/app/helpers/game-events.spec.ts` with 15 unit tests covering: time conversion, scheduling, cancellation, firing at exact/past time, not firing before time, removal after firing, multiple events, recurring via re-registration, pause behavior
+- All tests pass (270/270), lint passes, no new typecheck errors
+- Commit: f68b8e5
+- **Learnings for future iterations:**
+  - `gameTimeToMinutes()` uses `(day - 1) * 24 * 60` because Day 1 is the first day (not Day 0)
+  - During tick mode, `gamestate()` returns the tick-local copy which has the updated clock — safe to read after `updateGamestate`
+  - `processScheduledEvents` separates events into toFire/remaining before executing callbacks — prevents issues if callbacks schedule new events

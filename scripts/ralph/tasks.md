@@ -4,8 +4,8 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 15 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation)
-- **Remaining:** ~107 features
+- **Complete:** 16 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system)
+- **Remaining:** ~106 features
 
 ---
 
@@ -27,7 +27,7 @@ These unlock the main gameplay loop: building rooms that produce resources.
 
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
-| 2.1 | `time-system` | 5 | none |
+| ~~2.1~~ | ~~`time-system`~~ | ~~COMPLETE~~ | ~~none~~ |
 | 2.2 | `production-calculation-system` | 6 | resource-manager, adjacency-detection |
 | 2.3 | `room-placement-ui` | 6 | grid-system, tetromino-room-shapes, room-placement-validation |
 | 2.4 | `direct-adjacency-connection` | 4 | adjacency-detection |

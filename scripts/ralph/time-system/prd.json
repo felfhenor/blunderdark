@@ -82,8 +82,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scheduleEvent/cancelEvent/processScheduledEvents in game-events.ts. gameTimeToMinutes for comparison. Gameloop calls processScheduledEvents after advancing time. Recurring via callback re-registration. 15 unit tests."
     }
   ]
 }
