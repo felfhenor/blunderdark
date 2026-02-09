@@ -84,6 +84,7 @@ export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floo
     rooms: [],
     hallways: [],
     inhabitants: [],
+    connections: [],
   };
 }
 

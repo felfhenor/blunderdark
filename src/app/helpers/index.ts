@@ -1,6 +1,7 @@
 export * from './adjacency';
 export * from './analytics';
 export * from './clipboard';
+export * from './connections';
 export * from './content';
 export * from './content-initializers';
 export * from './debug';

@@ -590,6 +590,7 @@ function makeFloor(
     rooms,
     hallways: [],
     inhabitants,
+    connections: [],
   };
 }
 

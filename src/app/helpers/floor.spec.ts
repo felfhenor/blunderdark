@@ -35,6 +35,7 @@ vi.mock('@helpers/defaults', () => ({
     rooms: [],
     hallways: [],
     inhabitants: [],
+    connections: [],
   }),
 }));
 
