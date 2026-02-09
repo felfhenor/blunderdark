@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added formatPlacementErrors() and attemptPlacement() to room-placement.ts. GridComponent calls attemptPlacement() on click during preview mode, shows error via notifyError(). Player-friendly messages combine multiple errors. 5 unit tests added."
     }
   ]
 }

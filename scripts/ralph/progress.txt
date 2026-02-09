@@ -534,3 +534,19 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - For grid tile preview, using a Set of "x,y" strings provides O(1) lookup per tile vs O(n) array scan — important for 400 tiles
   - Preview state is global (module-level signals) — consistent with selectedTile pattern in grid.ts
   - The grid component is very small on the game-play page due to flex layout — sidebar takes priority; grid needs `flex-1` or similar to grow
+
+## room-placement-validation US-005: Placement Error Messages [DONE]
+- Added `formatPlacementErrors(errors)` to `src/app/helpers/room-placement.ts` — converts technical error strings to player-friendly message (e.g., "Cannot place room: tiles are already occupied")
+- Added `attemptPlacement(x, y)` — validates placement at position, returns `{ placed, errors, message }`
+- Updated `src/app/components/grid/grid.component.ts`:
+  - `onTileClick` now checks for active preview; calls `attemptPlacement()` and `notifyError()` if invalid
+  - When preview is active, clicking bypasses normal tile selection
+- Player-friendly error map converts internal messages: "Room extends beyond grid boundary" → "room extends beyond the grid boundary", "Tiles already occupied" → "tiles are already occupied"
+- Multiple errors combined into single notification: "Cannot place room: error1, error2"
+- Added 5 unit tests covering: empty errors, single bounds error, single overlap error, combined errors, unknown error lowercasing
+- All tests pass (245/245), lint passes, no new typecheck errors
+- Commit: 4258308
+- **Learnings for future iterations:**
+  - Avoid importing from `@helpers/notify` in helper files that are tested — it triggers circular dependency through barrel exports (notify.ts imports `isPageVisible` from `@helpers` barrel). Instead, return data from helpers and let components call `notifyError()`
+  - `attemptPlacement()` returns a result object rather than calling notify directly — decouples validation from notification, avoids circular deps, and is more testable
+  - The grid component handles both preview-mode clicks (attempt placement) and normal clicks (tile selection) — check `placementPreviewShape()` to determine mode
