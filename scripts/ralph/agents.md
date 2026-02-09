@@ -244,6 +244,9 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 - `validateConnection(floor, roomAId, roomBId)` checks: self-connection, room existence, adjacency, duplicates — returns `{ valid, error?, edgeTiles? }`
 - `createConnection(roomAId, roomBId)` validates internally and auto-computes edge tiles — no `edgeTiles` param needed
 - Edge tiles are computed via `getSharedEdges(tilesA, tilesB)` from adjacency.ts — returns `[tileFromA, tileFromB]` pairs
+- `getAdjacentUnconnectedRooms(floor, roomId)` — returns IDs of adjacent rooms without an existing connection
+- `getRoomConnections(floor, roomId)` — returns Connection[] for all connections involving a room
+- Production system uses geometric adjacency (tile positions) NOT the connection system for adjacency bonuses — connections are a separate layer for logical linking
 
 ## GameState Type Gotchas
 
