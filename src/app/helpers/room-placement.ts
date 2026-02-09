@@ -1,7 +1,13 @@
 import { computed, signal } from '@angular/core';
-import { getAbsoluteTiles } from '@helpers/room-shapes';
-import { gamestate } from '@helpers/state-game';
-import type { GridState, RoomShape, TileOffset } from '@interfaces';
+import { getAbsoluteTiles, getRoomShape } from '@helpers/room-shapes';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import type {
+  Floor,
+  GridState,
+  PlacedRoom,
+  RoomShape,
+  TileOffset,
+} from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
 export type ValidationResult = {
@@ -170,4 +176,142 @@ export function attemptPlacement(
   }
 
   return { placed: true, errors: [], message: '' };
+}
+
+// --- Room placement on floor ---
+
+export function placeRoomOnFloor(
+  floor: Floor,
+  room: PlacedRoom,
+  shape: RoomShape,
+): Floor | null {
+  const validation = validatePlacement(
+    shape,
+    room.anchorX,
+    room.anchorY,
+    floor.grid,
+  );
+  if (!validation.valid) return null;
+
+  const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
+  const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
+
+  for (const t of tiles) {
+    newGrid[t.y][t.x] = {
+      occupied: true,
+      occupiedBy: 'room',
+      roomId: room.id,
+      hallwayId: null,
+      connectionType: null,
+    };
+  }
+
+  return {
+    ...floor,
+    grid: newGrid,
+    rooms: [...floor.rooms, room],
+  };
+}
+
+export function removeRoomFromFloor(
+  floor: Floor,
+  roomId: string,
+  shape: RoomShape,
+): Floor | null {
+  const room = floor.rooms.find((r) => r.id === roomId);
+  if (!room) return null;
+
+  const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
+  const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
+
+  for (const t of tiles) {
+    if (t.y >= 0 && t.y < newGrid.length && t.x >= 0 && t.x < newGrid[0].length) {
+      const gridTile = newGrid[t.y][t.x];
+      if (gridTile.roomId === roomId) {
+        newGrid[t.y][t.x] = {
+          occupied: false,
+          occupiedBy: 'empty',
+          roomId: null,
+          hallwayId: gridTile.hallwayId,
+          connectionType: gridTile.connectionType,
+        };
+      }
+    }
+  }
+
+  return {
+    ...floor,
+    grid: newGrid,
+    rooms: floor.rooms.filter((r) => r.id !== roomId),
+  };
+}
+
+export async function placeRoom(
+  roomTypeId: string,
+  shapeId: string,
+  anchorX: number,
+  anchorY: number,
+): Promise<PlacedRoom | null> {
+  const shape = getRoomShape(shapeId);
+  if (!shape) return null;
+
+  const state = gamestate();
+  const floorIndex = state.world.currentFloorIndex;
+  const floor = state.world.floors[floorIndex];
+  if (!floor) return null;
+
+  const room: PlacedRoom = {
+    id: crypto.randomUUID(),
+    roomTypeId,
+    shapeId,
+    anchorX,
+    anchorY,
+  };
+
+  const updatedFloor = placeRoomOnFloor(floor, room, shape);
+  if (!updatedFloor) return null;
+
+  await updateGamestate((s) => {
+    const newFloors = [...s.world.floors];
+    newFloors[floorIndex] = updatedFloor;
+    return {
+      ...s,
+      world: {
+        ...s.world,
+        floors: newFloors,
+      },
+    };
+  });
+
+  return room;
+}
+
+export async function removeRoom(roomId: string): Promise<boolean> {
+  const state = gamestate();
+  const floorIndex = state.world.currentFloorIndex;
+  const floor = state.world.floors[floorIndex];
+  if (!floor) return false;
+
+  const room = floor.rooms.find((r) => r.id === roomId);
+  if (!room) return false;
+
+  const shape = getRoomShape(room.shapeId);
+  if (!shape) return false;
+
+  const updatedFloor = removeRoomFromFloor(floor, roomId, shape);
+  if (!updatedFloor) return false;
+
+  await updateGamestate((s) => {
+    const newFloors = [...s.world.floors];
+    newFloors[floorIndex] = updatedFloor;
+    return {
+      ...s,
+      world: {
+        ...s.world,
+        floors: newFloors,
+      },
+    };
+  });
+
+  return true;
 }

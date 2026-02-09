@@ -1,8 +1,10 @@
 import { createEmptyGrid, setTile } from '@helpers/grid';
-import type { RoomShape } from '@interfaces';
+import type { Floor, PlacedRoom, RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 import {
   formatPlacementErrors,
+  placeRoomOnFloor,
+  removeRoomFromFloor,
   validateBounds,
   validateNoOverlap,
   validatePlacement,
@@ -229,5 +231,196 @@ describe('formatPlacementErrors', () => {
   it('should lowercase unknown error messages', () => {
     const message = formatPlacementErrors(['Some Unknown Error']);
     expect(message).toBe('Cannot place room: some unknown error');
+  });
+});
+
+function makeFloor(
+  rooms: PlacedRoom[] = [],
+  grid = createEmptyGrid(),
+): Floor {
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 1,
+    biome: 'neutral',
+    grid,
+    rooms,
+    hallways: [],
+    inhabitants: [],
+  };
+}
+
+describe('placeRoomOnFloor', () => {
+  it('should place a room and mark grid tiles', () => {
+    const floor = makeFloor();
+    const room: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const result = placeRoomOnFloor(floor, room, square2x2);
+
+    expect(result).not.toBeNull();
+    expect(result!.rooms).toHaveLength(1);
+    expect(result!.rooms[0].id).toBe('room-1');
+
+    // Check all 4 tiles are marked
+    expect(result!.grid[5][5].occupied).toBe(true);
+    expect(result!.grid[5][5].occupiedBy).toBe('room');
+    expect(result!.grid[5][5].roomId).toBe('room-1');
+    expect(result!.grid[5][6].roomId).toBe('room-1');
+    expect(result!.grid[6][5].roomId).toBe('room-1');
+    expect(result!.grid[6][6].roomId).toBe('room-1');
+  });
+
+  it('should return null for invalid placement (out of bounds)', () => {
+    const floor = makeFloor();
+    const room: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 19,
+      anchorY: 19,
+    };
+    const result = placeRoomOnFloor(floor, room, square2x2);
+    expect(result).toBeNull();
+  });
+
+  it('should return null for overlapping placement', () => {
+    const floor = makeFloor();
+    const room1: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const placed = placeRoomOnFloor(floor, room1, square2x2)!;
+
+    const room2: PlacedRoom = {
+      id: 'room-2',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 6,
+      anchorY: 6,
+    };
+    const result = placeRoomOnFloor(placed, room2, square2x2);
+    expect(result).toBeNull();
+  });
+
+  it('should allow placing non-overlapping rooms', () => {
+    const floor = makeFloor();
+    const room1: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const placed = placeRoomOnFloor(floor, room1, square2x2)!;
+
+    const room2: PlacedRoom = {
+      id: 'room-2',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 3,
+      anchorY: 0,
+    };
+    const result = placeRoomOnFloor(placed, room2, square2x2);
+    expect(result).not.toBeNull();
+    expect(result!.rooms).toHaveLength(2);
+  });
+
+  it('should not mutate the original floor', () => {
+    const floor = makeFloor();
+    const room: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    placeRoomOnFloor(floor, room, square2x2);
+
+    expect(floor.rooms).toHaveLength(0);
+    expect(floor.grid[5][5].occupied).toBe(false);
+  });
+});
+
+describe('removeRoomFromFloor', () => {
+  it('should remove a room and clear grid tiles', () => {
+    const floor = makeFloor();
+    const room: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const placed = placeRoomOnFloor(floor, room, square2x2)!;
+
+    const result = removeRoomFromFloor(placed, 'room-1', square2x2);
+    expect(result).not.toBeNull();
+    expect(result!.rooms).toHaveLength(0);
+    expect(result!.grid[5][5].occupied).toBe(false);
+    expect(result!.grid[5][5].roomId).toBeNull();
+    expect(result!.grid[5][6].occupied).toBe(false);
+    expect(result!.grid[6][5].occupied).toBe(false);
+    expect(result!.grid[6][6].occupied).toBe(false);
+  });
+
+  it('should return null for non-existent room', () => {
+    const floor = makeFloor();
+    const result = removeRoomFromFloor(floor, 'nonexistent', square2x2);
+    expect(result).toBeNull();
+  });
+
+  it('should only remove the specified room', () => {
+    const floor = makeFloor();
+    const room1: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const room2: PlacedRoom = {
+      id: 'room-2',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    let placed = placeRoomOnFloor(floor, room1, square2x2)!;
+    placed = placeRoomOnFloor(placed, room2, square2x2)!;
+
+    const result = removeRoomFromFloor(placed, 'room-1', square2x2);
+    expect(result).not.toBeNull();
+    expect(result!.rooms).toHaveLength(1);
+    expect(result!.rooms[0].id).toBe('room-2');
+    // room-1 tiles cleared
+    expect(result!.grid[0][0].occupied).toBe(false);
+    // room-2 tiles still present
+    expect(result!.grid[5][5].occupied).toBe(true);
+    expect(result!.grid[5][5].roomId).toBe('room-2');
+  });
+
+  it('should not mutate the original floor', () => {
+    const floor = makeFloor();
+    const room: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const placed = placeRoomOnFloor(floor, room, square2x2)!;
+
+    removeRoomFromFloor(placed, 'room-1', square2x2);
+
+    expect(placed.rooms).toHaveLength(1);
+    expect(placed.grid[5][5].occupied).toBe(true);
   });
 });
