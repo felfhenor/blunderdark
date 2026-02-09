@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
+import { DisplayGameTimeComponent } from '@components/display-game-time/display-game-time.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
@@ -41,6 +42,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ModalComponent,
     ButtonQuitComponent,
     ButtonSettingsComponent,
+    DisplayGameTimeComponent,
   ],
   providers: [],
   templateUrl: './navbar.component.html',
