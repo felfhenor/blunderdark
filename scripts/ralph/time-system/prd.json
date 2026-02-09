@@ -50,8 +50,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "GameSpeed type (1|2|4) in options. Speed buttons in navbar with btn-primary highlight on active. Keyboard 1/2/3 via hotkeys. Gameloop multiplies gameSpeed with debugTickMultiplier."
     },
     {
       "id": "US-004",

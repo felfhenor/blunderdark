@@ -581,3 +581,20 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - The navbar component already has a full pause system with pause menu, resume, and ESC key handling
   - `@ngneat/hotkeys` is used for global keyboard shortcuts (e.g., `[hotkeys]="'SPACE'"` with `isGlobal`)
   - `appRequireSetup` directive hides elements until setup is complete — the pause button is only visible in-game
+
+## time-system US-003: Speed Controls [DONE]
+- Added `GameSpeed` type (`1 | 2 | 4`) to `src/app/interfaces/state-options.ts`
+- Added `gameSpeed: 1` default to `src/app/helpers/state-options.ts`
+- Added `GAME_SPEEDS` constant, `gameSpeed` computed signal, and `setGameSpeed()` to `src/app/helpers/game-time.ts`
+- Updated `src/app/helpers/gameloop.ts` — tick calculation now includes `getOption('gameSpeed')` multiplied with `debugTickMultiplier`
+- Updated `src/app/components/navbar/navbar.component.ts` — added `gameSpeed`, `gameSpeeds`, `setSpeed()`
+- Updated `src/app/components/navbar/navbar.component.html` — speed buttons (1x/2x/4x) next to pause button with:
+  - `btn-primary` class on active speed, `btn-ghost` on inactive
+  - Keyboard shortcuts 1/2/3 via `@ngneat/hotkeys`
+  - Tooltip showing speed and shortcut
+- All tests pass (255/255), lint passes, no new typecheck errors
+- Commit: c46ff0b
+- **Learnings for future iterations:**
+  - `GameSpeed` is a union type `1 | 2 | 4`, not a generic number — keeps the type safe
+  - Speed multiplies alongside `debugTickMultiplier` (both are factors in tick calculation)
+  - `@ngneat/hotkeys` accepts string hotkey like `'1'`, `'2'`, `'3'` for number keys
