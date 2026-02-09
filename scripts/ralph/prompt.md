@@ -86,7 +86,7 @@ Only update AGENTS.md if you have **genuinely reusable knowledge** that would he
 
 ## Browser Testing (Required for Frontend Stories)
 
-For any story that changes UI, you MUST verify it works in the browser:
+For any story that changes UI, you MUST verify it works in the browser (the server can be started with `npm start` and the app port is 9766):
 
 1. Load the `dev-browser` skill
 2. Navigate to the relevant page
