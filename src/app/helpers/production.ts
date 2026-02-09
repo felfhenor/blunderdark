@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content';
 import type {
   InhabitantDefinition,
   InhabitantInstance,
+  InhabitantState,
   IsContentItem,
   PlacedRoom,
   RoomDefinition,
@@ -89,4 +90,30 @@ export function calculateAdjacencyBonus(
   }
 
   return totalBonus;
+}
+
+const STATE_MODIFIERS: Record<InhabitantState, number> = {
+  normal: 1.0,
+  scared: 0.5,
+  hungry: 0.75,
+};
+
+export function calculateConditionalModifiers(
+  placedRoom: PlacedRoom,
+  inhabitants: InhabitantInstance[],
+): number {
+  const assigned = inhabitants.filter(
+    (i) => i.assignedRoomId === placedRoom.id,
+  );
+
+  if (assigned.length === 0) return 1.0;
+
+  const activeStates = new Set(assigned.map((i) => i.state));
+
+  let multiplier = 1.0;
+  for (const state of activeStates) {
+    multiplier *= STATE_MODIFIERS[state];
+  }
+
+  return multiplier;
 }

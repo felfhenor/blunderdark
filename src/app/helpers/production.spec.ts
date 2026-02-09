@@ -138,6 +138,7 @@ vi.mock('@helpers/content', () => {
 import type { InhabitantInstance, PlacedRoom } from '@interfaces';
 import {
   calculateAdjacencyBonus,
+  calculateConditionalModifiers,
   calculateInhabitantBonus,
   getBaseProduction,
   getRoomDefinition,
@@ -429,5 +430,127 @@ describe('calculateAdjacencyBonus', () => {
       allRooms,
     );
     expect(bonus).toBe(0);
+  });
+});
+
+describe('calculateConditionalModifiers', () => {
+  const placedRoom: PlacedRoom = {
+    id: 'placed-room-1',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  it('should return 1.0 when no inhabitants are assigned', () => {
+    const result = calculateConditionalModifiers(placedRoom, []);
+    expect(result).toBe(1.0);
+  });
+
+  it('should return 1.0 when all assigned inhabitants are normal', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'normal',
+        assignedRoomId: 'placed-room-1',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-goblin',
+        name: 'Goblin 2',
+        state: 'normal',
+        assignedRoomId: 'placed-room-1',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    expect(result).toBe(1.0);
+  });
+
+  it('should return 0.5 when any assigned inhabitant is scared', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'scared',
+        assignedRoomId: 'placed-room-1',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    expect(result).toBe(0.5);
+  });
+
+  it('should return 0.75 when any assigned inhabitant is hungry', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'hungry',
+        assignedRoomId: 'placed-room-1',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    expect(result).toBe(0.75);
+  });
+
+  it('should multiply modifiers when both scared and hungry inhabitants present', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'scared',
+        assignedRoomId: 'placed-room-1',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-goblin',
+        name: 'Goblin 2',
+        state: 'hungry',
+        assignedRoomId: 'placed-room-1',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    // scared (0.5) * hungry (0.75) = 0.375
+    expect(result).toBeCloseTo(0.375);
+  });
+
+  it('should not double-count the same state from multiple inhabitants', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'scared',
+        assignedRoomId: 'placed-room-1',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-goblin',
+        name: 'Goblin 2',
+        state: 'scared',
+        assignedRoomId: 'placed-room-1',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    // Two scared inhabitants, but scared modifier only applies once: 0.5
+    expect(result).toBe(0.5);
+  });
+
+  it('should ignore inhabitants assigned to other rooms', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'scared',
+        assignedRoomId: 'placed-room-other',
+      },
+    ];
+    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    expect(result).toBe(1.0);
   });
 });
