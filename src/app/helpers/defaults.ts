@@ -23,6 +23,9 @@ export function defaultGameState(): GameState {
     clock: {
       numTicks: 0,
       lastSaveTick: 0,
+      day: 1,
+      hour: 0,
+      minute: 0,
     },
     world: {
       grid: createEmptyGrid(),

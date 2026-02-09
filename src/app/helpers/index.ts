@@ -8,6 +8,7 @@ export * from './defaults';
 export * from './discord';
 export * from './floor';
 export * from './game-init';
+export * from './game-time';
 export * from './gameloop';
 export * from './grid';
 export * from './hallways';

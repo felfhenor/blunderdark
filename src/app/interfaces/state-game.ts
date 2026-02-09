@@ -26,6 +26,9 @@ export interface GameStateWorld {
 export interface GameStateClock {
   numTicks: number;
   lastSaveTick: number;
+  day: number;
+  hour: number;
+  minute: number;
 }
 
 export interface GameStateMeta {
