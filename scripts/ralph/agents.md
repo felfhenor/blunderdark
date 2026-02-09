@@ -116,6 +116,8 @@ When adding build-time validation for a content type:
 
 Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection.
 
+**CAUTION:** `rng.ts` imports `worldGameId` from `@helpers/world` → `world.ts` imports from `@helpers/state-game` → `state-game.ts` imports `defaults.ts` → `defaults.ts` imports `rng.ts`. This creates a circular dependency. **Do NOT import `rngUuid` from `@helpers/rng` in any file that also imports from `@helpers/state-game`** (like `room-placement.ts`). Use `crypto.randomUUID()` instead for UUID generation in those files.
+
 ## Biome Data
 
 `BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering.
@@ -179,6 +181,15 @@ OKLCH color format works in SCSS files — the Angular compiler converts them to
 - `calculateSingleRoomProduction(room, floor)` — per-room production with all bonuses/modifiers
 - `getRoomProductionRates(roomId)` — finds room across floors, returns its individual production
 - Importing `gamestate` from `@helpers/state-game` in helper files is safe — no circular dependency with the production module chain
+
+## Room Placement
+
+- `placeRoomOnFloor(floor, room, shape)` — pure function that validates placement, marks grid tiles, and adds room to floor. Returns updated Floor or null.
+- `removeRoomFromFloor(floor, roomId, shape)` — pure function that clears grid tiles and removes room. Takes shape as parameter to stay pure/testable.
+- `placeRoom(roomTypeId, shapeId, anchorX, anchorY)` — async wrapper using `updateGamestate` on current floor
+- `removeRoom(roomId)` — async wrapper resolving shape via content lookup
+- Pure functions are testable without mocking gamestate or content — keep data manipulation separate from signal/state access
+- Grid tiles use `[y][x]` indexing — `newGrid[t.y][t.x]` not `newGrid[t.x][t.y]`
 
 ## GameState Type Gotchas
 

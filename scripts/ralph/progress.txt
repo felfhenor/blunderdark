@@ -726,3 +726,33 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - `computed()` signals in helper files work fine when importing `gamestate` from `@helpers/state-game` — no circular dependency issues
   - `Object.entries()` on `Partial<Record<string, number>>` returns `[string, number | undefined][]` — must check for undefined before comparisons
   - Per-room production uses the same floor context (adjacency, inhabitants) as total production — extracted to `calculateSingleRoomProduction` to avoid duplicating logic
+
+## room-placement-ui US-001: Room State in Game State [DONE]
+- Added `placeRoomOnFloor(floor, room, shape)` pure function to `src/app/helpers/room-placement.ts`:
+  - Validates placement against floor grid (bounds + overlap)
+  - Marks grid tiles as occupied with `roomId`, `occupiedBy: 'room'`, `occupied: true`
+  - Appends room to floor's `rooms` array
+  - Returns updated Floor (or null on validation failure)
+- Added `removeRoomFromFloor(floor, roomId, shape)` pure function:
+  - Finds room in floor's rooms array by ID
+  - Clears grid tiles matching the room's shape (resets to empty)
+  - Removes room from rooms array
+  - Only clears tiles where `roomId` matches (prevents accidental clearing of other rooms)
+- Added `placeRoom(roomTypeId, shapeId, anchorX, anchorY)` async wrapper:
+  - Resolves shape via `getRoomShape()`, generates UUID with `crypto.randomUUID()`
+  - Calls `placeRoomOnFloor()` on current floor, updates gamestate
+  - Returns the `PlacedRoom` object (or null on failure)
+- Added `removeRoom(roomId)` async wrapper:
+  - Resolves room and shape from current floor, calls `removeRoomFromFloor()`
+  - Updates gamestate with modified floor
+- PlacedRoom type already existed in `room-shape.ts` with `id, roomTypeId, shapeId, anchorX, anchorY`
+- Floor.rooms (PlacedRoom[]) already existed in `floor.ts` — rooms tracked per floor
+- GridTile already had `roomId`, `occupiedBy`, `occupied` fields — compatible with placement
+- Save/load handled automatically by `indexedDbSignal` on gamestate
+- Added 9 new tests: place valid, place out-of-bounds, place overlapping, place non-overlapping, place immutability, remove valid, remove non-existent, remove one of two, remove immutability
+- All tests pass (324/324), lint passes, no new typecheck errors
+- Commit: 276ea6d
+- **Learnings for future iterations:**
+  - `rng.ts` imports `worldGameId` from `@helpers/world` → `world.ts` imports from `@helpers/state-game` — importing `rngUuid` from `@helpers/rng` in any file that also uses `state-game.ts` creates a circular dependency. Use `crypto.randomUUID()` instead.
+  - Pure functions that operate on Floor data (like `placeRoomOnFloor`) are testable without mocking gamestate — the async wrappers handle gamestate integration
+  - `removeRoomFromFloor` takes shape as parameter (not content lookup) to stay pure and testable without mocking `@helpers/content`
