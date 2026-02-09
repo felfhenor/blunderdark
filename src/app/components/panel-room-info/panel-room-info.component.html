@@ -1,0 +1,46 @@
+@if (selectedRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">{{ room.name }}</h3>
+
+      @if (adjacentUnconnected().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Connect to:</h4>
+          <div class="flex flex-col gap-1">
+            @for (adj of adjacentUnconnected(); track adj.id) {
+              <button
+                class="btn btn-xs btn-outline btn-success"
+                (click)="onConnect(adj.id)"
+              >
+                {{ adj.name }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (activeConnections().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Connected:</h4>
+          <div class="flex flex-col gap-1">
+            @for (conn of activeConnections(); track conn.connectionId) {
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs">{{ conn.otherRoomName }}</span>
+                <button
+                  class="btn btn-xs btn-outline btn-error"
+                  (click)="onDisconnect(conn.connectionId)"
+                >
+                  Disconnect
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (adjacentUnconnected().length === 0 && activeConnections().length === 0) {
+        <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
+      }
+    </div>
+  </div>
+}
