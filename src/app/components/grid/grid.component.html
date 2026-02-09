@@ -1,4 +1,4 @@
-<div class="grid-container" (mouseleave)="onGridLeave()">
+<div class="grid-container" (mouseleave)="onGridLeave()" (contextmenu)="onRightClick($event)">
   @for (row of grid(); track rowIdx; let rowIdx = $index) {
     @for (tile of row; track colIdx; let colIdx = $index) {
       <div

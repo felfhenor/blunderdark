@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  clearPlacementPreview,
   clearPreviewPosition,
   deselectTile,
   executeRoomPlacement,
+  exitPlacementMode,
   gamestate,
   notifyError,
   placementPreview,
@@ -77,9 +77,16 @@ export class GridComponent {
     }
   }
 
+  public onRightClick(event: MouseEvent): void {
+    if (placementPreviewShape()) {
+      event.preventDefault();
+      exitPlacementMode();
+    }
+  }
+
   public onEscapeKey(): void {
     if (placementPreviewShape()) {
-      clearPlacementPreview();
+      exitPlacementMode();
     } else {
       deselectTile();
     }
