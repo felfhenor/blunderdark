@@ -4,8 +4,8 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 19 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection)
-- **In Progress:** hallway-placement-tool (US-001-002 done, US-003 remaining)
+- **Complete:** 20 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool)
+- **In Progress:** none
 - **Remaining:** ~104 features
 
 ---
@@ -32,7 +32,7 @@ These unlock the main gameplay loop: building rooms that produce resources.
 | ~~2.2~~ | ~~`production-calculation-system`~~ | ~~COMPLETE~~ | ~~resource-manager, adjacency-detection~~ |
 | ~~2.3~~ | ~~`room-placement-ui`~~ | ~~COMPLETE~~ | ~~grid-system, tetromino-room-shapes, room-placement-validation~~ |
 | ~~2.4~~ | ~~`direct-adjacency-connection`~~ | ~~COMPLETE~~ | ~~adjacency-detection~~ |
-| 2.5 | `hallway-placement-tool` | 5 | grid-system, hallway-data-structure |
+| ~~2.5~~ | ~~`hallway-placement-tool`~~ | ~~COMPLETE~~ | ~~grid-system, hallway-data-structure~~ |
 
 ---
 
