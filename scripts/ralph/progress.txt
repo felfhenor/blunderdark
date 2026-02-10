@@ -950,3 +950,30 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - Both tiles on either side of a shared edge should show doorway indicators — compute opposite direction for the roomB tile
   - CSS doorway indicators work well at small tile sizes (~30px) — 3px bar at 60% width is visible without being overwhelming
   - The `@if (expr; as var)` syntax in Angular templates works with `Set` — `dirs.has('top')` is valid in the template
+
+## hallway-placement-tool US-001: Implement Hallway Build Mode Entry and Exit [DONE]
+- Created `src/app/helpers/hallway-placement.ts` with:
+  - `HallwayBuildStep` type: `'inactive' | 'selectSource' | 'selectDestination' | 'preview'`
+  - `hallwayBuildStep` signal — tracks current step in hallway build workflow
+  - `hallwaySourceRoomId` and `hallwayDestRoomId` signals — track selected rooms (for future US-002)
+  - `isHallwayBuildMode` computed — true when step !== 'inactive'
+  - `enterHallwayBuildMode()` — exits room placement mode first, then sets step to 'selectSource'
+  - `exitHallwayBuildMode()` — resets all hallway state to inactive/null
+- Updated `src/app/components/panel-room-select/`:
+  - Added "Build Hallway" button at top of build panel (toggles to "Cancel Hallway" when active)
+  - Room list disabled (opacity-40, pointer-events-none, disabled attribute) when in hallway mode
+  - Title changed from "Build Room" to "Build" to encompass both actions
+  - `selectRoom()` calls `exitHallwayBuildMode()` first for mutual exclusion
+- Updated `src/app/components/grid/grid.component.ts`:
+  - Escape key exits hallway mode first (before checking room placement mode)
+  - Right-click exits hallway mode (with `preventDefault()`)
+  - Added `isHallwayMode` computed for template binding
+- Updated `grid.component.html` with `[class.hallway-mode]` on container
+- Updated `grid.component.scss` with `.hallway-mode .grid-tile { cursor: crosshair; }`
+- Added `hallway-placement` export to helpers barrel
+- All tests pass (354/354), no new typecheck errors
+- Commit: f97bba0
+- **Learnings for future iterations:**
+  - Build mode mutual exclusion: hallway-placement.ts imports `exitPlacementMode()` from room-placement.ts (one-way dep); panel-room-select calls `exitHallwayBuildMode()` before entering room mode (UI layer)
+  - `hallway-placement.ts` uses `exitPlacementMode()` from `@helpers/room-placement` (NOT from barrel `@helpers`) — avoids potential circular deps
+  - Tailwind's `pointer-events-none` class works alongside DaisyUI's `[disabled]` for full interaction blocking

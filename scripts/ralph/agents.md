@@ -260,6 +260,16 @@ For rendering visual indicators on tile edges (like doorway connections):
 6. CSS: absolute positioned bars at 60% width, 3px thick — visible at ~30px tile sizes
 7. `pointer-events: none` prevents doorway indicators from capturing mouse events
 
+## Build Mode Mutual Exclusion
+
+When multiple build modes exist (room placement, hallway build):
+
+1. Each mode has its own helper file with enter/exit functions and signal state
+2. `enterX()` calls `exitY()` for all other modes — one-way import direction (hallway-placement.ts → room-placement.ts)
+3. UI components handle the reverse direction: `selectRoom()` calls `exitHallwayBuildMode()` before `enterPlacementMode()`
+4. Grid component's Escape/right-click handlers check modes in priority order (hallway first, then room placement, then deselect)
+5. This avoids circular dependencies between helper files
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

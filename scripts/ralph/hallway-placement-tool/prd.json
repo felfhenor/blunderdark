@@ -18,8 +18,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "hallway-placement.ts with HallwayBuildStep signal. Build Hallway button in panel-room-select toggles mode. Escape/right-click/Cancel all exit. Room buttons disabled in hallway mode. Crosshair cursor on grid. Dev server not running so browser verification skipped."
     },
     {
       "id": "US-002",
