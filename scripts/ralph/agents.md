@@ -270,6 +270,18 @@ When multiple build modes exist (room placement, hallway build):
 4. Grid component's Escape/right-click handlers check modes in priority order (hallway first, then room placement, then deselect)
 5. This avoids circular dependencies between helper files
 
+## Hallway Pathfinding Pattern
+
+BFS pathfinding for hallways between rooms:
+
+1. Find empty tiles adjacent to source room (start set) and destination room (end set)
+2. BFS from start set through unoccupied tiles to any tile in end set
+3. Adjacent rooms (sharing an edge) still have valid hallway paths — the empty tiles around them don't overlap, so BFS finds a route through neighboring empties
+4. Block hallway between same room (self-connection returns null)
+5. `hallwayPreviewTileSet` uses `Set<string>` of `"x,y"` keys for O(1) per-tile lookup (same pattern as placement preview)
+6. Click handler (`handleHallwayTileClick`) uses step-based state machine: `selectSource → selectDestination → preview`
+7. In preview step, clicking a different room updates destination (re-pathfinds)
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
