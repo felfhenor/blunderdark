@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "isUniqueRoomTypePlaced() pure function checks all floors for existing room type. executeRoomPlacement() rejects placement if roomDef.isUnique and already placed. placedRoomTypeIds computed signal drives UI reactivity. panel-room-select disables button with 'Already built (unique room)' tooltip. 5 unit tests covering empty/placed/cross-floor/different-type scenarios. All 367 tests pass."
     },
     {
       "id": "US-003",

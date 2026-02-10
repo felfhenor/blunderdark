@@ -43,6 +43,9 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `PlacedRoom` type in `room-shape.ts` includes `roomTypeId` linking to the content definition — when adding fields to this type, update all test PlacedRoom literals in `room-shapes.spec.ts`
 - `RoomDefinition` type in `room.ts` includes `production: RoomProduction`, `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`, `isUnique: boolean`, `maxInhabitants: number` (-1 = unlimited), `inhabitantRestriction: string | null`, `fearLevel: number | 'variable'`
 - When adding fields to `RoomDefinition`, also update `ensureRoom()` in `content-initializers.ts` with defaults — the initializer is what populates missing fields from YAML
+- `isUniqueRoomTypePlaced(floors, roomTypeId)` checks all floors for an existing room of that type — used for dungeon-wide unique constraint enforcement
+- `placedRoomTypeIds` computed signal exposes the set of room type IDs placed across all floors — reactive for UI bindings
+- Unique room enforcement is at the data level (`executeRoomPlacement`) and the UI level (`panel-room-select` disables button with tooltip)
 - `getBaseProduction(roomTypeId)` returns `{}` for rooms with no production or non-existent room types — callers don't need to handle undefined
 - `getRoomDefinition(roomTypeId)` returns `undefined` for non-existent types — callers must check
 - Room YAML lives in `gamedata/room/base.yml` — 7 base rooms defined with varying production rates, costs, and adjacency bonuses
