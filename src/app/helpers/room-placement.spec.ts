@@ -3,6 +3,7 @@ import type { Floor, PlacedRoom, RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 import {
   formatPlacementErrors,
+  isUniqueRoomTypePlaced,
   placeRoomOnFloor,
   removeRoomFromFloor,
   validateBounds,
@@ -423,5 +424,69 @@ describe('removeRoomFromFloor', () => {
 
     expect(placed.rooms).toHaveLength(1);
     expect(placed.grid[5][5].occupied).toBe(true);
+  });
+});
+
+describe('isUniqueRoomTypePlaced', () => {
+  it('should return false when no rooms are placed', () => {
+    const floors = [makeFloor()];
+    expect(isUniqueRoomTypePlaced(floors, 'room-throne')).toBe(false);
+  });
+
+  it('should return true when the room type is placed on the current floor', () => {
+    const existingRoom: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floors = [makeFloor([existingRoom])];
+    expect(isUniqueRoomTypePlaced(floors, 'room-throne')).toBe(true);
+  });
+
+  it('should return true when the room type is placed on a different floor', () => {
+    const existingRoom: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floors = [makeFloor(), makeFloor([existingRoom])];
+    expect(isUniqueRoomTypePlaced(floors, 'room-throne')).toBe(true);
+  });
+
+  it('should return false for a different room type', () => {
+    const existingRoom: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floors = [makeFloor([existingRoom])];
+    expect(isUniqueRoomTypePlaced(floors, 'room-throne')).toBe(false);
+  });
+
+  it('should check across multiple floors', () => {
+    const room1: PlacedRoom = {
+      id: 'room-1',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'square-2x2',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const room2: PlacedRoom = {
+      id: 'room-2',
+      roomTypeId: 'room-throne',
+      shapeId: 'square-2x2',
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const floors = [makeFloor([room1]), makeFloor([room2])];
+    expect(isUniqueRoomTypePlaced(floors, 'room-throne')).toBe(true);
+    expect(isUniqueRoomTypePlaced(floors, 'room-crystal-mine')).toBe(true);
+    expect(isUniqueRoomTypePlaced(floors, 'room-barracks')).toBe(false);
   });
 });

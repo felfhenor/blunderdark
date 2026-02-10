@@ -13,6 +13,7 @@ import {
   hallwayPreviewPath,
   hallwayStatusMessage,
   isHallwayBuildMode,
+  placedRoomTypeIds,
   selectedRoomTypeId,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
@@ -35,12 +36,19 @@ export class PanelRoomSelectComponent {
   public hallwayPath = hallwayPreviewPath;
   public canAffordHallway = canAffordHallway;
 
+  public placedRoomTypeIds = placedRoomTypeIds;
+
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
   }
 
   public isAffordable(room: RoomDefinition): boolean {
     return canAfford(room.cost);
+  }
+
+  public isUniqueAndPlaced(room: RoomDefinition): boolean {
+    if (!room.isUnique) return false;
+    return this.placedRoomTypeIds().has(room.id);
   }
 
   public getRoomShapeForPreview(

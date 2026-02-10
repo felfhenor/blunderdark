@@ -99,6 +99,36 @@ export function validatePlacement(
   };
 }
 
+// --- Unique room enforcement ---
+
+/**
+ * Check if a room type is already placed on any floor in the dungeon.
+ * Used to enforce unique room constraints (e.g., only one Throne Room per dungeon).
+ */
+export function isUniqueRoomTypePlaced(
+  floors: Floor[],
+  roomTypeId: string,
+): boolean {
+  return floors.some((floor) =>
+    floor.rooms.some((room) => room.roomTypeId === roomTypeId),
+  );
+}
+
+/**
+ * Set of room type IDs that are currently placed on any floor.
+ * Used by the UI to gray out unique rooms that are already built.
+ */
+export const placedRoomTypeIds = computed(() => {
+  const state = gamestate();
+  const placed = new Set<string>();
+  for (const floor of state.world.floors) {
+    for (const room of floor.rooms) {
+      placed.add(room.roomTypeId);
+    }
+  }
+  return placed;
+});
+
 // --- Placement mode state ---
 
 export const selectedRoomTypeId = signal<string | null>(null);
@@ -228,6 +258,13 @@ export async function executeRoomPlacement(
 
   const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
+
+  if (roomDef.isUnique) {
+    const allFloors = gamestate().world.floors;
+    if (isUniqueRoomTypePlaced(allFloors, roomTypeId)) {
+      return { success: false, error: 'This unique room is already built' };
+    }
+  }
 
   if (!canAfford(roomDef.cost)) {
     return { success: false, error: 'Not enough resources' };

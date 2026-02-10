@@ -38,7 +38,8 @@
           class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-1"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
-          [disabled]="isHallwayMode()"
+          [disabled]="isHallwayMode() || isUniqueAndPlaced(room)"
+          [title]="isUniqueAndPlaced(room) ? 'Already built (unique room)' : ''"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">
