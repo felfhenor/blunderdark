@@ -94,6 +94,55 @@ export class GridComponent {
     return { set, valid: preview.valid };
   });
 
+  /**
+   * Map of "x,y" → Set of directions ('top'|'right'|'bottom'|'left') for doorway indicators.
+   * Both sides of a shared edge get a doorway marker.
+   */
+  private doorwayMap = computed(() => {
+    const floor = currentFloor();
+    if (!floor) return new Map<string, Set<string>>();
+
+    const map = new Map<string, Set<string>>();
+    const grid = floor.grid;
+
+    const dirLookup: Array<{
+      dx: number;
+      dy: number;
+      dir: string;
+      opposite: string;
+    }> = [
+      { dx: 0, dy: -1, dir: 'top', opposite: 'bottom' },
+      { dx: 1, dy: 0, dir: 'right', opposite: 'left' },
+      { dx: 0, dy: 1, dir: 'bottom', opposite: 'top' },
+      { dx: -1, dy: 0, dir: 'left', opposite: 'right' },
+    ];
+
+    for (const conn of floor.connections) {
+      for (const tile of conn.edgeTiles) {
+        for (const { dx, dy, dir, opposite } of dirLookup) {
+          const nx = tile.x + dx;
+          const ny = tile.y + dy;
+          const neighborTile = grid[ny]?.[nx];
+          if (neighborTile?.roomId === conn.roomBId) {
+            const keyA = `${tile.x},${tile.y}`;
+            if (!map.has(keyA)) map.set(keyA, new Set());
+            map.get(keyA)!.add(dir);
+
+            const keyB = `${nx},${ny}`;
+            if (!map.has(keyB)) map.set(keyB, new Set());
+            map.get(keyB)!.add(opposite);
+          }
+        }
+      }
+    }
+
+    return map;
+  });
+
+  public getDoorways(x: number, y: number): Set<string> | undefined {
+    return this.doorwayMap().get(`${x},${y}`);
+  }
+
   public isSelected(x: number, y: number): boolean {
     const sel = this.selectedTile();
     return sel?.x === x && sel?.y === y;

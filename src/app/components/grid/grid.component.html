@@ -15,6 +15,20 @@
         @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
           <span class="room-label">{{ getRoomName(tile.roomId) }}</span>
         }
+        @if (getDoorways(colIdx, rowIdx); as dirs) {
+          @if (dirs.has('top')) {
+            <div class="doorway doorway-top"></div>
+          }
+          @if (dirs.has('right')) {
+            <div class="doorway doorway-right"></div>
+          }
+          @if (dirs.has('bottom')) {
+            <div class="doorway doorway-bottom"></div>
+          }
+          @if (dirs.has('left')) {
+            <div class="doorway doorway-left"></div>
+          }
+        }
       </div>
     }
   }

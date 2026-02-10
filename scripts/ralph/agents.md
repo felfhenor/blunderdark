@@ -248,6 +248,18 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 - `getRoomConnections(floor, roomId)` — returns Connection[] for all connections involving a room
 - Production system uses geometric adjacency (tile positions) NOT the connection system for adjacency bonuses — connections are a separate layer for logical linking
 
+## Doorway Rendering Pattern
+
+For rendering visual indicators on tile edges (like doorway connections):
+
+1. Build a `Map<string, Set<string>>` computed signal from data (e.g., connections + grid)
+2. Key: `"x,y"` string, Value: Set of directions (`'top'|'right'|'bottom'|'left'`)
+3. For shared edges, add indicators to BOTH tiles — one direction on the roomA tile, the opposite on the roomB tile
+4. Direction determined by checking which neighbor in the grid has the target `roomId`
+5. Template: use `@if (getMethod(x, y); as dirs)` + `dirs.has('top')` to conditionally render
+6. CSS: absolute positioned bars at 60% width, 3px thick — visible at ~30px tile sizes
+7. `pointer-events: none` prevents doorway indicators from capturing mouse events
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

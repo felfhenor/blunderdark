@@ -66,8 +66,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "doorwayMap computed signal in GridComponent builds Map<string, Set<string>> from floor connections. Gold doorway bars rendered on both sides of shared edges via CSS absolute positioning. Reactive — indicators appear/disappear with connections."
     }
   ]
 }
