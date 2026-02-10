@@ -1,7 +1,11 @@
 import { computed, signal } from '@angular/core';
 import { currentFloor } from '@helpers/floor';
+import { addHallway, addHallwayToGrid } from '@helpers/hallways';
+import { canAfford, payCost } from '@helpers/resources';
+import { rngUuid } from '@helpers/rng';
 import { exitPlacementMode } from '@helpers/room-placement';
-import type { GridState, TileOffset } from '@interfaces';
+import { updateGamestate } from '@helpers/state-game';
+import type { GridState, Hallway, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
 export type HallwayBuildStep =
@@ -194,6 +198,15 @@ export const hallwayPreviewCost = computed(() => {
 });
 
 /**
+ * Whether the player can afford the current hallway preview cost.
+ */
+export const canAffordHallway = computed(() => {
+  const cost = hallwayPreviewCost();
+  if (cost <= 0) return true;
+  return canAfford({ crystals: cost });
+});
+
+/**
  * Status message for the hallway build mode UI.
  */
 export const hallwayStatusMessage = computed(() => {
@@ -207,3 +220,55 @@ export const hallwayStatusMessage = computed(() => {
   }
   return '';
 });
+
+/**
+ * Confirm the hallway build: deduct crystals, place tiles, add hallway to floor.
+ * Returns true on success, false if the build could not be completed.
+ */
+export async function confirmHallwayBuild(): Promise<boolean> {
+  const path = hallwayPreviewPath();
+  if (!path || path.length === 0) return false;
+
+  const sourceId = hallwaySourceRoomId();
+  const destId = hallwayDestRoomId();
+  if (!sourceId || !destId) return false;
+
+  const cost = hallwayPreviewCost();
+  const paid = await payCost({ crystals: cost });
+  if (!paid) return false;
+
+  const hallway: Hallway = {
+    id: rngUuid(),
+    startRoomId: sourceId,
+    endRoomId: destId,
+    tiles: [...path],
+    upgrades: [],
+  };
+
+  await updateGamestate((state) => {
+    const floorIndex = state.world.currentFloorIndex;
+    const floor = state.world.floors[floorIndex];
+    if (!floor) return state;
+
+    const updatedGrid = addHallwayToGrid(floor.grid, hallway);
+    const updatedHallways = addHallway(floor.hallways, hallway);
+
+    const updatedFloors = [...state.world.floors];
+    updatedFloors[floorIndex] = {
+      ...floor,
+      grid: updatedGrid,
+      hallways: updatedHallways,
+    };
+
+    return {
+      ...state,
+      world: {
+        ...state.world,
+        floors: updatedFloors,
+      },
+    };
+  });
+
+  exitHallwayBuildMode();
+  return true;
+}

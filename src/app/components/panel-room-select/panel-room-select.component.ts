@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   canAfford,
+  canAffordHallway,
+  confirmHallwayBuild,
   enterHallwayBuildMode,
   enterPlacementMode,
   exitHallwayBuildMode,
@@ -31,6 +33,7 @@ export class PanelRoomSelectComponent {
   public hallwayStatus = hallwayStatusMessage;
   public hallwayCost = hallwayPreviewCost;
   public hallwayPath = hallwayPreviewPath;
+  public canAffordHallway = canAffordHallway;
 
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
@@ -92,6 +95,10 @@ export class PanelRoomSelectComponent {
     } else {
       enterHallwayBuildMode();
     }
+  }
+
+  public async confirmHallway(): Promise<void> {
+    await confirmHallwayBuild();
   }
 
   public capitalizeFirst(str: string): string {
