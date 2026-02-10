@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added restrictionTags: string[] to InhabitantDefinition type and ensureInhabitant() default. Pure validation functions: meetsInhabitantRestriction() checks tag membership, canAssignInhabitantToRoom() validates restriction + capacity, getEligibleInhabitants() filters definitions. assignInhabitantToRoom() enforces restrictions at data level before updating state. unassignInhabitantFromRoom() clears assignedRoomId (production system already returns 0 bonus for empty rooms). 15 unit tests covering restriction matching, capacity limits, and filtering. All 382 tests pass."
     },
     {
       "id": "US-004",

@@ -50,7 +50,11 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `getRoomDefinition(roomTypeId)` returns `undefined` for non-existent types — callers must check
 - Room YAML lives in `gamedata/room/base.yml` — 7 base rooms defined with varying production rates, costs, and adjacency bonuses
 - `calculateInhabitantBonus(placedRoom, inhabitants)` returns `{ bonus, hasWorkers }` — bonus is additive sum of `(workerEfficiency - 1.0)` + `production_bonus` trait effectValues per assigned inhabitant
-- `InhabitantDefinition` content type is `'inhabitant'` — loaded from `gamedata/inhabitant/base.yml` via ContentService
+- `InhabitantDefinition` content type is `'inhabitant'` — loaded from `gamedata/inhabitant/base.yml` via ContentService; includes `restrictionTags: string[]` for room assignment restrictions
+- `restrictionTags` on `InhabitantDefinition` matches against `inhabitantRestriction` on `RoomDefinition` — if restriction is null, any inhabitant allowed; otherwise tag must be in the array
+- When adding fields to `InhabitantDefinition`, also update `ensureInhabitant()` in `content-initializers.ts` with defaults
+- `canAssignInhabitantToRoom(def, roomDef, assignedCount)` checks restriction then capacity; `getEligibleInhabitants(allDefs, roomDef)` filters to eligible definitions
+- `assignInhabitantToRoom(instanceId, roomId, roomTypeId)` enforces restrictions at the data level before updating state; `unassignInhabitantFromRoom(instanceId)` clears assignedRoomId
 - `workerEfficiency` of 1.0 = 0% bonus; only `production_bonus` effectType traits contribute to production bonuses; other trait types (defense_bonus, trap_bonus) are ignored
 - `calculateAdjacencyBonus(placedRoom, adjacentRoomIds, allPlacedRooms)` returns additive bonus from gamedata adjacency rules — caller provides adjacentRoomIds from AdjacencyMap
 - `calculateConditionalModifiers(placedRoom, inhabitants)` returns multiplicative modifier from inhabitant states — scared=0.5, hungry=0.75, normal=1.0; unique states only (Set dedup)
