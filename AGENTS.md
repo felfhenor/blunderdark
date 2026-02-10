@@ -59,6 +59,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - When testing functions that call other helpers, mock the helper module rather than setting up deep gamestate
 - Lint rule `typescript-paths/absolute-import` requires `@helpers/room-placement` not `./room-placement` in test imports
 
+## Hallway System
+
+- `hallway-placement.ts` manages the hallway build workflow via `HallwayBuildStep` signal: inactive → selectSource → selectDestination → preview
+- `hallways.ts` has pure helper functions: `addHallwayToGrid()` marks tiles as `occupied: true, occupiedBy: 'hallway'`, `addHallway()` appends to hallway array
+- Hallway data lives on each `Floor` object (`floor.hallways: Hallway[]`), not at world level
+- To place a hallway: (1) `payCost({ crystals: cost })`, (2) create `Hallway` object with `rngUuid()`, (3) `updateGamestate` to update `floor.grid` via `addHallwayToGrid` and `floor.hallways` via `addHallway`
+- `canAfford()` from resources.ts works inside `computed()` — it reads `gamestate()` internally so Angular tracks the dependency
+
 ## UI Patterns
 
 - DaisyUI progress bars use classes like `progress-error`, `progress-warning`, etc.

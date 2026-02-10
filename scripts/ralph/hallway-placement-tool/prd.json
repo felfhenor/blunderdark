@@ -56,8 +56,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "confirmHallwayBuild() in hallway-placement.ts handles full flow: validates path exists, pays crystal cost via payCost(), creates Hallway object, updates floor grid and hallways array via updateGamestate(), exits build mode. canAffordHallway computed signal drives UI: Confirm button disabled when insufficient crystals, cost text turns red. Panel-room-select template shows Confirm button during preview step with tooltip 'Insufficient Crystals' when disabled."
     }
   ]
 }

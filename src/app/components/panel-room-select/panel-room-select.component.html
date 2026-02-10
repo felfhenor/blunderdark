@@ -17,8 +17,19 @@
 
     @if (isHallwayMode()) {
       <div class="hallway-status mt-1 mb-1">
-        <p class="text-xs opacity-70">{{ hallwayStatus() }}</p>
+        <p class="text-xs" [class.text-error]="hallwayPath() && !canAffordHallway()" [class.opacity-70]="!hallwayPath() || canAffordHallway()">{{ hallwayStatus() }}</p>
       </div>
+
+      @if (hallwayPath()) {
+        <button
+          class="btn btn-sm btn-success w-full"
+          [disabled]="!canAffordHallway()"
+          [title]="canAffordHallway() ? 'Confirm hallway construction' : 'Insufficient Crystals'"
+          (click)="confirmHallway()"
+        >
+          Confirm
+        </button>
+      }
     }
 
     <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode()" [class.pointer-events-none]="isHallwayMode()">
