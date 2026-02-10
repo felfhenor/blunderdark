@@ -53,6 +53,16 @@
     background-color: oklch(0.55 0.25 25);
     opacity: 0.7;
   }
+
+  &.hallway-source {
+    outline: 2px solid oklch(0.75 0.18 200);
+    outline-offset: -2px;
+  }
+
+  &.hallway-path {
+    background-color: oklch(0.6 0.15 200);
+    opacity: 0.8;
+  }
 }
 
 .doorway {

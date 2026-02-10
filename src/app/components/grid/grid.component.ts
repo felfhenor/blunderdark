@@ -7,6 +7,9 @@ import {
   exitHallwayBuildMode,
   exitPlacementMode,
   getRoomDefinition,
+  hallwayPreviewTileSet,
+  hallwaySourceRoomId,
+  handleHallwayTileClick,
   isHallwayBuildMode,
   notifyError,
   placementPreview,
@@ -161,6 +164,10 @@ export class GridComponent {
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
+    if (isHallwayBuildMode()) {
+      handleHallwayTileClick(x, y);
+      return;
+    }
     if (placementPreviewShape()) {
       const result = await executeRoomPlacement(x, y);
       if (!result.success && result.error) {
@@ -184,6 +191,17 @@ export class GridComponent {
   }
 
   public isHallwayMode = isHallwayBuildMode;
+  public hallwaySourceId = hallwaySourceRoomId;
+  private hallwayPathSet = hallwayPreviewTileSet;
+
+  public isHallwayPathTile(x: number, y: number): boolean {
+    return this.hallwayPathSet().has(`${x},${y}`);
+  }
+
+  public isHallwaySourceRoom(roomId: string | null): boolean {
+    if (!roomId) return false;
+    return hallwaySourceRoomId() === roomId;
+  }
 
   public onRightClick(event: MouseEvent): void {
     if (isHallwayBuildMode()) {

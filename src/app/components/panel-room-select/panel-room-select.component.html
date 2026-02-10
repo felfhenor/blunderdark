@@ -3,7 +3,7 @@
     <h3 class="card-title text-sm">Build</h3>
 
     <button
-      class="btn btn-sm btn-outline w-full mb-2"
+      class="btn btn-sm btn-outline w-full"
       [class.btn-active]="isHallwayMode()"
       [class.btn-primary]="isHallwayMode()"
       (click)="toggleHallwayMode()"
@@ -14,6 +14,12 @@
         Build Hallway
       }
     </button>
+
+    @if (isHallwayMode()) {
+      <div class="hallway-status mt-1 mb-1">
+        <p class="text-xs opacity-70">{{ hallwayStatus() }}</p>
+      </div>
+    }
 
     <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode()" [class.pointer-events-none]="isHallwayMode()">
       @for (room of rooms(); track room.id) {

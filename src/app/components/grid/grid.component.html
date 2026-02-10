@@ -8,6 +8,8 @@
         [class.selected]="isSelected(colIdx, rowIdx)"
         [class.preview-valid]="isPreviewValid(colIdx, rowIdx)"
         [class.preview-invalid]="isPreviewInvalid(colIdx, rowIdx)"
+        [class.hallway-source]="isHallwaySourceRoom(tile.roomId)"
+        [class.hallway-path]="isHallwayPathTile(colIdx, rowIdx)"
         [style.--room-color]="getRoomColor(tile.roomId)"
         (click)="onTileClick(colIdx, rowIdx)"
         (mouseenter)="onTileHover(colIdx, rowIdx)"

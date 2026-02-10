@@ -7,6 +7,9 @@ import {
   exitPlacementMode,
   getEntriesByType,
   getRoomShape,
+  hallwayPreviewCost,
+  hallwayPreviewPath,
+  hallwayStatusMessage,
   isHallwayBuildMode,
   selectedRoomTypeId,
 } from '@helpers';
@@ -25,6 +28,9 @@ export class PanelRoomSelectComponent {
 
   public selectedId = selectedRoomTypeId;
   public isHallwayMode = isHallwayBuildMode;
+  public hallwayStatus = hallwayStatusMessage;
+  public hallwayCost = hallwayPreviewCost;
+  public hallwayPath = hallwayPreviewPath;
 
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
