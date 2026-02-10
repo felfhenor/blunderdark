@@ -925,3 +925,28 @@ Started: Mon, Feb  2, 2026  2:24:22 PM
   - The production system uses geometric adjacency (`areRoomsAdjacent` on tile positions) not the connection system — connections are a separate concept for logical room links
   - Panel conditionally renders via `@if (selectedRoom(); as room)` — disappears when no room tile is selected
   - `getRoomDefinition(roomTypeId)` from production.ts provides room names for display
+
+## direct-adjacency-connection US-004: Render Doorway Icons on Connected Edges [DONE]
+- Added `doorwayMap` computed signal to `src/app/components/grid/grid.component.ts`:
+  - Iterates all floor connections and their edge tiles
+  - For each edge tile, determines direction to the other room by checking grid neighbors
+  - Builds a `Map<string, Set<string>>` of "x,y" → directions ('top'|'right'|'bottom'|'left')
+  - Both sides of a shared edge get a doorway marker (roomA tile + roomB tile with opposite direction)
+- Added `getDoorways(x, y)` method to GridComponent for template binding
+- Updated `grid.component.html` with doorway indicator divs inside each tile:
+  - Uses `@if (getDoorways(colIdx, rowIdx); as dirs)` to conditionally render
+  - Renders `.doorway-top`, `.doorway-right`, `.doorway-bottom`, `.doorway-left` divs per direction
+- Updated `grid.component.scss` with `.doorway` styles:
+  - Absolute positioned bars on tile edges, `oklch(0.85 0.15 80)` gold color
+  - 60% width/height bars, 3px thick, positioned at 20% offset
+  - `z-index: 2`, `pointer-events: none`, `border-radius: 1px`
+- Doorway indicators are reactive — appear when connections are created, disappear when severed
+- Multiple connections from one room each show their own doorway icons on the correct edges
+- All tests pass (354/354), no new typecheck errors
+- **direct-adjacency-connection FEATURE COMPLETE** — all 4 user stories done
+- Commit: 6ef6501
+- **Learnings for future iterations:**
+  - `edgeTiles` in a Connection stores roomA-side tiles only — to determine direction, check which neighbor in the grid has `roomBId`
+  - Both tiles on either side of a shared edge should show doorway indicators — compute opposite direction for the roomB tile
+  - CSS doorway indicators work well at small tile sizes (~30px) — 3px bar at 60% width is visible without being overwhelming
+  - The `@if (expr; as var)` syntax in Angular templates works with `Set` — `dirs.has('top')` is valid in the template
