@@ -206,6 +206,7 @@ function ensureInhabitant(
       workerEfficiency: 1.0,
     },
     traits: inhabitant.traits ?? [],
+    restrictionTags: inhabitant.restrictionTags ?? [],
   };
 }
 

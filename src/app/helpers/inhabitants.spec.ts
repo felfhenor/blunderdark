@@ -1,4 +1,9 @@
-import type { GameState, InhabitantInstance } from '@interfaces';
+import type {
+  GameState,
+  InhabitantDefinition,
+  InhabitantInstance,
+  RoomDefinition,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockInhabitants: InhabitantInstance[];
@@ -25,6 +30,9 @@ const {
   removeInhabitant,
   serializeInhabitants,
   deserializeInhabitants,
+  meetsInhabitantRestriction,
+  canAssignInhabitantToRoom,
+  getEligibleInhabitants,
 } = await import('@helpers/inhabitants');
 
 function createTestInhabitant(
@@ -144,5 +152,181 @@ describe('inhabitant serialization', () => {
     const serialized = serializeInhabitants(original);
     serialized[0].name = 'Modified';
     expect(original[0].name).toBe('Goblin Worker');
+  });
+});
+
+// --- Test helpers for restriction tests ---
+
+function createTestInhabitantDef(
+  overrides: Partial<InhabitantDefinition> = {},
+): InhabitantDefinition {
+  return {
+    id: 'def-goblin',
+    name: 'Goblin',
+    type: 'creature',
+    tier: 1,
+    description: 'A common goblin',
+    cost: {},
+    stats: {
+      hp: 10,
+      attack: 2,
+      defense: 1,
+      speed: 3,
+      workerEfficiency: 1.0,
+    },
+    traits: [],
+    restrictionTags: [],
+    ...overrides,
+  };
+}
+
+function createTestRoomDef(
+  overrides: Partial<RoomDefinition> = {},
+): RoomDefinition {
+  return {
+    id: 'room-barracks',
+    name: 'Barracks',
+    description: 'A training room',
+    shapeId: 'shape-2x2',
+    cost: {},
+    production: {},
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+    isUnique: false,
+    maxInhabitants: -1,
+    inhabitantRestriction: null,
+    fearLevel: 0,
+    ...overrides,
+  };
+}
+
+describe('meetsInhabitantRestriction', () => {
+  it('should allow any inhabitant when restriction is null', () => {
+    const def = createTestInhabitantDef();
+    expect(meetsInhabitantRestriction(def, null)).toBe(true);
+  });
+
+  it('should allow inhabitant with matching restriction tag', () => {
+    const def = createTestInhabitantDef({ restrictionTags: ['unique'] });
+    expect(meetsInhabitantRestriction(def, 'unique')).toBe(true);
+  });
+
+  it('should reject inhabitant without matching restriction tag', () => {
+    const def = createTestInhabitantDef({ restrictionTags: [] });
+    expect(meetsInhabitantRestriction(def, 'unique')).toBe(false);
+  });
+
+  it('should reject inhabitant with different restriction tags', () => {
+    const def = createTestInhabitantDef({ restrictionTags: ['undead', 'elite'] });
+    expect(meetsInhabitantRestriction(def, 'unique')).toBe(false);
+  });
+
+  it('should allow inhabitant with multiple tags including the required one', () => {
+    const def = createTestInhabitantDef({
+      restrictionTags: ['dragon', 'unique', 'boss'],
+    });
+    expect(meetsInhabitantRestriction(def, 'unique')).toBe(true);
+  });
+});
+
+describe('canAssignInhabitantToRoom', () => {
+  it('should allow assignment to unrestricted room', () => {
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef();
+    const result = canAssignInhabitantToRoom(def, room, 0);
+    expect(result.allowed).toBe(true);
+  });
+
+  it('should reject non-unique inhabitant from Throne Room', () => {
+    const def = createTestInhabitantDef({ restrictionTags: [] });
+    const room = createTestRoomDef({
+      name: 'Throne Room',
+      inhabitantRestriction: 'unique',
+      maxInhabitants: 1,
+    });
+    const result = canAssignInhabitantToRoom(def, room, 0);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('unique');
+  });
+
+  it('should allow unique inhabitant in Throne Room', () => {
+    const def = createTestInhabitantDef({ restrictionTags: ['unique'] });
+    const room = createTestRoomDef({
+      name: 'Throne Room',
+      inhabitantRestriction: 'unique',
+      maxInhabitants: 1,
+    });
+    const result = canAssignInhabitantToRoom(def, room, 0);
+    expect(result.allowed).toBe(true);
+  });
+
+  it('should reject when room is at max capacity', () => {
+    const def = createTestInhabitantDef({ restrictionTags: ['unique'] });
+    const room = createTestRoomDef({
+      inhabitantRestriction: 'unique',
+      maxInhabitants: 1,
+    });
+    const result = canAssignInhabitantToRoom(def, room, 1);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('maximum capacity');
+  });
+
+  it('should allow unlimited inhabitants when maxInhabitants is -1', () => {
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef({ maxInhabitants: -1 });
+    const result = canAssignInhabitantToRoom(def, room, 100);
+    expect(result.allowed).toBe(true);
+  });
+
+  it('should check restriction before capacity', () => {
+    const def = createTestInhabitantDef({ restrictionTags: [] });
+    const room = createTestRoomDef({
+      inhabitantRestriction: 'unique',
+      maxInhabitants: 1,
+    });
+    const result = canAssignInhabitantToRoom(def, room, 1);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('unique');
+  });
+});
+
+describe('getEligibleInhabitants', () => {
+  it('should return all inhabitants for unrestricted room', () => {
+    const defs = [
+      createTestInhabitantDef({ id: 'goblin' }),
+      createTestInhabitantDef({ id: 'skeleton', restrictionTags: ['unique'] }),
+    ];
+    const room = createTestRoomDef();
+    expect(getEligibleInhabitants(defs, room)).toHaveLength(2);
+  });
+
+  it('should filter to only unique inhabitants for Throne Room', () => {
+    const defs = [
+      createTestInhabitantDef({ id: 'goblin', name: 'Goblin' }),
+      createTestInhabitantDef({
+        id: 'dragon',
+        name: 'Dragon',
+        restrictionTags: ['unique'],
+      }),
+      createTestInhabitantDef({ id: 'kobold', name: 'Kobold' }),
+    ];
+    const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
+    const eligible = getEligibleInhabitants(defs, room);
+    expect(eligible).toHaveLength(1);
+    expect(eligible[0].name).toBe('Dragon');
+  });
+
+  it('should return empty array when no inhabitants meet restriction', () => {
+    const defs = [
+      createTestInhabitantDef({ id: 'goblin' }),
+      createTestInhabitantDef({ id: 'kobold' }),
+    ];
+    const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
+    expect(getEligibleInhabitants(defs, room)).toHaveLength(0);
+  });
+
+  it('should handle empty inhabitant list', () => {
+    const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
+    expect(getEligibleInhabitants([], room)).toHaveLength(0);
   });
 });

@@ -1,6 +1,12 @@
 import { computed, type Signal } from '@angular/core';
+import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { InhabitantInstance } from '@interfaces';
+import type {
+  InhabitantDefinition,
+  InhabitantInstance,
+  IsContentItem,
+  RoomDefinition,
+} from '@interfaces';
 
 export function allInhabitants(): Signal<InhabitantInstance[]> {
   return computed(() => gamestate().world.inhabitants);
@@ -54,4 +60,134 @@ export function deserializeInhabitants(
     state: i.state ?? 'normal',
     assignedRoomId: i.assignedRoomId ?? null,
   }));
+}
+
+// --- Inhabitant restriction validation ---
+
+/**
+ * Check if an inhabitant definition meets a room's inhabitant restriction.
+ * Returns true if the inhabitant is eligible for the restriction.
+ * A null restriction means any inhabitant is allowed.
+ */
+export function meetsInhabitantRestriction(
+  inhabitantDef: InhabitantDefinition,
+  restriction: string | null,
+): boolean {
+  if (restriction === null) return true;
+  return inhabitantDef.restrictionTags.includes(restriction);
+}
+
+/**
+ * Check if an inhabitant can be assigned to a specific room.
+ * Validates restriction tags and max inhabitant capacity.
+ */
+export function canAssignInhabitantToRoom(
+  inhabitantDef: InhabitantDefinition,
+  roomDef: RoomDefinition,
+  currentAssignedCount: number,
+): { allowed: boolean; reason?: string } {
+  if (!meetsInhabitantRestriction(inhabitantDef, roomDef.inhabitantRestriction)) {
+    return {
+      allowed: false,
+      reason: `Only ${roomDef.inhabitantRestriction} creatures can be assigned to this room`,
+    };
+  }
+
+  if (
+    roomDef.maxInhabitants >= 0 &&
+    currentAssignedCount >= roomDef.maxInhabitants
+  ) {
+    return { allowed: false, reason: 'Room is at maximum capacity' };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Filter a list of inhabitant definitions to only those eligible for a room.
+ */
+export function getEligibleInhabitants(
+  allDefs: InhabitantDefinition[],
+  roomDef: RoomDefinition,
+): InhabitantDefinition[] {
+  return allDefs.filter((def) =>
+    meetsInhabitantRestriction(def, roomDef.inhabitantRestriction),
+  );
+}
+
+// --- Inhabitant assignment ---
+
+/**
+ * Assign an inhabitant instance to a room, with restriction enforcement.
+ */
+export async function assignInhabitantToRoom(
+  instanceId: string,
+  roomId: string,
+  roomTypeId: string,
+): Promise<{ success: boolean; error?: string }> {
+  const state = gamestate();
+  const instance = state.world.inhabitants.find(
+    (i) => i.instanceId === instanceId,
+  );
+  if (!instance) return { success: false, error: 'Inhabitant not found' };
+
+  if (instance.assignedRoomId !== null) {
+    return { success: false, error: 'Inhabitant is already assigned to a room' };
+  }
+
+  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  if (!roomDef) return { success: false, error: 'Unknown room type' };
+
+  const inhabitantDef = getEntry<InhabitantDefinition & IsContentItem>(
+    instance.definitionId,
+  );
+  if (!inhabitantDef) {
+    return { success: false, error: 'Unknown inhabitant type' };
+  }
+
+  const assignedCount = state.world.inhabitants.filter(
+    (i) => i.assignedRoomId === roomId,
+  ).length;
+
+  const check = canAssignInhabitantToRoom(inhabitantDef, roomDef, assignedCount);
+  if (!check.allowed) {
+    return { success: false, error: check.reason };
+  }
+
+  await updateGamestate((s) => ({
+    ...s,
+    world: {
+      ...s.world,
+      inhabitants: s.world.inhabitants.map((i) =>
+        i.instanceId === instanceId ? { ...i, assignedRoomId: roomId } : i,
+      ),
+    },
+  }));
+
+  return { success: true };
+}
+
+/**
+ * Unassign an inhabitant from its current room.
+ */
+export async function unassignInhabitantFromRoom(
+  instanceId: string,
+): Promise<boolean> {
+  const state = gamestate();
+  const instance = state.world.inhabitants.find(
+    (i) => i.instanceId === instanceId,
+  );
+  if (!instance || instance.assignedRoomId === null) return false;
+
+  await updateGamestate((s) => ({
+    ...s,
+    world: {
+      ...s.world,
+      inhabitants: s.world.inhabitants.map((i) =>
+        i.instanceId === instanceId ? { ...i, assignedRoomId: null } : i,
+      ),
+    },
+  }));
+
+  return true;
 }

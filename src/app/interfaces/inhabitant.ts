@@ -25,6 +25,7 @@ export type InhabitantDefinition = {
   cost: Partial<Record<ResourceType, number>>;
   stats: InhabitantStats;
   traits: InhabitantTrait[];
+  restrictionTags: string[];
 };
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry';
