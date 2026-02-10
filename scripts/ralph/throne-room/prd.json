@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added rulerBonuses: Record<string, number> to InhabitantDefinition. Created 3 unique ruler creatures in YAML: Dragon (attack: +10%, fear: +5%), Lich (researchSpeed: +20%, fluxProduction: +15%), Demon Lord (corruptionGeneration: +25%, fear: +10%, invaderMorale: -10%). New throne-room.ts helper with findThroneRoom(), getSeatedRulerInstance(), getActiveRulerBonuses(), getRulerBonusValue() pure functions and computed signals (seatedRuler, activeRulerBonuses). 16 unit tests verify each ruler's bonuses and removal. All 398 tests pass."
     },
     {
       "id": "US-005",

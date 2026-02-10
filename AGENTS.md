@@ -55,6 +55,11 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - When adding fields to `InhabitantDefinition`, also update `ensureInhabitant()` in `content-initializers.ts` with defaults
 - `canAssignInhabitantToRoom(def, roomDef, assignedCount)` checks restriction then capacity; `getEligibleInhabitants(allDefs, roomDef)` filters to eligible definitions
 - `assignInhabitantToRoom(instanceId, roomId, roomTypeId)` enforces restrictions at the data level before updating state; `unassignInhabitantFromRoom(instanceId)` clears assignedRoomId
+- `rulerBonuses: Record<string, number>` on `InhabitantDefinition` defines dungeon-wide bonuses for unique rulers — keys are bonus types (attack, fear, researchSpeed, fluxProduction, corruptionGeneration, invaderMorale), values are percentage modifiers
+- `throne-room.ts` helper: `findThroneRoom(floors)` searches all floors, `getSeatedRulerInstance(floor, roomId)` finds the assigned inhabitant, `getActiveRulerBonuses(floors)` returns the seated ruler's bonus record
+- `THRONE_ROOM_TYPE_ID` constant in `throne-room.ts` references the Throne Room content ID — use this instead of hardcoding the UUID
+- Unique ruler creatures (Dragon, Lich, Demon Lord) are tier 4 with `restrictionTags: ['unique']` — they have `rulerBonuses` but empty `traits` since their bonuses are dungeon-wide, not room-specific
+- TypeScript `Record<string, number>` properties must use bracket notation (`bonuses['attack']`) not dot notation in strict mode — TS4111 error otherwise
 - `workerEfficiency` of 1.0 = 0% bonus; only `production_bonus` effectType traits contribute to production bonuses; other trait types (defense_bonus, trap_bonus) are ignored
 - `calculateAdjacencyBonus(placedRoom, adjacentRoomIds, allPlacedRooms)` returns additive bonus from gamedata adjacency rules — caller provides adjacentRoomIds from AdjacencyMap
 - `calculateConditionalModifiers(placedRoom, inhabitants)` returns multiplicative modifier from inhabitant states — scared=0.5, hungry=0.75, normal=1.0; unique states only (Set dedup)
