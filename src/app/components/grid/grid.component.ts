@@ -4,8 +4,10 @@ import {
   currentFloor,
   deselectTile,
   executeRoomPlacement,
+  exitHallwayBuildMode,
   exitPlacementMode,
   getRoomDefinition,
+  isHallwayBuildMode,
   notifyError,
   placementPreview,
   placementPreviewShape,
@@ -181,15 +183,22 @@ export class GridComponent {
     }
   }
 
+  public isHallwayMode = isHallwayBuildMode;
+
   public onRightClick(event: MouseEvent): void {
-    if (placementPreviewShape()) {
+    if (isHallwayBuildMode()) {
+      event.preventDefault();
+      exitHallwayBuildMode();
+    } else if (placementPreviewShape()) {
       event.preventDefault();
       exitPlacementMode();
     }
   }
 
   public onEscapeKey(): void {
-    if (placementPreviewShape()) {
+    if (isHallwayBuildMode()) {
+      exitHallwayBuildMode();
+    } else if (placementPreviewShape()) {
       exitPlacementMode();
     } else {
       deselectTile();

@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   canAfford,
+  enterHallwayBuildMode,
   enterPlacementMode,
+  exitHallwayBuildMode,
   exitPlacementMode,
   getEntriesByType,
   getRoomShape,
+  isHallwayBuildMode,
   selectedRoomTypeId,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
@@ -21,6 +24,7 @@ export class PanelRoomSelectComponent {
   );
 
   public selectedId = selectedRoomTypeId;
+  public isHallwayMode = isHallwayBuildMode;
 
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
@@ -69,10 +73,19 @@ export class PanelRoomSelectComponent {
       return;
     }
 
+    exitHallwayBuildMode();
     const shape = getRoomShape(room.shapeId);
     if (!shape) return;
 
     enterPlacementMode(room.id, shape);
+  }
+
+  public toggleHallwayMode(): void {
+    if (isHallwayBuildMode()) {
+      exitHallwayBuildMode();
+    } else {
+      enterHallwayBuildMode();
+    }
   }
 
   public capitalizeFirst(str: string): string {

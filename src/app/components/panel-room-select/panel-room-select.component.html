@@ -1,13 +1,27 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
-    <h3 class="card-title text-sm">Build Room</h3>
+    <h3 class="card-title text-sm">Build</h3>
 
-    <div class="room-list flex flex-col gap-2">
+    <button
+      class="btn btn-sm btn-outline w-full mb-2"
+      [class.btn-active]="isHallwayMode()"
+      [class.btn-primary]="isHallwayMode()"
+      (click)="toggleHallwayMode()"
+    >
+      @if (isHallwayMode()) {
+        Cancel Hallway
+      } @else {
+        Build Hallway
+      }
+    </button>
+
+    <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode()" [class.pointer-events-none]="isHallwayMode()">
       @for (room of rooms(); track room.id) {
         <button
           class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-1"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
+          [disabled]="isHallwayMode()"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">

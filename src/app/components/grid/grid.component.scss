@@ -12,6 +12,10 @@
   aspect-ratio: 1;
 }
 
+.grid-container.hallway-mode .grid-tile {
+  cursor: crosshair;
+}
+
 .grid-tile {
   background-color: var(--b3, #2a2a3a);
   border: 1px solid var(--b2, #1a1a2a);
