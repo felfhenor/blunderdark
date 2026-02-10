@@ -37,8 +37,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BFS pathfinding through empty grid tiles. Source room highlighted with outline, path shown as teal overlay. Status messages and cost (tile count × 5 Crystals) displayed in panel. handleHallwayTileClick manages selectSource → selectDestination → preview flow. 8 unit tests for findHallwayPath. Dev server not running so browser verification skipped."
     },
     {
       "id": "US-003",
