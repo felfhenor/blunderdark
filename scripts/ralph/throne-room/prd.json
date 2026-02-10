@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Updated existing Throne Room in gamedata/room/base.yml with 4x4 shape (Square 4x4), isUnique: true, maxInhabitants: 1, inhabitantRestriction: unique, fearLevel: variable. Added new fields to RoomDefinition type and ensureRoom initializer with backward-compatible defaults. gamedata:build, typecheck, lint, and all 362 tests pass."
     },
     {
       "id": "US-002",

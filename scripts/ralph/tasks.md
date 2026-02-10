@@ -5,8 +5,8 @@ A prioritized list of features based on dependencies and logical progression.
 ## Status Summary
 
 - **Complete:** 20 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool)
-- **In Progress:** none
-- **Remaining:** ~104 features
+- **In Progress:** throne-room (US-001 done, US-002-007 remaining)
+- **Remaining:** ~103 features
 
 ---
 
