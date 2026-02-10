@@ -180,6 +180,10 @@ function ensureRoom(
     production: room.production ?? {},
     requiresWorkers: room.requiresWorkers ?? false,
     adjacencyBonuses: room.adjacencyBonuses ?? [],
+    isUnique: room.isUnique ?? false,
+    maxInhabitants: room.maxInhabitants ?? -1,
+    inhabitantRestriction: room.inhabitantRestriction ?? null,
+    fearLevel: room.fearLevel ?? 0,
   };
 }
 

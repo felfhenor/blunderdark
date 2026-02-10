@@ -1,12 +1,17 @@
 - id: aa100001-0001-0001-0001-000000000001
   name: Throne Room
-  description: The heart of your dungeon. Generates a small amount of gold passively.
-  shapeId: aa000000-0000-0000-0000-000000000002
-  cost: {}
-  production:
-    gold: 0.5
+  description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
+  shapeId: 635a07d9-11f9-445c-a626-dacd9fbb16bc
+  cost:
+    gold: 100
+    crystals: 50
+  production: {}
   requiresWorkers: false
   adjacencyBonuses: []
+  isUnique: true
+  maxInhabitants: 1
+  inhabitantRestriction: unique
+  fearLevel: variable
 
 - id: aa100001-0001-0001-0001-000000000002
   name: Crystal Mine

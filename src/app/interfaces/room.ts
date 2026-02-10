@@ -16,4 +16,8 @@ export type RoomDefinition = {
   production: RoomProduction;
   requiresWorkers: boolean;
   adjacencyBonuses: AdjacencyBonus[];
+  isUnique: boolean;
+  maxInhabitants: number;
+  inhabitantRestriction: string | null;
+  fearLevel: number | 'variable';
 };
