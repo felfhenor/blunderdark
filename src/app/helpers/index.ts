@@ -33,6 +33,7 @@ export * from './sfx';
 export * from './signal';
 export * from './state-game';
 export * from './state-options';
+export * from './throne-room';
 export * from './timer';
 export * from './ui';
 export * from './version';

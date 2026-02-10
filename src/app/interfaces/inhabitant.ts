@@ -16,6 +16,8 @@ export type InhabitantStats = {
   workerEfficiency: number;
 };
 
+export type RulerBonuses = Record<string, number>;
+
 export type InhabitantDefinition = {
   id: string;
   name: string;
@@ -26,6 +28,7 @@ export type InhabitantDefinition = {
   stats: InhabitantStats;
   traits: InhabitantTrait[];
   restrictionTags: string[];
+  rulerBonuses: RulerBonuses;
 };
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry';

@@ -103,3 +103,70 @@
       description: Can be assigned to any room type without penalty.
       effectType: versatility
       effectValue: 1.0
+
+- id: d4a60001-0001-0001-0001-000000000001
+  name: Dragon
+  type: dragon
+  tier: 4
+  description: An ancient wyrm of immense power. Its presence inspires ferocity in all dungeon defenders.
+  cost:
+    gold: 500
+    essence: 200
+    crystals: 100
+  stats:
+    hp: 500
+    attack: 80
+    defense: 60
+    speed: 20
+    workerEfficiency: 1.0
+  traits: []
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    attack: 0.10
+    fear: 0.05
+
+- id: d4a60001-0001-0001-0001-000000000002
+  name: Lich
+  type: undead
+  tier: 4
+  description: A master of dark arcana who has transcended death itself. Its intellect accelerates all research and flux generation.
+  cost:
+    gold: 400
+    essence: 300
+    crystals: 50
+  stats:
+    hp: 300
+    attack: 40
+    defense: 30
+    speed: 15
+    workerEfficiency: 1.0
+  traits: []
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    researchSpeed: 0.20
+    fluxProduction: 0.15
+
+- id: d4a60001-0001-0001-0001-000000000003
+  name: Demon Lord
+  type: demon
+  tier: 4
+  description: A terrifying lord of the abyss. Its malevolent aura corrupts everything and crushes the will of invaders.
+  cost:
+    gold: 450
+    essence: 150
+    corruption: 100
+  stats:
+    hp: 400
+    attack: 70
+    defense: 50
+    speed: 25
+    workerEfficiency: 1.0
+  traits: []
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    corruptionGeneration: 0.25
+    fear: 0.10
+    invaderMorale: -0.10
