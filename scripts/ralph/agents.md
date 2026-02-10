@@ -1,6 +1,6 @@
 # Ralph Agent Patterns
 
-Consolidated learnings from progress.txt for future iterations.
+Consolidated learnings for future iterations.
 
 ## Adding New Content Types
 
@@ -212,7 +212,7 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 ```html
 <div class="shape-preview" [style.--grid-size]="getShapeGridSize(room)">
   @for (tile of getShapeTiles(room); track tile.key) {
-    <div class="shape-tile" [style.grid-column]="tile.x + 1" [style.grid-row]="tile.y + 1"></div>
+  <div class="shape-tile" [style.grid-column]="tile.x + 1" [style.grid-row]="tile.y + 1"></div>
   }
 </div>
 ```
