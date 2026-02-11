@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "isRoomRemovable() checks removable flag from RoomDefinition. Altar YAML has removable: false. Tests in room-removal.spec.ts verify altar cannot be removed."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "calculateRefund() in room-removal.ts computes 50% floor'd refund. executeRoomRemoval() calls addResource() which caps at max. 7 tests cover various cost scenarios."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "removeRoomFromFloor() in room-placement.ts clears grid tiles. executeRoomRemoval() updates gamestate. Tests verify tile clearing, hallway preservation, and re-placement."
     },
     {
       "id": "US-004",
@@ -60,8 +60,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "executeRoomRemoval() unassigns inhabitants via updateGamestate (sets assignedRoomId to null). Notification includes displaced names. Production auto-updates since production system is data-driven."
     },
     {
       "id": "US-005",
@@ -76,8 +76,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "panel-room-info component shows canRemoveRoom computed signal. Disabled button with title tooltip for non-removable rooms. Browser verified: disabled button shows for Altar."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SweetAlert2 confirmation dialog with dynamic title/text from removalSwalTitle/removalSwalText computed signals. Shows refund and displaced count. Cancel/Escape supported by SweetAlert2 default behavior."
     }
   ]
 }
