@@ -84,3 +84,15 @@
   production: {}
   requiresWorkers: false
   adjacencyBonuses: []
+
+- id: aa100001-0001-0001-0001-000000000008
+  name: Treasure Vault
+  description: A secure chamber for storing gold and valuables. Produces gold passively and boosts the Throne Room when adjacent.
+  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  cost:
+    gold: 120
+    crystals: 40
+  production:
+    gold: 0.8
+  requiresWorkers: false
+  adjacencyBonuses: []

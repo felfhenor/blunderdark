@@ -1,13 +1,17 @@
 import { computed } from '@angular/core';
+import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
+import { getAbsoluteTiles, getShapeBounds } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
-import type {
-  Floor,
-  InhabitantDefinition,
-  InhabitantInstance,
-  IsContentItem,
-  PlacedRoom,
-  RulerBonuses,
+import {
+  GRID_SIZE,
+  type Floor,
+  type InhabitantDefinition,
+  type InhabitantInstance,
+  type IsContentItem,
+  type PlacedRoom,
+  type RoomShape,
+  type RulerBonuses,
 } from '@interfaces';
 
 export const THRONE_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000001';
@@ -135,3 +139,112 @@ export function getThroneRoomFearLevel(floors: Floor[]): number | null {
 export const throneRoomFearLevel = computed<number | null>(() => {
   return getThroneRoomFearLevel(gamestate().world.floors);
 });
+
+// --- Adjacency & centrality bonuses ---
+
+export const TREASURE_VAULT_TYPE_ID = 'aa100001-0001-0001-0001-000000000008';
+export const CENTRALITY_THRESHOLD = 5;
+export const VAULT_ADJACENCY_GOLD_BONUS = 0.05;
+export const CENTRALITY_RULER_BONUS_MULTIPLIER = 0.1;
+
+export type ThronePositionalBonuses = {
+  vaultAdjacent: boolean;
+  central: boolean;
+  goldProductionBonus: number;
+  rulerBonusMultiplier: number;
+};
+
+/**
+ * Check if a room's center is within a Manhattan distance threshold of the grid center.
+ */
+export function isRoomCentral(
+  anchorX: number,
+  anchorY: number,
+  shapeWidth: number,
+  shapeHeight: number,
+  gridSize: number,
+  threshold: number,
+): boolean {
+  const roomCenterX = anchorX + shapeWidth / 2;
+  const roomCenterY = anchorY + shapeHeight / 2;
+  const gridCenterX = gridSize / 2;
+  const gridCenterY = gridSize / 2;
+  const distance =
+    Math.abs(roomCenterX - gridCenterX) + Math.abs(roomCenterY - gridCenterY);
+  return distance <= threshold;
+}
+
+/**
+ * Get positional bonuses for the Throne Room.
+ * Checks vault adjacency and central placement.
+ */
+export function getThroneRoomPositionalBonuses(
+  floors: Floor[],
+): ThronePositionalBonuses {
+  const defaultBonuses: ThronePositionalBonuses = {
+    vaultAdjacent: false,
+    central: false,
+    goldProductionBonus: 0,
+    rulerBonusMultiplier: 0,
+  };
+
+  const throne = findThroneRoom(floors);
+  if (!throne) return defaultBonuses;
+
+  const throneShape = getEntry<RoomShape & IsContentItem>(
+    throne.room.shapeId,
+  );
+  if (!throneShape) return defaultBonuses;
+
+  const throneTiles = getAbsoluteTiles(
+    throneShape,
+    throne.room.anchorX,
+    throne.room.anchorY,
+  );
+
+  // Check vault adjacency
+  const vaultRooms = throne.floor.rooms.filter(
+    (r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID,
+  );
+  let vaultAdjacent = false;
+  for (const vault of vaultRooms) {
+    const vaultShape = getEntry<RoomShape & IsContentItem>(vault.shapeId);
+    if (!vaultShape) continue;
+    const vaultTiles = getAbsoluteTiles(
+      vaultShape,
+      vault.anchorX,
+      vault.anchorY,
+    );
+    if (areRoomsAdjacent(throneTiles, vaultTiles)) {
+      vaultAdjacent = true;
+      break;
+    }
+  }
+
+  // Check centrality
+  const bounds = getShapeBounds(throneShape);
+  const central = isRoomCentral(
+    throne.room.anchorX,
+    throne.room.anchorY,
+    bounds.width,
+    bounds.height,
+    GRID_SIZE,
+    CENTRALITY_THRESHOLD,
+  );
+
+  return {
+    vaultAdjacent,
+    central,
+    goldProductionBonus: vaultAdjacent ? VAULT_ADJACENCY_GOLD_BONUS : 0,
+    rulerBonusMultiplier: central ? CENTRALITY_RULER_BONUS_MULTIPLIER : 0,
+  };
+}
+
+/**
+ * Reactive computed signal for the Throne Room's positional bonuses.
+ */
+export const thronePositionalBonuses = computed<ThronePositionalBonuses>(
+  () => {
+    return getThroneRoomPositionalBonuses(gamestate().world.floors);
+  },
+);

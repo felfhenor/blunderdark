@@ -4,6 +4,7 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  RoomShape,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,11 +24,17 @@ vi.mock('@helpers/state-game', () => ({
 const {
   THRONE_ROOM_TYPE_ID,
   EMPTY_THRONE_FEAR_LEVEL,
+  TREASURE_VAULT_TYPE_ID,
+  CENTRALITY_THRESHOLD,
+  VAULT_ADJACENCY_GOLD_BONUS,
+  CENTRALITY_RULER_BONUS_MULTIPLIER,
   findThroneRoom,
   getSeatedRulerInstance,
   getActiveRulerBonuses,
   getRulerBonusValue,
   getThroneRoomFearLevel,
+  isRoomCentral,
+  getThroneRoomPositionalBonuses,
 } = await import('@helpers/throne-room');
 
 // --- Test helpers ---
@@ -431,5 +438,232 @@ describe('getThroneRoomFearLevel', () => {
     });
 
     expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
+  });
+});
+
+// --- Room shape helpers for adjacency tests ---
+
+function createRoomShape(
+  overrides: Partial<RoomShape & IsContentItem> = {},
+): RoomShape & IsContentItem {
+  return {
+    id: 'shape-4x4',
+    name: 'Square 4x4',
+    __type: 'roomshape',
+    width: 4,
+    height: 4,
+    tiles: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 },
+      { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
+      { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
+      { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 },
+    ],
+    ...overrides,
+  } as RoomShape & IsContentItem;
+}
+
+function createVaultShape(): RoomShape & IsContentItem {
+  return createRoomShape({
+    id: 'shape-3x3',
+    name: 'Square 3x3',
+    width: 3,
+    height: 3,
+    tiles: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
+      { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 },
+      { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 },
+    ],
+  });
+}
+
+function createVaultRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
+  return {
+    id: 'vault-001',
+    roomTypeId: TREASURE_VAULT_TYPE_ID,
+    shapeId: 'shape-3x3',
+    anchorX: 9,
+    anchorY: 5,
+    ...overrides,
+  };
+}
+
+// --- Adjacency & centrality tests ---
+
+describe('isRoomCentral', () => {
+  it('should return true when room center is at grid center', () => {
+    // 4x4 room at anchor (8,8): center = (10, 10), grid center = (10, 10)
+    expect(isRoomCentral(8, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+  });
+
+  it('should return true when room center is within threshold', () => {
+    // 4x4 room at anchor (6,6): center = (8, 8), distance = 4
+    expect(isRoomCentral(6, 6, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+  });
+
+  it('should return false when room center is beyond threshold', () => {
+    // 4x4 room at anchor (0,0): center = (2, 2), distance = 16
+    expect(isRoomCentral(0, 0, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(false);
+  });
+
+  it('should return true at exactly the threshold distance', () => {
+    // 4x4 room at anchor (3,8): center = (5, 10), distance = |5-10| + |10-10| = 5
+    expect(isRoomCentral(3, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+  });
+
+  it('should return false just beyond the threshold', () => {
+    // 4x4 room at anchor (2,8): center = (4, 10), distance = |4-10| + |10-10| = 6
+    expect(isRoomCentral(2, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(false);
+  });
+});
+
+describe('getThroneRoomPositionalBonuses', () => {
+  beforeEach(() => {
+    mockContent.clear();
+  });
+
+  it('should return default bonuses when no Throne Room exists', () => {
+    const result = getThroneRoomPositionalBonuses([createFloor()]);
+    expect(result.vaultAdjacent).toBe(false);
+    expect(result.central).toBe(false);
+    expect(result.goldProductionBonus).toBe(0);
+    expect(result.rulerBonusMultiplier).toBe(0);
+  });
+
+  it('should return default bonuses when throne shape is unknown', () => {
+    const floor = createFloor({
+      rooms: [createPlacedRoom({ shapeId: 'nonexistent-shape' })],
+    });
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(false);
+    expect(result.central).toBe(false);
+  });
+
+  it('should detect vault adjacency when vault shares an edge', () => {
+    const throneShape = createRoomShape();
+    const vaultShape = createVaultShape();
+    mockContent.set('shape-4x4', throneShape);
+    mockContent.set('shape-3x3', vaultShape);
+
+    // Throne at (5,5), vault at (9,5) — vault left edge touches throne right edge
+    const floor = createFloor({
+      rooms: [
+        createPlacedRoom({ anchorX: 5, anchorY: 5 }),
+        createVaultRoom({ anchorX: 9, anchorY: 5 }),
+      ],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(true);
+    expect(result.goldProductionBonus).toBe(VAULT_ADJACENCY_GOLD_BONUS);
+  });
+
+  it('should not detect vault adjacency when vault is far away', () => {
+    const throneShape = createRoomShape();
+    const vaultShape = createVaultShape();
+    mockContent.set('shape-4x4', throneShape);
+    mockContent.set('shape-3x3', vaultShape);
+
+    // Throne at (5,5), vault at (15,15) — not adjacent
+    const floor = createFloor({
+      rooms: [
+        createPlacedRoom({ anchorX: 5, anchorY: 5 }),
+        createVaultRoom({ anchorX: 15, anchorY: 15 }),
+      ],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(false);
+    expect(result.goldProductionBonus).toBe(0);
+  });
+
+  it('should not detect adjacency for diagonal-only touching', () => {
+    const throneShape = createRoomShape();
+    const vaultShape = createVaultShape();
+    mockContent.set('shape-4x4', throneShape);
+    mockContent.set('shape-3x3', vaultShape);
+
+    // Throne at (5,5) occupies (5,5)-(8,8). Vault at (9,9) — only diagonal
+    const floor = createFloor({
+      rooms: [
+        createPlacedRoom({ anchorX: 5, anchorY: 5 }),
+        createVaultRoom({ anchorX: 9, anchorY: 9 }),
+      ],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(false);
+  });
+
+  it('should detect central placement', () => {
+    const throneShape = createRoomShape();
+    mockContent.set('shape-4x4', throneShape);
+
+    // Throne at (8,8): center = (10,10), distance = 0
+    const floor = createFloor({
+      rooms: [createPlacedRoom({ anchorX: 8, anchorY: 8 })],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.central).toBe(true);
+    expect(result.rulerBonusMultiplier).toBe(CENTRALITY_RULER_BONUS_MULTIPLIER);
+  });
+
+  it('should not detect central placement when far from center', () => {
+    const throneShape = createRoomShape();
+    mockContent.set('shape-4x4', throneShape);
+
+    // Throne at (0,0): center = (2,2), distance = 16
+    const floor = createFloor({
+      rooms: [createPlacedRoom({ anchorX: 0, anchorY: 0 })],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.central).toBe(false);
+    expect(result.rulerBonusMultiplier).toBe(0);
+  });
+
+  it('should return both bonuses when adjacent to vault and central', () => {
+    const throneShape = createRoomShape();
+    const vaultShape = createVaultShape();
+    mockContent.set('shape-4x4', throneShape);
+    mockContent.set('shape-3x3', vaultShape);
+
+    // Throne at (8,8) is central, vault at (12,8) is adjacent
+    const floor = createFloor({
+      rooms: [
+        createPlacedRoom({ anchorX: 8, anchorY: 8 }),
+        createVaultRoom({ anchorX: 12, anchorY: 8 }),
+      ],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(true);
+    expect(result.central).toBe(true);
+    expect(result.goldProductionBonus).toBe(VAULT_ADJACENCY_GOLD_BONUS);
+    expect(result.rulerBonusMultiplier).toBe(CENTRALITY_RULER_BONUS_MULTIPLIER);
+  });
+
+  it('should ignore non-vault rooms for adjacency', () => {
+    const throneShape = createRoomShape();
+    const otherShape = createVaultShape();
+    mockContent.set('shape-4x4', throneShape);
+    mockContent.set('shape-3x3', otherShape);
+
+    // Adjacent room is NOT a vault
+    const floor = createFloor({
+      rooms: [
+        createPlacedRoom({ anchorX: 5, anchorY: 5 }),
+        {
+          id: 'other-room',
+          roomTypeId: 'some-other-type',
+          shapeId: 'shape-3x3',
+          anchorX: 9,
+          anchorY: 5,
+        },
+      ],
+    });
+
+    const result = getThroneRoomPositionalBonuses([floor]);
+    expect(result.vaultAdjacent).toBe(false);
   });
 });
