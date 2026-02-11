@@ -17,4 +17,5 @@ export type PlacedRoom = {
   shapeId: string;
   anchorX: number;
   anchorY: number;
+  appliedUpgradePathId?: string;
 };

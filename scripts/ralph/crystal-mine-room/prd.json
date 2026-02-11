@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Three mutually exclusive upgrade paths defined in YAML: Deep Vein Extraction (productionMultiplier 1.5x, 75 crystals), Expanded Tunnels (maxInhabitantBonus +2, 60 crystals), Crystal Resonance (fearReduction 1 + secondaryProduction 0.2 flux, 80 crystals). PlacedRoom type extended with optional appliedUpgradePathId. room-upgrades.ts helper enforces mutual exclusivity: only one path per room, choosing one locks out all others. 22 tests covering validation, application, effects retrieval, and mutual exclusivity."
     },
     {
       "id": "US-003",
