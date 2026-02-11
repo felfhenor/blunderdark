@@ -32,6 +32,16 @@
       }
     }
 
+    @if (selectedId()) {
+      <button
+        class="btn btn-sm btn-outline w-full"
+        title="Rotate placement (R key or Right-click)"
+        (click)="rotate()"
+      >
+        Rotate (R)
+      </button>
+    }
+
     <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode()" [class.pointer-events-none]="isHallwayMode()">
       @for (room of rooms(); track room.id) {
         <button

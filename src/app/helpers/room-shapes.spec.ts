@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getAbsoluteTiles,
+  getRotatedShape,
   getShapeBounds,
   resolveRoomShape,
+  rotateTile90,
+  rotateTiles,
   shapeFitsInGrid,
 } from '@helpers/room-shapes';
 
@@ -192,5 +195,143 @@ describe('resolveRoomShape', () => {
     const shape = resolveRoomShape(placed);
     expect(shape.id).toBe('fallback');
     expect(shape.tiles).toHaveLength(1);
+  });
+});
+
+describe('rotateTile90', () => {
+  it('should rotate (0,0) in a 3-tall shape to (2,0)', () => {
+    expect(rotateTile90({ x: 0, y: 0 }, 3)).toEqual({ x: 2, y: 0 });
+  });
+
+  it('should rotate (0,2) in a 3-tall shape to (0,0)', () => {
+    expect(rotateTile90({ x: 0, y: 2 }, 3)).toEqual({ x: 0, y: 0 });
+  });
+
+  it('should rotate (2,2) in a 3-tall shape to (0,2)', () => {
+    expect(rotateTile90({ x: 2, y: 2 }, 3)).toEqual({ x: 0, y: 2 });
+  });
+});
+
+describe('rotateTiles', () => {
+  it('should return original tiles for rotation 0', () => {
+    const result = rotateTiles(lShape.tiles, lShape.width, lShape.height, 0);
+    expect(result.tiles).toEqual(lShape.tiles);
+    expect(result.width).toBe(3);
+    expect(result.height).toBe(3);
+  });
+
+  it('should rotate L-shape 90° clockwise', () => {
+    // Original L-shape (3x3):     After 90° CW:
+    //   X . .                       X X X
+    //   X . .                       X . .
+    //   X X X                       X . .
+    const result = rotateTiles(lShape.tiles, lShape.width, lShape.height, 1);
+    expect(result.width).toBe(3);
+    expect(result.height).toBe(3);
+
+    const tileSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
+    expect(tileSet).toContain('0,0');
+    expect(tileSet).toContain('1,0');
+    expect(tileSet).toContain('2,0');
+    expect(tileSet).toContain('0,1');
+    expect(tileSet).toContain('0,2');
+    expect(result.tiles).toHaveLength(5);
+  });
+
+  it('should rotate L-shape 180°', () => {
+    // Original:       After 180°:
+    //   X . .          X X X
+    //   X . .          . . X
+    //   X X X          . . X
+    const result = rotateTiles(lShape.tiles, lShape.width, lShape.height, 2);
+    expect(result.width).toBe(3);
+    expect(result.height).toBe(3);
+
+    const tileSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
+    expect(tileSet).toContain('0,0');
+    expect(tileSet).toContain('1,0');
+    expect(tileSet).toContain('2,0');
+    expect(tileSet).toContain('2,1');
+    expect(tileSet).toContain('2,2');
+    expect(result.tiles).toHaveLength(5);
+  });
+
+  it('should rotate L-shape 270° (3 steps)', () => {
+    // Original:       After 270° CW:
+    //   X . .          . . X
+    //   X . .          . . X
+    //   X X X          X X X
+    const result = rotateTiles(lShape.tiles, lShape.width, lShape.height, 3);
+    expect(result.width).toBe(3);
+    expect(result.height).toBe(3);
+
+    const tileSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
+    expect(result.tiles).toHaveLength(5);
+    expect(tileSet).toContain('2,0');
+    expect(tileSet).toContain('2,1');
+    expect(tileSet).toContain('0,2');
+    expect(tileSet).toContain('1,2');
+    expect(tileSet).toContain('2,2');
+  });
+
+  it('should rotate I-shape 90° to horizontal', () => {
+    // I-shape is 1x4 vertical → after 90° should be 4x1 horizontal
+    const result = rotateTiles(iShape.tiles, iShape.width, iShape.height, 1);
+    expect(result.width).toBe(4);
+    expect(result.height).toBe(1);
+
+    const tileSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
+    expect(tileSet).toContain('0,0');
+    expect(tileSet).toContain('1,0');
+    expect(tileSet).toContain('2,0');
+    expect(tileSet).toContain('3,0');
+  });
+
+  it('should return to original after 4 rotations', () => {
+    const result = rotateTiles(lShape.tiles, lShape.width, lShape.height, 0);
+    // Rotate 4 times manually
+    let { tiles, width, height } = rotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      1,
+    );
+    ({ tiles, width, height } = rotateTiles(tiles, width, height, 1));
+    ({ tiles, width, height } = rotateTiles(tiles, width, height, 1));
+    ({ tiles, width, height } = rotateTiles(tiles, width, height, 1));
+
+    expect(width).toBe(lShape.width);
+    expect(height).toBe(lShape.height);
+
+    const originalSet = new Set(
+      result.tiles.map((t) => `${t.x},${t.y}`),
+    );
+    const rotatedSet = new Set(tiles.map((t) => `${t.x},${t.y}`));
+    expect(rotatedSet).toEqual(originalSet);
+  });
+});
+
+describe('getRotatedShape', () => {
+  it('should return the same shape for rotation 0', () => {
+    const result = getRotatedShape(lShape, 0);
+    expect(result).toBe(lShape);
+  });
+
+  it('should return a new shape with rotated tiles for rotation 1', () => {
+    const result = getRotatedShape(lShape, 1);
+    expect(result).not.toBe(lShape);
+    expect(result.id).toBe(lShape.id);
+    expect(result.name).toBe(lShape.name);
+    expect(result.tiles).toHaveLength(5);
+  });
+
+  it('should preserve symmetric shapes', () => {
+    // 2x2 square is rotationally symmetric
+    const result = getRotatedShape(square2x2, 1);
+    const originalSet = new Set(
+      square2x2.tiles.map((t) => `${t.x},${t.y}`),
+    );
+    const rotatedSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
+    expect(rotatedSet).toEqual(originalSet);
   });
 });
