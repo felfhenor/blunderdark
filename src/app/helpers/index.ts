@@ -26,6 +26,7 @@ export * from './resources';
 export * from './rng';
 export * from './room-placement';
 export * from './room-shapes';
+export * from './room-upgrades';
 export * from './scheduler';
 export * from './season';
 export * from './setup';
