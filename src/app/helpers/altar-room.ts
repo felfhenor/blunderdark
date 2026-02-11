@@ -220,6 +220,26 @@ export const altarFearReductionAura = computed<number>(() => {
 });
 
 /**
+ * Calculate the effective fear level for a room, accounting for the Altar's fear reduction aura.
+ * Returns the room's base fear level minus the Altar's aura if adjacent, clamped to 0.
+ * For rooms with 'variable' fear level, returns the original value unchanged.
+ */
+export function getEffectiveFearLevel(
+  floor: Floor,
+  room: PlacedRoom,
+  baseFearLevel: number | 'variable',
+): number | 'variable' {
+  if (baseFearLevel === 'variable') return 'variable';
+
+  const aura = getAltarFearReductionAura([floor]);
+  if (aura <= 0) return baseFearLevel;
+
+  if (!isAdjacentToAltar(floor, room)) return baseFearLevel;
+
+  return Math.max(0, baseFearLevel - aura);
+}
+
+/**
  * Reactive signal: whether recruitment is available (requires Altar at Level 1+).
  * The Altar's presence enables basic recruitment; upgrades may expand it later.
  */
