@@ -1,0 +1,136 @@
+@if (throneRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Throne Room</h3>
+
+      <!-- Ruler Section -->
+      <div class="mt-2">
+        @if (rulerInfo(); as ruler) {
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-2">
+              <div
+                class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-lg"
+              >
+                {{ ruler.definition.name.charAt(0) }}
+              </div>
+              <div>
+                <div class="font-semibold text-sm">
+                  {{ ruler.instance.name }}
+                </div>
+                <div class="text-xs opacity-70">
+                  {{ ruler.definition.type }} - Tier
+                  {{ ruler.definition.tier }}
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="btn btn-xs btn-outline btn-error mt-1"
+              (click)="onRemoveRuler()"
+            >
+              Remove Ruler
+            </button>
+          </div>
+        } @else {
+          <div class="text-sm opacity-60 italic">Empty Throne</div>
+
+          @if (eligibleCreatures().length > 0) {
+            <div class="mt-1 flex flex-col gap-1">
+              @for (
+                creature of eligibleCreatures();
+                track creature.instance.instanceId
+              ) {
+                <button
+                  class="btn btn-xs btn-outline btn-primary"
+                  (click)="onAssignRuler(creature.instance.instanceId)"
+                >
+                  Assign {{ creature.name }}
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="text-xs opacity-50 mt-1">
+              No eligible creatures available
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Fear Level -->
+      @if (fearLevel() !== null) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Fear Level</h4>
+          <div class="flex items-center gap-2">
+            <progress
+              class="progress w-full"
+              [class.progress-error]="fearLevel()! >= 4"
+              [class.progress-warning]="
+                fearLevel()! >= 2 && fearLevel()! < 4
+              "
+              [class.progress-info]="fearLevel()! < 2"
+              [value]="fearLevel()!"
+              max="5"
+            ></progress>
+            <span class="text-xs font-mono">{{ fearLevel() }}/5</span>
+          </div>
+        </div>
+      }
+
+      <!-- Dungeon-Wide Bonuses -->
+      @if (bonusEntries().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">
+            Dungeon-Wide Bonuses
+          </h4>
+          <div class="flex flex-col gap-0.5">
+            @for (entry of bonusEntries(); track entry[0]) {
+              <div class="flex justify-between text-xs">
+                <span>{{ entry[0] }}</span>
+                <span
+                  class="font-mono"
+                  [class.text-success]="entry[1] > 0"
+                  [class.text-error]="entry[1] < 0"
+                >
+                  {{ entry[1] > 0 ? "+" : "" }}{{ entry[1] | number: "1.0-2" }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Positional Bonuses -->
+      @if (positional().vaultAdjacent || positional().central) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">
+            Positional Bonuses
+          </h4>
+          <div class="flex flex-col gap-0.5">
+            @if (positional().vaultAdjacent) {
+              <div class="flex justify-between text-xs">
+                <span>Vault Adjacent</span>
+                <span class="font-mono text-success"
+                  >+{{
+                    positional().goldProductionBonus | number: "1.0-2"
+                  }}
+                  gold</span
+                >
+              </div>
+            }
+            @if (positional().central) {
+              <div class="flex justify-between text-xs">
+                <span>Central Placement</span>
+                <span class="font-mono text-success"
+                  >+{{
+                    positional().rulerBonusMultiplier | number: "1.0-2"
+                  }}
+                  ruler bonuses</span
+                >
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

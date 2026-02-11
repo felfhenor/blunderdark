@@ -46,7 +46,9 @@ function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
 }
 
 export function ensureContent<T extends IsContentItem>(content: T): T {
-  return initializers[content.__type](content) satisfies T;
+  const init = initializers[content.__type];
+  if (!init) return content;
+  return init(content) satisfies T;
 }
 
 function ensureHero(hero: Partial<HeroContent>): Required<HeroContent> {
