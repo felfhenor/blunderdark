@@ -70,6 +70,10 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `calculateAdjacencyBonus(placedRoom, adjacentRoomIds, allPlacedRooms)` returns additive bonus from gamedata adjacency rules — caller provides adjacentRoomIds from AdjacencyMap
 - `calculateConditionalModifiers(placedRoom, inhabitants)` returns multiplicative modifier from inhabitant states — scared=0.5, hungry=0.75, normal=1.0; unique states only (Set dedup)
 - Production formula: `Final = Base * (1 + inhabitantBonus + adjacencyBonus) * conditionalModifier` — bonuses are additive, modifiers are multiplicative
+- `PlacedRoom.appliedUpgradePathId?: string` tracks the chosen upgrade — optional field so existing PlacedRoom literals in tests don't break
+- `room-upgrades.ts` helper: `canApplyUpgrade()` enforces mutual exclusivity (one upgrade per room), `applyUpgrade()` returns new PlacedRoom, `getAppliedUpgradeEffects()` returns effects array
+- Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
+- Room YAML upgrade paths use UUIDs prefixed `aa200001-` to distinguish from room IDs (`aa100001-`)
 
 ## Testing
 
