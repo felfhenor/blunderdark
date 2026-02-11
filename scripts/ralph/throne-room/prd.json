@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added rulerFearLevel: number to InhabitantDefinition with YAML values: Dragon=4, Lich=3, Demon Lord=5. getThroneRoomFearLevel(floors) returns null if no throne, EMPTY_THRONE_FEAR_LEVEL (1) if empty, or ruler's value. throneRoomFearLevel computed signal for reactive UI/system consumption. Fear propagation system integration ready when that system is built (Phase 11). 7 unit tests. All 405 tests pass."
     },
     {
       "id": "US-006",
