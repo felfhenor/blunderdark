@@ -1,5 +1,6 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
+import { autoPlaceRooms } from '@helpers/altar-room';
 import {
   defaultFloor,
   defaultReputationState,
@@ -28,6 +29,9 @@ export async function worldgenGenerateWorld(): Promise<
   // Resolve the starting biome (handles 'random' selection)
   const startingBiome = resolveStartingBiome();
 
+  // Create the starting floor and auto-place initial rooms (e.g., Altar)
+  const startingFloor = autoPlaceRooms(defaultFloor(1, startingBiome));
+
   return {
     grid: createEmptyGrid(),
     resources: defaultResources(),
@@ -36,7 +40,7 @@ export async function worldgenGenerateWorld(): Promise<
     season: defaultSeasonState(),
     research: defaultResearchState(),
     reputation: defaultReputationState(),
-    floors: [defaultFloor(1, startingBiome)],
+    floors: [startingFloor],
     currentFloorIndex: 0,
     didFinish: true,
   };

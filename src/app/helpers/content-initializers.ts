@@ -183,10 +183,13 @@ function ensureRoom(
     requiresWorkers: room.requiresWorkers ?? false,
     adjacencyBonuses: room.adjacencyBonuses ?? [],
     isUnique: room.isUnique ?? false,
+    removable: room.removable ?? true,
     maxInhabitants: room.maxInhabitants ?? -1,
     inhabitantRestriction: room.inhabitantRestriction ?? null,
     fearLevel: room.fearLevel ?? 0,
+    fearReductionAura: room.fearReductionAura ?? 0,
     upgradePaths: room.upgradePaths ?? [],
+    autoPlace: room.autoPlace ?? false,
   };
 }
 

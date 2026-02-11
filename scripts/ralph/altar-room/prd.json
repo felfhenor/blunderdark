@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added to gamedata/room/base.yml with all fields. Uses existing 3x3 Square shape."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "autoPlaceRooms() in altar-room.ts places all autoPlace rooms at grid center during worldgen."
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "removable: false on RoomDefinition. isRoomRemovable() check in removeRoom() rejects removal."
     },
     {
       "id": "US-004",
@@ -59,8 +59,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "hasAltarRoom signal gates room placement. panel-room-select filters autoPlace rooms and checks Altar presence."
     },
     {
       "id": "US-005",
@@ -72,8 +72,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "canRecruit computed signal based on Altar presence. panel-altar component shows recruitment status."
     },
     {
       "id": "US-006",
@@ -88,8 +88,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Sequential upgrade system: Level 2 costs 150g/75c/30e. applyAltarUpgrade validates ordering."
     },
     {
       "id": "US-007",
@@ -104,8 +104,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Level 3 costs 300g/150c/60e. Requires Level 2. Level 3 supersedes Level 2 upgrade effects."
     },
     {
       "id": "US-008",
@@ -119,8 +119,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "getEffectiveFearLevel reduces fear for adjacent rooms. Aura scales with Altar level (1/2/3)."
     }
   ]
 }

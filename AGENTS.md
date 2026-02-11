@@ -88,6 +88,19 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
 - Room YAML upgrade paths use UUIDs prefixed `aa200001-` to distinguish from room IDs (`aa100001-`)
 
+## Altar Room & Auto-Placement
+
+- `ALTAR_ROOM_TYPE_ID` constant in `altar-room.ts` references the Altar Room content ID — use this instead of hardcoding the UUID
+- `autoPlaceRooms(floor)` finds all rooms with `autoPlace: true` and places them centered on the grid — called during `worldgenGenerateWorld()`
+- `removable: boolean` field on `RoomDefinition` — `isRoomRemovable(roomTypeId)` in `room-placement.ts` checks this before allowing removal
+- `autoPlace: boolean` field on `RoomDefinition` — rooms with `autoPlace: true` are excluded from the build panel and auto-placed during world generation
+- `fearReductionAura: number` field on `RoomDefinition` — base aura value, overridden by upgrade `fearReductionAura` effect type
+- Altar uses sequential upgrade levels (1→2→3) on the existing mutually-exclusive `appliedUpgradePathId` system — `getAltarLevel()` checks which upgrade is applied, `applyAltarUpgrade()` validates level ordering
+- `getEffectiveFearLevel(floor, room, baseFearLevel)` reduces fear for rooms adjacent to the Altar — returns 'variable' unchanged, otherwise clamps to 0
+- `isAdjacentToAltar(floor, room)` uses `areRoomsAdjacent()` from adjacency.ts — checks edge-sharing between room tiles and Altar tiles
+- `panel-altar` component follows same pattern as `panel-throne-room` — shows when selected tile is the Altar, displays level/aura/recruitment/upgrade UI
+- When adding new fields to `RoomDefinition`, update defaults in `ensureRoom()` AND update all mock `RoomDefinition` objects in test files (mushroom-grove.spec.ts, inhabitants.spec.ts, etc.)
+
 ## Testing
 
 - Pre-existing typecheck errors exist in `scripts/` files and some older components — these are expected

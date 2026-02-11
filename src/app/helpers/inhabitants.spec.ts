@@ -189,6 +189,8 @@ function createTestInhabitantDef(
     },
     traits: [],
     restrictionTags: [],
+    rulerBonuses: {},
+    rulerFearLevel: 0,
     ...overrides,
   };
 }
@@ -206,10 +208,13 @@ function createTestRoomDef(
     requiresWorkers: false,
     adjacencyBonuses: [],
     isUnique: false,
+    removable: true,
     maxInhabitants: -1,
     inhabitantRestriction: null,
     fearLevel: 0,
+    fearReductionAura: 0,
     upgradePaths: [],
+    autoPlace: false,
     ...overrides,
   };
 }

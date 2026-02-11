@@ -67,10 +67,13 @@ const mushroomGroveRoom: RoomDefinition & IsContentItem = {
     { adjacentRoomType: DARK_FORGE_ID, bonus: 0.15 },
   ],
   isUnique: false,
+  removable: true,
   maxInhabitants: 3,
   inhabitantRestriction: null,
   fearLevel: 1,
+  fearReductionAura: 0,
   upgradePaths: [bountifulHarvestPath, expandedGrowthPath, tranquilGardenPath],
+  autoPlace: false,
 };
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
@@ -84,10 +87,13 @@ const soulWellRoom: RoomDefinition & IsContentItem = {
   requiresWorkers: false,
   adjacencyBonuses: [],
   isUnique: false,
+  removable: true,
   maxInhabitants: 0,
   inhabitantRestriction: null,
   fearLevel: 0,
+  fearReductionAura: 0,
   upgradePaths: [],
+  autoPlace: false,
 };
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
@@ -101,10 +107,13 @@ const shadowLibraryRoom: RoomDefinition & IsContentItem = {
   requiresWorkers: true,
   adjacencyBonuses: [],
   isUnique: false,
+  removable: true,
   maxInhabitants: 2,
   inhabitantRestriction: null,
   fearLevel: 0,
+  fearReductionAura: 0,
   upgradePaths: [],
+  autoPlace: false,
 };
 
 const darkForgeRoom: RoomDefinition & IsContentItem = {
@@ -118,10 +127,13 @@ const darkForgeRoom: RoomDefinition & IsContentItem = {
   requiresWorkers: true,
   adjacencyBonuses: [],
   isUnique: false,
+  removable: true,
   maxInhabitants: 2,
   inhabitantRestriction: null,
   fearLevel: 0,
+  fearReductionAura: 0,
   upgradePaths: [],
+  autoPlace: false,
 };
 
 mockContent.set('shape-t', {
