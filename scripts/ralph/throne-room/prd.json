@@ -93,8 +93,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added Treasure Vault room to gamedata/room/base.yml (id: aa100001-...-000000000008, Square 3x3, gold: 0.8 production). New constants: TREASURE_VAULT_TYPE_ID, CENTRALITY_THRESHOLD (5), VAULT_ADJACENCY_GOLD_BONUS (0.05), CENTRALITY_RULER_BONUS_MULTIPLIER (0.10). isRoomCentral() pure function uses Manhattan distance from room center to grid center. getThroneRoomPositionalBonuses(floors) checks vault adjacency via areRoomsAdjacent() and centrality via isRoomCentral(). thronePositionalBonuses computed signal for reactive consumption. 14 new unit tests (5 centrality, 9 positional bonuses). All 419 tests pass."
     },
     {
       "id": "US-007",

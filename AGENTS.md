@@ -61,6 +61,11 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - Unique ruler creatures (Dragon, Lich, Demon Lord) are tier 4 with `restrictionTags: ['unique']` — they have `rulerBonuses`, `rulerFearLevel`, but empty `traits` since their bonuses are dungeon-wide, not room-specific
 - `rulerFearLevel: number` on `InhabitantDefinition` — the fear level this ruler provides (Dragon=4, Lich=3, Demon Lord=5); `getThroneRoomFearLevel(floors)` returns null if no throne, 1 (EMPTY_THRONE_FEAR_LEVEL) if empty, or ruler's value
 - TypeScript `Record<string, number>` properties must use bracket notation (`bonuses['attack']`) not dot notation in strict mode — TS4111 error otherwise
+- `TREASURE_VAULT_TYPE_ID` constant in `throne-room.ts` references the Treasure Vault content ID — used for adjacency bonus checks
+- `getThroneRoomPositionalBonuses(floors)` returns `ThronePositionalBonuses` with `vaultAdjacent`, `central`, `goldProductionBonus` (+5% if adjacent to vault), `rulerBonusMultiplier` (+10% if centrally placed)
+- `isRoomCentral(anchorX, anchorY, shapeWidth, shapeHeight, gridSize, threshold)` — pure function using Manhattan distance from room center to grid center; threshold=5 for Throne Room
+- Room shape resolution in throne-room.ts uses `getEntry<RoomShape & IsContentItem>(shapeId)` — in tests, put shapes into `mockContent` Map and the mock `getEntry` returns them
+- `areRoomsAdjacent` from `adjacency.ts` checks edge-sharing (not diagonal) — used for vault adjacency detection
 - `workerEfficiency` of 1.0 = 0% bonus; only `production_bonus` effectType traits contribute to production bonuses; other trait types (defense_bonus, trap_bonus) are ignored
 - `calculateAdjacencyBonus(placedRoom, adjacentRoomIds, allPlacedRooms)` returns additive bonus from gamedata adjacency rules — caller provides adjacentRoomIds from AdjacencyMap
 - `calculateConditionalModifiers(placedRoom, inhabitants)` returns multiplicative modifier from inhabitant states — scared=0.5, hungry=0.75, normal=1.0; unique states only (Set dedup)

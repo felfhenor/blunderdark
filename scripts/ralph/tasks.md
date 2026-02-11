@@ -5,7 +5,7 @@ A prioritized list of features based on dependencies and logical progression.
 ## Status Summary
 
 - **Complete:** 20 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool)
-- **In Progress:** throne-room (US-001-005 done, US-006-007 remaining)
+- **In Progress:** throne-room (US-001-006 done, US-007 remaining)
 - **Remaining:** ~103 features
 
 ---
@@ -42,7 +42,7 @@ Build the first rooms so players can actually play.
 
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
-| 3.1 | `throne-room` | 6 | room-placement-ui |
+| 3.1 | `throne-room` | 7 (US-001-006 done, US-007 remaining) | room-placement-ui |
 | 3.2 | `crystal-mine-room` | 5 | room-placement-ui, production-calculation-system |
 | 3.3 | `mushroom-grove-room` | 5 | room-placement-ui, production-calculation-system |
 | 3.4 | `altar-room` | 8 | room-placement-ui |
