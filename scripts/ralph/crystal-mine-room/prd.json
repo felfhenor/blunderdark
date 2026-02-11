@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Crystal Mine updated in gamedata/room/base.yml with L-shape, 5 crystals/min (1.0/tick), maxInhabitants 2, fearLevel 1, adjacency bonuses for Mine+Mine/Forge/Library, and 3 upgrade paths. RoomUpgradePath type added to room.ts, ensureRoom updated."
     },
     {
       "id": "US-002",

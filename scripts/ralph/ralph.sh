@@ -35,16 +35,8 @@ if [[ "$TOOL" != "claude" ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROGRESS_FILE="$SCRIPT_DIR/progress.txt"
 ARCHIVE_DIR="$SCRIPT_DIR/archive"
 LAST_BRANCH_FILE="$SCRIPT_DIR/.last-branch"
-
-# Initialize progress file if it doesn't exist
-if [ ! -f "$PROGRESS_FILE" ]; then
-  echo "# Ralph Progress Log" > "$PROGRESS_FILE"
-  echo "Started: $(date)" >> "$PROGRESS_FILE"
-  echo "---" >> "$PROGRESS_FILE"
-fi
 
 echo "Starting Ralph - Tool: $TOOL - Max iterations: $MAX_ITERATIONS"
 
@@ -54,32 +46,17 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   echo "  Ralph Iteration $i of $MAX_ITERATIONS ($TOOL)"
   echo "==============================================================="
 
-  # Create a temp file for capturing output
-  TEMP_OUTPUT=$(mktemp)
-
   # Run the claude command directly with the autonomous task instructions
-  # Use tee to both display and capture output
-  (cd "$SCRIPT_DIR" && claude --permission-mode bypassPermissions "@prompt.md @AGENTS.md @tasks.md \
-1. Choose the next task from tasks.md and the prompt.md file to understand your context. Utilize the agents file to understand helpful tips you've discovered before. \
-2. Find the next incomplete task and implement it. \
-3. Commit your changes. \
-4. Update @agents.md with your learnings and findings (see @prompt.md for good conventions). \
-5. Update the prd.json file in the task folder to reflect the completed task. \
-6. Update @tasks.md with the status of the task you just completed. \
-7. Commit your changes as well as any outstanding changes (such as scripts or markdown files). \
-8. Merge your changes into the 'master' branch. \
-ONLY DO ONE TASK AT A TIME." 2>&1) | tee "$TEMP_OUTPUT" || true
+  OUTPUT=$(claude --dangerously-skip-permissions --print < "$SCRIPT_DIR/CLAUDE.md" 2>&1 | tee /dev/stderr) || true
 
   # Check for completion signal
-  if grep -q "<promise>COMPLETE</promise>" "$TEMP_OUTPUT"; then
-    rm -f "$TEMP_OUTPUT"
+  if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then
     echo ""
     echo "Ralph completed all tasks!"
     echo "Completed at iteration $i of $MAX_ITERATIONS"
     exit 0
   fi
 
-  rm -f "$TEMP_OUTPUT"
   echo "Iteration $i complete. Continuing..."
   sleep 2
 done
