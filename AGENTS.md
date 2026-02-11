@@ -101,6 +101,16 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `panel-altar` component follows same pattern as `panel-throne-room` — shows when selected tile is the Altar, displays level/aura/recruitment/upgrade UI
 - When adding new fields to `RoomDefinition`, update defaults in `ensureRoom()` AND update all mock `RoomDefinition` objects in test files (mushroom-grove.spec.ts, inhabitants.spec.ts, etc.)
 
+## Room Removal System
+
+- `room-removal.ts` is the main orchestration helper — `executeRoomRemoval()` handles validation, grid clearing, inhabitant unassignment, and resource refund in one atomic operation
+- `calculateRefund(cost)` returns 50% of each resource rounded down (Math.floor) — pure function, easy to test
+- `getRemovalInfo(roomId)` returns a preview of what removal would do (room name, refund, displaced inhabitant names, canRemove flag) — used by the confirmation dialog
+- `executeRoomRemoval()` does a single `updateGamestate()` call for grid + inhabitant changes, then separate `addResource()` calls for refund — refund is capped at resource max by `addResource()`
+- The removal UI lives in `panel-room-info` component — `canRemoveRoom` computed checks `isRoomRemovable()`, disabled button shown for non-removable rooms
+- SweetAlert2 confirmation dialog uses `[swal]="removeSwal"` + `<swal>` pattern with dynamic `[title]` and `[text]` bindings from computed signals
+- `removeRoomFromFloor()` preserves hallway data (`hallwayId`, `connectionType`) on tiles when clearing room data — important for tiles that have both room and hallway occupancy
+
 ## Testing
 
 - Pre-existing typecheck errors exist in `scripts/` files and some older components — these are expected

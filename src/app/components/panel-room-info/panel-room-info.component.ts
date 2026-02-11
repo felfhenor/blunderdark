@@ -3,11 +3,14 @@ import {
   assignInhabitantToRoom,
   createConnection,
   currentFloor,
+  executeRoomRemoval,
   getAdjacentUnconnectedRooms,
   getEntry,
   getEffectiveMaxInhabitants,
+  getRemovalInfo,
   getRoomConnections,
   getRoomDefinition,
+  isRoomRemovable,
   meetsInhabitantRestriction,
   notifyError,
   notifySuccess,
@@ -16,9 +19,11 @@ import {
   unassignInhabitantFromRoom,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
+  imports: [SweetAlert2Module],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -171,6 +176,66 @@ export class PanelRoomInfoComponent {
       notifySuccess('Inhabitant unassigned');
     } else {
       notifyError('Failed to unassign inhabitant');
+    }
+  }
+
+  public canRemoveRoom = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    return isRoomRemovable(room.roomTypeId);
+  });
+
+  public removalInfo = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return null;
+    return getRemovalInfo(room.id);
+  });
+
+  public removalSwalTitle = computed(() => {
+    const info = this.removalInfo();
+    return info ? `Remove ${info.roomName}?` : 'Remove Room?';
+  });
+
+  public removalSwalText = computed(() => {
+    const info = this.removalInfo();
+    if (!info) return '';
+
+    const parts: string[] = [];
+
+    const refundEntries = Object.entries(info.refund).filter(
+      ([, v]) => v > 0,
+    );
+    if (refundEntries.length > 0) {
+      const refundStr = refundEntries
+        .map(([type, amount]) => `${amount} ${type}`)
+        .join(', ');
+      parts.push(`Refund: ${refundStr}`);
+    } else {
+      parts.push('No resource refund.');
+    }
+
+    if (info.displacedInhabitantNames.length > 0) {
+      parts.push(
+        `${info.displacedInhabitantNames.length} inhabitant(s) will be displaced.`,
+      );
+    }
+
+    return parts.join('\n');
+  });
+
+  public async onConfirmRemoval(): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const result = await executeRoomRemoval(room.id);
+    if (result.success) {
+      let message = `${room.name} demolished`;
+      if (result.displacedNames && result.displacedNames.length > 0) {
+        message += `. Displaced: ${result.displacedNames.join(', ')}`;
+      }
+      notifySuccess(message);
+    } else {
+      notifyError(result.error ?? 'Failed to remove room');
     }
   }
 }

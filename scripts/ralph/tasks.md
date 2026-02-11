@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 24 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room)
+- **Complete:** 25 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal)
 - **In Progress:** None
-- **Remaining:** ~100 features
+- **Remaining:** ~99 features
 
 ---
 
@@ -46,7 +46,7 @@ Build the first rooms so players can actually play.
 | ~~3.2~~ | ~~`crystal-mine-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui, production-calculation-system~~ |
 | ~~3.3~~ | ~~`mushroom-grove-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui, production-calculation-system~~ |
 | ~~3.4~~ | ~~`altar-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui~~ |
-| 3.5 | `room-removal` | 4 | room-placement-ui |
+| ~~3.5~~ | ~~`room-removal`~~ | ~~COMPLETE~~ | ~~room-placement-ui~~ |
 
 ---
 

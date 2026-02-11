@@ -86,6 +86,36 @@
       @if (adjacentUnconnected().length === 0 && activeConnections().length === 0) {
         <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
       }
+
+      <div class="divider my-1"></div>
+
+      @if (canRemoveRoom()) {
+        <button
+          class="btn btn-sm btn-error btn-outline w-full"
+          [swal]="removeSwal"
+        >
+          Remove Room
+        </button>
+
+        <swal
+          #removeSwal
+          [title]="removalSwalTitle()"
+          [text]="removalSwalText()"
+          icon="warning"
+          confirmButtonText="Yes, demolish"
+          cancelButtonText="No, cancel"
+          [showCancelButton]="true"
+          (confirm)="onConfirmRemoval()"
+        ></swal>
+      } @else {
+        <button
+          class="btn btn-sm btn-outline w-full btn-disabled"
+          disabled
+          title="Altar cannot be removed"
+        >
+          Remove Room
+        </button>
+      }
     </div>
   </div>
 }
