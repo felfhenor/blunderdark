@@ -31,8 +31,11 @@ export type RoomDefinition = {
   requiresWorkers: boolean;
   adjacencyBonuses: AdjacencyBonus[];
   isUnique: boolean;
+  removable: boolean;
   maxInhabitants: number;
   inhabitantRestriction: string | null;
   fearLevel: number | 'variable';
+  fearReductionAura: number;
   upgradePaths: RoomUpgradePath[];
+  autoPlace: boolean;
 };

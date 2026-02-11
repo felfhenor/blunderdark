@@ -1,3 +1,50 @@
+- id: aa100001-0001-0001-0001-000000000009
+  name: Altar Room
+  description: The dark heart of your dungeon. This ancient altar is the source of your power, enabling room construction and creature recruitment. Its calming aura reduces fear in adjacent rooms.
+  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  cost: {}
+  production:
+    essence: 0.2
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: true
+  removable: false
+  autoPlace: true
+  maxInhabitants: 0
+  inhabitantRestriction: null
+  fearLevel: 0
+  fearReductionAura: 1
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000007
+      name: Empowered Altar
+      description: Channel deeper magical energies to expand your dungeon-building capabilities and strengthen the calming aura.
+      cost:
+        gold: 150
+        crystals: 75
+        essence: 30
+      effects:
+        - type: fearReductionAura
+          value: 2
+        - type: secondaryProduction
+          value: 0.2
+          resource: essence
+    - id: aa200001-0001-0001-0001-000000000008
+      name: Ascendant Altar
+      description: Unlock the altar's full potential, granting access to advanced rooms and maximizing its stabilizing influence.
+      cost:
+        gold: 300
+        crystals: 150
+        essence: 60
+      effects:
+        - type: fearReductionAura
+          value: 3
+        - type: secondaryProduction
+          value: 0.4
+          resource: essence
+        - type: secondaryProduction
+          value: 0.2
+          resource: flux
+
 - id: aa100001-0001-0001-0001-000000000001
   name: Throne Room
   description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
