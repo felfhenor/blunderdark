@@ -124,3 +124,12 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Upgrade effects are NOT yet wired into production calculations** — `productionMultiplier` and `secondaryProduction` upgrade effects from `room-upgrades.ts` are defined but not applied in `calculateTotalProduction()` or `calculateSingleRoomProduction()`. This needs to be done when upgrade UI is implemented.
 - `processProduction(state)` in `gameloop.ts` is the entry point — called every tick, sums all room production, adds to resources capped at max
 - `productionRates` is a computed signal that recalculates whenever `gamestate().world.floors` changes — used by `PanelResourcesComponent` for live rate display
+
+## Inhabitant Capacity & Assignment
+
+- `getEffectiveMaxInhabitants(placedRoom, roomDef)` in `room-upgrades.ts` returns base + `maxInhabitantBonus` from upgrade effects — returns -1 for unlimited
+- `canAssignInhabitantToRoom(def, roomDef, count, placedRoom?)` accepts optional `PlacedRoom` to use effective capacity from upgrades; without it, falls back to `roomDef.maxInhabitants`
+- `assignInhabitantToRoom()` searches `state.world.floors` to find the `PlacedRoom` by room ID — this is necessary because `PlacedRoom` lives on `Floor.rooms`, not on `GameStateWorld` directly
+- **Inhabitants exist in two places:** `GameStateWorld.inhabitants` (used by inhabitant management functions) and `Floor.inhabitants` (used by production, throne room, and UI panels) — be careful which you query
+- `panel-room-info` component shows inhabitant count, assigned list with Remove buttons, and eligible unassigned inhabitants with Assign buttons — only for rooms with `maxInhabitants !== 0`
+- When mocking `room-upgrades` in `inhabitants.spec.ts`, use `vi.mock('@helpers/room-upgrades')` to control `getEffectiveMaxInhabitants` return values without needing the content system

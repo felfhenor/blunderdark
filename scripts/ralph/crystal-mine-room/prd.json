@@ -80,8 +80,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added getEffectiveMaxInhabitants() to room-upgrades.ts that computes base capacity + maxInhabitantBonus from upgrade effects. Updated canAssignInhabitantToRoom() with optional PlacedRoom param for upgrade-aware capacity checks. assignInhabitantToRoom() now finds PlacedRoom across floors and passes it to capacity validation. Room info panel (panel-room-info) now displays current/max inhabitant count, lists assigned inhabitants with Remove buttons, and shows eligible unassigned inhabitants with Assign buttons. Capacity display correctly reflects upgrade bonuses (2 base, 4 with Expanded Tunnels upgrade). 10 new tests: 5 for getEffectiveMaxInhabitants, 5 for upgrade-aware canAssignInhabitantToRoom. All 463 tests pass, lint clean, typecheck clean. Browser verified: app compiles and renders correctly."
     }
   ]
 }
