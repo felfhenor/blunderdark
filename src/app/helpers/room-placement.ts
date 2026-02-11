@@ -424,6 +424,16 @@ export async function placeRoom(
   return room;
 }
 
+/**
+ * Check if a placed room can be removed based on its definition.
+ * Returns false for rooms with removable: false (e.g., Altar Room).
+ */
+export function isRoomRemovable(roomTypeId: string): boolean {
+  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  if (!roomDef) return true;
+  return roomDef.removable;
+}
+
 export async function removeRoom(roomId: string): Promise<boolean> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
@@ -432,6 +442,8 @@ export async function removeRoom(roomId: string): Promise<boolean> {
 
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return false;
+
+  if (!isRoomRemovable(room.roomTypeId)) return false;
 
   const baseShape = getRoomShape(room.shapeId);
   if (!baseShape) return false;
