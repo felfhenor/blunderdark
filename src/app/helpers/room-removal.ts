@@ -1,5 +1,4 @@
 import { getEntry } from '@helpers/content';
-import { currentFloor } from '@helpers/floor';
 import {
   isRoomRemovable,
   removeRoomFromFloor,
@@ -9,7 +8,6 @@ import { getRotatedShape, getRoomShape } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
-  PlacedRoom,
   ResourceCost,
   ResourceType,
   RoomDefinition,
@@ -153,14 +151,4 @@ export async function executeRoomRemoval(
   }
 
   return { success: true, displacedNames };
-}
-
-/**
- * Get the placed room at the currently selected tile.
- */
-export function getSelectedPlacedRoom(): PlacedRoom | null {
-  const floor = currentFloor();
-  if (!floor) return null;
-
-  return null; // The component handles this via its own computed
 }
