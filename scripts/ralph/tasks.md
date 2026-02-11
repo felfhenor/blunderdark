@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 21 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room)
-- **In Progress:** crystal-mine-room (US-001, US-002, US-003, US-004 complete, US-005 remaining)
-- **Remaining:** ~103 features
+- **Complete:** 22 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room)
+- **In Progress:** None
+- **Remaining:** ~102 features
 
 ---
 
@@ -43,7 +43,7 @@ Build the first rooms so players can actually play.
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
 | ~~3.1~~ | ~~`throne-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui~~ |
-| 3.2 | `crystal-mine-room` | 5 | room-placement-ui, production-calculation-system |
+| ~~3.2~~ | ~~`crystal-mine-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui, production-calculation-system~~ |
 | 3.3 | `mushroom-grove-room` | 5 | room-placement-ui, production-calculation-system |
 | 3.4 | `altar-room` | 8 | room-placement-ui |
 | 3.5 | `room-removal` | 4 | room-placement-ui |

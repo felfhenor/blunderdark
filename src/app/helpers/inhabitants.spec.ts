@@ -2,11 +2,13 @@ import type {
   GameState,
   InhabitantDefinition,
   InhabitantInstance,
+  PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockInhabitants: InhabitantInstance[];
+let mockEffectiveMax: number | undefined;
 
 vi.mock('@helpers/state-game', () => {
   return {
@@ -22,6 +24,16 @@ vi.mock('@helpers/state-game', () => {
     }),
   };
 });
+
+vi.mock('@helpers/room-upgrades', () => ({
+  getEffectiveMaxInhabitants: (
+    _placedRoom: PlacedRoom,
+    roomDef: RoomDefinition,
+  ) => {
+    if (mockEffectiveMax !== undefined) return mockEffectiveMax;
+    return roomDef.maxInhabitants;
+  },
+}));
 
 const {
   allInhabitants,
@@ -51,6 +63,7 @@ function createTestInhabitant(
 describe('inhabitant management', () => {
   beforeEach(() => {
     mockInhabitants = [];
+    mockEffectiveMax = undefined;
   });
 
   it('should add an inhabitant', async () => {
@@ -329,5 +342,71 @@ describe('getEligibleInhabitants', () => {
   it('should handle empty inhabitant list', () => {
     const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
     expect(getEligibleInhabitants([], room)).toHaveLength(0);
+  });
+});
+
+// --- PlacedRoom helpers for upgrade-aware tests ---
+
+function createTestPlacedRoom(
+  overrides: Partial<PlacedRoom> = {},
+): PlacedRoom {
+  return {
+    id: 'placed-room-001',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-l',
+    anchorX: 5,
+    anchorY: 5,
+    ...overrides,
+  };
+}
+
+describe('canAssignInhabitantToRoom with PlacedRoom (upgrade-aware)', () => {
+  it('should use base capacity when no PlacedRoom is provided', () => {
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef({ maxInhabitants: 2 });
+    const result = canAssignInhabitantToRoom(def, room, 2);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('maximum capacity');
+  });
+
+  it('should use effective capacity from PlacedRoom when provided', () => {
+    mockEffectiveMax = 4;
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef({ maxInhabitants: 2 });
+    const placed = createTestPlacedRoom();
+    const result = canAssignInhabitantToRoom(def, room, 2, placed);
+    expect(result.allowed).toBe(true);
+  });
+
+  it('should reject when at effective capacity from upgrade', () => {
+    mockEffectiveMax = 4;
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef({ maxInhabitants: 2 });
+    const placed = createTestPlacedRoom();
+    const result = canAssignInhabitantToRoom(def, room, 4, placed);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('maximum capacity');
+  });
+
+  it('should still check restriction before capacity with PlacedRoom', () => {
+    mockEffectiveMax = 4;
+    const def = createTestInhabitantDef({ restrictionTags: [] });
+    const room = createTestRoomDef({
+      maxInhabitants: 2,
+      inhabitantRestriction: 'unique',
+    });
+    const placed = createTestPlacedRoom();
+    const result = canAssignInhabitantToRoom(def, room, 0, placed);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('unique');
+  });
+
+  it('should allow unlimited with PlacedRoom when effective max is -1', () => {
+    mockEffectiveMax = -1;
+    const def = createTestInhabitantDef();
+    const room = createTestRoomDef({ maxInhabitants: -1 });
+    const placed = createTestPlacedRoom();
+    const result = canAssignInhabitantToRoom(def, room, 100, placed);
+    expect(result.allowed).toBe(true);
   });
 });
