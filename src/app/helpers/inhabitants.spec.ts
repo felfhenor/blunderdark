@@ -196,6 +196,7 @@ function createTestRoomDef(
     maxInhabitants: -1,
     inhabitantRestriction: null,
     fearLevel: 0,
+    upgradePaths: [],
     ...overrides,
   };
 }

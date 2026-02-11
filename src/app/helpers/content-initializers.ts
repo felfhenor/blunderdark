@@ -186,6 +186,7 @@ function ensureRoom(
     maxInhabitants: room.maxInhabitants ?? -1,
     inhabitantRestriction: room.inhabitantRestriction ?? null,
     fearLevel: room.fearLevel ?? 0,
+    upgradePaths: room.upgradePaths ?? [],
   };
 }
 
