@@ -119,6 +119,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `PanelResourcesComponent` displays all 7 resource types with progress bars and `+X/min` production rates — uses `productionRates` computed signal and `productionPerMinute()` helper
 - `ensureContent()` in `content-initializers.ts` gracefully handles unknown content types by returning content as-is — prevents crashes when new YAML content types (e.g., currency) lack an initializer function
 
+## Adding Generic Rooms
+
+- **Generic rooms (non-unique, no special logic) only need YAML changes** — the existing placement, production, adjacency, and upgrade systems are fully data-driven. No helper code or component changes are needed.
+- Room production values in YAML are **per tick**. To get per-minute rate, multiply by `TICKS_PER_MINUTE` (5). Example: 8 Food/min = `food: 1.6` in YAML.
+- Adjacency bonuses reference specific room type IDs (not categories). For "Water rooms" use Soul Well ID, for "Dark rooms" use Shadow Library/Dark Forge IDs.
+- Upgrade path IDs use `aa200001-` prefix, room IDs use `aa100001-` prefix. Increment the last digits to avoid collisions with existing entries.
+- The T-Shape room shape ID is `0279e677-6073-4a18-b57b-8e6008f4a3a5` — a 3x2 bounding box with 4 tiles.
+
 ## Production & Upgrade Integration
 
 - **Upgrade effects are NOT yet wired into production calculations** — `productionMultiplier` and `secondaryProduction` upgrade effects from `room-upgrades.ts` are defined but not applied in `calculateTotalProduction()` or `calculateSingleRoomProduction()`. This needs to be done when upgrade UI is implemented.
