@@ -13,6 +13,7 @@ import {
   hallwayPreviewCost,
   hallwayPreviewPath,
   hallwayStatusMessage,
+  hasAltarRoom,
   isHallwayBuildMode,
   placedRoomTypeIds,
   placementRotation,
@@ -29,8 +30,12 @@ import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    getEntriesByType<RoomDefinition & IsContentItem>('room'),
+    getEntriesByType<RoomDefinition & IsContentItem>('room').filter(
+      (r) => !r.autoPlace,
+    ),
   );
+
+  public hasAltar = hasAltarRoom;
 
   public selectedId = selectedRoomTypeId;
   public isHallwayMode = isHallwayBuildMode;

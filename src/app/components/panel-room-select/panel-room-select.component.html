@@ -42,14 +42,18 @@
       </button>
     }
 
-    <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode()" [class.pointer-events-none]="isHallwayMode()">
+    @if (!hasAltar()) {
+      <p class="text-xs opacity-70">Build an Altar to unlock room construction.</p>
+    }
+
+    <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode() || !hasAltar()" [class.pointer-events-none]="isHallwayMode() || !hasAltar()">
       @for (room of rooms(); track room.id) {
         <button
           class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-1"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
-          [disabled]="isHallwayMode() || isUniqueAndPlaced(room)"
-          [title]="isUniqueAndPlaced(room) ? 'Already built (unique room)' : ''"
+          [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || !hasAltar()"
+          [title]="isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">

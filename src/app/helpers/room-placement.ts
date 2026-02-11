@@ -1,4 +1,5 @@
 import { computed, signal } from '@angular/core';
+import { findAltarRoom } from '@helpers/altar-room';
 import { getEntry } from '@helpers/content';
 import { currentFloor } from '@helpers/floor';
 import { canAfford, payCost } from '@helpers/resources';
@@ -280,6 +281,14 @@ export async function executeRoomPlacement(
 
   const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
+
+  // Non-autoPlace rooms require the Altar to be present
+  if (!roomDef.autoPlace) {
+    const allFloors = gamestate().world.floors;
+    if (!findAltarRoom(allFloors)) {
+      return { success: false, error: 'An Altar is required to build rooms' };
+    }
+  }
 
   if (roomDef.isUnique) {
     const allFloors = gamestate().world.floors;
