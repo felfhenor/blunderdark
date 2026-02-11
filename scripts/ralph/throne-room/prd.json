@@ -110,8 +110,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created panel-throne-room component (3 files: .ts, .html, .scss) with computed signals for throne room detection, ruler info, bonuses, fear level, and positional bonuses. Shows 'Empty Throne' when no ruler, fear level progress bar (color-coded by severity), dungeon-wide bonus list with +/- coloring, positional bonuses (vault adjacency, central placement), assign/remove ruler buttons, and 'No eligible creatures available' message. Added to game-play sidebar. Also fixed pre-existing bug in ensureContent() that crashed on unknown content types like 'currency'. Browser-verified: panel renders correctly showing 'Empty Throne', fear 1/5, and Central Placement +0.1 bonus. All 419 tests pass."
     }
   ]
 }

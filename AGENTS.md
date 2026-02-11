@@ -95,3 +95,8 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `@ngneat/hotkeys` provides global keyboard shortcuts: `[hotkeys]="'SPACE'"` with `isGlobal` directive attr, `(hotkey)` event handler
 - `appRequireSetup` / `appRequireNotSetup` directives show/hide elements based on setup state
 - Navbar component already has pause button, pause menu (ESC), Space bar toggle — check before re-implementing
+- Panel components follow card pattern: `card bg-base-100 shadow-xl` → `card-body p-4` → `card-title text-sm` for headers
+- Panel components conditionally render using a computed signal (e.g., `throneRoom()` returns null if not relevant) and wrapping template in `@if`
+- `panel-throne-room` component shows when a Throne Room tile is selected — reads from `selectedTile()`, `currentFloor()`, then finds the room and checks `roomTypeId === THRONE_ROOM_TYPE_ID`
+- Sidebar panels are added to `game-play.component.html` inside the `.sidebar` div — order matters for visual stacking
+- `ensureContent()` in `content-initializers.ts` gracefully handles unknown content types by returning content as-is — prevents crashes when new YAML content types (e.g., currency) lack an initializer function
