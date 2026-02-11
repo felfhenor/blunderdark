@@ -115,3 +115,11 @@ export function isAdjacentToAltar(
 export const altarFearReductionAura = computed<number>(() => {
   return getAltarFearReductionAura(gamestate().world.floors);
 });
+
+/**
+ * Reactive signal: whether recruitment is available (requires Altar at Level 1+).
+ * The Altar's presence enables basic recruitment; upgrades may expand it later.
+ */
+export const canRecruit = computed<boolean>(() => {
+  return findAltarRoom(gamestate().world.floors) !== null;
+});
