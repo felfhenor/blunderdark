@@ -116,4 +116,11 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - Panel components conditionally render using a computed signal (e.g., `throneRoom()` returns null if not relevant) and wrapping template in `@if`
 - `panel-throne-room` component shows when a Throne Room tile is selected — reads from `selectedTile()`, `currentFloor()`, then finds the room and checks `roomTypeId === THRONE_ROOM_TYPE_ID`
 - Sidebar panels are added to `game-play.component.html` inside the `.sidebar` div — order matters for visual stacking
+- `PanelResourcesComponent` displays all 7 resource types with progress bars and `+X/min` production rates — uses `productionRates` computed signal and `productionPerMinute()` helper
 - `ensureContent()` in `content-initializers.ts` gracefully handles unknown content types by returning content as-is — prevents crashes when new YAML content types (e.g., currency) lack an initializer function
+
+## Production & Upgrade Integration
+
+- **Upgrade effects are NOT yet wired into production calculations** — `productionMultiplier` and `secondaryProduction` upgrade effects from `room-upgrades.ts` are defined but not applied in `calculateTotalProduction()` or `calculateSingleRoomProduction()`. This needs to be done when upgrade UI is implemented.
+- `processProduction(state)` in `gameloop.ts` is the entry point — called every tick, sums all room production, adds to resources capped at max
+- `productionRates` is a computed signal that recalculates whenever `gamestate().world.floors` changes — used by `PanelResourcesComponent` for live rate display

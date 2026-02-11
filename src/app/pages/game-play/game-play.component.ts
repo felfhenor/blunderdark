@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { GridComponent } from '@components/grid/grid.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
+import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
@@ -19,6 +20,7 @@ import { getOption } from '@helpers';
     GridComponent,
     PanelFloorSelectorComponent,
     PanelReputationComponent,
+    PanelResourcesComponent,
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
     PanelThroneRoomComponent,
