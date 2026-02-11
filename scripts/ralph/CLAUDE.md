@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Your Task
+
+1. Choose the next task from tasks.md and the prompt.md file to understand your context. Utilize the agents file to understand helpful tips you've discovered before.
+2. Find the next incomplete task and implement it.
+3. Commit your changes.
+4. Update @agents.md with your learnings and findings (see @prompt.md for good conventions).
+5. Update the prd.json file in the task folder to reflect the completed task.
+6. Update @tasks.md with the status of the task you just completed.
+7. Commit your changes as well as any outstanding changes (such as scripts or markdown files).
+8. Merge your changes into the 'master' branch.
+
 ## Project Overview
 
 Blunderdark is a browser-based and desktop dungeon-building game built with Angular 20, TypeScript, and Electron. Game content is defined in YAML files, compiled to JSON at build time, and delivered alongside generated sprite atlases. PIXI is used to render the world.

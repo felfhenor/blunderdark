@@ -15,16 +15,51 @@
 
 - id: aa100001-0001-0001-0001-000000000002
   name: Crystal Mine
-  description: Extracts crystals from the surrounding rock. Requires workers for full output.
-  shapeId: aa000000-0000-0000-0000-000000000001
+  description: An L-shaped excavation that extracts crystals from deep rock veins. Requires workers for full output. Benefits from proximity to other mines, forges, and libraries.
+  shapeId: 5634b24d-d5dd-4a8f-9877-4393cdc05ffb
   cost:
     gold: 50
   production:
     crystals: 1.0
   requiresWorkers: true
+  maxInhabitants: 2
+  fearLevel: 1
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
       bonus: 0.1
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+      bonus: 0.15
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+      bonus: 0.1
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000001
+      name: Deep Vein Extraction
+      description: Optimized mining techniques increase crystal yield by 50%.
+      cost:
+        crystals: 75
+      effects:
+        - type: productionMultiplier
+          value: 1.5
+          resource: crystals
+    - id: aa200001-0001-0001-0001-000000000002
+      name: Expanded Tunnels
+      description: Widen the mine shafts to accommodate more workers, increasing capacity from 2 to 4.
+      cost:
+        crystals: 60
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+    - id: aa200001-0001-0001-0001-000000000003
+      name: Crystal Resonance
+      description: Harmonic crystal formations reduce fear in the mine and produce a small amount of flux.
+      cost:
+        crystals: 80
+      effects:
+        - type: fearReduction
+          value: 1
+        - type: secondaryProduction
+          value: 0.2
+          resource: flux
 
 - id: aa100001-0001-0001-0001-000000000003
   name: Mushroom Grove

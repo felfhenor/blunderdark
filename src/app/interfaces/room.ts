@@ -7,6 +7,20 @@ export type AdjacencyBonus = {
   bonus: number;
 };
 
+export type RoomUpgradeEffect = {
+  type: string;
+  value: number;
+  resource?: string;
+};
+
+export type RoomUpgradePath = {
+  id: string;
+  name: string;
+  description: string;
+  cost: ResourceCost;
+  effects: RoomUpgradeEffect[];
+};
+
 export type RoomDefinition = {
   id: string;
   name: string;
@@ -20,4 +34,5 @@ export type RoomDefinition = {
   maxInhabitants: number;
   inhabitantRestriction: string | null;
   fearLevel: number | 'variable';
+  upgradePaths: RoomUpgradePath[];
 };
