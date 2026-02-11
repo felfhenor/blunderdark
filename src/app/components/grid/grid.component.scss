@@ -4,12 +4,9 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(20, 1fr);
+  grid-template-columns: repeat(20, 64px);
+  grid-template-rows: repeat(20, 64px);
   gap: 1px;
-  width: 100%;
-  max-width: 600px;
-  aspect-ratio: 1;
 }
 
 .grid-container.hallway-mode .grid-tile {
@@ -106,7 +103,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 6px;
+  font-size: 11px;
   font-weight: 700;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
