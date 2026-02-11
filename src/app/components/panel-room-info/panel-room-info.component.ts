@@ -1,15 +1,21 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
+  assignInhabitantToRoom,
   createConnection,
   currentFloor,
   getAdjacentUnconnectedRooms,
+  getEntry,
+  getEffectiveMaxInhabitants,
   getRoomConnections,
   getRoomDefinition,
+  meetsInhabitantRestriction,
   notifyError,
   notifySuccess,
   removeConnection,
   selectedTile,
+  unassignInhabitantFromRoom,
 } from '@helpers';
+import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 
 @Component({
   selector: 'app-panel-room-info',
@@ -30,11 +36,60 @@ export class PanelRoomInfoComponent {
     if (!room) return null;
 
     const def = getRoomDefinition(room.roomTypeId);
+    if (!def) return null;
+
+    const effectiveMax = getEffectiveMaxInhabitants(room, def);
+
     return {
       id: room.id,
-      name: def?.name ?? 'Unknown Room',
+      name: def.name,
       roomTypeId: room.roomTypeId,
+      placedRoom: room,
+      maxInhabitants: effectiveMax,
     };
+  });
+
+  public assignedInhabitants = computed(() => {
+    const room = this.selectedRoom();
+    const floor = currentFloor();
+    if (!room || !floor) return [];
+
+    return floor.inhabitants
+      .filter((i) => i.assignedRoomId === room.id)
+      .map((i) => {
+        const def = getEntry<InhabitantDefinition & IsContentItem>(
+          i.definitionId,
+        );
+        return { instance: i, name: def?.name ?? i.name };
+      });
+  });
+
+  public inhabitantCount = computed(() => this.assignedInhabitants().length);
+
+  public eligibleUnassigned = computed(() => {
+    const room = this.selectedRoom();
+    const floor = currentFloor();
+    if (!room || !floor || room.maxInhabitants === 0) return [];
+
+    const roomDef = getRoomDefinition(room.roomTypeId);
+    if (!roomDef) return [];
+
+    return floor.inhabitants
+      .filter((i) => {
+        if (i.assignedRoomId !== null) return false;
+        const def = getEntry<InhabitantDefinition & IsContentItem>(
+          i.definitionId,
+        );
+        return def
+          ? meetsInhabitantRestriction(def, roomDef.inhabitantRestriction)
+          : false;
+      })
+      .map((i) => {
+        const def = getEntry<InhabitantDefinition & IsContentItem>(
+          i.definitionId,
+        );
+        return { instance: i, name: def?.name ?? i.name };
+      });
   });
 
   public adjacentUnconnected = computed(() => {
@@ -91,6 +146,31 @@ export class PanelRoomInfoComponent {
       notifySuccess('Connection removed');
     } else {
       notifyError('Failed to remove connection');
+    }
+  }
+
+  public async onAssignInhabitant(instanceId: string): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const result = await assignInhabitantToRoom(
+      instanceId,
+      room.id,
+      room.roomTypeId,
+    );
+    if (!result.success && result.error) {
+      notifyError(result.error);
+    } else if (result.success) {
+      notifySuccess('Inhabitant assigned');
+    }
+  }
+
+  public async onUnassignInhabitant(instanceId: string): Promise<void> {
+    const removed = await unassignInhabitantFromRoom(instanceId);
+    if (removed) {
+      notifySuccess('Inhabitant unassigned');
+    } else {
+      notifyError('Failed to unassign inhabitant');
     }
   }
 }

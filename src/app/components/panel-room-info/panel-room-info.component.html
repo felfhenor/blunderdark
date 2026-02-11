@@ -3,6 +3,51 @@
     <div class="card-body p-4">
       <h3 class="card-title text-sm">{{ room.name }}</h3>
 
+      @if (room.maxInhabitants !== 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">
+            Inhabitants:
+            <span class="font-mono">
+              {{ inhabitantCount() }}/{{ room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants }}
+            </span>
+          </h4>
+
+          @if (assignedInhabitants().length > 0) {
+            <div class="flex flex-col gap-1 mb-2">
+              @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs">{{ inh.name }}</span>
+                  <button
+                    class="btn btn-xs btn-outline btn-error"
+                    (click)="onUnassignInhabitant(inh.instance.instanceId)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (room.maxInhabitants === -1 || inhabitantCount() < room.maxInhabitants) {
+            @if (eligibleUnassigned().length > 0) {
+              <div class="flex flex-col gap-1">
+                <span class="text-xs opacity-50">Assign:</span>
+                @for (inh of eligibleUnassigned(); track inh.instance.instanceId) {
+                  <button
+                    class="btn btn-xs btn-outline btn-success"
+                    (click)="onAssignInhabitant(inh.instance.instanceId)"
+                  >
+                    {{ inh.name }}
+                  </button>
+                }
+              </div>
+            } @else if (assignedInhabitants().length === 0) {
+              <p class="text-xs opacity-50">No eligible inhabitants available.</p>
+            }
+          }
+        </div>
+      }
+
       @if (adjacentUnconnected().length > 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">Connect to:</h4>

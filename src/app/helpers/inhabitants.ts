@@ -1,10 +1,12 @@
 import { computed, type Signal } from '@angular/core';
 import { getEntry } from '@helpers/content';
+import { getEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   InhabitantDefinition,
   InhabitantInstance,
   IsContentItem,
+  PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
 
@@ -80,11 +82,13 @@ export function meetsInhabitantRestriction(
 /**
  * Check if an inhabitant can be assigned to a specific room.
  * Validates restriction tags and max inhabitant capacity.
+ * If a PlacedRoom is provided, uses effective capacity (base + upgrade bonuses).
  */
 export function canAssignInhabitantToRoom(
   inhabitantDef: InhabitantDefinition,
   roomDef: RoomDefinition,
   currentAssignedCount: number,
+  placedRoom?: PlacedRoom,
 ): { allowed: boolean; reason?: string } {
   if (!meetsInhabitantRestriction(inhabitantDef, roomDef.inhabitantRestriction)) {
     return {
@@ -93,10 +97,11 @@ export function canAssignInhabitantToRoom(
     };
   }
 
-  if (
-    roomDef.maxInhabitants >= 0 &&
-    currentAssignedCount >= roomDef.maxInhabitants
-  ) {
+  const maxCapacity = placedRoom
+    ? getEffectiveMaxInhabitants(placedRoom, roomDef)
+    : roomDef.maxInhabitants;
+
+  if (maxCapacity >= 0 && currentAssignedCount >= maxCapacity) {
     return { allowed: false, reason: 'Room is at maximum capacity' };
   }
 
@@ -149,7 +154,19 @@ export async function assignInhabitantToRoom(
     (i) => i.assignedRoomId === roomId,
   ).length;
 
-  const check = canAssignInhabitantToRoom(inhabitantDef, roomDef, assignedCount);
+  // Find the PlacedRoom to account for upgrade bonuses in capacity check
+  let placedRoom: PlacedRoom | undefined;
+  for (const floor of state.world.floors) {
+    placedRoom = floor.rooms.find((r) => r.id === roomId);
+    if (placedRoom) break;
+  }
+
+  const check = canAssignInhabitantToRoom(
+    inhabitantDef,
+    roomDef,
+    assignedCount,
+    placedRoom,
+  );
   if (!check.allowed) {
     return { success: false, error: check.reason };
   }

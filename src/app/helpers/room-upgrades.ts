@@ -73,3 +73,25 @@ export function getAvailableUpgrades(
   if (placedRoom.appliedUpgradePathId) return [];
   return getUpgradePaths(placedRoom.roomTypeId);
 }
+
+/**
+ * Calculate the effective max inhabitants for a placed room,
+ * accounting for upgrade bonuses (maxInhabitantBonus).
+ * Returns -1 for unlimited capacity.
+ */
+export function getEffectiveMaxInhabitants(
+  placedRoom: PlacedRoom,
+  roomDef: RoomDefinition,
+): number {
+  if (roomDef.maxInhabitants < 0) return -1;
+
+  const effects = getAppliedUpgradeEffects(placedRoom);
+  let bonus = 0;
+  for (const effect of effects) {
+    if (effect.type === 'maxInhabitantBonus') {
+      bonus += effect.value;
+    }
+  }
+
+  return roomDef.maxInhabitants + bonus;
+}

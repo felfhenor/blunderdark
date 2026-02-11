@@ -21,6 +21,7 @@ const {
   canApplyUpgrade,
   applyUpgrade,
   getAvailableUpgrades,
+  getEffectiveMaxInhabitants,
 } = await import('@helpers/room-upgrades');
 
 // --- Test data ---
@@ -269,5 +270,50 @@ describe('mutual exclusivity', () => {
   it('should show no available upgrades after any path is chosen', () => {
     const room = applyUpgrade(createPlacedRoom(), 'upgrade-capacity');
     expect(getAvailableUpgrades(room)).toEqual([]);
+  });
+});
+
+describe('getEffectiveMaxInhabitants', () => {
+  it('should return base maxInhabitants when no upgrade applied', () => {
+    const room = createPlacedRoom();
+    const result = getEffectiveMaxInhabitants(room, crystalMineRoom);
+    expect(result).toBe(2);
+  });
+
+  it('should return base + bonus when capacity upgrade is applied', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-capacity',
+    });
+    const result = getEffectiveMaxInhabitants(room, crystalMineRoom);
+    expect(result).toBe(4);
+  });
+
+  it('should return base when non-capacity upgrade is applied', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-efficiency',
+    });
+    const result = getEffectiveMaxInhabitants(room, crystalMineRoom);
+    expect(result).toBe(2);
+  });
+
+  it('should return -1 for unlimited capacity rooms regardless of upgrades', () => {
+    const unlimitedRoom: RoomDefinition & IsContentItem = {
+      ...crystalMineRoom,
+      id: 'unlimited-room',
+      maxInhabitants: -1,
+    };
+    mockContent.set('unlimited-room', unlimitedRoom);
+
+    const room = createPlacedRoom({ roomTypeId: 'unlimited-room' });
+    const result = getEffectiveMaxInhabitants(room, unlimitedRoom);
+    expect(result).toBe(-1);
+  });
+
+  it('should return base when upgrade path ID does not match any path', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'nonexistent',
+    });
+    const result = getEffectiveMaxInhabitants(room, crystalMineRoom);
+    expect(result).toBe(2);
   });
 });
