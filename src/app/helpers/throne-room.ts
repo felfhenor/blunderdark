@@ -104,3 +104,34 @@ export const activeRulerBonuses = computed<RulerBonuses>(() => {
 export function rulerBonus(bonusType: string): number {
   return activeRulerBonuses()[bonusType] ?? 0;
 }
+
+// --- Fear level ---
+
+export const EMPTY_THRONE_FEAR_LEVEL = 1;
+
+/**
+ * Get the Throne Room's effective fear level.
+ * Returns EMPTY_THRONE_FEAR_LEVEL (1) if no Throne Room or no ruler seated.
+ * Returns the ruler's rulerFearLevel if a ruler is seated.
+ * Returns null if the Throne Room is not placed.
+ */
+export function getThroneRoomFearLevel(floors: Floor[]): number | null {
+  const throne = findThroneRoom(floors);
+  if (!throne) return null;
+
+  const ruler = getSeatedRulerInstance(throne.floor, throne.room.id);
+  if (!ruler) return EMPTY_THRONE_FEAR_LEVEL;
+
+  const def = getRulerDefinition(ruler);
+  if (!def || def.rulerFearLevel <= 0) return EMPTY_THRONE_FEAR_LEVEL;
+
+  return def.rulerFearLevel;
+}
+
+/**
+ * Reactive computed signal for the Throne Room's fear level.
+ * Returns null if no Throne Room is placed.
+ */
+export const throneRoomFearLevel = computed<number | null>(() => {
+  return getThroneRoomFearLevel(gamestate().world.floors);
+});

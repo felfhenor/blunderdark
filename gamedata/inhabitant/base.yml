@@ -125,6 +125,7 @@
   rulerBonuses:
     attack: 0.10
     fear: 0.05
+  rulerFearLevel: 4
 
 - id: d4a60001-0001-0001-0001-000000000002
   name: Lich
@@ -147,6 +148,7 @@
   rulerBonuses:
     researchSpeed: 0.20
     fluxProduction: 0.15
+  rulerFearLevel: 3
 
 - id: d4a60001-0001-0001-0001-000000000003
   name: Demon Lord
@@ -170,3 +172,4 @@
     corruptionGeneration: 0.25
     fear: 0.10
     invaderMorale: -0.10
+  rulerFearLevel: 5

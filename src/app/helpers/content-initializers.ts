@@ -208,6 +208,7 @@ function ensureInhabitant(
     traits: inhabitant.traits ?? [],
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},
+    rulerFearLevel: inhabitant.rulerFearLevel ?? 0,
   };
 }
 

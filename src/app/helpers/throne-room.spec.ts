@@ -22,10 +22,12 @@ vi.mock('@helpers/state-game', () => ({
 
 const {
   THRONE_ROOM_TYPE_ID,
+  EMPTY_THRONE_FEAR_LEVEL,
   findThroneRoom,
   getSeatedRulerInstance,
   getActiveRulerBonuses,
   getRulerBonusValue,
+  getThroneRoomFearLevel,
 } = await import('@helpers/throne-room');
 
 // --- Test helpers ---
@@ -75,6 +77,7 @@ function createInhabitantDef(
     traits: [],
     restrictionTags: ['unique'],
     rulerBonuses: { attack: 0.1, fear: 0.05 },
+    rulerFearLevel: 4,
     ...overrides,
   } as InhabitantDefinition & IsContentItem;
 }
@@ -311,5 +314,122 @@ describe('getRulerBonusValue', () => {
     expect(getRulerBonusValue([floor], 'attack')).toBe(0.1);
     expect(getRulerBonusValue([floor], 'fear')).toBe(0.05);
     expect(getRulerBonusValue([floor], 'researchSpeed')).toBe(0);
+  });
+});
+
+describe('getThroneRoomFearLevel', () => {
+  beforeEach(() => {
+    mockContent.clear();
+  });
+
+  it('should return null when no Throne Room exists', () => {
+    expect(getThroneRoomFearLevel([createFloor()])).toBeNull();
+  });
+
+  it('should return EMPTY_THRONE_FEAR_LEVEL when Throne Room has no ruler', () => {
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [],
+    });
+    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
+    expect(EMPTY_THRONE_FEAR_LEVEL).toBe(1);
+  });
+
+  it('should return fear level 4 for Dragon ruler', () => {
+    const dragonDef = createInhabitantDef({
+      id: 'def-dragon',
+      rulerFearLevel: 4,
+    });
+    mockContent.set('def-dragon', dragonDef);
+
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [
+        createInhabitantInstance({
+          definitionId: 'def-dragon',
+          assignedRoomId: 'room-001',
+        }),
+      ],
+    });
+
+    expect(getThroneRoomFearLevel([floor])).toBe(4);
+  });
+
+  it('should return fear level 3 for Lich ruler', () => {
+    const lichDef = createInhabitantDef({
+      id: 'def-lich',
+      name: 'Lich',
+      rulerFearLevel: 3,
+    });
+    mockContent.set('def-lich', lichDef);
+
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [
+        createInhabitantInstance({
+          instanceId: 'ruler-lich',
+          definitionId: 'def-lich',
+          assignedRoomId: 'room-001',
+        }),
+      ],
+    });
+
+    expect(getThroneRoomFearLevel([floor])).toBe(3);
+  });
+
+  it('should return fear level 5 for Demon Lord ruler', () => {
+    const demonDef = createInhabitantDef({
+      id: 'def-demon',
+      name: 'Demon Lord',
+      rulerFearLevel: 5,
+    });
+    mockContent.set('def-demon', demonDef);
+
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [
+        createInhabitantInstance({
+          instanceId: 'ruler-demon',
+          definitionId: 'def-demon',
+          assignedRoomId: 'room-001',
+        }),
+      ],
+    });
+
+    expect(getThroneRoomFearLevel([floor])).toBe(5);
+  });
+
+  it('should return EMPTY_THRONE_FEAR_LEVEL when ruler definition is unknown', () => {
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [
+        createInhabitantInstance({
+          definitionId: 'nonexistent-def',
+          assignedRoomId: 'room-001',
+        }),
+      ],
+    });
+
+    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
+  });
+
+  it('should return EMPTY_THRONE_FEAR_LEVEL when ruler has rulerFearLevel 0', () => {
+    const weakDef = createInhabitantDef({
+      id: 'def-weak',
+      rulerFearLevel: 0,
+    });
+    mockContent.set('def-weak', weakDef);
+
+    const floor = createFloor({
+      rooms: [createPlacedRoom()],
+      inhabitants: [
+        createInhabitantInstance({
+          definitionId: 'def-weak',
+          assignedRoomId: 'room-001',
+        }),
+      ],
+    });
+
+    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
   });
 });

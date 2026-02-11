@@ -29,6 +29,7 @@ export type InhabitantDefinition = {
   traits: InhabitantTrait[];
   restrictionTags: string[];
   rulerBonuses: RulerBonuses;
+  rulerFearLevel: number;
 };
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry';
