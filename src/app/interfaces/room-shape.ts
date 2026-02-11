@@ -3,6 +3,8 @@ export type TileOffset = {
   y: number;
 };
 
+export type Rotation = 0 | 1 | 2 | 3;
+
 export type RoomShape = {
   id: string;
   name: string;
@@ -17,5 +19,6 @@ export type PlacedRoom = {
   shapeId: string;
   anchorX: number;
   anchorY: number;
+  rotation?: Rotation;
   appliedUpgradePathId?: string;
 };

@@ -14,6 +14,7 @@ import {
   notifyError,
   placementPreview,
   placementPreviewShape,
+  rotatePlacement,
   selectedTile,
   selectTile,
   updatePreviewPosition,
@@ -47,6 +48,7 @@ function getRoomColor(roomTypeId: string): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '(document:keydown.escape)': 'onEscapeKey()',
+    '(document:keydown.r)': 'onRotateKey()',
   },
 })
 export class GridComponent {
@@ -209,7 +211,13 @@ export class GridComponent {
       exitHallwayBuildMode();
     } else if (placementPreviewShape()) {
       event.preventDefault();
-      exitPlacementMode();
+      rotatePlacement();
+    }
+  }
+
+  public onRotateKey(): void {
+    if (placementPreviewShape()) {
+      rotatePlacement();
     }
   }
 

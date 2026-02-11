@@ -3,13 +3,18 @@ import { getEntry } from '@helpers/content';
 import { currentFloor } from '@helpers/floor';
 import { canAfford, payCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
-import { getAbsoluteTiles, getRoomShape } from '@helpers/room-shapes';
+import {
+  getAbsoluteTiles,
+  getRotatedShape,
+  getRoomShape,
+} from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
   GridState,
   IsContentItem,
   PlacedRoom,
+  Rotation,
   RoomDefinition,
   RoomShape,
   TileOffset,
@@ -132,17 +137,34 @@ export const placedRoomTypeIds = computed(() => {
 // --- Placement mode state ---
 
 export const selectedRoomTypeId = signal<string | null>(null);
+export const placementRotation = signal<Rotation>(0);
+
+/** The base (unrotated) shape for the current placement. */
+const placementBaseShape = signal<RoomShape | null>(null);
 
 export function enterPlacementMode(roomTypeId: string, shape: RoomShape): void {
   selectedRoomTypeId.set(roomTypeId);
+  placementBaseShape.set(shape);
+  placementRotation.set(0);
   placementPreviewShape.set(shape);
   placementPreviewPosition.set(null);
 }
 
 export function exitPlacementMode(): void {
   selectedRoomTypeId.set(null);
+  placementBaseShape.set(null);
+  placementRotation.set(0);
   placementPreviewShape.set(null);
   placementPreviewPosition.set(null);
+}
+
+/** Rotate the placement preview by 90° clockwise. */
+export function rotatePlacement(): void {
+  const base = placementBaseShape();
+  if (!base) return;
+  const next = ((placementRotation() + 1) % 4) as Rotation;
+  placementRotation.set(next);
+  placementPreviewShape.set(getRotatedShape(base, next));
 }
 
 // --- Placement preview state ---
@@ -273,7 +295,13 @@ export async function executeRoomPlacement(
   const paid = await payCost(roomDef.cost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
-  const placed = await placeRoom(roomTypeId, roomDef.shapeId, x, y);
+  const placed = await placeRoom(
+    roomTypeId,
+    roomDef.shapeId,
+    x,
+    y,
+    placementRotation(),
+  );
   if (!placed) return { success: false, error: 'Failed to place room' };
 
   return { success: true };
@@ -357,9 +385,12 @@ export async function placeRoom(
   shapeId: string,
   anchorX: number,
   anchorY: number,
+  rotation: Rotation = 0,
 ): Promise<PlacedRoom | null> {
-  const shape = getRoomShape(shapeId);
-  if (!shape) return null;
+  const baseShape = getRoomShape(shapeId);
+  if (!baseShape) return null;
+
+  const shape = getRotatedShape(baseShape, rotation);
 
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
@@ -372,6 +403,7 @@ export async function placeRoom(
     shapeId,
     anchorX,
     anchorY,
+    rotation: rotation || undefined,
   };
 
   const updatedFloor = placeRoomOnFloor(floor, room, shape);
@@ -401,8 +433,10 @@ export async function removeRoom(roomId: string): Promise<boolean> {
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return false;
 
-  const shape = getRoomShape(room.shapeId);
-  if (!shape) return false;
+  const baseShape = getRoomShape(room.shapeId);
+  if (!baseShape) return false;
+
+  const shape = getRotatedShape(baseShape, room.rotation ?? 0);
 
   const updatedFloor = removeRoomFromFloor(floor, roomId, shape);
   if (!updatedFloor) return false;

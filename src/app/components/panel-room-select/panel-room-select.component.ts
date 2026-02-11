@@ -8,12 +8,15 @@ import {
   exitHallwayBuildMode,
   exitPlacementMode,
   getEntriesByType,
+  getRotatedShape,
   getRoomShape,
   hallwayPreviewCost,
   hallwayPreviewPath,
   hallwayStatusMessage,
   isHallwayBuildMode,
   placedRoomTypeIds,
+  placementRotation,
+  rotatePlacement,
   selectedRoomTypeId,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
@@ -37,6 +40,7 @@ export class PanelRoomSelectComponent {
   public canAffordHallway = canAffordHallway;
 
   public placedRoomTypeIds = placedRoomTypeIds;
+  public rotation = placementRotation;
 
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
@@ -65,16 +69,25 @@ export class PanelRoomSelectComponent {
       .map(([type, amount]) => ({ type, amount: amount as number }));
   }
 
+  private getEffectiveShape(room: RoomDefinition): RoomShape | undefined {
+    const base = getRoomShape(room.shapeId);
+    if (!base) return undefined;
+    if (this.isSelected(room.id)) {
+      return getRotatedShape(base, this.rotation());
+    }
+    return base;
+  }
+
   public getShapeTiles(
     room: RoomDefinition,
   ): { x: number; y: number; key: string }[] {
-    const shape = getRoomShape(room.shapeId);
+    const shape = this.getEffectiveShape(room);
     if (!shape) return [];
     return shape.tiles.map((t) => ({ x: t.x, y: t.y, key: `${t.x},${t.y}` }));
   }
 
   public getShapeGridSize(room: RoomDefinition): number {
-    const shape = getRoomShape(room.shapeId);
+    const shape = this.getEffectiveShape(room);
     if (!shape) return 1;
     let max = 0;
     for (const t of shape.tiles) {
@@ -107,6 +120,10 @@ export class PanelRoomSelectComponent {
 
   public async confirmHallway(): Promise<void> {
     await confirmHallwayBuild();
+  }
+
+  public rotate(): void {
+    rotatePlacement();
   }
 
   public capitalizeFirst(str: string): string {

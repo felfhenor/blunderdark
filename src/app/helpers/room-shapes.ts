@@ -3,6 +3,7 @@ import type {
   GRID_SIZE,
   IsContentItem,
   PlacedRoom,
+  Rotation,
   RoomShape,
   TileOffset,
 } from '@interfaces';
@@ -59,6 +60,59 @@ export function shapeFitsInGrid(
   );
 }
 
+/**
+ * Rotate a single tile 90° clockwise around the origin within a bounding box.
+ * For a shape of size (w, h), rotating 90° CW maps (x, y) → (h - 1 - y, x).
+ */
+export function rotateTile90(
+  tile: TileOffset,
+  height: number,
+): TileOffset {
+  return { x: height - 1 - tile.y, y: tile.x };
+}
+
+/**
+ * Rotate all tiles by the given number of 90° clockwise steps (0–3).
+ * Returns new tiles and updated width/height.
+ */
+export function rotateTiles(
+  tiles: TileOffset[],
+  width: number,
+  height: number,
+  rotation: Rotation,
+): { tiles: TileOffset[]; width: number; height: number } {
+  let currentTiles = tiles;
+  let w = width;
+  let h = height;
+
+  for (let i = 0; i < rotation; i++) {
+    currentTiles = currentTiles.map((t) => rotateTile90(t, h));
+    [w, h] = [h, w];
+  }
+
+  return { tiles: currentTiles, width: w, height: h };
+}
+
+/**
+ * Return a new RoomShape with tiles rotated by the given rotation.
+ * If rotation is 0, returns the original shape unchanged.
+ */
+export function getRotatedShape(
+  shape: RoomShape,
+  rotation: Rotation,
+): RoomShape {
+  if (rotation === 0) return shape;
+
+  const rotated = rotateTiles(shape.tiles, shape.width, shape.height, rotation);
+
+  return {
+    ...shape,
+    tiles: rotated.tiles,
+    width: rotated.width,
+    height: rotated.height,
+  };
+}
+
 const FALLBACK_SHAPE: RoomShape = {
   id: 'fallback',
   name: 'Fallback',
@@ -68,5 +122,6 @@ const FALLBACK_SHAPE: RoomShape = {
 };
 
 export function resolveRoomShape(placedRoom: PlacedRoom): RoomShape {
-  return getRoomShape(placedRoom.shapeId) ?? FALLBACK_SHAPE;
+  const base = getRoomShape(placedRoom.shapeId) ?? FALLBACK_SHAPE;
+  return getRotatedShape(base, placedRoom.rotation ?? 0);
 }
