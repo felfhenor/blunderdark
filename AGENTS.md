@@ -38,6 +38,19 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `getAbsoluteTiles()` from room-shapes.ts converts shape-relative tiles to grid-absolute coordinates
 - For grid tile lookup in templates, use a `Set<string>` of "x,y" keys for O(1) lookup vs O(n) array scan
 
+## Room Rotation System
+
+- `Rotation` type is `0 | 1 | 2 | 3` (0°, 90°, 180°, 270° clockwise) — defined in `room-shape.ts`
+- `PlacedRoom.rotation?: Rotation` — optional field (0 is default), stored on placed rooms for grid reconstruction
+- `rotateTile90(tile, height)` rotates a single point 90° CW: `(x, y) → (h-1-y, x)` — pure function in `room-shapes.ts`
+- `rotateTiles(tiles, w, h, rotation)` applies N 90° rotations, swapping w/h each step — returns `{ tiles, width, height }`
+- `getRotatedShape(shape, rotation)` returns a new RoomShape with rotated tiles — returns original for rotation 0
+- `resolveRoomShape(placedRoom)` now applies `placedRoom.rotation` — all downstream systems (production, adjacency, connections) automatically handle rotated rooms
+- `placementRotation` signal tracks current rotation during placement; `rotatePlacement()` increments by 1 (mod 4) and updates the preview shape
+- `enterPlacementMode()` stores the base (unrotated) shape internally; rotation always applies to the base shape, not incrementally
+- R key and right-click rotate during placement; Escape exits placement mode
+- `throne-room.ts` uses `getEntry<RoomShape>()` directly instead of `resolveRoomShape()` — safe because the Throne Room's 3x3 square shape is rotationally symmetric
+
 ## Room & Production System
 
 - `PlacedRoom` type in `room-shape.ts` includes `roomTypeId` linking to the content definition — when adding fields to this type, update all test PlacedRoom literals in `room-shapes.spec.ts`

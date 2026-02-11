@@ -49,8 +49,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added Rotation type (0|1|2|3) to PlacedRoom. Implemented rotateTile90, rotateTiles, getRotatedShape pure functions in room-shapes.ts. Added placementRotation signal and rotatePlacement() to room-placement.ts. R key and right-click rotate during placement. Rotate button added to panel-room-select UI. resolveRoomShape now applies stored rotation so production/adjacency/connection systems automatically handle rotated rooms. 17 new tests for rotation math. Browser verified: all 4 orientations render correctly on grid."
     },
     {
       "id": "US-004",
