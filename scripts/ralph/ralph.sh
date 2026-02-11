@@ -60,7 +60,7 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   # Run the claude command directly with the autonomous task instructions
   # Use tee to both display and capture output
   (cd "$SCRIPT_DIR" && claude --permission-mode bypassPermissions "@prompt.md @AGENTS.md @tasks.md \
-1. Choose the next task from tasks.md and read the progress file and the prompt file to understand your context. Utilize the agents file to understand helpful tips you've discovered before. \
+1. Choose the next task from tasks.md and the prompt.md file to understand your context. Utilize the agents file to understand helpful tips you've discovered before. \
 2. Find the next incomplete task and implement it. \
 3. Commit your changes. \
 4. Update @agents.md with your learnings and findings (see @prompt.md for good conventions). \
