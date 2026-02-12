@@ -300,6 +300,15 @@ BFS pathfinding for hallways between rooms:
 - `describeCondition()` uses `getRoomDefinition()` from production.ts to get room names for condition descriptions
 - When testing `synergy.ts` functions that import from `@helpers/production`, add `vi.mock('@helpers/production')` to provide `getRoomDefinition` — the mock must be placed before imports (hoisted by vitest)
 
+## Adding Rooms via YAML
+
+- Room definitions live in `gamedata/room/base.yml`; room shapes in `gamedata/roomshape/base.yml`
+- If a room references a shapeId that doesn't exist, create the shape first — the build will succeed but the room won't render
+- Production values in YAML are **per tick**. With `TICKS_PER_MINUTE = 5`, divide desired per-minute rate by 5 (e.g., 3 research/min = 0.6/tick)
+- `workerEfficiency` affects production via `totalBonus += workerEfficiency - 1.0` — a skeleton with `workerEfficiency: 0.7` applies a -0.3 penalty, so `0.6 base * (1 - 0.3) = 0.42` actual
+- `fearIncrease` is a valid upgrade effect type for room upgrades (used by Forbidden Knowledge) — data-only for now, will be wired when fear system is implemented
+- Test pattern for room-specific specs: mock `@helpers/content` with inline room/shape/inhabitant data, then test production, adjacency, upgrades via imported helper functions
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
