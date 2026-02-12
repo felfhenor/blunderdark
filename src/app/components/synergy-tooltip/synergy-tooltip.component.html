@@ -1,0 +1,51 @@
+@if (roomData(); as data) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Synergies</h3>
+
+      @if (data.active.length > 0) {
+        <div class="synergy-section">
+          <div class="text-xs font-semibold text-success mb-1">Active Synergies</div>
+          @for (synergy of data.active; track synergy.id) {
+            <div class="synergy-item active-synergy">
+              <div class="flex items-center gap-1 mb-0.5">
+                <span class="synergy-dot bg-success"></span>
+                <span class="text-xs font-semibold">{{ synergy.name }}</span>
+              </div>
+              <div class="text-[10px] opacity-70 ml-4">{{ synergy.description }}</div>
+              <div class="text-[10px] text-success ml-4 font-medium">
+                {{ formatEffect(synergy) }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (data.potential.length > 0) {
+        @if (data.active.length > 0) {
+          <div class="divider my-1 h-0"></div>
+        }
+        <div class="synergy-section">
+          <div class="text-xs font-semibold text-warning mb-1">Potential Synergies</div>
+          @for (ps of data.potential; track ps.synergy.id) {
+            <div class="synergy-item potential-synergy">
+              <div class="flex items-center gap-1 mb-0.5">
+                <span class="synergy-dot bg-warning"></span>
+                <span class="text-xs font-semibold">{{ ps.synergy.name }}</span>
+              </div>
+              <div class="text-[10px] opacity-70 ml-4">{{ getPotentialEffect(ps) }}</div>
+              <div class="text-[10px] text-warning ml-4">
+                @for (cond of ps.missingConditions; track cond; let last = $last) {
+                  <span>{{ cond }}</span>
+                  @if (!last) {
+                    <span>, </span>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

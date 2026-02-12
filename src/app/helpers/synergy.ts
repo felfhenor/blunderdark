@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
+import { getRoomDefinition } from '@helpers/production';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -230,3 +231,79 @@ export function getActiveSynergies(
 export const activeSynergyMap = computed(() => {
   return evaluateAllSynergies(gamestate().world.floors);
 });
+
+export type PotentialSynergy = {
+  synergy: SynergyDefinition;
+  missingConditions: string[];
+};
+
+function describeCondition(condition: SynergyCondition): string {
+  switch (condition.type) {
+    case 'adjacentRoomType': {
+      const def = getRoomDefinition(condition.roomTypeId!);
+      return `Place ${def?.name ?? 'a room'} adjacent`;
+    }
+    case 'connectedRoomType': {
+      const def = getRoomDefinition(condition.roomTypeId!);
+      return `Connect to ${def?.name ?? 'a room'}`;
+    }
+    case 'inhabitantType':
+      return `Assign a ${condition.inhabitantType} worker`;
+    case 'minInhabitants':
+      return `Assign ${condition.count ?? 1}+ inhabitants`;
+    default:
+      return '';
+  }
+}
+
+export function getPotentialSynergiesForRoom(
+  room: PlacedRoom,
+  floor: Floor,
+  adjacentRoomIds: string[],
+  synergies?: SynergyDefinition[],
+): PotentialSynergy[] {
+  const defs = synergies ?? SYNERGY_DEFINITIONS;
+  const potentials: PotentialSynergy[] = [];
+
+  for (const synergy of defs) {
+    const roomTypeCondition = synergy.conditions.find(
+      (c) => c.type === 'roomType',
+    );
+    if (roomTypeCondition && roomTypeCondition.roomTypeId !== room.roomTypeId) {
+      continue;
+    }
+
+    const conditionResults = synergy.conditions.map((c) => ({
+      condition: c,
+      met: evaluateCondition(c, room, floor, adjacentRoomIds),
+    }));
+
+    const allMet = conditionResults.every((r) => r.met);
+    if (allMet) continue;
+
+    const missing = conditionResults
+      .filter((r) => !r.met && r.condition.type !== 'roomType')
+      .map((r) => describeCondition(r.condition))
+      .filter((d) => d !== '');
+
+    if (missing.length > 0) {
+      potentials.push({ synergy, missingConditions: missing });
+    }
+  }
+
+  return potentials;
+}
+
+export function formatSynergyEffect(
+  effect: SynergyDefinition['effects'][0],
+): string {
+  if (effect.type === 'productionBonus') {
+    const pct = Math.round(effect.value * 100);
+    const resource = effect.resource ? ` ${effect.resource}` : '';
+    return `+${pct}%${resource} production`;
+  }
+  if (effect.type === 'fearReduction') {
+    return `-${effect.value} fear`;
+  }
+  return '';
+}

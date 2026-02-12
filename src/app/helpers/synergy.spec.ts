@@ -143,6 +143,21 @@ vi.mock('@helpers/content', () => {
   };
 });
 
+vi.mock('@helpers/production', () => ({
+  getRoomDefinition: vi.fn((id: string) => {
+    const rooms: Record<string, { name: string }> = {
+      'room-dark-forge': { name: 'Dark Forge' },
+      'room-soul-well': { name: 'Soul Well' },
+      'room-barracks': { name: 'Barracks' },
+      'room-crystal-mine': { name: 'Crystal Mine' },
+      'room-mushroom-grove': { name: 'Mushroom Grove' },
+      'room-shadow-library': { name: 'Shadow Library' },
+      'room-treasure-vault': { name: 'Treasure Vault' },
+    };
+    return rooms[id] ?? undefined;
+  }),
+}));
+
 import type {
   Connection,
   Floor,
@@ -154,6 +169,8 @@ import {
   evaluateCondition,
   evaluateAllSynergies,
   evaluateSynergiesForRoom,
+  formatSynergyEffect,
+  getPotentialSynergiesForRoom,
   SYNERGY_DEFINITIONS,
 } from '@helpers/synergy';
 
@@ -856,5 +873,202 @@ describe('synergy re-evaluation scenarios', () => {
       testSynergies,
     );
     expect(withoutForge.has('placed-mine')).toBe(false);
+  });
+});
+
+describe('formatSynergyEffect', () => {
+  it('should format production bonus with resource', () => {
+    const result = formatSynergyEffect({
+      type: 'productionBonus',
+      value: 0.15,
+      resource: 'crystals',
+    });
+    expect(result).toBe('+15% crystals production');
+  });
+
+  it('should format production bonus without resource', () => {
+    const result = formatSynergyEffect({
+      type: 'productionBonus',
+      value: 0.2,
+    });
+    expect(result).toBe('+20% production');
+  });
+
+  it('should format fear reduction', () => {
+    const result = formatSynergyEffect({
+      type: 'fearReduction',
+      value: 5,
+    });
+    expect(result).toBe('-5 fear');
+  });
+
+  it('should round percentage correctly', () => {
+    const result = formatSynergyEffect({
+      type: 'productionBonus',
+      value: 0.333,
+      resource: 'gold',
+    });
+    expect(result).toBe('+33% gold production');
+  });
+});
+
+describe('getPotentialSynergiesForRoom', () => {
+  const testSynergies: SynergyDefinition[] = [
+    {
+      id: 'test-mine-forge',
+      name: 'Test Mine Forge',
+      description: 'Mine near forge with creature worker',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'inhabitantType', inhabitantType: 'creature' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.15 }],
+    },
+    {
+      id: 'test-forge-staff',
+      name: 'Test Forge Staff',
+      description: 'Forge with 2+ workers',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-dark-forge' },
+        { type: 'minInhabitants', count: 2 },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.1 }],
+    },
+    {
+      id: 'test-library-well',
+      name: 'Test Library Well',
+      description: 'Library connected to well',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-shadow-library' },
+        { type: 'connectedRoomType', roomTypeId: 'room-soul-well' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.15, resource: 'research' }],
+    },
+  ];
+
+  const mine: PlacedRoom = {
+    id: 'placed-mine',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const forge: PlacedRoom = {
+    id: 'placed-forge',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  it('should return potential synergies with missing conditions', () => {
+    // Mine exists but no forge adjacent and no creature worker
+    const floor = makeFloor([mine]);
+    const potentials = getPotentialSynergiesForRoom(
+      mine,
+      floor,
+      [],
+      testSynergies,
+    );
+    expect(potentials).toHaveLength(1);
+    expect(potentials[0].synergy.id).toBe('test-mine-forge');
+    expect(potentials[0].missingConditions).toHaveLength(2);
+    expect(potentials[0].missingConditions).toContain(
+      'Place Dark Forge adjacent',
+    );
+    expect(potentials[0].missingConditions).toContain(
+      'Assign a creature worker',
+    );
+  });
+
+  it('should not return synergies for non-matching room types', () => {
+    // Mine doesn't match forge-staff or library-well synergies
+    const floor = makeFloor([mine]);
+    const potentials = getPotentialSynergiesForRoom(
+      mine,
+      floor,
+      [],
+      testSynergies,
+    );
+    const ids = potentials.map((p) => p.synergy.id);
+    expect(ids).not.toContain('test-forge-staff');
+    expect(ids).not.toContain('test-library-well');
+  });
+
+  it('should not return fully active synergies as potential', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const potentials = getPotentialSynergiesForRoom(
+      mine,
+      floor,
+      ['placed-forge'],
+      testSynergies,
+    );
+    const ids = potentials.map((p) => p.synergy.id);
+    expect(ids).not.toContain('test-mine-forge');
+  });
+
+  it('should show remaining missing conditions when some are met', () => {
+    // Mine with forge adjacent but no creature worker
+    const floor = makeFloor([mine, forge]);
+    const potentials = getPotentialSynergiesForRoom(
+      mine,
+      floor,
+      ['placed-forge'],
+      testSynergies,
+    );
+    expect(potentials).toHaveLength(1);
+    expect(potentials[0].synergy.id).toBe('test-mine-forge');
+    expect(potentials[0].missingConditions).toHaveLength(1);
+    expect(potentials[0].missingConditions[0]).toBe(
+      'Assign a creature worker',
+    );
+  });
+
+  it('should describe connected room type conditions', () => {
+    const library: PlacedRoom = {
+      id: 'placed-library',
+      roomTypeId: 'room-shadow-library',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([library]);
+    const potentials = getPotentialSynergiesForRoom(
+      library,
+      floor,
+      [],
+      testSynergies,
+    );
+    expect(potentials).toHaveLength(1);
+    expect(potentials[0].synergy.id).toBe('test-library-well');
+    expect(potentials[0].missingConditions[0]).toBe(
+      'Connect to Soul Well',
+    );
+  });
+
+  it('should describe minInhabitants conditions', () => {
+    const floor = makeFloor([forge]);
+    const potentials = getPotentialSynergiesForRoom(
+      forge,
+      floor,
+      [],
+      testSynergies,
+    );
+    expect(potentials).toHaveLength(1);
+    expect(potentials[0].synergy.id).toBe('test-forge-staff');
+    expect(potentials[0].missingConditions[0]).toBe(
+      'Assign 2+ inhabitants',
+    );
   });
 });
