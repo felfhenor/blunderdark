@@ -126,3 +126,43 @@ export type PrisonerHandlingResult = {
   corruptionChange: number;
   fearChange: number;
 };
+
+// --- Turn-based combat types ---
+
+import type { CombatResult } from '@interfaces/combat';
+
+export type CombatantSide = 'defender' | 'invader';
+
+export type TilePosition = {
+  x: number;
+  y: number;
+};
+
+export type Combatant = {
+  id: string;
+  side: CombatantSide;
+  name: string;
+  speed: number;
+  hp: number;
+  maxHp: number;
+  attack: number;
+  defense: number;
+  hasActed: boolean;
+  position: TilePosition | null;
+};
+
+export type TurnAction = 'move' | 'attack' | 'ability' | 'wait';
+
+export type ActionResult = {
+  action: TurnAction;
+  actorId: string;
+  targetId: string | null;
+  targetPosition: TilePosition | null;
+  combatResult: CombatResult | null;
+};
+
+export type TurnQueue = {
+  combatants: Combatant[];
+  currentIndex: number;
+  round: number;
+};
