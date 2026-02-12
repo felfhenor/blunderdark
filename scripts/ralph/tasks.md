@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 47 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions)
+- **Complete:** 48 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions, invasion-rewards-system)
 - **In Progress:** None
-- **Remaining:** ~75 features
+- **Remaining:** ~74 features
 
 ---
 
@@ -126,7 +126,7 @@ The main threat/challenge loop.
 | ~~9.4~~ | ~~`invasion-composition-logic`~~ | ~~COMPLETE (4/4)~~ | ~~multiple-invader-types~~ |
 | ~~9.5~~ | ~~`invasion-objectives-system`~~ | ~~COMPLETE (4/5, 1 deferred)~~ | ~~invasion-trigger-system~~ |
 | ~~9.6~~ | ~~`invasion-win-loss-conditions`~~ | ~~COMPLETE (2/3, 1 deferred)~~ | ~~basic-combat-resolution~~ |
-| 9.7 | `invasion-rewards-system` | 5 | invasion-win-loss-conditions |
+| ~~9.7~~ | ~~`invasion-rewards-system`~~ | ~~COMPLETE (4/5, 1 deferred)~~ | ~~invasion-win-loss-conditions~~ |
 | 9.8 | `turn-based-invasion-mode` | 8 | invasion-trigger-system, basic-combat-resolution |
 
 ---

@@ -460,6 +460,24 @@ When adding new fields to `GameStateWorld`:
 - `createHistoryEntry` produces a record compatible with the invasion schedule history system
 - `DetailedInvasionResult` type extends basic InvasionResult with turn count, defender/invader stats, endReason
 
+## Invasion Rewards System
+
+- `invasion-rewards.ts` helper: pure functions for reward/penalty calculation, loot rolling, prisoner capture and handling
+- `DefenseRewards` type: reputationGain, experienceGain, goldGain, resourceGains, capturedPrisoners
+- `DefensePenalties` type: reputationLoss, goldLost, resourceLosses, killedInhabitantIds
+- Reward formula: +5 base rep, +1 per kill, +3 if all secondaries prevented. Experience = invaderCount * 10 * rewardMultiplier
+- Penalty formula: 20% gold lost, -3 reputation, +10 crystals +5 essence per completed secondary
+- Class-based loot: `CLASS_LOOT` record maps InvaderClassType to gold range + bonus resource. Warrior=crystals, Rogue=essence, Mage=flux, Cleric=essence, Paladin=flux, Ranger=food
+- Prisoner capture: `rollPrisonerCaptures()` with 30% chance per retreating invader, looks up InvaderDefinition for class/stats
+- 5 prisoner handling options (pure functions returning `PrisonerHandlingResult`):
+  - Execute: +2 fear, +1 rep
+  - Ransom: gold by class (20-50g), -1 rep
+  - Convert: class-specific success rates (rogue 50%, paladin 5%), +5 corruption
+  - Sacrifice: random boon (flux/essence/research), +5 corruption, +2 rep
+  - Experiment: research = avg(stats), +3 corruption
+- Altar rebuild cost: 100 crystals + 50 gold + 20 flux
+- `CapturedPrisoner` type: id, invaderClass, name, stats, captureDay
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
