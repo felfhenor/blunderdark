@@ -342,13 +342,53 @@
 
 - id: aa100001-0001-0001-0001-000000000007
   name: Barracks
-  description: Houses and trains your fighters. No resource production.
-  shapeId: aa000000-0000-0000-0000-000000000002
+  description: A long, narrow hall lined with weapon racks and sleeping quarters. Houses and trains your fighters, providing no resource production but significantly boosting your dungeon's combat readiness. Its military atmosphere can unsettle peaceful creatures.
+  shapeId: 9b17bc0c-1b9a-48f2-95e7-cc5b2090c614
   cost:
     gold: 70
   production: {}
   requiresWorkers: false
-  adjacencyBonuses: []
+  maxInhabitants: 6
+  fearLevel: 1
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+      bonus: 0.15
+      description: The Dark Forge provides weapons and armor for garrisoned troops.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000001
+      bonus: 0.2
+      description: Proximity to the Throne Room improves command structure and morale.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000007
+      bonus: 0.1
+      description: Connected barracks share training resources and patrol routes.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000024
+      name: Fortified Barracks
+      description: Reinforce walls and expand sleeping quarters, increasing troop capacity and hardening the structure against assault.
+      cost:
+        gold: 100
+        crystals: 40
+      effects:
+        - type: maxInhabitantBonus
+          value: 4
+    - id: aa200001-0001-0001-0001-000000000025
+      name: Comfortable Quarters
+      description: Replace crude bunks with proper beds and add a mess hall. Eliminates the barracks' fearsome atmosphere and improves unit morale.
+      cost:
+        gold: 80
+        crystals: 20
+      effects:
+        - type: fearReduction
+          value: 1
+    - id: aa200001-0001-0001-0001-000000000026
+      name: War Room
+      description: Add strategic planning tables and communication crystals. Grants a defensive bonus to all rooms on the floor during invasions.
+      cost:
+        gold: 120
+        crystals: 60
+        essence: 20
+      effects:
+        - type: fearIncrease
+          value: 1
 
 - id: aa100001-0001-0001-0001-000000000008
   name: Treasure Vault
