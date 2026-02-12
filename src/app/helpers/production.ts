@@ -264,6 +264,94 @@ export function getRoomProductionRates(roomId: string): RoomProduction {
   return {};
 }
 
+export type ResourceProductionBreakdown = {
+  base: number;
+  inhabitantBonus: number;
+  adjacencyBonus: number;
+  modifierEffect: number;
+  final: number;
+};
+
+export function calculateProductionBreakdowns(
+  floors: Floor[],
+): Record<string, ResourceProductionBreakdown> {
+  const breakdowns: Record<string, ResourceProductionBreakdown> = {};
+
+  for (const floor of floors) {
+    const roomTiles = new Map<string, TileOffset[]>();
+    for (const room of floor.rooms) {
+      const shape = resolveRoomShape(room);
+      roomTiles.set(
+        room.id,
+        getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+      );
+    }
+
+    for (const room of floor.rooms) {
+      const roomDef = getRoomDefinition(room.roomTypeId);
+      if (!roomDef) continue;
+
+      const base = roomDef.production;
+      if (!base || Object.keys(base).length === 0) continue;
+
+      const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+        room,
+        floor.inhabitants,
+      );
+
+      if (roomDef.requiresWorkers && !hasWorkers) continue;
+
+      const thisTiles = roomTiles.get(room.id) ?? [];
+      const adjacentRoomIds: string[] = [];
+      for (const other of floor.rooms) {
+        if (other.id === room.id) continue;
+        const otherTiles = roomTiles.get(other.id) ?? [];
+        if (areRoomsAdjacent(thisTiles, otherTiles)) {
+          adjacentRoomIds.push(other.id);
+        }
+      }
+
+      const adjacencyBonusVal = calculateAdjacencyBonus(
+        room,
+        adjacentRoomIds,
+        floor.rooms,
+      );
+      const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+
+      for (const [resourceType, baseAmount] of Object.entries(base)) {
+        if (!baseAmount) continue;
+
+        const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal);
+        const finalAmount = withBonuses * modifier;
+
+        if (!breakdowns[resourceType]) {
+          breakdowns[resourceType] = {
+            base: 0,
+            inhabitantBonus: 0,
+            adjacencyBonus: 0,
+            modifierEffect: 0,
+            final: 0,
+          };
+        }
+
+        breakdowns[resourceType].base += baseAmount;
+        breakdowns[resourceType].inhabitantBonus +=
+          baseAmount * inhabitantBonus;
+        breakdowns[resourceType].adjacencyBonus +=
+          baseAmount * adjacencyBonusVal;
+        breakdowns[resourceType].modifierEffect += finalAmount - withBonuses;
+        breakdowns[resourceType].final += finalAmount;
+      }
+    }
+  }
+
+  return breakdowns;
+}
+
+export const productionBreakdowns = computed(() => {
+  return calculateProductionBreakdowns(gamestate().world.floors);
+});
+
 export function processProduction(state: GameState): void {
   const production = calculateTotalProduction(state.world.floors);
 

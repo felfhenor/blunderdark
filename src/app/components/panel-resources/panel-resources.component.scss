@@ -1,3 +1,63 @@
 :host {
   display: block;
+  width: 100%;
+}
+
+.resource-bar {
+  background: oklch(var(--b2));
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.resource-item {
+  position: relative;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border-left: 3px solid transparent;
+  cursor: default;
+
+  &.resource-low {
+    border-left-color: oklch(var(--wa));
+    background: oklch(var(--wa) / 0.08);
+  }
+
+  &.resource-critical {
+    border-left-color: oklch(var(--er));
+    background: oklch(var(--er) / 0.08);
+    animation: pulse-warning 1.5s ease-in-out infinite;
+  }
+
+  &.resource-empty {
+    border-left-color: oklch(var(--er));
+    background: oklch(var(--er) / 0.05);
+    opacity: 0.6;
+  }
+}
+
+.resource-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 0.75rem;
+  margin-top: 0.25rem;
+  background: oklch(var(--b3));
+  border: 1px solid oklch(var(--bc) / 0.15);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);
+  pointer-events: none;
+}
+
+@keyframes pulse-warning {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }

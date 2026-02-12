@@ -1,33 +1,88 @@
-<div class="card bg-base-100 shadow-xl">
-  <div class="card-body p-4">
-    <h3 class="card-title text-sm">Resources</h3>
+<div class="resource-bar flex flex-wrap gap-2">
+  @for (res of resources; track res.type) {
+    <div
+      class="resource-item flex-1 min-w-[120px]"
+      [class]="getWarningClass(res.type)"
+      (mouseenter)="onMouseEnter(res.type)"
+      (mouseleave)="onMouseLeave()"
+    >
+      <div class="flex items-center justify-between mb-0.5">
+        <span class="text-xs font-semibold truncate">{{ res.label }}</span>
+        <span class="text-xs flex items-center gap-1">
+          @if (isFull(res.type)) {
+            <span class="badge badge-xs badge-warning">FULL</span>
+          }
+        </span>
+      </div>
 
-    <div class="flex flex-col gap-2">
-      @for (res of resources; track res.type) {
-        <div class="resource-row">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-semibold">{{ res.label }}</span>
-            <span class="text-xs opacity-70">
-              {{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}
-            </span>
+      <progress
+        class="progress w-full h-1.5"
+        [class]="res.color"
+        [value]="getPercent(res.type)"
+        max="100"
+      ></progress>
+
+      <div class="flex items-center justify-between mt-0.5">
+        <span class="text-[10px] opacity-70">
+          {{ getCurrent(res.type) | number: '1.0-0' }}/{{ getMax(res.type) | number: '1.0-0' }}
+        </span>
+        <span class="text-[10px]" [class]="getRateClass(res.type)">
+          {{ formatRate(res.type) }}
+        </span>
+      </div>
+
+      @if (activeTooltip() === res.type) {
+        <div class="resource-tooltip">
+          <div class="font-semibold text-sm mb-1">{{ res.label }}</div>
+          <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
+
+          <div class="text-xs mb-1">
+            <span class="opacity-70">Amount:</span>
+            {{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}
           </div>
 
-          <progress
-            class="progress w-full h-2"
-            [class]="res.color"
-            [value]="getPercent(res.type)"
-            max="100"
-          ></progress>
+          <div class="text-xs mb-2">
+            <span class="opacity-70">Rate:</span>
+            <span [class]="getRateClass(res.type)">{{ formatRate(res.type) }}</span>
+          </div>
 
-          @if (getRate(res.type) > 0) {
-            <div class="text-right mt-0.5">
-              <span class="text-xs opacity-50">
-                +{{ getRate(res.type) | number: '1.0-2' }}/min
-              </span>
+          @if (getBreakdown(res.type); as bd) {
+            <div class="divider my-1 h-0"></div>
+            <div class="text-xs font-semibold mb-1">Production Breakdown</div>
+            <div class="flex flex-col gap-0.5 text-xs">
+              <div class="flex justify-between">
+                <span class="opacity-70">Base:</span>
+                <span>{{ formatBreakdownRate(bd.base) }}/min</span>
+              </div>
+              @if (bd.inhabitantBonus !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Inhabitants:</span>
+                  <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
+                </div>
+              }
+              @if (bd.adjacencyBonus !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Adjacency:</span>
+                  <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
+                </div>
+              }
+              @if (bd.modifierEffect !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Modifiers:</span>
+                  <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+                    {{ formatBreakdownRate(bd.modifierEffect) }}/min
+                  </span>
+                </div>
+              }
+              <div class="divider my-0.5 h-0"></div>
+              <div class="flex justify-between font-semibold">
+                <span>Total:</span>
+                <span>{{ formatBreakdownRate(bd.final) }}/min</span>
+              </div>
             </div>
           }
         </div>
       }
     </div>
-  </div>
+  }
 </div>
