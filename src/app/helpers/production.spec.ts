@@ -902,6 +902,118 @@ describe('calculateSingleRoomProduction', () => {
   });
 });
 
+describe('production changes on assignment state changes', () => {
+  it('should produce nothing when worker room has no assigned inhabitants, then produce when one is assigned', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+
+    // No inhabitants assigned
+    const floorEmpty = makeFloor([mine], []);
+    const prodEmpty = calculateSingleRoomProduction(mine, floorEmpty);
+    expect(prodEmpty).toEqual({});
+
+    // Assign one inhabitant
+    const floorAssigned = makeFloor([mine], [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ]);
+    const prodAssigned = calculateSingleRoomProduction(mine, floorAssigned);
+    expect(prodAssigned['crystals']).toBeCloseTo(1.2);
+  });
+
+  it('should reduce production when inhabitant is unassigned from a multi-worker room', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+
+    // Two inhabitants assigned
+    const floorTwo = makeFloor([mine], [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-goblin',
+        name: 'Goblin 2',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ]);
+    const prodTwo = calculateSingleRoomProduction(mine, floorTwo);
+    // Base 1.0 * (1 + 0.2 + 0.2) = 1.4
+    expect(prodTwo['crystals']).toBeCloseTo(1.4);
+
+    // Unassign one (only one remains)
+    const floorOne = makeFloor([mine], [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin 1',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-goblin',
+        name: 'Goblin 2',
+        state: 'normal',
+        assignedRoomId: null,
+      },
+    ]);
+    const prodOne = calculateSingleRoomProduction(mine, floorOne);
+    // Base 1.0 * (1 + 0.2) = 1.2
+    expect(prodOne['crystals']).toBeCloseTo(1.2);
+  });
+
+  it('should reflect assignment changes in total production across floors', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+
+    // No inhabitants — worker room produces nothing
+    const floorsEmpty = [makeFloor([mine], [])];
+    const totalEmpty = calculateTotalProduction(floorsEmpty);
+    expect(totalEmpty).toEqual({});
+
+    // Assign inhabitant — now produces
+    const floorsAssigned = [
+      makeFloor([mine], [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-goblin',
+          name: 'Goblin',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+      ]),
+    ];
+    const totalAssigned = calculateTotalProduction(floorsAssigned);
+    expect(totalAssigned['crystals']).toBeCloseTo(1.2);
+  });
+});
+
 describe('productionPerMinute', () => {
   it('should convert per-tick rate to per-minute', () => {
     // TICKS_PER_MINUTE = 5
