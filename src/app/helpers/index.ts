@@ -1,6 +1,7 @@
 export * from './adjacency';
 export * from './altar-room';
 export * from './analytics';
+export * from './assignment';
 export * from './clipboard';
 export * from './connections';
 export * from './content';
