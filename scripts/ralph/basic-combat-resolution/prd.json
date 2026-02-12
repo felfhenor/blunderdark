@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CombatUnit and CombatResult types defined in src/app/interfaces/combat.ts. CombatResult also includes defenderHp for convenience."
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "rollD20() and doesAttackHit() implemented in src/app/helpers/combat.ts. Natural 20/1 rules enforced."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "calculateDamage() with min 1, HP clamped to 0, defenderDead flag in CombatResult."
     },
     {
       "id": "US-004",
@@ -60,8 +60,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "resolveCombat() is pure, takes injectable RNG () => number, returns full CombatResult."
     },
     {
       "id": "US-005",
@@ -79,8 +79,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "20 tests covering rollD20 (3), doesAttackHit (6), calculateDamage (3), resolveCombat (8). All edge cases including nat 20/1, min damage, exact death, HP clamping."
     },
     {
       "id": "US-006",
@@ -97,7 +97,7 @@
       ],
       "priority": 6,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires invasion/combat UI mode which doesn't exist yet. No visual context to render floating numbers in."
     },
     {
       "id": "US-007",
@@ -114,7 +114,7 @@
       ],
       "priority": 7,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires invasion mode UI (Phase 9) to display health bars on units."
     }
   ]
 }
