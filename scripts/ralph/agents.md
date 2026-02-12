@@ -312,6 +312,19 @@ BFS pathfinding for hallways between rooms:
 - Passive rooms (`requiresWorkers: false`) still apply worker bonuses/penalties if inhabitants are assigned — `calculateInhabitantBonus` runs regardless of `requiresWorkers`, which only controls the "zero workers = zero production" gate
 - Reuse existing shapes when possible rather than creating duplicates (e.g., Soul Well uses existing 3x3 square `60e19fcd`)
 
+## Training System
+
+- `training.ts` helper: `processTraining(state)` runs each tick inside `updateGamestate` — mutates `state.world.inhabitants` in-place (same pattern as `processProduction`)
+- `TRAINING_GROUNDS_TYPE_ID = 'aa100001-0001-0001-0001-000000000012'`
+- `BASE_TRAINING_TICKS = TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes)
+- Training fields on `InhabitantInstance` are **optional** (`trained?`, `trainingProgress?`, `trainingBonuses?`) to avoid breaking existing test mocks
+- `deserializeInhabitants()` provides defaults for training fields via `??` — backwards-compatible
+- Training adjacency effects checked directly in training.ts (not via YAML adjacency bonus system): Barracks -20% time, Altar +1 all stats
+- New upgrade effect types: `trainingAttackBonus`, `trainingTimeMultiplier`, `trainingDefenseBonus` — handled in training.ts
+- `trainingCompleted$` observable emits on training completion — subscribe in service for notifications
+- When adding optional fields to shared types (InhabitantInstance), prefer `?:` over required to avoid cascade updates across all test files
+- `getAdjacentRoomTypeIds(room, floor, tileMap?)` is a reusable function returning `Set<string>` of adjacent room type IDs
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

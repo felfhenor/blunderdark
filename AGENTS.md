@@ -225,3 +225,16 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `SYNERGY_DEFINITIONS` constant array holds all synergy definitions — add new synergies here without code changes
 - Connection-based conditions use `floor.connections` directly (pure) — don't import `areRoomsConnected` from connections.ts which reads from signals
 - Synergies are floor-scoped (no cross-floor evaluation) — same pattern as adjacency bonuses
+
+## Training System
+
+- `training.ts` helper: `processTraining(state)` runs each tick inside `updateGamestate` — mutates `state.world.inhabitants` in-place (same pattern as `processProduction` mutating `state.world.resources`)
+- `TRAINING_GROUNDS_TYPE_ID` constant references the Training Grounds room content ID
+- `BASE_TRAINING_TICKS = TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes of training)
+- Training fields on `InhabitantInstance` are **optional** (`trained?`, `trainingProgress?`, `trainingBonuses?`) — avoids breaking 13+ spec files that create inhabitant mocks
+- `deserializeInhabitants()` provides defaults for training fields via `??` — backwards-compatible with saved data that predates training
+- Training adjacency effects are checked in training.ts directly (not via the YAML adjacency bonus system) — Barracks: -20% time, Altar: +1 all stats
+- `getAdjacentRoomTypeIds(room, floor, tileMap?)` returns a Set of adjacent room type IDs — reusable for any room-specific adjacency checks
+- New upgrade effect types: `trainingAttackBonus`, `trainingTimeMultiplier`, `trainingDefenseBonus` — handled in training.ts, transparent to existing room-upgrades.ts
+- `trainingCompleted$` observable emits on training completion — subscribe in a service for notifications
+- When adding optional fields to shared types (InhabitantInstance), prefer `?:` syntax over required fields to avoid cascade updates across all test files

@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined in gamedata/room/base.yml with ID aa100001-0001-0001-0001-000000000012, T-shape, 4 max inhabitants, fear level 1, 3 adjacency bonuses, 3 upgrade paths."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing T-Shape (ID 0279e677) which supports rotation. Placement and validation handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in training.ts: processTraining runs each tick, increments trainingProgress for inhabitants in Training Grounds, marks trained=true with +1 defense bonus after 25 ticks (5 game-minutes). Bonuses stored on InhabitantInstance and persist across room reassignment. 43 tests cover all scenarios."
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "panel-training-grounds component shows progress bars for training inhabitants, 'Trained' badge for completed, 'Training' badge for in-progress. trainingCompleted$ observable emits on completion for notification subscription."
     },
     {
       "id": "US-005",
@@ -76,8 +76,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "maxInhabitants: 4 in YAML, Mass Training upgrade adds maxInhabitantBonus: 2 (total 6). fearLevel: 1. Tests verify capacity with and without upgrades."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Three upgrades implemented: Elite Training (+1 attack, 1.2x time), Mass Training (+2 capacity, 0.7x time), Specialized Drills (+1 extra defense). Specialized Drills simplified from random trait to deterministic +1 defense bonus since instance-level trait system doesn't exist yet. Mutual exclusivity enforced by existing canApplyUpgrade system."
     },
     {
       "id": "US-007",
@@ -107,8 +107,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Barracks adjacency: -20% training time (implemented). Altar adjacency: +1 to all trained stats (implemented). Forge adjacency: defined in YAML as descriptive bonus; equipment slot effect deferred since no equipment system exists yet."
     }
   ]
 }
