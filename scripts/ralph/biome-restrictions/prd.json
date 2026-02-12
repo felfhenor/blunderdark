@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined BIOME_RESTRICTIONS config map in biome-restrictions.ts. Volcanic blocks Underground Lake & Mushroom Grove. Flooded blocks Soul Well. Crystal limits Crystal Mine to 5/floor. Corrupted blocks Mushroom Grove & Underground Lake. Torture Chamber not yet in game so omitted from flooded."
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "canBuildRoomOnFloor(roomTypeId, biome, floor) resolves room name via getEntry then checks BIOME_RESTRICTIONS. Also added getRoomBiomeRestrictionInfo for UI display with count info."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added biome restriction check in executeRoomPlacement() after unique room check and before affordability check."
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added isBiomeRestricted, getBiomeRestrictionTooltip, getBiomeLimitLabel to panel-room-select. Restricted rooms are disabled with room-biome-restricted CSS class (opacity 0.35). Count-limited rooms show badge with current/max count."
     },
     {
       "id": "US-005",
@@ -81,8 +81,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "25 tests covering all biome restrictions, count limits, unrestricted rooms, corrupted biome blocks, and getRoomBiomeRestrictionInfo. All 1405 tests pass."
     }
   ]
 }
