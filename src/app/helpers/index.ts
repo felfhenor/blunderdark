@@ -24,6 +24,7 @@ export * from './icons';
 export * from './inhabitants';
 export * from './invaders';
 export * from './invasion-composition';
+export * from './invasion-objectives';
 export * from './invasion-triggers';
 export * from './logging';
 export * from './migrate';
