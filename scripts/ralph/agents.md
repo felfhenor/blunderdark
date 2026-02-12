@@ -493,6 +493,19 @@ When adding new fields to `GameStateWorld`:
 - AI (`resolveAiAction`): attack weakest adjacent enemy > move toward nearest enemy (manhattan) > wait
 - `executeAiTurn`: wraps AI decision + execution in one call
 
+## Conditional State Modifiers
+
+- `state-modifiers.ts` helper: per-creature state modifier lookup with fallback defaults
+- `StateModifier` type: `productionMultiplier`, `foodConsumptionMultiplier`, optional `attackMultiplier`, `defenseMultiplier`
+- `InhabitantDefinition` has optional `fearTolerance?: number` and `stateModifiers?: Partial<Record<InhabitantState, StateModifier>>`
+- `isInhabitantScared(inhabitant, roomFearLevel)`: scared when fear > tolerance. `DEFAULT_FEAR_TOLERANCE = 2`
+- `getStateModifier(definitionId, state)`: returns creature-specific modifier or fallback default
+- `getProductionMultiplier` / `getFoodConsumptionMultiplier` / `getAttackMultiplier` / `getDefenseMultiplier`: per-inhabitant helpers
+- `calculatePerCreatureProductionModifier(assignedInhabitants)`: averages per-creature production multipliers (replaces old flat state multiplication)
+- Production pipeline change: `calculateConditionalModifiers` now delegates to `calculatePerCreatureProductionModifier` — behavior changed from "multiply unique states" to "average per-creature multipliers"
+- Default fallbacks match old behavior: normal=1.0, scared=0.5, hungry=0.75 — creatures without YAML data get these
+- Fear tolerance values: Slime=0, Goblin=1, Myconid=1, Kobold=2, Skeleton=4, Dragon=4, Lich=4, Demon Lord=4
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
