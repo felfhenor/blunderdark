@@ -436,6 +436,18 @@ When adding new fields to `GameStateWorld`:
 5. Update `makeGameState()` helpers in test files that construct full GameState objects (production.spec.ts, training.spec.ts, trap-workshop.spec.ts, invasion-triggers.spec.ts)
 6. Migration is handled automatically by `merge(defaultGameState(), state)` in `migrate.ts`
 
+## Invasion Objectives System
+
+- `invasion-objectives.ts` helper: `assignInvasionObjectives(state, seed)` returns 1 primary (DestroyAltar) + 2 secondary objectives
+- 7 secondary templates: SlayMonster, StealTreasure, DefileLibrary, SealPortal, PlunderVault, RescuePrisoner, ScoutDungeon
+- Each template has `isEligible(state)` and `getTargetId(state)` — eligibility checked against game state (room types, inhabitants)
+- SlayMonster targets tier 2+ inhabitants — must look up `InhabitantDefinition` via `getEntry()` since `InhabitantInstance` has no `tier` field
+- `InhabitantInstance` uses `instanceId` (NOT `id`) for targeting
+- `resolveInvasionOutcome(objectives)` — altar destroyed = defeat (multiplier 0); victory = 1.0 + 0.25 per prevented - 0.25 per completed secondary
+- Progress calculators: `calculateSlayMonsterProgress(currentHp, maxHp)`, `calculateStealTreasureProgress(goldLooted, goldTarget)`, `calculateSealPortalProgress(turnsSpent, turnsRequired)`
+- Room type IDs for objectives: Altar (000009), Treasure Vault (000008), Shadow Library (000004), Ley Line Nexus (000011), Soul Well (000005)
+- When mocking `@helpers/content` for inhabitant tier lookups, use a `Map<string, unknown>` and `registerInhabitantDefs()` helper
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
