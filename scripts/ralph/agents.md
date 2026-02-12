@@ -448,6 +448,18 @@ When adding new fields to `GameStateWorld`:
 - Room type IDs for objectives: Altar (000009), Treasure Vault (000008), Shadow Library (000004), Ley Line Nexus (000011), Soul Well (000005)
 - When mocking `@helpers/content` for inhabitant tier lookups, use a `Map<string, unknown>` and `registerInhabitantDefs()` helper
 
+## Invasion Win/Loss Conditions
+
+- `invasion-win-loss.ts` helper: pure functions for checking invasion end conditions and resolving results
+- Constants: `ALTAR_MAX_HP = 100`, `MAX_INVASION_TURNS = 30`, `SECONDARY_OBJECTIVES_FOR_VICTORY = 2`
+- `InvasionState` type in `invasion.ts` tracks active invasion: turn counter, altar HP, invaders, objectives, defender/invader counts
+- `checkInvasionEnd(state)` returns `InvasionEndReason | null` — priority: altar_destroyed > objectives_completed > all_invaders_eliminated > turn_limit_reached
+- All state mutations are pure (return new state): `damageAltar`, `advanceInvasionTurn`, `markInvaderKilled`, `recordDefenderLoss`, `endInvasion`
+- `damageAltar` auto-updates the DestroyAltar objective progress based on HP percentage
+- `resolveDetailedResult` delegates to `resolveInvasionOutcome` from invasion-objectives for reward multiplier calculation
+- `createHistoryEntry` produces a record compatible with the invasion schedule history system
+- `DetailedInvasionResult` type extends basic InvasionResult with turn count, defender/invader stats, endReason
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
