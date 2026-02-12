@@ -1,0 +1,88 @@
+# Warrior - High HP/Attack, defensive tank
+- id: aa900001-0001-0001-0001-000000000001
+  name: Warrior
+  description: A heavily armored fighter with high HP and strong attacks. Uses Shield Wall to reduce incoming damage.
+  invaderClass: warrior
+  baseStats:
+    hp: 30
+    attack: 8
+    defense: 7
+    speed: 3
+  abilityIds:
+    - Shield Wall
+  sprite: invader-warrior
+
+# Rogue - High Speed, trap specialist
+- id: aa900001-0001-0001-0001-000000000002
+  name: Rogue
+  description: A swift and cunning infiltrator. Can disarm traps and deal devastating backstab damage.
+  invaderClass: rogue
+  baseStats:
+    hp: 15
+    attack: 6
+    defense: 3
+    speed: 10
+  abilityIds:
+    - Disarm Trap
+    - Backstab
+  sprite: invader-rogue
+
+# Mage - High magic Attack, spell-focused
+- id: aa900001-0001-0001-0001-000000000003
+  name: Mage
+  description: A powerful spellcaster whose arcane bolts ignore physical defenses. Can dispel magical protections.
+  invaderClass: mage
+  baseStats:
+    hp: 12
+    attack: 10
+    defense: 2
+    speed: 5
+  abilityIds:
+    - Arcane Bolt
+    - Dispel
+  sprite: invader-mage
+
+# Cleric - High Defense, healer and anti-undead
+- id: aa900001-0001-0001-0001-000000000004
+  name: Cleric
+  description: A holy warrior who heals allies and deals devastating damage to undead creatures.
+  invaderClass: cleric
+  baseStats:
+    hp: 20
+    attack: 4
+    defense: 8
+    speed: 4
+  abilityIds:
+    - Heal
+    - Turn Undead
+  sprite: invader-cleric
+
+# Paladin - High HP/Defense, anti-corruption champion
+- id: aa900001-0001-0001-0001-000000000005
+  name: Paladin
+  description: A righteous champion who smites corrupted foes and inspires courage in allies against fear.
+  invaderClass: paladin
+  baseStats:
+    hp: 28
+    attack: 7
+    defense: 9
+    speed: 2
+  abilityIds:
+    - Smite Evil
+    - Aura of Courage
+  sprite: invader-paladin
+
+# Ranger - High Speed, scout and marker
+- id: aa900001-0001-0001-0001-000000000006
+  name: Ranger
+  description: A skilled tracker who scouts ahead and marks targets, increasing all damage against them.
+  invaderClass: ranger
+  baseStats:
+    hp: 18
+    attack: 7
+    defense: 4
+    speed: 9
+  abilityIds:
+    - Scout
+    - Mark Target
+  sprite: invader-ranger

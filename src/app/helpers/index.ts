@@ -22,6 +22,7 @@ export * from './hallway-placement';
 export * from './hallways';
 export * from './icons';
 export * from './inhabitants';
+export * from './invaders';
 export * from './logging';
 export * from './migrate';
 export * from './notify';

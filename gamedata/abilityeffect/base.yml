@@ -33,3 +33,47 @@
   dealsDamage: false
   statusName: resurrected
   overrideTargetsHit: 1
+
+# --- Invader ability effects ---
+
+- id: ae000001-0000-4000-a000-000000000007
+  name: Heal
+  dealsDamage: false
+  statusName: healing
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000008
+  name: Disarm
+  dealsDamage: false
+  statusName: disarm
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000009
+  name: Magic Damage
+  dealsDamage: true
+  statusName: null
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000010
+  name: Dispel
+  dealsDamage: false
+  statusName: dispel
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000011
+  name: Fear Immunity
+  dealsDamage: false
+  statusName: courage
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000012
+  name: Scout
+  dealsDamage: false
+  statusName: scouting
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000013
+  name: Mark
+  dealsDamage: false
+  statusName: marked
+  overrideTargetsHit: null

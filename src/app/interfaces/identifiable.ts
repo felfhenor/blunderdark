@@ -3,6 +3,7 @@ export type ContentType =
   | 'combatability'
   | 'hero'
   | 'inhabitant'
+  | 'invader'
   | 'item'
   | 'monster'
   | 'pet'

@@ -6,6 +6,7 @@ import type {
   HeroContent,
   HeroId,
   InhabitantDefinition,
+  InvaderDefinition,
   IsContentItem,
   ItemContent,
   ItemId,
@@ -34,6 +35,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   combatability: ensureCombatAbility,
   hero: ensureHero,
   inhabitant: ensureInhabitant,
+  invader: ensureInvader,
   item: ensureItem,
   monster: ensureMonster,
   pet: ensurePet,
@@ -225,6 +227,21 @@ function ensureInhabitant(
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},
     rulerFearLevel: inhabitant.rulerFearLevel ?? 0,
+  };
+}
+
+function ensureInvader(
+  invader: Partial<InvaderDefinition & IsContentItem>,
+): InvaderDefinition & IsContentItem {
+  return {
+    id: invader.id ?? 'UNKNOWN',
+    name: invader.name ?? 'UNKNOWN',
+    __type: 'invader',
+    description: invader.description ?? '',
+    invaderClass: invader.invaderClass ?? 'warrior',
+    baseStats: invader.baseStats ?? { hp: 0, attack: 0, defense: 0, speed: 0 },
+    abilityIds: invader.abilityIds ?? [],
+    sprite: invader.sprite ?? 'UNKNOWN',
   };
 }
 
