@@ -413,3 +413,64 @@
           resource: gold
         - type: fearIncrease
           value: 2
+
+- id: aa100001-0001-0001-0001-000000000011
+  name: Ley Line Nexus
+  description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
+  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  cost:
+    gold: 100
+    crystals: 50
+    essence: 20
+  production:
+    flux: 2.0
+  requiresWorkers: true
+  maxInhabitants: 2
+  fearLevel: 2
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+      bonus: 0.2
+      description: Arcane knowledge from the Shadow Library amplifies ley line channeling.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+      bonus: 0.15
+      description: Soul essence from the Well resonates with the ley line's magical frequency.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000011
+      bonus: 0.25
+      description: Adjacent nexus points create a powerful ley line network with amplified output.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000021
+      name: Flux Amplifier
+      description: Install crystalline focusing arrays that amplify the ley line's natural flux output.
+      cost:
+        gold: 120
+        crystals: 80
+        essence: 30
+      effects:
+        - type: productionMultiplier
+          value: 1.5
+          resource: flux
+    - id: aa200001-0001-0001-0001-000000000022
+      name: Expanded Nexus
+      description: Widen the convergence chamber to accommodate an additional channeler.
+      cost:
+        gold: 100
+        crystals: 60
+      effects:
+        - type: maxInhabitantBonus
+          value: 1
+    - id: aa200001-0001-0001-0001-000000000023
+      name: Arcane Overcharge
+      description: Push the ley line beyond its natural limits. Dramatically increases flux output but the unstable energies create an unsettling atmosphere and generate research insights.
+      cost:
+        gold: 150
+        crystals: 100
+        essence: 40
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: flux
+        - type: fearIncrease
+          value: 1
+        - type: secondaryProduction
+          value: 0.2
+          resource: research
