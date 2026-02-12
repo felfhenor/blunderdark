@@ -214,3 +214,14 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - Rich tooltips use custom CSS absolute positioning with a delay timer (250ms) — DaisyUI's `data-tip` tooltips only support plain text, so custom implementation is needed for HTML content
 - Warning thresholds: `LOW_THRESHOLD = 0.2`, `CRITICAL_THRESHOLD = 0.1` — configurable constants, not hardcoded inline
 - Production breakdown math: `inhabitantContrib = base * inhabitantBonus`, `adjacencyContrib = base * adjacencyBonus`, `modifierEffect = withBonuses * (modifier - 1)`
+
+## Synergy Detection System
+
+- `synergy.ts` implements a data-driven synergy system — synergies are `SynergyDefinition[]` with declarative conditions and effects
+- 5 condition types: `roomType`, `adjacentRoomType`, `connectedRoomType`, `inhabitantType`, `minInhabitants` — evaluated per-room using pure functions
+- `evaluateAllSynergies(floors, synergies?)` returns `Map<string, SynergyDefinition[]>` mapping roomId → active synergies — builds adjacency map internally per floor
+- `activeSynergyMap` computed signal caches results, re-evaluates when `gamestate()` changes — no explicit invalidation needed
+- `getActiveSynergies(roomId)` convenience function reads from the computed signal
+- `SYNERGY_DEFINITIONS` constant array holds all synergy definitions — add new synergies here without code changes
+- Connection-based conditions use `floor.connections` directly (pure) — don't import `areRoomsConnected` from connections.ts which reads from signals
+- Synergies are floor-scoped (no cross-floor evaluation) — same pattern as adjacency bonuses
