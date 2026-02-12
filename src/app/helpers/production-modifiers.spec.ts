@@ -1,18 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import {
-  BIOME_ROOM_BONUSES,
-  DEPTH_BONUS_PER_LEVEL,
-  applyModifiers,
-  calculateProductionModifiers,
-  evaluateModifiers,
-  getBiomeBonus,
-  getModifierRegistry,
-  isDayTime,
-  isNightTime,
-} from '@helpers/production-modifiers';
-import type { ProductionModifierContext } from '@helpers/production-modifiers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Room type IDs matching production-modifiers.ts constants
+// Room type IDs (test-local)
 const SHADOW_LIBRARY = 'aa100001-0001-0001-0001-000000000004';
 const SOUL_WELL = 'aa100001-0001-0001-0001-000000000005';
 const CRYSTAL_MINE = 'aa100001-0001-0001-0001-000000000002';
@@ -21,6 +9,38 @@ const DARK_FORGE = 'aa100001-0001-0001-0001-000000000006';
 const UNDERGROUND_LAKE = 'aa100001-0001-0001-0001-000000000010';
 const LEY_LINE_NEXUS = 'aa100001-0001-0001-0001-000000000011';
 const THRONE_ROOM = 'aa100001-0001-0001-0001-000000000001';
+
+// Mock room definitions with timeOfDayBonus and biomeBonuses
+const mockRoomDefs = [
+  { id: CRYSTAL_MINE, __type: 'room', timeOfDayBonus: { period: 'day', bonus: 0.10 }, biomeBonuses: { volcanic: 0.15, crystal: 0.40 } },
+  { id: MUSHROOM_GROVE, __type: 'room', timeOfDayBonus: { period: 'day', bonus: 0.15 }, biomeBonuses: { fungal: 0.60 } },
+  { id: SHADOW_LIBRARY, __type: 'room', timeOfDayBonus: { period: 'night', bonus: 0.20 }, biomeBonuses: { corrupted: 1.00 } },
+  { id: SOUL_WELL, __type: 'room', timeOfDayBonus: { period: 'night', bonus: 0.15 }, biomeBonuses: { corrupted: 1.00 } },
+  { id: DARK_FORGE, __type: 'room', biomeBonuses: { volcanic: 0.50 } },
+  { id: UNDERGROUND_LAKE, __type: 'room', biomeBonuses: { flooded: 0.50 } },
+  { id: LEY_LINE_NEXUS, __type: 'room', biomeBonuses: { crystal: 0.10 } },
+  { id: THRONE_ROOM, __type: 'room' },
+];
+
+vi.mock('@helpers/content', () => ({
+  getEntriesByType: vi.fn((type: string) => {
+    if (type === 'room') return mockRoomDefs;
+    return [];
+  }),
+}));
+
+import {
+  DEPTH_BONUS_PER_LEVEL,
+  applyModifiers,
+  calculateProductionModifiers,
+  evaluateModifiers,
+  getBiomeBonus,
+  getModifierRegistry,
+  isDayTime,
+  isNightTime,
+  resetProductionModifierCache,
+} from '@helpers/production-modifiers';
+import type { ProductionModifierContext } from '@helpers/production-modifiers';
 
 function makeContext(overrides: Partial<ProductionModifierContext> = {}): ProductionModifierContext {
   return {
@@ -31,6 +51,10 @@ function makeContext(overrides: Partial<ProductionModifierContext> = {}): Produc
     ...overrides,
   };
 }
+
+beforeEach(() => {
+  resetProductionModifierCache();
+});
 
 // --- Time helpers ---
 
@@ -414,25 +438,3 @@ describe('getBiomeBonus', () => {
   });
 });
 
-// --- BIOME_ROOM_BONUSES ---
-
-describe('BIOME_ROOM_BONUSES', () => {
-  it('should have entries for all non-neutral biomes', () => {
-    expect(BIOME_ROOM_BONUSES.volcanic).toBeDefined();
-    expect(BIOME_ROOM_BONUSES.fungal).toBeDefined();
-    expect(BIOME_ROOM_BONUSES.crystal).toBeDefined();
-    expect(BIOME_ROOM_BONUSES.corrupted).toBeDefined();
-    expect(BIOME_ROOM_BONUSES.flooded).toBeDefined();
-  });
-
-  it('should not have an entry for neutral biome', () => {
-    expect(BIOME_ROOM_BONUSES['neutral' as keyof typeof BIOME_ROOM_BONUSES]).toBeUndefined();
-  });
-
-  it('should store raw bonus values (not multipliers)', () => {
-    // Bonus values are added to 1.0 to get the multiplier
-    expect(BIOME_ROOM_BONUSES.volcanic![DARK_FORGE]).toBe(0.50);
-    expect(BIOME_ROOM_BONUSES.corrupted![SOUL_WELL]).toBe(1.00);
-    expect(BIOME_ROOM_BONUSES.fungal![MUSHROOM_GROVE]).toBe(0.60);
-  });
-});

@@ -7,6 +7,7 @@ import {
   canRecruit,
   currentFloor,
   currentInhabitantCount,
+  findRoomIdByRole,
   gamestate,
   getNextAltarUpgrade,
   getRecruitableInhabitants,
@@ -18,7 +19,6 @@ import {
   recruitInhabitant,
   selectedTile,
   unlockedTier,
-  ALTAR_ROOM_TYPE_ID,
 } from '@helpers';
 import type {
   InhabitantDefinition,
@@ -51,7 +51,7 @@ export class PanelAltarComponent {
     if (!gridTile?.roomId) return null;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== ALTAR_ROOM_TYPE_ID) return null;
+    if (!room || room.roomTypeId !== findRoomIdByRole('altar')) return null;
 
     return room;
   });

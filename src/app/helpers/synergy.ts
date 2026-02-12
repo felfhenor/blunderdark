@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { getRoomDefinition } from '@helpers/production';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
@@ -15,74 +15,9 @@ import type {
   TileOffset,
 } from '@interfaces';
 
-// Room type ID constants for synergy definitions
-const CRYSTAL_MINE = 'aa100001-0001-0001-0001-000000000002';
-const MUSHROOM_GROVE = 'aa100001-0001-0001-0001-000000000003';
-const SHADOW_LIBRARY = 'aa100001-0001-0001-0001-000000000004';
-const SOUL_WELL = 'aa100001-0001-0001-0001-000000000005';
-const DARK_FORGE = 'aa100001-0001-0001-0001-000000000006';
-const BARRACKS = 'aa100001-0001-0001-0001-000000000007';
-const TREASURE_VAULT = 'aa100001-0001-0001-0001-000000000008';
-
-export const SYNERGY_DEFINITIONS: SynergyDefinition[] = [
-  {
-    id: 'synergy-dark-industry',
-    name: 'Dark Industry',
-    description:
-      'Goblin miners near a Dark Forge extract crystals with forge-heated tools.',
-    conditions: [
-      { type: 'roomType', roomTypeId: CRYSTAL_MINE },
-      { type: 'adjacentRoomType', roomTypeId: DARK_FORGE },
-      { type: 'inhabitantType', inhabitantType: 'creature' },
-    ],
-    effects: [{ type: 'productionBonus', value: 0.15, resource: 'crystals' }],
-  },
-  {
-    id: 'synergy-verdant-communion',
-    name: 'Verdant Communion',
-    description:
-      'Myconid workers harmonize with Soul Well energy for explosive fungal growth.',
-    conditions: [
-      { type: 'roomType', roomTypeId: MUSHROOM_GROVE },
-      { type: 'adjacentRoomType', roomTypeId: SOUL_WELL },
-      { type: 'inhabitantType', inhabitantType: 'fungal' },
-    ],
-    effects: [{ type: 'productionBonus', value: 0.2, resource: 'food' }],
-  },
-  {
-    id: 'synergy-arcane-resonance',
-    name: 'Arcane Resonance',
-    description:
-      'A spiritual connection between the library and well amplifies research.',
-    conditions: [
-      { type: 'roomType', roomTypeId: SHADOW_LIBRARY },
-      { type: 'connectedRoomType', roomTypeId: SOUL_WELL },
-    ],
-    effects: [{ type: 'productionBonus', value: 0.15, resource: 'research' }],
-  },
-  {
-    id: 'synergy-forge-master',
-    name: 'Forge Master',
-    description:
-      'A fully-staffed forge operates at peak efficiency with specialized workers.',
-    conditions: [
-      { type: 'roomType', roomTypeId: DARK_FORGE },
-      { type: 'minInhabitants', count: 2 },
-    ],
-    effects: [{ type: 'productionBonus', value: 0.1, resource: 'gold' }],
-  },
-  {
-    id: 'synergy-treasury-guard',
-    name: 'Treasury Guard',
-    description:
-      'Barracks guards protect the vault, enabling more efficient gold storage.',
-    conditions: [
-      { type: 'roomType', roomTypeId: TREASURE_VAULT },
-      { type: 'adjacentRoomType', roomTypeId: BARRACKS },
-    ],
-    effects: [{ type: 'productionBonus', value: 0.2, resource: 'gold' }],
-  },
-];
+export function getSynergyDefinitions(): SynergyDefinition[] {
+  return getEntriesByType<SynergyDefinition & IsContentItem>('synergy');
+}
 
 function buildAdjacencyMap(
   floor: Floor,
@@ -187,7 +122,7 @@ export function evaluateSynergiesForRoom(
   adjacentRoomIds: string[],
   synergies?: SynergyDefinition[],
 ): SynergyDefinition[] {
-  const defs = synergies ?? SYNERGY_DEFINITIONS;
+  const defs = synergies ?? getSynergyDefinitions();
   return defs.filter((synergy) =>
     synergy.conditions.every((c) =>
       evaluateCondition(c, room, floor, adjacentRoomIds),
@@ -262,7 +197,7 @@ export function getPotentialSynergiesForRoom(
   adjacentRoomIds: string[],
   synergies?: SynergyDefinition[],
 ): PotentialSynergy[] {
-  const defs = synergies ?? SYNERGY_DEFINITIONS;
+  const defs = synergies ?? getSynergyDefinitions();
   const potentials: PotentialSynergy[] = [];
 
   for (const synergy of defs) {

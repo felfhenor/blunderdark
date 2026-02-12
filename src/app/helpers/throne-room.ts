@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
+import { findRoomIdByRole } from '@helpers/room-roles';
 import { getAbsoluteTiles, getShapeBounds } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import {
@@ -10,11 +11,10 @@ import {
   type InhabitantInstance,
   type IsContentItem,
   type PlacedRoom,
+  type RoomDefinition,
   type RoomShape,
   type RulerBonuses,
 } from '@interfaces';
-
-export const THRONE_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000001';
 
 // --- Pure functions ---
 
@@ -25,9 +25,12 @@ export const THRONE_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000001';
 export function findThroneRoom(
   floors: Floor[],
 ): { floor: Floor; room: PlacedRoom } | null {
+  const throneId = findRoomIdByRole('throne');
+  if (!throneId) return null;
+
   for (const floor of floors) {
     const room = floor.rooms.find(
-      (r) => r.roomTypeId === THRONE_ROOM_TYPE_ID,
+      (r) => r.roomTypeId === throneId,
     );
     if (room) return { floor, room };
   }
@@ -142,9 +145,7 @@ export const throneRoomFearLevel = computed<number | null>(() => {
 
 // --- Adjacency & centrality bonuses ---
 
-export const TREASURE_VAULT_TYPE_ID = 'aa100001-0001-0001-0001-000000000008';
 export const CENTRALITY_THRESHOLD = 5;
-export const VAULT_ADJACENCY_GOLD_BONUS = 0.05;
 export const CENTRALITY_RULER_BONUS_MULTIPLIER = 0.1;
 
 export type ThronePositionalBonuses = {
@@ -176,7 +177,7 @@ export function isRoomCentral(
 
 /**
  * Get positional bonuses for the Throne Room.
- * Checks vault adjacency and central placement.
+ * Checks adjacent rooms for throneAdjacencyEffects and central placement.
  */
 export function getThroneRoomPositionalBonuses(
   floors: Floor[],
@@ -202,22 +203,20 @@ export function getThroneRoomPositionalBonuses(
     throne.room.anchorY,
   );
 
-  // Check vault adjacency
-  const vaultRooms = throne.floor.rooms.filter(
-    (r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID,
-  );
+  // Check adjacent rooms for throneAdjacencyEffects
+  let goldProductionBonus = 0;
   let vaultAdjacent = false;
-  for (const vault of vaultRooms) {
-    const vaultShape = getEntry<RoomShape & IsContentItem>(vault.shapeId);
-    if (!vaultShape) continue;
-    const vaultTiles = getAbsoluteTiles(
-      vaultShape,
-      vault.anchorX,
-      vault.anchorY,
-    );
-    if (areRoomsAdjacent(throneTiles, vaultTiles)) {
+  for (const adjRoom of throne.floor.rooms) {
+    if (adjRoom.id === throne.room.id) continue;
+    const adjShape = getEntry<RoomShape & IsContentItem>(adjRoom.shapeId);
+    if (!adjShape) continue;
+    const adjTiles = getAbsoluteTiles(adjShape, adjRoom.anchorX, adjRoom.anchorY);
+    if (!areRoomsAdjacent(throneTiles, adjTiles)) continue;
+
+    const adjDef = getEntry<RoomDefinition & IsContentItem>(adjRoom.roomTypeId);
+    if (adjDef?.throneAdjacencyEffects?.goldProductionBonus) {
       vaultAdjacent = true;
-      break;
+      goldProductionBonus += adjDef.throneAdjacencyEffects.goldProductionBonus;
     }
   }
 
@@ -235,7 +234,7 @@ export function getThroneRoomPositionalBonuses(
   return {
     vaultAdjacent,
     central,
-    goldProductionBonus: vaultAdjacent ? VAULT_ADJACENCY_GOLD_BONUS : 0,
+    goldProductionBonus,
     rulerBonusMultiplier: central ? CENTRALITY_RULER_BONUS_MULTIPLIER : 0,
   };
 }

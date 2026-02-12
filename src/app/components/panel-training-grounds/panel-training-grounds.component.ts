@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   currentFloor,
+  findRoomIdByRole,
   gamestate,
   getEntry,
   getTrainingProgressPercent,
   getTrainingRoomInfo,
   selectedTile,
-  TRAINING_GROUNDS_TYPE_ID,
 } from '@helpers';
 import { TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
@@ -31,7 +31,7 @@ export class PanelTrainingGroundsComponent {
     if (!gridTile?.roomId) return null;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== TRAINING_GROUNDS_TYPE_ID) return null;
+    if (!room || room.roomTypeId !== findRoomIdByRole('trainingGrounds')) return null;
 
     return getTrainingRoomInfo(room.id);
   });

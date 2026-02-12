@@ -8,6 +8,12 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+// --- Constants (test-local) ---
+
+const THRONE_ROOM_TYPE_ID = 'test-throne-room-type';
+const TREASURE_VAULT_TYPE_ID = 'test-vault-type';
+const VAULT_ADJACENCY_GOLD_BONUS = 0.05;
+
 // --- Mocks ---
 
 const mockFloors: Floor[] = [];
@@ -21,12 +27,17 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: () => ({ world: { floors: mockFloors } }),
 }));
 
+vi.mock('@helpers/room-roles', () => ({
+  findRoomIdByRole: vi.fn((role: string) => {
+    if (role === 'throne') return THRONE_ROOM_TYPE_ID;
+    return undefined;
+  }),
+  resetRoleCache: vi.fn(),
+}));
+
 const {
-  THRONE_ROOM_TYPE_ID,
   EMPTY_THRONE_FEAR_LEVEL,
-  TREASURE_VAULT_TYPE_ID,
   CENTRALITY_THRESHOLD,
-  VAULT_ADJACENCY_GOLD_BONUS,
   CENTRALITY_RULER_BONUS_MULTIPLIER,
   findThroneRoom,
   getSeatedRulerInstance,
@@ -519,6 +530,11 @@ describe('isRoomCentral', () => {
 describe('getThroneRoomPositionalBonuses', () => {
   beforeEach(() => {
     mockContent.clear();
+    mockContent.set(TREASURE_VAULT_TYPE_ID, {
+      id: TREASURE_VAULT_TYPE_ID,
+      __type: 'room',
+      throneAdjacencyEffects: { goldProductionBonus: VAULT_ADJACENCY_GOLD_BONUS },
+    });
   });
 
   it('should return default bonuses when no Throne Room exists', () => {

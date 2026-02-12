@@ -3,6 +3,7 @@ import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { canAfford, payCost } from '@helpers/resources';
 import { placeRoomOnFloor } from '@helpers/room-placement';
+import { findRoomIdByRole } from '@helpers/room-roles';
 import { rngUuid } from '@helpers/rng';
 import { getAbsoluteTiles } from '@helpers/room-shapes';
 import {
@@ -21,17 +22,18 @@ import type {
 } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
-export const ALTAR_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000009';
-
 /**
  * Find the placed Altar Room across all floors.
  */
 export function findAltarRoom(
   floors: Floor[],
 ): { floor: Floor; room: PlacedRoom } | null {
+  const altarId = findRoomIdByRole('altar');
+  if (!altarId) return null;
+
   for (const floor of floors) {
     const room = floor.rooms.find(
-      (r) => r.roomTypeId === ALTAR_ROOM_TYPE_ID,
+      (r) => r.roomTypeId === altarId,
     );
     if (room) return { floor, room };
   }
@@ -79,19 +81,26 @@ export function autoPlaceRooms(floor: Floor): Floor {
   return currentFloor;
 }
 
-export const ALTAR_UPGRADE_LEVEL_2_ID = 'aa200001-0001-0001-0001-000000000007';
-export const ALTAR_UPGRADE_LEVEL_3_ID = 'aa200001-0001-0001-0001-000000000008';
-
 /**
  * Get the Altar Room's current level (1 = base, 2 = Empowered, 3 = Ascendant).
+ * Uses upgradeLevel field from upgrade path definitions.
  */
 export function getAltarLevel(floors: Floor[]): number {
   const altar = findAltarRoom(floors);
   if (!altar) return 0;
 
-  if (altar.room.appliedUpgradePathId === ALTAR_UPGRADE_LEVEL_3_ID) return 3;
-  if (altar.room.appliedUpgradePathId === ALTAR_UPGRADE_LEVEL_2_ID) return 2;
-  return 1;
+  if (!altar.room.appliedUpgradePathId) return 1;
+
+  const altarId = findRoomIdByRole('altar');
+  if (!altarId) return 1;
+
+  const paths = getUpgradePaths(altarId);
+  const appliedPath = paths.find((p) => p.id === altar.room.appliedUpgradePathId);
+  if (appliedPath?.upgradeLevel) return appliedPath.upgradeLevel;
+
+  // Fallback: use index position
+  const appliedIndex = paths.findIndex((p) => p.id === altar.room.appliedUpgradePathId);
+  return appliedIndex >= 0 ? appliedIndex + 2 : 1;
 }
 
 /**
@@ -109,15 +118,20 @@ export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | null {
   const altar = findAltarRoom(floors);
   if (!altar) return null;
 
-  const currentLevel = getAltarLevel(floors);
-  const paths = getUpgradePaths(ALTAR_ROOM_TYPE_ID);
+  const altarId = findRoomIdByRole('altar');
+  if (!altarId) return null;
 
-  if (currentLevel === 1) {
-    return paths.find((p) => p.id === ALTAR_UPGRADE_LEVEL_2_ID) ?? null;
-  }
-  if (currentLevel === 2) {
-    return paths.find((p) => p.id === ALTAR_UPGRADE_LEVEL_3_ID) ?? null;
-  }
+  const currentLevel = getAltarLevel(floors);
+  const paths = getUpgradePaths(altarId);
+
+  const nextLevel = currentLevel + 1;
+  // Find the path matching the next upgrade level
+  const nextPath = paths.find((p) => p.upgradeLevel === nextLevel);
+  if (nextPath) return nextPath;
+
+  // Fallback: use index-based progression
+  if (currentLevel === 1 && paths.length >= 1) return paths[0];
+  if (currentLevel === 2 && paths.length >= 2) return paths[1];
 
   return null;
 }
@@ -132,17 +146,18 @@ export async function applyAltarUpgrade(
   const altar = findAltarRoom(state.world.floors);
   if (!altar) return { success: false, error: 'No Altar found' };
 
-  const paths = getUpgradePaths(ALTAR_ROOM_TYPE_ID);
+  const altarId = findRoomIdByRole('altar');
+  if (!altarId) return { success: false, error: 'No Altar type found' };
+
+  const paths = getUpgradePaths(altarId);
   const path = paths.find((p) => p.id === upgradePathId);
   if (!path) return { success: false, error: 'Invalid upgrade path' };
 
   // Validate level ordering
   const currentLevel = getAltarLevel(state.world.floors);
-  if (upgradePathId === ALTAR_UPGRADE_LEVEL_2_ID && currentLevel !== 1) {
-    return { success: false, error: 'Altar must be Level 1 to apply this upgrade' };
-  }
-  if (upgradePathId === ALTAR_UPGRADE_LEVEL_3_ID && currentLevel !== 2) {
-    return { success: false, error: 'Altar must be Level 2 to apply this upgrade' };
+  const targetLevel = path.upgradeLevel ?? (paths.indexOf(path) + 2);
+  if (targetLevel !== currentLevel + 1) {
+    return { success: false, error: `Altar must be Level ${targetLevel - 1} to apply this upgrade` };
   }
 
   if (!canAfford(path.cost)) {
@@ -197,8 +212,11 @@ export function isAdjacentToAltar(
   floor: Floor,
   room: PlacedRoom,
 ): boolean {
+  const altarId = findRoomIdByRole('altar');
+  if (!altarId) return false;
+
   const altarPlaced = floor.rooms.find(
-    (r) => r.roomTypeId === ALTAR_ROOM_TYPE_ID,
+    (r) => r.roomTypeId === altarId,
   );
   if (!altarPlaced) return false;
 

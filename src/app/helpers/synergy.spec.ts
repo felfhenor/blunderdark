@@ -171,7 +171,6 @@ import {
   evaluateSynergiesForRoom,
   formatSynergyEffect,
   getPotentialSynergiesForRoom,
-  SYNERGY_DEFINITIONS,
 } from '@helpers/synergy';
 
 function makeFloor(
@@ -192,27 +191,6 @@ function makeFloor(
     traps: [],
   };
 }
-
-describe('SYNERGY_DEFINITIONS', () => {
-  it('should have at least 5 synergy definitions', () => {
-    expect(SYNERGY_DEFINITIONS.length).toBeGreaterThanOrEqual(5);
-  });
-
-  it('should have unique ids', () => {
-    const ids = SYNERGY_DEFINITIONS.map((s) => s.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it('should have all required fields', () => {
-    for (const synergy of SYNERGY_DEFINITIONS) {
-      expect(synergy.id).toBeTruthy();
-      expect(synergy.name).toBeTruthy();
-      expect(synergy.description).toBeTruthy();
-      expect(synergy.conditions.length).toBeGreaterThan(0);
-      expect(synergy.effects.length).toBeGreaterThan(0);
-    }
-  });
-});
 
 describe('evaluateCondition', () => {
   const mine: PlacedRoom = {

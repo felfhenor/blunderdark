@@ -10,7 +10,7 @@ import {
   getCompositionWeights,
   getPartySize,
   selectPartyComposition,
-  COMPOSITION_WEIGHTS_ID,
+  resetInvasionCompositionCache,
 } from '@helpers/invasion-composition';
 import seedrandom from 'seedrandom';
 
@@ -19,8 +19,21 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+const TREASURE_VAULT_ID = 'aa100001-0001-0001-0001-000000000008';
+const SHADOW_LIBRARY_ID = 'aa100001-0001-0001-0001-000000000004';
+const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
+
+const mockRoomDefs = [
+  { id: TREASURE_VAULT_ID, __type: 'room', invasionProfile: { dimension: 'wealth', weight: 15 } },
+  { id: SHADOW_LIBRARY_ID, __type: 'room', invasionProfile: { dimension: 'knowledge', weight: 15 } },
+  { id: CRYSTAL_MINE_ID, __type: 'room', invasionProfile: { dimension: 'wealth', weight: 10 } },
+];
+
 vi.mock('@helpers/content', () => ({
-  getEntriesByType: vi.fn(() => []),
+  getEntriesByType: vi.fn((type: string) => {
+    if (type === 'room') return mockRoomDefs;
+    return [];
+  }),
   getEntry: vi.fn(() => undefined),
 }));
 
@@ -37,6 +50,8 @@ vi.mock('@helpers/invaders', () => ({
 }));
 
 // --- Test data ---
+
+const COMPOSITION_WEIGHTS_ID = 'test-composition-weights';
 
 const defaultWeightConfig: CompositionWeightConfig = {
   id: COMPOSITION_WEIGHTS_ID,
@@ -204,6 +219,7 @@ function makeGameState(overrides: {
 describe('invasion-composition', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetInvasionCompositionCache();
   });
 
   // --- calculateDungeonProfile ---

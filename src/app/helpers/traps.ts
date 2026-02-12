@@ -9,14 +9,6 @@ import type {
   TrapInventoryEntry,
 } from '@interfaces';
 
-// --- Trap Definition IDs ---
-
-export const PIT_TRAP_ID = 'aa800001-0001-0001-0001-000000000001';
-export const ARROW_TRAP_ID = 'aa800001-0001-0001-0001-000000000002';
-export const RUNE_TRAP_ID = 'aa800001-0001-0001-0001-000000000003';
-export const MAGIC_TRAP_ID = 'aa800001-0001-0001-0001-000000000004';
-export const FEAR_GLYPH_ID = 'aa800001-0001-0001-0001-000000000005';
-
 // --- Trap Definition Lookup ---
 
 export function getTrapDefinition(

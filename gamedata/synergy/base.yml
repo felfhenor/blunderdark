@@ -1,0 +1,68 @@
+- id: aa300001-0001-0001-0001-000000000001
+  name: Dark Industry
+  description: Goblin miners near a Dark Forge extract crystals with forge-heated tools.
+  conditions:
+    - type: roomType
+      roomTypeId: Crystal Mine
+    - type: adjacentRoomType
+      roomTypeId: Dark Forge
+    - type: inhabitantType
+      inhabitantType: creature
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: crystals
+
+- id: aa300001-0001-0001-0001-000000000002
+  name: Verdant Communion
+  description: Myconid workers harmonize with Soul Well energy for explosive fungal growth.
+  conditions:
+    - type: roomType
+      roomTypeId: Mushroom Grove
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+    - type: inhabitantType
+      inhabitantType: fungal
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: food
+
+- id: aa300001-0001-0001-0001-000000000003
+  name: Arcane Resonance
+  description: A spiritual connection between the library and well amplifies research.
+  conditions:
+    - type: roomType
+      roomTypeId: Shadow Library
+    - type: connectedRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: research
+
+- id: aa300001-0001-0001-0001-000000000004
+  name: Forge Master
+  description: A fully-staffed forge operates at peak efficiency with specialized workers.
+  conditions:
+    - type: roomType
+      roomTypeId: Dark Forge
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.1
+      resource: gold
+
+- id: aa300001-0001-0001-0001-000000000005
+  name: Treasury Guard
+  description: Barracks guards protect the vault, enabling more efficient gold storage.
+  conditions:
+    - type: roomType
+      roomTypeId: Treasure Vault
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: gold

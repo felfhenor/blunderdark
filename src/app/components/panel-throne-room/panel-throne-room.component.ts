@@ -4,6 +4,7 @@ import {
   activeRulerBonuses,
   assignInhabitantToRoom,
   currentFloor,
+  findRoomIdByRole,
   getEntry,
   getRulerDefinition,
   meetsInhabitantRestriction,
@@ -13,7 +14,6 @@ import {
   selectedTile,
   thronePositionalBonuses,
   throneRoomFearLevel,
-  THRONE_ROOM_TYPE_ID,
   unassignInhabitantFromRoom,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
@@ -35,7 +35,7 @@ export class PanelThroneRoomComponent {
     if (!gridTile?.roomId) return null;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== THRONE_ROOM_TYPE_ID) return null;
+    if (!room || room.roomTypeId !== findRoomIdByRole('throne')) return null;
 
     return room;
   });

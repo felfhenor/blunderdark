@@ -1,4 +1,5 @@
-import type { BiomeType } from '@interfaces';
+import { getEntriesByType } from '@helpers/content';
+import type { BiomeType, IsContentItem, RoomDefinition } from '@interfaces';
 
 // --- Types ---
 
@@ -29,21 +30,69 @@ export type ProductionModifierDefinition = {
 
 // --- Constants ---
 
-// Room type IDs
-const SHADOW_LIBRARY = 'aa100001-0001-0001-0001-000000000004';
-const SOUL_WELL = 'aa100001-0001-0001-0001-000000000005';
-const CRYSTAL_MINE = 'aa100001-0001-0001-0001-000000000002';
-const MUSHROOM_GROVE = 'aa100001-0001-0001-0001-000000000003';
-const DARK_FORGE = 'aa100001-0001-0001-0001-000000000006';
-const UNDERGROUND_LAKE = 'aa100001-0001-0001-0001-000000000010';
-const LEY_LINE_NEXUS = 'aa100001-0001-0001-0001-000000000011';
-
 // Time thresholds
 export const NIGHT_START = 18;
 export const NIGHT_END = 6;
 
 // Depth bonus
 export const DEPTH_BONUS_PER_LEVEL = 0.05;
+
+// --- Lazy lookup maps built from room data ---
+
+let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | null = null;
+let biomeMap: Map<string, Map<string, number>> | null = null;
+
+function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
+  const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+  const day = new Map<string, number>();
+  const night = new Map<string, number>();
+  for (const room of rooms) {
+    if (room.timeOfDayBonus) {
+      if (room.timeOfDayBonus.period === 'day') {
+        day.set(room.id, room.timeOfDayBonus.bonus);
+      } else {
+        night.set(room.id, room.timeOfDayBonus.bonus);
+      }
+    }
+  }
+  return { day, night };
+}
+
+function getTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
+  if (!timeOfDayMap) {
+    timeOfDayMap = buildTimeOfDayMap();
+  }
+  return timeOfDayMap;
+}
+
+function buildBiomeMap(): Map<string, Map<string, number>> {
+  const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+  const map = new Map<string, Map<string, number>>();
+  for (const room of rooms) {
+    if (room.biomeBonuses) {
+      for (const [biome, bonus] of Object.entries(room.biomeBonuses)) {
+        if (bonus === null || bonus === undefined) continue;
+        if (!map.has(biome)) {
+          map.set(biome, new Map());
+        }
+        map.get(biome)!.set(room.id, bonus);
+      }
+    }
+  }
+  return map;
+}
+
+function getBiomeMap(): Map<string, Map<string, number>> {
+  if (!biomeMap) {
+    biomeMap = buildBiomeMap();
+  }
+  return biomeMap;
+}
+
+export function resetProductionModifierCache(): void {
+  timeOfDayMap = null;
+  biomeMap = null;
+}
 
 // --- Time-of-day helpers ---
 
@@ -57,21 +106,12 @@ export function isDayTime(hour: number): boolean {
 
 // --- Time-of-day modifier ---
 
-const NIGHT_BONUS_ROOMS: Record<string, number> = {
-  [SHADOW_LIBRARY]: 0.20,
-  [SOUL_WELL]: 0.15,
-};
-
-const DAY_BONUS_ROOMS: Record<string, number> = {
-  [MUSHROOM_GROVE]: 0.15,
-  [CRYSTAL_MINE]: 0.10,
-};
-
 function evaluateTimeOfDay(context: ProductionModifierContext): number {
+  const map = getTimeOfDayMap();
   if (isNightTime(context.hour)) {
-    return 1.0 + (NIGHT_BONUS_ROOMS[context.roomTypeId] ?? 0);
+    return 1.0 + (map.night.get(context.roomTypeId) ?? 0);
   }
-  return 1.0 + (DAY_BONUS_ROOMS[context.roomTypeId] ?? 0);
+  return 1.0 + (map.day.get(context.roomTypeId) ?? 0);
 }
 
 // --- Floor depth modifier ---
@@ -82,35 +122,15 @@ function evaluateFloorDepth(context: ProductionModifierContext): number {
 
 // --- Biome modifier ---
 
-export const BIOME_ROOM_BONUSES: Partial<Record<BiomeType, Record<string, number>>> = {
-  volcanic: {
-    [DARK_FORGE]: 0.50,
-    [CRYSTAL_MINE]: 0.15,
-  },
-  fungal: {
-    [MUSHROOM_GROVE]: 0.60,
-  },
-  crystal: {
-    [CRYSTAL_MINE]: 0.40,
-    [LEY_LINE_NEXUS]: 0.10,
-  },
-  corrupted: {
-    [SOUL_WELL]: 1.00,
-    [SHADOW_LIBRARY]: 1.00,
-  },
-  flooded: {
-    [UNDERGROUND_LAKE]: 0.50,
-  },
-};
-
 /**
  * Get the biome bonus multiplier for a specific room type on a specific biome.
  * Returns 1.0 for rooms not affected by the biome or for neutral biome.
  */
 export function getBiomeBonus(biome: BiomeType, roomTypeId: string): number {
-  const biomeRooms = BIOME_ROOM_BONUSES[biome];
+  const map = getBiomeMap();
+  const biomeRooms = map.get(biome);
   if (!biomeRooms) return 1.0;
-  return 1.0 + (biomeRooms[roomTypeId] ?? 0);
+  return 1.0 + (biomeRooms.get(roomTypeId) ?? 0);
 }
 
 function evaluateBiome(context: ProductionModifierContext): number {

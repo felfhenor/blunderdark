@@ -1,9 +1,11 @@
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
+import { findRoomIdByRole } from '@helpers/room-roles';
 import { rngShuffle, rngUuid } from '@helpers/rng';
 import type {
   GameState,
   InhabitantDefinition,
   IsContentItem,
+  RoomDefinition,
 } from '@interfaces';
 import type {
   InvasionObjective,
@@ -12,19 +14,62 @@ import type {
 } from '@interfaces/invasion-objective';
 import seedrandom from 'seedrandom';
 
-// --- Room type IDs ---
-
-const ALTAR_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000009';
-const TREASURE_VAULT_TYPE_ID = 'aa100001-0001-0001-0001-000000000008';
-const SHADOW_LIBRARY_TYPE_ID = 'aa100001-0001-0001-0001-000000000004';
-const LEY_LINE_NEXUS_TYPE_ID = 'aa100001-0001-0001-0001-000000000011';
-const SOUL_WELL_TYPE_ID = 'aa100001-0001-0001-0001-000000000005';
-
 // --- Helpers ---
 
 function getInhabitantTier(definitionId: string): number {
   const def = getEntry<InhabitantDefinition & IsContentItem>(definitionId);
   return def?.tier ?? 1;
+}
+
+// --- Data-driven room lookup for objectives ---
+
+let objectiveTypeCache: Map<string, string[]> | null = null;
+
+function getObjectiveTypeMap(): Map<string, string[]> {
+  if (!objectiveTypeCache) {
+    const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+    objectiveTypeCache = new Map();
+    for (const room of rooms) {
+      if (room.objectiveTypes) {
+        for (const objType of room.objectiveTypes) {
+          if (!objectiveTypeCache.has(objType)) {
+            objectiveTypeCache.set(objType, []);
+          }
+          objectiveTypeCache.get(objType)!.push(room.id);
+        }
+      }
+    }
+  }
+  return objectiveTypeCache;
+}
+
+export function resetInvasionObjectivesCache(): void {
+  objectiveTypeCache = null;
+}
+
+function findRoomByObjectiveType(
+  state: GameState,
+  objectiveType: string,
+): string | null {
+  const map = getObjectiveTypeMap();
+  const roomTypeIds = map.get(objectiveType);
+  if (!roomTypeIds || roomTypeIds.length === 0) return null;
+
+  for (const floor of state.world.floors) {
+    for (const room of floor.rooms) {
+      if (roomTypeIds.includes(room.roomTypeId)) {
+        return room.id;
+      }
+    }
+  }
+  return null;
+}
+
+function hasRoomWithObjectiveType(
+  state: GameState,
+  objectiveType: string,
+): boolean {
+  return findRoomByObjectiveType(state, objectiveType) !== null;
 }
 
 // --- Objective definitions ---
@@ -55,79 +100,29 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
     type: 'StealTreasure',
     name: 'Steal Treasure',
     description: 'Loot gold from the dungeon treasury.',
-    isEligible: (state) =>
-      state.world.floors.some((f) =>
-        f.rooms.some((r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID),
-      ),
-    getTargetId: (state) => {
-      for (const floor of state.world.floors) {
-        const room = floor.rooms.find(
-          (r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID,
-        );
-        if (room) return room.id;
-      }
-      return null;
-    },
+    isEligible: (state) => hasRoomWithObjectiveType(state, 'StealTreasure'),
+    getTargetId: (state) => findRoomByObjectiveType(state, 'StealTreasure'),
   },
   {
     type: 'DefileLibrary',
     name: 'Defile Library',
     description: 'Destroy forbidden knowledge stored in the shadow library.',
-    isEligible: (state) =>
-      state.world.floors.some((f) =>
-        f.rooms.some((r) => r.roomTypeId === SHADOW_LIBRARY_TYPE_ID),
-      ),
-    getTargetId: (state) => {
-      for (const floor of state.world.floors) {
-        const room = floor.rooms.find(
-          (r) => r.roomTypeId === SHADOW_LIBRARY_TYPE_ID,
-        );
-        if (room) return room.id;
-      }
-      return null;
-    },
+    isEligible: (state) => hasRoomWithObjectiveType(state, 'DefileLibrary'),
+    getTargetId: (state) => findRoomByObjectiveType(state, 'DefileLibrary'),
   },
   {
     type: 'SealPortal',
     name: 'Seal Portal',
     description: 'Seal a dark energy nexus to weaken the dungeon.',
-    isEligible: (state) =>
-      state.world.floors.some((f) =>
-        f.rooms.some(
-          (r) =>
-            r.roomTypeId === LEY_LINE_NEXUS_TYPE_ID ||
-            r.roomTypeId === SOUL_WELL_TYPE_ID,
-        ),
-      ),
-    getTargetId: (state) => {
-      for (const floor of state.world.floors) {
-        const room = floor.rooms.find(
-          (r) =>
-            r.roomTypeId === LEY_LINE_NEXUS_TYPE_ID ||
-            r.roomTypeId === SOUL_WELL_TYPE_ID,
-        );
-        if (room) return room.id;
-      }
-      return null;
-    },
+    isEligible: (state) => hasRoomWithObjectiveType(state, 'SealPortal'),
+    getTargetId: (state) => findRoomByObjectiveType(state, 'SealPortal'),
   },
   {
     type: 'PlunderVault',
     name: 'Plunder Vault',
     description: 'Break into the treasure vault and carry away riches.',
-    isEligible: (state) =>
-      state.world.floors.some((f) =>
-        f.rooms.some((r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID),
-      ),
-    getTargetId: (state) => {
-      for (const floor of state.world.floors) {
-        const room = floor.rooms.find(
-          (r) => r.roomTypeId === TREASURE_VAULT_TYPE_ID,
-        );
-        if (room) return room.id;
-      }
-      return null;
-    },
+    isEligible: (state) => hasRoomWithObjectiveType(state, 'PlunderVault'),
+    getTargetId: (state) => findRoomByObjectiveType(state, 'PlunderVault'),
   },
   {
     type: 'RescuePrisoner',
@@ -203,9 +198,12 @@ export function assignInvasionObjectives(
 }
 
 function findAltarRoomId(state: GameState): string | null {
+  const altarTypeId = findRoomIdByRole('altar');
+  if (!altarTypeId) return null;
+
   for (const floor of state.world.floors) {
     const altar = floor.rooms.find(
-      (r) => r.roomTypeId === ALTAR_ROOM_TYPE_ID,
+      (r) => r.roomTypeId === altarTypeId,
     );
     if (altar) return altar.id;
   }

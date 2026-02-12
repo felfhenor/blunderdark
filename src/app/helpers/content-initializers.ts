@@ -22,6 +22,7 @@ import type {
   StageContent,
   StageId,
   StatBlock,
+  SynergyDefinition,
   TrapDefinition,
   TrinketContent,
   TrinketId,
@@ -46,6 +47,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   room: ensureRoom,
   roomshape: ensureRoomShape,
   stage: ensureStage,
+  synergy: ensureSynergy,
   trap: ensureTrap,
   trinket: ensureTrinket,
   weapon: ensureWeapon,
@@ -204,6 +206,26 @@ function ensureRoom(
     fearReductionAura: room.fearReductionAura ?? 0,
     upgradePaths: room.upgradePaths ?? [],
     autoPlace: room.autoPlace ?? false,
+    role: room.role ?? undefined,
+    timeOfDayBonus: room.timeOfDayBonus ?? undefined,
+    biomeBonuses: room.biomeBonuses ?? undefined,
+    invasionProfile: room.invasionProfile ?? undefined,
+    objectiveTypes: room.objectiveTypes ?? undefined,
+    trainingAdjacencyEffects: room.trainingAdjacencyEffects ?? undefined,
+    throneAdjacencyEffects: room.throneAdjacencyEffects ?? undefined,
+  };
+}
+
+function ensureSynergy(
+  synergy: Partial<SynergyDefinition & IsContentItem>,
+): SynergyDefinition & IsContentItem {
+  return {
+    id: synergy.id ?? 'UNKNOWN',
+    name: synergy.name ?? 'UNKNOWN',
+    __type: 'synergy',
+    description: synergy.description ?? '',
+    conditions: synergy.conditions ?? [],
+    effects: synergy.effects ?? [],
   };
 }
 

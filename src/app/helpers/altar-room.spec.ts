@@ -26,6 +26,7 @@ const empoweredAltarPath: RoomUpgradePath = {
     { type: 'fearReductionAura', value: 2 },
     { type: 'secondaryProduction', value: 0.2, resource: 'essence' },
   ],
+  upgradeLevel: 2,
 };
 
 const ascendantAltarPath: RoomUpgradePath = {
@@ -38,6 +39,7 @@ const ascendantAltarPath: RoomUpgradePath = {
     { type: 'secondaryProduction', value: 0.4, resource: 'essence' },
     { type: 'secondaryProduction', value: 0.2, resource: 'flux' },
   ],
+  upgradeLevel: 3,
 };
 
 // --- Mock content ---
@@ -57,6 +59,14 @@ vi.mock('@helpers/content', () => ({
   }),
   getEntries: vi.fn(),
   allIdsByName: vi.fn(() => new Map()),
+}));
+
+vi.mock('@helpers/room-roles', () => ({
+  findRoomIdByRole: vi.fn((role: string) => {
+    if (role === 'altar') return ALTAR_ROOM_ID;
+    return undefined;
+  }),
+  resetRoleCache: vi.fn(),
 }));
 
 const altarRoomDef: RoomDefinition & IsContentItem = {
@@ -136,9 +146,6 @@ import {
   getNextAltarUpgrade,
   getEffectiveFearLevel,
   isAdjacentToAltar,
-  ALTAR_ROOM_TYPE_ID,
-  ALTAR_UPGRADE_LEVEL_2_ID,
-  ALTAR_UPGRADE_LEVEL_3_ID,
 } from '@helpers/altar-room';
 import { isRoomRemovable } from '@helpers/room-placement';
 import {
@@ -193,17 +200,6 @@ beforeEach(() => {
   mockContent.set(CRYSTAL_MINE_ID, crystalMineRoom);
   mockContent.set(ALTAR_SHAPE_ID, altarShape);
   mockContent.set('shape-l', mineShape);
-});
-
-describe('Altar Room: constants', () => {
-  it('should export correct type ID', () => {
-    expect(ALTAR_ROOM_TYPE_ID).toBe(ALTAR_ROOM_ID);
-  });
-
-  it('should export correct upgrade level IDs', () => {
-    expect(ALTAR_UPGRADE_LEVEL_2_ID).toBe(UPGRADE_LEVEL_2_ID);
-    expect(ALTAR_UPGRADE_LEVEL_3_ID).toBe(UPGRADE_LEVEL_3_ID);
-  });
 });
 
 describe('Altar Room: findAltarRoom', () => {

@@ -1,5 +1,6 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { TICKS_PER_MINUTE } from '@helpers/game-time';
+import { findRoomIdByRole } from '@helpers/room-roles';
 import { getAppliedUpgradeEffects } from '@helpers/room-upgrades';
 import { addToTrapInventory } from '@helpers/traps';
 import type {
@@ -11,9 +12,6 @@ import type {
   TrapDefinition,
 } from '@interfaces';
 import type { ResourceCost } from '@interfaces/resource';
-
-export const TRAP_WORKSHOP_TYPE_ID =
-  'aa100001-0001-0001-0001-000000000013';
 
 /** Base crafting time: 3 game-minutes = 15 ticks */
 export const BASE_CRAFTING_TICKS = TICKS_PER_MINUTE * 3;
@@ -122,7 +120,7 @@ export function canQueueTrap(
     const room = floor.rooms.find((r) => r.id === roomId);
     if (!room) continue;
 
-    if (room.roomTypeId !== TRAP_WORKSHOP_TYPE_ID) {
+    if (room.roomTypeId !== findRoomIdByRole('trapWorkshop')) {
       return { canQueue: false, reason: 'Room is not a Trap Workshop' };
     }
 
@@ -147,7 +145,7 @@ export function canQueueTrap(
 export function processTrapCrafting(state: GameState): void {
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
-      if (room.roomTypeId !== TRAP_WORKSHOP_TYPE_ID) continue;
+      if (room.roomTypeId !== findRoomIdByRole('trapWorkshop')) continue;
 
       const queueIndex = state.world.trapCraftingQueues.findIndex(
         (q) => q.roomId === room.id,
@@ -199,7 +197,7 @@ export function getTrapWorkshopInfo(
 ): TrapWorkshopInfo | null {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
-    if (!room || room.roomTypeId !== TRAP_WORKSHOP_TYPE_ID) continue;
+    if (!room || room.roomTypeId !== findRoomIdByRole('trapWorkshop')) continue;
 
     const assignedWorkerCount = floor.inhabitants.filter(
       (i) => i.assignedRoomId === roomId,

@@ -20,6 +20,7 @@ export type RoomUpgradePath = {
   description: string;
   cost: ResourceCost;
   effects: RoomUpgradeEffect[];
+  upgradeLevel?: number;
 };
 
 export type RoomDefinition = {
@@ -39,4 +40,11 @@ export type RoomDefinition = {
   fearReductionAura: number;
   upgradePaths: RoomUpgradePath[];
   autoPlace: boolean;
+  role?: string;
+  timeOfDayBonus?: { period: 'day' | 'night'; bonus: number };
+  biomeBonuses?: Partial<Record<string, number>>;
+  invasionProfile?: { dimension: string; weight: number };
+  objectiveTypes?: string[];
+  trainingAdjacencyEffects?: { timeReduction?: number; statBonus?: number };
+  throneAdjacencyEffects?: { goldProductionBonus?: number };
 };

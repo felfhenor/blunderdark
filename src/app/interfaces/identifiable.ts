@@ -13,6 +13,7 @@ export type ContentType =
   | 'room'
   | 'roomshape'
   | 'stage'
+  | 'synergy'
   | 'trap'
   | 'trinket'
   | 'weapon';

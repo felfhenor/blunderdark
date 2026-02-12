@@ -8,18 +8,12 @@ import {
   calculateStealTreasureProgress,
   calculateSealPortalProgress,
   resolveInvasionOutcome,
+  resetInvasionObjectivesCache,
 } from '@helpers/invasion-objectives';
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(() => ({})),
   updateGamestate: vi.fn(),
-}));
-
-const mockContent = new Map<string, unknown>();
-
-vi.mock('@helpers/content', () => ({
-  getEntry: vi.fn((id: string) => mockContent.get(id)),
-  getEntriesByType: vi.fn(() => []),
 }));
 
 // --- Test helpers ---
@@ -28,6 +22,31 @@ const ALTAR_ROOM_TYPE_ID = 'aa100001-0001-0001-0001-000000000009';
 const TREASURE_VAULT_TYPE_ID = 'aa100001-0001-0001-0001-000000000008';
 const SHADOW_LIBRARY_TYPE_ID = 'aa100001-0001-0001-0001-000000000004';
 const LEY_LINE_NEXUS_TYPE_ID = 'aa100001-0001-0001-0001-000000000011';
+
+const mockContent = new Map<string, unknown>();
+
+const mockRoomDefs = [
+  { id: ALTAR_ROOM_TYPE_ID, __type: 'room', role: 'altar', objectiveTypes: ['DestroyAltar'] },
+  { id: TREASURE_VAULT_TYPE_ID, __type: 'room', objectiveTypes: ['StealTreasure', 'PlunderVault'] },
+  { id: SHADOW_LIBRARY_TYPE_ID, __type: 'room', objectiveTypes: ['DefileLibrary'] },
+  { id: LEY_LINE_NEXUS_TYPE_ID, __type: 'room', objectiveTypes: ['SealPortal'] },
+];
+
+vi.mock('@helpers/content', () => ({
+  getEntry: vi.fn((id: string) => mockContent.get(id)),
+  getEntriesByType: vi.fn((type: string) => {
+    if (type === 'room') return mockRoomDefs;
+    return [];
+  }),
+}));
+
+vi.mock('@helpers/room-roles', () => ({
+  findRoomIdByRole: vi.fn((role: string) => {
+    if (role === 'altar') return ALTAR_ROOM_TYPE_ID;
+    return undefined;
+  }),
+  resetRoleCache: vi.fn(),
+}));
 
 function makeRoom(
   id: string,
@@ -170,6 +189,7 @@ describe('invasion-objectives', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockContent.clear();
+    resetInvasionObjectivesCache();
   });
 
   // --- assignInvasionObjectives ---

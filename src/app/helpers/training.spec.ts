@@ -59,6 +59,14 @@ vi.mock('@helpers/content', () => ({
   allIdsByName: vi.fn(() => new Map()),
 }));
 
+vi.mock('@helpers/room-roles', () => ({
+  findRoomIdByRole: vi.fn((role: string) => {
+    if (role === 'trainingGrounds') return TRAINING_GROUNDS_ID;
+    return undefined;
+  }),
+  resetRoleCache: vi.fn(),
+}));
+
 const trainingGroundsRoom: RoomDefinition & IsContentItem = {
   id: TRAINING_GROUNDS_ID,
   name: 'Training Grounds',
@@ -101,6 +109,7 @@ const barracksRoom: RoomDefinition & IsContentItem = {
   fearReductionAura: 0,
   upgradePaths: [],
   autoPlace: false,
+  trainingAdjacencyEffects: { timeReduction: 0.20 },
 };
 
 const altarRoom: RoomDefinition & IsContentItem = {
@@ -121,6 +130,7 @@ const altarRoom: RoomDefinition & IsContentItem = {
   fearReductionAura: 1,
   upgradePaths: [],
   autoPlace: true,
+  trainingAdjacencyEffects: { statBonus: 1 },
 };
 
 // --- Shape mocks ---
@@ -184,7 +194,6 @@ import {
   getTrainingTicksForRoom,
   isTrainingGroundsRoom,
   processTraining,
-  TRAINING_GROUNDS_TYPE_ID,
 } from '@helpers/training';
 
 // --- Helpers ---
@@ -320,7 +329,7 @@ describe('Training Grounds: definition', () => {
 
 describe('Training Grounds: isTrainingGroundsRoom', () => {
   it('should return true for Training Grounds type ID', () => {
-    expect(isTrainingGroundsRoom(TRAINING_GROUNDS_TYPE_ID)).toBe(true);
+    expect(isTrainingGroundsRoom(TRAINING_GROUNDS_ID)).toBe(true);
   });
 
   it('should return false for other room types', () => {

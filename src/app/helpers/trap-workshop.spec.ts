@@ -62,6 +62,14 @@ vi.mock('@helpers/content', () => ({
   allIdsByName: vi.fn(() => new Map()),
 }));
 
+vi.mock('@helpers/room-roles', () => ({
+  findRoomIdByRole: vi.fn((role: string) => {
+    if (role === 'trapWorkshop') return TRAP_WORKSHOP_ID;
+    return undefined;
+  }),
+  resetRoleCache: vi.fn(),
+}));
+
 // --- Trap definitions ---
 
 const pitTrapDef: TrapDefinition & IsContentItem = {
@@ -224,7 +232,6 @@ import {
   getQueueForRoom,
   processTrapCrafting,
   removeJobFromQueue,
-  TRAP_WORKSHOP_TYPE_ID,
 } from '@helpers/trap-workshop';
 
 // --- Setup ---
@@ -239,10 +246,6 @@ beforeEach(() => {
 // --- Tests ---
 
 describe('Trap Workshop Room Definition', () => {
-  it('should have correct room type ID', () => {
-    expect(TRAP_WORKSHOP_TYPE_ID).toBe(TRAP_WORKSHOP_ID);
-  });
-
   it('should have correct definition properties', () => {
     expect(workshopDef.maxInhabitants).toBe(2);
     expect(workshopDef.fearLevel).toBe(2);

@@ -1,23 +1,21 @@
 import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
+import { getEntry } from '@helpers/content';
 import { TICKS_PER_MINUTE } from '@helpers/game-time';
+import { findRoomIdByRole } from '@helpers/room-roles';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import { getAppliedUpgradeEffects } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   GameState,
+  IsContentItem,
   PlacedRoom,
+  RoomDefinition,
   TileOffset,
   TrainingBonuses,
 } from '@interfaces';
 import { Subject } from 'rxjs';
-
-export const TRAINING_GROUNDS_TYPE_ID =
-  'aa100001-0001-0001-0001-000000000012';
-
-const BARRACKS_TYPE_ID = 'aa100001-0001-0001-0001-000000000007';
-const ALTAR_TYPE_ID = 'aa100001-0001-0001-0001-000000000009';
 
 /** Base training time: 5 game-minutes = 25 ticks (TICKS_PER_MINUTE * 5) */
 export const BASE_TRAINING_TICKS = TICKS_PER_MINUTE * 5;
@@ -37,7 +35,7 @@ export const trainingCompleted$ = trainingCompletedSubject.asObservable();
  * Check if a room type is a Training Grounds.
  */
 export function isTrainingGroundsRoom(roomTypeId: string): boolean {
-  return roomTypeId === TRAINING_GROUNDS_TYPE_ID;
+  return roomTypeId === findRoomIdByRole('trainingGrounds');
 }
 
 /**
@@ -98,9 +96,12 @@ export function getTrainingTicksForRoom(
     }
   }
 
-  // Adjacent to Barracks: -20% training time
-  if (adjacentRoomTypeIds.has(BARRACKS_TYPE_ID)) {
-    ticks = Math.round(ticks * 0.8);
+  // Check adjacent rooms for trainingAdjacencyEffects.timeReduction
+  for (const adjTypeId of adjacentRoomTypeIds) {
+    const adjDef = getEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    if (adjDef?.trainingAdjacencyEffects?.timeReduction) {
+      ticks = Math.round(ticks * (1 - adjDef.trainingAdjacencyEffects.timeReduction));
+    }
   }
 
   return Math.max(1, ticks);
@@ -126,10 +127,13 @@ export function getTrainingBonusesForRoom(
     }
   }
 
-  // Adjacent to Altar: +1 to all trained stats
-  if (adjacentRoomTypeIds.has(ALTAR_TYPE_ID)) {
-    bonuses.defense += 1;
-    bonuses.attack += 1;
+  // Check adjacent rooms for trainingAdjacencyEffects.statBonus
+  for (const adjTypeId of adjacentRoomTypeIds) {
+    const adjDef = getEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    if (adjDef?.trainingAdjacencyEffects?.statBonus) {
+      bonuses.defense += adjDef.trainingAdjacencyEffects.statBonus;
+      bonuses.attack += adjDef.trainingAdjacencyEffects.statBonus;
+    }
   }
 
   return bonuses;
@@ -152,11 +156,13 @@ export function getTrainingProgressPercent(
  * Called each tick inside updateGamestate — mutates state in-place.
  */
 export function processTraining(state: GameState): void {
+  const trainingGroundsId = findRoomIdByRole('trainingGrounds');
+
   for (const floor of state.world.floors) {
     const tileMap = buildRoomTilesMap(floor);
 
     for (const room of floor.rooms) {
-      if (room.roomTypeId !== TRAINING_GROUNDS_TYPE_ID) continue;
+      if (room.roomTypeId !== trainingGroundsId) continue;
 
       const adjacentTypes = getAdjacentRoomTypeIds(room, floor, tileMap);
       const targetTicks = getTrainingTicksForRoom(room, adjacentTypes);
@@ -197,10 +203,11 @@ export type TrainingRoomInfo = {
 export function getTrainingRoomInfo(
   roomId: string,
 ): TrainingRoomInfo | null {
+  const trainingGroundsId = findRoomIdByRole('trainingGrounds');
   const state = gamestate();
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
-    if (!room || room.roomTypeId !== TRAINING_GROUNDS_TYPE_ID) continue;
+    if (!room || room.roomTypeId !== trainingGroundsId) continue;
 
     const adjacentTypes = getAdjacentRoomTypeIds(room, floor);
     return {
@@ -217,6 +224,7 @@ export function getTrainingRoomInfo(
  * Reactive signal: selected tile's Training Grounds info (null if not a Training Grounds).
  */
 export const selectedTrainingRoom = computed<TrainingRoomInfo | null>(() => {
+  const trainingGroundsId = findRoomIdByRole('trainingGrounds');
   const state = gamestate();
   const floors = state.world.floors;
   const floorIndex = state.world.currentFloorIndex;
@@ -226,7 +234,7 @@ export const selectedTrainingRoom = computed<TrainingRoomInfo | null>(() => {
   // Find the training grounds room from the floor's rooms list
   // We check all rooms to find if any is selected (via UI)
   for (const room of floor.rooms) {
-    if (room.roomTypeId === TRAINING_GROUNDS_TYPE_ID) {
+    if (room.roomTypeId === trainingGroundsId) {
       const adjacentTypes = getAdjacentRoomTypeIds(room, floor);
       return {
         placedRoom: room,

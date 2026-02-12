@@ -14,10 +14,16 @@
   inhabitantRestriction: null
   fearLevel: 0
   fearReductionAura: 1
+  role: altar
+  trainingAdjacencyEffects:
+    statBonus: 1
+  objectiveTypes:
+    - DestroyAltar
   upgradePaths:
     - id: aa200001-0001-0001-0001-000000000007
       name: Empowered Altar
       description: Channel deeper magical energies to expand your dungeon-building capabilities and strengthen the calming aura.
+      upgradeLevel: 2
       cost:
         gold: 150
         crystals: 75
@@ -31,6 +37,7 @@
     - id: aa200001-0001-0001-0001-000000000008
       name: Ascendant Altar
       description: Unlock the altar's full potential, granting access to advanced rooms and maximizing its stabilizing influence.
+      upgradeLevel: 3
       cost:
         gold: 300
         crystals: 150
@@ -59,6 +66,7 @@
   maxInhabitants: 1
   inhabitantRestriction: unique
   fearLevel: variable
+  role: throne
 
 - id: aa100001-0001-0001-0001-000000000002
   name: Crystal Mine
@@ -71,6 +79,15 @@
   requiresWorkers: true
   maxInhabitants: 2
   fearLevel: 1
+  timeOfDayBonus:
+    period: day
+    bonus: 0.10
+  biomeBonuses:
+    volcanic: 0.15
+    crystal: 0.40
+  invasionProfile:
+    dimension: wealth
+    weight: 10
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000002
       bonus: 0.1
@@ -122,6 +139,11 @@
   requiresWorkers: true
   maxInhabitants: 3
   fearLevel: 1
+  timeOfDayBonus:
+    period: day
+    bonus: 0.15
+  biomeBonuses:
+    fungal: 0.60
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000005
       bonus: 0.4
@@ -171,6 +193,16 @@
   requiresWorkers: true
   maxInhabitants: 1
   fearLevel: 2
+  timeOfDayBonus:
+    period: night
+    bonus: 0.20
+  biomeBonuses:
+    corrupted: 1.00
+  invasionProfile:
+    dimension: knowledge
+    weight: 15
+  objectiveTypes:
+    - DefileLibrary
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000005
       bonus: 0.15
@@ -228,6 +260,16 @@
   requiresWorkers: false
   maxInhabitants: 2
   fearLevel: 3
+  timeOfDayBonus:
+    period: night
+    bonus: 0.15
+  biomeBonuses:
+    corrupted: 1.00
+  invasionProfile:
+    dimension: corruption
+    weight: 15
+  objectiveTypes:
+    - SealPortal
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000003
       bonus: 0.2
@@ -276,6 +318,8 @@
   production:
     gold: 1.2
   requiresWorkers: true
+  biomeBonuses:
+    volcanic: 0.50
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000002
       bonus: 0.15
@@ -293,6 +337,8 @@
   requiresWorkers: true
   maxInhabitants: 3
   fearLevel: 0
+  biomeBonuses:
+    flooded: 0.50
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000003
       bonus: 0.3
@@ -350,6 +396,9 @@
   requiresWorkers: false
   maxInhabitants: 6
   fearLevel: 1
+  role: barracks
+  trainingAdjacencyEffects:
+    timeReduction: 0.20
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000006
       bonus: 0.15
@@ -402,6 +451,14 @@
   requiresWorkers: false
   maxInhabitants: 1
   fearLevel: 1
+  invasionProfile:
+    dimension: wealth
+    weight: 15
+  objectiveTypes:
+    - StealTreasure
+    - PlunderVault
+  throneAdjacencyEffects:
+    goldProductionBonus: 0.05
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000006
       bonus: 0.15
@@ -458,6 +515,7 @@
   name: Training Grounds
   description: A T-shaped combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
   shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  role: trainingGrounds
   cost:
     gold: 80
     crystals: 30
@@ -515,6 +573,13 @@
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
   shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  biomeBonuses:
+    crystal: 0.10
+  invasionProfile:
+    dimension: knowledge
+    weight: 10
+  objectiveTypes:
+    - SealPortal
   cost:
     gold: 100
     crystals: 50
@@ -576,6 +641,7 @@
   name: Trap Workshop
   description: A compact 2x2 crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
   shapeId: 2af760d1-77ce-4eb7-b045-acad573f8ec2
+  role: trapWorkshop
   cost:
     gold: 90
     crystals: 30

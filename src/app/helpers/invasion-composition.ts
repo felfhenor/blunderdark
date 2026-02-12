@@ -7,6 +7,7 @@ import type {
   GameState,
   InvaderClassWeights,
   IsContentItem,
+  RoomDefinition,
 } from '@interfaces';
 import type {
   InvaderClassType,
@@ -14,14 +15,6 @@ import type {
   InvaderInstance,
 } from '@interfaces/invader';
 import seedrandom from 'seedrandom';
-
-// --- Room type IDs for profile calculation ---
-
-const SHADOW_LIBRARY_TYPE_ID = 'aa100001-0001-0001-0001-000000000004';
-const SOUL_WELL_TYPE_ID = 'aa100001-0001-0001-0001-000000000005';
-const TREASURE_VAULT_TYPE_ID = 'aa100001-0001-0001-0001-000000000008';
-const CRYSTAL_MINE_TYPE_ID = 'aa100001-0001-0001-0001-000000000002';
-const LEY_LINE_NEXUS_TYPE_ID = 'aa100001-0001-0001-0001-000000000011';
 
 const INVADER_CLASSES: InvaderClassType[] = [
   'warrior',
@@ -34,6 +27,27 @@ const INVADER_CLASSES: InvaderClassType[] = [
 
 const PROFILE_THRESHOLD = 60;
 
+// --- Data-driven profile lookup ---
+
+let invasionProfileCache: Map<string, { dimension: string; weight: number }> | null = null;
+
+function getInvasionProfileMap(): Map<string, { dimension: string; weight: number }> {
+  if (!invasionProfileCache) {
+    const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+    invasionProfileCache = new Map();
+    for (const room of rooms) {
+      if (room.invasionProfile) {
+        invasionProfileCache.set(room.id, room.invasionProfile);
+      }
+    }
+  }
+  return invasionProfileCache;
+}
+
+export function resetInvasionCompositionCache(): void {
+  invasionProfileCache = null;
+}
+
 // --- Dungeon profile ---
 
 /**
@@ -43,54 +57,45 @@ const PROFILE_THRESHOLD = 60;
 export function calculateDungeonProfile(state: GameState): DungeonProfile {
   const floors = state.world.floors;
   const resources = state.world.resources;
+  const profileMap = getInvasionProfileMap();
 
-  // Count rooms across all floors
+  // Count rooms across all floors and accumulate profile dimension weights
   let totalRooms = 0;
-  let treasureVaults = 0;
-  let crystalMines = 0;
-  let shadowLibraries = 0;
-  let leyLineNexuses = 0;
-  let soulWells = 0;
+  const dimensionTotals: Record<string, number> = {
+    corruption: 0,
+    wealth: 0,
+    knowledge: 0,
+  };
 
   for (const floor of floors) {
     totalRooms += floor.rooms.length;
     for (const room of floor.rooms) {
-      if (room.roomTypeId === TREASURE_VAULT_TYPE_ID) treasureVaults++;
-      if (room.roomTypeId === CRYSTAL_MINE_TYPE_ID) crystalMines++;
-      if (room.roomTypeId === SHADOW_LIBRARY_TYPE_ID) shadowLibraries++;
-      if (room.roomTypeId === LEY_LINE_NEXUS_TYPE_ID) leyLineNexuses++;
-      if (room.roomTypeId === SOUL_WELL_TYPE_ID) soulWells++;
+      const profile = profileMap.get(room.roomTypeId);
+      if (profile && dimensionTotals[profile.dimension] !== undefined) {
+        dimensionTotals[profile.dimension] += profile.weight;
+      }
     }
   }
 
-  // Corruption: resource level + soul well bonuses
+  // Corruption: resource level + room bonuses
   const corruptionLevel = resources.corruption?.current ?? 0;
-  const corruptionRoomBonus = soulWells * 15;
-  const corruption = Math.min(100, corruptionLevel + corruptionRoomBonus);
+  const corruption = Math.min(100, corruptionLevel + dimensionTotals.corruption);
 
   // Wealth: gold level + room bonuses
   const goldLevel =
     resources.gold?.max > 0
       ? (resources.gold.current / resources.gold.max) * 50
       : 0;
-  const wealthRoomBonus = Math.min(
-    50,
-    treasureVaults * 15 + crystalMines * 10,
-  );
-  const wealth = Math.min(100, Math.round(goldLevel + wealthRoomBonus));
+  const wealth = Math.min(100, Math.round(goldLevel + Math.min(50, dimensionTotals.wealth)));
 
   // Knowledge: research progress + room bonuses
   const researchBonus = Math.min(
     50,
     (state.world.research.completedNodes?.length ?? 0) * 10,
   );
-  const knowledgeRoomBonus = Math.min(
-    50,
-    shadowLibraries * 15 + leyLineNexuses * 10,
-  );
   const knowledge = Math.min(
     100,
-    Math.round(researchBonus + knowledgeRoomBonus),
+    Math.round(researchBonus + Math.min(50, dimensionTotals.knowledge)),
   );
 
   // Threat level: based on game day
@@ -103,9 +108,6 @@ export function calculateDungeonProfile(state: GameState): DungeonProfile {
 }
 
 // --- Weight configuration ---
-
-export const COMPOSITION_WEIGHTS_ID =
-  'aa950001-0001-0001-0001-000000000001';
 
 export function getCompositionWeightConfig(): CompositionWeightConfig | undefined {
   const entries = getEntriesByType<CompositionWeightConfig & IsContentItem>(
