@@ -5,6 +5,7 @@ import { processScheduledEvents } from '@helpers/game-events';
 import { advanceClockTime } from '@helpers/game-time';
 import { processProduction } from '@helpers/production';
 import { processTraining } from '@helpers/training';
+import { processTrapCrafting } from '@helpers/trap-workshop';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
@@ -54,6 +55,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     state.clock = advanceClockTime(state.clock, numTicks);
     processProduction(state);
     processTraining(state);
+    processTrapCrafting(state);
     return state;
   });
 

@@ -38,6 +38,7 @@ export function defaultGameState(): GameState {
       floors: [defaultFloor()],
       currentFloorIndex: 0,
       trapInventory: [],
+      trapCraftingQueues: [],
     },
   };
 }

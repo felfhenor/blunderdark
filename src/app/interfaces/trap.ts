@@ -34,3 +34,14 @@ export type TrapInventoryEntry = {
   trapTypeId: string;
   count: number;
 };
+
+export type TrapCraftingJob = {
+  trapTypeId: string;
+  progress: number;
+  targetTicks: number;
+};
+
+export type TrapCraftingQueue = {
+  roomId: string;
+  jobs: TrapCraftingJob[];
+};

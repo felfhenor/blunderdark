@@ -571,3 +571,60 @@
         - type: secondaryProduction
           value: 0.2
           resource: research
+
+- id: aa100001-0001-0001-0001-000000000013
+  name: Trap Workshop
+  description: A compact 2x2 crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
+  shapeId: 2af760d1-77ce-4eb7-b045-acad573f8ec2
+  cost:
+    gold: 90
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 2
+  inhabitantRestriction: null
+  fearLevel: 2
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+      bonus: 0.2
+      description: The Dark Forge provides superior materials, increasing trap durability.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+      bonus: 0.15
+      description: Library research improves trap design efficiency.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+      bonus: 0.1
+      description: Crystal Mine provides raw materials for trap mechanisms.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000030
+      name: Master Trapper
+      description: Expand the workshop to house more workers and unlock advanced trap designs.
+      cost:
+        gold: 120
+        crystals: 60
+        essence: 20
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+        - type: craftingSpeedMultiplier
+          value: 1.2
+    - id: aa200001-0001-0001-0001-000000000031
+      name: Efficient Assembly
+      description: Streamlined production techniques reduce crafting costs by 25% and time by 30%.
+      cost:
+        gold: 100
+        crystals: 50
+      effects:
+        - type: craftingCostMultiplier
+          value: 0.75
+        - type: craftingSpeedMultiplier
+          value: 0.7
+    - id: aa200001-0001-0001-0001-000000000032
+      name: Enchanted Traps
+      description: Infuse crafted traps with elemental energy, adding bonus magical damage to all traps produced.
+      cost:
+        gold: 130
+        crystals: 70
+        essence: 30
+      effects:
+        - type: craftingBonusDamage
+          value: 5
