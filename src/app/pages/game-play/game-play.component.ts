@@ -6,6 +6,7 @@ import { PanelAltarComponent } from '@components/panel-altar/panel-altar.compone
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
+import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
@@ -25,6 +26,7 @@ import { getOption } from '@helpers';
     PanelResourcesComponent,
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
+    PanelRosterComponent,
     PanelThroneRoomComponent,
   ],
   templateUrl: './game-play.component.html',

@@ -1,0 +1,167 @@
+@if (allCount() > 0) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Inhabitants</h3>
+
+      <!-- Filter tabs -->
+      <div class="flex gap-1 mt-1">
+        <button
+          class="btn btn-xs"
+          [class.btn-primary]="activeFilter() === 'all'"
+          [class.btn-ghost]="activeFilter() !== 'all'"
+          (click)="setFilter('all')"
+        >All ({{ allCount() }})</button>
+        <button
+          class="btn btn-xs"
+          [class.btn-primary]="activeFilter() === 'assigned'"
+          [class.btn-ghost]="activeFilter() !== 'assigned'"
+          (click)="setFilter('assigned')"
+        >Assigned ({{ assignedCount() }})</button>
+        <button
+          class="btn btn-xs"
+          [class.btn-primary]="activeFilter() === 'unassigned'"
+          [class.btn-ghost]="activeFilter() !== 'unassigned'"
+          (click)="setFilter('unassigned')"
+        >Idle ({{ unassignedCount() }})</button>
+      </div>
+
+      <!-- Roster list -->
+      <div class="roster-list mt-2">
+        @for (entry of filteredEntries(); track entry.instance.instanceId) {
+          <div
+            class="roster-entry"
+            [class.selected]="selectedInhabitantId() === entry.instance.instanceId"
+            (click)="selectInhabitant(entry.instance.instanceId)"
+          >
+            <div class="flex items-center justify-between gap-1">
+              <div class="flex items-center gap-1 min-w-0">
+                <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier }}</span>
+                <span class="text-xs font-semibold truncate">{{ entry.def.name }}</span>
+              </div>
+              <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
+                {{ entry.instance.state }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between mt-0.5">
+              <div class="stats-row">
+                <span class="stat-item" title="HP">{{ entry.def.stats.hp }}</span>
+                <span class="stat-item" title="ATK">{{ entry.def.stats.attack }}</span>
+                <span class="stat-item" title="DEF">{{ entry.def.stats.defense }}</span>
+                <span class="stat-item" title="SPD">{{ entry.def.stats.speed }}</span>
+                <span
+                  class="stat-item"
+                  [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
+                  [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
+                  title="Worker Efficiency"
+                >{{ entry.def.stats.workerEfficiency.toFixed(1) }}x</span>
+              </div>
+            </div>
+
+            @if (entry.def.traits.length > 0) {
+              <div class="flex flex-wrap gap-0.5 mt-0.5">
+                @for (trait of entry.def.traits; track trait.id) {
+                  <span class="badge badge-xs badge-outline opacity-70" [title]="trait.description">
+                    {{ trait.name }}
+                  </span>
+                }
+              </div>
+            }
+
+            <div class="text-xs mt-0.5" [class.opacity-50]="!entry.roomName">
+              {{ entry.roomName ?? 'Unassigned' }}
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Detail view -->
+      @if (selectedEntry(); as entry) {
+        <div class="divider my-1"></div>
+        <div class="detail-panel">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold">{{ entry.def.name }}</h4>
+            <button class="btn btn-xs btn-ghost btn-circle" (click)="closeDetail()">✕</button>
+          </div>
+          <p class="text-xs opacity-60">{{ entry.def.description }}</p>
+          <div class="text-xs mt-1">
+            <span class="opacity-70">Type:</span> {{ entry.def.type }}
+            <span class="opacity-70 ml-2">Tier:</span> {{ entry.def.tier }}
+            <span class="opacity-70 ml-2">State:</span>
+            <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
+              {{ entry.instance.state }}
+            </span>
+          </div>
+
+          <!-- Full stats -->
+          <div class="grid grid-cols-2 gap-x-4 gap-y-0 mt-1 text-xs">
+            <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp }}</div>
+            <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack }}</div>
+            <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense }}</div>
+            <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed }}</div>
+            <div class="col-span-2">
+              <span class="opacity-50">Efficiency:</span>
+              <span
+                [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
+                [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
+              >{{ entry.def.stats.workerEfficiency.toFixed(1) }}x</span>
+            </div>
+          </div>
+
+          <!-- Traits -->
+          @if (entry.def.traits.length > 0) {
+            <div class="mt-1">
+              <span class="text-xs opacity-50">Traits:</span>
+              @for (trait of entry.def.traits; track trait.id) {
+                <div class="text-xs ml-1">
+                  <span class="font-semibold">{{ trait.name }}</span> — {{ trait.description }}
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Current assignment -->
+          <div class="mt-1 text-xs">
+            <span class="opacity-50">Assigned:</span>
+            {{ entry.roomName ?? 'None' }}
+          </div>
+
+          <!-- Unassign button -->
+          @if (entry.instance.assignedRoomId) {
+            <button
+              class="btn btn-xs btn-outline btn-error w-full mt-1"
+              (click)="onUnassign(entry.instance.instanceId)"
+            >Unassign</button>
+          }
+
+          <!-- Reassign list -->
+          <div class="mt-1">
+            <span class="text-xs opacity-50">Assign to:</span>
+            <div class="reassign-list mt-0.5">
+              @for (r of availableRooms(); track r.room.id) {
+                <button
+                  class="btn btn-xs w-full justify-start"
+                  [class.btn-outline]="r.canAssign"
+                  [class.btn-success]="r.canAssign"
+                  [class.btn-disabled]="!r.canAssign"
+                  [disabled]="!r.canAssign"
+                  (click)="onAssignToRoom(entry.instance.instanceId, r.room.id, r.room.roomTypeId)"
+                >{{ r.roomDef.name }}</button>
+              }
+              @if (availableRooms().length === 0) {
+                <p class="text-xs opacity-50">No rooms available.</p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Inhabitants</h3>
+      <p class="text-xs opacity-50">No inhabitants yet. Visit the altar to recruit.</p>
+    </div>
+  </div>
+}

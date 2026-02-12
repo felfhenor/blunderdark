@@ -2,8 +2,6 @@ import { getEntry } from '@helpers/content';
 import { getEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
-  InhabitantDefinition,
-  InhabitantInstance,
   IsContentItem,
   PlacedRoom,
   RoomDefinition,

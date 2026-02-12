@@ -1,0 +1,191 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
+import {
+  assignInhabitantToRoom,
+  canAssignToRoom,
+  getEntry,
+  getRoomDefinition,
+  notifyError,
+  notifySuccess,
+  unassignInhabitantFromRoom,
+} from '@helpers';
+import { gamestate } from '@helpers/state-game';
+import type {
+  InhabitantDefinition,
+  InhabitantInstance,
+  IsContentItem,
+  PlacedRoom,
+  RoomDefinition,
+} from '@interfaces';
+
+type RosterFilter = 'all' | 'assigned' | 'unassigned';
+
+type RosterEntry = {
+  instance: InhabitantInstance;
+  def: InhabitantDefinition & IsContentItem;
+  roomName: string | null;
+};
+
+@Component({
+  selector: 'app-panel-roster',
+  templateUrl: './panel-roster.component.html',
+  styleUrl: './panel-roster.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PanelRosterComponent {
+  public activeFilter = signal<RosterFilter>('all');
+  public selectedInhabitantId = signal<string | null>(null);
+
+  private allEntries = computed<RosterEntry[]>(() => {
+    const state = gamestate();
+    const inhabitants = state.world.inhabitants;
+    const floors = state.world.floors;
+
+    return inhabitants
+      .map((inst) => {
+        const def = getEntry<InhabitantDefinition & IsContentItem>(
+          inst.definitionId,
+        );
+        if (!def) return null;
+
+        let roomName: string | null = null;
+        if (inst.assignedRoomId) {
+          for (const floor of floors) {
+            const room = floor.rooms.find(
+              (r) => r.id === inst.assignedRoomId,
+            );
+            if (room) {
+              const roomDef = getRoomDefinition(room.roomTypeId);
+              roomName = roomDef?.name ?? 'Unknown Room';
+              break;
+            }
+          }
+        }
+
+        return { instance: inst, def, roomName } as RosterEntry;
+      })
+      .filter((e): e is RosterEntry => e !== null);
+  });
+
+  public allCount = computed(() => this.allEntries().length);
+
+  public assignedCount = computed(
+    () =>
+      this.allEntries().filter((e) => e.instance.assignedRoomId !== null)
+        .length,
+  );
+
+  public unassignedCount = computed(
+    () =>
+      this.allEntries().filter((e) => e.instance.assignedRoomId === null)
+        .length,
+  );
+
+  public filteredEntries = computed(() => {
+    const filter = this.activeFilter();
+    const entries = this.allEntries();
+    if (filter === 'assigned')
+      return entries.filter((e) => e.instance.assignedRoomId !== null);
+    if (filter === 'unassigned')
+      return entries.filter((e) => e.instance.assignedRoomId === null);
+    return entries;
+  });
+
+  public selectedEntry = computed<RosterEntry | null>(() => {
+    const id = this.selectedInhabitantId();
+    if (!id) return null;
+    return this.allEntries().find((e) => e.instance.instanceId === id) ?? null;
+  });
+
+  public availableRooms = computed(() => {
+    const entry = this.selectedEntry();
+    if (!entry) return [];
+
+    const floors = gamestate().world.floors;
+    const rooms: Array<{
+      room: PlacedRoom;
+      roomDef: RoomDefinition & IsContentItem;
+      floorName: string;
+      canAssign: boolean;
+    }> = [];
+
+    for (const floor of floors) {
+      for (const room of floor.rooms) {
+        const roomDef = getEntry<RoomDefinition & IsContentItem>(
+          room.roomTypeId,
+        );
+        if (!roomDef || roomDef.maxInhabitants === 0) continue;
+
+        const validation = canAssignToRoom(room.id);
+        rooms.push({
+          room,
+          roomDef,
+          floorName: floor.name,
+          canAssign: validation.allowed,
+        });
+      }
+    }
+
+    return rooms;
+  });
+
+  public setFilter(filter: RosterFilter): void {
+    this.activeFilter.set(filter);
+  }
+
+  public selectInhabitant(instanceId: string): void {
+    const current = this.selectedInhabitantId();
+    this.selectedInhabitantId.set(
+      current === instanceId ? null : instanceId,
+    );
+  }
+
+  public closeDetail(): void {
+    this.selectedInhabitantId.set(null);
+  }
+
+  public async onAssignToRoom(
+    instanceId: string,
+    roomId: string,
+    roomTypeId: string,
+  ): Promise<void> {
+    const entry = this.selectedEntry();
+    if (!entry) return;
+
+    // If already assigned, unassign first
+    if (entry.instance.assignedRoomId !== null) {
+      await unassignInhabitantFromRoom(instanceId);
+    }
+
+    const result = await assignInhabitantToRoom(instanceId, roomId, roomTypeId);
+    if (!result.success && result.error) {
+      notifyError(result.error);
+    } else if (result.success) {
+      notifySuccess('Inhabitant assigned');
+    }
+  }
+
+  public async onUnassign(instanceId: string): Promise<void> {
+    const removed = await unassignInhabitantFromRoom(instanceId);
+    if (removed) {
+      notifySuccess('Inhabitant unassigned');
+    } else {
+      notifyError('Failed to unassign inhabitant');
+    }
+  }
+
+  public getStatClass(value: number, stat: string): string {
+    if (stat === 'workerEfficiency') return value > 1.0 ? 'stat-high' : value < 1.0 ? 'stat-low' : '';
+    return '';
+  }
+
+  public getStateClass(state: string): string {
+    if (state === 'scared') return 'badge-error';
+    if (state === 'hungry') return 'badge-warning';
+    return 'badge-success';
+  }
+}
