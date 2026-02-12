@@ -3,10 +3,7 @@ import type { GridState, GridTile } from '@interfaces/grid';
 import type { Hallway, HallwayUpgrade } from '@interfaces/hallway';
 import type { TileOffset } from '@interfaces/room-shape';
 
-export function addHallwayToGrid(
-  grid: GridState,
-  hallway: Hallway,
-): GridState {
+export function addHallwayToGrid(grid: GridState, hallway: Hallway): GridState {
   let result = grid;
 
   for (const tile of hallway.tiles) {
@@ -15,7 +12,7 @@ export function addHallwayToGrid(
     const newTile: GridTile = {
       occupied: true,
       occupiedBy: 'hallway',
-      roomId: null,
+      roomId: undefined,
       hallwayId: hallway.id,
       connectionType: 'hallway',
     };
@@ -40,9 +37,9 @@ export function removeHallwayFromGrid(
     const emptyTile: GridTile = {
       occupied: false,
       occupiedBy: 'empty',
-      roomId: null,
-      hallwayId: null,
-      connectionType: null,
+      roomId: undefined,
+      hallwayId: undefined,
+      connectionType: undefined,
     };
     result = setTile(result, tile.x, tile.y, emptyTile);
   }
@@ -72,10 +69,7 @@ export function getHallwaysBetween(
   );
 }
 
-export function addHallway(
-  hallways: Hallway[],
-  hallway: Hallway,
-): Hallway[] {
+export function addHallway(hallways: Hallway[], hallway: Hallway): Hallway[] {
   return [...hallways, hallway];
 }
 
@@ -107,7 +101,11 @@ export function removeUpgradeFromHallway(
 }
 
 export function serializeHallways(hallways: Hallway[]): Hallway[] {
-  return hallways.map((h) => ({ ...h, tiles: [...h.tiles], upgrades: [...h.upgrades] }));
+  return hallways.map((h) => ({
+    ...h,
+    tiles: [...h.tiles],
+    upgrades: [...h.upgrades],
+  }));
 }
 
 export function deserializeHallways(data: unknown[]): Hallway[] {

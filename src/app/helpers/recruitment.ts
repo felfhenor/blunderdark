@@ -119,7 +119,7 @@ export async function recruitInhabitant(
     definitionId: def.id,
     name: def.name,
     state: 'normal',
-    assignedRoomId: null,
+    assignedRoomId: undefined,
   };
 
   await addInhabitant(instance);
