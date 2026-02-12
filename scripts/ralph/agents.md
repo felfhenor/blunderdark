@@ -395,6 +395,31 @@ When adding a new required field to the `Floor` type:
 - Both connections and hallways create bidirectional edges with baseCost 1
 - Graph is rebuilt when floor state changes (not incremental) — fast enough for ≤400 nodes
 
+## Invasion Trigger System
+
+- `invasion-triggers.ts` helper: `processInvasionSchedule(state, rng?)` runs each tick inside `updateGamestate` — mutates `state.world.invasionSchedule` in-place
+- `InvasionSchedule` stored in `GameStateWorld.invasionSchedule` — auto-persisted via IndexedDB
+- Grace period: 30 days (configurable via `gracePeriodEnd` field), no invasions before it ends
+- Escalating intervals: 15 days (day 30-59), 10 days (day 60-99), 7 days (day 100+), minimum 5 days
+- Variance: +/- 2 days determined at scheduling time (not re-rolled), cannot push before grace period, min 3 days between invasions
+- Warning: fires 2 game-minutes before invasion day start (day N, hour 0, minute 0) via `notify('Invasion', ...)` — dismissible via `warningDismissed` flag
+- Special invasions: `addSpecialInvasion(schedule, type, currentDay, delay?)` — bypasses normal schedule, types: 'crusade' | 'raid' | 'bounty_hunter'
+- Past-due handling: `shouldTriggerInvasion` uses `>=` so loading a save past the scheduled day triggers immediately
+- Computed signals: `nextInvasionDay`, `invasionWarningActive`, `isInGracePeriodSignal`, `invasionGracePeriodEnd`, `invasionHistory`
+- RNG: pass `PRNG` (seedrandom) for testability, defaults to `rngRandom()` in production
+- `NotificationCategory` type extended with `'Invasion'` for warning notifications
+
+## Adding Fields to GameStateWorld (Updated)
+
+When adding new fields to `GameStateWorld`:
+
+1. Add the field to the interface in `src/app/interfaces/state-game.ts`
+2. Add default factory in `src/app/helpers/defaults.ts` (e.g., `defaultInvasionSchedule()`)
+3. Update `defaultGameState()` to include the new field
+4. Update `worldgenGenerateWorld()` in `worldgen.ts` to include the field
+5. Update `makeGameState()` helpers in test files that construct full GameState objects (production.spec.ts, training.spec.ts, trap-workshop.spec.ts, invasion-triggers.spec.ts)
+6. Migration is handled automatically by `merge(defaultGameState(), state)` in `migrate.ts`
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

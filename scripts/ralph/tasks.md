@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 43 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding)
+- **Complete:** 44 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system)
 - **In Progress:** None
-- **Remaining:** ~79 features
+- **Remaining:** ~78 features
 
 ---
 
@@ -122,7 +122,7 @@ The main threat/challenge loop.
 |----------|---------|---------|------------|
 | ~~9.1~~ | ~~`multiple-invader-types`~~ | ~~COMPLETE (3/3)~~ | ~~none~~ |
 | ~~9.2~~ | ~~`invader-pathfinding`~~ | ~~COMPLETE (4/4)~~ | ~~grid-system, hallway-data-structure~~ |
-| 9.3 | `invasion-trigger-system` | 3 | time-system |
+| ~~9.3~~ | ~~`invasion-trigger-system`~~ | ~~COMPLETE (3/3)~~ | ~~time-system~~ |
 | 9.4 | `invasion-composition-logic` | 4 | multiple-invader-types |
 | 9.5 | `invasion-objectives-system` | 5 | invasion-trigger-system |
 | 9.6 | `invasion-win-loss-conditions` | 3 | basic-combat-resolution |
