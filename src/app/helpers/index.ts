@@ -9,6 +9,7 @@ export * from './content-initializers';
 export * from './debug';
 export * from './defaults';
 export * from './discord';
+export * from './efficiency';
 export * from './floor';
 export * from './game-events';
 export * from './game-init';

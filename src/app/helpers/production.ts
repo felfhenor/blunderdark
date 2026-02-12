@@ -53,6 +53,9 @@ export function calculateInhabitantBonus(
     return { bonus: 0, hasWorkers: false };
   }
 
+  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  const roomProduction = roomDef?.production ?? {};
+
   let totalBonus = 0;
 
   for (const inhabitant of assignedInhabitants) {
@@ -65,7 +68,15 @@ export function calculateInhabitantBonus(
 
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {
-        totalBonus += trait.effectValue;
+        // Only apply trait if it targets this room's production or has no target
+        if (
+          !trait.targetResourceType ||
+          trait.targetResourceType === 'all' ||
+          (roomProduction[trait.targetResourceType] !== undefined &&
+            roomProduction[trait.targetResourceType]! > 0)
+        ) {
+          totalBonus += trait.effectValue;
+        }
       }
     }
   }

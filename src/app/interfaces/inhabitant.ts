@@ -6,6 +6,7 @@ export type InhabitantTrait = {
   description: string;
   effectType: string;
   effectValue: number;
+  targetResourceType?: string;
 };
 
 export type InhabitantStats = {

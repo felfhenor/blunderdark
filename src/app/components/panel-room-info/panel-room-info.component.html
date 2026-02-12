@@ -13,6 +13,36 @@
         </div>
       }
 
+      @if (efficiencyBreakdown(); as eff) {
+        <div class="mt-1">
+          <div class="flex items-center gap-1">
+            <span class="text-xs opacity-50">Efficiency:</span>
+            <span
+              class="text-xs font-semibold"
+              [class.text-success]="eff.totalMultiplier > 1.0"
+              [class.text-error]="eff.totalMultiplier < 1.0"
+            >{{ (eff.totalMultiplier * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="text-xs opacity-40 ml-2">Base: {{ (eff.baseEfficiency * 100).toFixed(0) }}%</div>
+          @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
+            <div class="text-xs ml-2">
+              <span>{{ contrib.name }}:</span>
+              <span
+                [class.text-success]="contrib.totalBonus > 0"
+                [class.text-error]="contrib.totalBonus < 0"
+              >
+                {{ contrib.totalBonus >= 0 ? '+' : '' }}{{ (contrib.totalBonus * 100).toFixed(0) }}%
+              </span>
+              @for (tb of contrib.traitBonuses; track tb.traitName) {
+                @if (tb.applies) {
+                  <span class="opacity-50">({{ tb.traitName }})</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+
       @if (room.maxInhabitants !== 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">

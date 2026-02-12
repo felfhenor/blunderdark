@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   assignInhabitantToRoom,
+  calculateRoomEfficiency,
   createConnection,
   currentFloor,
   executeRoomRemoval,
@@ -83,6 +84,17 @@ export class PanelRoomInfoComponent {
         type,
         perMinute: productionPerMinute(perTick as number),
       }));
+  });
+
+  public efficiencyBreakdown = computed(() => {
+    const room = this.selectedRoom();
+    const floor = currentFloor();
+    if (!room || !floor) return null;
+
+    const roomDef = getRoomDefinition(room.roomTypeId);
+    if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return null;
+
+    return calculateRoomEfficiency(room.placedRoom, floor.inhabitants);
   });
 
   public eligibleUnassigned = computed(() => {
