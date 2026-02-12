@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
 import { TICKS_PER_MINUTE } from '@helpers/game-time';
+import { calculateProductionModifiers } from '@helpers/production-modifiers';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
 import { calculatePerCreatureProductionModifier } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
@@ -175,7 +176,7 @@ export function calculateConditionalModifiers(
   return calculatePerCreatureProductionModifier(assigned);
 }
 
-export function calculateTotalProduction(floors: Floor[]): RoomProduction {
+export function calculateTotalProduction(floors: Floor[], hour?: number): RoomProduction {
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
@@ -217,12 +218,20 @@ export function calculateTotalProduction(floors: Floor[]): RoomProduction {
         adjacentRoomIds,
         floor.rooms,
       );
-      const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const envModifier = hour !== undefined
+        ? calculateProductionModifiers({
+            roomTypeId: room.roomTypeId,
+            floorDepth: floor.depth,
+            floorBiome: floor.biome,
+            hour,
+          })
+        : 1.0;
 
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * modifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier;
         totalProduction[resourceType] =
           (totalProduction[resourceType] ?? 0) + final;
       }
@@ -235,6 +244,7 @@ export function calculateTotalProduction(floors: Floor[]): RoomProduction {
 export function calculateSingleRoomProduction(
   room: PlacedRoom,
   floor: Floor,
+  hour?: number,
 ): RoomProduction {
   const roomDef = getRoomDefinition(room.roomTypeId);
   if (!roomDef) return {};
@@ -270,20 +280,29 @@ export function calculateSingleRoomProduction(
     adjacentRoomIds,
     floor.rooms,
   );
-  const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+  const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+  const envModifier = hour !== undefined
+    ? calculateProductionModifiers({
+        roomTypeId: room.roomTypeId,
+        floorDepth: floor.depth,
+        floorBiome: floor.biome,
+        hour,
+      })
+    : 1.0;
 
   const production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
     if (!baseAmount) continue;
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * modifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier;
   }
 
   return production;
 }
 
 export const productionRates = computed<RoomProduction>(() => {
-  return calculateTotalProduction(gamestate().world.floors);
+  const state = gamestate();
+  return calculateTotalProduction(state.world.floors, state.clock.hour);
 });
 
 export function productionPerMinute(perTickRate: number): number {
@@ -291,11 +310,11 @@ export function productionPerMinute(perTickRate: number): number {
 }
 
 export function getRoomProductionRates(roomId: string): RoomProduction {
-  const floors = gamestate().world.floors;
-  for (const floor of floors) {
+  const state = gamestate();
+  for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return calculateSingleRoomProduction(room, floor);
+      return calculateSingleRoomProduction(room, floor, state.clock.hour);
     }
   }
   return {};
@@ -311,6 +330,7 @@ export type ResourceProductionBreakdown = {
 
 export function calculateProductionBreakdowns(
   floors: Floor[],
+  hour?: number,
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
 
@@ -353,7 +373,16 @@ export function calculateProductionBreakdowns(
         adjacentRoomIds,
         floor.rooms,
       );
-      const modifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const envModifier = hour !== undefined
+        ? calculateProductionModifiers({
+            roomTypeId: room.roomTypeId,
+            floorDepth: floor.depth,
+            floorBiome: floor.biome,
+            hour,
+          })
+        : 1.0;
+      const modifier = stateModifier * envModifier;
 
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
@@ -386,11 +415,12 @@ export function calculateProductionBreakdowns(
 }
 
 export const productionBreakdowns = computed(() => {
-  return calculateProductionBreakdowns(gamestate().world.floors);
+  const state = gamestate();
+  return calculateProductionBreakdowns(state.world.floors, state.clock.hour);
 });
 
 export function processProduction(state: GameState): void {
-  const production = calculateTotalProduction(state.world.floors);
+  const production = calculateTotalProduction(state.world.floors, state.clock.hour);
 
   for (const [type, amount] of Object.entries(production)) {
     if (!amount || amount <= 0) continue;

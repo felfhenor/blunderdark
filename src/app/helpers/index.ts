@@ -34,6 +34,7 @@ export * from './migrate';
 export * from './notify';
 export * from './pathfinding';
 export * from './production';
+export * from './production-modifiers';
 export * from './recruitment';
 export * from './reputation';
 export * from './resources';

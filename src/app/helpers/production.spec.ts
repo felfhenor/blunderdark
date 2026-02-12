@@ -586,7 +586,7 @@ function makeFloor(
   return {
     id: 'floor-1',
     name: 'Floor 1',
-    depth: 1,
+    depth: 0,
     biome: 'neutral',
     grid: { tiles: [] } as unknown as Floor['grid'],
     rooms,
@@ -605,7 +605,7 @@ function makeGameState(
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test' as GameState['gameId'],
-    clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
+    clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
     world: {
       grid: { tiles: [] } as unknown as GameState['world']['grid'],
       resources: {
