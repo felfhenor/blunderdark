@@ -454,6 +454,63 @@
         - type: fearIncrease
           value: 2
 
+- id: aa100001-0001-0001-0001-000000000012
+  name: Training Grounds
+  description: A T-shaped combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
+  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 4
+  inhabitantRestriction: null
+  fearLevel: 1
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000007
+      bonus: 0.2
+      description: Shared training resources and weapon racks reduce training time by 20%.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+      bonus: 0.1
+      description: Forged weapons and armor improve training quality.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000009
+      bonus: 0.15
+      description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000027
+      name: Elite Training
+      description: Advanced combat techniques grant +1 attack in addition to +1 defense, but training takes 20% longer.
+      cost:
+        gold: 100
+        crystals: 50
+        essence: 20
+      effects:
+        - type: trainingAttackBonus
+          value: 1
+        - type: trainingTimeMultiplier
+          value: 1.2
+    - id: aa200001-0001-0001-0001-000000000028
+      name: Mass Training
+      description: Expanded training facilities increase capacity from 4 to 6 and reduce training time by 30%.
+      cost:
+        gold: 80
+        crystals: 30
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+        - type: trainingTimeMultiplier
+          value: 0.7
+    - id: aa200001-0001-0001-0001-000000000029
+      name: Specialized Drills
+      description: Intensive defensive drills grant an extra +1 defense bonus to trained inhabitants.
+      cost:
+        gold: 120
+        crystals: 60
+        essence: 30
+      effects:
+        - type: trainingDefenseBonus
+          value: 1
+
 - id: aa100001-0001-0001-0001-000000000011
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.

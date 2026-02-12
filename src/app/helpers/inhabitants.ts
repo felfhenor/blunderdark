@@ -61,6 +61,9 @@ export function deserializeInhabitants(
     name: i.name,
     state: i.state ?? 'normal',
     assignedRoomId: i.assignedRoomId ?? null,
+    trained: i.trained ?? false,
+    trainingProgress: i.trainingProgress ?? 0,
+    trainingBonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
   }));
 }
 

@@ -1,0 +1,67 @@
+@if (trainingRoom(); as info) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Training Grounds</h3>
+
+      <div class="flex flex-col gap-1 mt-1">
+        <div class="flex items-center gap-2">
+          <span class="text-xs opacity-50">Training Time:</span>
+          <span class="text-xs font-semibold">{{ trainingTimeMinutes() }} min</span>
+        </div>
+
+        @if (expectedBonuses(); as bonuses) {
+          <div class="flex items-center gap-2">
+            <span class="text-xs opacity-50">Bonuses:</span>
+            <span class="text-xs">
+              @if (bonuses.defense > 0) {
+                <span class="badge badge-xs badge-info">+{{ bonuses.defense }} DEF</span>
+              }
+              @if (bonuses.attack > 0) {
+                <span class="badge badge-xs badge-warning">+{{ bonuses.attack }} ATK</span>
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (trainees().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Trainees:</h4>
+          <div class="flex flex-col gap-2">
+            @for (trainee of trainees(); track trainee.instanceId) {
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs">{{ trainee.name }}</span>
+                  @if (trainee.trained) {
+                    <span class="badge badge-xs badge-success">Trained</span>
+                  } @else {
+                    <span class="badge badge-xs badge-warning">Training</span>
+                  }
+                </div>
+                @if (!trainee.trained) {
+                  <progress
+                    class="progress progress-info w-full"
+                    [value]="trainee.percent"
+                    max="100"
+                  ></progress>
+                  <span class="text-xs opacity-40">{{ trainee.percent }}%</span>
+                } @else {
+                  <div class="flex gap-1">
+                    @if (trainee.bonuses.defense > 0) {
+                      <span class="text-xs text-info">+{{ trainee.bonuses.defense }} DEF</span>
+                    }
+                    @if (trainee.bonuses.attack > 0) {
+                      <span class="text-xs text-warning">+{{ trainee.bonuses.attack }} ATK</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="text-xs opacity-50 mt-2">No inhabitants assigned for training.</p>
+      }
+    </div>
+  </div>
+}

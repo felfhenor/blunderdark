@@ -35,10 +35,18 @@ export type InhabitantDefinition = {
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry';
 
+export type TrainingBonuses = {
+  defense: number;
+  attack: number;
+};
+
 export type InhabitantInstance = {
   instanceId: string;
   definitionId: string;
   name: string;
   state: InhabitantState;
   assignedRoomId: string | null;
+  trained?: boolean;
+  trainingProgress?: number;
+  trainingBonuses?: TrainingBonuses;
 };

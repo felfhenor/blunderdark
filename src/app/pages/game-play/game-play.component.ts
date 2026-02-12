@@ -10,6 +10,7 @@ import { PanelRosterComponent } from '@components/panel-roster/panel-roster.comp
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
+import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -29,6 +30,7 @@ import { getOption } from '@helpers';
     PanelRoomSelectComponent,
     PanelRosterComponent,
     PanelThroneRoomComponent,
+    PanelTrainingGroundsComponent,
     SynergyTooltipComponent,
   ],
   templateUrl: './game-play.component.html',

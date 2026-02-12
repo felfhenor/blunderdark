@@ -4,6 +4,7 @@ import { computed } from '@angular/core';
 import { processScheduledEvents } from '@helpers/game-events';
 import { advanceClockTime } from '@helpers/game-time';
 import { processProduction } from '@helpers/production';
+import { processTraining } from '@helpers/training';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
@@ -52,6 +53,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     state.clock.numTicks += numTicks;
     state.clock = advanceClockTime(state.clock, numTicks);
     processProduction(state);
+    processTraining(state);
     return state;
   });
 

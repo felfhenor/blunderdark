@@ -56,6 +56,9 @@ function createTestInhabitant(
     name: 'Goblin Worker',
     state: 'normal',
     assignedRoomId: null,
+    trained: false,
+    trainingProgress: 0,
+    trainingBonuses: { defense: 0, attack: 0 },
     ...overrides,
   };
 }
@@ -115,6 +118,9 @@ describe('inhabitant serialization', () => {
       name: 'Goblin Miner',
       state: 'scared',
       assignedRoomId: 'room-abc',
+      trained: true,
+      trainingProgress: 25,
+      trainingBonuses: { defense: 1, attack: 0 },
     };
 
     const serialized = serializeInhabitants([original]);
