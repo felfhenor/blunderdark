@@ -381,6 +381,20 @@ When adding a new required field to the `Floor` type:
 - `createInvaderInstance(definition)` looks up ability IDs via `getEntry` to initialize ability states
 - Cooldown/status helpers: `applyCooldown`, `tickCooldowns`, `applyStatusEffect`, `tickStatusEffects`, `hasStatusEffect`, `clearStatusEffects`, `applyHealing`
 
+## Pathfinding System
+
+- `pathfinding.ts` helper: `buildDungeonGraph(floor, roomFearLevels)` creates graph from Floor's rooms, connections, and hallways
+- `DungeonGraph` uses adjacency list: `Map<string, PathEdge[]>` keyed by room ID
+- `PathNode` stores roomId, roomTypeId, x/y (anchor), fearLevel
+- `findPath(graph, start, goal, options)` — Dijkstra's algorithm (NOT A* with Manhattan, because rooms connect at arbitrary distances via hallways making Manhattan inadmissible)
+- Fear cost: when `morale < room.fearLevel`, edge cost is `baseCost * fearCostMultiplier` (default 3x)
+- `PathfindingOptions`: `morale`, `fearCostMultiplier`, `blockedNodes: Set<string>`
+- `findPathWithObjectives(graph, start, primaryGoal, secondaryObjectives, options)` — detours to secondary if cost < 2x direct path
+- `recalculatePath(graph, current, goal, newBlockedNode, options)` — adds blocked node and re-pathfinds
+- Empty path = no valid route (invader enters 'confused' state)
+- Both connections and hallways create bidirectional edges with baseCost 1
+- Graph is rebuilt when floor state changes (not incremental) — fast enough for ≤400 nodes
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

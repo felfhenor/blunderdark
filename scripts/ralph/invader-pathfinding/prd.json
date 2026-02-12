@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "DungeonGraph with PathNode (rooms) and PathEdge (connections/hallways). buildDungeonGraph(floor, fearLevels) builds adjacency list from Floor data."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses Dijkstra (h=0) instead of A* with Manhattan because rooms connect at arbitrary distances via hallways, making Manhattan inadmissible. Fear cost = baseCost * 3 when morale < fearLevel."
     },
     {
       "id": "US-003",
@@ -50,8 +50,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "findPathWithObjectives() selects highest-priority secondary within 2x threshold. recalculatePath() adds blocked node and re-runs Dijkstra. Empty path = confused state."
     },
     {
       "id": "US-004",
@@ -68,8 +68,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "39 tests covering graph building, basic pathfinding, fear costs, secondary objectives, dynamic recalculation, and complex graph scenarios."
     }
   ]
 }
