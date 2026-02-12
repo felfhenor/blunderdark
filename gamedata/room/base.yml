@@ -161,18 +161,60 @@
 
 - id: aa100001-0001-0001-0001-000000000004
   name: Shadow Library
-  description: A repository of forbidden knowledge. Generates research points passively.
+  description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
   shapeId: aa000000-0000-0000-0000-000000000002
   cost:
     gold: 80
     crystals: 30
   production:
-    research: 0.8
+    research: 0.6
   requiresWorkers: true
+  maxInhabitants: 1
+  fearLevel: 2
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000005
       bonus: 0.15
       description: Soul essence enhances arcane research comprehension.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+      bonus: 0.1
+      description: Crystal mine ore samples provide material for arcane study.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+      bonus: 0.2
+      description: Adjacent libraries share knowledge and cross-reference tomes.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000010
+      name: Arcane Focus
+      description: Enchanted reading lenses and amplified candlelight drastically improve research throughput.
+      cost:
+        gold: 100
+        crystals: 60
+        essence: 20
+      effects:
+        - type: productionMultiplier
+          value: 1.75
+          resource: research
+    - id: aa200001-0001-0001-0001-000000000011
+      name: Expanded Archives
+      description: Extend the library with additional reading chambers to accommodate more scholars.
+      cost:
+        gold: 90
+        crystals: 40
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+    - id: aa200001-0001-0001-0001-000000000012
+      name: Forbidden Knowledge
+      description: Unlock the darkest tomes. Greatly boosts research but intensifies the library's fearsome aura.
+      cost:
+        gold: 120
+        crystals: 80
+        essence: 30
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: research
+        - type: fearIncrease
+          value: 2
 
 - id: aa100001-0001-0001-0001-000000000005
   name: Soul Well
