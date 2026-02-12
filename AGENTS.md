@@ -164,3 +164,15 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Inhabitants exist in two places:** `GameStateWorld.inhabitants` (used by inhabitant management functions) and `Floor.inhabitants` (used by production, throne room, and UI panels) — be careful which you query
 - `panel-room-info` component shows inhabitant count, assigned list with Remove buttons, and eligible unassigned inhabitants with Assign buttons — only for rooms with `maxInhabitants !== 0`
 - When mocking `room-upgrades` in `inhabitants.spec.ts`, use `vi.mock('@helpers/room-upgrades')` to control `getEffectiveMaxInhabitants` return values without needing the content system
+
+## Inhabitant Recruitment System
+
+- `recruitment.ts` helper: `recruitInhabitant(def)` handles validation (altar check, roster limit, tier gate, affordability), cost deduction via `payCost()`, and instance creation via `addInhabitant()` in one async call
+- `getRecruitableInhabitants()` returns all non-unique inhabitant definitions sorted by tier then name — filters out `restrictionTags: ['unique']` (rulers)
+- `getRecruitShortfall(cost, resources)` is a pure function taking cost and resources as params — avoids `computed()` issues in Vitest
+- `DEFAULT_MAX_INHABITANTS = 50` — configurable roster cap; `isRosterFull` computed signal checks `inhabitants.length >= max`
+- `unlockedTier` computed signal returns `1` — placeholder for future progression system (research/upgrades)
+- Recruitment UI lives in `panel-altar` component (not a separate component) — the Altar panel expands to show recruitable inhabitants when the altar is selected
+- `RecruitableEntry` type bundles def, affordable flag, locked flag, shortfall, and costEntries for efficient template binding
+- When testing `recruitment.ts`, mock `canRecruit` as a simple function `() => mockHasAltar` — Angular `computed()` signals at module level don't work in Vitest, so test only the pure functions via `await import()`
+- `IsContentItem` type has `__type` but NOT `__key` — don't add `__key` to test mock objects
