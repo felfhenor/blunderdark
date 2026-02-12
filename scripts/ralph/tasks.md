@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 37 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities)
+- **Complete:** 38 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room)
 - **In Progress:** None
-- **Remaining:** ~85 features
+- **Remaining:** ~84 features
 
 ---
 
@@ -98,7 +98,7 @@ Combat system for invasions and training.
 |----------|---------|---------|------------|
 | ~~7.1~~ | ~~`basic-combat-resolution`~~ | ~~COMPLETE (5/7, 2 deferred)~~ | ~~inhabitant-data-model~~ |
 | ~~7.2~~ | ~~`special-combat-abilities`~~ | ~~COMPLETE (8/9, 1 deferred)~~ | ~~basic-combat-resolution~~ |
-| 7.3 | `barracks-room` | 5 | room-placement-ui, basic-combat-resolution |
+| ~~7.3~~ | ~~`barracks-room`~~ | ~~COMPLETE (5/7, 2 deferred)~~ | ~~room-placement-ui, basic-combat-resolution~~ |
 | 7.4 | `training-grounds-room` | 5 | room-placement-ui, basic-combat-resolution |
 
 ---

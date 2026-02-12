@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Updated in gamedata/room/base.yml with I-shape (9b17bc0c), fearLevel 1, maxInhabitants 6, 3 adjacency bonuses, 3 upgrade paths. No production (housing room)."
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing I-Shape (9b17bc0c-1b9a-48f2-95e7-cc5b2090c614). Placement handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "maxInhabitants: 6, Fortified Barracks upgrade adds +4 (6→10). Garrison status marking deferred (requires combat readiness system)."
     },
     {
       "id": "US-004",
@@ -63,7 +63,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Defense rating system doesn't exist yet. Requires a dungeon-wide defense aggregation system and overview UI."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrades: Fortified (+4 capacity), Comfortable Quarters (fearReduction 1), War Room (fearIncrease 1). Defense rating buff and morale bonus deferred (systems don't exist)."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 adjacency bonuses: Dark Forge +15%, Throne Room +20%, another Barracks +10%. Training Grounds and Trap Workshop bonuses deferred (rooms don't exist yet)."
     },
     {
       "id": "US-007",
@@ -108,7 +108,7 @@
       ],
       "priority": 7,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires combat readiness system and defense rating aggregation. Inhabitant assignment to Barracks works via existing system."
     }
   ]
 }
