@@ -42,3 +42,43 @@ export type DungeonProfile = {
   size: number;
   threatLevel: number;
 };
+
+// --- Win/Loss types ---
+
+import type { InvaderInstance } from '@interfaces/invader';
+import type { InvasionObjective } from '@interfaces/invasion-objective';
+
+export type InvasionEndReason =
+  | 'all_invaders_eliminated'
+  | 'turn_limit_reached'
+  | 'altar_destroyed'
+  | 'objectives_completed';
+
+export type InvasionState = {
+  invasionId: string;
+  currentTurn: number;
+  maxTurns: number;
+  altarHp: number;
+  altarMaxHp: number;
+  invaders: InvaderInstance[];
+  objectives: InvasionObjective[];
+  defenderCount: number;
+  defendersLost: number;
+  invadersKilled: number;
+  isActive: boolean;
+};
+
+export type DetailedInvasionResult = {
+  invasionId: string;
+  day: number;
+  outcome: 'victory' | 'defeat';
+  endReason: InvasionEndReason;
+  turnsTaken: number;
+  invaderCount: number;
+  invadersKilled: number;
+  defenderCount: number;
+  defendersLost: number;
+  objectivesCompleted: number;
+  objectivesTotal: number;
+  rewardMultiplier: number;
+};
