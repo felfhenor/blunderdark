@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BIOME_ROOM_BONUSES exported from production-modifiers.ts. Volcanic: Dark Forge +50%, Crystal Mine +15%. Fungal: Mushroom Grove +60%. Crystal: Crystal Mine +40%, Ley Line Nexus +10%. Corrupted: Soul Well +100%, Shadow Library +100%. Flooded: Underground Lake +50%. Neutral has no entry."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "getBiomeBonus(biome, roomTypeId) in production-modifiers.ts. Pure function, returns 1.0 + bonus or 1.0 for no match/neutral."
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Already integrated in conditional-production-modifiers (10.2). Biome modifier is in the MODIFIER_REGISTRY with type 'biome', evaluated automatically via calculateProductionModifiers(context). Stacks multiplicatively with time-of-day and floor-depth modifiers."
     },
     {
       "id": "US-004",
@@ -65,7 +65,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred — UI display requires panel components that don't exist yet. The data layer (getBiomeBonus, evaluateModifiers) is ready for UI consumption."
     },
     {
       "id": "US-005",
@@ -82,8 +82,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Tests in production-modifiers.spec.ts (not separate file — biome bonuses are part of the production modifier system). 22 new tests covering getBiomeBonus, BIOME_ROOM_BONUSES, and updated biome modifier integration tests. All 1389 tests pass."
     }
   ]
 }

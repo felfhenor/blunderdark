@@ -514,7 +514,9 @@ When adding new fields to `GameStateWorld`:
 - `evaluateModifiers(context)` — returns array of active modifier results for UI display
 - Night (18:00-05:59): Shadow Library +20%, Soul Well +15%. Day (06:00-17:59): Mushroom Grove +15%, Crystal Mine +10%
 - Depth: +5% per floor depth level (DEPTH_BONUS_PER_LEVEL = 0.05)
-- Biome bonuses: volcanic→Crystal Mine +15%, fungal→Mushroom Grove +20%, crystal→Crystal Mine +25%/Ley Line +10%, corrupted→Soul Well +20%/Shadow Library +15%, flooded→Underground Lake +20%
+- Biome bonuses: volcanic→Dark Forge +50%/Crystal Mine +15%, fungal→Mushroom Grove +60%, crystal→Crystal Mine +40%/Ley Line +10%, corrupted→Soul Well +100%/Shadow Library +100%, flooded→Underground Lake +50%
+- `getBiomeBonus(biome, roomTypeId)` — pure function returning multiplier (1.0 + bonus). Exported for direct use.
+- `BIOME_ROOM_BONUSES` — exported constant mapping biome→room→bonus (raw bonus values, not multipliers)
 - Production pipeline: `calculateTotalProduction(floors, hour?)` — optional `hour` param. When omitted, env modifiers = 1.0. Computed signals and `processProduction` pass actual `state.clock.hour`
 - Formula: `final = base * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier`
 - Test pattern: use `depth: 0` and `biome: 'neutral'` in makeFloor for tests that don't test env modifiers
