@@ -182,6 +182,17 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `ContentType` union in `identifiable.ts` is the source of truth — test files using fictional types ('armor', 'skill', 'guardian') will fail typecheck; use valid types ('trinket', 'pet', 'monster')
 - When adding new fields to interfaces, grep for test mock objects across all spec files and update them
 
+## Inhabitant Roster UI
+
+- `PanelRosterComponent` in `panel-roster/` — standalone panel showing all inhabitants with filter, stats, and detail view
+- Uses `gamestate().world.inhabitants` directly (not `currentFloor().inhabitants`) since roster is dungeon-wide, not floor-scoped
+- `allEntries` computed builds `RosterEntry[]` with instance, definition, and resolved room name — maps over `gamestate().world.inhabitants` and looks up defs via `getEntry`
+- Room name resolution: iterate `state.world.floors` to find the room matching `assignedRoomId`, then `getRoomDefinition()` for the name
+- Filter tabs use signal + computed pattern: `activeFilter` signal drives `filteredEntries` computed
+- Detail view uses `selectedInhabitantId` signal; `availableRooms` computed lists all rooms with `maxInhabitants !== 0` and their `canAssignToRoom` status
+- For reassignment from roster: unassign first, then assign — `assignInhabitantToRoom` rejects already-assigned inhabitants
+- Panel placed in sidebar between floor-selector and room-info panels for easy access
+
 ## Inhabitant Recruitment System
 
 - `recruitment.ts` helper: `recruitInhabitant(def)` handles validation (altar check, roster limit, tier gate, affordability), cost deduction via `payCost()`, and instance creation via `addInhabitant()` in one async call

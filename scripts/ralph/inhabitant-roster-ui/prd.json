@@ -19,8 +19,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelRosterComponent with scrollable list, tier badges, state badges, compact stats row, trait badges, and room assignment display. Empty state shows altar recruitment message."
     },
     {
       "id": "US-002",
@@ -35,8 +35,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Three filter tabs (All/Assigned/Idle) with counts. Uses signal for active filter and computed for filtered entries. Default is All."
     },
     {
       "id": "US-003",
@@ -54,8 +54,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Detail panel below the roster list with full stats grid, trait descriptions, unassign button, and room reassignment list. Rooms at capacity are shown disabled. Close button dismisses detail."
     }
   ]
 }
