@@ -293,7 +293,7 @@
 
 - id: aa100001-0001-0001-0001-000000000008
   name: Treasure Vault
-  description: A secure chamber for storing gold and valuables. Produces gold passively and boosts the Throne Room when adjacent.
+  description: A fortified 3x3 chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
   shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
   cost:
     gold: 120
@@ -301,7 +301,56 @@
   production:
     gold: 0.8
   requiresWorkers: false
+  maxInhabitants: 1
+  fearLevel: 1
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000006
       bonus: 0.15
       description: Forged valuables fill the vault more efficiently.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000009
+      bonus: 0.25
+      description: The altar's dark power blesses the vault's gold, increasing its yield.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000001
+      bonus: 0.2
+      description: Proximity to the Throne Room encourages tribute and efficient accounting.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000008
+      bonus: 0.1
+      description: Connected vaults share security infrastructure, reducing overhead.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000015
+      name: Reinforced Vault
+      description: Reinforce walls with enchanted steel and add additional warding glyphs. Increases gold production and eliminates security risks.
+      cost:
+        gold: 150
+        crystals: 80
+      effects:
+        - type: productionMultiplier
+          value: 1.5
+          resource: gold
+        - type: fearReduction
+          value: 1
+    - id: aa200001-0001-0001-0001-000000000016
+      name: Investment Vault
+      description: Transform the vault into a financial hub. Double gold generation rate and house a dedicated treasurer.
+      cost:
+        gold: 200
+        crystals: 60
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: gold
+        - type: maxInhabitantBonus
+          value: 1
+    - id: aa200001-0001-0001-0001-000000000017
+      name: Dragon's Hoard
+      description: Amass a legendary treasure hoard. Massively boosts gold production but the overwhelming wealth attracts dangerous attention.
+      cost:
+        gold: 180
+        crystals: 100
+        essence: 20
+      effects:
+        - type: productionMultiplier
+          value: 2.5
+          resource: gold
+        - type: fearIncrease
+          value: 2
