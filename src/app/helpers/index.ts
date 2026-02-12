@@ -48,6 +48,7 @@ export * from './setup';
 export * from './sfx';
 export * from './signal';
 export * from './state-game';
+export * from './state-modifiers';
 export * from './state-options';
 export * from './synergy';
 export * from './throne-room';

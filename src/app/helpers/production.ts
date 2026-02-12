@@ -3,13 +3,13 @@ import { areRoomsAdjacent } from '@helpers/adjacency';
 import { getEntry } from '@helpers/content';
 import { TICKS_PER_MINUTE } from '@helpers/game-time';
 import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
+import { calculatePerCreatureProductionModifier } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   GameState,
   InhabitantDefinition,
   InhabitantInstance,
-  InhabitantState,
   IsContentItem,
   PlacedRoom,
   ResourceType,
@@ -162,12 +162,6 @@ export function getActiveAdjacencyBonuses(
   return activeBonuses;
 }
 
-const STATE_MODIFIERS: Record<InhabitantState, number> = {
-  normal: 1.0,
-  scared: 0.5,
-  hungry: 0.75,
-};
-
 export function calculateConditionalModifiers(
   placedRoom: PlacedRoom,
   inhabitants: InhabitantInstance[],
@@ -178,14 +172,7 @@ export function calculateConditionalModifiers(
 
   if (assigned.length === 0) return 1.0;
 
-  const activeStates = new Set(assigned.map((i) => i.state));
-
-  let multiplier = 1.0;
-  for (const state of activeStates) {
-    multiplier *= STATE_MODIFIERS[state];
-  }
-
-  return multiplier;
+  return calculatePerCreatureProductionModifier(assigned);
 }
 
 export function calculateTotalProduction(floors: Floor[]): RoomProduction {

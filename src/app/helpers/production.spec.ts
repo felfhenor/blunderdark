@@ -538,11 +538,11 @@ describe('calculateConditionalModifiers', () => {
       },
     ];
     const result = calculateConditionalModifiers(placedRoom, inhabitants);
-    // scared (0.5) * hungry (0.75) = 0.375
-    expect(result).toBeCloseTo(0.375);
+    // Per-creature averaging: scared (0.5) + hungry (0.75) / 2 = 0.625
+    expect(result).toBeCloseTo(0.625);
   });
 
-  it('should not double-count the same state from multiple inhabitants', () => {
+  it('should average same state from multiple inhabitants', () => {
     const inhabitants: InhabitantInstance[] = [
       {
         instanceId: 'inst-1',
@@ -560,7 +560,7 @@ describe('calculateConditionalModifiers', () => {
       },
     ];
     const result = calculateConditionalModifiers(placedRoom, inhabitants);
-    // Two scared inhabitants, but scared modifier only applies once: 0.5
+    // Two scared inhabitants: (0.5 + 0.5) / 2 = 0.5
     expect(result).toBe(0.5);
   });
 

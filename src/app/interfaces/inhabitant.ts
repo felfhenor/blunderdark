@@ -31,9 +31,18 @@ export type InhabitantDefinition = {
   restrictionTags: string[];
   rulerBonuses: RulerBonuses;
   rulerFearLevel: number;
+  fearTolerance?: number;
+  stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
 };
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry';
+
+export type StateModifier = {
+  productionMultiplier: number;
+  foodConsumptionMultiplier: number;
+  attackMultiplier?: number;
+  defenseMultiplier?: number;
+};
 
 export type TrainingBonuses = {
   defense: number;
