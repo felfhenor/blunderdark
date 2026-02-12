@@ -349,6 +349,22 @@ When adding a new required field to the `Floor` type:
 4. Update ALL `makeFloor()` helpers in spec files (~15 files) to include the new field
 5. No changes needed to `worldgen.ts` if it uses `defaultFloor()`
 
+## Trap Workshop / Crafting Queue System
+
+- `trap-workshop.ts` helper: `processTrapCrafting(state)` runs each tick inside `updateGamestate` — mutates crafting queues in-place (same pattern as production/training)
+- `TRAP_WORKSHOP_TYPE_ID = 'aa100001-0001-0001-0001-000000000013'`
+- `BASE_CRAFTING_TICKS = TICKS_PER_MINUTE * 3` (15 ticks = 3 game-minutes)
+- Crafting queues stored globally in `GameStateWorld.trapCraftingQueues: TrapCraftingQueue[]` (not per-floor)
+- Each queue maps to a room by `roomId`, contains an ordered list of `TrapCraftingJob` objects
+- Only the first job in each queue progresses each tick (FIFO processing)
+- Worker speed bonus: each additional worker beyond first reduces time by 20%, capped at 0.4 multiplier (60% max reduction)
+- New upgrade effect types: `craftingSpeedMultiplier`, `craftingCostMultiplier`, `craftingBonusDamage` — handled in trap-workshop.ts
+- `canQueueTrap(roomId, floors)` validates: room is Trap Workshop, has at least 1 assigned inhabitant
+- `getCraftingCostForRoom(placedRoom, baseCost)` applies cost multiplier upgrades to resource costs
+- `getCraftingTicksForRoom(placedRoom, workerCount)` applies speed multiplier upgrades + worker bonus
+- `getTrapWorkshopInfo(roomId, state)` returns full workshop state for UI rendering
+- When mocking `@helpers/content` in trap-workshop tests, provide both `getEntriesByType` and `getEntry` mocks
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Room defined in gamedata/room/base.yml with ID aa100001-0001-0001-0001-000000000013"
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing 2x2 square shape (2af760d1); placement uses existing room-placement system"
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "5 trap types from trap-system (8.1). canQueueTrap validates assigned inhabitant. processTrapCrafting adds to trapInventory on completion."
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TrapCraftingQueue supports multiple jobs. Progress tracked via job.progress/job.targetTicks. Each extra worker reduces time by 20% (capped at 60%)."
     },
     {
       "id": "US-005",
@@ -75,8 +75,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "maxInhabitants: 2, fearLevel: 2. Master Trapper upgrade adds maxInhabitantBonus: 2."
     },
     {
       "id": "US-006",
@@ -91,8 +91,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrade paths: Master Trapper (speed 1.2x, +2 capacity), Efficient Assembly (cost 0.75x, speed 0.7x), Enchanted Traps (bonus damage +5). Mutually exclusive via upgrade system."
     },
     {
       "id": "US-007",
@@ -106,8 +106,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Adapted to existing rooms: Dark Forge +20% crafting speed, Shadow Library +15% crafting speed, Crystal Mine +10% crafting speed. Defined in YAML adjacencyBonuses."
     }
   ]
 }
