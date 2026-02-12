@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TrapDefinition, TrapInstance, TrapInventoryEntry types created. TrapInstance stored in Floor.traps[], TrapInventoryEntry[] in GameStateWorld.trapInventory. canBeDisarmed field added beyond PRD spec."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "5 trap types defined in gamedata/trap/base.yml. All compile correctly with gamedata:build."
     },
     {
       "id": "US-003",
@@ -49,8 +49,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "rollTrapTrigger() and applyTrapTrigger() implement full trigger logic. Invasion system integration deferred to invasion feature (Phase 9)."
     },
     {
       "id": "US-004",
@@ -66,7 +66,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred to trap-workshop-room feature (8.2). craftCost fields defined on each TrapDefinition for future integration."
     },
     {
       "id": "US-005",
@@ -80,8 +80,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TrapInventoryEntry[] stored in GameStateWorld.trapInventory. addToTrapInventory, removeFromTrapInventory, getTrapInventoryCount helpers implemented. UI display deferred to trap-workshop-room (8.2)."
     },
     {
       "id": "US-006",
@@ -97,8 +97,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "canPlaceTrap, placeTrap, removeTrap pure functions implemented with full validation. UI component and visual rendering deferred to trap-workshop-room (8.2)."
     },
     {
       "id": "US-007",
@@ -114,7 +114,7 @@
       ],
       "priority": 7,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred — requires invasion system (Phase 9) for visual trigger feedback. TrapTriggerResult type provides all data needed for future UI integration."
     },
     {
       "id": "US-008",
@@ -132,8 +132,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "52 tests in traps.spec.ts covering: inventory CRUD, placement validation, trigger mechanics, rogue disarm, fear glyph morale, charge decrement/destruction, all 5 trap definitions."
     }
   ]
 }

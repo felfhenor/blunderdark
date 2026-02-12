@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 39 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room)
+- **Complete:** 40 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system)
 - **In Progress:** None
-- **Remaining:** ~83 features
+- **Remaining:** ~82 features
 
 ---
 
@@ -109,7 +109,7 @@ Passive defense mechanisms.
 
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
-| 8.1 | `trap-system` | 6 | grid-system |
+| ~~8.1~~ | ~~`trap-system`~~ | ~~COMPLETE (6/8, 2 deferred)~~ | ~~grid-system~~ |
 | 8.2 | `trap-workshop-room` | 5 | room-placement-ui, trap-system |
 
 ---

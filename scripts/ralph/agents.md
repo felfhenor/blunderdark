@@ -325,6 +325,30 @@ BFS pathfinding for hallways between rooms:
 - When adding optional fields to shared types (InhabitantInstance), prefer `?:` over required to avoid cascade updates across all test files
 - `getAdjacentRoomTypeIds(room, floor, tileMap?)` is a reusable function returning `Set<string>` of adjacent room type IDs
 
+## Trap System
+
+- Trap definitions in `gamedata/trap/base.yml` — 5 types: Pit, Arrow, Rune, Magic, Fear Glyph
+- UUID prefix for traps: `aa800001-0001-0001-0001-00000000000X`
+- `TrapDefinition` (content type) vs `TrapInstance` (runtime placed trap) vs `TrapInventoryEntry` (unplaced inventory)
+- `TrapInstance` stored per-floor in `Floor.traps: TrapInstance[]` — similar to `Floor.hallways`
+- `TrapInventoryEntry[]` stored in `GameStateWorld.trapInventory` — player's unplaced trap stock
+- Trap placement: hallway tiles only, max 1 trap per tile, validated via `canPlaceTrap(floor, tileX, tileY)`
+- Trap trigger: `rollTrapTrigger(trap, isRogue, roll)` — deterministic given a roll value for testability
+- Rogue disarm: 60% chance to disarm instead of trigger, except `canBeDisarmed: false` traps (Rune Trap)
+- Fear Glyph: only trap with `effectType: 'fear'` — applies 10 morale penalty in addition to damage
+- `processTraps(state)` is a no-op hook for future tick-based trap mechanics — traps are event-driven (invasions)
+- When adding fields to `Floor` type, must update ALL `makeFloor()` test helpers across ~15 spec files
+
+## Adding Fields to Floor Type
+
+When adding a new required field to the `Floor` type:
+
+1. Add to interface in `src/app/interfaces/floor.ts`
+2. Add default in `defaultFloor()` in `src/app/helpers/defaults.ts`
+3. Add migration in `migrateFloors()` in `src/app/helpers/floor.ts` (`saved.field ?? base.field`)
+4. Update ALL `makeFloor()` helpers in spec files (~15 files) to include the new field
+5. No changes needed to `worldgen.ts` if it uses `defaultFloor()`
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
