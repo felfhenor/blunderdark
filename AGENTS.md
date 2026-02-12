@@ -204,3 +204,11 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `RecruitableEntry` type bundles def, affordable flag, locked flag, shortfall, and costEntries for efficient template binding
 - When testing `recruitment.ts`, mock `canRecruit` as a simple function `() => mockHasAltar` — Angular `computed()` signals at module level don't work in Vitest, so test only the pure functions via `await import()`
 - `IsContentItem` type has `__type` but NOT `__key` — don't add `__key` to test mock objects
+
+## Resource UI Display
+
+- `PanelResourcesComponent` is a horizontal bar at the **top** of the game-play page (not in the sidebar) — wraps the game-play container in a flex-col with the resource bar above the sidebar+grid row
+- `productionBreakdowns` computed signal in `production.ts` returns `Record<string, ResourceProductionBreakdown>` with per-resource-type breakdown (base, inhabitantBonus, adjacencyBonus, modifierEffect, final)
+- Rich tooltips use custom CSS absolute positioning with a delay timer (250ms) — DaisyUI's `data-tip` tooltips only support plain text, so custom implementation is needed for HTML content
+- Warning thresholds: `LOW_THRESHOLD = 0.2`, `CRITICAL_THRESHOLD = 0.1` — configurable constants, not hardcoded inline
+- Production breakdown math: `inhabitantContrib = base * inhabitantBonus`, `adjacencyContrib = base * adjacencyBonus`, `modifierEffect = withBonuses * (modifier - 1)`
