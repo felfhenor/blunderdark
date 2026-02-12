@@ -1,6 +1,6 @@
 # Research nodes define the tech tree for dungeon advancement.
 # Three branches: dark, arcane, engineering
-# Each node has: id, name, description, branch, cost, prerequisites, unlocks, tier
+# Each node has: id, name, description, branch, cost, prerequisiteResearchIds, unlocks, tier
 
 # --- DARK BRANCH: root node ---
 - id: aa000001-0001-4000-b001-000000000001
@@ -9,7 +9,7 @@
   branch: dark
   cost:
     research: 10
-  prerequisites: []
+  prerequisiteResearchIds: []
   unlocks: []
   tier: 1
 
@@ -20,7 +20,7 @@
   branch: arcane
   cost:
     research: 10
-  prerequisites: []
+  prerequisiteResearchIds: []
   unlocks: []
   tier: 1
 
@@ -31,6 +31,6 @@
   branch: engineering
   cost:
     research: 10
-  prerequisites: []
+  prerequisiteResearchIds: []
   unlocks: []
   tier: 1

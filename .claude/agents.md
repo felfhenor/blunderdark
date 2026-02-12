@@ -499,7 +499,7 @@ When multiple build modes exist (room placement, hallway build):
 - `pathfinding.ts` helper: `buildDungeonGraph(floor, roomFearLevels)` creates graph from Floor's rooms, connections, and hallways
 - `DungeonGraph` uses adjacency list: `Map<string, PathEdge[]>` keyed by room ID
 - `PathNode` stores roomId, roomTypeId, x/y (anchor), fearLevel
-- `findPath(graph, start, goal, options)` — Dijkstra's algorithm (NOT A* with Manhattan, because rooms connect at arbitrary distances via hallways making Manhattan inadmissible)
+- `findPath(graph, start, goal, options)` — Dijkstra's algorithm (NOT A\* with Manhattan, because rooms connect at arbitrary distances via hallways making Manhattan inadmissible)
 - Fear cost: when `morale < room.fearLevel`, edge cost is `baseCost * fearCostMultiplier` (default 3x)
 - `PathfindingOptions`: `morale`, `fearCostMultiplier`, `blockedNodes: Set<string>`
 - `findPathWithObjectives(graph, start, primaryGoal, secondaryObjectives, options)` — detours to secondary if cost < 2x direct path
@@ -558,7 +558,7 @@ When multiple build modes exist (room placement, hallway build):
 ### Invasion Rewards System
 
 - `invasion-rewards.ts` helper: pure functions for reward/penalty calculation, loot rolling, prisoner capture and handling
-- Reward formula: +5 base rep, +1 per kill, +3 if all secondaries prevented. Experience = invaderCount * 10 * rewardMultiplier
+- Reward formula: +5 base rep, +1 per kill, +3 if all secondaries prevented. Experience = invaderCount _ 10 _ rewardMultiplier
 - Penalty formula: 20% gold lost, -3 reputation, +10 crystals +5 essence per completed secondary
 - Class-based loot: `CLASS_LOOT` record maps InvaderClassType to gold range + bonus resource
 - Prisoner capture: `rollPrisonerCaptures()` with 30% chance per retreating invader
@@ -606,6 +606,7 @@ When multiple build modes exist (room placement, hallway build):
 - Cost scaling pattern across tiers: T1=10 research, T2=25/5, T3=50/15, T4=100/30/15 tertiary, T5=200/60/30, T6=400/120/60
 - Root nodes (tier 1) are defined in `base.yml`; branch-specific nodes (tier 2+) go in `dark.yml`, `arcane.yml`, `engineering.yml`
 - Tree structure: 3 paths from root at tier 2, specializations at tier 3, cross-path combinations at tier 4, convergence at tier 5-6
+- Research prerequisites use `prerequisiteResearchIds` key (not `prerequisites`) — this naming allows `rewriteDataIds()` to auto-resolve names to UUIDs at build time. YAML files use human-readable research node names; the build script converts them to UUIDs.
 
 ## Gamedata Build-Time Validation
 
@@ -615,7 +616,6 @@ When adding build-time validation for a content type:
 2. Call it between `processFiles()` and `rewriteDataIds()` — data is loaded but IDs haven't been rewritten
 3. Access data via `allData['contenttype']` — contains all entries from all YAML files merged
 4. On failure: `console.error()` + `process.exit(1)` to halt the build
-5. Research prerequisites use raw UUIDs (not name references) because `rewriteDataIds` only transforms keys matching content type folder names
 
 ## GameState Type Gotchas
 

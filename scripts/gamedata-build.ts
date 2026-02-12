@@ -155,8 +155,8 @@ const validateResearchTree = () => {
 
   // 1. Validate all prerequisite references point to valid node IDs
   researchNodes.forEach((node: any) => {
-    if (!isArray(node.prerequisites)) return;
-    node.prerequisites.forEach((prereqId: string) => {
+    if (!isArray(node.prerequisiteResearchIds)) return;
+    node.prerequisiteResearchIds.forEach((prereqId: string) => {
       if (!nodeIds.has(prereqId)) {
         errors.push(
           `Node "${node.name}" (${node.id}) has invalid prerequisite "${prereqId}" — no matching research node exists`,
@@ -165,16 +165,16 @@ const validateResearchTree = () => {
     });
   });
 
-  // 2. Check every branch has at least one root node (no prerequisites)
+  // 2. Check every branch has at least one root node (no prerequisiteResearchIds)
   const branches = new Set(researchNodes.map((n: any) => n.branch));
   branches.forEach((branch: string) => {
     const branchNodes = researchNodes.filter((n: any) => n.branch === branch);
     const rootNodes = branchNodes.filter(
-      (n: any) => !n.prerequisites || n.prerequisites.length === 0,
+      (n: any) => !n.prerequisiteResearchIds || n.prerequisiteResearchIds.length === 0,
     );
     if (rootNodes.length === 0) {
       errors.push(
-        `Branch "${branch}" has no root node (a node with empty prerequisites)`,
+        `Branch "${branch}" has no root node (a node with empty prerequisiteResearchIds)`,
       );
     }
   });
@@ -182,8 +182,8 @@ const validateResearchTree = () => {
   // 3. Circular dependency detection via DFS
   const adjacency: Record<string, string[]> = {};
   researchNodes.forEach((node: any) => {
-    adjacency[node.id] = isArray(node.prerequisites)
-      ? node.prerequisites.filter((id: string) => nodeIds.has(id))
+    adjacency[node.id] = isArray(node.prerequisiteResearchIds)
+      ? node.prerequisiteResearchIds.filter((id: string) => nodeIds.has(id))
       : [];
   });
 
@@ -237,5 +237,5 @@ const validateResearchTree = () => {
 };
 
 processFiles();
-validateResearchTree();
 rewriteDataIds();
+validateResearchTree();

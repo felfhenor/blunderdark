@@ -8,7 +8,7 @@ export type ResearchNode = {
   description: string;
   branch: ResearchBranch;
   cost: ResourceCost;
-  prerequisites: string[];
+  prerequisiteResearchIds: string[];
   unlocks: string[];
   tier: number;
 };

@@ -25,8 +25,8 @@
   cost:
     research: 25
     flux: 5
-  prerequisites:
-    - aa000002-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Arcane Basics
   unlocks: []
   tier: 2
 
@@ -37,8 +37,8 @@
   cost:
     research: 25
     flux: 5
-  prerequisites:
-    - aa000002-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Arcane Basics
   unlocks: []
   tier: 2
 
@@ -49,8 +49,8 @@
   cost:
     research: 25
     flux: 5
-  prerequisites:
-    - aa000002-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Arcane Basics
   unlocks: []
   tier: 2
 
@@ -63,8 +63,8 @@
   cost:
     research: 50
     flux: 15
-  prerequisites:
-    - aa000002-0002-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Flux Manipulation
   unlocks: []
   tier: 3
 
@@ -75,8 +75,8 @@
   cost:
     research: 50
     flux: 15
-  prerequisites:
-    - aa000002-0003-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Ley Line Tapping
   unlocks: []
   tier: 3
 
@@ -87,8 +87,8 @@
   cost:
     research: 50
     flux: 15
-  prerequisites:
-    - aa000002-0004-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Enchantment
   unlocks: []
   tier: 3
 
@@ -102,9 +102,9 @@
     research: 100
     flux: 30
     crystals: 15
-  prerequisites:
-    - aa000002-0005-4000-b001-000000000001
-    - aa000002-0004-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Arcane Amplification
+    - Enchantment
   unlocks: []
   tier: 4
 
@@ -116,9 +116,9 @@
     research: 100
     flux: 30
     crystals: 15
-  prerequisites:
-    - aa000002-0006-4000-b001-000000000001
-    - aa000002-0003-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Elemental Binding
+    - Ley Line Tapping
   unlocks: []
   tier: 4
 
@@ -130,9 +130,9 @@
     research: 100
     flux: 30
     crystals: 15
-  prerequisites:
-    - aa000002-0007-4000-b001-000000000001
-    - aa000002-0005-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Warding
+    - Arcane Amplification
   unlocks: []
   tier: 4
 
@@ -146,9 +146,9 @@
     research: 200
     flux: 60
     crystals: 30
-  prerequisites:
-    - aa000002-0008-4000-b001-000000000001
-    - aa000002-0009-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dimensional Studies
+    - Ley Line Mastery
   unlocks: []
   tier: 5
 
@@ -160,9 +160,9 @@
     research: 200
     flux: 60
     crystals: 30
-  prerequisites:
-    - aa000002-0010-4000-b001-000000000001
-    - aa000002-0008-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Spellweave Lattice
+    - Dimensional Studies
   unlocks: []
   tier: 5
 
@@ -176,8 +176,8 @@
     research: 400
     flux: 120
     crystals: 60
-  prerequisites:
-    - aa000002-0011-4000-b001-000000000001
-    - aa000002-0012-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Arcane Convergence
+    - Planar Nexus
   unlocks: []
   tier: 6

@@ -25,8 +25,8 @@
   cost:
     research: 25
     essence: 5
-  prerequisites:
-    - aa000001-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dark Arts Fundamentals
   unlocks: []
   tier: 2
 
@@ -37,8 +37,8 @@
   cost:
     research: 25
     essence: 5
-  prerequisites:
-    - aa000001-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dark Arts Fundamentals
   unlocks: []
   tier: 2
 
@@ -49,8 +49,8 @@
   cost:
     research: 25
     essence: 5
-  prerequisites:
-    - aa000001-0001-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dark Arts Fundamentals
   unlocks: []
   tier: 2
 
@@ -63,8 +63,8 @@
   cost:
     research: 50
     essence: 15
-  prerequisites:
-    - aa000001-0004-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Necromancy
   unlocks: []
   tier: 3
 
@@ -75,8 +75,8 @@
   cost:
     research: 50
     essence: 15
-  prerequisites:
-    - aa000001-0002-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Soul Manipulation
   unlocks: []
   tier: 3
 
@@ -88,8 +88,8 @@
     research: 50
     essence: 15
     corruption: 5
-  prerequisites:
-    - aa000001-0003-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Shadow Magic
   unlocks: []
   tier: 3
 
@@ -103,9 +103,9 @@
     research: 100
     essence: 30
     corruption: 15
-  prerequisites:
-    - aa000001-0005-4000-b001-000000000001
-    - aa000001-0006-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Undead Mastery
+    - Soul Well
   unlocks: []
   tier: 4
 
@@ -117,9 +117,9 @@
     research: 100
     essence: 30
     corruption: 15
-  prerequisites:
-    - aa000001-0003-4000-b001-000000000001
-    - aa000001-0007-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Shadow Magic
+    - Corruption Control
   unlocks: []
   tier: 4
 
@@ -133,9 +133,9 @@
     research: 200
     essence: 60
     corruption: 30
-  prerequisites:
-    - aa000001-0008-4000-b001-000000000001
-    - aa000001-0009-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dark Rituals
+    - Shadow Weaving
   unlocks: []
   tier: 5
 
@@ -147,8 +147,8 @@
     research: 200
     essence: 60
     corruption: 30
-  prerequisites:
-    - aa000001-0008-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Dark Rituals
   unlocks: []
   tier: 5
 
@@ -162,8 +162,8 @@
     research: 400
     essence: 120
     corruption: 60
-  prerequisites:
-    - aa000001-0010-4000-b001-000000000001
-    - aa000001-0011-4000-b001-000000000001
+  prerequisiteResearchIds:
+    - Abyssal Gateway
+    - Soul Forge
   unlocks: []
   tier: 6

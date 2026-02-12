@@ -175,7 +175,7 @@ function ensureResearch(
     description: node.description ?? '',
     branch: node.branch ?? 'dark',
     cost: node.cost ?? {},
-    prerequisites: node.prerequisites ?? [],
+    prerequisiteResearchIds: node.prerequisiteResearchIds ?? [],
     unlocks: node.unlocks ?? [],
     tier: node.tier ?? 1,
   };
