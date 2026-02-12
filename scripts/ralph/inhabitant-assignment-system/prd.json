@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in assignment.ts with canAssignToRoom, getAssignmentCount, isInhabitantAssigned, getRoomAssignmentInfo. 17 unit tests in assignment.spec.ts."
     },
     {
       "id": "US-002",
@@ -35,8 +35,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Panel-room-info shows room name, production rates (per-minute), assigned inhabitants with Remove buttons, and eligible unassigned inhabitants with Assign buttons. Fixed pre-existing typecheck errors in spec files."
     },
     {
       "id": "US-003",
@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Production recalculation is automatic via Angular signals — gamestate change triggers computed signal recomputation. Added 3 explicit tests in production.spec.ts verifying production changes on assignment/unassignment."
     },
     {
       "id": "US-004",
@@ -68,8 +68,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added roomAssignmentMap computed signal to grid component. X/Y badges rendered on anchor tiles with color coding: green (full), yellow (partial), red (empty). Rooms with maxInhabitants=0 show no badge."
     }
   ]
 }

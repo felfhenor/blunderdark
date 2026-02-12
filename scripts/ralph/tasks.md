@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 26 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system)
+- **Complete:** 24 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system)
 - **In Progress:** None
-- **Remaining:** ~98 features
+- **Remaining:** ~97 features
 
 ---
 
@@ -57,7 +57,7 @@ Allow recruiting and assigning creatures to rooms.
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
 | ~~4.1~~ | ~~`inhabitant-recruitment-system`~~ | ~~COMPLETE~~ | ~~inhabitant-data-model, resource-manager~~ |
-| 4.2 | `inhabitant-assignment-system` | 4 | inhabitant-data-model, room-placement-ui |
+| ~~4.2~~ | ~~`inhabitant-assignment-system`~~ | ~~COMPLETE~~ | ~~inhabitant-data-model, room-placement-ui~~ |
 | 4.3 | `inhabitant-roster-ui` | 5 | inhabitant-data-model |
 | 4.4 | `efficiency-calculation` | 5 | inhabitant-assignment-system, production-calculation-system |
 

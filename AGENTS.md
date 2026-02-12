@@ -165,6 +165,23 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `panel-room-info` component shows inhabitant count, assigned list with Remove buttons, and eligible unassigned inhabitants with Assign buttons — only for rooms with `maxInhabitants !== 0`
 - When mocking `room-upgrades` in `inhabitants.spec.ts`, use `vi.mock('@helpers/room-upgrades')` to control `getEffectiveMaxInhabitants` return values without needing the content system
 
+## Assignment System
+
+- `assignment.ts` helper: `canAssignToRoom(roomId)` returns `AssignmentValidation` with allowed/reason/currentCount/maxCapacity — handles room lookup across floors, room type lookup, effective capacity from upgrades
+- `getRoomAssignmentInfo(roomId)` returns `{ currentCount, maxCapacity }` or null — lighter version for UI indicators
+- `getAssignmentCount(roomId)` and `isInhabitantAssigned(instanceId)` — simple query helpers
+- Grid component uses `roomAssignmentMap` computed signal to build per-room assignment status (full/partial/empty) for O(1) per-tile lookup — same pattern as `roomInfoMap`
+- Assignment indicators rendered as small badges on room anchor tiles — only shown for rooms with `maxInhabitants !== 0`
+- Color coding: green (full), yellow (partial), red (empty) using OKLCH colors
+- Production recalculation is automatic via Angular signals — no explicit trigger needed when assignment changes; `gamestate` signal change cascades through `productionRates` computed
+
+## Pre-existing Test Typecheck Fixes
+
+- `GridTile` mock objects in spec files need `occupiedBy: 'room'` and `hallwayId: null` — these fields were added to the interface but not all test mocks were updated
+- `RoomDefinition` mock objects need `removable: true`, `fearReductionAura: 0`, `autoPlace: false` — same pattern, fields added to interface but test mocks lagged
+- `ContentType` union in `identifiable.ts` is the source of truth — test files using fictional types ('armor', 'skill', 'guardian') will fail typecheck; use valid types ('trinket', 'pet', 'monster')
+- When adding new fields to interfaces, grep for test mock objects across all spec files and update them
+
 ## Inhabitant Recruitment System
 
 - `recruitment.ts` helper: `recruitInhabitant(def)` handles validation (altar check, roster limit, tier gate, affordability), cost deduction via `payCost()`, and instance creation via `addInhabitant()` in one async call
