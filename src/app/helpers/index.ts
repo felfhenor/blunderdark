@@ -25,6 +25,7 @@ export * from './inhabitants';
 export * from './invaders';
 export * from './invasion-composition';
 export * from './invasion-objectives';
+export * from './invasion-rewards';
 export * from './invasion-triggers';
 export * from './invasion-win-loss';
 export * from './logging';

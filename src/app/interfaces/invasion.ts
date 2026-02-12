@@ -82,3 +82,47 @@ export type DetailedInvasionResult = {
   objectivesTotal: number;
   rewardMultiplier: number;
 };
+
+// --- Rewards types ---
+
+import type { InvaderStats } from '@interfaces/invader';
+import type { ResourceType } from '@interfaces/resource';
+
+export type DefenseRewards = {
+  reputationGain: number;
+  experienceGain: number;
+  goldGain: number;
+  resourceGains: Partial<Record<ResourceType, number>>;
+  capturedPrisoners: CapturedPrisoner[];
+};
+
+export type DefensePenalties = {
+  reputationLoss: number;
+  goldLost: number;
+  resourceLosses: Partial<Record<ResourceType, number>>;
+  killedInhabitantIds: string[];
+};
+
+export type CapturedPrisoner = {
+  id: string;
+  invaderClass: InvaderClassType;
+  name: string;
+  stats: InvaderStats;
+  captureDay: number;
+};
+
+export type PrisonerAction =
+  | 'execute'
+  | 'ransom'
+  | 'convert'
+  | 'sacrifice'
+  | 'experiment';
+
+export type PrisonerHandlingResult = {
+  action: PrisonerAction;
+  success: boolean;
+  resourceChanges: Partial<Record<ResourceType, number>>;
+  reputationChange: number;
+  corruptionChange: number;
+  fearChange: number;
+};
