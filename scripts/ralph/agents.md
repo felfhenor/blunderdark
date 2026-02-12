@@ -365,6 +365,22 @@ When adding a new required field to the `Floor` type:
 - `getTrapWorkshopInfo(roomId, state)` returns full workshop state for UI rendering
 - When mocking `@helpers/content` in trap-workshop tests, provide both `getEntriesByType` and `getEntry` mocks
 
+## Invader System
+
+- Invader definitions in `gamedata/invader/base.yml` — 6 classes: Warrior, Rogue, Mage, Cleric, Paladin, Ranger
+- UUID prefix for invaders: `aa900001-0001-0001-0001-00000000000X`
+- `InvaderDefinition` (content type) vs `InvaderInstance` (runtime with HP, status effects, ability states)
+- `InvaderInstance.abilityStates: AbilityState[]` — reuses the same AbilityState type from combat system
+- `InvaderInstance.statusEffects: StatusEffect[]` — tracks named effects with durations (shielded, marked, courage, etc.)
+- `resolveInvaderAbility(invader, ability, targetIds, rng)` — pure function returning `AbilityResult | null`
+- AbilityResult: `{ effectType, value, duration, targetIds, cooldownApplied }` — caller applies results
+- Invader abilities are CombatAbility entries referencing AbilityEffectDefinition by name via `effectType`
+- New ability effects: Heal, Disarm, Magic Damage, Dispel, Fear Immunity, Scout, Mark
+- New combat abilities: Shield Wall, Disarm Trap, Backstab, Arcane Bolt, Dispel, Heal, Turn Undead, Smite Evil, Aura of Courage, Scout, Mark Target
+- **Mock content collision warning**: When mocking `@helpers/content` in tests, do NOT register abilities by name if effect names overlap (e.g., "Scout" effect vs "Scout" ability) — register abilities by ID only
+- `createInvaderInstance(definition)` looks up ability IDs via `getEntry` to initialize ability states
+- Cooldown/status helpers: `applyCooldown`, `tickCooldowns`, `applyStatusEffect`, `tickStatusEffects`, `hasStatusEffect`, `clearStatusEffects`, `applyHealing`
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

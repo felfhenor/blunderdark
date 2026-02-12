@@ -20,8 +20,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "InvaderDefinition type in invader.ts, InvaderInstance with AbilityState[], StatusEffect[]. 6 classes in gamedata/invader/base.yml. YAML folder is 'invader' (not 'invaders')."
     },
     {
       "id": "US-002",
@@ -37,8 +37,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "getAllInvaderDefinitions(), getInvaderDefinitionById(), resolveInvaderAbility() in invaders.ts. Cooldown managed via applyCooldown/tickCooldowns."
     },
     {
       "id": "US-003",
@@ -55,8 +55,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "37 tests in invaders.spec.ts (plural). 998 total tests pass."
     }
   ]
 }

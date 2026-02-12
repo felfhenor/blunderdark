@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 41 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room)
+- **Complete:** 42 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types)
 - **In Progress:** None
-- **Remaining:** ~81 features
+- **Remaining:** ~80 features
 
 ---
 
@@ -120,7 +120,7 @@ The main threat/challenge loop.
 
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
-| 9.1 | `multiple-invader-types` | 3 | none |
+| ~~9.1~~ | ~~`multiple-invader-types`~~ | ~~COMPLETE (3/3)~~ | ~~none~~ |
 | 9.2 | `invader-pathfinding` | 4 | grid-system, hallway-data-structure |
 | 9.3 | `invasion-trigger-system` | 3 | time-system |
 | 9.4 | `invasion-composition-logic` | 4 | multiple-invader-types |
