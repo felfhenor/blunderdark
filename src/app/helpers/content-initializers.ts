@@ -181,7 +181,11 @@ function ensureRoom(
     cost: room.cost ?? {},
     production: room.production ?? {},
     requiresWorkers: room.requiresWorkers ?? false,
-    adjacencyBonuses: room.adjacencyBonuses ?? [],
+    adjacencyBonuses: (room.adjacencyBonuses ?? []).map((b) => ({
+      adjacentRoomType: b.adjacentRoomType ?? '',
+      bonus: b.bonus ?? 0,
+      description: b.description ?? '',
+    })),
     isUnique: room.isUnique ?? false,
     removable: room.removable ?? true,
     maxInhabitants: room.maxInhabitants ?? -1,

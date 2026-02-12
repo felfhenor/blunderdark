@@ -5,6 +5,7 @@ export type RoomProduction = Partial<Record<string, number>>;
 export type AdjacencyBonus = {
   adjacentRoomType: string;
   bonus: number;
+  description: string;
 };
 
 export type RoomUpgradeEffect = {

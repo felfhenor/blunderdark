@@ -112,6 +112,56 @@ export function calculateAdjacencyBonus(
   return totalBonus;
 }
 
+export type ActiveAdjacencyBonus = {
+  sourceRoomId: string;
+  sourceRoomName: string;
+  bonus: number;
+  description: string;
+};
+
+export function getActiveAdjacencyBonuses(
+  placedRoom: PlacedRoom,
+  floor: Floor,
+): ActiveAdjacencyBonus[] {
+  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  if (!roomDef) return [];
+
+  const bonusRules = roomDef.adjacencyBonuses;
+  if (bonusRules.length === 0) return [];
+
+  const roomTiles = new Map<string, TileOffset[]>();
+  for (const room of floor.rooms) {
+    const shape = resolveRoomShape(room);
+    roomTiles.set(
+      room.id,
+      getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+    );
+  }
+
+  const thisTiles = roomTiles.get(placedRoom.id) ?? [];
+  const activeBonuses: ActiveAdjacencyBonus[] = [];
+
+  for (const other of floor.rooms) {
+    if (other.id === placedRoom.id) continue;
+    const otherTiles = roomTiles.get(other.id) ?? [];
+    if (!areRoomsAdjacent(thisTiles, otherTiles)) continue;
+
+    for (const rule of bonusRules) {
+      if (rule.adjacentRoomType === other.roomTypeId) {
+        const otherDef = getRoomDefinition(other.roomTypeId);
+        activeBonuses.push({
+          sourceRoomId: other.id,
+          sourceRoomName: otherDef?.name ?? 'Unknown Room',
+          bonus: rule.bonus,
+          description: rule.description,
+        });
+      }
+    }
+  }
+
+  return activeBonuses;
+}
+
 const STATE_MODIFIERS: Record<InhabitantState, number> = {
   normal: 1.0,
   scared: 0.5,

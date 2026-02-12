@@ -74,10 +74,13 @@
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000002
       bonus: 0.1
+      description: Shared mineral veins between adjacent mines boost extraction.
     - adjacentRoomType: aa100001-0001-0001-0001-000000000006
       bonus: 0.15
+      description: Nearby forge heats rock, making crystal extraction easier.
     - adjacentRoomType: aa100001-0001-0001-0001-000000000004
       bonus: 0.1
+      description: Library scholars identify optimal mining patterns.
   upgradePaths:
     - id: aa200001-0001-0001-0001-000000000001
       name: Deep Vein Extraction
@@ -122,10 +125,13 @@
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000005
       bonus: 0.4
+      description: Soul Well moisture accelerates fungal growth dramatically.
     - adjacentRoomType: aa100001-0001-0001-0001-000000000004
       bonus: 0.15
+      description: Library knowledge improves cultivation techniques.
     - adjacentRoomType: aa100001-0001-0001-0001-000000000006
       bonus: 0.15
+      description: Forge warmth creates ideal growing conditions.
   upgradePaths:
     - id: aa200001-0001-0001-0001-000000000004
       name: Bountiful Harvest
@@ -163,7 +169,10 @@
   production:
     research: 0.8
   requiresWorkers: true
-  adjacencyBonuses: []
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+      bonus: 0.15
+      description: Soul essence enhances arcane research comprehension.
 
 - id: aa100001-0001-0001-0001-000000000005
   name: Soul Well
@@ -175,7 +184,10 @@
   production:
     essence: 0.3
   requiresWorkers: false
-  adjacencyBonuses: []
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000003
+      bonus: 0.2
+      description: Living fungi attract wandering spirits to the well.
 
 - id: aa100001-0001-0001-0001-000000000006
   name: Dark Forge
@@ -190,6 +202,7 @@
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000002
       bonus: 0.15
+      description: Raw crystal ore fuels the forge's smelting process.
 
 - id: aa100001-0001-0001-0001-000000000007
   name: Barracks
@@ -211,4 +224,7 @@
   production:
     gold: 0.8
   requiresWorkers: false
-  adjacencyBonuses: []
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+      bonus: 0.15
+      description: Forged valuables fill the vault more efficiently.

@@ -62,9 +62,9 @@ const mushroomGroveRoom: RoomDefinition & IsContentItem = {
   production: { food: 1.6 },
   requiresWorkers: true,
   adjacencyBonuses: [
-    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.4 },
-    { adjacentRoomType: SHADOW_LIBRARY_ID, bonus: 0.15 },
-    { adjacentRoomType: DARK_FORGE_ID, bonus: 0.15 },
+    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.4, description: '' },
+    { adjacentRoomType: SHADOW_LIBRARY_ID, bonus: 0.15, description: '' },
+    { adjacentRoomType: DARK_FORGE_ID, bonus: 0.15, description: '' },
   ],
   isUnique: false,
   removable: true,

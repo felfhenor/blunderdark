@@ -12,7 +12,7 @@ vi.mock('@helpers/content', () => {
     production: { crystals: 1.0 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomType: 'room-dark-forge', bonus: 0.1 },
+      { adjacentRoomType: 'room-dark-forge', bonus: 0.1, description: 'Forge heats rock' },
     ],
   });
   entries.set('room-throne', {
@@ -48,7 +48,7 @@ vi.mock('@helpers/content', () => {
     production: { gold: 1.2 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomType: 'room-crystal-mine', bonus: 0.15 },
+      { adjacentRoomType: 'room-crystal-mine', bonus: 0.15, description: 'Raw crystal ore fuels forging' },
     ],
   });
 
@@ -158,8 +158,10 @@ import {
   calculateAdjacencyBonus,
   calculateConditionalModifiers,
   calculateInhabitantBonus,
+  calculateProductionBreakdowns,
   calculateSingleRoomProduction,
   calculateTotalProduction,
+  getActiveAdjacencyBonuses,
   getBaseProduction,
   getRoomDefinition,
   processProduction,
@@ -1026,5 +1028,253 @@ describe('productionPerMinute', () => {
 
   it('should handle fractional rates', () => {
     expect(productionPerMinute(0.5)).toBeCloseTo(2.5);
+  });
+});
+
+describe('getActiveAdjacencyBonuses', () => {
+  const crystalMine: PlacedRoom = {
+    id: 'placed-mine-1',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const darkForge: PlacedRoom = {
+    id: 'placed-forge-1',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  const throne: PlacedRoom = {
+    id: 'placed-throne-1',
+    roomTypeId: 'room-throne',
+    shapeId: 'shape-1',
+    anchorX: 4,
+    anchorY: 0,
+  };
+
+  it('should return empty array when room has no bonus rules', () => {
+    const floor = makeFloor([throne, crystalMine]);
+    const bonuses = getActiveAdjacencyBonuses(throne, floor);
+    expect(bonuses).toEqual([]);
+  });
+
+  it('should return empty array when no matching adjacent rooms', () => {
+    const floor = makeFloor([crystalMine, throne]);
+    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    expect(bonuses).toEqual([]);
+  });
+
+  it('should return active bonus when adjacent to matching room', () => {
+    // Mine at (0,0)-(1,0), Forge at (2,0)-(3,0) — adjacent
+    const floor = makeFloor([crystalMine, darkForge]);
+    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    expect(bonuses).toHaveLength(1);
+    expect(bonuses[0].sourceRoomId).toBe('placed-forge-1');
+    expect(bonuses[0].sourceRoomName).toBe('Dark Forge');
+    expect(bonuses[0].bonus).toBeCloseTo(0.1);
+    expect(bonuses[0].description).toBe('Forge heats rock');
+  });
+
+  it('should return bonuses bidirectionally', () => {
+    const floor = makeFloor([crystalMine, darkForge]);
+    const forgeBonuses = getActiveAdjacencyBonuses(darkForge, floor);
+    expect(forgeBonuses).toHaveLength(1);
+    expect(forgeBonuses[0].sourceRoomName).toBe('Crystal Mine');
+    expect(forgeBonuses[0].bonus).toBeCloseTo(0.15);
+  });
+
+  it('should return multiple bonuses when adjacent to multiple matching rooms', () => {
+    const secondForge: PlacedRoom = {
+      id: 'placed-forge-2',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 1,
+    };
+    const floor = makeFloor([crystalMine, darkForge, secondForge]);
+    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    expect(bonuses).toHaveLength(2);
+    expect(bonuses.every((b) => b.bonus === 0.1)).toBe(true);
+  });
+
+  it('should not return bonuses for non-adjacent rooms', () => {
+    const farForge: PlacedRoom = {
+      id: 'placed-forge-far',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 10,
+      anchorY: 10,
+    };
+    const floor = makeFloor([crystalMine, farForge]);
+    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    expect(bonuses).toEqual([]);
+  });
+});
+
+describe('adjacency bonus deactivation on removal', () => {
+  it('should lose adjacency bonus when adjacent room is removed', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const forge: PlacedRoom = {
+      id: 'placed-forge',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+
+    // With forge adjacent: bonus applies
+    const floorWithForge = makeFloor([mine, forge], inhabitants);
+    const prodWith = calculateSingleRoomProduction(mine, floorWithForge);
+    // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
+    expect(prodWith['crystals']).toBeCloseTo(1.3);
+
+    // After removing forge: bonus gone
+    const floorWithoutForge = makeFloor([mine], inhabitants);
+    const prodWithout = calculateSingleRoomProduction(mine, floorWithoutForge);
+    // Base 1.0 * (1 + 0.2 goblin) * 1.0 = 1.2
+    expect(prodWithout['crystals']).toBeCloseTo(1.2);
+  });
+
+  it('should not share adjacency bonuses across floors', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const forge: PlacedRoom = {
+      id: 'placed-forge',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+
+    // Mine on floor 1, forge on floor 2 — no cross-floor adjacency
+    const floor1 = makeFloor([mine], inhabitants);
+    const floor2 = makeFloor([forge]);
+    const production = calculateTotalProduction([floor1, floor2]);
+    // Mine gets NO adjacency bonus (forge is on different floor)
+    // Base 1.0 * (1 + 0.2 goblin) = 1.2
+    expect(production['crystals']).toBeCloseTo(1.2);
+  });
+});
+
+describe('calculateProductionBreakdowns', () => {
+  it('should return empty object when no rooms produce', () => {
+    const floor = makeFloor([]);
+    const breakdowns = calculateProductionBreakdowns([floor]);
+    expect(breakdowns).toEqual({});
+  });
+
+  it('should return base breakdown for passive room', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne',
+      roomTypeId: 'room-throne',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const breakdowns = calculateProductionBreakdowns([floor]);
+    expect(breakdowns['gold']).toBeDefined();
+    expect(breakdowns['gold'].base).toBeCloseTo(0.5);
+    expect(breakdowns['gold'].inhabitantBonus).toBe(0);
+    expect(breakdowns['gold'].adjacencyBonus).toBe(0);
+    expect(breakdowns['gold'].modifierEffect).toBe(0);
+    expect(breakdowns['gold'].final).toBeCloseTo(0.5);
+  });
+
+  it('should include inhabitant bonus in breakdown', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const breakdowns = calculateProductionBreakdowns([floor]);
+    expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
+    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
+    expect(breakdowns['crystals'].final).toBeCloseTo(1.2);
+  });
+
+  it('should include adjacency bonus in breakdown', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine',
+      roomTypeId: 'room-crystal-mine',
+      shapeId: 'shape-1',
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const forge: PlacedRoom = {
+      id: 'placed-forge',
+      roomTypeId: 'room-dark-forge',
+      shapeId: 'shape-1',
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+      {
+        instanceId: 'inst-2',
+        definitionId: 'def-skeleton',
+        name: 'Skeleton',
+        state: 'normal',
+        assignedRoomId: 'placed-forge',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const breakdowns = calculateProductionBreakdowns([floor]);
+    // Mine: base 1.0, iBonus 0.2, aBonus 0.1, final = 1.0 * (1 + 0.2 + 0.1) = 1.3
+    expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
+    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
+    expect(breakdowns['crystals'].adjacencyBonus).toBeCloseTo(0.1);
+    expect(breakdowns['crystals'].final).toBeCloseTo(1.3);
   });
 });
