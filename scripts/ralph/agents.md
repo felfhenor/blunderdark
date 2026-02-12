@@ -291,6 +291,15 @@ BFS pathfinding for hallways between rooms:
 6. Click handler (`handleHallwayTileClick`) uses step-based state machine: `selectSource → selectDestination → preview`
 7. In preview step, clicking a different room updates destination (re-pathfinds)
 
+## Synergy Tooltip Pattern
+
+- `SynergyTooltipComponent` is a sidebar panel (not a hover tooltip) that reads `selectedTile()` and `currentFloor()` via computed()
+- Builds adjacency map internally (same pattern as production.ts) to evaluate synergies for the selected room
+- `getPotentialSynergiesForRoom()` filters synergies where roomType matches but other conditions aren't met — returns missing conditions as human-readable strings
+- `formatSynergyEffect()` formats effect values for display (e.g., "+15% crystals production")
+- `describeCondition()` uses `getRoomDefinition()` from production.ts to get room names for condition descriptions
+- When testing `synergy.ts` functions that import from `@helpers/production`, add `vi.mock('@helpers/production')` to provide `getRoomDefinition` — the mock must be placed before imports (hoisted by vitest)
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
