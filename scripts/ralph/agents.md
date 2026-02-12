@@ -185,6 +185,15 @@ OKLCH color format works in SCSS files — the Angular compiler converts them to
 - `getRoomProductionRates(roomId)` — finds room across floors, returns its individual production
 - Importing `gamestate` from `@helpers/state-game` in helper files is safe — no circular dependency with the production module chain
 
+## Efficiency Calculation System
+
+- `efficiency.ts` imports `getRoomDefinition` from `production.ts` (one-way, safe) — do NOT import from efficiency.ts in production.ts to avoid circular dependency
+- `calculateInhabitantBonus` in production.ts already handles trait-room matching via `targetResourceType` — efficiency.ts provides a separate breakdown for UI display
+- Trait-room matching: traits with `targetResourceType` only apply when the room produces that resource; `undefined` or `'all'` traits apply to any room
+- `InhabitantTrait` has optional `targetResourceType?: string` field — existing traits without it always apply (backwards compatible)
+- `calculateRoomEfficiency(room, inhabitants)` returns per-inhabitant breakdown for UI, while `calculateInhabitantBonus` returns a single bonus number for production
+- When mocking `gamestate()` in tests with partial state, cast through `unknown` first: `as unknown as ReturnType<typeof gamestate>`
+
 ## Room Placement
 
 - `placeRoomOnFloor(floor, room, shape)` — pure function that validates placement, marks grid tiles, and adds room to floor. Returns updated Floor or null.
