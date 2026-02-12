@@ -1,5 +1,8 @@
 import { getEntriesByType } from '@helpers/content';
-import { createInvaderInstance, getAllInvaderDefinitions } from '@helpers/invaders';
+import {
+  createInvaderInstance,
+  getAllInvaderDefinitions,
+} from '@helpers/invaders';
 import { rngChoice } from '@helpers/rng';
 import type {
   CompositionWeightConfig,
@@ -29,9 +32,14 @@ const PROFILE_THRESHOLD = 60;
 
 // --- Data-driven profile lookup ---
 
-let invasionProfileCache: Map<string, { dimension: string; weight: number }> | undefined = undefined;
+let invasionProfileCache:
+  | Map<string, { dimension: string; weight: number }>
+  | undefined = undefined;
 
-function getInvasionProfileMap(): Map<string, { dimension: string; weight: number }> {
+function getInvasionProfileMap(): Map<
+  string,
+  { dimension: string; weight: number }
+> {
   if (!invasionProfileCache) {
     const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
     invasionProfileCache = new Map();
@@ -79,14 +87,20 @@ export function calculateDungeonProfile(state: GameState): DungeonProfile {
 
   // Corruption: resource level + room bonuses
   const corruptionLevel = resources.corruption?.current ?? 0;
-  const corruption = Math.min(100, corruptionLevel + dimensionTotals.corruption);
+  const corruption = Math.min(
+    100,
+    corruptionLevel + dimensionTotals['corruption'],
+  );
 
   // Wealth: gold level + room bonuses
   const goldLevel =
     resources.gold?.max > 0
       ? (resources.gold.current / resources.gold.max) * 50
       : 0;
-  const wealth = Math.min(100, Math.round(goldLevel + Math.min(50, dimensionTotals.wealth)));
+  const wealth = Math.min(
+    100,
+    Math.round(goldLevel + Math.min(50, dimensionTotals['wealth'])),
+  );
 
   // Knowledge: research progress + room bonuses
   const researchBonus = Math.min(
@@ -95,21 +109,20 @@ export function calculateDungeonProfile(state: GameState): DungeonProfile {
   );
   const knowledge = Math.min(
     100,
-    Math.round(researchBonus + Math.min(50, dimensionTotals.knowledge)),
+    Math.round(researchBonus + Math.min(50, dimensionTotals['knowledge'])),
   );
 
   // Threat level: based on game day
-  const threatLevel = Math.min(
-    100,
-    Math.floor((state.clock.day - 1) / 3),
-  );
+  const threatLevel = Math.min(100, Math.floor((state.clock.day - 1) / 3));
 
   return { corruption, wealth, knowledge, size: totalRooms, threatLevel };
 }
 
 // --- Weight configuration ---
 
-export function getCompositionWeightConfig(): CompositionWeightConfig | undefined {
+export function getCompositionWeightConfig():
+  | CompositionWeightConfig
+  | undefined {
   const entries = getEntriesByType<CompositionWeightConfig & IsContentItem>(
     'invasion',
   );
@@ -132,8 +145,7 @@ export function getCompositionWeights(
   if (profile.corruption > PROFILE_THRESHOLD)
     highProfiles.push('highCorruption');
   if (profile.wealth > PROFILE_THRESHOLD) highProfiles.push('highWealth');
-  if (profile.knowledge > PROFILE_THRESHOLD)
-    highProfiles.push('highKnowledge');
+  if (profile.knowledge > PROFILE_THRESHOLD) highProfiles.push('highKnowledge');
 
   if (highProfiles.length === 0) return { ...config.balanced };
 
@@ -166,10 +178,7 @@ export function getCompositionWeights(
  * Determine party size based on dungeon room count.
  * Small (1-10): 3-5, Medium (11-25): 6-10, Large (26+): 11-15.
  */
-export function getPartySize(
-  roomCount: number,
-  rng: () => number,
-): number {
+export function getPartySize(roomCount: number, rng: () => number): number {
   if (roomCount <= 10) return 3 + Math.floor(rng() * 3); // 3-5
   if (roomCount <= 25) return 6 + Math.floor(rng() * 5); // 6-10
   return 11 + Math.floor(rng() * 5); // 11-15
@@ -289,7 +298,8 @@ function ensureClassDiversity(
   while (uniqueClasses.size < 3) {
     // Find a class not yet in the party
     const missingClass = INVADER_CLASSES.find(
-      (cls) => !uniqueClasses.has(cls) && (defsByClass.get(cls)?.length ?? 0) > 0,
+      (cls) =>
+        !uniqueClasses.has(cls) && (defsByClass.get(cls)?.length ?? 0) > 0,
     );
     if (!missingClass) break;
 
@@ -316,7 +326,10 @@ function ensureClassDiversity(
     const defs = defsByClass.get(missingClass) ?? [];
     if (defs.length === 0) break;
 
-    party[replaceIdx] = rngChoice(defs, seedrandom(`diversity-${missingClass}`));
+    party[replaceIdx] = rngChoice(
+      defs,
+      seedrandom(`diversity-${missingClass}`),
+    );
     classCounts[replaceClass]--;
     classCounts[missingClass]++;
     uniqueClasses.add(missingClass);
@@ -338,12 +351,7 @@ export function generateInvasionParty(
   if (!config || invaderDefs.length === 0) return [];
 
   const weights = getCompositionWeights(profile, config);
-  const selected = selectPartyComposition(
-    profile,
-    invaderDefs,
-    weights,
-    seed,
-  );
+  const selected = selectPartyComposition(profile, invaderDefs, weights, seed);
 
   return selected.map((def) => createInvaderInstance(def));
 }

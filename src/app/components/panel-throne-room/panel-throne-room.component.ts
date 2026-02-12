@@ -1,5 +1,5 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { DecimalPipe, KeyValuePipe } from '@angular/common';
 import {
   activeRulerBonuses,
   assignInhabitantToRoom,
@@ -20,7 +20,7 @@ import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 
 @Component({
   selector: 'app-panel-throne-room',
-  imports: [DecimalPipe, KeyValuePipe],
+  imports: [DecimalPipe],
   templateUrl: './panel-throne-room.component.html',
   styleUrl: './panel-throne-room.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,7 +35,8 @@ export class PanelThroneRoomComponent {
     if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('throne')) return undefined;
+    if (!room || room.roomTypeId !== findRoomIdByRole('throne'))
+      return undefined;
 
     return room;
   });
