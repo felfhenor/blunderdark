@@ -31,7 +31,7 @@ function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): Inhabitant
     definitionId: 'goblin',
     name: 'Goblin Worker',
     state: 'normal' as InhabitantState,
-    assignedRoomId: null,
+    assignedRoomId: undefined,
     ...overrides,
   };
 }

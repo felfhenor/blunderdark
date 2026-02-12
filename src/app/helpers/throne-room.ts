@@ -24,9 +24,9 @@ import {
  */
 export function findThroneRoom(
   floors: Floor[],
-): { floor: Floor; room: PlacedRoom } | null {
+): { floor: Floor; room: PlacedRoom } | undefined {
   const throneId = findRoomIdByRole('throne');
-  if (!throneId) return null;
+  if (!throneId) return undefined;
 
   for (const floor of floors) {
     const room = floor.rooms.find(
@@ -34,7 +34,7 @@ export function findThroneRoom(
     );
     if (room) return { floor, room };
   }
-  return null;
+  return undefined;
 }
 
 /**
@@ -43,9 +43,9 @@ export function findThroneRoom(
 export function getSeatedRulerInstance(
   floor: Floor,
   throneRoomId: string,
-): InhabitantInstance | null {
+): InhabitantInstance | undefined {
   return (
-    floor.inhabitants.find((i) => i.assignedRoomId === throneRoomId) ?? null
+    floor.inhabitants.find((i) => i.assignedRoomId === throneRoomId) ?? undefined
   );
 }
 
@@ -54,8 +54,8 @@ export function getSeatedRulerInstance(
  */
 export function getRulerDefinition(
   instance: InhabitantInstance,
-): (InhabitantDefinition & IsContentItem) | null {
-  return getEntry<InhabitantDefinition & IsContentItem>(instance.definitionId) ?? null;
+): (InhabitantDefinition & IsContentItem) | undefined {
+  return getEntry<InhabitantDefinition & IsContentItem>(instance.definitionId) ?? undefined;
 }
 
 /**
@@ -91,10 +91,10 @@ export function getRulerBonusValue(
 /**
  * The currently seated ruler instance, or null if no Throne Room or empty.
  */
-export const seatedRuler = computed<InhabitantInstance | null>(() => {
+export const seatedRuler = computed<InhabitantInstance | undefined>(() => {
   const floors = gamestate().world.floors;
   const throne = findThroneRoom(floors);
-  if (!throne) return null;
+  if (!throne) return undefined;
   return getSeatedRulerInstance(throne.floor, throne.room.id);
 });
 
@@ -122,9 +122,9 @@ export const EMPTY_THRONE_FEAR_LEVEL = 1;
  * Returns the ruler's rulerFearLevel if a ruler is seated.
  * Returns null if the Throne Room is not placed.
  */
-export function getThroneRoomFearLevel(floors: Floor[]): number | null {
+export function getThroneRoomFearLevel(floors: Floor[]): number | undefined {
   const throne = findThroneRoom(floors);
-  if (!throne) return null;
+  if (!throne) return undefined;
 
   const ruler = getSeatedRulerInstance(throne.floor, throne.room.id);
   if (!ruler) return EMPTY_THRONE_FEAR_LEVEL;
@@ -139,7 +139,7 @@ export function getThroneRoomFearLevel(floors: Floor[]): number | null {
  * Reactive computed signal for the Throne Room's fear level.
  * Returns null if no Throne Room is placed.
  */
-export const throneRoomFearLevel = computed<number | null>(() => {
+export const throneRoomFearLevel = computed<number | undefined>(() => {
   return getThroneRoomFearLevel(gamestate().world.floors);
 });
 

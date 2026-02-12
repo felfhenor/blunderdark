@@ -114,7 +114,7 @@ const workshopDef: RoomDefinition & IsContentItem = {
   production: {},
   requiresWorkers: false,
   maxInhabitants: 2,
-  inhabitantRestriction: null,
+  inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
   adjacencyBonuses: [
@@ -199,7 +199,7 @@ function makeGameState(overrides: {
       season: { currentSeason: 'growth', dayInSeason: 1, totalSeasonCycles: 0 },
       research: {
         completedNodes: [],
-        activeResearch: null,
+        activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
       },
@@ -209,7 +209,7 @@ function makeGameState(overrides: {
       trapInventory: overrides.trapInventory ?? [],
       trapCraftingQueues: overrides.trapCraftingQueues ?? [],
       invasionSchedule: {
-        nextInvasionDay: null,
+        nextInvasionDay: undefined,
         nextInvasionVariance: 0,
         gracePeriodEnd: 30,
         invasionHistory: [],

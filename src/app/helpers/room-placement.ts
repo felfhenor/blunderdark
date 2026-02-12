@@ -138,26 +138,26 @@ export const placedRoomTypeIds = computed(() => {
 
 // --- Placement mode state ---
 
-export const selectedRoomTypeId = signal<string | null>(null);
+export const selectedRoomTypeId = signal<string | undefined>(undefined);
 export const placementRotation = signal<Rotation>(0);
 
 /** The base (unrotated) shape for the current placement. */
-const placementBaseShape = signal<RoomShape | null>(null);
+const placementBaseShape = signal<RoomShape | undefined>(undefined);
 
 export function enterPlacementMode(roomTypeId: string, shape: RoomShape): void {
   selectedRoomTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
   placementRotation.set(0);
   placementPreviewShape.set(shape);
-  placementPreviewPosition.set(null);
+  placementPreviewPosition.set(undefined);
 }
 
 export function exitPlacementMode(): void {
-  selectedRoomTypeId.set(null);
-  placementBaseShape.set(null);
+  selectedRoomTypeId.set(undefined);
+  placementBaseShape.set(undefined);
   placementRotation.set(0);
-  placementPreviewShape.set(null);
-  placementPreviewPosition.set(null);
+  placementPreviewShape.set(undefined);
+  placementPreviewPosition.set(undefined);
 }
 
 /** Rotate the placement preview by 90° clockwise. */
@@ -175,16 +175,16 @@ export type PreviewTile = TileOffset & {
   inBounds: boolean;
 };
 
-export const placementPreviewShape = signal<RoomShape | null>(null);
-export const placementPreviewPosition = signal<TileOffset | null>(null);
+export const placementPreviewShape = signal<RoomShape | undefined>(undefined);
+export const placementPreviewPosition = signal<TileOffset | undefined>(undefined);
 
 export const placementPreview = computed(() => {
   const shape = placementPreviewShape();
   const position = placementPreviewPosition();
-  if (!shape || !position) return null;
+  if (!shape || !position) return undefined;
 
   const floor = currentFloor();
-  if (!floor) return null;
+  if (!floor) return undefined;
 
   const grid = floor.grid;
   const validation = validatePlacement(shape, position.x, position.y, grid);
@@ -201,11 +201,11 @@ export const placementPreview = computed(() => {
 });
 
 export function setPlacementPreview(
-  shape: RoomShape | null,
-  position?: TileOffset | null,
+  shape: RoomShape | undefined,
+  position?: TileOffset | undefined,
 ): void {
   placementPreviewShape.set(shape);
-  placementPreviewPosition.set(position ?? null);
+  placementPreviewPosition.set(position ?? undefined);
 }
 
 export function updatePreviewPosition(x: number, y: number): void {
@@ -214,12 +214,12 @@ export function updatePreviewPosition(x: number, y: number): void {
 }
 
 export function clearPreviewPosition(): void {
-  placementPreviewPosition.set(null);
+  placementPreviewPosition.set(undefined);
 }
 
 export function clearPlacementPreview(): void {
-  placementPreviewShape.set(null);
-  placementPreviewPosition.set(null);
+  placementPreviewShape.set(undefined);
+  placementPreviewPosition.set(undefined);
 }
 
 // --- Placement error messages ---
@@ -329,14 +329,14 @@ export function placeRoomOnFloor(
   floor: Floor,
   room: PlacedRoom,
   shape: RoomShape,
-): Floor | null {
+): Floor | undefined {
   const validation = validatePlacement(
     shape,
     room.anchorX,
     room.anchorY,
     floor.grid,
   );
-  if (!validation.valid) return null;
+  if (!validation.valid) return undefined;
 
   const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
   const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
@@ -346,8 +346,8 @@ export function placeRoomOnFloor(
       occupied: true,
       occupiedBy: 'room',
       roomId: room.id,
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     };
   }
 
@@ -362,9 +362,9 @@ export function removeRoomFromFloor(
   floor: Floor,
   roomId: string,
   shape: RoomShape,
-): Floor | null {
+): Floor | undefined {
   const room = floor.rooms.find((r) => r.id === roomId);
-  if (!room) return null;
+  if (!room) return undefined;
 
   const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
   const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
@@ -381,7 +381,7 @@ export function removeRoomFromFloor(
         newGrid[t.y][t.x] = {
           occupied: false,
           occupiedBy: 'empty',
-          roomId: null,
+          roomId: undefined,
           hallwayId: gridTile.hallwayId,
           connectionType: gridTile.connectionType,
         };
@@ -402,16 +402,16 @@ export async function placeRoom(
   anchorX: number,
   anchorY: number,
   rotation: Rotation = 0,
-): Promise<PlacedRoom | null> {
+): Promise<PlacedRoom | undefined> {
   const baseShape = getRoomShape(shapeId);
-  if (!baseShape) return null;
+  if (!baseShape) return undefined;
 
   const shape = getRotatedShape(baseShape, rotation);
 
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
-  if (!floor) return null;
+  if (!floor) return undefined;
 
   const room: PlacedRoom = {
     id: rngUuid(),
@@ -423,7 +423,7 @@ export async function placeRoom(
   };
 
   const updatedFloor = placeRoomOnFloor(floor, room, shape);
-  if (!updatedFloor) return null;
+  if (!updatedFloor) return undefined;
 
   await updateGamestate((s) => {
     const newFloors = [...s.world.floors];

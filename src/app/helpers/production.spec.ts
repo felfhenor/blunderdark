@@ -627,7 +627,7 @@ function makeGameState(
       },
       research: {
         completedNodes: [],
-        activeResearch: null,
+        activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
       },
@@ -643,7 +643,7 @@ function makeGameState(
       trapInventory: [],
       trapCraftingQueues: [],
       invasionSchedule: {
-        nextInvasionDay: null,
+        nextInvasionDay: undefined,
         nextInvasionVariance: 0,
         gracePeriodEnd: 30,
         invasionHistory: [],
@@ -989,7 +989,7 @@ describe('production changes on assignment state changes', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 2',
         state: 'normal',
-        assignedRoomId: null,
+        assignedRoomId: undefined,
       },
     ]);
     const prodOne = calculateSingleRoomProduction(mine, floorOne);

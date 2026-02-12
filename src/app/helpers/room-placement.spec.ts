@@ -119,8 +119,8 @@ describe('validateNoOverlap', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'existing-room',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
 
     const result = validateNoOverlap(square2x2, 5, 5, grid);
@@ -135,8 +135,8 @@ describe('validateNoOverlap', () => {
       occupied: true,
       occupiedBy: 'room' as const,
       roomId: 'existing-room',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     };
     grid = setTile(grid, 5, 5, occupiedTile);
     grid = setTile(grid, 6, 5, occupiedTile);
@@ -154,8 +154,8 @@ describe('validateNoOverlap', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'existing-room',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
 
     const result = validateNoOverlap(square2x2, 5, 5, grid);
@@ -184,8 +184,8 @@ describe('validatePlacement', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'existing-room',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
 
     const result = validatePlacement(square2x2, 5, 5, grid);
@@ -200,8 +200,8 @@ describe('validatePlacement', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'existing-room',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
 
     const result = validatePlacement(square2x2, 19, 0, grid);
@@ -275,7 +275,7 @@ describe('placeRoomOnFloor', () => {
     };
     const result = placeRoomOnFloor(floor, room, square2x2);
 
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-1');
 
@@ -288,7 +288,7 @@ describe('placeRoomOnFloor', () => {
     expect(result!.grid[6][6].roomId).toBe('room-1');
   });
 
-  it('should return null for invalid placement (out of bounds)', () => {
+  it('should return undefined for invalid placement (out of bounds)', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
       id: 'room-1',
@@ -298,10 +298,10 @@ describe('placeRoomOnFloor', () => {
       anchorY: 19,
     };
     const result = placeRoomOnFloor(floor, room, square2x2);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
-  it('should return null for overlapping placement', () => {
+  it('should return undefined for overlapping placement', () => {
     const floor = makeFloor();
     const room1: PlacedRoom = {
       id: 'room-1',
@@ -320,7 +320,7 @@ describe('placeRoomOnFloor', () => {
       anchorY: 6,
     };
     const result = placeRoomOnFloor(placed, room2, square2x2);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should allow placing non-overlapping rooms', () => {
@@ -342,7 +342,7 @@ describe('placeRoomOnFloor', () => {
       anchorY: 0,
     };
     const result = placeRoomOnFloor(placed, room2, square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(2);
   });
 
@@ -375,19 +375,19 @@ describe('removeRoomFromFloor', () => {
     const placed = placeRoomOnFloor(floor, room, square2x2)!;
 
     const result = removeRoomFromFloor(placed, 'room-1', square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
     expect(result!.grid[5][5].occupied).toBe(false);
-    expect(result!.grid[5][5].roomId).toBeNull();
+    expect(result!.grid[5][5].roomId).toBeUndefined();
     expect(result!.grid[5][6].occupied).toBe(false);
     expect(result!.grid[6][5].occupied).toBe(false);
     expect(result!.grid[6][6].occupied).toBe(false);
   });
 
-  it('should return null for non-existent room', () => {
+  it('should return undefined for non-existent room', () => {
     const floor = makeFloor();
     const result = removeRoomFromFloor(floor, 'nonexistent', square2x2);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should only remove the specified room', () => {
@@ -410,7 +410,7 @@ describe('removeRoomFromFloor', () => {
     placed = placeRoomOnFloor(placed, room2, square2x2)!;
 
     const result = removeRoomFromFloor(placed, 'room-1', square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
     // room-1 tiles cleared

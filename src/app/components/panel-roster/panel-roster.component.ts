@@ -27,7 +27,7 @@ type RosterFilter = 'all' | 'assigned' | 'unassigned';
 type RosterEntry = {
   instance: InhabitantInstance;
   def: InhabitantDefinition & IsContentItem;
-  roomName: string | null;
+  roomName: string | undefined;
 };
 
 @Component({
@@ -38,7 +38,7 @@ type RosterEntry = {
 })
 export class PanelRosterComponent {
   public activeFilter = signal<RosterFilter>('all');
-  public selectedInhabitantId = signal<string | null>(null);
+  public selectedInhabitantId = signal<string | undefined>(undefined);
 
   private allEntries = computed<RosterEntry[]>(() => {
     const state = gamestate();
@@ -50,9 +50,9 @@ export class PanelRosterComponent {
         const def = getEntry<InhabitantDefinition & IsContentItem>(
           inst.definitionId,
         );
-        if (!def) return null;
+        if (!def) return undefined;
 
-        let roomName: string | null = null;
+        let roomName: string | undefined = undefined;
         if (inst.assignedRoomId) {
           for (const floor of floors) {
             const room = floor.rooms.find(
@@ -68,20 +68,20 @@ export class PanelRosterComponent {
 
         return { instance: inst, def, roomName } as RosterEntry;
       })
-      .filter((e): e is RosterEntry => e !== null);
+      .filter((e): e is RosterEntry => e !== undefined);
   });
 
   public allCount = computed(() => this.allEntries().length);
 
   public assignedCount = computed(
     () =>
-      this.allEntries().filter((e) => e.instance.assignedRoomId !== null)
+      this.allEntries().filter((e) => e.instance.assignedRoomId !== undefined)
         .length,
   );
 
   public unassignedCount = computed(
     () =>
-      this.allEntries().filter((e) => e.instance.assignedRoomId === null)
+      this.allEntries().filter((e) => e.instance.assignedRoomId === undefined)
         .length,
   );
 
@@ -89,16 +89,16 @@ export class PanelRosterComponent {
     const filter = this.activeFilter();
     const entries = this.allEntries();
     if (filter === 'assigned')
-      return entries.filter((e) => e.instance.assignedRoomId !== null);
+      return entries.filter((e) => e.instance.assignedRoomId !== undefined);
     if (filter === 'unassigned')
-      return entries.filter((e) => e.instance.assignedRoomId === null);
+      return entries.filter((e) => e.instance.assignedRoomId === undefined);
     return entries;
   });
 
-  public selectedEntry = computed<RosterEntry | null>(() => {
+  public selectedEntry = computed<RosterEntry | undefined>(() => {
     const id = this.selectedInhabitantId();
-    if (!id) return null;
-    return this.allEntries().find((e) => e.instance.instanceId === id) ?? null;
+    if (!id) return undefined;
+    return this.allEntries().find((e) => e.instance.instanceId === id) ?? undefined;
   });
 
   public availableRooms = computed(() => {
@@ -140,12 +140,12 @@ export class PanelRosterComponent {
   public selectInhabitant(instanceId: string): void {
     const current = this.selectedInhabitantId();
     this.selectedInhabitantId.set(
-      current === instanceId ? null : instanceId,
+      current === instanceId ? undefined : instanceId,
     );
   }
 
   public closeDetail(): void {
-    this.selectedInhabitantId.set(null);
+    this.selectedInhabitantId.set(undefined);
   }
 
   public async onAssignToRoom(
@@ -157,7 +157,7 @@ export class PanelRosterComponent {
     if (!entry) return;
 
     // If already assigned, unassign first
-    if (entry.instance.assignedRoomId !== null) {
+    if (entry.instance.assignedRoomId !== undefined) {
       await unassignInhabitantFromRoom(instanceId);
     }
 

@@ -179,27 +179,27 @@ describe('addConnectionToFloor', () => {
   it('should add a new connection', () => {
     const floor = makeFloor({ connections: [] });
     const result = addConnectionToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.floor.connections).toHaveLength(1);
     expect(result!.connection.roomAId).toBe('room-a');
     expect(result!.connection.roomBId).toBe('room-b');
     expect(result!.connection.edgeTiles).toEqual([{ x: 2, y: 0 }]);
   });
 
-  it('should return null for duplicate connection', () => {
+  it('should return undefined for duplicate connection', () => {
     const floor = makeFloor({
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
     const result = addConnectionToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
-  it('should return null for duplicate connection in reverse order', () => {
+  it('should return undefined for duplicate connection in reverse order', () => {
     const floor = makeFloor({
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
     const result = addConnectionToFloor(floor, 'room-b', 'room-a', [{ x: 2, y: 0 }]);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {
@@ -218,15 +218,15 @@ describe('removeConnectionFromFloor', () => {
       ],
     });
     const result = removeConnectionFromFloor(floor, 'conn-1');
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.connections).toHaveLength(1);
     expect(result!.connections[0].id).toBe('conn-2');
   });
 
-  it('should return null for nonexistent connection ID', () => {
+  it('should return undefined for nonexistent connection ID', () => {
     const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' })] });
     const result = removeConnectionFromFloor(floor, 'conn-99');
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {

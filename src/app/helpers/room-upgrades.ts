@@ -20,11 +20,11 @@ export function getUpgradePaths(roomTypeId: string): RoomUpgradePath[] {
 
 export function getAppliedUpgrade(
   placedRoom: PlacedRoom,
-): RoomUpgradePath | null {
-  if (!placedRoom.appliedUpgradePathId) return null;
+): RoomUpgradePath | undefined {
+  if (!placedRoom.appliedUpgradePathId) return undefined;
 
   const paths = getUpgradePaths(placedRoom.roomTypeId);
-  return paths.find((p) => p.id === placedRoom.appliedUpgradePathId) ?? null;
+  return paths.find((p) => p.id === placedRoom.appliedUpgradePathId) ?? undefined;
 }
 
 export function getAppliedUpgradeEffects(

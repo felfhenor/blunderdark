@@ -201,7 +201,7 @@ function ensureRoom(
     isUnique: room.isUnique ?? false,
     removable: room.removable ?? true,
     maxInhabitants: room.maxInhabitants ?? -1,
-    inhabitantRestriction: room.inhabitantRestriction ?? null,
+    inhabitantRestriction: room.inhabitantRestriction ?? undefined,
     fearLevel: room.fearLevel ?? 0,
     fearReductionAura: room.fearReductionAura ?? 0,
     upgradePaths: room.upgradePaths ?? [],
@@ -290,8 +290,8 @@ function ensureAbilityEffect(
     name: effect.name ?? 'UNKNOWN',
     __type: 'abilityeffect',
     dealsDamage: effect.dealsDamage ?? false,
-    statusName: effect.statusName ?? null,
-    overrideTargetsHit: effect.overrideTargetsHit ?? null,
+    statusName: effect.statusName ?? undefined,
+    overrideTargetsHit: effect.overrideTargetsHit ?? undefined,
   };
 }
 

@@ -29,7 +29,7 @@ const PROFILE_THRESHOLD = 60;
 
 // --- Data-driven profile lookup ---
 
-let invasionProfileCache: Map<string, { dimension: string; weight: number }> | null = null;
+let invasionProfileCache: Map<string, { dimension: string; weight: number }> | undefined = undefined;
 
 function getInvasionProfileMap(): Map<string, { dimension: string; weight: number }> {
   if (!invasionProfileCache) {
@@ -45,7 +45,7 @@ function getInvasionProfileMap(): Map<string, { dimension: string; weight: numbe
 }
 
 export function resetInvasionCompositionCache(): void {
-  invasionProfileCache = null;
+  invasionProfileCache = undefined;
 }
 
 // --- Dungeon profile ---

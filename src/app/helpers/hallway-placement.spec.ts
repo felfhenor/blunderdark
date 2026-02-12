@@ -8,8 +8,8 @@ function roomTile(roomId: string): GridTile {
     occupied: true,
     occupiedBy: 'room',
     roomId,
-    hallwayId: null,
-    connectionType: null,
+    hallwayId: undefined,
+    connectionType: undefined,
   };
 }
 
@@ -33,7 +33,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).not.toBeNull();
+    expect(path).toBeDefined();
     expect(path!.length).toBe(2);
     expect(path![0]).toEqual({ x: 4, y: 5 });
     expect(path![1]).toEqual({ x: 5, y: 5 });
@@ -46,7 +46,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).not.toBeNull();
+    expect(path).toBeDefined();
     expect(path!.length).toBe(1);
     expect(path![0]).toEqual({ x: 4, y: 5 });
   });
@@ -58,7 +58,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).not.toBeNull();
+    expect(path).toBeDefined();
     // Path routes through empty tiles adjacent to both rooms
     expect(path!.length).toBeGreaterThanOrEqual(2);
   });
@@ -69,7 +69,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-a');
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should return null when path is blocked', () => {
@@ -84,7 +84,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should find a path around obstacles', () => {
@@ -101,7 +101,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).not.toBeNull();
+    expect(path).toBeDefined();
     expect(path!.length).toBeGreaterThan(2);
     // Path should go through the gap at (4,3)
     expect(path!.some((t) => t.x === 4 && t.y === 3)).toBe(true);
@@ -113,7 +113,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should find shortest path (BFS guarantees this)', () => {
@@ -123,7 +123,7 @@ describe('findHallwayPath', () => {
     ]);
 
     const path = findHallwayPath(grid, 'room-a', 'room-b');
-    expect(path).not.toBeNull();
+    expect(path).toBeDefined();
     expect(path!.length).toBe(2);
   });
 });

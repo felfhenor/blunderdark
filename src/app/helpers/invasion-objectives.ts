@@ -23,7 +23,7 @@ function getInhabitantTier(definitionId: string): number {
 
 // --- Data-driven room lookup for objectives ---
 
-let objectiveTypeCache: Map<string, string[]> | null = null;
+let objectiveTypeCache: Map<string, string[]> | undefined = undefined;
 
 function getObjectiveTypeMap(): Map<string, string[]> {
   if (!objectiveTypeCache) {
@@ -44,16 +44,16 @@ function getObjectiveTypeMap(): Map<string, string[]> {
 }
 
 export function resetInvasionObjectivesCache(): void {
-  objectiveTypeCache = null;
+  objectiveTypeCache = undefined;
 }
 
 function findRoomByObjectiveType(
   state: GameState,
   objectiveType: string,
-): string | null {
+): string | undefined {
   const map = getObjectiveTypeMap();
   const roomTypeIds = map.get(objectiveType);
-  if (!roomTypeIds || roomTypeIds.length === 0) return null;
+  if (!roomTypeIds || roomTypeIds.length === 0) return undefined;
 
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
@@ -62,14 +62,14 @@ function findRoomByObjectiveType(
       }
     }
   }
-  return null;
+  return undefined;
 }
 
 function hasRoomWithObjectiveType(
   state: GameState,
   objectiveType: string,
 ): boolean {
-  return findRoomByObjectiveType(state, objectiveType) !== null;
+  return findRoomByObjectiveType(state, objectiveType) !== undefined;
 }
 
 // --- Objective definitions ---
@@ -79,7 +79,7 @@ type ObjectiveTemplate = {
   name: string;
   description: string;
   isEligible: (state: GameState) => boolean;
-  getTargetId: (state: GameState) => string | null;
+  getTargetId: (state: GameState) => string | undefined;
 };
 
 const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
@@ -93,7 +93,7 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
       const target = state.world.inhabitants.find(
         (i) => getInhabitantTier(i.definitionId) >= 2,
       );
-      return target?.instanceId ?? null;
+      return target?.instanceId ?? undefined;
     },
   },
   {
@@ -129,14 +129,14 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
     name: 'Rescue Prisoner',
     description: 'Free a captive creature from the dungeon.',
     isEligible: (state) => state.world.inhabitants.length > 0,
-    getTargetId: (state) => state.world.inhabitants[0]?.instanceId ?? null,
+    getTargetId: (state) => state.world.inhabitants[0]?.instanceId ?? undefined,
   },
   {
     type: 'ScoutDungeon',
     name: 'Scout Dungeon',
     description: 'Map the dungeon layout for future invasions.',
     isEligible: () => true,
-    getTargetId: () => null,
+    getTargetId: () => undefined,
   },
 ];
 
@@ -197,9 +197,9 @@ export function assignInvasionObjectives(
   return objectives;
 }
 
-function findAltarRoomId(state: GameState): string | null {
+function findAltarRoomId(state: GameState): string | undefined {
   const altarTypeId = findRoomIdByRole('altar');
-  if (!altarTypeId) return null;
+  if (!altarTypeId) return undefined;
 
   for (const floor of state.world.floors) {
     const altar = floor.rooms.find(
@@ -207,7 +207,7 @@ function findAltarRoomId(state: GameState): string | null {
     );
     if (altar) return altar.id;
   }
-  return null;
+  return undefined;
 }
 
 // --- Progress tracking ---

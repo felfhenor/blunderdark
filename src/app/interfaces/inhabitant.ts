@@ -54,7 +54,7 @@ export type InhabitantInstance = {
   definitionId: string;
   name: string;
   state: InhabitantState;
-  assignedRoomId: string | null;
+  assignedRoomId: string | undefined;
   trained?: boolean;
   trainingProgress?: number;
   trainingBonuses?: TrainingBonuses;

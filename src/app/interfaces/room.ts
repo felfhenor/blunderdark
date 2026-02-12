@@ -35,7 +35,7 @@ export type RoomDefinition = {
   isUnique: boolean;
   removable: boolean;
   maxInhabitants: number;
-  inhabitantRestriction: string | null;
+  inhabitantRestriction: string | undefined;
   fearLevel: number | 'variable';
   fearReductionAura: number;
   upgradePaths: RoomUpgradePath[];

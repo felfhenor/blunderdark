@@ -25,13 +25,13 @@ export class PanelTrainingGroundsComponent {
   public trainingRoom = computed(() => {
     const tile = selectedTile();
     const floor = currentFloor();
-    if (!tile || !floor) return null;
+    if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return null;
+    if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('trainingGrounds')) return null;
+    if (!room || room.roomTypeId !== findRoomIdByRole('trainingGrounds')) return undefined;
 
     return getTrainingRoomInfo(room.id);
   });
@@ -69,9 +69,9 @@ export class PanelTrainingGroundsComponent {
     return info.targetTicks / TICKS_PER_MINUTE;
   });
 
-  public expectedBonuses = computed<TrainingBonuses | null>(() => {
+  public expectedBonuses = computed<TrainingBonuses | undefined>(() => {
     const info = this.trainingRoom();
-    if (!info) return null;
+    if (!info) return undefined;
     return info.bonuses;
   });
 }

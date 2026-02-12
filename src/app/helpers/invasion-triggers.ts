@@ -40,8 +40,8 @@ export function isInGracePeriod(
 
 export function getLastInvasionDay(
   schedule: InvasionSchedule,
-): number | null {
-  if (schedule.invasionHistory.length === 0) return null;
+): number | undefined {
+  if (schedule.invasionHistory.length === 0) return undefined;
   return schedule.invasionHistory[schedule.invasionHistory.length - 1].day;
 }
 
@@ -51,7 +51,7 @@ export function getLastInvasionDay(
  */
 export function calculateNextInvasionDay(
   currentDay: number,
-  lastInvasionDay: number | null,
+  lastInvasionDay: number | undefined,
   gracePeriodEnd: number,
   rng: PRNG,
 ): { day: number; variance: number } {
@@ -67,7 +67,7 @@ export function calculateNextInvasionDay(
 
   // Min 3 days between consecutive invasions
   if (
-    lastInvasionDay !== null &&
+    lastInvasionDay !== undefined &&
     nextDay - lastInvasionDay < MIN_DAYS_BETWEEN_INVASIONS
   ) {
     nextDay = lastInvasionDay + MIN_DAYS_BETWEEN_INVASIONS;
@@ -80,7 +80,7 @@ export function shouldTriggerInvasion(
   schedule: InvasionSchedule,
   currentDay: number,
 ): boolean {
-  if (schedule.nextInvasionDay === null) return false;
+  if (schedule.nextInvasionDay === undefined) return false;
   return currentDay >= schedule.nextInvasionDay;
 }
 
@@ -92,7 +92,7 @@ export function shouldShowWarning(
   schedule: InvasionSchedule,
   currentTime: GameTime,
 ): boolean {
-  if (schedule.nextInvasionDay === null) return false;
+  if (schedule.nextInvasionDay === undefined) return false;
 
   const invasionTime: GameTime = {
     day: schedule.nextInvasionDay,
@@ -148,7 +148,7 @@ export function processInvasionSchedule(
   if (isInGracePeriod(currentDay, schedule.gracePeriodEnd)) return;
 
   // If no invasion scheduled, schedule one
-  if (schedule.nextInvasionDay === null) {
+  if (schedule.nextInvasionDay === undefined) {
     const result = calculateNextInvasionDay(
       currentDay,
       getLastInvasionDay(schedule),

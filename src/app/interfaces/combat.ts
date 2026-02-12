@@ -20,8 +20,8 @@ export type AbilityTargetType = 'single' | 'aoe' | 'self';
 export type AbilityEffectDefinition = IsContentItem & {
   __type: 'abilityeffect';
   dealsDamage: boolean;
-  statusName: string | null;
-  overrideTargetsHit: number | null;
+  statusName: string | undefined;
+  overrideTargetsHit: number | undefined;
 };
 
 export type CombatAbility = IsContentItem & {
@@ -49,6 +49,6 @@ export type AbilityActivation = {
   targetType: AbilityTargetType;
   damage: number;
   targetsHit: number;
-  statusApplied: string | null;
+  statusApplied: string | undefined;
   statusDuration: number;
 };

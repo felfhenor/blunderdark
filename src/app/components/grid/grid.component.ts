@@ -111,23 +111,23 @@ export class GridComponent {
   });
 
   public getAssignmentInfo(
-    roomId: string | null,
-  ): { current: number; max: number; status: 'full' | 'partial' | 'empty' } | null {
-    if (!roomId) return null;
-    return this.roomAssignmentMap().get(roomId) ?? null;
+    roomId: string | undefined,
+  ): { current: number; max: number; status: 'full' | 'partial' | 'empty' } | undefined {
+    if (!roomId) return undefined;
+    return this.roomAssignmentMap().get(roomId) ?? undefined;
   }
 
-  public getRoomColor(roomId: string | null): string | null {
-    if (!roomId) return null;
-    return this.roomInfoMap().get(roomId)?.color ?? null;
+  public getRoomColor(roomId: string | undefined): string | undefined {
+    if (!roomId) return undefined;
+    return this.roomInfoMap().get(roomId)?.color ?? undefined;
   }
 
-  public getRoomName(roomId: string | null): string | null {
-    if (!roomId) return null;
-    return this.roomInfoMap().get(roomId)?.name ?? null;
+  public getRoomName(roomId: string | undefined): string | undefined {
+    if (!roomId) return undefined;
+    return this.roomInfoMap().get(roomId)?.name ?? undefined;
   }
 
-  public isRoomAnchor(x: number, y: number, roomId: string | null): boolean {
+  public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {
     if (!roomId) return false;
     const floor = currentFloor();
     if (!floor) return false;
@@ -137,7 +137,7 @@ export class GridComponent {
 
   private previewTileSet = computed(() => {
     const preview = this.placementPreview();
-    if (!preview) return null;
+    if (!preview) return undefined;
     const set = new Set<string>();
     for (const t of preview.tiles) {
       if (t.inBounds) {
@@ -203,12 +203,12 @@ export class GridComponent {
 
   public isPreviewValid(x: number, y: number): boolean {
     const data = this.previewTileSet();
-    return data !== null && data.valid && data.set.has(`${x},${y}`);
+    return data !== undefined && data.valid && data.set.has(`${x},${y}`);
   }
 
   public isPreviewInvalid(x: number, y: number): boolean {
     const data = this.previewTileSet();
-    return data !== null && !data.valid && data.set.has(`${x},${y}`);
+    return data !== undefined && !data.valid && data.set.has(`${x},${y}`);
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
@@ -246,7 +246,7 @@ export class GridComponent {
     return this.hallwayPathSet().has(`${x},${y}`);
   }
 
-  public isHallwaySourceRoom(roomId: string | null): boolean {
+  public isHallwaySourceRoom(roomId: string | undefined): boolean {
     if (!roomId) return false;
     return hallwaySourceRoomId() === roomId;
   }

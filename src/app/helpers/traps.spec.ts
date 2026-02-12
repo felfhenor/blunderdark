@@ -113,9 +113,9 @@ function makeTile(overrides: Partial<GridTile> = {}): GridTile {
   return {
     occupied: false,
     occupiedBy: 'empty',
-    roomId: null,
-    hallwayId: null,
-    connectionType: null,
+    roomId: undefined,
+    hallwayId: undefined,
+    connectionType: undefined,
     ...overrides,
   };
 }
@@ -236,12 +236,12 @@ describe('Trap Inventory', () => {
         { trapTypeId: PIT_TRAP_ID, count: 1 },
       ];
       const result = removeFromTrapInventory(inventory, PIT_TRAP_ID, 5);
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     it('should return null if trap type not in inventory', () => {
       const result = removeFromTrapInventory([], PIT_TRAP_ID, 1);
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
   });
 
@@ -329,7 +329,7 @@ describe('Trap Placement', () => {
       const floor = makeFloor({ grid });
 
       const result = placeTrap(floor, PIT_TRAP_ID, 1, 3);
-      expect(result).not.toBeNull();
+      expect(result).toBeDefined();
       expect(result!.trap.trapTypeId).toBe(PIT_TRAP_ID);
       expect(result!.trap.hallwayId).toBe('h-1');
       expect(result!.trap.tileX).toBe(1);
@@ -342,7 +342,7 @@ describe('Trap Placement', () => {
     it('should return null for invalid placement', () => {
       const floor = makeFloor();
       const result = placeTrap(floor, PIT_TRAP_ID, 0, 0);
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     it('should return null for unknown trap type', () => {
@@ -355,7 +355,7 @@ describe('Trap Placement', () => {
       const floor = makeFloor({ grid });
 
       const result = placeTrap(floor, 'nonexistent-id', 0, 0);
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     it('should set charges from trap definition', () => {
@@ -378,7 +378,7 @@ describe('Trap Placement', () => {
       const floor = makeFloor({ traps: [trap] });
 
       const result = removeTrap(floor, 'trap-to-remove');
-      expect(result).not.toBeNull();
+      expect(result).toBeDefined();
       expect(result!.trap.id).toBe('trap-to-remove');
       expect(result!.floor.traps).toHaveLength(0);
     });
@@ -386,7 +386,7 @@ describe('Trap Placement', () => {
     it('should return null for non-existent trap', () => {
       const floor = makeFloor();
       const result = removeTrap(floor, 'nonexistent');
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     it('should only remove the specified trap', () => {

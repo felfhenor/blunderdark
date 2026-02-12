@@ -59,16 +59,16 @@ export function resolveInvaderAbility(
   ability: CombatAbility,
   targetIds: string[],
   rng: () => number = Math.random,
-): AbilityResult | null {
+): AbilityResult | undefined {
   // Check cooldown
   const state = invader.abilityStates.find((s) => s.abilityId === ability.id);
-  if (!state || state.currentCooldown > 0) return null;
+  if (!state || state.currentCooldown > 0) return undefined;
 
   // Look up effect definition by ability's effectType (name-based lookup)
   const effect = getEntry<AbilityEffectDefinition & IsContentItem>(
     ability.effectType,
   );
-  if (!effect) return null;
+  if (!effect) return undefined;
 
   let value = 0;
 

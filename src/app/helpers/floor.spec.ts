@@ -197,7 +197,7 @@ describe('canCreateFloor', () => {
 describe('createFloor', () => {
   it('should create floor at next depth with default neutral biome', async () => {
     const floor = await createFloor();
-    expect(floor).not.toBeNull();
+    expect(floor).toBeDefined();
     expect(floor?.depth).toBe(4);
     expect(floor?.biome).toBe('neutral');
     expect(floor?.rooms).toEqual([]);
@@ -207,11 +207,11 @@ describe('createFloor', () => {
 
   it('should create floor with specified biome', async () => {
     const floor = await createFloor('volcanic');
-    expect(floor).not.toBeNull();
+    expect(floor).toBeDefined();
     expect(floor?.biome).toBe('volcanic');
   });
 
-  it('should return null when max floors reached', async () => {
+  it('should return undefined when max floors reached', async () => {
     mockGamestate.mockReturnValue({
       world: {
         floors: Array.from({ length: 10 }, (_, i) =>
@@ -222,15 +222,15 @@ describe('createFloor', () => {
     });
 
     const floor = await createFloor();
-    expect(floor).toBeNull();
+    expect(floor).toBeUndefined();
     expect(mockPayCost).not.toHaveBeenCalled();
   });
 
-  it('should return null when payCost fails', async () => {
+  it('should return undefined when payCost fails', async () => {
     mockPayCost.mockResolvedValue(false);
 
     const floor = await createFloor();
-    expect(floor).toBeNull();
+    expect(floor).toBeUndefined();
     expect(mockUpdateGamestate).not.toHaveBeenCalled();
   });
 

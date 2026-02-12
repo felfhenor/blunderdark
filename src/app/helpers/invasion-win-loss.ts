@@ -77,13 +77,13 @@ export function isTurnLimitReached(state: InvasionState): boolean {
 // --- Main win/loss check ---
 
 /**
- * Check if the invasion should end. Returns the end reason, or null if ongoing.
+ * Check if the invasion should end. Returns the end reason, or undefined if ongoing.
  * Priority: altar destroyed > objectives completed > all invaders eliminated > turn limit.
  */
 export function checkInvasionEnd(
   state: InvasionState,
-): InvasionEndReason | null {
-  if (!state.isActive) return null;
+): InvasionEndReason | undefined {
+  if (!state.isActive) return undefined;
 
   // Invader victory conditions (checked first — losing takes priority)
   if (isAltarDestroyed(state)) return 'altar_destroyed';
@@ -93,7 +93,7 @@ export function checkInvasionEnd(
   if (areAllInvadersEliminated(state)) return 'all_invaders_eliminated';
   if (isTurnLimitReached(state)) return 'turn_limit_reached';
 
-  return null;
+  return undefined;
 }
 
 // --- State mutations (pure, return new state) ---

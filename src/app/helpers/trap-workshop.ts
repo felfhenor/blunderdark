@@ -194,7 +194,7 @@ export type TrapWorkshopInfo = {
 export function getTrapWorkshopInfo(
   roomId: string,
   state: GameState,
-): TrapWorkshopInfo | null {
+): TrapWorkshopInfo | undefined {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (!room || room.roomTypeId !== findRoomIdByRole('trapWorkshop')) continue;
@@ -220,7 +220,7 @@ export function getTrapWorkshopInfo(
       availableTraps: allTraps,
     };
   }
-  return null;
+  return undefined;
 }
 
 export function getTrapDefinitionById(

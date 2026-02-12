@@ -18,7 +18,7 @@ export function createCombatant(
   side: CombatantSide,
   name: string,
   stats: { hp: number; maxHp: number; attack: number; defense: number; speed: number },
-  position: TilePosition | null,
+  position: TilePosition | undefined,
 ): Combatant {
   return {
     id,
@@ -57,10 +57,10 @@ export function buildTurnQueue(combatants: Combatant[]): TurnQueue {
 }
 
 /**
- * Get the current actor in the queue. Returns null if queue is empty or all dead.
+ * Get the current actor in the queue. Returns undefined if queue is empty or all dead.
  */
-export function getCurrentActor(queue: TurnQueue): Combatant | null {
-  if (queue.combatants.length === 0) return null;
+export function getCurrentActor(queue: TurnQueue): Combatant | undefined {
+  if (queue.combatants.length === 0) return undefined;
 
   // Find next alive, non-acted combatant from currentIndex
   for (let i = queue.currentIndex; i < queue.combatants.length; i++) {
@@ -68,7 +68,7 @@ export function getCurrentActor(queue: TurnQueue): Combatant | null {
     if (c.hp > 0 && !c.hasActed) return c;
   }
 
-  return null;
+  return undefined;
 }
 
 /**
@@ -194,7 +194,7 @@ export function getValidAttackTargets(
     (c) =>
       c.hp > 0 &&
       c.side !== actor.side &&
-      c.position !== null &&
+      c.position !== undefined &&
       arePositionsAdjacent(actor.position!, c.position),
   );
 }
@@ -242,9 +242,9 @@ export function executeMove(
     result: {
       action: 'move',
       actorId,
-      targetId: null,
+      targetId: undefined,
       targetPosition: { ...target },
-      combatResult: null,
+      combatResult: undefined,
     },
   };
 }
@@ -270,8 +270,8 @@ export function executeAttack(
         action: 'attack',
         actorId,
         targetId,
-        targetPosition: null,
-        combatResult: null,
+        targetPosition: undefined,
+        combatResult: undefined,
       },
     };
   }
@@ -294,7 +294,7 @@ export function executeAttack(
       action: 'attack',
       actorId,
       targetId,
-      targetPosition: defender.position ? { ...defender.position } : null,
+      targetPosition: defender.position ? { ...defender.position } : undefined,
       combatResult,
     },
   };
@@ -307,9 +307,9 @@ export function executeWait(actorId: string): ActionResult {
   return {
     action: 'wait',
     actorId,
-    targetId: null,
-    targetPosition: null,
-    combatResult: null,
+    targetId: undefined,
+    targetPosition: undefined,
+    combatResult: undefined,
   };
 }
 
@@ -322,18 +322,18 @@ export function executeWait(actorId: string): ActionResult {
 export function resolveAiAction(
   actor: Combatant,
   allCombatants: Combatant[],
-): { action: TurnAction; targetId: string | null; targetPosition: TilePosition | null } {
+): { action: TurnAction; targetId: string | undefined; targetPosition: TilePosition | undefined } {
   // 1. Attack adjacent defender if possible
   const attackTargets = getValidAttackTargets(actor, allCombatants);
   if (attackTargets.length > 0) {
     // Attack the weakest target
     const weakest = attackTargets.reduce((a, b) => (a.hp <= b.hp ? a : b));
-    return { action: 'attack', targetId: weakest.id, targetPosition: null };
+    return { action: 'attack', targetId: weakest.id, targetPosition: undefined };
   }
 
   // 2. Move toward nearest enemy
   const enemies = allCombatants.filter(
-    (c) => c.hp > 0 && c.side !== actor.side && c.position !== null,
+    (c) => c.hp > 0 && c.side !== actor.side && c.position !== undefined,
   );
   if (enemies.length > 0 && actor.position) {
     const moveTargets = getValidMoveTargets(actor, allCombatants);
@@ -346,14 +346,14 @@ export function resolveAiAction(
           nearestEnemy.position,
         );
         if (bestMove) {
-          return { action: 'move', targetId: null, targetPosition: bestMove };
+          return { action: 'move', targetId: undefined, targetPosition: bestMove };
         }
       }
     }
   }
 
   // 3. Wait
-  return { action: 'wait', targetId: null, targetPosition: null };
+  return { action: 'wait', targetId: undefined, targetPosition: undefined };
 }
 
 /**
@@ -401,8 +401,8 @@ function manhattanDistance(a: TilePosition, b: TilePosition): number {
 function findNearestEnemy(
   position: TilePosition,
   enemies: Combatant[],
-): Combatant | null {
-  let nearest: Combatant | null = null;
+): Combatant | undefined {
+  let nearest: Combatant | undefined = undefined;
   let nearestDist = Infinity;
 
   for (const enemy of enemies) {
@@ -420,8 +420,8 @@ function findNearestEnemy(
 function findBestMoveToward(
   moveTargets: TilePosition[],
   goal: TilePosition,
-): TilePosition | null {
-  let best: TilePosition | null = null;
+): TilePosition | undefined {
+  let best: TilePosition | undefined = undefined;
   let bestDist = Infinity;
 
   for (const target of moveTargets) {

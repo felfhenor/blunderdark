@@ -38,9 +38,9 @@ export function removeFromTrapInventory(
   inventory: TrapInventoryEntry[],
   trapTypeId: string,
   count = 1,
-): TrapInventoryEntry[] | null {
+): TrapInventoryEntry[] | undefined {
   const existing = inventory.find((e) => e.trapTypeId === trapTypeId);
-  if (!existing || existing.count < count) return null;
+  if (!existing || existing.count < count) return undefined;
 
   return inventory
     .map((e) =>
@@ -87,15 +87,15 @@ export function placeTrap(
   trapTypeId: string,
   tileX: number,
   tileY: number,
-): { floor: Floor; trap: TrapInstance } | null {
+): { floor: Floor; trap: TrapInstance } | undefined {
   const { canPlace } = canPlaceTrap(floor, tileX, tileY);
-  if (!canPlace) return null;
+  if (!canPlace) return undefined;
 
   const def = getTrapDefinition(trapTypeId);
-  if (!def) return null;
+  if (!def) return undefined;
 
   const tile = floor.grid[tileY]?.[tileX];
-  if (!tile?.hallwayId) return null;
+  if (!tile?.hallwayId) return undefined;
 
   const trap: TrapInstance = {
     id: rngUuid(),
@@ -119,9 +119,9 @@ export function placeTrap(
 export function removeTrap(
   floor: Floor,
   trapId: string,
-): { floor: Floor; trap: TrapInstance } | null {
+): { floor: Floor; trap: TrapInstance } | undefined {
   const trap = (floor.traps ?? []).find((t) => t.id === trapId);
-  if (!trap) return null;
+  if (!trap) return undefined;
 
   return {
     floor: {

@@ -68,7 +68,7 @@ const crystalMineRoom: RoomDefinition & IsContentItem = {
   isUnique: false,
   removable: true,
   maxInhabitants: 2,
-  inhabitantRestriction: null,
+  inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
   autoPlace: false,
@@ -175,7 +175,7 @@ describe('applyUpgrade', () => {
 describe('getAppliedUpgrade', () => {
   it('should return null for a room with no upgrade', () => {
     const room = createPlacedRoom();
-    expect(getAppliedUpgrade(room)).toBeNull();
+    expect(getAppliedUpgrade(room)).toBeUndefined();
   });
 
   it('should return the applied upgrade path', () => {
@@ -183,7 +183,7 @@ describe('getAppliedUpgrade', () => {
       appliedUpgradePathId: 'upgrade-efficiency',
     });
     const upgrade = getAppliedUpgrade(room);
-    expect(upgrade).not.toBeNull();
+    expect(upgrade).toBeDefined();
     expect(upgrade!.name).toBe('Deep Vein Extraction');
   });
 
@@ -191,7 +191,7 @@ describe('getAppliedUpgrade', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'nonexistent',
     });
-    expect(getAppliedUpgrade(room)).toBeNull();
+    expect(getAppliedUpgrade(room)).toBeUndefined();
   });
 });
 

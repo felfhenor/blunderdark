@@ -57,7 +57,7 @@ export function indexedDbSignal<T>(
   const STORE_NAME = 'gamestate';
   const DB_VERSION = 1;
 
-  let db: IDBDatabase | null = null;
+  let db: IDBDatabase | undefined = undefined;
   let isInitialized = false;
 
   const writableSignal = signal(initialValue);

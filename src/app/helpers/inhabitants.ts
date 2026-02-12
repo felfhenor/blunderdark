@@ -60,7 +60,7 @@ export function deserializeInhabitants(
     definitionId: i.definitionId,
     name: i.name,
     state: i.state ?? 'normal',
-    assignedRoomId: i.assignedRoomId ?? null,
+    assignedRoomId: i.assignedRoomId ?? undefined,
     trained: i.trained ?? false,
     trainingProgress: i.trainingProgress ?? 0,
     trainingBonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
@@ -72,13 +72,13 @@ export function deserializeInhabitants(
 /**
  * Check if an inhabitant definition meets a room's inhabitant restriction.
  * Returns true if the inhabitant is eligible for the restriction.
- * A null restriction means any inhabitant is allowed.
+ * An undefined restriction means any inhabitant is allowed.
  */
 export function meetsInhabitantRestriction(
   inhabitantDef: InhabitantDefinition,
-  restriction: string | null,
+  restriction: string | undefined,
 ): boolean {
-  if (restriction === null) return true;
+  if (restriction === undefined) return true;
   return inhabitantDef.restrictionTags.includes(restriction);
 }
 
@@ -139,7 +139,7 @@ export async function assignInhabitantToRoom(
   );
   if (!instance) return { success: false, error: 'Inhabitant not found' };
 
-  if (instance.assignedRoomId !== null) {
+  if (instance.assignedRoomId !== undefined) {
     return { success: false, error: 'Inhabitant is already assigned to a room' };
   }
 
@@ -197,14 +197,14 @@ export async function unassignInhabitantFromRoom(
   const instance = state.world.inhabitants.find(
     (i) => i.instanceId === instanceId,
   );
-  if (!instance || instance.assignedRoomId === null) return false;
+  if (!instance || instance.assignedRoomId === undefined) return false;
 
   await updateGamestate((s) => ({
     ...s,
     world: {
       ...s.world,
       inhabitants: s.world.inhabitants.map((i) =>
-        i.instanceId === instanceId ? { ...i, assignedRoomId: null } : i,
+        i.instanceId === instanceId ? { ...i, assignedRoomId: undefined } : i,
       ),
     },
   }));

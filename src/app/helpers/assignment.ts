@@ -69,16 +69,16 @@ export function isInhabitantAssigned(instanceId: string): boolean {
   const instance = gamestate().world.inhabitants.find(
     (i) => i.instanceId === instanceId,
   );
-  return instance?.assignedRoomId !== null && instance?.assignedRoomId !== undefined;
+  return instance?.assignedRoomId !== undefined;
 }
 
 /**
  * Get assignment info for a specific room: current count and max capacity.
- * Returns null if room is not found or does not accept inhabitants.
+ * Returns undefined if room is not found or does not accept inhabitants.
  */
 export function getRoomAssignmentInfo(
   roomId: string,
-): { currentCount: number; maxCapacity: number } | null {
+): { currentCount: number; maxCapacity: number } | undefined {
   const state = gamestate();
 
   let placedRoom: PlacedRoom | undefined;
@@ -87,13 +87,13 @@ export function getRoomAssignmentInfo(
     if (placedRoom) break;
   }
 
-  if (!placedRoom) return null;
+  if (!placedRoom) return undefined;
 
   const roomDef = getEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
-  if (!roomDef) return null;
+  if (!roomDef) return undefined;
 
   const maxCapacity = getEffectiveMaxInhabitants(placedRoom, roomDef);
-  if (maxCapacity === 0) return null;
+  if (maxCapacity === 0) return undefined;
 
   const currentCount = state.world.inhabitants.filter(
     (i) => i.assignedRoomId === roomId,

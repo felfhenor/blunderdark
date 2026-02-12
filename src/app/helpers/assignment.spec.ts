@@ -82,7 +82,7 @@ function createTestRoomDef(
     isUnique: false,
     removable: true,
     maxInhabitants: 2,
-    inhabitantRestriction: null,
+    inhabitantRestriction: undefined,
     fearLevel: 1,
     fearReductionAura: 0,
     upgradePaths: [],
@@ -99,7 +99,7 @@ function createTestInhabitant(
     definitionId: 'def-goblin',
     name: 'Goblin Worker',
     state: 'normal',
-    assignedRoomId: null,
+    assignedRoomId: undefined,
     ...overrides,
   };
 }
@@ -238,7 +238,7 @@ describe('getAssignmentCount', () => {
       createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
       createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-002' }),
       createTestInhabitant({ instanceId: 'inst-003', assignedRoomId: 'room-001' }),
-      createTestInhabitant({ instanceId: 'inst-004', assignedRoomId: null }),
+      createTestInhabitant({ instanceId: 'inst-004', assignedRoomId: undefined }),
     ];
     expect(getAssignmentCount('room-001')).toBe(2);
   });
@@ -259,7 +259,7 @@ describe('isInhabitantAssigned', () => {
 
   it('should return false for unassigned inhabitant', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: null }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: undefined }),
     ];
     expect(isInhabitantAssigned('inst-001')).toBe(false);
   });
@@ -282,7 +282,7 @@ describe('getRoomAssignmentInfo', () => {
 
   it('should return null for non-existent room', () => {
     mockFloors = [{ rooms: [], inhabitants: [] }];
-    expect(getRoomAssignmentInfo('nonexistent')).toBeNull();
+    expect(getRoomAssignmentInfo('nonexistent')).toBeUndefined();
   });
 
   it('should return null for room that does not accept inhabitants', () => {
@@ -290,7 +290,7 @@ describe('getRoomAssignmentInfo', () => {
     const def = createTestRoomDef({ maxInhabitants: 0 });
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
-    expect(getRoomAssignmentInfo('room-001')).toBeNull();
+    expect(getRoomAssignmentInfo('room-001')).toBeUndefined();
   });
 
   it('should return count and max for a valid room', () => {
@@ -303,7 +303,7 @@ describe('getRoomAssignmentInfo', () => {
     ];
 
     const info = getRoomAssignmentInfo('room-001');
-    expect(info).not.toBeNull();
+    expect(info).toBeDefined();
     expect(info!.currentCount).toBe(1);
     expect(info!.maxCapacity).toBe(3);
   });
@@ -317,7 +317,7 @@ describe('getRoomAssignmentInfo', () => {
     mockInhabitants = [];
 
     const info = getRoomAssignmentInfo('room-001');
-    expect(info).not.toBeNull();
+    expect(info).toBeDefined();
     expect(info!.currentCount).toBe(0);
     expect(info!.maxCapacity).toBe(5);
   });

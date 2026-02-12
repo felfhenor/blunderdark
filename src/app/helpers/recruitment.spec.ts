@@ -211,7 +211,7 @@ describe('recruitment helper', () => {
       expect(mockInhabitants[0].definitionId).toBe('goblin-001');
       expect(mockInhabitants[0].name).toBe('Goblin');
       expect(mockInhabitants[0].state).toBe('normal');
-      expect(mockInhabitants[0].assignedRoomId).toBeNull();
+      expect(mockInhabitants[0].assignedRoomId).toBeUndefined();
     });
 
     it('should fail when altar is not placed', async () => {
@@ -236,7 +236,7 @@ describe('recruitment helper', () => {
           definitionId: 'goblin-001',
           name: 'Goblin',
           state: 'normal' as const,
-          assignedRoomId: null,
+          assignedRoomId: undefined,
         }),
       );
       const result = await recruitInhabitant(goblinDef);

@@ -21,7 +21,7 @@ export type ResearchTree = {
 
 export type ResearchState = {
   completedNodes: string[];
-  activeResearch: string | null;
+  activeResearch: string | undefined;
   activeResearchProgress: number;
   activeResearchStartTick: number;
 };

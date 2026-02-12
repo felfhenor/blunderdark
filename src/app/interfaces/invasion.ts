@@ -11,7 +11,7 @@ export type PendingSpecialInvasion = {
 };
 
 export type InvasionSchedule = {
-  nextInvasionDay: number | null;
+  nextInvasionDay: number | undefined;
   nextInvasionVariance: number;
   gracePeriodEnd: number;
   invasionHistory: InvasionHistoryEntry[];
@@ -148,7 +148,7 @@ export type Combatant = {
   attack: number;
   defense: number;
   hasActed: boolean;
-  position: TilePosition | null;
+  position: TilePosition | undefined;
 };
 
 export type TurnAction = 'move' | 'attack' | 'ability' | 'wait';
@@ -156,9 +156,9 @@ export type TurnAction = 'move' | 'attack' | 'ability' | 'wait';
 export type ActionResult = {
   action: TurnAction;
   actorId: string;
-  targetId: string | null;
-  targetPosition: TilePosition | null;
-  combatResult: CombatResult | null;
+  targetId: string | undefined;
+  targetPosition: TilePosition | undefined;
+  combatResult: CombatResult | undefined;
 };
 
 export type TurnQueue = {

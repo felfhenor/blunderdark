@@ -28,8 +28,8 @@ describe('Grid Helpers', () => {
       for (const row of grid) {
         for (const tile of row) {
           expect(tile.occupied).toBe(false);
-          expect(tile.roomId).toBeNull();
-          expect(tile.connectionType).toBeNull();
+          expect(tile.roomId).toBeUndefined();
+          expect(tile.connectionType).toBeUndefined();
         }
       }
     });
@@ -60,17 +60,17 @@ describe('Grid Helpers', () => {
       expect(tile).toEqual({
         occupied: false,
         occupiedBy: 'empty',
-        roomId: null,
-        hallwayId: null,
-        connectionType: null,
+        roomId: undefined,
+        hallwayId: undefined,
+        connectionType: undefined,
       });
     });
 
-    it('should return null for out-of-bounds coordinates', () => {
+    it('should return undefined for out-of-bounds coordinates', () => {
       const grid = createEmptyGrid();
-      expect(getTile(grid, -1, 0)).toBeNull();
-      expect(getTile(grid, 0, 20)).toBeNull();
-      expect(getTile(grid, 25, 25)).toBeNull();
+      expect(getTile(grid, -1, 0)).toBeUndefined();
+      expect(getTile(grid, 0, 20)).toBeUndefined();
+      expect(getTile(grid, 25, 25)).toBeUndefined();
     });
   });
 
@@ -81,7 +81,7 @@ describe('Grid Helpers', () => {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'room-1',
-        hallwayId: null,
+        hallwayId: undefined,
         connectionType: 'door',
       };
 
@@ -97,8 +97,8 @@ describe('Grid Helpers', () => {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'room-1',
-        hallwayId: null,
-        connectionType: null,
+        hallwayId: undefined,
+        connectionType: undefined,
       };
 
       setTile(grid, 3, 7, newTile);
@@ -112,8 +112,8 @@ describe('Grid Helpers', () => {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'room-1',
-        hallwayId: null,
-        connectionType: null,
+        hallwayId: undefined,
+        connectionType: undefined,
       };
 
       const result = setTile(grid, -1, 0, newTile);
@@ -139,7 +139,7 @@ describe('Grid Helpers', () => {
       expect(selectedTile()).toEqual({ x: 5, y: 5 });
 
       selectTile(5, 5);
-      expect(selectedTile()).toBeNull();
+      expect(selectedTile()).toBeUndefined();
     });
 
     it('should change selection to a different tile', () => {
@@ -151,7 +151,7 @@ describe('Grid Helpers', () => {
     it('should deselect tile', () => {
       selectTile(5, 5);
       deselectTile();
-      expect(selectedTile()).toBeNull();
+      expect(selectedTile()).toBeUndefined();
     });
   });
 
@@ -162,7 +162,7 @@ describe('Grid Helpers', () => {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'test-room',
-        hallwayId: null,
+        hallwayId: undefined,
         connectionType: 'corridor',
       });
 
@@ -174,7 +174,7 @@ describe('Grid Helpers', () => {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'test-room',
-        hallwayId: null,
+        hallwayId: undefined,
         connectionType: 'corridor',
       });
     });

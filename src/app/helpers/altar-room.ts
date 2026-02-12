@@ -27,9 +27,9 @@ import { GRID_SIZE } from '@interfaces/grid';
  */
 export function findAltarRoom(
   floors: Floor[],
-): { floor: Floor; room: PlacedRoom } | null {
+): { floor: Floor; room: PlacedRoom } | undefined {
   const altarId = findRoomIdByRole('altar');
-  if (!altarId) return null;
+  if (!altarId) return undefined;
 
   for (const floor of floors) {
     const room = floor.rooms.find(
@@ -37,14 +37,14 @@ export function findAltarRoom(
     );
     if (room) return { floor, room };
   }
-  return null;
+  return undefined;
 }
 
 /**
  * Reactive signal: whether the Altar Room is placed.
  */
 export const hasAltarRoom = computed<boolean>(() => {
-  return findAltarRoom(gamestate().world.floors) !== null;
+  return findAltarRoom(gamestate().world.floors) !== undefined;
 });
 
 /**
@@ -112,14 +112,14 @@ export const altarLevel = computed<number>(() => {
 
 /**
  * Get the next available upgrade for the Altar Room.
- * Returns null if fully upgraded or no Altar exists.
+ * Returns undefined if fully upgraded or no Altar exists.
  */
-export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | null {
+export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | undefined {
   const altar = findAltarRoom(floors);
-  if (!altar) return null;
+  if (!altar) return undefined;
 
   const altarId = findRoomIdByRole('altar');
-  if (!altarId) return null;
+  if (!altarId) return undefined;
 
   const currentLevel = getAltarLevel(floors);
   const paths = getUpgradePaths(altarId);
@@ -133,7 +133,7 @@ export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | null {
   if (currentLevel === 1 && paths.length >= 1) return paths[0];
   if (currentLevel === 2 && paths.length >= 2) return paths[1];
 
-  return null;
+  return undefined;
 }
 
 /**
@@ -262,5 +262,5 @@ export function getEffectiveFearLevel(
  * The Altar's presence enables basic recruitment; upgrades may expand it later.
  */
 export const canRecruit = computed<boolean>(() => {
-  return findAltarRoom(gamestate().world.floors) !== null;
+  return findAltarRoom(gamestate().world.floors) !== undefined;
 });

@@ -20,22 +20,22 @@ export const isHallwayBuildMode = computed(
   () => hallwayBuildStep() !== 'inactive',
 );
 
-export const hallwaySourceRoomId = signal<string | null>(null);
-export const hallwayDestRoomId = signal<string | null>(null);
+export const hallwaySourceRoomId = signal<string | undefined>(undefined);
+export const hallwayDestRoomId = signal<string | undefined>(undefined);
 
 export const HALLWAY_COST_PER_TILE = 5;
 
 export function enterHallwayBuildMode(): void {
   exitPlacementMode();
   hallwayBuildStep.set('selectSource');
-  hallwaySourceRoomId.set(null);
-  hallwayDestRoomId.set(null);
+  hallwaySourceRoomId.set(undefined);
+  hallwayDestRoomId.set(undefined);
 }
 
 export function exitHallwayBuildMode(): void {
   hallwayBuildStep.set('inactive');
-  hallwaySourceRoomId.set(null);
-  hallwayDestRoomId.set(null);
+  hallwaySourceRoomId.set(undefined);
+  hallwayDestRoomId.set(undefined);
 }
 
 /**
@@ -102,14 +102,14 @@ function findRoomAdjacentEmptyTiles(
 
 /**
  * BFS pathfinding through empty tiles between two rooms.
- * Returns the shortest path of empty tiles, or null if unreachable.
+ * Returns the shortest path of empty tiles, or undefined if unreachable.
  */
 export function findHallwayPath(
   grid: GridState,
   sourceRoomId: string,
   destRoomId: string,
-): TileOffset[] | null {
-  if (sourceRoomId === destRoomId) return null;
+): TileOffset[] | undefined {
+  if (sourceRoomId === destRoomId) return undefined;
 
   const starts = findRoomAdjacentEmptyTiles(grid, sourceRoomId);
   const endSet = new Set(
@@ -118,7 +118,7 @@ export function findHallwayPath(
     ),
   );
 
-  if (starts.length === 0 || endSet.size === 0) return null;
+  if (starts.length === 0 || endSet.size === 0) return undefined;
 
   const visited = new Set<string>();
   const queue: Array<{ x: number; y: number; path: TileOffset[] }> = [];
@@ -158,7 +158,7 @@ export function findHallwayPath(
     }
   }
 
-  return null;
+  return undefined;
 }
 
 /**
@@ -167,14 +167,14 @@ export function findHallwayPath(
  */
 export const hallwayPreviewPath = computed(() => {
   const step = hallwayBuildStep();
-  if (step !== 'preview') return null;
+  if (step !== 'preview') return undefined;
 
   const sourceId = hallwaySourceRoomId();
   const destId = hallwayDestRoomId();
-  if (!sourceId || !destId) return null;
+  if (!sourceId || !destId) return undefined;
 
   const floor = currentFloor();
-  if (!floor) return null;
+  if (!floor) return undefined;
 
   return findHallwayPath(floor.grid, sourceId, destId);
 });

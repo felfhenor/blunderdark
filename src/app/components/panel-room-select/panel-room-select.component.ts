@@ -77,14 +77,14 @@ export class PanelRoomSelectComponent {
     return info.reason ?? '';
   }
 
-  public getBiomeLimitLabel(room: RoomDefinition): string | null {
+  public getBiomeLimitLabel(room: RoomDefinition): string | undefined {
     const floor = currentFloor();
-    if (!floor) return null;
+    if (!floor) return undefined;
     const info = getRoomBiomeRestrictionInfo(room.id, floor.biome, floor);
     if (info.maxCount !== undefined && info.currentCount !== undefined) {
       return `${info.currentCount}/${info.maxCount}`;
     }
-    return null;
+    return undefined;
   }
 
   public getRoomShapeForPreview(

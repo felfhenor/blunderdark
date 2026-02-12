@@ -39,8 +39,8 @@ export const DEPTH_BONUS_PER_LEVEL = 0.05;
 
 // --- Lazy lookup maps built from room data ---
 
-let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | null = null;
-let biomeMap: Map<string, Map<string, number>> | null = null;
+let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | undefined = undefined;
+let biomeMap: Map<string, Map<string, number>> | undefined = undefined;
 
 function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
   const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
@@ -71,7 +71,7 @@ function buildBiomeMap(): Map<string, Map<string, number>> {
   for (const room of rooms) {
     if (room.biomeBonuses) {
       for (const [biome, bonus] of Object.entries(room.biomeBonuses)) {
-        if (bonus === null || bonus === undefined) continue;
+        if (bonus === undefined) continue;
         if (!map.has(biome)) {
           map.set(biome, new Map());
         }
@@ -90,8 +90,8 @@ function getBiomeMap(): Map<string, Map<string, number>> {
 }
 
 export function resetProductionModifierCache(): void {
-  timeOfDayMap = null;
-  biomeMap = null;
+  timeOfDayMap = undefined;
+  biomeMap = undefined;
 }
 
 // --- Time-of-day helpers ---

@@ -62,7 +62,7 @@ function makeGameState(overrides: {
       },
       research: {
         completedNodes: [],
-        activeResearch: null,
+        activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
       },
@@ -129,7 +129,7 @@ describe('invasion-triggers', () => {
   describe('getLastInvasionDay', () => {
     it('should return null for empty history', () => {
       const schedule = makeSchedule();
-      expect(getLastInvasionDay(schedule)).toBeNull();
+      expect(getLastInvasionDay(schedule)).toBeUndefined();
     });
 
     it('should return the day of the last invasion', () => {
@@ -148,7 +148,7 @@ describe('invasion-triggers', () => {
   describe('calculateNextInvasionDay', () => {
     it('should schedule based on interval + variance', () => {
       const rng = seedrandom('fixed-seed');
-      const result = calculateNextInvasionDay(30, null, 30, rng);
+      const result = calculateNextInvasionDay(30, undefined, 30, rng);
       expect(result.day).toBeGreaterThanOrEqual(30 + 15 - MAX_VARIANCE);
       expect(result.day).toBeLessThanOrEqual(30 + 15 + MAX_VARIANCE);
       expect(result.variance).toBeGreaterThanOrEqual(-MAX_VARIANCE);
@@ -158,7 +158,7 @@ describe('invasion-triggers', () => {
     it('should not push invasion before grace period', () => {
       // Use day 28 with a large negative variance — result should be >= 30
       const rng = seedrandom('push-before-grace');
-      const result = calculateNextInvasionDay(28, null, 30, rng);
+      const result = calculateNextInvasionDay(28, undefined, 30, rng);
       expect(result.day).toBeGreaterThanOrEqual(30);
     });
 
@@ -172,7 +172,7 @@ describe('invasion-triggers', () => {
 
     it('should use correct interval for day 60+', () => {
       const rng = seedrandom('day-60');
-      const result = calculateNextInvasionDay(60, null, 30, rng);
+      const result = calculateNextInvasionDay(60, undefined, 30, rng);
       // Interval is 10 at day 60, so day should be ~70 +/- 2
       expect(result.day).toBeGreaterThanOrEqual(60 + 10 - MAX_VARIANCE);
       expect(result.day).toBeLessThanOrEqual(60 + 10 + MAX_VARIANCE);
@@ -180,7 +180,7 @@ describe('invasion-triggers', () => {
 
     it('should use correct interval for day 100+', () => {
       const rng = seedrandom('day-100');
-      const result = calculateNextInvasionDay(100, null, 30, rng);
+      const result = calculateNextInvasionDay(100, undefined, 30, rng);
       // Interval is 7 at day 100, so day should be ~107 +/- 2
       expect(result.day).toBeGreaterThanOrEqual(100 + 7 - MAX_VARIANCE);
       expect(result.day).toBeLessThanOrEqual(100 + 7 + MAX_VARIANCE);
@@ -189,8 +189,8 @@ describe('invasion-triggers', () => {
     it('should produce deterministic results with same seed', () => {
       const rng1 = seedrandom('deterministic');
       const rng2 = seedrandom('deterministic');
-      const result1 = calculateNextInvasionDay(30, null, 30, rng1);
-      const result2 = calculateNextInvasionDay(30, null, 30, rng2);
+      const result1 = calculateNextInvasionDay(30, undefined, 30, rng1);
+      const result2 = calculateNextInvasionDay(30, undefined, 30, rng2);
       expect(result1).toEqual(result2);
     });
   });
@@ -199,7 +199,7 @@ describe('invasion-triggers', () => {
 
   describe('shouldTriggerInvasion', () => {
     it('should return false when no invasion scheduled', () => {
-      const schedule = makeSchedule({ nextInvasionDay: null });
+      const schedule = makeSchedule({ nextInvasionDay: undefined });
       expect(shouldTriggerInvasion(schedule, 50)).toBe(false);
     });
 
@@ -223,7 +223,7 @@ describe('invasion-triggers', () => {
 
   describe('shouldShowWarning', () => {
     it('should return false when no invasion scheduled', () => {
-      const schedule = makeSchedule({ nextInvasionDay: null });
+      const schedule = makeSchedule({ nextInvasionDay: undefined });
       const time: GameTime = { day: 44, hour: 23, minute: 58 };
       expect(shouldShowWarning(schedule, time)).toBe(false);
     });
@@ -296,14 +296,14 @@ describe('invasion-triggers', () => {
       const state = makeGameState({ day: 15 });
       const rng = seedrandom('grace');
       processInvasionSchedule(state, rng);
-      expect(state.world.invasionSchedule.nextInvasionDay).toBeNull();
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
     });
 
     it('should schedule first invasion when grace period ends', () => {
       const state = makeGameState({ day: 30 });
       const rng = seedrandom('first-schedule');
       processInvasionSchedule(state, rng);
-      expect(state.world.invasionSchedule.nextInvasionDay).not.toBeNull();
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeDefined();
       expect(
         state.world.invasionSchedule.nextInvasionDay!,
       ).toBeGreaterThanOrEqual(30);
@@ -459,7 +459,7 @@ describe('invasion-triggers', () => {
   describe('defaultInvasionSchedule', () => {
     it('should have correct defaults', () => {
       const schedule = defaultInvasionSchedule();
-      expect(schedule.nextInvasionDay).toBeNull();
+      expect(schedule.nextInvasionDay).toBeUndefined();
       expect(schedule.nextInvasionVariance).toBe(0);
       expect(schedule.gracePeriodEnd).toBe(30);
       expect(schedule.invasionHistory).toEqual([]);

@@ -778,7 +778,7 @@ describe('synergy re-evaluation scenarios', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: null,
+        assignedRoomId: undefined,
       },
     ];
     const inactive = evaluateAllSynergies(

@@ -96,7 +96,7 @@ beforeEach(() => {
     removable: false,
     autoPlace: true,
     maxInhabitants: 0,
-    inhabitantRestriction: null,
+    inhabitantRestriction: undefined,
     fearLevel: 0,
     fearReductionAura: 1,
     upgradePaths: [],
@@ -117,7 +117,7 @@ beforeEach(() => {
     removable: true,
     autoPlace: false,
     maxInhabitants: 2,
-    inhabitantRestriction: null,
+    inhabitantRestriction: undefined,
     fearLevel: 1,
     fearReductionAura: 0,
     upgradePaths: [],
@@ -225,21 +225,21 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorY: 5,
     };
     const placed = placeRoomOnFloor(floor, room, square2x2)!;
-    expect(placed).not.toBeNull();
+    expect(placed).toBeDefined();
 
     const result = removeRoomFromFloor(placed, 'room-1', square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
 
     // All 4 tiles should be cleared
     expect(result!.grid[5][5].occupied).toBe(false);
-    expect(result!.grid[5][5].roomId).toBeNull();
+    expect(result!.grid[5][5].roomId).toBeUndefined();
     expect(result!.grid[5][6].occupied).toBe(false);
-    expect(result!.grid[5][6].roomId).toBeNull();
+    expect(result!.grid[5][6].roomId).toBeUndefined();
     expect(result!.grid[6][5].occupied).toBe(false);
-    expect(result!.grid[6][5].roomId).toBeNull();
+    expect(result!.grid[6][5].roomId).toBeUndefined();
     expect(result!.grid[6][6].occupied).toBe(false);
-    expect(result!.grid[6][6].roomId).toBeNull();
+    expect(result!.grid[6][6].roomId).toBeUndefined();
   });
 
   it('should not affect tiles of other rooms', () => {
@@ -262,7 +262,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     placed = placeRoomOnFloor(placed, room2, square2x2)!;
 
     const result = removeRoomFromFloor(placed, 'room-1', square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
 
@@ -281,28 +281,28 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: 'hallway-1',
-      connectionType: null,
+      connectionType: undefined,
     });
     grid = setTile(grid, 6, 5, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
     grid = setTile(grid, 5, 6, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
     grid = setTile(grid, 6, 6, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
 
     const room: PlacedRoom = {
@@ -315,17 +315,17 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const floor = makeFloor([room], grid);
 
     const result = removeRoomFromFloor(floor, 'room-1', square2x2);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // Hallway data should be preserved
     expect(result!.grid[5][5].hallwayId).toBe('hallway-1');
     expect(result!.grid[5][5].occupied).toBe(false);
-    expect(result!.grid[5][5].roomId).toBeNull();
+    expect(result!.grid[5][5].roomId).toBeUndefined();
   });
 
-  it('should return null when trying to remove non-existent room', () => {
+  it('should return undefined when trying to remove non-existent room', () => {
     const floor = makeFloor();
     const result = removeRoomFromFloor(floor, 'nonexistent', square2x2);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should allow re-placing a room on cleared tiles', () => {
@@ -349,7 +349,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorY: 5,
     };
     const rePlaced = placeRoomOnFloor(removed, newRoom, square2x2);
-    expect(rePlaced).not.toBeNull();
+    expect(rePlaced).toBeDefined();
     expect(rePlaced!.rooms).toHaveLength(1);
     expect(rePlaced!.rooms[0].id).toBe('room-new');
   });

@@ -42,17 +42,17 @@ export function calculateRefund(cost: ResourceCost): RemovalRefund {
  * Get information about what would happen if a room were removed.
  * Used by the confirmation dialog to show refund and displaced inhabitants.
  */
-export function getRemovalInfo(roomId: string): RemovalInfo | null {
+export function getRemovalInfo(roomId: string): RemovalInfo | undefined {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
-  if (!floor) return null;
+  if (!floor) return undefined;
 
   const room = floor.rooms.find((r) => r.id === roomId);
-  if (!room) return null;
+  if (!room) return undefined;
 
   const roomDef = getEntry<RoomDefinition & IsContentItem>(room.roomTypeId);
-  if (!roomDef) return null;
+  if (!roomDef) return undefined;
 
   if (!isRoomRemovable(room.roomTypeId)) {
     return {
@@ -130,7 +130,7 @@ export async function executeRoomRemoval(
 
     // Unassign all inhabitants from this room
     const newInhabitants = s.world.inhabitants.map((i) =>
-      i.assignedRoomId === roomId ? { ...i, assignedRoomId: null } : i,
+      i.assignedRoomId === roomId ? { ...i, assignedRoomId: undefined } : i,
     );
 
     return {

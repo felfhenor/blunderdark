@@ -133,14 +133,14 @@ export function canCreateFloor(): { canCreate: boolean; reason?: string } {
 /**
  * Create a new floor at the next available depth.
  * Deducts resource costs and adds the floor to the game state.
- * Returns the new floor on success, or null if creation failed.
+ * Returns the new floor on success, or undefined if creation failed.
  */
 export async function createFloor(
   biome: BiomeType = 'neutral',
-): Promise<Floor | null> {
+): Promise<Floor | undefined> {
   const { canCreate } = canCreateFloor();
   if (!canCreate) {
-    return null;
+    return undefined;
   }
 
   const nextDepth = gamestate().world.floors.length + 1;
@@ -148,7 +148,7 @@ export async function createFloor(
 
   const paid = await payCost(cost);
   if (!paid) {
-    return null;
+    return undefined;
   }
 
   const newFloor = defaultFloor(nextDepth, biome);

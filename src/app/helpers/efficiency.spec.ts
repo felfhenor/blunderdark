@@ -314,7 +314,7 @@ describe('calculateInhabitantContribution', () => {
       assignedRoomId: 'room-1',
     };
     const result = calculateInhabitantContribution(instance, crystalProduction);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.name).toBe('Goblin');
     // workerEfficiency: 1.0 → 0 bonus, Miner trait matches crystals: +0.2
     expect(result!.workerEfficiencyBonus).toBe(0);
@@ -334,7 +334,7 @@ describe('calculateInhabitantContribution', () => {
     };
     // Goblin Miner targets crystals, food room doesn't produce crystals
     const result = calculateInhabitantContribution(instance, foodProduction);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.traitBonuses[0].applies).toBe(false);
     // Only workerEfficiency bonus: 1.0 - 1.0 = 0
     expect(result!.totalBonus).toBeCloseTo(0);
@@ -350,7 +350,7 @@ describe('calculateInhabitantContribution', () => {
     };
     // Myconid in crystal mine: workerEfficiency 1.3 → 0.3, but Farmer targets food → no match
     const result = calculateInhabitantContribution(instance, crystalProduction);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.workerEfficiencyBonus).toBeCloseTo(0.3);
     expect(result!.traitBonuses[0].applies).toBe(false);
     expect(result!.totalBonus).toBeCloseTo(0.3);
@@ -365,7 +365,7 @@ describe('calculateInhabitantContribution', () => {
       assignedRoomId: 'room-1',
     };
     const result = calculateInhabitantContribution(instance, crystalProduction);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should handle inhabitant with no efficiency traits', () => {
@@ -377,7 +377,7 @@ describe('calculateInhabitantContribution', () => {
       assignedRoomId: 'room-1',
     };
     const result = calculateInhabitantContribution(instance, crystalProduction);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // workerEfficiency 0.7 → -0.3, no production_bonus traits
     expect(result!.workerEfficiencyBonus).toBeCloseTo(-0.3);
     expect(result!.traitBonuses).toHaveLength(0);

@@ -118,9 +118,9 @@ export function addConnectionToFloor(
   roomAId: string,
   roomBId: string,
   edgeTiles: TileOffset[],
-): { floor: Floor; connection: Connection } | null {
+): { floor: Floor; connection: Connection } | undefined {
   const existing = findConnection(floor, roomAId, roomBId);
-  if (existing) return null;
+  if (existing) return undefined;
 
   const connection: Connection = {
     id: rngUuid(),
@@ -145,9 +145,9 @@ export function addConnectionToFloor(
 export function removeConnectionFromFloor(
   floor: Floor,
   connectionId: string,
-): Floor | null {
+): Floor | undefined {
   const index = floor.connections.findIndex((c) => c.id === connectionId);
-  if (index === -1) return null;
+  if (index === -1) return undefined;
 
   return {
     ...floor,

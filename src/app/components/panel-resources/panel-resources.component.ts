@@ -84,8 +84,8 @@ export class PanelResourcesComponent {
   public rates = productionRates;
   public breakdowns = productionBreakdowns;
 
-  public activeTooltip = signal<ResourceType | null>(null);
-  private tooltipTimer: ReturnType<typeof setTimeout> | null = null;
+  public activeTooltip = signal<ResourceType | undefined>(undefined);
+  private tooltipTimer: ReturnType<typeof setTimeout> | undefined = undefined;
 
   public getCurrent(type: ResourceType): number {
     return this.allResources()[type].current;
@@ -136,8 +136,8 @@ export class PanelResourcesComponent {
     return '0/min';
   }
 
-  public getBreakdown(type: ResourceType): ResourceProductionBreakdown | null {
-    return this.breakdowns()[type] ?? null;
+  public getBreakdown(type: ResourceType): ResourceProductionBreakdown | undefined {
+    return this.breakdowns()[type] ?? undefined;
   }
 
   public formatBreakdownRate(perTick: number): string {
@@ -156,13 +156,13 @@ export class PanelResourcesComponent {
 
   public onMouseLeave(): void {
     this.clearTimer();
-    this.activeTooltip.set(null);
+    this.activeTooltip.set(undefined);
   }
 
   private clearTimer(): void {
     if (this.tooltipTimer) {
       clearTimeout(this.tooltipTimer);
-      this.tooltipTimer = null;
+      this.tooltipTimer = undefined;
     }
   }
 }

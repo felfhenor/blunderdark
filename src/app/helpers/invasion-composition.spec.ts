@@ -173,7 +173,7 @@ function makeGameState(overrides: {
       },
       research: {
         completedNodes: overrides.completedNodes ?? [],
-        activeResearch: null,
+        activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
       },
@@ -202,7 +202,7 @@ function makeGameState(overrides: {
       trapInventory: [],
       trapCraftingQueues: [],
       invasionSchedule: {
-        nextInvasionDay: null,
+        nextInvasionDay: undefined,
         nextInvasionVariance: 0,
         gracePeriodEnd: 30,
         invasionHistory: [],

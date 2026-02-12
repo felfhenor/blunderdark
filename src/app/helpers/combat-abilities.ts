@@ -84,18 +84,18 @@ export function tryActivateAbility(
   attacker: CombatUnit,
   targetCount: number,
   rng: () => number,
-): { activation: AbilityActivation; updatedStates: AbilityState[] } | null {
-  if (!isAbilityReady(ability, states)) return null;
+): { activation: AbilityActivation; updatedStates: AbilityState[] } | undefined {
+  if (!isAbilityReady(ability, states)) return undefined;
 
   // Check proc chance
   const roll = rng() * 100;
-  if (roll > ability.chance) return null;
+  if (roll > ability.chance) return undefined;
 
   const effect = getEffectDefinition(ability);
-  if (!effect) return null;
+  if (!effect) return undefined;
 
   let damage = 0;
-  let statusApplied: string | null = null;
+  let statusApplied: string | undefined = undefined;
   let statusDuration = 0;
   let targetsHit = 1;
 
@@ -111,7 +111,7 @@ export function tryActivateAbility(
     statusDuration = ability.duration;
   }
 
-  if (effect.overrideTargetsHit !== null) {
+  if (effect.overrideTargetsHit !== undefined) {
     targetsHit = effect.overrideTargetsHit;
     damage = 0;
   }

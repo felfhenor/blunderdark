@@ -3,9 +3,9 @@ export type TileOccupant = 'empty' | 'room' | 'hallway';
 export type GridTile = {
   occupied: boolean;
   occupiedBy: TileOccupant;
-  roomId: string | null;
-  hallwayId: string | null;
-  connectionType: string | null;
+  roomId: string | undefined;
+  hallwayId: string | undefined;
+  connectionType: string | undefined;
 };
 
 export type GridState = GridTile[][];

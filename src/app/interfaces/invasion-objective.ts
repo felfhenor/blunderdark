@@ -13,7 +13,7 @@ export type InvasionObjective = {
   type: ObjectiveType;
   name: string;
   description: string;
-  targetId: string | null;
+  targetId: string | undefined;
   isPrimary: boolean;
   isCompleted: boolean;
   progress: number;

@@ -45,13 +45,13 @@ export class PanelAltarComponent {
   public altarRoom = computed(() => {
     const tile = selectedTile();
     const floor = currentFloor();
-    if (!tile || !floor) return null;
+    if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return null;
+    if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('altar')) return null;
+    if (!room || room.roomTypeId !== findRoomIdByRole('altar')) return undefined;
 
     return room;
   });
@@ -64,7 +64,7 @@ export class PanelAltarComponent {
   public maxInhabitants = maxInhabitantCount;
   public tierUnlocked = unlockedTier;
 
-  public nextUpgrade = computed<RoomUpgradePath | null>(() => {
+  public nextUpgrade = computed<RoomUpgradePath | undefined>(() => {
     return getNextAltarUpgrade(gamestate().world.floors);
   });
 

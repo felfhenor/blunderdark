@@ -59,8 +59,8 @@ function makeEffect(
     name: 'Test Effect',
     __type: 'abilityeffect',
     dealsDamage: false,
-    statusName: null,
-    overrideTargetsHit: null,
+    statusName: undefined,
+    overrideTargetsHit: undefined,
     ...overrides,
   };
 }
@@ -483,19 +483,19 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('returns null when ability state is missing', () => {
     const invader = makeInvaderInstance({ abilityStates: [] });
     const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('Shield Wall targets self and returns defense buff', () => {
     const invader = makeInvaderInstance();
     const result = resolveInvaderAbility(invader, shieldWallAbility, ['enemy-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Buff Defense');
     expect(result!.value).toBe(25);
     expect(result!.duration).toBe(2);
@@ -511,7 +511,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, backstabAbility, ['target-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // Rogue attack = 6, value = 200% → 6 * 2 = 12
     expect(result!.value).toBe(12);
     expect(result!.targetIds).toEqual(['target-1']);
@@ -525,7 +525,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, arcaneBoltAbility, ['target-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // Mage attack = 10, value = 150% → 10 * 1.5 = 15
     expect(result!.value).toBe(15);
     expect(result!.effectType).toBe('Magic Damage');
@@ -540,7 +540,7 @@ describe('resolveInvaderAbility', () => {
     });
     const targets = ['undead-1', 'undead-2', 'undead-3'];
     const result = resolveInvaderAbility(invader, turnUndeadAbility, targets);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // Cleric attack = 4, value = 150% → 4 * 1.5 = 6
     expect(result!.value).toBe(6);
     expect(result!.targetIds).toEqual(targets);
@@ -555,7 +555,7 @@ describe('resolveInvaderAbility', () => {
     });
     const allies = ['ally-1', 'ally-2'];
     const result = resolveInvaderAbility(invader, auraOfCourageAbility, allies);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Fear Immunity');
     expect(result!.targetIds).toEqual(allies);
   });
@@ -568,7 +568,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, scoutAbility, ['target-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Scout');
     expect(result!.value).toBe(2);
     expect(result!.targetIds).toEqual([invader.id]);
@@ -582,7 +582,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, markTargetAbility, ['target-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Mark');
     expect(result!.value).toBe(20);
     expect(result!.duration).toBe(3);
@@ -597,7 +597,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, dispelAbility, ['target-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Dispel');
     expect(result!.value).toBe(0);
     expect(result!.targetIds).toEqual(['target-1']);
@@ -618,7 +618,7 @@ describe('Rogue disarm', () => {
     });
     // rng returns 0.3 → roll = 30 → 30 <= 60 → success
     const result = resolveInvaderAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.3);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.effectType).toBe('Disarm');
     expect(result!.value).toBe(1);
   });
@@ -632,7 +632,7 @@ describe('Rogue disarm', () => {
     });
     // rng returns 0.8 → roll = 80 → 80 > 60 → failure
     const result = resolveInvaderAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.8);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.value).toBe(0);
   });
 });
@@ -648,7 +648,7 @@ describe('Cleric heal', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, healAbility, ['ally-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // maxHp = 20, value = 20% → 20 * 0.2 = 4
     expect(result!.value).toBe(4);
     expect(result!.effectType).toBe('Heal');
@@ -681,7 +681,7 @@ describe('Cooldown prevents ability reuse', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('applyCooldown sets cooldown on the correct ability', () => {
@@ -721,13 +721,13 @@ describe('Cooldown prevents ability reuse', () => {
       ],
     });
     // Still on cooldown
-    expect(resolveInvaderAbility(invader, shieldWallAbility, ['t'])).toBeNull();
+    expect(resolveInvaderAbility(invader, shieldWallAbility, ['t'])).toBeUndefined();
     // Tick down
     invader = tickCooldowns(invader);
     expect(invader.abilityStates[0].currentCooldown).toBe(0);
     // Now it should work
     const result = resolveInvaderAbility(invader, shieldWallAbility, ['t']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
   });
 });
 
@@ -740,7 +740,7 @@ describe('Paladin Smite Evil', () => {
       ],
     });
     const result = resolveInvaderAbility(invader, smiteEvilAbility, ['corrupted-1']);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     // Paladin attack = 7, value = 200% → 7 * 2 = 14
     expect(result!.value).toBe(14);
     expect(result!.effectType).toBe('Damage');

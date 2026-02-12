@@ -116,7 +116,7 @@ function makeGameState(overrides: {
         definitionId: `def-${i.id}`,
         name: `inhabitant-${i.id}`,
         state: 'normal' as const,
-        assignedRoomId: null,
+        assignedRoomId: undefined,
       })),
       hallways: [],
       season: {
@@ -126,7 +126,7 @@ function makeGameState(overrides: {
       },
       research: {
         completedNodes: [],
-        activeResearch: null,
+        activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
       },
@@ -155,7 +155,7 @@ function makeGameState(overrides: {
       trapInventory: [],
       trapCraftingQueues: [],
       invasionSchedule: {
-        nextInvasionDay: null,
+        nextInvasionDay: undefined,
         nextInvasionVariance: 0,
         gracePeriodEnd: 30,
         invasionHistory: [],
@@ -305,7 +305,7 @@ describe('invasion-objectives', () => {
           o.type === 'PlunderVault',
       );
       for (const obj of roomObjectives) {
-        expect(obj.targetId).not.toBeNull();
+        expect(obj.targetId).toBeDefined();
       }
     });
 

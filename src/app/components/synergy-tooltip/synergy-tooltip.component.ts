@@ -22,16 +22,16 @@ export class SynergyTooltipComponent {
   public roomData = computed(() => {
     const tile = selectedTile();
     const floor = currentFloor();
-    if (!tile || !floor) return null;
+    if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return null;
+    if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return null;
+    if (!room) return undefined;
 
     const def = getRoomDefinition(room.roomTypeId);
-    if (!def) return null;
+    if (!def) return undefined;
 
     const roomTiles = new Map<string, { x: number; y: number }[]>();
     for (const r of floor.rooms) {
@@ -56,7 +56,7 @@ export class SynergyTooltipComponent {
       adjacentRoomIds,
     );
 
-    if (active.length === 0 && potential.length === 0) return null;
+    if (active.length === 0 && potential.length === 0) return undefined;
 
     return {
       roomName: def.name,

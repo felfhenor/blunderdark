@@ -55,7 +55,7 @@ function createTestInhabitant(
     definitionId: '7f716f6e-3742-496b-8277-875c180b0d94',
     name: 'Goblin Worker',
     state: 'normal',
-    assignedRoomId: null,
+    assignedRoomId: undefined,
     trained: false,
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
@@ -163,7 +163,7 @@ describe('inhabitant serialization', () => {
     const deserialized = deserializeInhabitants(partial);
 
     expect(deserialized[0].state).toBe('normal');
-    expect(deserialized[0].assignedRoomId).toBeNull();
+    expect(deserialized[0].assignedRoomId).toBeUndefined();
   });
 
   it('should not mutate the original array during serialization', () => {
@@ -216,7 +216,7 @@ function createTestRoomDef(
     isUnique: false,
     removable: true,
     maxInhabitants: -1,
-    inhabitantRestriction: null,
+    inhabitantRestriction: undefined,
     fearLevel: 0,
     fearReductionAura: 0,
     upgradePaths: [],
@@ -228,7 +228,7 @@ function createTestRoomDef(
 describe('meetsInhabitantRestriction', () => {
   it('should allow any inhabitant when restriction is null', () => {
     const def = createTestInhabitantDef();
-    expect(meetsInhabitantRestriction(def, null)).toBe(true);
+    expect(meetsInhabitantRestriction(def, undefined)).toBe(true);
   });
 
   it('should allow inhabitant with matching restriction tag', () => {

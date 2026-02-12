@@ -61,7 +61,7 @@ describe('removeHallwayFromGrid', () => {
       const tile = getTile(grid, t.x, t.y);
       expect(tile?.occupied).toBe(false);
       expect(tile?.occupiedBy).toBe('empty');
-      expect(tile?.hallwayId).toBeNull();
+      expect(tile?.hallwayId).toBeUndefined();
     }
   });
 
@@ -95,8 +95,8 @@ describe('isTileBlockedForHallway', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
-      hallwayId: null,
-      connectionType: null,
+      hallwayId: undefined,
+      connectionType: undefined,
     });
     expect(isTileBlockedForHallway(grid, 5, 5)).toBe(true);
   });

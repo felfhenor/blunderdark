@@ -24,8 +24,8 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     name: 'Damage',
     __type: 'abilityeffect',
     dealsDamage: true,
-    statusName: null,
-    overrideTargetsHit: null,
+    statusName: undefined,
+    overrideTargetsHit: undefined,
   },
   Stun: {
     id: 'ae000001-0000-4000-a000-000000000002',
@@ -33,7 +33,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     __type: 'abilityeffect',
     dealsDamage: false,
     statusName: 'stunned',
-    overrideTargetsHit: null,
+    overrideTargetsHit: undefined,
   },
   'Buff Attack': {
     id: 'ae000001-0000-4000-a000-000000000003',
@@ -41,7 +41,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     __type: 'abilityeffect',
     dealsDamage: false,
     statusName: 'berserk',
-    overrideTargetsHit: null,
+    overrideTargetsHit: undefined,
   },
   'Buff Defense': {
     id: 'ae000001-0000-4000-a000-000000000004',
@@ -49,7 +49,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     __type: 'abilityeffect',
     dealsDamage: false,
     statusName: 'shielded',
-    overrideTargetsHit: null,
+    overrideTargetsHit: undefined,
   },
   Evasion: {
     id: 'ae000001-0000-4000-a000-000000000005',
@@ -260,7 +260,7 @@ describe('tryActivateAbility: damage abilities', () => {
     const states = initAbilityStates([breathWeapon]);
     const attacker = makeUnit({ attack: 80 });
     const result = tryActivateAbility(breathWeapon, states, attacker, 3, fixedRng(0.5));
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.activation.abilityName).toBe('Breath Weapon');
     expect(result!.activation.damage).toBe(120); // 80 * 150/100
     expect(result!.activation.targetsHit).toBe(3);
@@ -281,14 +281,14 @@ describe('tryActivateAbility: damage abilities', () => {
     ];
     const attacker = makeUnit({ attack: 80 });
     const result = tryActivateAbility(breathWeapon, states, attacker, 3, fixedRng(0.5));
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('should activate death bolt with single target damage', () => {
     const states = initAbilityStates([deathBolt]);
     const attacker = makeUnit({ attack: 40 });
     const result = tryActivateAbility(deathBolt, states, attacker, 5, fixedRng(0.5));
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.activation.damage).toBe(80); // 40 * 200/100
     expect(result!.activation.targetsHit).toBe(1); // single target
   });
@@ -300,7 +300,7 @@ describe('tryActivateAbility: stun (petrifying gaze)', () => {
     const attacker = makeUnit();
     // 10% chance, roll 5 (5 <= 10, success)
     const result = tryActivateAbility(petrifyingGaze, states, attacker, 1, fixedRng(0.05));
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.activation.statusApplied).toBe('stunned');
     expect(result!.activation.statusDuration).toBe(3);
   });
@@ -310,7 +310,7 @@ describe('tryActivateAbility: stun (petrifying gaze)', () => {
     const attacker = makeUnit();
     // 10% chance, roll 50 (50 > 10, fail)
     const result = tryActivateAbility(petrifyingGaze, states, attacker, 1, fixedRng(0.5));
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 });
 
@@ -319,7 +319,7 @@ describe('tryActivateAbility: shield buff', () => {
     const states = initAbilityStates([lichShield]);
     const attacker = makeUnit();
     const result = tryActivateAbility(lichShield, states, attacker, 0, fixedRng(0.5));
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.activation.statusApplied).toBe('shielded');
     const shieldState = result!.updatedStates.find((s) => s.abilityId === 'ability-shield');
     expect(shieldState!.isActive).toBe(true);
@@ -408,14 +408,14 @@ describe('full cooldown lifecycle', () => {
 
     // Turn 1: activate (cooldown 0 → fires → cooldown set to 3)
     const result = tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5));
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     states = result!.updatedStates;
     expect(states[0].currentCooldown).toBe(3);
 
     // Turn 2: tick (3→2), can't fire
     states = tickAbilityStates(states);
     expect(states[0].currentCooldown).toBe(2);
-    expect(tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5))).toBeNull();
+    expect(tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5))).toBeUndefined();
 
     // Turn 3: tick (2→1)
     states = tickAbilityStates(states);
@@ -428,7 +428,7 @@ describe('full cooldown lifecycle', () => {
 
     // Turn 5: can activate again
     const result2 = tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5));
-    expect(result2).not.toBeNull();
+    expect(result2).toBeDefined();
   });
 });
 

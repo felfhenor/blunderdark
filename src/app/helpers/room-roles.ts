@@ -1,7 +1,7 @@
 import { getEntriesByType } from '@helpers/content';
 import type { IsContentItem, RoomDefinition } from '@interfaces';
 
-let roleCache: Map<string, string> | null = null;
+let roleCache: Map<string, string> | undefined = undefined;
 
 function buildRoleCache(): Map<string, string> {
   const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
@@ -22,5 +22,5 @@ export function findRoomIdByRole(role: string): string | undefined {
 }
 
 export function resetRoleCache(): void {
-  roleCache = null;
+  roleCache = undefined;
 }

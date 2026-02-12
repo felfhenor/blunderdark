@@ -69,7 +69,7 @@ function createInhabitantInstance(
     definitionId: 'def-dragon',
     name: 'Dragon',
     state: 'normal',
-    assignedRoomId: null,
+    assignedRoomId: undefined,
     ...overrides,
   };
 }
@@ -118,11 +118,11 @@ function createFloor(overrides: Partial<Floor> = {}): Floor {
 // --- Tests ---
 
 describe('findThroneRoom', () => {
-  it('should return null when no floors exist', () => {
-    expect(findThroneRoom([])).toBeNull();
+  it('should return undefined when no floors exist', () => {
+    expect(findThroneRoom([])).toBeUndefined();
   });
 
-  it('should return null when Throne Room is not placed', () => {
+  it('should return undefined when Throne Room is not placed', () => {
     const floor = createFloor({
       rooms: [
         createPlacedRoom({
@@ -131,14 +131,14 @@ describe('findThroneRoom', () => {
         }),
       ],
     });
-    expect(findThroneRoom([floor])).toBeNull();
+    expect(findThroneRoom([floor])).toBeUndefined();
   });
 
   it('should find Throne Room on the first floor', () => {
     const throneRoom = createPlacedRoom();
     const floor = createFloor({ rooms: [throneRoom] });
     const result = findThroneRoom([floor]);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.room.id).toBe('room-001');
     expect(result!.floor.id).toBe('floor-1');
   });
@@ -152,31 +152,31 @@ describe('findThroneRoom', () => {
       rooms: [throneRoom],
     });
     const result = findThroneRoom([floor1, floor2]);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.floor.id).toBe('floor-2');
   });
 });
 
 describe('getSeatedRulerInstance', () => {
-  it('should return null when no inhabitants are assigned', () => {
+  it('should return undefined when no inhabitants are assigned', () => {
     const floor = createFloor({ inhabitants: [] });
-    expect(getSeatedRulerInstance(floor, 'room-001')).toBeNull();
+    expect(getSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
   });
 
-  it('should return null when no inhabitant is assigned to the throne room', () => {
+  it('should return undefined when no inhabitant is assigned to the throne room', () => {
     const floor = createFloor({
       inhabitants: [
         createInhabitantInstance({ assignedRoomId: 'other-room' }),
       ],
     });
-    expect(getSeatedRulerInstance(floor, 'room-001')).toBeNull();
+    expect(getSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
   });
 
   it('should return the seated ruler', () => {
     const ruler = createInhabitantInstance({ assignedRoomId: 'room-001' });
     const floor = createFloor({ inhabitants: [ruler] });
     const result = getSeatedRulerInstance(floor, 'room-001');
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.instanceId).toBe('ruler-001');
   });
 });
@@ -280,7 +280,7 @@ describe('getActiveRulerBonuses', () => {
     const floor = createFloor({
       rooms: [createPlacedRoom()],
       inhabitants: [
-        createInhabitantInstance({ assignedRoomId: null }),
+        createInhabitantInstance({ assignedRoomId: undefined }),
       ],
     });
 
@@ -340,8 +340,8 @@ describe('getThroneRoomFearLevel', () => {
     mockContent.clear();
   });
 
-  it('should return null when no Throne Room exists', () => {
-    expect(getThroneRoomFearLevel([createFloor()])).toBeNull();
+  it('should return undefined when no Throne Room exists', () => {
+    expect(getThroneRoomFearLevel([createFloor()])).toBeUndefined();
   });
 
   it('should return EMPTY_THRONE_FEAR_LEVEL when Throne Room has no ruler', () => {

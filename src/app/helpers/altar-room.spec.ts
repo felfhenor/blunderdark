@@ -82,7 +82,7 @@ const altarRoomDef: RoomDefinition & IsContentItem = {
   isUnique: true,
   removable: false,
   maxInhabitants: 0,
-  inhabitantRestriction: null,
+  inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 1,
   upgradePaths: [empoweredAltarPath, ascendantAltarPath],
@@ -102,7 +102,7 @@ const crystalMineRoom: RoomDefinition & IsContentItem = {
   isUnique: false,
   removable: true,
   maxInhabitants: 2,
-  inhabitantRestriction: null,
+  inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
   upgradePaths: [],
@@ -207,18 +207,18 @@ describe('Altar Room: findAltarRoom', () => {
     const altar = createAltarRoom();
     const floor = makeFloor([altar]);
     const result = findAltarRoom([floor]);
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result!.room.id).toBe('placed-altar-1');
   });
 
-  it('should return null when no Altar Room exists', () => {
+  it('should return undefined when no Altar Room exists', () => {
     const mine = createMineRoom();
     const floor = makeFloor([mine]);
-    expect(findAltarRoom([floor])).toBeNull();
+    expect(findAltarRoom([floor])).toBeUndefined();
   });
 
-  it('should return null for empty floors', () => {
-    expect(findAltarRoom([makeFloor([])])).toBeNull();
+  it('should return undefined for empty floors', () => {
+    expect(findAltarRoom([makeFloor([])])).toBeUndefined();
   });
 });
 
@@ -285,7 +285,7 @@ describe('Altar Room: upgrade paths', () => {
     const altar = createAltarRoom();
     const floor = makeFloor([altar]);
     const next = getNextAltarUpgrade([floor]);
-    expect(next).not.toBeNull();
+    expect(next).toBeDefined();
     expect(next!.id).toBe(UPGRADE_LEVEL_2_ID);
     expect(next!.name).toBe('Empowered Altar');
   });
@@ -294,19 +294,19 @@ describe('Altar Room: upgrade paths', () => {
     const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
     const floor = makeFloor([altar]);
     const next = getNextAltarUpgrade([floor]);
-    expect(next).not.toBeNull();
+    expect(next).toBeDefined();
     expect(next!.id).toBe(UPGRADE_LEVEL_3_ID);
     expect(next!.name).toBe('Ascendant Altar');
   });
 
-  it('should return null when fully upgraded', () => {
+  it('should return undefined when fully upgraded', () => {
     const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
     const floor = makeFloor([altar]);
-    expect(getNextAltarUpgrade([floor])).toBeNull();
+    expect(getNextAltarUpgrade([floor])).toBeUndefined();
   });
 
-  it('should return null when no Altar exists', () => {
-    expect(getNextAltarUpgrade([makeFloor([])])).toBeNull();
+  it('should return undefined when no Altar exists', () => {
+    expect(getNextAltarUpgrade([makeFloor([])])).toBeUndefined();
   });
 });
 

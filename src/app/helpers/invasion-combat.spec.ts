@@ -25,7 +25,7 @@ import {
 function makeDefender(
   id: string,
   speed: number,
-  position: TilePosition | null = null,
+  position: TilePosition | undefined = undefined,
   hp = 20,
 ): Combatant {
   return createCombatant(id, 'defender', `Defender ${id}`, {
@@ -40,7 +40,7 @@ function makeDefender(
 function makeInvader(
   id: string,
   speed: number,
-  position: TilePosition | null = null,
+  position: TilePosition | undefined = undefined,
   hp = 15,
 ): Combatant {
   return createCombatant(id, 'invader', `Invader ${id}`, {
@@ -77,11 +77,11 @@ describe('invasion-combat', () => {
       expect(c.position).toEqual({ x: 5, y: 3 });
     });
 
-    it('should allow null position', () => {
+    it('should allow undefined position', () => {
       const c = createCombatant('c1', 'invader', 'Warrior', {
         hp: 15, maxHp: 15, attack: 6, defense: 4, speed: 2,
-      }, null);
-      expect(c.position).toBeNull();
+      }, undefined);
+      expect(c.position).toBeUndefined();
     });
   });
 
@@ -126,23 +126,23 @@ describe('invasion-combat', () => {
 
     it('should skip dead combatants', () => {
       const combatants = [
-        makeDefender('d1', 5, null, 0),
+        makeDefender('d1', 5, undefined, 0),
         makeInvader('i1', 3),
       ];
       const queue = buildTurnQueue(combatants);
       expect(getCurrentActor(queue)?.id).toBe('i1');
     });
 
-    it('should return null for empty queue', () => {
+    it('should return undefined for empty queue', () => {
       const queue = buildTurnQueue([]);
-      expect(getCurrentActor(queue)).toBeNull();
+      expect(getCurrentActor(queue)).toBeUndefined();
     });
 
-    it('should return null when all have acted', () => {
+    it('should return undefined when all have acted', () => {
       const combatants = [makeDefender('d1', 5)];
       let queue = buildTurnQueue(combatants);
       queue = advanceTurn(queue);
-      expect(getCurrentActor(queue)).toBeNull();
+      expect(getCurrentActor(queue)).toBeUndefined();
     });
   });
 
@@ -160,7 +160,7 @@ describe('invasion-combat', () => {
     it('should skip dead combatants when advancing', () => {
       const queue = buildTurnQueue([
         makeDefender('d1', 7),
-        makeDefender('d2', 5, null, 0),
+        makeDefender('d2', 5, undefined, 0),
         makeInvader('i1', 3),
       ]);
       const advanced = advanceTurn(queue);
@@ -197,7 +197,7 @@ describe('invasion-combat', () => {
     it('should ignore dead combatants', () => {
       const queue = buildTurnQueue([
         makeDefender('d1', 5),
-        makeInvader('i1', 3, null, 0),
+        makeInvader('i1', 3, undefined, 0),
       ]);
       const advanced = advanceTurn(queue);
       expect(isRoundComplete(advanced)).toBe(true);
@@ -220,7 +220,7 @@ describe('invasion-combat', () => {
     it('should remove dead combatants', () => {
       const combatants = [
         makeDefender('d1', 5),
-        makeInvader('i1', 3, null, 0),
+        makeInvader('i1', 3, undefined, 0),
       ];
       const queue = buildTurnQueue(combatants);
       const newRound = startNewRound(queue);
@@ -258,9 +258,9 @@ describe('invasion-combat', () => {
   describe('getAliveCombatants', () => {
     it('should return only combatants with hp > 0', () => {
       const queue = buildTurnQueue([
-        makeDefender('d1', 5, null, 20),
-        makeInvader('i1', 3, null, 0),
-        makeDefender('d2', 2, null, 10),
+        makeDefender('d1', 5, undefined, 20),
+        makeInvader('i1', 3, undefined, 0),
+        makeDefender('d2', 2, undefined, 10),
       ]);
       const alive = getAliveCombatants(queue);
       expect(alive).toHaveLength(2);
@@ -323,7 +323,7 @@ describe('invasion-combat', () => {
     });
 
     it('should return empty for actor with no position', () => {
-      const actor = makeDefender('d1', 5, null);
+      const actor = makeDefender('d1', 5, undefined);
       expect(getValidMoveTargets(actor, [actor])).toEqual([]);
     });
 
@@ -366,7 +366,7 @@ describe('invasion-combat', () => {
     });
 
     it('should return empty for actor with no position', () => {
-      const actor = makeDefender('d1', 5, null);
+      const actor = makeDefender('d1', 5, undefined);
       const enemy = makeInvader('i1', 3, { x: 5, y: 5 });
       expect(getValidAttackTargets(actor, [actor, enemy])).toEqual([]);
     });
@@ -374,7 +374,7 @@ describe('invasion-combat', () => {
 
   describe('getAvailableActions', () => {
     it('should always include wait', () => {
-      const actor = makeDefender('d1', 5, null);
+      const actor = makeDefender('d1', 5, undefined);
       const actions = getAvailableActions(actor, [actor]);
       expect(actions).toContain('wait');
     });
@@ -408,7 +408,7 @@ describe('invasion-combat', () => {
       expect(result.action).toBe('move');
       expect(result.actorId).toBe('d1');
       expect(result.targetPosition).toEqual({ x: 5, y: 4 });
-      expect(result.combatResult).toBeNull();
+      expect(result.combatResult).toBeUndefined();
     });
 
     it('should not mutate original queue', () => {
@@ -430,7 +430,7 @@ describe('invasion-combat', () => {
       expect(result.action).toBe('attack');
       expect(result.actorId).toBe('d1');
       expect(result.targetId).toBe('i1');
-      expect(result.combatResult).not.toBeNull();
+      expect(result.combatResult).toBeDefined();
       expect(result.combatResult!.hit).toBe(true);
       // Defender HP should be updated in queue
       const target = updated.combatants.find((c) => c.id === 'i1');
@@ -461,7 +461,7 @@ describe('invasion-combat', () => {
     it('should handle unknown attacker gracefully', () => {
       const queue = buildTurnQueue([makeDefender('d1', 5)]);
       const { result } = executeAttack(queue, 'nonexistent', 'd1', fixedRng(0.5));
-      expect(result.combatResult).toBeNull();
+      expect(result.combatResult).toBeUndefined();
     });
   });
 
@@ -470,8 +470,8 @@ describe('invasion-combat', () => {
       const result = executeWait('d1');
       expect(result.action).toBe('wait');
       expect(result.actorId).toBe('d1');
-      expect(result.targetId).toBeNull();
-      expect(result.combatResult).toBeNull();
+      expect(result.targetId).toBeUndefined();
+      expect(result.combatResult).toBeUndefined();
     });
   });
 
@@ -509,7 +509,7 @@ describe('invasion-combat', () => {
     });
 
     it('should wait when actor has no position', () => {
-      const actor = makeInvader('i1', 5, null);
+      const actor = makeInvader('i1', 5, undefined);
       const enemy = makeDefender('d1', 3, { x: 5, y: 5 });
       const decision = resolveAiAction(actor, [actor, enemy]);
       expect(decision.action).toBe('wait');

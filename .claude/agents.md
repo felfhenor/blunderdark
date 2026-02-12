@@ -108,7 +108,7 @@ For cross-cutting events (level-ups, season transitions, notifications):
 ## Room & Production System
 
 - `PlacedRoom` type in `room-shape.ts` includes `roomTypeId` linking to the content definition — when adding fields to this type, update all test PlacedRoom literals in `room-shapes.spec.ts`
-- `RoomDefinition` type in `room.ts` includes `production: RoomProduction`, `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`, `isUnique: boolean`, `maxInhabitants: number` (-1 = unlimited), `inhabitantRestriction: string | null`, `fearLevel: number | 'variable'`
+- `RoomDefinition` type in `room.ts` includes `production: RoomProduction`, `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`, `isUnique: boolean`, `maxInhabitants: number` (-1 = unlimited), `inhabitantRestriction: string | undefined`, `fearLevel: number | 'variable'`
 - When adding fields to `RoomDefinition`, also update `ensureRoom()` in `content-initializers.ts` with defaults — the initializer is what populates missing fields from YAML
 - `isUniqueRoomTypePlaced(floors, roomTypeId)` checks all floors for an existing room of that type — used for dungeon-wide unique constraint enforcement
 - `placedRoomTypeIds` computed signal exposes the set of room type IDs placed across all floors — reactive for UI bindings
@@ -486,7 +486,7 @@ When multiple build modes exist (room placement, hallway build):
 - `InvaderDefinition` (content type) vs `InvaderInstance` (runtime with HP, status effects, ability states)
 - `InvaderInstance.abilityStates: AbilityState[]` — reuses the same AbilityState type from combat system
 - `InvaderInstance.statusEffects: StatusEffect[]` — tracks named effects with durations (shielded, marked, courage, etc.)
-- `resolveInvaderAbility(invader, ability, targetIds, rng)` — pure function returning `AbilityResult | null`
+- `resolveInvaderAbility(invader, ability, targetIds, rng)` — pure function returning `AbilityResult | undefined`
 - Invader abilities are CombatAbility entries referencing AbilityEffectDefinition by name via `effectType`
 - **Mock content collision warning**: When mocking `@helpers/content` in tests, do NOT register abilities by name if effect names overlap (e.g., "Scout" effect vs "Scout" ability) — register abilities by ID only
 - `createInvaderInstance(definition)` looks up ability IDs via `getEntry` to initialize ability states
@@ -549,7 +549,7 @@ When multiple build modes exist (room placement, hallway build):
 - `invasion-win-loss.ts` helper: pure functions for checking invasion end conditions and resolving results
 - Constants: `ALTAR_MAX_HP = 100`, `MAX_INVASION_TURNS = 30`, `SECONDARY_OBJECTIVES_FOR_VICTORY = 2`
 - `InvasionState` type in `invasion.ts` tracks active invasion: turn counter, altar HP, invaders, objectives, defender/invader counts
-- `checkInvasionEnd(state)` returns `InvasionEndReason | null` — priority: altar_destroyed > objectives_completed > all_invaders_eliminated > turn_limit_reached
+- `checkInvasionEnd(state)` returns `InvasionEndReason | undefined` — priority: altar_destroyed > objectives_completed > all_invaders_eliminated > turn_limit_reached
 - All state mutations are pure (return new state): `damageAltar`, `advanceInvasionTurn`, `markInvaderKilled`, `recordDefenderLoss`, `endInvasion`
 - `damageAltar` auto-updates the DestroyAltar objective progress based on HP percentage
 
@@ -635,3 +635,4 @@ When adding build-time validation for a content type:
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
 - `BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering
+- Do not use `null` as a return type, optional type, or anywhere in the codebase — use `undefined` instead for consistency and to avoid confusion

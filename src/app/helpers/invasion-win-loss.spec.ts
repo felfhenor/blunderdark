@@ -88,7 +88,7 @@ function makeSecondaryObjective(
     type,
     name: type,
     description: `${type} objective.`,
-    targetId: null,
+    targetId: undefined,
     isPrimary: false,
     isCompleted: completed,
     progress: completed ? 100 : 0,
@@ -269,12 +269,12 @@ describe('invasion-win-loss', () => {
   describe('checkInvasionEnd', () => {
     it('should return null when invasion is ongoing', () => {
       const state = makeInvasionState();
-      expect(checkInvasionEnd(state)).toBeNull();
+      expect(checkInvasionEnd(state)).toBeUndefined();
     });
 
     it('should return null when invasion is already inactive', () => {
       const state = makeInvasionState({ isActive: false, altarHp: 0 });
-      expect(checkInvasionEnd(state)).toBeNull();
+      expect(checkInvasionEnd(state)).toBeUndefined();
     });
 
     it('should return altar_destroyed when altar HP is 0', () => {
@@ -609,7 +609,7 @@ describe('invasion-win-loss', () => {
       // Turn 1: kill first invader
       state = advanceInvasionTurn(state);
       state = markInvaderKilled(state, 'a');
-      expect(checkInvasionEnd(state)).toBeNull();
+      expect(checkInvasionEnd(state)).toBeUndefined();
 
       // Turn 2: kill second invader
       state = advanceInvasionTurn(state);

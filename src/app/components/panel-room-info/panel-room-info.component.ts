@@ -35,16 +35,16 @@ export class PanelRoomInfoComponent {
   public selectedRoom = computed(() => {
     const tile = selectedTile();
     const floor = currentFloor();
-    if (!tile || !floor) return null;
+    if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return null;
+    if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return null;
+    if (!room) return undefined;
 
     const def = getRoomDefinition(room.roomTypeId);
-    if (!def) return null;
+    if (!def) return undefined;
 
     const effectiveMax = getEffectiveMaxInhabitants(room, def);
 
@@ -89,10 +89,10 @@ export class PanelRoomInfoComponent {
   public efficiencyBreakdown = computed(() => {
     const room = this.selectedRoom();
     const floor = currentFloor();
-    if (!room || !floor) return null;
+    if (!room || !floor) return undefined;
 
     const roomDef = getRoomDefinition(room.roomTypeId);
-    if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return null;
+    if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return undefined;
 
     return calculateRoomEfficiency(room.placedRoom, floor.inhabitants);
   });
@@ -107,7 +107,7 @@ export class PanelRoomInfoComponent {
 
     return floor.inhabitants
       .filter((i) => {
-        if (i.assignedRoomId !== null) return false;
+        if (i.assignedRoomId !== undefined) return false;
         const def = getEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
@@ -213,7 +213,7 @@ export class PanelRoomInfoComponent {
 
   public removalInfo = computed(() => {
     const room = this.selectedRoom();
-    if (!room) return null;
+    if (!room) return undefined;
     return getRemovalInfo(room.id);
   });
 

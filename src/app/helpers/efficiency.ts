@@ -73,11 +73,11 @@ export function doesTraitApplyToRoom(
 export function calculateInhabitantContribution(
   instance: InhabitantInstance,
   roomProduction: RoomProduction,
-): InhabitantContribution | null {
+): InhabitantContribution | undefined {
   const def = getEntry<InhabitantDefinition & IsContentItem>(
     instance.definitionId,
   );
-  if (!def) return null;
+  if (!def) return undefined;
 
   const workerEfficiencyBonus = def.stats.workerEfficiency - 1.0;
 
@@ -185,7 +185,7 @@ export function calculateMatchedInhabitantBonus(
 /**
  * Get the efficiency breakdown for a specific room by ID.
  */
-export function getRoomEfficiency(roomId: string): RoomEfficiencyBreakdown | null {
+export function getRoomEfficiency(roomId: string): RoomEfficiencyBreakdown | undefined {
   const floors = gamestate().world.floors;
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
@@ -193,7 +193,7 @@ export function getRoomEfficiency(roomId: string): RoomEfficiencyBreakdown | nul
       return calculateRoomEfficiency(room, floor.inhabitants);
     }
   }
-  return null;
+  return undefined;
 }
 
 /**

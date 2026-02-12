@@ -202,7 +202,7 @@ export type TrainingRoomInfo = {
 
 export function getTrainingRoomInfo(
   roomId: string,
-): TrainingRoomInfo | null {
+): TrainingRoomInfo | undefined {
   const trainingGroundsId = findRoomIdByRole('trainingGrounds');
   const state = gamestate();
   for (const floor of state.world.floors) {
@@ -217,19 +217,19 @@ export function getTrainingRoomInfo(
       bonuses: getTrainingBonusesForRoom(room, adjacentTypes),
     };
   }
-  return null;
+  return undefined;
 }
 
 /**
  * Reactive signal: selected tile's Training Grounds info (null if not a Training Grounds).
  */
-export const selectedTrainingRoom = computed<TrainingRoomInfo | null>(() => {
+export const selectedTrainingRoom = computed<TrainingRoomInfo | undefined>(() => {
   const trainingGroundsId = findRoomIdByRole('trainingGrounds');
   const state = gamestate();
   const floors = state.world.floors;
   const floorIndex = state.world.currentFloorIndex;
   const floor = floors[floorIndex];
-  if (!floor) return null;
+  if (!floor) return undefined;
 
   // Find the training grounds room from the floor's rooms list
   // We check all rooms to find if any is selected (via UI)
@@ -244,5 +244,5 @@ export const selectedTrainingRoom = computed<TrainingRoomInfo | null>(() => {
       };
     }
   }
-  return null;
+  return undefined;
 });

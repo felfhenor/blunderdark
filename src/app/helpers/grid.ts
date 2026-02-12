@@ -7,9 +7,9 @@ export function createEmptyGrid(): GridState {
     Array.from({ length: GRID_SIZE }, () => ({
       occupied: false,
       occupiedBy: 'empty' as const,
-      roomId: null,
-      hallwayId: null,
-      connectionType: null,
+      roomId: undefined,
+      hallwayId: undefined,
+      connectionType: undefined,
     })),
   );
 }
@@ -22,8 +22,8 @@ export function getTile(
   grid: GridState,
   x: number,
   y: number,
-): GridTile | null {
-  if (!isInBounds(x, y)) return null;
+): GridTile | undefined {
+  if (!isInBounds(x, y)) return undefined;
   return grid[y][x];
 }
 
@@ -43,17 +43,17 @@ export function resetGrid(): GridState {
   return createEmptyGrid();
 }
 
-export const selectedTile = signal<{ x: number; y: number } | null>(null);
+export const selectedTile = signal<{ x: number; y: number } | undefined>(undefined);
 
 export function selectTile(x: number, y: number): void {
   const current = selectedTile();
   if (current?.x === x && current?.y === y) {
-    selectedTile.set(null);
+    selectedTile.set(undefined);
   } else {
     selectedTile.set({ x, y });
   }
 }
 
 export function deselectTile(): void {
-  selectedTile.set(null);
+  selectedTile.set(undefined);
 }

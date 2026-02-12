@@ -66,7 +66,7 @@ export function defaultReputationState(): ReputationState {
 export function defaultResearchState(): ResearchState {
   return {
     completedNodes: [],
-    activeResearch: null,
+    activeResearch: undefined,
     activeResearchProgress: 0,
     activeResearchStartTick: 0,
   };
@@ -95,7 +95,7 @@ export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floo
 
 export function defaultInvasionSchedule(): InvasionSchedule {
   return {
-    nextInvasionDay: null,
+    nextInvasionDay: undefined,
     nextInvasionVariance: 0,
     gracePeriodEnd: 30,
     invasionHistory: [],
