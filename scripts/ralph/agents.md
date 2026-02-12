@@ -308,6 +308,9 @@ BFS pathfinding for hallways between rooms:
 - `workerEfficiency` affects production via `totalBonus += workerEfficiency - 1.0` — a skeleton with `workerEfficiency: 0.7` applies a -0.3 penalty, so `0.6 base * (1 - 0.3) = 0.42` actual
 - `fearIncrease` is a valid upgrade effect type for room upgrades (used by Forbidden Knowledge) — data-only for now, will be wired when fear system is implemented
 - Test pattern for room-specific specs: mock `@helpers/content` with inline room/shape/inhabitant data, then test production, adjacency, upgrades via imported helper functions
+- When a PRD references systems that don't exist yet (e.g., corruption, skeleton spawning), implement what fits in current architecture and mark deferred stories with notes explaining dependencies
+- Passive rooms (`requiresWorkers: false`) still apply worker bonuses/penalties if inhabitants are assigned — `calculateInhabitantBonus` runs regardless of `requiresWorkers`, which only controls the "zero workers = zero production" gate
+- Reuse existing shapes when possible rather than creating duplicates (e.g., Soul Well uses existing 3x3 square `60e19fcd`)
 
 ## GameState Type Gotchas
 

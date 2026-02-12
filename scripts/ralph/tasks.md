@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 31 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room)
+- **Complete:** 32 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room)
 - **In Progress:** None
-- **Remaining:** ~91 features
+- **Remaining:** ~90 features
 
 ---
 
@@ -83,7 +83,7 @@ More room variety for economic depth.
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
 | ~~6.1~~ | ~~`shadow-library-room`~~ | ~~COMPLETE~~ | ~~room-placement-ui, production-calculation-system~~ |
-| 6.2 | `soul-well-room` | 5 | room-placement-ui, production-calculation-system |
+| ~~6.2~~ | ~~`soul-well-room`~~ | ~~COMPLETE (5/8, 3 deferred)~~ | ~~room-placement-ui, production-calculation-system~~ |
 | 6.3 | `treasure-vault-room` | 5 | room-placement-ui |
 | 6.4 | `underground-lake-room` | 5 | room-placement-ui |
 | 6.5 | `ley-line-nexus-room` | 5 | room-placement-ui |

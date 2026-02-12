@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Soul Well defined in gamedata/room/base.yml with 3x3 shape, fearLevel 3, maxInhabitants 2, 3 adjacency bonuses, 2 upgrade paths"
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing Square 3x3 shape (60e19fcd). Placement and rendering handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -45,7 +45,7 @@
       ],
       "priority": 3,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires inhabitant spawning system (periodic creation of inhabitants from rooms). Not part of current production architecture."
     },
     {
       "id": "US-004",
@@ -60,7 +60,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires Corruption resource system (Phase 12). Cannot implement until corruption-resource feature is complete."
     },
     {
       "id": "US-005",
@@ -76,7 +76,7 @@
       ],
       "priority": 5,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Depends on US-003 and US-004 (dual modes). Requires room mode state infrastructure."
     },
     {
       "id": "US-006",
@@ -91,8 +91,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fear level set to 3. Fear effects on inhabitants and corruption spread require Phase 11 (fear system) and Phase 12 (corruption system) respectively."
     },
     {
       "id": "US-007",
@@ -105,8 +105,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined with productionMultiplier 1.5x essence + maxInhabitantBonus 1 (2→3 capacity). Skeleton spawn time reduction deferred until spawning system exists."
     },
     {
       "id": "US-008",
@@ -119,8 +119,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined with productionMultiplier 1.75x essence + fearReduction 1. Corruption conversion improvement deferred until Phase 12."
     }
   ]
 }
