@@ -478,6 +478,21 @@ When adding new fields to `GameStateWorld`:
 - Altar rebuild cost: 100 crystals + 50 gold + 20 flux
 - `CapturedPrisoner` type: id, invaderClass, name, stats, captureDay
 
+## Turn-Based Invasion Combat
+
+- `invasion-combat.ts` helper: pure functions for turn queue management, action validation/execution, and AI
+- `Combatant` type unifies defenders and invaders: id, side, name, speed, hp/maxHp, attack, defense, hasActed, position
+- `TurnQueue`: combatants sorted by speed (desc), defenders-first on ties. Tracks currentIndex and round number
+- Turn flow: `buildTurnQueue` → `getCurrentActor` → execute action → `advanceTurn` → check `isRoundComplete` → `startNewRound`
+- `startNewRound` removes dead combatants, resets hasActed, re-sorts, increments round
+- Position system: `TilePosition = { x, y }`, cardinal adjacency only (no diagonals)
+- `getValidMoveTargets`: adjacent tiles not occupied by alive combatants, must be >= 0 coordinates
+- `getValidAttackTargets`: adjacent alive enemies
+- `executeMove` / `executeAttack` / `executeWait`: all return `{ queue, result }` (pure, no mutation)
+- `executeAttack` delegates to `resolveCombat` from combat.ts for d20-based hit/damage resolution
+- AI (`resolveAiAction`): attack weakest adjacent enemy > move toward nearest enemy (manhattan) > wait
+- `executeAiTurn`: wraps AI decision + execution in one call
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)

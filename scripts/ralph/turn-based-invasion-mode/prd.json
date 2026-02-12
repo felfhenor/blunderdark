@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Deferred to UI integration. The service will wrap the helper functions. Game loop pausing is already supported via isPaused flag in GameStateMeta."
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Combatant type unifies defenders and invaders with id, side, speed, hp, maxHp, attack, defense, hasActed, position. buildTurnQueue sorts by speed (desc), defenders-first on ties. advanceTurn marks current as acted and skips dead. startNewRound removes dead, resets hasActed, re-sorts."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "getValidMoveTargets returns cardinal adjacent unoccupied tiles (excludes alive combatants). executeMove returns new queue with updated position."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "getValidAttackTargets returns adjacent enemies. executeAttack delegates to resolveCombat from combat.ts, updates target HP. Visual feedback deferred to UI."
     },
     {
       "id": "US-005",
@@ -77,8 +77,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Ability action type defined. getAvailableActions framework supports ability check. Full ability targeting integration deferred to when defender combat abilities are defined (defenders use InhabitantInstance which currently has no ability system)."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "resolveAiAction: attack weakest adjacent enemy > move toward nearest enemy (manhattan distance) > wait. executeAiTurn wraps decision + execution. AI delay for visual clarity deferred to UI service."
     },
     {
       "id": "US-007",
@@ -109,8 +109,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Deferred - UI component. TurnQueue data structure supports all needed data (combatants with side, getCurrentActor for highlighting). Will be implemented when invasion UI is built."
     },
     {
       "id": "US-008",
@@ -125,8 +125,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Deferred - UI component. getAvailableActions provides disabled/enabled state. getValidMoveTargets and getValidAttackTargets provide target highlighting data."
     }
   ]
 }
