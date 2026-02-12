@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined in gamedata/room/base.yml with 3x3 shape, fearLevel 1, maxInhabitants 1, 4 adjacency bonuses, 3 upgrade paths"
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing Square 3x3 shape (60e19fcd). Placement handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -45,7 +45,7 @@
       ],
       "priority": 3,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: No storage cap system exists yet. Resource storage caps are not implemented in the current architecture."
     },
     {
       "id": "US-004",
@@ -59,8 +59,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Produces 0.8 gold/tick (4 gold/min) passively. Worker assignment modifies via inhabitant bonus. Storage cap check deferred."
     },
     {
       "id": "US-005",
@@ -75,7 +75,7 @@
       ],
       "priority": 5,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Requires combat system (Phase 7) and game event system. Mimic risk mechanic cannot be implemented without these."
     },
     {
       "id": "US-006",
@@ -90,8 +90,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrades defined: Reinforced (1.5x gold + fear reduction), Investment (2x gold + capacity), Dragon's Hoard (2.5x gold + fear increase). Storage bonus and mimic effects deferred."
     },
     {
       "id": "US-007",
@@ -104,8 +104,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 adjacency bonuses: Dark Forge +15%, Altar +25%, Throne Room +20%, another Vault +10%. Trap Workshop bonus deferred (room doesn't exist yet)."
     }
   ]
 }
