@@ -26,6 +26,7 @@ export * from './invaders';
 export * from './logging';
 export * from './migrate';
 export * from './notify';
+export * from './pathfinding';
 export * from './production';
 export * from './recruitment';
 export * from './reputation';
