@@ -2,6 +2,7 @@ import { defaultStats } from '@helpers/defaults';
 import type {
   AbilityEffectDefinition,
   CombatAbility,
+  CompositionWeightConfig,
   ContentType,
   HeroContent,
   HeroId,
@@ -36,6 +37,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   hero: ensureHero,
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
+  invasion: ensureInvasion,
   item: ensureItem,
   monster: ensureMonster,
   pet: ensurePet,
@@ -304,5 +306,21 @@ function ensureTrap(
     triggerChance: trap.triggerChance ?? 0.5,
     canBeDisarmed: trap.canBeDisarmed ?? true,
     sprite: trap.sprite ?? 'UNKNOWN',
+  };
+}
+
+const defaultWeights = { warrior: 17, rogue: 17, mage: 17, cleric: 17, paladin: 16, ranger: 16 };
+
+function ensureInvasion(
+  config: Partial<CompositionWeightConfig & IsContentItem>,
+): CompositionWeightConfig & IsContentItem {
+  return {
+    id: config.id ?? 'UNKNOWN',
+    name: config.name ?? 'UNKNOWN',
+    __type: 'invasion',
+    balanced: config.balanced ?? { ...defaultWeights },
+    highCorruption: config.highCorruption ?? { ...defaultWeights },
+    highWealth: config.highWealth ?? { ...defaultWeights },
+    highKnowledge: config.highKnowledge ?? { ...defaultWeights },
   };
 }

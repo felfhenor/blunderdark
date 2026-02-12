@@ -19,3 +19,26 @@ export type InvasionSchedule = {
   warningActive: boolean;
   warningDismissed: boolean;
 };
+
+// --- Composition types ---
+
+import type { InvaderClassType } from '@interfaces/invader';
+
+export type InvaderClassWeights = Record<InvaderClassType, number>;
+
+export type CompositionWeightConfig = {
+  id: string;
+  name: string;
+  balanced: InvaderClassWeights;
+  highCorruption: InvaderClassWeights;
+  highWealth: InvaderClassWeights;
+  highKnowledge: InvaderClassWeights;
+};
+
+export type DungeonProfile = {
+  corruption: number;
+  wealth: number;
+  knowledge: number;
+  size: number;
+  threatLevel: number;
+};

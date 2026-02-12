@@ -1,0 +1,31 @@
+- id: aa950001-0001-0001-0001-000000000001
+  name: Composition Weights
+  type: invasion
+  balanced:
+    warrior: 20
+    rogue: 17
+    mage: 17
+    cleric: 16
+    paladin: 15
+    ranger: 15
+  highCorruption:
+    warrior: 10
+    rogue: 10
+    mage: 10
+    cleric: 25
+    paladin: 30
+    ranger: 15
+  highWealth:
+    warrior: 20
+    rogue: 30
+    mage: 10
+    cleric: 10
+    paladin: 10
+    ranger: 20
+  highKnowledge:
+    warrior: 10
+    rogue: 15
+    mage: 30
+    cleric: 10
+    paladin: 10
+    ranger: 25

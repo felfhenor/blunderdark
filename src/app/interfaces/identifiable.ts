@@ -4,6 +4,7 @@ export type ContentType =
   | 'hero'
   | 'inhabitant'
   | 'invader'
+  | 'invasion'
   | 'item'
   | 'monster'
   | 'pet'
