@@ -1,34 +1,34 @@
-- id: a48a78f9-f52f-4285-a868-4f60a732640d
+- id: d24ea771-7bc8-4157-809e-31f97241e73c
   name: Crystal
   resourceType: crystals
   defaultMax: 500
 
-- id: b7c3e1a2-9d4f-4b8e-a1c6-2f5e8d3a7b9c
+- id: 4d01d142-09f2-4586-9441-81962409bae5
   name: Food
   resourceType: food
   defaultMax: 500
 
-- id: c8d4f2b3-ae50-4c9f-b2d7-3a6f9e4b8c0d
+- id: ac38d42e-897c-4a27-bd84-6e25463058a7
   name: Gold
   resourceType: gold
   defaultMax: 1000
 
-- id: d9e5a3c4-bf61-4da0-c3e8-4b7a0f5c9d1e
+- id: 27ae39e1-d365-41bd-a46d-c1e994aaa27c
   name: Flux
   resourceType: flux
   defaultMax: 200
 
-- id: e0f6b4d5-ca72-4eb1-d4f9-5c8b1a6d0e2f
+- id: 0813a67a-d03f-4d3f-bf68-70d2cfaca8ab
   name: Research
   resourceType: research
   defaultMax: 300
 
-- id: f1a7c5e6-db83-4fc2-e5a0-6d9c2b7e1f3a
+- id: 3f2be4c4-803c-4b0d-91f0-0ebea0eb914c
   name: Essence
   resourceType: essence
   defaultMax: 200
 
-- id: a2b8d6f7-ec94-40d3-f6b1-7e0d3c8f2a4b
+- id: f1c87151-aea3-436b-a81d-347fdd706a27
   name: Corruption
   resourceType: corruption
   defaultMax: 100

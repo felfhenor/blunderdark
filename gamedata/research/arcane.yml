@@ -18,7 +18,7 @@
 
 # --- TIER 2: Three paths branch from Arcane Basics ---
 
-- id: aa000002-0002-4000-b001-000000000001
+- id: dd1436c4-151c-4915-8645-ffb953df3870
   name: Flux Manipulation
   description: Master the flow of raw magical flux, learning to store and redirect arcane energy efficiently.
   branch: arcane
@@ -30,7 +30,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000002-0003-4000-b001-000000000001
+- id: 7a2ebad7-c9ab-4718-a456-0562b7a8da6d
   name: Ley Line Tapping
   description: Discover how to tap into the ley lines running beneath the dungeon for a steady supply of magical power.
   branch: arcane
@@ -42,7 +42,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000002-0004-4000-b001-000000000001
+- id: 85974131-d05e-4b8e-81f5-4ae3247e781a
   name: Enchantment
   description: Imbue objects and rooms with persistent magical effects that enhance their function.
   branch: arcane
@@ -56,7 +56,7 @@
 
 # --- TIER 3: Specializations ---
 
-- id: aa000002-0005-4000-b001-000000000001
+- id: 5267d87a-43c9-4495-abb6-c1393714ba49
   name: Arcane Amplification
   description: Amplify the output of magical structures, increasing flux generation and spell potency across the dungeon.
   branch: arcane
@@ -68,7 +68,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000002-0006-4000-b001-000000000001
+- id: e318e918-eb4f-4d0b-823e-360ddf1dfe80
   name: Elemental Binding
   description: Bind elemental forces to your dungeon, harnessing fire, ice, and lightning for defense and production.
   branch: arcane
@@ -80,7 +80,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000002-0007-4000-b001-000000000001
+- id: 21df8436-d4be-4f55-b2eb-217dfec171a0
   name: Warding
   description: Create powerful protective wards that shield rooms and inhabitants from magical intrusion.
   branch: arcane
@@ -94,7 +94,7 @@
 
 # --- TIER 4: Advanced combinations ---
 
-- id: aa000002-0008-4000-b001-000000000001
+- id: 75c17355-430c-4e6b-a878-b21921698019
   name: Dimensional Studies
   description: Explore the boundaries between planes, unlocking the ability to bend space within your dungeon.
   branch: arcane
@@ -108,7 +108,7 @@
   unlocks: []
   tier: 4
 
-- id: aa000002-0009-4000-b001-000000000001
+- id: 3bae2f3c-511a-4afd-9f52-8f4839dc847f
   name: Ley Line Mastery
   description: Achieve total control over ley line networks, redirecting their flow to power entire dungeon floors.
   branch: arcane
@@ -122,7 +122,7 @@
   unlocks: []
   tier: 4
 
-- id: aa000002-0010-4000-b001-000000000001
+- id: 575be533-699f-492f-81f9-3cd003a0e822
   name: Spellweave Lattice
   description: Weave interconnected spell matrices that allow wards and enchantments to reinforce each other.
   branch: arcane
@@ -138,7 +138,7 @@
 
 # --- TIER 5: Pinnacle powers ---
 
-- id: aa000002-0011-4000-b001-000000000001
+- id: 1ec9d1cf-fb5b-4492-bd94-a5acb7a2f193
   name: Arcane Convergence
   description: Merge dimensional magic with ley line power to create zones of intensified magical energy.
   branch: arcane
@@ -152,7 +152,7 @@
   unlocks: []
   tier: 5
 
-- id: aa000002-0012-4000-b001-000000000001
+- id: a0d84b13-668d-4cfc-9ed9-79355f70d484
   name: Planar Nexus
   description: Establish a permanent connection to other planes, allowing the summoning of arcane constructs and exotic materials.
   branch: arcane
@@ -168,7 +168,7 @@
 
 # --- TIER 6: Ultimate mastery ---
 
-- id: aa000002-0013-4000-b001-000000000001
+- id: 2cc80814-082f-4f70-833a-1e175ae142a6
   name: Grand Arcanum
   description: Achieve the pinnacle of arcane knowledge, unifying all schools of magic into a single transcendent discipline.
   branch: arcane

@@ -1,4 +1,4 @@
-- id: aa800001-0001-0001-0001-000000000001
+- id: 91146dfb-4cfd-4333-a6e6-9250e35a386f
   name: Pit Trap
   description: "A concealed pit that causes moderate physical damage and slows invaders."
   effectType: physical
@@ -12,7 +12,7 @@
     gold: 30
     crystals: 10
 
-- id: aa800001-0001-0001-0001-000000000002
+- id: 20d4e4dc-40e2-4934-82f0-14d27e14374c
   name: Arrow Trap
   description: "A wall-mounted mechanism that fires arrows at passing invaders."
   effectType: physical
@@ -26,7 +26,7 @@
     gold: 40
     crystals: 15
 
-- id: aa800001-0001-0001-0001-000000000003
+- id: 06abd451-577b-46b7-926f-e6ffb8beddd5
   name: Rune Trap
   description: "A magical rune that deals magic damage bypassing physical defense. Cannot be disarmed."
   effectType: magic
@@ -40,7 +40,7 @@
     gold: 50
     essence: 20
 
-- id: aa800001-0001-0001-0001-000000000004
+- id: 64dce52e-d3ec-4547-9369-ad97941c1233
   name: Magic Trap
   description: "An enchantment that reduces the Attack of invaders by 30% for 3 turns."
   effectType: debuff
@@ -54,7 +54,7 @@
     gold: 35
     flux: 15
 
-- id: aa800001-0001-0001-0001-000000000005
+- id: 9a5e5bd8-4110-434d-b204-45c2e150f34b
   name: Fear Glyph
   description: "A terrifying glyph that deals minor damage and demoralizes the invading party."
   effectType: fear

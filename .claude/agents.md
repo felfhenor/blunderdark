@@ -8,7 +8,8 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Use `findRoomIdByRole(role)` from `room-roles.ts`** to look up rooms that have special gameplay logic (e.g., `'altar'`, `'throne'`, `'trainingGrounds'`, `'trapWorkshop'`). The `role` field is set in `gamedata/room/base.yml`.
 - **Use data fields on `RoomDefinition`** to drive behavior: `timeOfDayBonus`, `biomeBonuses`, `invasionProfile`, `objectiveTypes`, `trainingAdjacencyEffects`, `throneAdjacencyEffects`. Add new optional fields when rooms need new behavior — don't match on IDs.
 - **Synergies are defined in `gamedata/synergy/base.yml`**, loaded via `getEntriesByType('synergy')` — not hardcoded in TypeScript.
-- **In spec files**, define test-local arbitrary UUID constants (e.g., `const ALTAR_ROOM_ID = 'aa100001-...'`) — these are not hardcoded production references, they're test fixtures.
+- **In spec files**, define test-local arbitrary UUID constants — these are not hardcoded production references, they're test fixtures.
+- **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()` in Node.js.
 
 ## Circular Dependency Avoidance
 
@@ -139,7 +140,7 @@ For cross-cutting events (level-ups, season transitions, notifications):
 - `PlacedRoom.appliedUpgradePathId?: string` tracks the chosen upgrade — optional field so existing PlacedRoom literals in tests don't break
 - `room-upgrades.ts` helper: `canApplyUpgrade()` enforces mutual exclusivity (one upgrade per room), `applyUpgrade()` returns new PlacedRoom, `getAppliedUpgradeEffects()` returns effects array
 - Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
-- Room YAML upgrade paths use UUIDs prefixed `aa200001-` to distinguish from room IDs (`aa100001-`) — these are in YAML data only, never referenced by code
+- Room YAML upgrade paths are defined in YAML data only, never referenced by code
 
 ### Room Placement
 
@@ -334,7 +335,6 @@ When multiple build modes exist (room placement, hallway build):
 - **Generic rooms (non-unique, no special logic) only need YAML changes** — the existing placement, production, adjacency, and upgrade systems are fully data-driven. No helper code or component changes are needed.
 - Room production values in YAML are **per tick**. To get per-minute rate, multiply by `TICKS_PER_MINUTE` (5). Example: 8 Food/min = `food: 1.6` in YAML.
 - Adjacency bonuses in YAML reference room names (the build script auto-resolves names to UUIDs via `rewriteDataIds`).
-- Upgrade path IDs use `aa200001-` prefix, room IDs use `aa100001-` prefix in YAML. Increment the last digits to avoid collisions with existing entries. Never reference these prefixes in code.
 - Room definitions live in `gamedata/room/base.yml`; room shapes in `gamedata/roomshape/base.yml`
 - If a room references a shapeId that doesn't exist, create the shape first — the build will succeed but the room won't render
 - `workerEfficiency` affects production via `totalBonus += workerEfficiency - 1.0` — a skeleton with `workerEfficiency: 0.7` applies a -0.3 penalty
@@ -457,7 +457,6 @@ When multiple build modes exist (room placement, hallway build):
 ## Trap System
 
 - Trap definitions in `gamedata/trap/base.yml` — 5 types: Pit, Arrow, Rune, Magic, Fear Glyph
-- UUID prefix for traps in YAML: `aa800001-` — never reference in code
 - `TrapDefinition` (content type) vs `TrapInstance` (runtime placed trap) vs `TrapInventoryEntry` (unplaced inventory)
 - `TrapInstance` stored per-floor in `Floor.traps: TrapInstance[]` — similar to `Floor.hallways`
 - `TrapInventoryEntry[]` stored in `GameStateWorld.trapInventory` — player's unplaced trap stock
@@ -484,7 +483,6 @@ When multiple build modes exist (room placement, hallway build):
 ## Invader System
 
 - Invader definitions in `gamedata/invader/base.yml` — 6 classes: Warrior, Rogue, Mage, Cleric, Paladin, Ranger
-- UUID prefix for invaders in YAML: `aa900001-` — never reference in code
 - `InvaderDefinition` (content type) vs `InvaderInstance` (runtime with HP, status effects, ability states)
 - `InvaderInstance.abilityStates: AbilityState[]` — reuses the same AbilityState type from combat system
 - `InvaderInstance.statusEffects: StatusEffect[]` — tracks named effects with durations (shielded, marked, courage, etc.)
@@ -601,7 +599,6 @@ When multiple build modes exist (room placement, hallway build):
 
 ## Research Tree YAML Conventions
 
-- UUID pattern per branch in YAML: dark=`aa000001`, arcane=`aa000002`, engineering=`aa000003`
 - Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=gold
 - Cost scaling pattern across tiers: T1=10 research, T2=25/5, T3=50/15, T4=100/30/15 tertiary, T5=200/60/30, T6=400/120/60
 - Root nodes (tier 1) are defined in `base.yml`; branch-specific nodes (tier 2+) go in `dark.yml`, `arcane.yml`, `engineering.yml`

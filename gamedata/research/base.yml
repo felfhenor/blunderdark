@@ -3,7 +3,7 @@
 # Each node has: id, name, description, branch, cost, prerequisiteResearchIds, unlocks, tier
 
 # --- DARK BRANCH: root node ---
-- id: aa000001-0001-4000-b001-000000000001
+- id: 965efdaa-6c12-48e3-8337-3ad70b5d309d
   name: Dark Arts Fundamentals
   description: The foundational study of dark magic, opening paths to necromancy and soul manipulation.
   branch: dark
@@ -14,7 +14,7 @@
   tier: 1
 
 # --- ARCANE BRANCH: root node ---
-- id: aa000002-0001-4000-b001-000000000001
+- id: dd7790ca-f564-422d-80bf-932870898d70
   name: Arcane Basics
   description: Introduction to the fundamental principles of arcane magic and flux manipulation.
   branch: arcane
@@ -25,7 +25,7 @@
   tier: 1
 
 # --- ENGINEERING BRANCH: root node ---
-- id: aa000003-0001-4000-b001-000000000001
+- id: 25f6d6de-5850-44eb-8e98-c2b882791d4c
   name: Basic Engineering
   description: Foundational construction techniques for building stronger dungeon structures.
   branch: engineering

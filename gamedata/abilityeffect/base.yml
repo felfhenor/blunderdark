@@ -1,34 +1,34 @@
-- id: ae000001-0000-4000-a000-000000000001
+- id: 902257ed-ff1c-43ca-8cfc-4d2b65e722ae
   name: Damage
   dealsDamage: true
   statusName: null
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000002
+- id: 9843c449-d5e7-4170-bdaa-4190e6c1c87d
   name: Stun
   dealsDamage: false
   statusName: stunned
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000003
+- id: ad920649-69fb-4e42-980e-4adc2d1aec21
   name: Buff Attack
   dealsDamage: false
   statusName: berserk
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000004
+- id: d1db784e-f039-459b-9fb7-2ef415f5fce7
   name: Buff Defense
   dealsDamage: false
   statusName: shielded
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000005
+- id: 38a6c4ee-ca17-40f4-a874-b2fbd1aaceff
   name: Evasion
   dealsDamage: false
   statusName: phased
   overrideTargetsHit: 0
 
-- id: ae000001-0000-4000-a000-000000000006
+- id: c0baa092-6728-44ee-89d9-bc960176430a
   name: Resurrect
   dealsDamage: false
   statusName: resurrected
@@ -36,43 +36,43 @@
 
 # --- Invader ability effects ---
 
-- id: ae000001-0000-4000-a000-000000000007
+- id: 3781eca2-c547-4bf9-9273-9bcc1e882d41
   name: Heal
   dealsDamage: false
   statusName: healing
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000008
+- id: 0a7f5a36-d1bf-45b6-88b4-f39ca9ef8f56
   name: Disarm
   dealsDamage: false
   statusName: disarm
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000009
+- id: 10784fa3-50f8-404d-acba-b3f65f6cba54
   name: Magic Damage
   dealsDamage: true
   statusName: null
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000010
+- id: a1fd656d-5dda-4353-8c11-0621bd86125c
   name: Dispel
   dealsDamage: false
   statusName: dispel
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000011
+- id: 3cbdaa8d-fb4f-4e87-8e64-048760cacf98
   name: Fear Immunity
   dealsDamage: false
   statusName: courage
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000012
+- id: 633a1325-2d98-4e39-a068-956b7884be66
   name: Scout
   dealsDamage: false
   statusName: scouting
   overrideTargetsHit: null
 
-- id: ae000001-0000-4000-a000-000000000013
+- id: e698fb8e-ddea-47d8-94cb-2e53f6eff2a0
   name: Mark
   dealsDamage: false
   statusName: marked

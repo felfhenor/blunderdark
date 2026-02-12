@@ -18,7 +18,7 @@
 
 # --- TIER 2: Three paths branch from Basic Engineering ---
 
-- id: aa000003-0002-4000-b001-000000000001
+- id: 9e81a510-1b8d-4c20-8e7f-56a4b2f063fc
   name: Advanced Construction
   description: Develop superior building techniques that allow for larger and more resilient dungeon structures.
   branch: engineering
@@ -30,7 +30,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000003-0003-4000-b001-000000000001
+- id: eb8b543e-0b7d-47f8-9192-7fba92e9ea34
   name: Trap Design
   description: Study the fundamentals of mechanical trap construction, from simple pitfalls to pressure plates.
   branch: engineering
@@ -42,7 +42,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000003-0004-4000-b001-000000000001
+- id: 7c76338a-a73a-4b12-a726-beec4e93974d
   name: Advanced Manufacturing
   description: Establish efficient production lines for crafting materials, weapons, and dungeon components.
   branch: engineering
@@ -56,7 +56,7 @@
 
 # --- TIER 3: Specializations ---
 
-- id: aa000003-0005-4000-b001-000000000001
+- id: 6fc62ebf-39d2-47b0-9ba3-92c0241f6146
   name: Master Architecture
   description: Design complex multi-room structures with reinforced walls and optimized layouts for maximum efficiency.
   branch: engineering
@@ -68,7 +68,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000003-0006-4000-b001-000000000001
+- id: 687957be-a605-4d0d-811e-591a71f21300
   name: Automated Defenses
   description: Create self-resetting traps and automated defense systems that require no inhabitant intervention.
   branch: engineering
@@ -80,7 +80,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000003-0007-4000-b001-000000000001
+- id: e1af3b41-800b-4190-82de-7e8a2e626986
   name: Dark Forge
   description: Construct a forge powered by dungeon energy, capable of smelting exotic materials into powerful equipment.
   branch: engineering
@@ -94,7 +94,7 @@
 
 # --- TIER 4: Advanced combinations ---
 
-- id: aa000003-0008-4000-b001-000000000001
+- id: 127df468-753f-47a9-ab98-ab8b212cac69
   name: Siege Works
   description: Build massive defensive installations and siege equipment to repel even the largest invasion forces.
   branch: engineering
@@ -108,7 +108,7 @@
   unlocks: []
   tier: 4
 
-- id: aa000003-0009-4000-b001-000000000001
+- id: c1509327-9bf8-41ad-b674-9c79137fe3b9
   name: Mechanical Sentinels
   description: Construct autonomous mechanical guardians that patrol hallways and defend key positions.
   branch: engineering
@@ -122,7 +122,7 @@
   unlocks: []
   tier: 4
 
-- id: aa000003-0010-4000-b001-000000000001
+- id: 0493134f-837b-4636-909a-ca334d605466
   name: Golem Assembly
   description: Assemble powerful golems from forged materials, combining architectural precision with manufacturing might.
   branch: engineering
@@ -138,7 +138,7 @@
 
 # --- TIER 5: Pinnacle powers ---
 
-- id: aa000003-0011-4000-b001-000000000001
+- id: 6279db88-f682-4738-973c-fdd56c9d628f
   name: War Machines
   description: Engineer devastating war machines that combine siege weaponry with automated defense systems.
   branch: engineering
@@ -152,7 +152,7 @@
   unlocks: []
   tier: 5
 
-- id: aa000003-0012-4000-b001-000000000001
+- id: 4caa2af0-5ecd-48f5-b012-0223c2d3bb79
   name: Industrial Mastery
   description: Achieve peak manufacturing efficiency, producing golems and siege equipment at unprecedented scale.
   branch: engineering
@@ -168,7 +168,7 @@
 
 # --- TIER 6: Ultimate mastery ---
 
-- id: aa000003-0013-4000-b001-000000000001
+- id: 4c37ee38-c15a-4dc8-9a96-90f21414ecb8
   name: Grand Artificer
   description: Attain the ultimate mastery of engineering, creating wonders that blur the line between construction and creation.
   branch: engineering

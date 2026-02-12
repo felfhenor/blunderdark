@@ -1,7 +1,7 @@
-- id: aa100001-0001-0001-0001-000000000009
+- id: f48589fe-4326-4320-9506-64fe2ff5bcca
   name: Altar Room
   description: The dark heart of your dungeon. This ancient altar is the source of your power, enabling room construction and creature recruitment. Its calming aura reduces fear in adjacent rooms.
-  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
   cost: {}
   production:
     essence: 0.2
@@ -20,7 +20,7 @@
   objectiveTypes:
     - DestroyAltar
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000007
+    - id: 716874c3-4fbb-4214-8d47-195f278b8233
       name: Empowered Altar
       description: Channel deeper magical energies to expand your dungeon-building capabilities and strengthen the calming aura.
       upgradeLevel: 2
@@ -34,7 +34,7 @@
         - type: secondaryProduction
           value: 0.2
           resource: essence
-    - id: aa200001-0001-0001-0001-000000000008
+    - id: d31f3072-b312-40be-8a7e-6898bd0d4581
       name: Ascendant Altar
       description: Unlock the altar's full potential, granting access to advanced rooms and maximizing its stabilizing influence.
       upgradeLevel: 3
@@ -52,10 +52,10 @@
           value: 0.2
           resource: flux
 
-- id: aa100001-0001-0001-0001-000000000001
+- id: c9a1e8f5-2347-4885-b477-3363f9617077
   name: Throne Room
   description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
-  shapeId: 635a07d9-11f9-445c-a626-dacd9fbb16bc
+  shapeId: d487da0e-8fa6-4a13-b0bf-da3e87c8d52f
   cost:
     gold: 100
     crystals: 50
@@ -68,10 +68,10 @@
   fearLevel: variable
   role: throne
 
-- id: aa100001-0001-0001-0001-000000000002
+- id: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
   name: Crystal Mine
   description: An L-shaped excavation that extracts crystals from deep rock veins. Requires workers for full output. Benefits from proximity to other mines, forges, and libraries.
-  shapeId: 5634b24d-d5dd-4a8f-9877-4393cdc05ffb
+  shapeId: 82f509dd-9ff8-4c99-986d-0b57198a4749
   cost:
     gold: 50
   production:
@@ -89,17 +89,17 @@
     dimension: wealth
     weight: 10
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.1
       description: Shared mineral veins between adjacent mines boost extraction.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.15
       description: Nearby forge heats rock, making crystal extraction easier.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.1
       description: Library scholars identify optimal mining patterns.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000001
+    - id: d042c9be-de98-4973-88c1-26dd20d3d739
       name: Deep Vein Extraction
       description: Optimized mining techniques increase crystal yield by 50%.
       cost:
@@ -108,7 +108,7 @@
         - type: productionMultiplier
           value: 1.5
           resource: crystals
-    - id: aa200001-0001-0001-0001-000000000002
+    - id: c601bf43-d9d9-4e35-8608-14295382e789
       name: Expanded Tunnels
       description: Widen the mine shafts to accommodate more workers, increasing capacity from 2 to 4.
       cost:
@@ -116,7 +116,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 2
-    - id: aa200001-0001-0001-0001-000000000003
+    - id: a247b92c-7631-42b0-ad95-ea76ad2b864e
       name: Crystal Resonance
       description: Harmonic crystal formations reduce fear in the mine and produce a small amount of flux.
       cost:
@@ -128,10 +128,10 @@
           value: 0.2
           resource: flux
 
-- id: aa100001-0001-0001-0001-000000000003
+- id: 7fb314ad-a447-469f-82df-4b8c68f9deff
   name: Mushroom Grove
   description: A T-shaped grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
-  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
   cost:
     gold: 40
   production:
@@ -145,17 +145,17 @@
   biomeBonuses:
     fungal: 0.60
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.4
       description: Soul Well moisture accelerates fungal growth dramatically.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.15
       description: Library knowledge improves cultivation techniques.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.15
       description: Forge warmth creates ideal growing conditions.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000004
+    - id: 35ef7cb9-832a-4935-be46-ab19ae5e0ad3
       name: Bountiful Harvest
       description: Enhanced fungal cultivation techniques increase food yield by 50%.
       cost:
@@ -164,7 +164,7 @@
         - type: productionMultiplier
           value: 1.5
           resource: food
-    - id: aa200001-0001-0001-0001-000000000005
+    - id: 078aee06-566f-4e86-adbd-9d9c9a5b2bc4
       name: Expanded Growth
       description: Extend the growing chambers to accommodate more workers, increasing capacity from 3 to 5.
       cost:
@@ -172,7 +172,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 2
-    - id: aa200001-0001-0001-0001-000000000006
+    - id: 69a262d5-5350-44fa-b05e-5b7e0f5d50f3
       name: Tranquil Garden
       description: Calming spores and gentle bioluminescence eliminate all fear in the grove.
       cost:
@@ -181,10 +181,10 @@
         - type: fearReduction
           value: 1
 
-- id: aa100001-0001-0001-0001-000000000004
+- id: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
   name: Shadow Library
   description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
-  shapeId: aa000000-0000-0000-0000-000000000002
+  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
   cost:
     gold: 80
     crystals: 30
@@ -204,17 +204,17 @@
   objectiveTypes:
     - DefileLibrary
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.15
       description: Soul essence enhances arcane research comprehension.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.1
       description: Crystal mine ore samples provide material for arcane study.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.2
       description: Adjacent libraries share knowledge and cross-reference tomes.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000010
+    - id: 041042a7-c517-4fea-b8e7-c98df623d8fe
       name: Arcane Focus
       description: Enchanted reading lenses and amplified candlelight drastically improve research throughput.
       cost:
@@ -225,7 +225,7 @@
         - type: productionMultiplier
           value: 1.75
           resource: research
-    - id: aa200001-0001-0001-0001-000000000011
+    - id: 548bc228-bf35-4562-831e-9fcfe396dfa5
       name: Expanded Archives
       description: Extend the library with additional reading chambers to accommodate more scholars.
       cost:
@@ -234,7 +234,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 2
-    - id: aa200001-0001-0001-0001-000000000012
+    - id: 421e6410-bb97-4694-afa8-dafbd2295036
       name: Forbidden Knowledge
       description: Unlock the darkest tomes. Greatly boosts research but intensifies the library's fearsome aura.
       cost:
@@ -248,10 +248,10 @@
         - type: fearIncrease
           value: 2
 
-- id: aa100001-0001-0001-0001-000000000005
+- id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   name: Soul Well
   description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
-  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
   cost:
     gold: 100
     crystals: 50
@@ -271,17 +271,17 @@
   objectiveTypes:
     - SealPortal
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000003
+    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.2
       description: Living fungi attract wandering spirits to the well.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.15
       description: Arcane knowledge from the library focuses the well's spiritual draw.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.25
       description: Nearby wells create a spiritual resonance that amplifies essence flow.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000013
+    - id: e795e43b-16cd-4a74-aed5-4977d275ce21
       name: Necrotic Enhancement
       description: Deepen the well's connection to the spirit realm, boosting essence yield and allowing more workers to channel its power.
       cost:
@@ -294,7 +294,7 @@
           resource: essence
         - type: maxInhabitantBonus
           value: 1
-    - id: aa200001-0001-0001-0001-000000000014
+    - id: 61d78e22-a230-4c66-80a1-60367cb543f1
       name: Essence Mastery
       description: Purify the well's output for greater efficiency. The refined essence calms the surrounding area, reducing fear.
       cost:
@@ -308,10 +308,10 @@
         - type: fearReduction
           value: 1
 
-- id: aa100001-0001-0001-0001-000000000006
+- id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge
   description: Smelts ores and crafts equipment. Produces gold when worked.
-  shapeId: aa000000-0000-0000-0000-000000000003
+  shapeId: aab0b609-237e-4689-bb42-eca45d796746
   cost:
     gold: 60
     crystals: 20
@@ -321,14 +321,14 @@
   biomeBonuses:
     volcanic: 0.50
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.15
       description: Raw crystal ore fuels the forge's smelting process.
 
-- id: aa100001-0001-0001-0001-000000000010
+- id: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
   name: Underground Lake
   description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
-  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
   cost:
     gold: 60
     crystals: 20
@@ -340,17 +340,17 @@
   biomeBonuses:
     flooded: 0.50
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000003
+    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.3
       description: Lake moisture dramatically boosts fungal growth in the adjacent grove.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.15
       description: Spiritual waters from the Soul Well attract richer fish populations.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000010
+    - adjacentRoomType: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
       bonus: 0.2
       description: Connected lakes form a larger ecosystem with more abundant catches.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000018
+    - id: b7389938-e7a1-4c43-81b9-5161f4046f1a
       name: Deep Fishing
       description: Train fishers in deep-water techniques and install luminescent lures to dramatically increase the food catch.
       cost:
@@ -360,7 +360,7 @@
         - type: productionMultiplier
           value: 1.6
           resource: food
-    - id: aa200001-0001-0001-0001-000000000019
+    - id: 2f85cfdc-0955-42de-a028-fd37fe5efee2
       name: Expanded Lake
       description: Excavate additional chambers to extend the lake's reach, accommodating more fishers.
       cost:
@@ -369,7 +369,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 2
-    - id: aa200001-0001-0001-0001-000000000020
+    - id: 240a8e7e-7af0-4fa4-8e6d-0c5653e3994b
       name: Dark Waters
       description: Embrace the lake's deepest depths. Strange creatures lurk below, providing both food and an unsettling presence.
       cost:
@@ -386,10 +386,10 @@
           value: 0.1
           resource: essence
 
-- id: aa100001-0001-0001-0001-000000000007
+- id: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
   name: Barracks
   description: A long, narrow hall lined with weapon racks and sleeping quarters. Houses and trains your fighters, providing no resource production but significantly boosting your dungeon's combat readiness. Its military atmosphere can unsettle peaceful creatures.
-  shapeId: 9b17bc0c-1b9a-48f2-95e7-cc5b2090c614
+  shapeId: ac447f9c-de8c-4b07-8756-b0b570845ace
   cost:
     gold: 70
   production: {}
@@ -400,17 +400,17 @@
   trainingAdjacencyEffects:
     timeReduction: 0.20
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.15
       description: The Dark Forge provides weapons and armor for garrisoned troops.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000001
+    - adjacentRoomType: c9a1e8f5-2347-4885-b477-3363f9617077
       bonus: 0.2
       description: Proximity to the Throne Room improves command structure and morale.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000007
+    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
       bonus: 0.1
       description: Connected barracks share training resources and patrol routes.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000024
+    - id: c2dbdf17-8fa7-44df-9e03-81daef197773
       name: Fortified Barracks
       description: Reinforce walls and expand sleeping quarters, increasing troop capacity and hardening the structure against assault.
       cost:
@@ -419,7 +419,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 4
-    - id: aa200001-0001-0001-0001-000000000025
+    - id: 6680ccd4-db73-4e8a-a0fc-5b0e8da3e79f
       name: Comfortable Quarters
       description: Replace crude bunks with proper beds and add a mess hall. Eliminates the barracks' fearsome atmosphere and improves unit morale.
       cost:
@@ -428,7 +428,7 @@
       effects:
         - type: fearReduction
           value: 1
-    - id: aa200001-0001-0001-0001-000000000026
+    - id: 55becbce-b298-44c0-a864-e73ae5657305
       name: War Room
       description: Add strategic planning tables and communication crystals. Grants a defensive bonus to all rooms on the floor during invasions.
       cost:
@@ -439,10 +439,10 @@
         - type: fearIncrease
           value: 1
 
-- id: aa100001-0001-0001-0001-000000000008
+- id: 827472bd-6bbb-482f-86c8-ad30d5613237
   name: Treasure Vault
   description: A fortified 3x3 chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
-  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
+  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
   cost:
     gold: 120
     crystals: 40
@@ -460,20 +460,20 @@
   throneAdjacencyEffects:
     goldProductionBonus: 0.05
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.15
       description: Forged valuables fill the vault more efficiently.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000009
+    - adjacentRoomType: f48589fe-4326-4320-9506-64fe2ff5bcca
       bonus: 0.25
       description: The altar's dark power blesses the vault's gold, increasing its yield.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000001
+    - adjacentRoomType: c9a1e8f5-2347-4885-b477-3363f9617077
       bonus: 0.2
       description: Proximity to the Throne Room encourages tribute and efficient accounting.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000008
+    - adjacentRoomType: 827472bd-6bbb-482f-86c8-ad30d5613237
       bonus: 0.1
       description: Connected vaults share security infrastructure, reducing overhead.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000015
+    - id: 130ef3cc-fac2-4ea3-aa55-9a3b95df771e
       name: Reinforced Vault
       description: Reinforce walls with enchanted steel and add additional warding glyphs. Increases gold production and eliminates security risks.
       cost:
@@ -485,7 +485,7 @@
           resource: gold
         - type: fearReduction
           value: 1
-    - id: aa200001-0001-0001-0001-000000000016
+    - id: 20618e2f-fc5e-4b94-814a-43a8162130af
       name: Investment Vault
       description: Transform the vault into a financial hub. Double gold generation rate and house a dedicated treasurer.
       cost:
@@ -497,7 +497,7 @@
           resource: gold
         - type: maxInhabitantBonus
           value: 1
-    - id: aa200001-0001-0001-0001-000000000017
+    - id: 1c4a601d-ae48-4174-8a54-2632afe614da
       name: Dragon's Hoard
       description: Amass a legendary treasure hoard. Massively boosts gold production but the overwhelming wealth attracts dangerous attention.
       cost:
@@ -511,10 +511,10 @@
         - type: fearIncrease
           value: 2
 
-- id: aa100001-0001-0001-0001-000000000012
+- id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   name: Training Grounds
   description: A T-shaped combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
-  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
   role: trainingGrounds
   cost:
     gold: 80
@@ -525,17 +525,17 @@
   inhabitantRestriction: null
   fearLevel: 1
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000007
+    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
       bonus: 0.2
       description: Shared training resources and weapon racks reduce training time by 20%.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.1
       description: Forged weapons and armor improve training quality.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000009
+    - adjacentRoomType: f48589fe-4326-4320-9506-64fe2ff5bcca
       bonus: 0.15
       description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000027
+    - id: 3d0d6ce5-3083-4ef5-824a-7199e7254b0d
       name: Elite Training
       description: Advanced combat techniques grant +1 attack in addition to +1 defense, but training takes 20% longer.
       cost:
@@ -547,7 +547,7 @@
           value: 1
         - type: trainingTimeMultiplier
           value: 1.2
-    - id: aa200001-0001-0001-0001-000000000028
+    - id: fb9d4aa3-0c93-4178-965d-70dddd13877d
       name: Mass Training
       description: Expanded training facilities increase capacity from 4 to 6 and reduce training time by 30%.
       cost:
@@ -558,7 +558,7 @@
           value: 2
         - type: trainingTimeMultiplier
           value: 0.7
-    - id: aa200001-0001-0001-0001-000000000029
+    - id: 24679551-a0b0-4bc0-82af-26bb4cd4b4ca
       name: Specialized Drills
       description: Intensive defensive drills grant an extra +1 defense bonus to trained inhabitants.
       cost:
@@ -569,10 +569,10 @@
         - type: trainingDefenseBonus
           value: 1
 
-- id: aa100001-0001-0001-0001-000000000011
+- id: a7ef7e24-f250-45e7-986d-ad06b3610b52
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
-  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
   biomeBonuses:
     crystal: 0.10
   invasionProfile:
@@ -590,17 +590,17 @@
   maxInhabitants: 2
   fearLevel: 2
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.2
       description: Arcane knowledge from the Shadow Library amplifies ley line channeling.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.15
       description: Soul essence from the Well resonates with the ley line's magical frequency.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000011
+    - adjacentRoomType: a7ef7e24-f250-45e7-986d-ad06b3610b52
       bonus: 0.25
       description: Adjacent nexus points create a powerful ley line network with amplified output.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000021
+    - id: 04da0e2b-8529-48ba-a176-d37b3697cc70
       name: Flux Amplifier
       description: Install crystalline focusing arrays that amplify the ley line's natural flux output.
       cost:
@@ -611,7 +611,7 @@
         - type: productionMultiplier
           value: 1.5
           resource: flux
-    - id: aa200001-0001-0001-0001-000000000022
+    - id: 36f72b2b-6903-4d2e-9bee-7a521b175901
       name: Expanded Nexus
       description: Widen the convergence chamber to accommodate an additional channeler.
       cost:
@@ -620,7 +620,7 @@
       effects:
         - type: maxInhabitantBonus
           value: 1
-    - id: aa200001-0001-0001-0001-000000000023
+    - id: e52d3a63-cd44-4147-832b-342882f82c40
       name: Arcane Overcharge
       description: Push the ley line beyond its natural limits. Dramatically increases flux output but the unstable energies create an unsettling atmosphere and generate research insights.
       cost:
@@ -637,10 +637,10 @@
           value: 0.2
           resource: research
 
-- id: aa100001-0001-0001-0001-000000000013
+- id: 6d638daa-6e43-4569-a931-eb4710009da9
   name: Trap Workshop
   description: A compact 2x2 crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
-  shapeId: 2af760d1-77ce-4eb7-b045-acad573f8ec2
+  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
   role: trapWorkshop
   cost:
     gold: 90
@@ -651,17 +651,17 @@
   inhabitantRestriction: null
   fearLevel: 2
   adjacencyBonuses:
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000006
+    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.2
       description: The Dark Forge provides superior materials, increasing trap durability.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
       bonus: 0.15
       description: Library research improves trap design efficiency.
-    - adjacentRoomType: aa100001-0001-0001-0001-000000000002
+    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.1
       description: Crystal Mine provides raw materials for trap mechanisms.
   upgradePaths:
-    - id: aa200001-0001-0001-0001-000000000030
+    - id: 28f98e31-d05f-471d-b570-3eaa360de063
       name: Master Trapper
       description: Expand the workshop to house more workers and unlock advanced trap designs.
       cost:
@@ -673,7 +673,7 @@
           value: 2
         - type: craftingSpeedMultiplier
           value: 1.2
-    - id: aa200001-0001-0001-0001-000000000031
+    - id: 970b9a58-445c-4d07-99e9-3236a88ea75f
       name: Efficient Assembly
       description: Streamlined production techniques reduce crafting costs by 25% and time by 30%.
       cost:
@@ -684,7 +684,7 @@
           value: 0.75
         - type: craftingSpeedMultiplier
           value: 0.7
-    - id: aa200001-0001-0001-0001-000000000032
+    - id: d804977d-c0a0-4ef5-93db-eafa2c667490
       name: Enchanted Traps
       description: Infuse crafted traps with elemental energy, adding bonus magical damage to all traps produced.
       cost:

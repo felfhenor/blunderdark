@@ -1,4 +1,4 @@
-- id: ca000001-0000-4000-a000-000000000001
+- id: 27f875c7-7603-4a90-aeb9-e1588f42eef0
   name: Breath Weapon
   description: AOE fire damage
   effectType: Damage
@@ -8,7 +8,7 @@
   targetType: aoe
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000002
+- id: bd9bebcb-561e-43de-b0a7-16e95b0e716c
   name: Petrifying Gaze
   description: Stuns a single target
   effectType: Stun
@@ -18,7 +18,7 @@
   targetType: single
   duration: 3
 
-- id: ca000001-0000-4000-a000-000000000003
+- id: 24610e73-cd2b-4043-bdfa-a87803f7fbb0
   name: Death Bolt
   description: Single target 200% magic damage
   effectType: Damage
@@ -28,7 +28,7 @@
   targetType: single
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000004
+- id: d29b48e2-e2e1-4d8d-8563-049588faeab1
   name: Wraith Evasion
   description: 50% chance to evade physical attacks
   effectType: Evasion
@@ -38,7 +38,7 @@
   targetType: self
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000005
+- id: 6e64aaa6-5243-4687-be4d-d50af1dfe62e
   name: Berserk Rage
   description: +100% attack when below 50% HP
   effectType: Buff Attack
@@ -48,7 +48,7 @@
   targetType: self
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000006
+- id: 826d95b6-1ae2-4f2b-95a4-78f4fc38d0bf
   name: Lich Shield
   description: +50% defense for 3 turns
   effectType: Buff Defense
@@ -61,7 +61,7 @@
 # --- Invader combat abilities ---
 
 # Warrior abilities
-- id: ca000001-0000-4000-a000-000000000007
+- id: 97bade63-8c5e-4f96-92bd-717dfb0ab7b1
   name: Shield Wall
   description: Reduces incoming damage by 25% for 2 turns
   effectType: Buff Defense
@@ -72,7 +72,7 @@
   duration: 2
 
 # Rogue abilities
-- id: ca000001-0000-4000-a000-000000000008
+- id: cff58377-2009-4109-ae17-e530aab4af33
   name: Disarm Trap
   description: 60% chance to disarm a trap before triggering
   effectType: Disarm
@@ -82,7 +82,7 @@
   targetType: single
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000009
+- id: 3409c363-5f6e-4aae-9ae5-499d2ff7b4dc
   name: Backstab
   description: Deals double damage to a single target
   effectType: Damage
@@ -93,7 +93,7 @@
   duration: 0
 
 # Mage abilities
-- id: ca000001-0000-4000-a000-000000000010
+- id: defb78c8-5c5e-4fb6-a800-65b7dde3a226
   name: Arcane Bolt
   description: Magical attack that ignores physical defense
   effectType: Magic Damage
@@ -103,7 +103,7 @@
   targetType: single
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000011
+- id: c1946537-3ae0-4e7d-8838-ad5a74de56a3
   name: Dispel
   description: Removes all active buffs from a target
   effectType: Dispel
@@ -114,7 +114,7 @@
   duration: 0
 
 # Cleric abilities
-- id: ca000001-0000-4000-a000-000000000012
+- id: 03d7a2f3-91a1-4c50-b610-64fe51c72c0f
   name: Heal
   description: Restores 20% of max HP to a single target
   effectType: Heal
@@ -124,7 +124,7 @@
   targetType: single
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000013
+- id: 144d71fb-fb84-4606-894b-264e60118494
   name: Turn Undead
   description: Deals 150% bonus damage to undead creatures
   effectType: Damage
@@ -135,7 +135,7 @@
   duration: 0
 
 # Paladin abilities
-- id: ca000001-0000-4000-a000-000000000014
+- id: 332bca0a-1294-4253-9b4a-ab04d10b1c82
   name: Smite Evil
   description: Deals 200% bonus damage to corrupted targets
   effectType: Damage
@@ -145,7 +145,7 @@
   targetType: single
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000015
+- id: e4ba0ac8-7bc5-4733-8b7b-203c36bc3926
   name: Aura of Courage
   description: Grants fear immunity to all nearby allies
   effectType: Fear Immunity
@@ -156,7 +156,7 @@
   duration: 0
 
 # Ranger abilities
-- id: ca000001-0000-4000-a000-000000000016
+- id: 4af7403d-697d-4233-90a8-68128dd96760
   name: Scout
   description: Reveals 2 rooms ahead on the invasion path
   effectType: Scout
@@ -166,7 +166,7 @@
   targetType: self
   duration: 0
 
-- id: ca000001-0000-4000-a000-000000000017
+- id: 2d58ca2c-4a40-4207-9450-488602079f99
   name: Mark Target
   description: Marks a target for +20% damage for 3 turns
   effectType: Mark

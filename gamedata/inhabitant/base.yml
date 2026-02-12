@@ -1,4 +1,4 @@
-- id: 7f716f6e-3742-496b-8277-875c180b0d94
+- id: 213e57d9-7372-4684-b305-b8786635a660
   name: Goblin
   type: creature
   tier: 1
@@ -35,7 +35,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: 2d14f731-95fc-49ce-8d8a-ec1b2078cb5d
+- id: 6ecba454-025a-4404-8c0b-ac1f1a0b4779
   name: Kobold
   type: creature
   tier: 1
@@ -71,7 +71,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: 14c65d94-3a77-4b7a-a33e-dee9cf320787
+- id: c970d8c0-e920-4844-95ff-362f971abf06
   name: Skeleton
   type: undead
   tier: 1
@@ -105,7 +105,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: ab1957eb-67cb-401d-a745-a7c7081b0cc9
+- id: 0a597510-e8c7-4aab-ad71-43ce6f51ad50
   name: Myconid
   type: fungal
   tier: 1
@@ -142,7 +142,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: e62e86b6-da7c-4c91-8c0a-8d42a24829c8
+- id: d336e6e7-2d96-41cb-af02-106b34efbc16
   name: Slime
   type: ooze
   tier: 1
@@ -175,7 +175,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: d4a60001-0001-0001-0001-000000000001
+- id: 86d7ac62-3300-4d3c-9bc4-d5d12ee9d845
   name: Dragon
   type: dragon
   tier: 4
@@ -213,7 +213,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: d4a60001-0001-0001-0001-000000000002
+- id: 8339f820-cd95-415f-ad76-fbdafe974800
   name: Lich
   type: undead
   tier: 4
@@ -249,7 +249,7 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
-- id: d4a60001-0001-0001-0001-000000000003
+- id: 29912034-2c86-498a-a666-0daa617f400c
   name: Demon Lord
   type: demon
   tier: 4

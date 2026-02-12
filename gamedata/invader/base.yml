@@ -1,5 +1,5 @@
 # Warrior - High HP/Attack, defensive tank
-- id: aa900001-0001-0001-0001-000000000001
+- id: fce64c3f-f9bc-4a8e-bfa6-2760d8d6d14e
   name: Warrior
   description: A heavily armored fighter with high HP and strong attacks. Uses Shield Wall to reduce incoming damage.
   invaderClass: warrior
@@ -13,7 +13,7 @@
   sprite: invader-warrior
 
 # Rogue - High Speed, trap specialist
-- id: aa900001-0001-0001-0001-000000000002
+- id: 3290cd7b-9c5d-4671-8848-91626bd5bc05
   name: Rogue
   description: A swift and cunning infiltrator. Can disarm traps and deal devastating backstab damage.
   invaderClass: rogue
@@ -28,7 +28,7 @@
   sprite: invader-rogue
 
 # Mage - High magic Attack, spell-focused
-- id: aa900001-0001-0001-0001-000000000003
+- id: d3bc3506-4c94-44ea-9974-7a4edb444b17
   name: Mage
   description: A powerful spellcaster whose arcane bolts ignore physical defenses. Can dispel magical protections.
   invaderClass: mage
@@ -43,7 +43,7 @@
   sprite: invader-mage
 
 # Cleric - High Defense, healer and anti-undead
-- id: aa900001-0001-0001-0001-000000000004
+- id: 6b6210c0-f924-4d79-87fd-17af1517e298
   name: Cleric
   description: A holy warrior who heals allies and deals devastating damage to undead creatures.
   invaderClass: cleric
@@ -58,7 +58,7 @@
   sprite: invader-cleric
 
 # Paladin - High HP/Defense, anti-corruption champion
-- id: aa900001-0001-0001-0001-000000000005
+- id: 3d860aec-eda7-4170-b62f-364e6144ce0b
   name: Paladin
   description: A righteous champion who smites corrupted foes and inspires courage in allies against fear.
   invaderClass: paladin
@@ -73,7 +73,7 @@
   sprite: invader-paladin
 
 # Ranger - High Speed, scout and marker
-- id: aa900001-0001-0001-0001-000000000006
+- id: b1b8c630-39fb-4b2f-bf3c-990c657fc96c
   name: Ranger
   description: A skilled tracker who scouts ahead and marks targets, increasing all damage against them.
   invaderClass: ranger

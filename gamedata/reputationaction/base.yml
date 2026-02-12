@@ -2,20 +2,20 @@
 # terror, wealth, knowledge, harmony, chaos
 
 # --- TERROR actions (fear-based, intimidation) ---
-- id: 1a2b3c4d-0001-4000-a001-000000000001
+- id: 3f96200b-4d49-46ad-93db-b637a27a65f2
   name: Place Torture Chamber
   description: Building a torture chamber strikes fear into the hearts of all who hear of it.
   reputationRewards:
     terror: 15
     harmony: -5
 
-- id: 1a2b3c4d-0001-4000-a001-000000000002
+- id: a767bc20-42ea-47d5-8c70-a7cff16ca41d
   name: Defeat Invader
   description: Crushing an invading force sends a clear message to would-be attackers.
   reputationRewards:
     terror: 10
 
-- id: 1a2b3c4d-0001-4000-a001-000000000003
+- id: b62a8264-7822-4528-90f7-da9b87a4b67b
   name: Summon Wraith
   description: Summoning a wraith from the spirit realm inspires dread.
   reputationRewards:
@@ -23,40 +23,40 @@
     chaos: 3
 
 # --- WEALTH actions (gold, treasure, trade) ---
-- id: 1a2b3c4d-0002-4000-a001-000000000001
+- id: 40ba134a-2a3f-4b40-a14a-971c1d329d7e
   name: Build Treasure Vault
   description: Constructing a vault to store riches signals prosperity.
   reputationRewards:
     wealth: 15
 
-- id: 1a2b3c4d-0002-4000-a001-000000000002
+- id: c32c8844-9742-4ec8-807e-764566d7c25b
   name: Complete Trade Deal
   description: Successful trade with surface merchants spreads word of your prosperity.
   reputationRewards:
     wealth: 12
     harmony: 5
 
-- id: 1a2b3c4d-0002-4000-a001-000000000003
+- id: 25181bbd-bbb6-418b-81ed-8b3f0a2c7fdb
   name: Mine Gold Vein
   description: Extracting precious gold adds to your legendary hoard.
   reputationRewards:
     wealth: 8
 
 # --- KNOWLEDGE actions (research, discovery, magic) ---
-- id: 1a2b3c4d-0003-4000-a001-000000000001
+- id: 3df93d45-e8ea-4118-9eaf-7eb9c1eeba29
   name: Complete Research
   description: Completing a research project advances the understanding of dungeon magic.
   reputationRewards:
     knowledge: 15
 
-- id: 1a2b3c4d-0003-4000-a001-000000000002
+- id: aaf6b346-019c-4516-9643-4cb41275f042
   name: Build Library
   description: Constructing a shadow library to house ancient tomes.
   reputationRewards:
     knowledge: 12
     harmony: 3
 
-- id: 1a2b3c4d-0003-4000-a001-000000000003
+- id: e06d3394-3f9d-4dec-99f1-2566b61d0239
   name: Discover Ancient Artifact
   description: Unearthing a relic from ages past reveals forgotten secrets.
   reputationRewards:
@@ -64,20 +64,20 @@
     chaos: 2
 
 # --- HARMONY actions (balance, coexistence, stability) ---
-- id: 1a2b3c4d-0004-4000-a001-000000000001
+- id: 48ea4e0e-ca49-4d2b-83d1-b8110a4097ad
   name: Build Mushroom Grove
   description: Creating a peaceful fungal garden promotes natural balance.
   reputationRewards:
     harmony: 15
     knowledge: 3
 
-- id: 1a2b3c4d-0004-4000-a001-000000000002
+- id: bd047df4-f621-4bf0-9afb-f7e4e99b681d
   name: Feed All Inhabitants
   description: Ensuring no inhabitant goes hungry demonstrates benevolent leadership.
   reputationRewards:
     harmony: 10
 
-- id: 1a2b3c4d-0004-4000-a001-000000000003
+- id: 69c77f70-6e98-4e52-a5fe-07c206df048b
   name: Peaceful Season Transition
   description: Guiding the dungeon through a season change without incident.
   reputationRewards:
@@ -85,7 +85,7 @@
     wealth: 2
 
 # --- CHAOS actions (corruption, unpredictability, dark magic) ---
-- id: 1a2b3c4d-0005-4000-a001-000000000001
+- id: 7d107963-f5e9-4f7e-93f3-06ad8a6a171c
   name: Embrace Corruption
   description: Allowing corruption to spread through the dungeon empowers dark forces.
   reputationRewards:
@@ -93,14 +93,14 @@
     terror: 5
     harmony: -10
 
-- id: 1a2b3c4d-0005-4000-a001-000000000002
+- id: fe4121aa-1794-4d85-bdfe-cc512540a9a2
   name: Summon Demon
   description: Calling forth a demon from the abyss invites unpredictable power.
   reputationRewards:
     chaos: 12
     terror: 8
 
-- id: 1a2b3c4d-0005-4000-a001-000000000003
+- id: 47ab9fc6-f018-400a-a2e5-e559245bcfcf
   name: Activate Ley Line Nexus
   description: Tapping into raw magical energy creates surges of chaotic power.
   reputationRewards:

@@ -1,4 +1,4 @@
-- id: aa300001-0001-0001-0001-000000000001
+- id: 0525d9f1-08e7-4be3-8d06-dac038e69f50
   name: Dark Industry
   description: Goblin miners near a Dark Forge extract crystals with forge-heated tools.
   conditions:
@@ -13,7 +13,7 @@
       value: 0.15
       resource: crystals
 
-- id: aa300001-0001-0001-0001-000000000002
+- id: 46649b32-39d9-47d4-a11f-e096d5d828d2
   name: Verdant Communion
   description: Myconid workers harmonize with Soul Well energy for explosive fungal growth.
   conditions:
@@ -28,7 +28,7 @@
       value: 0.2
       resource: food
 
-- id: aa300001-0001-0001-0001-000000000003
+- id: 1145f2ea-d523-48e0-bed4-b546f6965a20
   name: Arcane Resonance
   description: A spiritual connection between the library and well amplifies research.
   conditions:
@@ -41,7 +41,7 @@
       value: 0.15
       resource: research
 
-- id: aa300001-0001-0001-0001-000000000004
+- id: efa90177-e5b4-4a06-9f6b-6dfa6eb54461
   name: Forge Master
   description: A fully-staffed forge operates at peak efficiency with specialized workers.
   conditions:
@@ -54,7 +54,7 @@
       value: 0.1
       resource: gold
 
-- id: aa300001-0001-0001-0001-000000000005
+- id: a3fee2b1-ec75-49a8-b2fd-7d6598ea73de
   name: Treasury Guard
   description: Barracks guards protect the vault, enabling more efficient gold storage.
   conditions:

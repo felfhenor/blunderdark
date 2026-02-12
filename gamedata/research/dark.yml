@@ -18,7 +18,7 @@
 
 # --- TIER 2: Three paths branch from Dark Arts Fundamentals ---
 
-- id: aa000001-0002-4000-b001-000000000001
+- id: 36c41bbd-675c-4300-abf7-273cd46333ef
   name: Soul Manipulation
   description: Learn to harvest and channel soul energy, the fundamental currency of dark power.
   branch: dark
@@ -30,7 +30,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000001-0003-4000-b001-000000000001
+- id: 1b956dec-e63e-467d-bd4d-20541f157d40
   name: Shadow Magic
   description: Harness the power of shadows to conceal, deceive, and strike from darkness.
   branch: dark
@@ -42,7 +42,7 @@
   unlocks: []
   tier: 2
 
-- id: aa000001-0004-4000-b001-000000000001
+- id: 303c1628-2834-4abf-a1e2-617fb554d151
   name: Necromancy
   description: The art of animating the dead, turning fallen enemies into loyal servants.
   branch: dark
@@ -56,7 +56,7 @@
 
 # --- TIER 3: Specializations ---
 
-- id: aa000001-0005-4000-b001-000000000001
+- id: 212cfb42-9e00-4114-b755-32c6c60ca482
   name: Undead Mastery
   description: Exert absolute control over undead minions, increasing their strength and durability.
   branch: dark
@@ -68,7 +68,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000001-0006-4000-b001-000000000001
+- id: 8a4edb8b-65bb-4d08-a30c-45097e1e8483
   name: Soul Well
   description: Construct a reservoir for captured souls, providing a steady stream of dark energy.
   branch: dark
@@ -80,7 +80,7 @@
   unlocks: []
   tier: 3
 
-- id: aa000001-0007-4000-b001-000000000001
+- id: b4b92c13-7086-471f-8855-5c01301e73ea
   name: Corruption Control
   description: Master the volatile forces of corruption, bending them to your will without self-destruction.
   branch: dark
@@ -95,7 +95,7 @@
 
 # --- TIER 4: Advanced combinations ---
 
-- id: aa000001-0008-4000-b001-000000000001
+- id: 153fd103-9151-4b42-8d1a-8c39f69fd377
   name: Dark Rituals
   description: Perform elaborate ceremonies combining necromancy and soul magic for devastating effects.
   branch: dark
@@ -109,7 +109,7 @@
   unlocks: []
   tier: 4
 
-- id: aa000001-0009-4000-b001-000000000001
+- id: 7758e38b-773b-426a-863e-c154566a49fa
   name: Shadow Weaving
   description: Weave shadows into semi-physical constructs that serve as both shield and weapon.
   branch: dark
@@ -125,7 +125,7 @@
 
 # --- TIER 5: Pinnacle powers ---
 
-- id: aa000001-0010-4000-b001-000000000001
+- id: de9b2001-7a9d-415c-bf42-936c813e02c5
   name: Abyssal Gateway
   description: Tear open a rift to the abyss, summoning forth entities of immense dark power.
   branch: dark
@@ -139,7 +139,7 @@
   unlocks: []
   tier: 5
 
-- id: aa000001-0011-4000-b001-000000000001
+- id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge
   description: Forge captured souls into powerful artifacts and imbue minions with stolen life force.
   branch: dark
@@ -154,7 +154,7 @@
 
 # --- TIER 6: Ultimate mastery ---
 
-- id: aa000001-0012-4000-b001-000000000001
+- id: ecd83419-15ec-4fde-9379-bde84da01a77
   name: Dark Apotheosis
   description: Transcend mortal limitations through total mastery of dark forces, becoming an avatar of darkness itself.
   branch: dark
