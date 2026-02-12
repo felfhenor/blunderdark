@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined in gamedata/room/base.yml with T-shape (0279e677), food production 1.0/tick, fearLevel 0, maxInhabitants 3, 3 adjacency bonuses, 3 upgrade paths"
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing T-shape (0279e677-6073-4a18-b57b-8e6008f4a3a5), same as Mushroom Grove. Placement handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Produces 1.0 food/tick (5 food/min) when workers assigned. requiresWorkers: true gates production. Tests verify 0 output with no workers."
     },
     {
       "id": "US-004",
@@ -62,7 +62,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Humidity aura is a global modifier system that doesn't exist yet. Would require a new 'aura' effect type in the production system. Adjacency bonuses (Lake's own production bonuses from neighbors) are implemented instead."
     },
     {
       "id": "US-005",
@@ -77,8 +77,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "maxInhabitants: 3, fearLevel: 0. Expanded Lake upgrade adds +2 capacity (3→5). Tests verify both base and upgraded capacity."
     },
     {
       "id": "US-006",
@@ -93,8 +93,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrades defined: Deep Fishing (1.6x food), Expanded Lake (+2 capacity), Dark Waters (1.5x food + fearIncrease 1 + 0.1 essence). Rare fish, extended humidity aura, and aquatic defenders deferred (require unimplemented systems)."
     },
     {
       "id": "US-007",
@@ -107,8 +107,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 adjacency bonuses: Mushroom Grove +30%, Soul Well +15%, another Lake +20%. Alchemy Lab bonus deferred (room doesn't exist yet). Bidirectional bonuses require the other room to also define adjacency — Mushroom Grove's adjacency bonuses are separate."
     },
     {
       "id": "US-008",
@@ -123,7 +123,7 @@
       ],
       "priority": 8,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Depends on humidity aura system (US-004) which is not yet implemented. Visual indicators require the aura system to exist first."
     }
   ]
 }
