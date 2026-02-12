@@ -66,9 +66,12 @@ const crystalMineRoom: RoomDefinition & IsContentItem = {
   requiresWorkers: true,
   adjacencyBonuses: [],
   isUnique: false,
+  removable: true,
   maxInhabitants: 2,
   inhabitantRestriction: null,
   fearLevel: 1,
+  fearReductionAura: 0,
+  autoPlace: false,
   upgradePaths: [efficiencyPath, capacityPath, specializationPath],
 };
 

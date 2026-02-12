@@ -3,6 +3,16 @@
     <div class="card-body p-4">
       <h3 class="card-title text-sm">{{ room.name }}</h3>
 
+      @if (roomProduction().length > 0) {
+        <div class="flex flex-wrap gap-2 mt-1">
+          @for (prod of roomProduction(); track prod.type) {
+            <span class="badge badge-sm badge-outline">
+              +{{ prod.perMinute.toFixed(1) }} {{ prod.type }}/min
+            </span>
+          }
+        </div>
+      }
+
       @if (room.maxInhabitants !== 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">

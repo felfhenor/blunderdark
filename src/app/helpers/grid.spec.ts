@@ -79,7 +79,9 @@ describe('Grid Helpers', () => {
       const grid = createEmptyGrid();
       const newTile: GridTile = {
         occupied: true,
+        occupiedBy: 'room',
         roomId: 'room-1',
+        hallwayId: null,
         connectionType: 'door',
       };
 
@@ -93,7 +95,9 @@ describe('Grid Helpers', () => {
       const grid = createEmptyGrid();
       const newTile: GridTile = {
         occupied: true,
+        occupiedBy: 'room',
         roomId: 'room-1',
+        hallwayId: null,
         connectionType: null,
       };
 
@@ -106,7 +110,9 @@ describe('Grid Helpers', () => {
       const grid = createEmptyGrid();
       const newTile: GridTile = {
         occupied: true,
+        occupiedBy: 'room',
         roomId: 'room-1',
+        hallwayId: null,
         connectionType: null,
       };
 
@@ -154,7 +160,9 @@ describe('Grid Helpers', () => {
       const grid = createEmptyGrid();
       const modified = setTile(grid, 2, 3, {
         occupied: true,
+        occupiedBy: 'room',
         roomId: 'test-room',
+        hallwayId: null,
         connectionType: 'corridor',
       });
 
@@ -164,7 +172,9 @@ describe('Grid Helpers', () => {
       expect(deserialized.length).toBe(GRID_SIZE);
       expect(deserialized[3][2]).toEqual({
         occupied: true,
+        occupiedBy: 'room',
         roomId: 'test-room',
+        hallwayId: null,
         connectionType: 'corridor',
       });
     });

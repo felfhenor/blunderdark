@@ -37,25 +37,25 @@ describe('Content Functions', () => {
   const mockArmor: IsContentItem = {
     id: 'armor-1',
     name: 'Leather Armor',
-    __type: 'armor',
+    __type: 'trinket',
   };
 
   const mockSkill: IsContentItem = {
     id: 'skill-1',
     name: 'Fireball',
-    __type: 'skill',
+    __type: 'pet',
   };
 
   const mockSkill2: IsContentItem = {
     id: 'skill-2',
     name: 'Ice Bolt',
-    __type: 'skill',
+    __type: 'pet',
   };
 
   const mockGuardian: IsContentItem = {
     id: 'guardian-1',
     name: 'Fire Elemental',
-    __type: 'guardian',
+    __type: 'monster',
   };
 
   beforeEach(() => {
@@ -168,7 +168,7 @@ describe('Content Functions', () => {
     });
 
     it('should return all entries of a specific type', () => {
-      const skills = getEntriesByType<IsContentItem>('skill');
+      const skills = getEntriesByType<IsContentItem>('pet');
 
       expect(skills).toHaveLength(2);
       expect(skills).toContain(mockSkill);
@@ -190,14 +190,14 @@ describe('Content Functions', () => {
     });
 
     it('should return only armor when filtering by armor type', () => {
-      const armor = getEntriesByType<IsContentItem>('armor');
+      const armor = getEntriesByType<IsContentItem>('trinket');
 
       expect(armor).toHaveLength(1);
       expect(armor[0]).toEqual(mockArmor);
     });
 
     it('should return only guardians when filtering by guardian type', () => {
-      const guardians = getEntriesByType<IsContentItem>('guardian');
+      const guardians = getEntriesByType<IsContentItem>('monster');
 
       expect(guardians).toHaveLength(1);
       expect(guardians[0]).toEqual(mockGuardian);
@@ -205,22 +205,18 @@ describe('Content Functions', () => {
 
     it('should handle all content types', () => {
       const allTypes: ContentType[] = [
-        'worldconfig',
-        'currency',
-        'guardian',
-        'skill',
-        'weapon',
-        'accessory',
+        'hero',
+        'inhabitant',
+        'item',
+        'monster',
+        'pet',
+        'reputationaction',
+        'research',
+        'room',
+        'roomshape',
+        'stage',
         'trinket',
-        'armor',
-        'festival',
-        'statuseffect',
-        'talent',
-        'talenttree',
-        'traitequipment',
-        'traitlocation',
-        'townupgrade',
-        'locationupgrade',
+        'weapon',
       ];
 
       // Should not throw for any content type
@@ -232,7 +228,7 @@ describe('Content Functions', () => {
     it('should return empty array when no content is loaded', () => {
       setAllContentById(new Map());
 
-      const skills = getEntriesByType<IsContentItem>('skill');
+      const skills = getEntriesByType<IsContentItem>('pet');
       expect(skills).toHaveLength(0);
     });
   });
@@ -297,7 +293,7 @@ describe('Content Functions', () => {
       const conflictItem: IsContentItem = {
         id: 'Iron Sword',
         name: 'Conflicting Item',
-        __type: 'armor',
+        __type: 'trinket',
       };
 
       const contentMap = new Map([
@@ -318,7 +314,7 @@ describe('Content Functions', () => {
     it('should handle multiple entries of same type correctly', () => {
       const skillResult = getEntry<IsContentItem>('skill-1');
       expect(skillResult).toEqual(mockSkill);
-      expect(skillResult?.__type).toBe('skill');
+      expect(skillResult?.__type).toBe('pet');
     });
 
     it('should handle case-sensitive lookups', () => {
@@ -367,7 +363,7 @@ describe('Content Functions', () => {
       const lightningBolt: IsContentItem = {
         id: 'lightning-skill-1',
         name: 'Lightning Bolt',
-        __type: 'skill',
+        __type: 'pet',
       };
 
       const contentMap = new Map([
@@ -380,7 +376,7 @@ describe('Content Functions', () => {
 
       // Test filtering by type
       const weapons = getEntriesByType<IsContentItem>('weapon');
-      const skills = getEntriesByType<IsContentItem>('skill');
+      const skills = getEntriesByType<IsContentItem>('pet');
 
       expect(weapons).toHaveLength(1);
       expect(weapons[0]).toEqual(magicSword);
@@ -426,7 +422,7 @@ describe('Content Functions', () => {
         const item: IsContentItem = {
           id: `item-${i}`,
           name: `Item ${i}`,
-          __type: i % 2 === 0 ? 'weapon' : 'armor',
+          __type: i % 2 === 0 ? 'weapon' : 'trinket',
         };
         largeNameMap.set(`Item ${i}`, `item-${i}`);
         largeContentMap.set(`item-${i}`, item);
@@ -441,7 +437,7 @@ describe('Content Functions', () => {
 
       // Test filtering
       const weapons = getEntriesByType<IsContentItem>('weapon');
-      const armor = getEntriesByType<IsContentItem>('armor');
+      const armor = getEntriesByType<IsContentItem>('trinket');
 
       expect(weapons.length).toBe(50);
       expect(armor.length).toBe(50);

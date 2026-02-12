@@ -10,10 +10,12 @@ import {
   getRemovalInfo,
   getRoomConnections,
   getRoomDefinition,
+  getRoomProductionRates,
   isRoomRemovable,
   meetsInhabitantRestriction,
   notifyError,
   notifySuccess,
+  productionPerMinute,
   removeConnection,
   selectedTile,
   unassignInhabitantFromRoom,
@@ -70,6 +72,18 @@ export class PanelRoomInfoComponent {
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);
+
+  public roomProduction = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return [];
+    const rates = getRoomProductionRates(room.id);
+    return Object.entries(rates)
+      .filter(([, v]) => v && v !== 0)
+      .map(([type, perTick]) => ({
+        type,
+        perMinute: productionPerMinute(perTick as number),
+      }));
+  });
 
   public eligibleUnassigned = computed(() => {
     const room = this.selectedRoom();

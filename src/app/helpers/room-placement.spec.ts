@@ -117,7 +117,9 @@ describe('validateNoOverlap', () => {
     let grid = createEmptyGrid();
     grid = setTile(grid, 5, 5, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'existing-room',
+      hallwayId: null,
       connectionType: null,
     });
 
@@ -131,7 +133,9 @@ describe('validateNoOverlap', () => {
     let grid = createEmptyGrid();
     const occupiedTile = {
       occupied: true,
+      occupiedBy: 'room' as const,
       roomId: 'existing-room',
+      hallwayId: null,
       connectionType: null,
     };
     grid = setTile(grid, 5, 5, occupiedTile);
@@ -148,7 +152,9 @@ describe('validateNoOverlap', () => {
     let grid = createEmptyGrid();
     grid = setTile(grid, 4, 5, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'existing-room',
+      hallwayId: null,
       connectionType: null,
     });
 
@@ -176,7 +182,9 @@ describe('validatePlacement', () => {
     let grid = createEmptyGrid();
     grid = setTile(grid, 5, 5, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'existing-room',
+      hallwayId: null,
       connectionType: null,
     });
 
@@ -190,7 +198,9 @@ describe('validatePlacement', () => {
     // Occupy tile at (19, 0) — placing a 2x2 at (19, 0) will be both out of bounds and overlapping
     grid = setTile(grid, 19, 0, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'existing-room',
+      hallwayId: null,
       connectionType: null,
     });
 

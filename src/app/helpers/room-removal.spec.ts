@@ -277,24 +277,28 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     // Simulate a tile that has both a room and a hallway
     grid = setTile(grid, 5, 5, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: 'hallway-1',
       connectionType: null,
     });
     grid = setTile(grid, 6, 5, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: null,
       connectionType: null,
     });
     grid = setTile(grid, 5, 6, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: null,
       connectionType: null,
     });
     grid = setTile(grid, 6, 6, {
       occupied: true,
+      occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: null,
       connectionType: null,
