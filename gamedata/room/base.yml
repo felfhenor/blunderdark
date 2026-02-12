@@ -218,18 +218,53 @@
 
 - id: aa100001-0001-0001-0001-000000000005
   name: Soul Well
-  description: Draws essence from the spiritual plane. Produces essence passively.
-  shapeId: aa000000-0000-0000-0000-000000000001
+  description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
+  shapeId: 60e19fcd-7572-4bf0-a626-415be05f6a03
   cost:
     gold: 100
     crystals: 50
   production:
     essence: 0.3
   requiresWorkers: false
+  maxInhabitants: 2
+  fearLevel: 3
   adjacencyBonuses:
     - adjacentRoomType: aa100001-0001-0001-0001-000000000003
       bonus: 0.2
       description: Living fungi attract wandering spirits to the well.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000004
+      bonus: 0.15
+      description: Arcane knowledge from the library focuses the well's spiritual draw.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+      bonus: 0.25
+      description: Nearby wells create a spiritual resonance that amplifies essence flow.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000013
+      name: Necrotic Enhancement
+      description: Deepen the well's connection to the spirit realm, boosting essence yield and allowing more workers to channel its power.
+      cost:
+        gold: 120
+        crystals: 60
+        essence: 25
+      effects:
+        - type: productionMultiplier
+          value: 1.5
+          resource: essence
+        - type: maxInhabitantBonus
+          value: 1
+    - id: aa200001-0001-0001-0001-000000000014
+      name: Essence Mastery
+      description: Purify the well's output for greater efficiency. The refined essence calms the surrounding area, reducing fear.
+      cost:
+        gold: 100
+        crystals: 80
+        essence: 40
+      effects:
+        - type: productionMultiplier
+          value: 1.75
+          resource: essence
+        - type: fearReduction
+          value: 1
 
 - id: aa100001-0001-0001-0001-000000000006
   name: Dark Forge
