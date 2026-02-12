@@ -506,6 +506,19 @@ When adding new fields to `GameStateWorld`:
 - Default fallbacks match old behavior: normal=1.0, scared=0.5, hungry=0.75 — creatures without YAML data get these
 - Fear tolerance values: Slime=0, Goblin=1, Myconid=1, Kobold=2, Skeleton=4, Dragon=4, Lich=4, Demon Lord=4
 
+## Conditional Production Modifiers
+
+- `production-modifiers.ts` helper: registry-based production modifier system with time-of-day, floor depth, and biome modifiers
+- `ProductionModifierContext`: `{ roomTypeId, floorDepth, floorBiome, hour }` — all data needed to evaluate modifiers
+- `calculateProductionModifiers(context)` — multiplies all registry modifiers together, returns combined multiplier
+- `evaluateModifiers(context)` — returns array of active modifier results for UI display
+- Night (18:00-05:59): Shadow Library +20%, Soul Well +15%. Day (06:00-17:59): Mushroom Grove +15%, Crystal Mine +10%
+- Depth: +5% per floor depth level (DEPTH_BONUS_PER_LEVEL = 0.05)
+- Biome bonuses: volcanic→Crystal Mine +15%, fungal→Mushroom Grove +20%, crystal→Crystal Mine +25%/Ley Line +10%, corrupted→Soul Well +20%/Shadow Library +15%, flooded→Underground Lake +20%
+- Production pipeline: `calculateTotalProduction(floors, hour?)` — optional `hour` param. When omitted, env modifiers = 1.0. Computed signals and `processProduction` pass actual `state.clock.hour`
+- Formula: `final = base * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier`
+- Test pattern: use `depth: 0` and `biome: 'neutral'` in makeFloor for tests that don't test env modifiers
+
 ## GameState Type Gotchas
 
 - Season type is `'growth' | 'harvest' | 'darkness' | 'storms'` (NOT 'spring'/'summer' etc.)
