@@ -4,6 +4,7 @@ import type {
   Floor,
   GameId,
   GameState,
+  InvasionSchedule,
   ReputationState,
   ResearchState,
   ResourceMap,
@@ -39,6 +40,7 @@ export function defaultGameState(): GameState {
       currentFloorIndex: 0,
       trapInventory: [],
       trapCraftingQueues: [],
+      invasionSchedule: defaultInvasionSchedule(),
     },
   };
 }
@@ -88,6 +90,18 @@ export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floo
     inhabitants: [],
     connections: [],
     traps: [],
+  };
+}
+
+export function defaultInvasionSchedule(): InvasionSchedule {
+  return {
+    nextInvasionDay: null,
+    nextInvasionVariance: 0,
+    gracePeriodEnd: 30,
+    invasionHistory: [],
+    pendingSpecialInvasions: [],
+    warningActive: false,
+    warningDismissed: false,
   };
 }
 

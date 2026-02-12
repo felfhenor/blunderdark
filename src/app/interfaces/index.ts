@@ -17,6 +17,7 @@ export * from './hallway';
 export * from './identifiable';
 export * from './inhabitant';
 export * from './invader';
+export * from './invasion';
 export * from './meta';
 export * from './reputation';
 export * from './research';

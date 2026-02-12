@@ -3,6 +3,7 @@ import { signal } from '@angular/core';
 import { autoPlaceRooms } from '@helpers/altar-room';
 import {
   defaultFloor,
+  defaultInvasionSchedule,
   defaultReputationState,
   defaultResearchState,
   defaultResources,
@@ -42,6 +43,9 @@ export async function worldgenGenerateWorld(): Promise<
     reputation: defaultReputationState(),
     floors: [startingFloor],
     currentFloorIndex: 0,
+    trapInventory: [],
+    trapCraftingQueues: [],
+    invasionSchedule: defaultInvasionSchedule(),
     didFinish: true,
   };
 }

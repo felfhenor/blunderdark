@@ -11,6 +11,7 @@ import type { ReputationState } from '@interfaces/reputation';
 import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
 import type { TrapCraftingQueue, TrapInventoryEntry } from '@interfaces/trap';
+import type { InvasionSchedule } from '@interfaces/invasion';
 
 export interface GameStateWorld {
   grid: GridState;
@@ -24,6 +25,7 @@ export interface GameStateWorld {
   currentFloorIndex: number;
   trapInventory: TrapInventoryEntry[];
   trapCraftingQueues: TrapCraftingQueue[];
+  invasionSchedule: InvasionSchedule;
 }
 
 export interface GameStateClock {

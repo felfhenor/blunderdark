@@ -640,6 +640,17 @@ function makeGameState(
       },
       floors,
       currentFloorIndex: 0,
+      trapInventory: [],
+      trapCraftingQueues: [],
+      invasionSchedule: {
+        nextInvasionDay: null,
+        nextInvasionVariance: 0,
+        gracePeriodEnd: 30,
+        invasionHistory: [],
+        pendingSpecialInvasions: [],
+        warningActive: false,
+        warningDismissed: false,
+      },
     },
   };
 }

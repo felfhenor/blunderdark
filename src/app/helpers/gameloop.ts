@@ -3,6 +3,7 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { processScheduledEvents } from '@helpers/game-events';
 import { advanceClockTime } from '@helpers/game-time';
+import { processInvasionSchedule } from '@helpers/invasion-triggers';
 import { processProduction } from '@helpers/production';
 import { processTraining } from '@helpers/training';
 import { processTrapCrafting } from '@helpers/trap-workshop';
@@ -56,6 +57,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     processProduction(state);
     processTraining(state);
     processTrapCrafting(state);
+    processInvasionSchedule(state);
     return state;
   });
 
