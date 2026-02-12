@@ -6,6 +6,7 @@ import {
   executeRoomPlacement,
   exitHallwayBuildMode,
   exitPlacementMode,
+  getEffectiveMaxInhabitants,
   getRoomDefinition,
   hallwayPreviewTileSet,
   hallwaySourceRoomId,
@@ -70,6 +71,51 @@ export class GridComponent {
     }
     return map;
   });
+
+  public roomAssignmentMap = computed(() => {
+    const floor = currentFloor();
+    if (!floor)
+      return new Map<
+        string,
+        { current: number; max: number; status: 'full' | 'partial' | 'empty' }
+      >();
+
+    const map = new Map<
+      string,
+      { current: number; max: number; status: 'full' | 'partial' | 'empty' }
+    >();
+
+    for (const room of floor.rooms) {
+      const def = getRoomDefinition(room.roomTypeId);
+      if (!def) continue;
+
+      const maxCapacity = getEffectiveMaxInhabitants(room, def);
+      if (maxCapacity === 0) continue;
+
+      const currentCount = floor.inhabitants.filter(
+        (i) => i.assignedRoomId === room.id,
+      ).length;
+
+      let status: 'full' | 'partial' | 'empty';
+      if (currentCount === 0) {
+        status = 'empty';
+      } else if (maxCapacity > 0 && currentCount >= maxCapacity) {
+        status = 'full';
+      } else {
+        status = 'partial';
+      }
+
+      map.set(room.id, { current: currentCount, max: maxCapacity, status });
+    }
+    return map;
+  });
+
+  public getAssignmentInfo(
+    roomId: string | null,
+  ): { current: number; max: number; status: 'full' | 'partial' | 'empty' } | null {
+    if (!roomId) return null;
+    return this.roomAssignmentMap().get(roomId) ?? null;
+  }
 
   public getRoomColor(roomId: string | null): string | null {
     if (!roomId) return null;

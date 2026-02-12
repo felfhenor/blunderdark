@@ -16,6 +16,14 @@
       >
         @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
           <span class="room-label">{{ getRoomName(tile.roomId) }}</span>
+          @if (getAssignmentInfo(tile.roomId); as info) {
+            <span
+              class="assignment-badge"
+              [class.status-full]="info.status === 'full'"
+              [class.status-partial]="info.status === 'partial'"
+              [class.status-empty]="info.status === 'empty'"
+            >{{ info.current }}/{{ info.max === -1 ? '\u221E' : info.max }}</span>
+          }
         }
         @if (getDoorways(colIdx, rowIdx); as dirs) {
           @if (dirs.has('top')) {

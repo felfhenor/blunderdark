@@ -111,3 +111,32 @@
   pointer-events: none;
   z-index: 1;
 }
+
+.assignment-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 3px;
+  border-radius: 3px;
+  line-height: 14px;
+  pointer-events: none;
+  z-index: 2;
+  white-space: nowrap;
+
+  &.status-full {
+    background-color: oklch(0.45 0.15 145);
+    color: oklch(0.9 0.05 145);
+  }
+
+  &.status-partial {
+    background-color: oklch(0.45 0.15 80);
+    color: oklch(0.9 0.05 80);
+  }
+
+  &.status-empty {
+    background-color: oklch(0.4 0.15 25);
+    color: oklch(0.9 0.05 25);
+  }
+}
