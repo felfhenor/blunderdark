@@ -409,6 +409,22 @@ When adding a new required field to the `Floor` type:
 - RNG: pass `PRNG` (seedrandom) for testability, defaults to `rngRandom()` in production
 - `NotificationCategory` type extended with `'Invasion'` for warning notifications
 
+## Invasion Composition System
+
+- `invasion-composition.ts` helper: `calculateDungeonProfile(state)` → `DungeonProfile` with corruption/wealth/knowledge (0-100), size, threatLevel
+- Composition weights stored in YAML: `gamedata/invasion/composition-weights.yml` — content type `'invasion'`
+- Weight profiles: balanced (all equal), highCorruption (Paladin+Cleric), highWealth (Rogue+Warrior), highKnowledge (Mage+Ranger)
+- `getCompositionWeights(profile, config)` — if any dimension >60, uses corresponding weight profile; multiple highs get averaged
+- `selectPartyComposition(profile, defs, weights, seed)` — pure function returning `InvaderDefinition[]`, testable without content mocks
+- `generateInvasionParty(profile, seed)` — wraps selectPartyComposition + createInvaderInstance for full `InvaderInstance[]`
+- Party size: 3-5 (≤10 rooms), 6-10 (11-25 rooms), 11-15 (26+ rooms)
+- Constraints: at least 1 warrior, no class >50% of party, balanced profiles have 3+ unique classes
+- `ensureClassDiversity()` swaps members of the most-represented class with missing classes
+- Profile calculation: corruption = resource + soul wells, wealth = gold ratio + treasure rooms, knowledge = research nodes + library rooms
+- Room type IDs used: Shadow Library (000004), Soul Well (000005), Treasure Vault (000008), Crystal Mine (000002), Ley Line Nexus (000011)
+- For statistical composition tests, run 50 iterations and check aggregate ratios (>40% threshold)
+- `findLastIndex` not available in target — use manual reverse loop instead
+
 ## Adding Fields to GameStateWorld (Updated)
 
 When adding new fields to `GameStateWorld`:
