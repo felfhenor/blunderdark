@@ -1,3 +1,5 @@
+import type { IsContentItem } from '@interfaces/identifiable';
+
 export type CombatUnit = {
   attack: number;
   defense: number;
@@ -15,19 +17,17 @@ export type CombatResult = {
 
 export type AbilityTargetType = 'single' | 'aoe' | 'self';
 
-export type AbilityEffectType =
-  | 'damage'
-  | 'stun'
-  | 'buff_attack'
-  | 'buff_defense'
-  | 'evasion'
-  | 'resurrect';
+export type AbilityEffectDefinition = IsContentItem & {
+  __type: 'abilityeffect';
+  dealsDamage: boolean;
+  statusName: string | null;
+  overrideTargetsHit: number | null;
+};
 
-export type CombatAbility = {
-  id: string;
-  name: string;
+export type CombatAbility = IsContentItem & {
+  __type: 'combatability';
   description: string;
-  effectType: AbilityEffectType;
+  effectType: string;
   value: number;
   chance: number;
   cooldown: number;
@@ -45,7 +45,7 @@ export type AbilityState = {
 export type AbilityActivation = {
   abilityId: string;
   abilityName: string;
-  effectType: AbilityEffectType;
+  effectType: string;
   targetType: AbilityTargetType;
   damage: number;
   targetsHit: number;

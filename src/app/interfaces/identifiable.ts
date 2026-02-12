@@ -1,4 +1,6 @@
 export type ContentType =
+  | 'abilityeffect'
+  | 'combatability'
   | 'hero'
   | 'inhabitant'
   | 'item'

@@ -1,9 +1,10 @@
 import type {
+  AbilityEffectDefinition,
   AbilityState,
   CombatAbility,
   CombatUnit,
 } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   applyBerserkBuff,
@@ -14,6 +15,70 @@ import {
   tickAbilityStates,
   tryActivateAbility,
 } from '@helpers/combat-abilities';
+
+// --- Effect definitions (mirrors gamedata/abilityeffect/base.yml) ---
+
+const effectDefinitions: Record<string, AbilityEffectDefinition> = {
+  Damage: {
+    id: 'ae000001-0000-4000-a000-000000000001',
+    name: 'Damage',
+    __type: 'abilityeffect',
+    dealsDamage: true,
+    statusName: null,
+    overrideTargetsHit: null,
+  },
+  Stun: {
+    id: 'ae000001-0000-4000-a000-000000000002',
+    name: 'Stun',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'stunned',
+    overrideTargetsHit: null,
+  },
+  'Buff Attack': {
+    id: 'ae000001-0000-4000-a000-000000000003',
+    name: 'Buff Attack',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'berserk',
+    overrideTargetsHit: null,
+  },
+  'Buff Defense': {
+    id: 'ae000001-0000-4000-a000-000000000004',
+    name: 'Buff Defense',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'shielded',
+    overrideTargetsHit: null,
+  },
+  Evasion: {
+    id: 'ae000001-0000-4000-a000-000000000005',
+    name: 'Evasion',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'phased',
+    overrideTargetsHit: 0,
+  },
+  Resurrect: {
+    id: 'ae000001-0000-4000-a000-000000000006',
+    name: 'Resurrect',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'resurrected',
+    overrideTargetsHit: 1,
+  },
+};
+
+vi.mock('@helpers/content', () => ({
+  getEntry: vi.fn((nameOrId: string) => {
+    return effectDefinitions[nameOrId] ?? Object.values(effectDefinitions).find((e) => e.id === nameOrId);
+  }),
+  getEntriesByType: vi.fn(() => []),
+  allIdsByName: vi.fn(() => new Map()),
+  allContentById: vi.fn(() => new Map()),
+  setAllIdsByName: vi.fn(),
+  setAllContentById: vi.fn(),
+}));
 
 // --- Helpers ---
 
@@ -34,8 +99,9 @@ function makeUnit(overrides: Partial<CombatUnit> = {}): CombatUnit {
 const breathWeapon: CombatAbility = {
   id: 'ability-breath-weapon',
   name: 'Breath Weapon',
+  __type: 'combatability',
   description: 'AOE fire damage',
-  effectType: 'damage',
+  effectType: 'Damage',
   value: 150, // 150% of attack
   chance: 100, // always fires when off cooldown
   cooldown: 3,
@@ -46,8 +112,9 @@ const breathWeapon: CombatAbility = {
 const petrifyingGaze: CombatAbility = {
   id: 'ability-petrifying-gaze',
   name: 'Petrifying Gaze',
+  __type: 'combatability',
   description: 'Stuns a single target',
-  effectType: 'stun',
+  effectType: 'Stun',
   value: 0,
   chance: 10, // 10% proc
   cooldown: 0,
@@ -58,8 +125,9 @@ const petrifyingGaze: CombatAbility = {
 const wraithEvasion: CombatAbility = {
   id: 'ability-intangible',
   name: 'Intangible',
+  __type: 'combatability',
   description: '50% chance to evade physical attacks',
-  effectType: 'evasion',
+  effectType: 'Evasion',
   value: 0,
   chance: 50,
   cooldown: 0,
@@ -70,8 +138,9 @@ const wraithEvasion: CombatAbility = {
 const berserkRage: CombatAbility = {
   id: 'ability-berserk-rage',
   name: 'Berserk Rage',
+  __type: 'combatability',
   description: '+100% attack when below 50% HP',
-  effectType: 'buff_attack',
+  effectType: 'Buff Attack',
   value: 100, // +100% attack
   chance: 50, // HP threshold: 50%
   cooldown: 0,
@@ -82,8 +151,9 @@ const berserkRage: CombatAbility = {
 const lichShield: CombatAbility = {
   id: 'ability-shield',
   name: 'Arcane Shield',
+  __type: 'combatability',
   description: '+50% defense for 3 turns',
-  effectType: 'buff_defense',
+  effectType: 'Buff Defense',
   value: 50,
   chance: 100,
   cooldown: 4,
@@ -94,8 +164,9 @@ const lichShield: CombatAbility = {
 const deathBolt: CombatAbility = {
   id: 'ability-death-bolt',
   name: 'Death Bolt',
+  __type: 'combatability',
   description: 'Single target 200% magic damage',
-  effectType: 'damage',
+  effectType: 'Damage',
   value: 200,
   chance: 100,
   cooldown: 2,

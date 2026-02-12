@@ -1,0 +1,35 @@
+- id: ae000001-0000-4000-a000-000000000001
+  name: Damage
+  dealsDamage: true
+  statusName: null
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000002
+  name: Stun
+  dealsDamage: false
+  statusName: stunned
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000003
+  name: Buff Attack
+  dealsDamage: false
+  statusName: berserk
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000004
+  name: Buff Defense
+  dealsDamage: false
+  statusName: shielded
+  overrideTargetsHit: null
+
+- id: ae000001-0000-4000-a000-000000000005
+  name: Evasion
+  dealsDamage: false
+  statusName: phased
+  overrideTargetsHit: 0
+
+- id: ae000001-0000-4000-a000-000000000006
+  name: Resurrect
+  dealsDamage: false
+  statusName: resurrected
+  overrideTargetsHit: 1

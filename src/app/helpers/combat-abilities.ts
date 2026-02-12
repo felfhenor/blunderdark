@@ -1,9 +1,12 @@
 import type {
   AbilityActivation,
+  AbilityEffectDefinition,
   AbilityState,
   CombatAbility,
   CombatUnit,
 } from '@interfaces';
+
+import { getEntry } from '@helpers/content';
 
 /**
  * Create initial ability states for a set of abilities (all off cooldown).
@@ -62,6 +65,16 @@ export function isAbilityReady(
 }
 
 /**
+ * Look up the AbilityEffectDefinition for an ability's effectType.
+ * effectType on CombatAbility stores the name of the effect (e.g. "Damage").
+ */
+function getEffectDefinition(
+  ability: CombatAbility,
+): AbilityEffectDefinition | undefined {
+  return getEntry<AbilityEffectDefinition>(ability.effectType);
+}
+
+/**
  * Try to activate an ability based on its proc chance.
  * Returns null if the ability doesn't proc or is on cooldown.
  */
@@ -78,48 +91,29 @@ export function tryActivateAbility(
   const roll = rng() * 100;
   if (roll > ability.chance) return null;
 
-  // Calculate damage based on effect type
+  const effect = getEffectDefinition(ability);
+  if (!effect) return null;
+
   let damage = 0;
   let statusApplied: string | null = null;
   let statusDuration = 0;
   let targetsHit = 1;
 
-  switch (ability.effectType) {
-    case 'damage': {
-      damage = Math.round(attacker.attack * (ability.value / 100));
-      if (ability.targetType === 'aoe') {
-        targetsHit = targetCount;
-      }
-      break;
+  if (effect.dealsDamage) {
+    damage = Math.round(attacker.attack * (ability.value / 100));
+    if (ability.targetType === 'aoe') {
+      targetsHit = targetCount;
     }
-    case 'stun': {
-      statusApplied = 'stunned';
-      statusDuration = ability.duration;
-      break;
-    }
-    case 'buff_attack': {
-      statusApplied = 'berserk';
-      statusDuration = ability.duration;
-      break;
-    }
-    case 'buff_defense': {
-      statusApplied = 'shielded';
-      statusDuration = ability.duration;
-      break;
-    }
-    case 'evasion': {
-      statusApplied = 'phased';
-      statusDuration = 0;
-      targetsHit = 0;
-      damage = 0;
-      break;
-    }
-    case 'resurrect': {
-      statusApplied = 'resurrected';
-      statusDuration = 0;
-      targetsHit = 1;
-      break;
-    }
+  }
+
+  if (effect.statusName) {
+    statusApplied = effect.statusName;
+    statusDuration = ability.duration;
+  }
+
+  if (effect.overrideTargetsHit !== null) {
+    targetsHit = effect.overrideTargetsHit;
+    damage = 0;
   }
 
   const activation: AbilityActivation = {
@@ -156,7 +150,10 @@ export function checkEvasion(
   states: AbilityState[],
   rng: () => number,
 ): boolean {
-  const evasionAbility = abilities.find((a) => a.effectType === 'evasion');
+  const evasionAbility = abilities.find((a) => {
+    const effect = getEffectDefinition(a);
+    return effect?.overrideTargetsHit === 0;
+  });
   if (!evasionAbility) return false;
 
   // Evasion is a passive — always checked, no cooldown needed
@@ -174,7 +171,10 @@ export function applyBerserkBuff(
   states: AbilityState[],
   unit: CombatUnit,
 ): number {
-  const berserkAbility = abilities.find((a) => a.effectType === 'buff_attack');
+  const berserkAbility = abilities.find((a) => {
+    const effect = getEffectDefinition(a);
+    return effect?.statusName === 'berserk';
+  });
   if (!berserkAbility) return baseAttack;
 
   // Check if berserk should be active (HP below threshold)
@@ -194,7 +194,10 @@ export function applyShieldBuff(
   abilities: CombatAbility[],
   states: AbilityState[],
 ): number {
-  const shieldAbility = abilities.find((a) => a.effectType === 'buff_defense');
+  const shieldAbility = abilities.find((a) => {
+    const effect = getEffectDefinition(a);
+    return effect?.statusName === 'shielded';
+  });
   if (!shieldAbility) return baseDefense;
 
   const state = states.find((s) => s.abilityId === shieldAbility.id);

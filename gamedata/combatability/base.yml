@@ -1,0 +1,59 @@
+- id: ca000001-0000-4000-a000-000000000001
+  name: Breath Weapon
+  description: AOE fire damage
+  effectType: Damage
+  value: 150
+  chance: 100
+  cooldown: 3
+  targetType: aoe
+  duration: 0
+
+- id: ca000001-0000-4000-a000-000000000002
+  name: Petrifying Gaze
+  description: Stuns a single target
+  effectType: Stun
+  value: 0
+  chance: 10
+  cooldown: 0
+  targetType: single
+  duration: 3
+
+- id: ca000001-0000-4000-a000-000000000003
+  name: Death Bolt
+  description: Single target 200% magic damage
+  effectType: Damage
+  value: 200
+  chance: 100
+  cooldown: 2
+  targetType: single
+  duration: 0
+
+- id: ca000001-0000-4000-a000-000000000004
+  name: Wraith Evasion
+  description: 50% chance to evade physical attacks
+  effectType: Evasion
+  value: 0
+  chance: 50
+  cooldown: 0
+  targetType: self
+  duration: 0
+
+- id: ca000001-0000-4000-a000-000000000005
+  name: Berserk Rage
+  description: +100% attack when below 50% HP
+  effectType: Buff Attack
+  value: 100
+  chance: 50
+  cooldown: 0
+  targetType: self
+  duration: 0
+
+- id: ca000001-0000-4000-a000-000000000006
+  name: Lich Shield
+  description: +50% defense for 3 turns
+  effectType: Buff Defense
+  value: 50
+  chance: 100
+  cooldown: 4
+  targetType: self
+  duration: 3

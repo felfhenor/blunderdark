@@ -1,5 +1,7 @@
 import { defaultStats } from '@helpers/defaults';
 import type {
+  AbilityEffectDefinition,
+  CombatAbility,
   ContentType,
   HeroContent,
   HeroId,
@@ -27,6 +29,8 @@ import type {
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  abilityeffect: ensureAbilityEffect,
+  combatability: ensureCombatAbility,
   hero: ensureHero,
   inhabitant: ensureInhabitant,
   item: ensureItem,
@@ -232,5 +236,35 @@ function ensureRoomShape(
     tiles: shape.tiles ?? [],
     width: shape.width ?? 0,
     height: shape.height ?? 0,
+  };
+}
+
+function ensureAbilityEffect(
+  effect: Partial<AbilityEffectDefinition>,
+): AbilityEffectDefinition {
+  return {
+    id: effect.id ?? 'UNKNOWN',
+    name: effect.name ?? 'UNKNOWN',
+    __type: 'abilityeffect',
+    dealsDamage: effect.dealsDamage ?? false,
+    statusName: effect.statusName ?? null,
+    overrideTargetsHit: effect.overrideTargetsHit ?? null,
+  };
+}
+
+function ensureCombatAbility(
+  ability: Partial<CombatAbility>,
+): CombatAbility {
+  return {
+    id: ability.id ?? 'UNKNOWN',
+    name: ability.name ?? 'UNKNOWN',
+    __type: 'combatability',
+    description: ability.description ?? '',
+    effectType: ability.effectType ?? '',
+    value: ability.value ?? 0,
+    chance: ability.chance ?? 0,
+    cooldown: ability.cooldown ?? 0,
+    targetType: ability.targetType ?? 'single',
+    duration: ability.duration ?? 0,
   };
 }
