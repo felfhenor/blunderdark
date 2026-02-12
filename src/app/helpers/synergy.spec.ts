@@ -1,0 +1,860 @@
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content', () => {
+  const entries = new Map<string, unknown>();
+
+  entries.set('room-crystal-mine', {
+    id: 'room-crystal-mine',
+    name: 'Crystal Mine',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { crystals: 1.0 },
+    requiresWorkers: true,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-dark-forge', {
+    id: 'room-dark-forge',
+    name: 'Dark Forge',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { gold: 1.2 },
+    requiresWorkers: true,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-mushroom-grove', {
+    id: 'room-mushroom-grove',
+    name: 'Mushroom Grove',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { food: 1.6 },
+    requiresWorkers: true,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-shadow-library', {
+    id: 'room-shadow-library',
+    name: 'Shadow Library',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { research: 0.8 },
+    requiresWorkers: true,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-soul-well', {
+    id: 'room-soul-well',
+    name: 'Soul Well',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { essence: 0.3 },
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-treasure-vault', {
+    id: 'room-treasure-vault',
+    name: 'Treasure Vault',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: { gold: 0.8 },
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-barracks', {
+    id: 'room-barracks',
+    name: 'Barracks',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1',
+    cost: {},
+    production: {},
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('def-goblin', {
+    id: 'def-goblin',
+    name: 'Goblin',
+    __type: 'inhabitant',
+    type: 'creature',
+    tier: 1,
+    description: '',
+    cost: {},
+    stats: { hp: 30, attack: 10, defense: 8, speed: 12, workerEfficiency: 1.0 },
+    traits: [],
+  });
+
+  entries.set('def-myconid', {
+    id: 'def-myconid',
+    name: 'Myconid',
+    __type: 'inhabitant',
+    type: 'fungal',
+    tier: 1,
+    description: '',
+    cost: {},
+    stats: { hp: 25, attack: 5, defense: 10, speed: 8, workerEfficiency: 1.3 },
+    traits: [],
+  });
+
+  entries.set('def-skeleton', {
+    id: 'def-skeleton',
+    name: 'Skeleton',
+    __type: 'inhabitant',
+    type: 'undead',
+    tier: 1,
+    description: '',
+    cost: {},
+    stats: { hp: 40, attack: 12, defense: 15, speed: 6, workerEfficiency: 0.7 },
+    traits: [],
+  });
+
+  entries.set('shape-1', {
+    id: 'shape-1',
+    name: 'Test 2x1',
+    __type: 'roomshape',
+    tiles: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    width: 2,
+    height: 1,
+  });
+
+  return {
+    getEntry: vi.fn((id: string) => entries.get(id)),
+    getEntriesByType: vi.fn(() => []),
+    getEntries: vi.fn(),
+    allIdsByName: vi.fn(() => new Map()),
+  };
+});
+
+import type {
+  Connection,
+  Floor,
+  InhabitantInstance,
+  PlacedRoom,
+  SynergyDefinition,
+} from '@interfaces';
+import {
+  evaluateCondition,
+  evaluateAllSynergies,
+  evaluateSynergiesForRoom,
+  SYNERGY_DEFINITIONS,
+} from '@helpers/synergy';
+
+function makeFloor(
+  rooms: PlacedRoom[],
+  inhabitants: InhabitantInstance[] = [],
+  connections: Connection[] = [],
+): Floor {
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 1,
+    biome: 'neutral',
+    grid: { tiles: [] } as unknown as Floor['grid'],
+    rooms,
+    hallways: [],
+    inhabitants,
+    connections,
+  };
+}
+
+describe('SYNERGY_DEFINITIONS', () => {
+  it('should have at least 5 synergy definitions', () => {
+    expect(SYNERGY_DEFINITIONS.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('should have unique ids', () => {
+    const ids = SYNERGY_DEFINITIONS.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('should have all required fields', () => {
+    for (const synergy of SYNERGY_DEFINITIONS) {
+      expect(synergy.id).toBeTruthy();
+      expect(synergy.name).toBeTruthy();
+      expect(synergy.description).toBeTruthy();
+      expect(synergy.conditions.length).toBeGreaterThan(0);
+      expect(synergy.effects.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('evaluateCondition', () => {
+  const mine: PlacedRoom = {
+    id: 'placed-mine',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const forge: PlacedRoom = {
+    id: 'placed-forge',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  describe('roomType condition', () => {
+    it('should return true when room type matches', () => {
+      const floor = makeFloor([mine]);
+      expect(
+        evaluateCondition(
+          { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false when room type does not match', () => {
+      const floor = makeFloor([mine]);
+      expect(
+        evaluateCondition(
+          { type: 'roomType', roomTypeId: 'room-dark-forge' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+  });
+
+  describe('adjacentRoomType condition', () => {
+    it('should return true when adjacent room type matches', () => {
+      const floor = makeFloor([mine, forge]);
+      expect(
+        evaluateCondition(
+          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+          mine,
+          floor,
+          ['placed-forge'],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false when no adjacent room matches', () => {
+      const floor = makeFloor([mine, forge]);
+      expect(
+        evaluateCondition(
+          { type: 'adjacentRoomType', roomTypeId: 'room-soul-well' },
+          mine,
+          floor,
+          ['placed-forge'],
+        ),
+      ).toBe(false);
+    });
+
+    it('should return false when room is not adjacent', () => {
+      const floor = makeFloor([mine, forge]);
+      expect(
+        evaluateCondition(
+          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+  });
+
+  describe('connectedRoomType condition', () => {
+    it('should return true when connected to matching room type', () => {
+      const conn: Connection = {
+        id: 'conn-1',
+        roomAId: 'placed-mine',
+        roomBId: 'placed-forge',
+        edgeTiles: [],
+      };
+      const floor = makeFloor([mine, forge], [], [conn]);
+      expect(
+        evaluateCondition(
+          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return true for the reverse direction of connection', () => {
+      const conn: Connection = {
+        id: 'conn-1',
+        roomAId: 'placed-mine',
+        roomBId: 'placed-forge',
+        edgeTiles: [],
+      };
+      const floor = makeFloor([mine, forge], [], [conn]);
+      expect(
+        evaluateCondition(
+          { type: 'connectedRoomType', roomTypeId: 'room-crystal-mine' },
+          forge,
+          floor,
+          [],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false when not connected', () => {
+      const floor = makeFloor([mine, forge]);
+      expect(
+        evaluateCondition(
+          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+  });
+
+  describe('inhabitantType condition', () => {
+    it('should return true when assigned inhabitant matches type', () => {
+      const inhabitants: InhabitantInstance[] = [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-goblin',
+          name: 'Goblin',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+      ];
+      const floor = makeFloor([mine], inhabitants);
+      expect(
+        evaluateCondition(
+          { type: 'inhabitantType', inhabitantType: 'creature' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false when no inhabitant matches type', () => {
+      const inhabitants: InhabitantInstance[] = [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-skeleton',
+          name: 'Skeleton',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+      ];
+      const floor = makeFloor([mine], inhabitants);
+      expect(
+        evaluateCondition(
+          { type: 'inhabitantType', inhabitantType: 'creature' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+
+    it('should return false when no inhabitants are assigned', () => {
+      const floor = makeFloor([mine]);
+      expect(
+        evaluateCondition(
+          { type: 'inhabitantType', inhabitantType: 'creature' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+
+    it('should ignore inhabitants assigned to other rooms', () => {
+      const inhabitants: InhabitantInstance[] = [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-goblin',
+          name: 'Goblin',
+          state: 'normal',
+          assignedRoomId: 'placed-forge',
+        },
+      ];
+      const floor = makeFloor([mine, forge], inhabitants);
+      expect(
+        evaluateCondition(
+          { type: 'inhabitantType', inhabitantType: 'creature' },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+  });
+
+  describe('minInhabitants condition', () => {
+    it('should return true when inhabitant count meets minimum', () => {
+      const inhabitants: InhabitantInstance[] = [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-goblin',
+          name: 'Goblin 1',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+        {
+          instanceId: 'inst-2',
+          definitionId: 'def-goblin',
+          name: 'Goblin 2',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+      ];
+      const floor = makeFloor([mine], inhabitants);
+      expect(
+        evaluateCondition(
+          { type: 'minInhabitants', count: 2 },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false when inhabitant count is below minimum', () => {
+      const inhabitants: InhabitantInstance[] = [
+        {
+          instanceId: 'inst-1',
+          definitionId: 'def-goblin',
+          name: 'Goblin',
+          state: 'normal',
+          assignedRoomId: 'placed-mine',
+        },
+      ];
+      const floor = makeFloor([mine], inhabitants);
+      expect(
+        evaluateCondition(
+          { type: 'minInhabitants', count: 2 },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+
+    it('should return false when no inhabitants assigned', () => {
+      const floor = makeFloor([mine]);
+      expect(
+        evaluateCondition(
+          { type: 'minInhabitants', count: 1 },
+          mine,
+          floor,
+          [],
+        ),
+      ).toBe(false);
+    });
+  });
+});
+
+describe('evaluateSynergiesForRoom', () => {
+  const testSynergies: SynergyDefinition[] = [
+    {
+      id: 'test-mine-forge',
+      name: 'Test Mine Forge',
+      description: 'Mine near forge with creature worker',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'inhabitantType', inhabitantType: 'creature' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.15 }],
+    },
+    {
+      id: 'test-forge-staff',
+      name: 'Test Forge Staff',
+      description: 'Forge with 2+ workers',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-dark-forge' },
+        { type: 'minInhabitants', count: 2 },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.1 }],
+    },
+  ];
+
+  const mine: PlacedRoom = {
+    id: 'placed-mine',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const forge: PlacedRoom = {
+    id: 'placed-forge',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  it('should activate synergy when all conditions are met', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const active = evaluateSynergiesForRoom(
+      mine,
+      floor,
+      ['placed-forge'],
+      testSynergies,
+    );
+    expect(active).toHaveLength(1);
+    expect(active[0].id).toBe('test-mine-forge');
+  });
+
+  it('should not activate synergy when a condition is not met', () => {
+    // No inhabitants — inhabitantType condition fails
+    const floor = makeFloor([mine, forge]);
+    const active = evaluateSynergiesForRoom(
+      mine,
+      floor,
+      ['placed-forge'],
+      testSynergies,
+    );
+    expect(active).toHaveLength(0);
+  });
+
+  it('should not activate synergy for wrong room type', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-forge',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    // Forge doesn't match mine-forge synergy's roomType condition
+    const active = evaluateSynergiesForRoom(
+      forge,
+      floor,
+      ['placed-mine'],
+      testSynergies,
+    );
+    // Only forge-staff might match, but needs 2 inhabitants
+    expect(active).toHaveLength(0);
+  });
+
+  it('should activate multiple synergies for same room when conditions met', () => {
+    const mineForgeMineSynergy: SynergyDefinition = {
+      id: 'test-mine-adjacent',
+      name: 'Test Mine Adjacent',
+      description: 'Mine near forge',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.05 }],
+    };
+    const allSynergies = [...testSynergies, mineForgeMineSynergy];
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const active = evaluateSynergiesForRoom(
+      mine,
+      floor,
+      ['placed-forge'],
+      allSynergies,
+    );
+    expect(active).toHaveLength(2);
+  });
+});
+
+describe('evaluateAllSynergies', () => {
+  const testSynergies: SynergyDefinition[] = [
+    {
+      id: 'test-mine-forge',
+      name: 'Test Mine Forge',
+      description: 'Mine near forge with creature worker',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'inhabitantType', inhabitantType: 'creature' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.15 }],
+    },
+  ];
+
+  const mine: PlacedRoom = {
+    id: 'placed-mine',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const forge: PlacedRoom = {
+    id: 'placed-forge',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  it('should return map of active synergies across all floors', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const floor = makeFloor([mine, forge], inhabitants);
+    const result = evaluateAllSynergies([floor], testSynergies);
+    expect(result.get('placed-mine')).toHaveLength(1);
+    expect(result.get('placed-mine')![0].id).toBe('test-mine-forge');
+    expect(result.has('placed-forge')).toBe(false);
+  });
+
+  it('should return empty map when no synergies activate', () => {
+    const floor = makeFloor([mine, forge]);
+    const result = evaluateAllSynergies([floor], testSynergies);
+    expect(result.size).toBe(0);
+  });
+
+  it('should not share synergies across floors', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    // Mine on floor 1, forge on floor 2 — adjacency not met
+    const floor1 = makeFloor([mine], inhabitants);
+    const floor2 = makeFloor([forge]);
+    const result = evaluateAllSynergies([floor1, floor2], testSynergies);
+    expect(result.size).toBe(0);
+  });
+});
+
+describe('synergy re-evaluation scenarios', () => {
+  const testSynergies: SynergyDefinition[] = [
+    {
+      id: 'test-mine-forge-creature',
+      name: 'Test',
+      description: 'Test',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'inhabitantType', inhabitantType: 'creature' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.15 }],
+    },
+    {
+      id: 'test-connected',
+      name: 'Test Connected',
+      description: 'Test',
+      conditions: [
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+        { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+      ],
+      effects: [{ type: 'productionBonus', value: 0.1 }],
+    },
+  ];
+
+  const mine: PlacedRoom = {
+    id: 'placed-mine',
+    roomTypeId: 'room-crystal-mine',
+    shapeId: 'shape-1',
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  const forge: PlacedRoom = {
+    id: 'placed-forge',
+    roomTypeId: 'room-dark-forge',
+    shapeId: 'shape-1',
+    anchorX: 2,
+    anchorY: 0,
+  };
+
+  it('should activate on room placement when conditions are met', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    // Before forge placed: no adjacency synergy
+    const beforePlacement = evaluateAllSynergies(
+      [makeFloor([mine], inhabitants)],
+      testSynergies,
+    );
+    expect(beforePlacement.size).toBe(0);
+
+    // After forge placed: synergy activates
+    const afterPlacement = evaluateAllSynergies(
+      [makeFloor([mine, forge], inhabitants)],
+      testSynergies,
+    );
+    expect(afterPlacement.get('placed-mine')).toHaveLength(1);
+    expect(afterPlacement.get('placed-mine')![0].id).toBe(
+      'test-mine-forge-creature',
+    );
+  });
+
+  it('should activate on inhabitant assignment', () => {
+    const floor = makeFloor([mine, forge]);
+    const before = evaluateAllSynergies([floor], testSynergies);
+    expect(before.size).toBe(0);
+
+    // Assign goblin (creature type)
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const after = evaluateAllSynergies(
+      [makeFloor([mine, forge], inhabitants)],
+      testSynergies,
+    );
+    expect(after.get('placed-mine')).toHaveLength(1);
+  });
+
+  it('should deactivate on inhabitant removal', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const active = evaluateAllSynergies(
+      [makeFloor([mine, forge], inhabitants)],
+      testSynergies,
+    );
+    expect(active.get('placed-mine')).toHaveLength(1);
+
+    // Unassign inhabitant
+    const unassigned: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: null,
+      },
+    ];
+    const inactive = evaluateAllSynergies(
+      [makeFloor([mine, forge], unassigned)],
+      testSynergies,
+    );
+    expect(inactive.has('placed-mine')).toBe(false);
+  });
+
+  it('should activate connection-based synergy when rooms are connected', () => {
+    const before = evaluateAllSynergies(
+      [makeFloor([mine, forge])],
+      testSynergies,
+    );
+    expect(before.size).toBe(0);
+
+    const conn: Connection = {
+      id: 'conn-1',
+      roomAId: 'placed-mine',
+      roomBId: 'placed-forge',
+      edgeTiles: [],
+    };
+    const after = evaluateAllSynergies(
+      [makeFloor([mine, forge], [], [conn])],
+      testSynergies,
+    );
+    expect(after.get('placed-mine')).toHaveLength(1);
+    expect(after.get('placed-mine')![0].id).toBe('test-connected');
+  });
+
+  it('should deactivate connection-based synergy when disconnected', () => {
+    const conn: Connection = {
+      id: 'conn-1',
+      roomAId: 'placed-mine',
+      roomBId: 'placed-forge',
+      edgeTiles: [],
+    };
+    const connected = evaluateAllSynergies(
+      [makeFloor([mine, forge], [], [conn])],
+      testSynergies,
+    );
+    expect(connected.get('placed-mine')).toHaveLength(1);
+
+    // Remove connection
+    const disconnected = evaluateAllSynergies(
+      [makeFloor([mine, forge])],
+      testSynergies,
+    );
+    expect(disconnected.has('placed-mine')).toBe(false);
+  });
+
+  it('should deactivate synergy when adjacent room is removed', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1',
+        definitionId: 'def-goblin',
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine',
+      },
+    ];
+    const withForge = evaluateAllSynergies(
+      [makeFloor([mine, forge], inhabitants)],
+      testSynergies,
+    );
+    expect(withForge.get('placed-mine')).toHaveLength(1);
+
+    // Remove forge
+    const withoutForge = evaluateAllSynergies(
+      [makeFloor([mine], inhabitants)],
+      testSynergies,
+    );
+    expect(withoutForge.has('placed-mine')).toBe(false);
+  });
+});

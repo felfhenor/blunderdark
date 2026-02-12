@@ -26,4 +26,5 @@ export * from './sfx';
 export * from './stat';
 export * from './state-game';
 export * from './state-options';
+export * from './synergy';
 export * from './traits';
