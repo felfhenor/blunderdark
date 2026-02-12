@@ -203,6 +203,7 @@ export function migrateFloors(world: Partial<GameStateWorld>): {
         hallways: saved.hallways ?? base.hallways,
         inhabitants: saved.inhabitants ?? base.inhabitants,
         connections: saved.connections ?? base.connections,
+        traps: saved.traps ?? base.traps,
       };
     });
   }

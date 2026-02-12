@@ -20,6 +20,7 @@ import type {
   StageContent,
   StageId,
   StatBlock,
+  TrapDefinition,
   TrinketContent,
   TrinketId,
   WeaponContent,
@@ -41,6 +42,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   room: ensureRoom,
   roomshape: ensureRoomShape,
   stage: ensureStage,
+  trap: ensureTrap,
   trinket: ensureTrinket,
   weapon: ensureWeapon,
 };
@@ -266,5 +268,24 @@ function ensureCombatAbility(
     cooldown: ability.cooldown ?? 0,
     targetType: ability.targetType ?? 'single',
     duration: ability.duration ?? 0,
+  };
+}
+
+function ensureTrap(
+  trap: Partial<TrapDefinition & IsContentItem>,
+): TrapDefinition & IsContentItem {
+  return {
+    id: trap.id ?? 'UNKNOWN',
+    name: trap.name ?? 'UNKNOWN',
+    __type: 'trap',
+    description: trap.description ?? '',
+    effectType: trap.effectType ?? 'physical',
+    damage: trap.damage ?? 0,
+    duration: trap.duration ?? 0,
+    charges: trap.charges ?? 1,
+    craftCost: trap.craftCost ?? {},
+    triggerChance: trap.triggerChance ?? 0.5,
+    canBeDisarmed: trap.canBeDisarmed ?? true,
+    sprite: trap.sprite ?? 'UNKNOWN',
   };
 }

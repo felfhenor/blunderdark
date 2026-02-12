@@ -160,6 +160,7 @@ function makeFloor(rooms: PlacedRoom[]): Floor {
     hallways: [],
     inhabitants: [],
     connections: [],
+    traps: [],
   };
 }
 

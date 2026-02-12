@@ -4,6 +4,7 @@ import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { PlacedRoom } from '@interfaces/room-shape';
+import type { TrapInstance } from '@interfaces/trap';
 
 export type Floor = {
   id: string;
@@ -15,6 +16,7 @@ export type Floor = {
   hallways: Hallway[];
   inhabitants: InhabitantInstance[];
   connections: Connection[];
+  traps: TrapInstance[];
 };
 
 export const MAX_FLOORS = 10;

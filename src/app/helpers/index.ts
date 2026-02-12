@@ -45,6 +45,7 @@ export * from './synergy';
 export * from './throne-room';
 export * from './timer';
 export * from './training';
+export * from './traps';
 export * from './ui';
 export * from './version';
 export * from './world';

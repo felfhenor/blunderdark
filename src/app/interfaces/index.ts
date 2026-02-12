@@ -29,3 +29,4 @@ export * from './state-game';
 export * from './state-options';
 export * from './synergy';
 export * from './traits';
+export * from './trap';

@@ -37,6 +37,7 @@ export function defaultGameState(): GameState {
       reputation: defaultReputationState(),
       floors: [defaultFloor()],
       currentFloorIndex: 0,
+      trapInventory: [],
     },
   };
 }
@@ -85,6 +86,7 @@ export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floo
     hallways: [],
     inhabitants: [],
     connections: [],
+    traps: [],
   };
 }
 

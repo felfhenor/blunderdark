@@ -10,6 +10,7 @@ import type { ResearchState } from '@interfaces/research';
 import type { ReputationState } from '@interfaces/reputation';
 import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
+import type { TrapInventoryEntry } from '@interfaces/trap';
 
 export interface GameStateWorld {
   grid: GridState;
@@ -21,6 +22,7 @@ export interface GameStateWorld {
   reputation: ReputationState;
   floors: Floor[];
   currentFloorIndex: number;
+  trapInventory: TrapInventoryEntry[];
 }
 
 export interface GameStateClock {

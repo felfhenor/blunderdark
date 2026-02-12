@@ -11,6 +11,7 @@ export type ContentType =
   | 'room'
   | 'roomshape'
   | 'stage'
+  | 'trap'
   | 'trinket'
   | 'weapon';
 

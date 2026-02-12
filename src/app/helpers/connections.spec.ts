@@ -47,6 +47,7 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
     hallways: [],
     inhabitants: [],
     connections: [],
+    traps: [],
     ...overrides,
   } as Floor;
 }

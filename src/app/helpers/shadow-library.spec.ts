@@ -186,6 +186,7 @@ function makeFloor(
     hallways: [],
     inhabitants,
     connections: [],
+    traps: [],
   };
 }
 
