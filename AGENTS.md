@@ -81,6 +81,8 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `areRoomsAdjacent` from `adjacency.ts` checks edge-sharing (not diagonal) — used for vault adjacency detection
 - `workerEfficiency` of 1.0 = 0% bonus; only `production_bonus` effectType traits contribute to production bonuses; other trait types (defense_bonus, trap_bonus) are ignored
 - `calculateAdjacencyBonus(placedRoom, adjacentRoomIds, allPlacedRooms)` returns additive bonus from gamedata adjacency rules — caller provides adjacentRoomIds from AdjacencyMap
+- `getActiveAdjacencyBonuses(placedRoom, floor)` returns `ActiveAdjacencyBonus[]` with sourceRoomId, sourceRoomName, bonus, description — used for UI display of which adjacent rooms contribute bonuses
+- `AdjacencyBonus` type has `description: string` field — displayed in tooltips; `ensureRoom()` defaults missing descriptions to empty string
 - `calculateConditionalModifiers(placedRoom, inhabitants)` returns multiplicative modifier from inhabitant states — scared=0.5, hungry=0.75, normal=1.0; unique states only (Set dedup)
 - Production formula: `Final = Base * (1 + inhabitantBonus + adjacencyBonus) * conditionalModifier` — bonuses are additive, modifiers are multiplicative
 - `PlacedRoom.appliedUpgradePathId?: string` tracks the chosen upgrade — optional field so existing PlacedRoom literals in tests don't break

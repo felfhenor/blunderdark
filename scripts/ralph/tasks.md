@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 27 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display)
+- **Complete:** 28 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system)
 - **In Progress:** None
-- **Remaining:** ~95 features
+- **Remaining:** ~94 features
 
 ---
 
@@ -70,7 +70,7 @@ Show players their economy status.
 | Priority | Feature | Stories | Depends On |
 |----------|---------|---------|------------|
 | ~~5.1~~ | ~~`resource-ui-display`~~ | ~~COMPLETE~~ | ~~resource-manager~~ |
-| 5.2 | `adjacency-bonus-system` | 5 | adjacency-detection, production-calculation-system |
+| ~~5.2~~ | ~~`adjacency-bonus-system`~~ | ~~COMPLETE~~ | ~~adjacency-detection, production-calculation-system~~ |
 | 5.3 | `synergy-detection-logic` | 4 | adjacency-detection |
 | 5.4 | `synergy-tooltip-system` | 4 | synergy-detection-logic |
 
