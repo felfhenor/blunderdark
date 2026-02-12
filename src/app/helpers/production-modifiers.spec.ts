@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BIOME_ROOM_BONUSES,
   DEPTH_BONUS_PER_LEVEL,
   applyModifiers,
   calculateProductionModifiers,
   evaluateModifiers,
+  getBiomeBonus,
   getModifierRegistry,
   isDayTime,
   isNightTime,
@@ -15,6 +17,7 @@ const SHADOW_LIBRARY = 'aa100001-0001-0001-0001-000000000004';
 const SOUL_WELL = 'aa100001-0001-0001-0001-000000000005';
 const CRYSTAL_MINE = 'aa100001-0001-0001-0001-000000000002';
 const MUSHROOM_GROVE = 'aa100001-0001-0001-0001-000000000003';
+const DARK_FORGE = 'aa100001-0001-0001-0001-000000000006';
 const UNDERGROUND_LAKE = 'aa100001-0001-0001-0001-000000000010';
 const LEY_LINE_NEXUS = 'aa100001-0001-0001-0001-000000000011';
 const THRONE_ROOM = 'aa100001-0001-0001-0001-000000000001';
@@ -214,22 +217,28 @@ describe('biome modifiers', () => {
   // Use nighttime for rooms with day bonuses to isolate biome effect
   // Use daytime for rooms with night bonuses to isolate biome effect
 
+  it('should give Dark Forge +50% in volcanic biome', () => {
+    const context = makeContext({ roomTypeId: DARK_FORGE, floorBiome: 'volcanic' });
+    const result = calculateProductionModifiers(context);
+    expect(result).toBeCloseTo(1.50);
+  });
+
   it('should give Crystal Mine +15% in volcanic biome', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, floorBiome: 'volcanic', hour: 22 });
     const result = calculateProductionModifiers(context);
     expect(result).toBeCloseTo(1.15);
   });
 
-  it('should give Mushroom Grove +20% in fungal biome', () => {
+  it('should give Mushroom Grove +60% in fungal biome', () => {
     const context = makeContext({ roomTypeId: MUSHROOM_GROVE, floorBiome: 'fungal', hour: 22 });
     const result = calculateProductionModifiers(context);
-    expect(result).toBeCloseTo(1.20);
+    expect(result).toBeCloseTo(1.60);
   });
 
-  it('should give Crystal Mine +25% in crystal biome', () => {
+  it('should give Crystal Mine +40% in crystal biome', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, floorBiome: 'crystal', hour: 22 });
     const result = calculateProductionModifiers(context);
-    expect(result).toBeCloseTo(1.25);
+    expect(result).toBeCloseTo(1.40);
   });
 
   it('should give Ley Line Nexus +10% in crystal biome', () => {
@@ -238,22 +247,22 @@ describe('biome modifiers', () => {
     expect(result).toBeCloseTo(1.10);
   });
 
-  it('should give Soul Well +20% in corrupted biome', () => {
+  it('should give Soul Well +100% in corrupted biome', () => {
     const context = makeContext({ roomTypeId: SOUL_WELL, floorBiome: 'corrupted' });
     const result = calculateProductionModifiers(context);
-    expect(result).toBeCloseTo(1.20);
+    expect(result).toBeCloseTo(2.00);
   });
 
-  it('should give Shadow Library +15% in corrupted biome', () => {
+  it('should give Shadow Library +100% in corrupted biome', () => {
     const context = makeContext({ roomTypeId: SHADOW_LIBRARY, floorBiome: 'corrupted' });
     const result = calculateProductionModifiers(context);
-    expect(result).toBeCloseTo(1.15);
+    expect(result).toBeCloseTo(2.00);
   });
 
-  it('should give Underground Lake +20% in flooded biome', () => {
+  it('should give Underground Lake +50% in flooded biome', () => {
     const context = makeContext({ roomTypeId: UNDERGROUND_LAKE, floorBiome: 'flooded' });
     const result = calculateProductionModifiers(context);
-    expect(result).toBeCloseTo(1.20);
+    expect(result).toBeCloseTo(1.50);
   });
 
   it('should give no biome bonus in neutral biome', () => {
@@ -281,25 +290,25 @@ describe('multiplicative stacking', () => {
   });
 
   it('should multiply time-of-day and biome modifiers', () => {
-    // Shadow Library at night (1.20) in corrupted biome (1.15) = 1.20 * 1.15 = 1.38
+    // Shadow Library at night (1.20) in corrupted biome (2.00) = 1.20 * 2.00 = 2.40
     const context = makeContext({
       roomTypeId: SHADOW_LIBRARY,
       hour: 22,
       floorBiome: 'corrupted',
     });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.38);
+    expect(calculateProductionModifiers(context)).toBeCloseTo(2.40);
   });
 
   it('should multiply all three modifiers', () => {
-    // Soul Well at night (1.15) at depth 3 (1.15) in corrupted biome (1.20)
-    // = 1.15 * 1.15 * 1.20 = 1.587
+    // Soul Well at night (1.15) at depth 3 (1.15) in corrupted biome (2.00)
+    // = 1.15 * 1.15 * 2.00 = 2.645
     const context = makeContext({
       roomTypeId: SOUL_WELL,
       hour: 0,
       floorDepth: 3,
       floorBiome: 'corrupted',
     });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.15 * 1.15 * 1.20);
+    expect(calculateProductionModifiers(context)).toBeCloseTo(1.15 * 1.15 * 2.00);
   });
 
   it('should return 1.0 when no modifiers apply', () => {
@@ -362,5 +371,68 @@ describe('evaluateModifiers', () => {
     const results = evaluateModifiers(context);
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].description).toBeTruthy();
+  });
+});
+
+// --- getBiomeBonus ---
+
+describe('getBiomeBonus', () => {
+  it('should return 1.0 for neutral biome', () => {
+    expect(getBiomeBonus('neutral', CRYSTAL_MINE)).toBe(1.0);
+  });
+
+  it('should return 1.0 for unrelated room type', () => {
+    expect(getBiomeBonus('volcanic', THRONE_ROOM)).toBe(1.0);
+  });
+
+  it('should return correct bonus for Dark Forge in volcanic', () => {
+    expect(getBiomeBonus('volcanic', DARK_FORGE)).toBeCloseTo(1.50);
+  });
+
+  it('should return correct bonus for Crystal Mine in volcanic', () => {
+    expect(getBiomeBonus('volcanic', CRYSTAL_MINE)).toBeCloseTo(1.15);
+  });
+
+  it('should return correct bonus for Mushroom Grove in fungal', () => {
+    expect(getBiomeBonus('fungal', MUSHROOM_GROVE)).toBeCloseTo(1.60);
+  });
+
+  it('should return correct bonus for Crystal Mine in crystal', () => {
+    expect(getBiomeBonus('crystal', CRYSTAL_MINE)).toBeCloseTo(1.40);
+  });
+
+  it('should return correct bonus for Soul Well in corrupted', () => {
+    expect(getBiomeBonus('corrupted', SOUL_WELL)).toBeCloseTo(2.00);
+  });
+
+  it('should return correct bonus for Shadow Library in corrupted', () => {
+    expect(getBiomeBonus('corrupted', SHADOW_LIBRARY)).toBeCloseTo(2.00);
+  });
+
+  it('should return correct bonus for Underground Lake in flooded', () => {
+    expect(getBiomeBonus('flooded', UNDERGROUND_LAKE)).toBeCloseTo(1.50);
+  });
+});
+
+// --- BIOME_ROOM_BONUSES ---
+
+describe('BIOME_ROOM_BONUSES', () => {
+  it('should have entries for all non-neutral biomes', () => {
+    expect(BIOME_ROOM_BONUSES.volcanic).toBeDefined();
+    expect(BIOME_ROOM_BONUSES.fungal).toBeDefined();
+    expect(BIOME_ROOM_BONUSES.crystal).toBeDefined();
+    expect(BIOME_ROOM_BONUSES.corrupted).toBeDefined();
+    expect(BIOME_ROOM_BONUSES.flooded).toBeDefined();
+  });
+
+  it('should not have an entry for neutral biome', () => {
+    expect(BIOME_ROOM_BONUSES['neutral' as keyof typeof BIOME_ROOM_BONUSES]).toBeUndefined();
+  });
+
+  it('should store raw bonus values (not multipliers)', () => {
+    // Bonus values are added to 1.0 to get the multiplier
+    expect(BIOME_ROOM_BONUSES.volcanic![DARK_FORGE]).toBe(0.50);
+    expect(BIOME_ROOM_BONUSES.corrupted![SOUL_WELL]).toBe(1.00);
+    expect(BIOME_ROOM_BONUSES.fungal![MUSHROOM_GROVE]).toBe(0.60);
   });
 });

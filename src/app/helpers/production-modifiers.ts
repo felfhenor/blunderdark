@@ -34,6 +34,7 @@ const SHADOW_LIBRARY = 'aa100001-0001-0001-0001-000000000004';
 const SOUL_WELL = 'aa100001-0001-0001-0001-000000000005';
 const CRYSTAL_MINE = 'aa100001-0001-0001-0001-000000000002';
 const MUSHROOM_GROVE = 'aa100001-0001-0001-0001-000000000003';
+const DARK_FORGE = 'aa100001-0001-0001-0001-000000000006';
 const UNDERGROUND_LAKE = 'aa100001-0001-0001-0001-000000000010';
 const LEY_LINE_NEXUS = 'aa100001-0001-0001-0001-000000000011';
 
@@ -81,30 +82,39 @@ function evaluateFloorDepth(context: ProductionModifierContext): number {
 
 // --- Biome modifier ---
 
-const BIOME_ROOM_BONUSES: Partial<Record<BiomeType, Record<string, number>>> = {
+export const BIOME_ROOM_BONUSES: Partial<Record<BiomeType, Record<string, number>>> = {
   volcanic: {
+    [DARK_FORGE]: 0.50,
     [CRYSTAL_MINE]: 0.15,
   },
   fungal: {
-    [MUSHROOM_GROVE]: 0.20,
+    [MUSHROOM_GROVE]: 0.60,
   },
   crystal: {
-    [CRYSTAL_MINE]: 0.25,
+    [CRYSTAL_MINE]: 0.40,
     [LEY_LINE_NEXUS]: 0.10,
   },
   corrupted: {
-    [SOUL_WELL]: 0.20,
-    [SHADOW_LIBRARY]: 0.15,
+    [SOUL_WELL]: 1.00,
+    [SHADOW_LIBRARY]: 1.00,
   },
   flooded: {
-    [UNDERGROUND_LAKE]: 0.20,
+    [UNDERGROUND_LAKE]: 0.50,
   },
 };
 
-function evaluateBiome(context: ProductionModifierContext): number {
-  const biomeRooms = BIOME_ROOM_BONUSES[context.floorBiome];
+/**
+ * Get the biome bonus multiplier for a specific room type on a specific biome.
+ * Returns 1.0 for rooms not affected by the biome or for neutral biome.
+ */
+export function getBiomeBonus(biome: BiomeType, roomTypeId: string): number {
+  const biomeRooms = BIOME_ROOM_BONUSES[biome];
   if (!biomeRooms) return 1.0;
-  return 1.0 + (biomeRooms[context.roomTypeId] ?? 0);
+  return 1.0 + (biomeRooms[roomTypeId] ?? 0);
+}
+
+function evaluateBiome(context: ProductionModifierContext): number {
+  return getBiomeBonus(context.floorBiome, context.roomTypeId);
 }
 
 // --- Modifier registry ---
