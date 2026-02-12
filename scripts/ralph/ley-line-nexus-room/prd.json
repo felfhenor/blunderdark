@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Defined in gamedata/room/base.yml with T-shape (0279e677), flux production 2.0/tick (10/min), fearLevel 2, maxInhabitants 2, 3 adjacency bonuses, 3 upgrade paths. Ley line placement restriction deferred (system doesn't exist)."
     },
     {
       "id": "US-002",
@@ -33,7 +33,7 @@
       ],
       "priority": 2,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Ley line convergence system doesn't exist yet. Requires world generation changes (floor-level ley line data), placement validation extension, and UI highlighting. Room uses existing T-shape and standard placement for now."
     },
     {
       "id": "US-003",
@@ -49,7 +49,7 @@
       ],
       "priority": 2,
       "passes": false,
-      "notes": ""
+      "notes": "DEFERRED: Magic amplification aura requires a global aura/modifier system (similar to Underground Lake humidity aura). Flux production (2.0/tick = 10/min) is implemented. Per-inhabitant bonus uses standard worker efficiency system. Magic room tagging doesn't exist yet."
     },
     {
       "id": "US-004",
@@ -67,8 +67,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "21 tests in ley-line-nexus.spec.ts covering: definition (7), base production (3), adjacency bonuses (4), all 3 upgrades (4), mutual exclusivity (2), full production with adjacency (1). Amplification aura and ley line placement tests deferred with their respective features."
     }
   ]
 }
