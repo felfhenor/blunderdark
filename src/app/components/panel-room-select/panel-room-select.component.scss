@@ -3,6 +3,10 @@
     opacity: 0.45;
   }
 
+  &.room-biome-restricted {
+    opacity: 0.35;
+  }
+
   &.btn-active {
     border-color: oklch(var(--p));
   }

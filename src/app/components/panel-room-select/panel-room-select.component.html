@@ -52,8 +52,9 @@
           class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-1"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
-          [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || !hasAltar()"
-          [title]="isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
+          [class.room-biome-restricted]="isBiomeRestricted(room)"
+          [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || isBiomeRestricted(room) || !hasAltar()"
+          [title]="isBiomeRestricted(room) ? getBiomeRestrictionTooltip(room) : isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">
@@ -70,6 +71,9 @@
               }
             </div>
             <span class="room-name flex-1 text-left text-xs font-semibold">{{ room.name }}</span>
+            @if (getBiomeLimitLabel(room); as limitLabel) {
+              <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
+            }
           </div>
 
           <div class="cost-row flex gap-2 w-full">

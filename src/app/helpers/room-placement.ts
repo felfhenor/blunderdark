@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { findAltarRoom } from '@helpers/altar-room';
+import { canBuildRoomOnFloor } from '@helpers/biome-restrictions';
 import { getEntry } from '@helpers/content';
 import { currentFloor } from '@helpers/floor';
 import { canAfford, payCost } from '@helpers/resources';
@@ -295,6 +296,12 @@ export async function executeRoomPlacement(
     if (isUniqueRoomTypePlaced(allFloors, roomTypeId)) {
       return { success: false, error: 'This unique room is already built' };
     }
+  }
+
+  // Check biome restrictions
+  const biomeCheck = canBuildRoomOnFloor(roomTypeId, floor.biome, floor);
+  if (!biomeCheck.allowed) {
+    return { success: false, error: biomeCheck.reason };
   }
 
   if (!canAfford(roomDef.cost)) {

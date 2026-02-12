@@ -2,6 +2,7 @@ export * from './adjacency';
 export * from './altar-room';
 export * from './analytics';
 export * from './assignment';
+export * from './biome-restrictions';
 export * from './clipboard';
 export * from './combat';
 export * from './combat-abilities';

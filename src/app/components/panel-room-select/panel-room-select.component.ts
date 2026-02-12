@@ -2,12 +2,16 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   canAfford,
   canAffordHallway,
+  canBuildRoomOnFloor,
   confirmHallwayBuild,
+  currentFloor,
+  currentFloorBiome,
   enterHallwayBuildMode,
   enterPlacementMode,
   exitHallwayBuildMode,
   exitPlacementMode,
   getEntriesByType,
+  getRoomBiomeRestrictionInfo,
   getRotatedShape,
   getRoomShape,
   hallwayPreviewCost,
@@ -58,6 +62,30 @@ export class PanelRoomSelectComponent {
   public isUniqueAndPlaced(room: RoomDefinition): boolean {
     if (!room.isUnique) return false;
     return this.placedRoomTypeIds().has(room.id);
+  }
+
+  public isBiomeRestricted(room: RoomDefinition): boolean {
+    const floor = currentFloor();
+    if (!floor) return false;
+    const result = canBuildRoomOnFloor(room.id, floor.biome, floor);
+    return !result.allowed;
+  }
+
+  public getBiomeRestrictionTooltip(room: RoomDefinition): string {
+    const floor = currentFloor();
+    if (!floor) return '';
+    const info = getRoomBiomeRestrictionInfo(room.id, floor.biome, floor);
+    return info.reason ?? '';
+  }
+
+  public getBiomeLimitLabel(room: RoomDefinition): string | null {
+    const floor = currentFloor();
+    if (!floor) return null;
+    const info = getRoomBiomeRestrictionInfo(room.id, floor.biome, floor);
+    if (info.maxCount !== undefined && info.currentCount !== undefined) {
+      return `${info.currentCount}/${info.maxCount}`;
+    }
+    return null;
   }
 
   public getRoomShapeForPreview(
