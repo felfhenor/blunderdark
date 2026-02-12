@@ -281,6 +281,65 @@
       bonus: 0.15
       description: Raw crystal ore fuels the forge's smelting process.
 
+- id: aa100001-0001-0001-0001-000000000010
+  name: Underground Lake
+  description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
+  shapeId: 0279e677-6073-4a18-b57b-8e6008f4a3a5
+  cost:
+    gold: 60
+    crystals: 20
+  production:
+    food: 1.0
+  requiresWorkers: true
+  maxInhabitants: 3
+  fearLevel: 0
+  adjacencyBonuses:
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000003
+      bonus: 0.3
+      description: Lake moisture dramatically boosts fungal growth in the adjacent grove.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000005
+      bonus: 0.15
+      description: Spiritual waters from the Soul Well attract richer fish populations.
+    - adjacentRoomType: aa100001-0001-0001-0001-000000000010
+      bonus: 0.2
+      description: Connected lakes form a larger ecosystem with more abundant catches.
+  upgradePaths:
+    - id: aa200001-0001-0001-0001-000000000018
+      name: Deep Fishing
+      description: Train fishers in deep-water techniques and install luminescent lures to dramatically increase the food catch.
+      cost:
+        gold: 80
+        crystals: 30
+      effects:
+        - type: productionMultiplier
+          value: 1.6
+          resource: food
+    - id: aa200001-0001-0001-0001-000000000019
+      name: Expanded Lake
+      description: Excavate additional chambers to extend the lake's reach, accommodating more fishers.
+      cost:
+        gold: 70
+        crystals: 25
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+    - id: aa200001-0001-0001-0001-000000000020
+      name: Dark Waters
+      description: Embrace the lake's deepest depths. Strange creatures lurk below, providing both food and an unsettling presence.
+      cost:
+        gold: 90
+        crystals: 40
+        essence: 15
+      effects:
+        - type: productionMultiplier
+          value: 1.5
+          resource: food
+        - type: fearIncrease
+          value: 1
+        - type: secondaryProduction
+          value: 0.1
+          resource: essence
+
 - id: aa100001-0001-0001-0001-000000000007
   name: Barracks
   description: Houses and trains your fighters. No resource production.
