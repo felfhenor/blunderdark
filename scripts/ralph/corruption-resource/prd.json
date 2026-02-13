@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "corruptionAdd() and corruptionSpend() in corruption.ts; max set to Number.MAX_SAFE_INTEGER"
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "corruptionCurrent and corruptionLevel computed signals in corruption.ts"
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Corruption displayed separately in panel-resources with level badge, color coding, warning icon, and tooltip with level description"
     },
     {
       "id": "US-004",
@@ -60,8 +60,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Already handled by existing resource system - corruption is part of ResourceMap which persists via IndexedDB. resourceMigrate() defaults missing corruption to 0."
     },
     {
       "id": "US-005",
@@ -75,8 +75,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "corruptionSpend() and corruptionCanAfford() provide the spending interface. Dark upgrade features that consume corruption can use these functions. The spending UI is part of the corruption tooltip in panel-resources."
     }
   ]
 }

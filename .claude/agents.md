@@ -740,6 +740,21 @@ When adding build-time validation for a content type:
 - `MoraleBarComponent` in `src/app/components/morale-bar/` — inline template, color-coded progress (green >60, yellow 30-60, red <30), floating text on changes, hover event log
 - Component auto-hides when morale is full and no events have occurred — shows during active invasions
 
+## Corruption System
+
+- `corruption.ts` helper: dedicated corruption functions wrapping the generic resource system
+- File-to-prefix: `corruption.ts` → `corruption` / `CORRUPTION`
+- Corruption has NO hard cap — `max: Number.MAX_SAFE_INTEGER` in `defaultResources()`, allowing unlimited accumulation
+- `CorruptionLevel` type: `'low' | 'medium' | 'high' | 'critical'` — thresholds at 0, 50, 100, 200
+- `corruptionCurrent` computed signal reads from `gamestate().world.resources.corruption.current`
+- `corruptionLevel` computed signal derives level from current value
+- `corruptionGetLevel(value)` pure function for use in non-signal contexts (tests, templates)
+- `corruptionGetLevelDescription(level)` returns human-readable effect description per level
+- `corruptionAdd(amount)` / `corruptionSpend(amount)` / `corruptionCanAfford(amount)` — convenience wrappers around `updateGamestate`
+- Corruption is displayed separately from other resources in `panel-resources` — no progress bar (uncapped), uses level-based color coding and badge instead
+- Panel-resources splits `RESOURCE_DISPLAY` into `resources` (non-corruption) and `corruptionDisplay` (corruption only) for differentiated rendering
+- Corruption already existed as a `ResourceType` — the corruption-resource feature added dedicated helper functions, level tracking, and enhanced UI
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -787,6 +802,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `combat-abilities.ts` | `combatAbility` | `COMBAT_ABILITY` |
 | `connections.ts` | `connection` | `CONNECTION` |
 | `content.ts` | `content` | `CONTENT` |
+| `corruption.ts` | `corruption` | `CORRUPTION` |
 | `day-night-modifiers.ts` | `dayNight` | `DAY_NIGHT` |
 | `debug.ts` | `debug` | `DEBUG` |
 | `defaults.ts` | `default` | `DEFAULT` |
