@@ -48,4 +48,7 @@ export type RoomDefinition = {
   objectiveTypes?: string[];
   trainingAdjacencyEffects?: { timeReduction?: number; statBonus?: number };
   throneAdjacencyEffects?: { goldProductionBonus?: number };
+  spawnRate?: number;
+  spawnType?: string;
+  spawnCapacity?: number;
 };

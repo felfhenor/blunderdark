@@ -63,6 +63,7 @@ export * from './season-bonuses';
 export * from './setup';
 export * from './sfx';
 export * from './signal';
+export * from './spawning-pool';
 export * from './state-game';
 export * from './state-modifiers';
 export * from './state-options';

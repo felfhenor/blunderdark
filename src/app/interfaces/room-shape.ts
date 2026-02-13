@@ -21,4 +21,5 @@ export type PlacedRoom = {
   anchorY: number;
   rotation?: Rotation;
   appliedUpgradePathId?: string;
+  spawnTicksRemaining?: number;
 };

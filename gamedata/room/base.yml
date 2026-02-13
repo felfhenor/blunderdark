@@ -781,3 +781,53 @@
       effects:
         - type: craftingBonusDamage
           value: 5
+
+- id: bf618a8c-5b95-4a63-9168-98da24e061c4
+  name: Spawning Pool
+  description: A bubbling pool of primordial ooze that periodically spawns basic creatures. The pool generates inhabitants automatically, growing your workforce without manual recruitment. Upgrades can accelerate spawning or produce stronger creatures.
+  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 2
+  fearLevel: 1
+  role: spawningPool
+  spawnRate: 25
+  spawnType: Goblin
+  spawnCapacity: 10
+  adjacencyBonuses:
+    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+      bonus: 0.15
+      description: Organic matter from the Mushroom Grove feeds the pool.
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+      bonus: 0.2
+      description: Soul essence from the Well accelerates spawning.
+  upgradePaths:
+    - id: 05a95f1e-2b7a-4309-acfd-a960f9416612
+      name: Rapid Spawning
+      description: Accelerated growth hormones reduce spawn time from 5 to 3 minutes and increase spawn capacity to 15.
+      cost:
+        gold: 100
+        crystals: 50
+        essence: 20
+      effects:
+        - type: spawnRateReduction
+          value: 10
+        - type: spawnCapacityBonus
+          value: 5
+        - type: maxInhabitantBonus
+          value: 2
+    - id: 8137978c-7955-4e5a-bf86-6fbd4af6141f
+      name: Dark Spawning
+      description: Corrupt the pool with dark energy to spawn Skeletons instead of Goblins. The undead aura increases room fear.
+      cost:
+        gold: 100
+        crystals: 40
+        essence: 30
+      effects:
+        - type: spawnTypeChange
+          value: 1
+        - type: fearIncrease
+          value: 2

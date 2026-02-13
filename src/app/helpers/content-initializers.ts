@@ -138,6 +138,9 @@ function ensureRoom(
     objectiveTypes: room.objectiveTypes ?? undefined,
     trainingAdjacencyEffects: room.trainingAdjacencyEffects ?? undefined,
     throneAdjacencyEffects: room.throneAdjacencyEffects ?? undefined,
+    spawnRate: room.spawnRate ?? undefined,
+    spawnType: room.spawnType ?? undefined,
+    spawnCapacity: room.spawnCapacity ?? undefined,
   };
 }
 
