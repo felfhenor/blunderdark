@@ -780,6 +780,17 @@ When adding build-time validation for a content type:
 - Grid component uses `[attr.data-corruption]="corruptionLevel()"` for CSS-only visual corruption effects — no new DOM elements needed
 - Corruption visual effects use inset `box-shadow` for edge tinting, `::after` pseudo-elements with `radial-gradient` for vein effects, and `@keyframes` for critical-level pulsing
 
+## Corruption Threshold Warnings
+
+- `corruption-thresholds.ts` helper: pre-threshold warning system that monitors corruption approaching 50/100/200 thresholds
+- File-to-prefix: `corruption-thresholds.ts` → `corruptionThreshold` / `CORRUPTION_THRESHOLD`
+- Warns at 80% of each threshold (40, 80, 160) — `CORRUPTION_THRESHOLD_WARNING_FACTOR = 0.8`
+- `corruptionThresholdProcess(state)` runs each tick after `corruptionEffectProcess` — checks warnings and updates `warnedThresholds` in state
+- `corruptionThresholdWarning$` Subject emits `CorruptionThresholdWarning` events for UI consumption (NotifyService can subscribe)
+- `corruptionThresholdNext` computed signal returns next uncrossed threshold for UI display
+- Warning tracking persisted in `CorruptionEffectState.warnedThresholds: number[]` — auto-cleared on threshold crossing or corruption drop
+- **Testing RxJS Subjects in Vitest**: Use `vi.spyOn(subject$, 'next')` pattern instead of `.subscribe()` — subscription-based testing fails when the module is loaded via `await import()` with `vi.mock()` dependencies. The spy approach works because it hooks directly into the module-scoped Subject instance.
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -828,6 +839,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `connections.ts` | `connection` | `CONNECTION` |
 | `content.ts` | `content` | `CONTENT` |
 | `corruption.ts` | `corruption` | `CORRUPTION` |
+| `corruption-thresholds.ts` | `corruptionThreshold` | `CORRUPTION_THRESHOLD` |
 | `day-night-modifiers.ts` | `dayNight` | `DAY_NIGHT` |
 | `debug.ts` | `debug` | `DEBUG` |
 | `defaults.ts` | `default` | `DEFAULT` |
