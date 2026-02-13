@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
+import { dayNightCalculateCreatureProductionModifier, dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
@@ -228,12 +229,18 @@ export function productionCalculateTotal(floors: Floor[], hour?: number): RoomPr
             hour,
           })
         : 1.0;
+      const creatureModifier = hour !== undefined
+        ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
+        : 1.0;
 
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
         const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
+        const dayNightResourceMod = hour !== undefined
+          ? dayNightGetResourceModifier(hour, resourceType)
+          : 1.0;
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
         totalProduction[resourceType] =
           (totalProduction[resourceType] ?? 0) + final;
       }
@@ -291,13 +298,19 @@ export function productionCalculateSingleRoom(
         hour,
       })
     : 1.0;
+  const creatureModifier = hour !== undefined
+    ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
+    : 1.0;
 
   const production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
     if (!baseAmount) continue;
     const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
+    const dayNightResourceMod = hour !== undefined
+      ? dayNightGetResourceModifier(hour, resourceType)
+      : 1.0;
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
   }
 
   return production;
@@ -385,11 +398,17 @@ export function productionCalculateBreakdowns(
             hour,
           })
         : 1.0;
+      const creatureModifier = hour !== undefined
+        ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
+        : 1.0;
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
 
         const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
-        const modifier = stateModifier * envModifier * depthModifier;
+        const dayNightResourceMod = hour !== undefined
+          ? dayNightGetResourceModifier(hour, resourceType)
+          : 1.0;
+        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
         const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal);
         const finalAmount = withBonuses * modifier;
 

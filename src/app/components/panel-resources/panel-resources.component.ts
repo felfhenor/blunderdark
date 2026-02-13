@@ -6,11 +6,15 @@ import {
   signal,
 } from '@angular/core';
 import {
+  dayNightFormatMultiplier,
+  dayNightGetAllActiveModifiers,
+  dayNightGetPhaseLabel,
   gamestate,
   productionBreakdowns,
   productionPerMinute,
   productionRates,
 } from '@helpers';
+import type { DayNightCreatureModifier, DayNightResourceModifier } from '@helpers/day-night-modifiers';
 import type { ResourceType } from '@interfaces';
 import type { ResourceProductionBreakdown } from '@helpers/production';
 
@@ -83,6 +87,11 @@ export class PanelResourcesComponent {
   public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
   public breakdowns = productionBreakdowns;
+
+  public activeTimeModifiers = computed(() => {
+    const hour = gamestate().clock.hour;
+    return dayNightGetAllActiveModifiers(hour);
+  });
 
   public activeTooltip = signal<ResourceType | undefined>(undefined);
   private tooltipTimer: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -157,6 +166,31 @@ export class PanelResourcesComponent {
   public onMouseLeave(): void {
     this.clearTimer();
     this.activeTooltip.set(undefined);
+  }
+
+  public getPhaseLabel(): string {
+    return dayNightGetPhaseLabel(this.activeTimeModifiers().phase);
+  }
+
+  public formatMultiplier(mod: DayNightResourceModifier | DayNightCreatureModifier): string {
+    return dayNightFormatMultiplier(mod.multiplier);
+  }
+
+  public isPositiveModifier(mod: DayNightResourceModifier | DayNightCreatureModifier): boolean {
+    return mod.multiplier > 1.0;
+  }
+
+  public getResourceLabel(resourceType: string): string {
+    const labels: Record<string, string> = {
+      crystals: 'Crystals',
+      food: 'Food',
+      gold: 'Gold',
+      flux: 'Flux',
+      essence: 'Essence',
+      corruption: 'Corruption',
+      research: 'Research',
+    };
+    return labels[resourceType] ?? resourceType;
   }
 
   private clearTimer(): void {

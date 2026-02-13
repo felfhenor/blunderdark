@@ -86,3 +86,29 @@
     </div>
   }
 </div>
+
+@if (activeTimeModifiers().resourceModifiers.length > 0 || activeTimeModifiers().creatureModifiers.length > 0) {
+  <div class="time-modifiers flex flex-wrap items-center gap-1 mt-1">
+    <span class="text-[10px] opacity-60 font-semibold">{{ getPhaseLabel() }}:</span>
+    @for (mod of activeTimeModifiers().resourceModifiers; track mod.resourceType + mod.phase) {
+      <span
+        class="badge badge-xs"
+        [class.badge-success]="isPositiveModifier(mod)"
+        [class.badge-error]="!isPositiveModifier(mod)"
+        [title]="mod.description"
+      >
+        {{ formatMultiplier(mod) }} {{ getResourceLabel(mod.resourceType) }}
+      </span>
+    }
+    @for (mod of activeTimeModifiers().creatureModifiers; track mod.creatureType + mod.phase) {
+      <span
+        class="badge badge-xs"
+        [class.badge-success]="isPositiveModifier(mod)"
+        [class.badge-error]="!isPositiveModifier(mod)"
+        [title]="mod.description"
+      >
+        {{ formatMultiplier(mod) }} {{ mod.creatureType }}
+      </span>
+    }
+  </div>
+}
