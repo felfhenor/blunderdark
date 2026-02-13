@@ -9,4 +9,5 @@ export type CorruptionEffectState = {
   darkUpgradeUnlocked: boolean;
   lastMutationCorruption: number | undefined;
   lastCrusadeCorruption: number | undefined;
+  warnedThresholds: number[];
 };

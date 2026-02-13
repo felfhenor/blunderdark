@@ -115,6 +115,7 @@ export function defaultCorruptionEffectState(): CorruptionEffectState {
     darkUpgradeUnlocked: false,
     lastMutationCorruption: undefined,
     lastCrusadeCorruption: undefined,
+    warnedThresholds: [],
   };
 }
 
