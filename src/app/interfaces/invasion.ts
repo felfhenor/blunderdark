@@ -52,7 +52,8 @@ export type InvasionEndReason =
   | 'all_invaders_eliminated'
   | 'turn_limit_reached'
   | 'altar_destroyed'
-  | 'objectives_completed';
+  | 'objectives_completed'
+  | 'morale_broken';
 
 export type InvasionState = {
   invasionId: string;

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { GridComponent } from '@components/grid/grid.component';
+import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
@@ -22,6 +23,7 @@ import { optionsGet } from '@helpers';
     RouterModule,
     TeleportOutletDirective,
     GridComponent,
+    MoraleBarComponent,
     PanelAltarComponent,
     PanelFloorSelectorComponent,
     PanelReputationComponent,

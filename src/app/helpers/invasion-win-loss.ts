@@ -1,4 +1,5 @@
 import { invasionObjectiveResolveOutcome } from '@helpers/invasion-objectives';
+import { moraleIsRetreating } from '@helpers/morale';
 import { rngUuid } from '@helpers/rng';
 import type {
   DetailedInvasionResult,
@@ -74,11 +75,26 @@ export function invasionWinLossIsTurnLimitReached(state: InvasionState): boolean
   return state.currentTurn >= state.maxTurns;
 }
 
+/**
+ * Check if invader morale has broken (retreat signal active and all alive invaders retreating).
+ * Reads the moraleIsRetreating signal. For pure function testing, use the parameter override.
+ */
+export function invasionWinLossIsMoraleBroken(
+  state: InvasionState,
+  retreating?: boolean,
+): boolean {
+  const isRetreating = retreating ?? moraleIsRetreating();
+  if (!isRetreating) return false;
+
+  // Morale broken — check if all living invaders have exited (HP <= 0 means killed or exited)
+  return state.invaders.every((i) => i.currentHp <= 0);
+}
+
 // --- Main win/loss check ---
 
 /**
  * Check if the invasion should end. Returns the end reason, or undefined if ongoing.
- * Priority: altar destroyed > objectives completed > all invaders eliminated > turn limit.
+ * Priority: altar destroyed > objectives completed > morale broken > all invaders eliminated > turn limit.
  */
 export function invasionWinLossCheckEnd(
   state: InvasionState,
@@ -91,6 +107,7 @@ export function invasionWinLossCheckEnd(
 
   // Defender victory conditions
   if (invasionWinLossAreAllEliminated(state)) return 'all_invaders_eliminated';
+  if (invasionWinLossIsMoraleBroken(state)) return 'morale_broken';
   if (invasionWinLossIsTurnLimitReached(state)) return 'turn_limit_reached';
 
   return undefined;
