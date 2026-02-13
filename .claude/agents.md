@@ -688,18 +688,25 @@ When adding build-time validation for a content type:
 
 ## Fear Level System
 
-- `fear-level.ts` helper: per-room effective fear calculation with breakdown (base, inhabitant modifier, upgrade adjustment, altar aura reduction)
+- `fear-level.ts` helper: per-room effective fear calculation with breakdown (base, inhabitant modifier, upgrade adjustment, altar aura reduction, propagated fear)
 - File-to-prefix: `fear-level.ts` → `fearLevel` / `FEAR_LEVEL`
 - `fearModifier` on `InhabitantDefinition` — positive values increase room fear (Skeleton=1, Dragon=2, Lich=1, Demon Lord=2), negative values decrease it (Myconid=-1), zero for common workers (Goblin, Kobold, Slime)
-- `FearLevelBreakdown` type: `{ baseFear, inhabitantModifier, upgradeAdjustment, altarAuraReduction, effectiveFear }` — all components of the fear calculation
+- `fearPropagationDistance` on `InhabitantDefinition` — how far this inhabitant extends fear propagation from its room (default 1). Dragon=2, Demon Lord=2, all others=1
+- `FearLevelBreakdown` type: `{ baseFear, inhabitantModifier, upgradeAdjustment, altarAuraReduction, propagatedFear, propagationSources, effectiveFear }` — all components of the fear calculation
+- `FearPropagationSource` type: `{ sourceRoomId, sourceRoomName, amount }` — identifies where propagated fear comes from
 - `fearLevelBreakdownMap` computed signal returns `Map<string, FearLevelBreakdown>` for all rooms across all floors — reads `gamestate()` so it auto-updates
 - `fearLevelRoomMap` computed signal returns simplified `Map<string, number>` (roomId → effectiveFear) — for pathfinding consumption
 - Fear is clamped to [0, 4]: None(0), Low(1), Medium(2), High(3), Very High(4)
+- **Fear propagation**: rooms with source fear >= High (3) propagate to adjacent rooms. High propagates +1, Very High propagates +2. Attenuates by -1 per step beyond distance 1
+- **Source fear** = baseFear + inhabitantModifier (unclamped, pre-upgrades/altar) — used for propagation checks to avoid feedback loops
+- Propagation uses `fearLevelBuildAdjacencyMap(floor)` which calls `roomShapeResolve`/`roomShapeGetAbsoluteTiles`/`adjacencyAreRoomsAdjacent` — must mock `@helpers/room-shapes` in tests
+- `fearLevelCalculateAllForFloor` does 3 passes: (1) individual breakdowns, (2) propagation via BFS, (3) recalculate effective fear with propagation
+- `fearLevelCalculateAllPropagation` is a pure function taking adjacency map and data maps — testable without mocks
 - Room YAML already had `fearLevel` field (number | 'variable') — 'variable' resolves via `throneRoomGetFearLevel()`
 - Upgrade effects: `fearReduction` (negative adjustment) and `fearIncrease` (positive adjustment) from `roomUpgradeGetAppliedEffects()`
 - Altar aura reduction only applies to rooms adjacent to the Altar — uses `altarRoomIsAdjacent()` and `altarRoomGetFearReductionAura()`
 - Fear is derived state (computed from existing gamestate), NOT stored as a new field — no migration needed
-- Dependencies: `@helpers/content`, `@helpers/room-upgrades`, `@helpers/altar-room`, `@helpers/throne-room`, `@helpers/state-game`, `@helpers/production` — no circular deps
+- Dependencies: `@helpers/content`, `@helpers/room-upgrades`, `@helpers/altar-room`, `@helpers/throne-room`, `@helpers/state-game`, `@helpers/production`, `@helpers/room-shapes`, `@helpers/adjacency` — no circular deps
 
 ## Miscellaneous
 

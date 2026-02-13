@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 58 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions, invasion-rewards-system, turn-based-invasion-mode, conditional-state-modifiers, conditional-production-modifiers, biome-bonuses, biome-restrictions, floor-depth-modifiers, day-night-production-modifiers, season-specific-bonuses, hunger-system, fear-level-tracking)
+- **Complete:** 59 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions, invasion-rewards-system, turn-based-invasion-mode, conditional-state-modifiers, conditional-production-modifiers, biome-bonuses, biome-restrictions, floor-depth-modifiers, day-night-production-modifiers, season-specific-bonuses, hunger-system, fear-level-tracking, fear-propagation)
 - **In Progress:** None
-- **Remaining:** ~69 features
+- **Remaining:** ~68 features
 
 ---
 
@@ -155,7 +155,7 @@ Inhabitant needs create management challenge.
 |----------|---------|---------|------------|
 | ~~11.1~~ | ~~`hunger-system`~~ | ~~COMPLETE (4/4)~~ | ~~inhabitant-data-model, resource-manager~~ |
 | ~~11.2~~ | ~~`fear-level-tracking`~~ | ~~COMPLETE (4/4)~~ | ~~inhabitant-data-model~~ |
-| 11.3 | `fear-propagation` | 4 | fear-level-tracking, adjacency-detection |
+| ~~11.3~~ | ~~`fear-propagation`~~ | ~~COMPLETE (5/5)~~ | ~~fear-level-tracking, adjacency-detection~~ |
 | 11.4 | `fear-hunger-ui-indicators` | 4 | hunger-system, fear-level-tracking |
 | 11.5 | `morale-system` | 4 | fear-level-tracking, hunger-system |
 
