@@ -9,12 +9,16 @@ import {
   viewChild,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { uiModalOpenCount } from '@helpers/ui';
 
 @Component({
   selector: 'app-modal',
   imports: [ButtonCloseComponent, NgClass],
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss',
+  host: {
+    '(document:keydown.escape)': 'onEscapeKey($event)',
+  },
 })
 export class ModalComponent {
   public visible = model<boolean>(false);
@@ -35,13 +39,25 @@ export class ModalComponent {
         return;
       }
 
+      uiModalOpenCount.update((c) => c + 1);
       this.modal()?.nativeElement.show();
     });
   }
 
+  public onEscapeKey(event: KeyboardEvent): void {
+    if (!this.visible() || !this.allowEscToClose()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.closeModal();
+  }
+
   public closeModal() {
+    const wasVisible = this.modal()?.nativeElement.open;
     this.modal()?.nativeElement.close();
     this.visible.set(false);
+    if (wasVisible) {
+      uiModalOpenCount.update((c) => Math.max(0, c - 1));
+    }
     this.modalClose.emit();
   }
 }

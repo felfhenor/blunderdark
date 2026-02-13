@@ -23,6 +23,7 @@ import {
   gridSelectTile,
   roomPlacementUpdatePreviewPosition,
   corruptionLevel,
+  uiIsAnyModalOpen,
 } from '@helpers';
 import { gridCreateEmpty } from '@helpers/grid';
 
@@ -462,6 +463,7 @@ export class GridComponent {
   }
 
   public onEscapeKey(): void {
+    if (uiIsAnyModalOpen()) return;
     if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {

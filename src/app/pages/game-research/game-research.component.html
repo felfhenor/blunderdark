@@ -1,232 +1,232 @@
-<div class="research-container flex flex-col">
-  <!-- Header -->
-  <div class="header flex items-center justify-between px-4 py-2 bg-base-200 flex-shrink-0">
-    <div class="flex items-center gap-3">
-      <button class="btn btn-sm btn-ghost" (click)="goBack()">
-        &larr; Back
-      </button>
-      <h1 class="text-lg font-bold">Research</h1>
-    </div>
+<app-modal [(visible)]="visible" [widthClass]="'max-w-5xl'">
+  <div replacement>
+    <div class="research-container flex flex-col bg-base-100 rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="header flex items-center justify-between px-4 py-2 bg-base-200 flex-shrink-0">
+        <h1 class="text-lg font-bold">Research</h1>
 
-    <div class="flex items-center gap-2 text-sm opacity-70">
-      Speed: {{ speedModifier() | number:'1.0-0' }}%
-    </div>
-  </div>
-
-  <!-- Active Research Summary Bar (US-007) -->
-  @if (activeResearchNode(); as active) {
-    <div class="active-summary flex items-center gap-3 px-4 py-2 bg-base-300 flex-shrink-0">
-      <span class="text-sm font-semibold">Researching:</span>
-      <span class="text-sm">{{ active.name }}</span>
-      <div class="flex-1">
-        <progress
-          class="progress progress-info w-full"
-          [value]="progressPercent()"
-          max="100"
-        ></progress>
+        <div class="flex items-center gap-3">
+          <span class="text-sm opacity-70">Speed: {{ speedModifier() | number:'1.0-0' }}%</span>
+          <button class="btn btn-sm btn-ghost" (click)="close()">Close</button>
+        </div>
       </div>
-      <span class="text-xs opacity-70">
-        {{ progressPercent() | number:'1.0-0' }}% &middot; {{ estimatedTimeRemaining() }}
-      </span>
-      <button
-        class="btn btn-xs btn-error btn-outline"
-        (click)="cancelResearch()"
-        [tp]="'Cancel research (progress lost, no refund)'"
-      >
-        Cancel
-      </button>
-    </div>
-  }
 
-  <!-- Branch Tabs (US-002) -->
-  <div role="tablist" class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0">
-    <button
-      role="tab"
-      class="tab"
-      [class.tab-active]="selectedBranch() === 'dark'"
-      (click)="selectBranch('dark')"
-    >
-      Dark
-    </button>
-    <button
-      role="tab"
-      class="tab"
-      [class.tab-active]="selectedBranch() === 'arcane'"
-      (click)="selectBranch('arcane')"
-    >
-      Arcane
-    </button>
-    <button
-      role="tab"
-      class="tab"
-      [class.tab-active]="selectedBranch() === 'engineering'"
-      (click)="selectBranch('engineering')"
-    >
-      Engineering
-    </button>
-  </div>
-
-  <!-- Main Content -->
-  <div class="flex flex-1 min-h-0">
-    <!-- Tree View (US-003) -->
-    <div class="tree-panel flex-1 overflow-auto p-4">
-      <div class="tree-layout flex flex-col items-center gap-6">
-        @for (tierGroup of tierNodes(); track tierGroup.tier) {
-          <div class="tier-group">
-            <div class="tier-label text-xs opacity-50 mb-2 text-center">
-              Tier {{ tierGroup.tier }}
-            </div>
-            <div class="tier-nodes flex gap-4 justify-center flex-wrap">
-              @for (node of tierGroup.nodes; track node.id) {
-                <button
-                  class="node-card"
-                  [class.node-completed]="node.nodeState === 'completed'"
-                  [class.node-active]="node.nodeState === 'active'"
-                  [class.node-available]="node.nodeState === 'available'"
-                  [class.node-locked]="node.nodeState === 'locked'"
-                  [class.node-selected]="selectedNodeId() === node.id"
-                  (click)="selectNode(node.id)"
-                >
-                  <div class="node-name text-xs font-semibold">{{ node.name }}</div>
-
-                  @if (node.nodeState === 'completed') {
-                    <div class="node-icon text-success">&check;</div>
-                  }
-
-                  @if (node.nodeState === 'active') {
-                    <div class="node-progress-mini">
-                      <progress
-                        class="progress progress-info w-full"
-                        [value]="getNodeProgressPercent(node.id)"
-                        max="100"
-                      ></progress>
-                    </div>
-                  }
-                </button>
-              }
-            </div>
+      <!-- Active Research Summary Bar -->
+      @if (activeResearchNode(); as active) {
+        <div class="active-summary flex items-center gap-3 px-4 py-2 bg-base-300 flex-shrink-0">
+          <span class="text-sm font-semibold">Researching:</span>
+          <span class="text-sm">{{ active.name }}</span>
+          <div class="flex-1">
+            <progress
+              class="progress progress-info w-full"
+              [value]="progressPercent()"
+              max="100"
+            ></progress>
           </div>
+          <span class="text-xs opacity-70">
+            {{ progressPercent() | number:'1.0-0' }}% &middot; {{ estimatedTimeRemaining() }}
+          </span>
+          <button
+            class="btn btn-xs btn-error btn-outline"
+            (click)="cancelResearch()"
+            [tp]="'Cancel research (progress lost, no refund)'"
+          >
+            Cancel
+          </button>
+        </div>
+      }
 
-          <!-- Connector lines between tiers -->
-          @if (!$last) {
-            <div class="tier-connector">
-              <div class="connector-line"></div>
-            </div>
-          }
-        }
+      <!-- Branch Tabs -->
+      <div role="tablist" class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0">
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="selectedBranch() === 'dark'"
+          (click)="selectBranch('dark')"
+        >
+          Dark
+        </button>
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="selectedBranch() === 'arcane'"
+          (click)="selectBranch('arcane')"
+        >
+          Arcane
+        </button>
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="selectedBranch() === 'engineering'"
+          (click)="selectBranch('engineering')"
+        >
+          Engineering
+        </button>
       </div>
-    </div>
 
-    <!-- Detail Panel (US-005) -->
-    @if (selectedNode(); as node) {
-      <div class="detail-panel w-72 flex-shrink-0 border-l border-base-300 overflow-y-auto p-4">
-        <div class="card bg-base-200">
-          <div class="card-body p-4 gap-3">
-            <!-- Node Name & State Badge -->
-            <div class="flex items-start justify-between">
-              <h3 class="card-title text-sm">{{ node.name }}</h3>
-              @switch (selectedNodeState()) {
-                @case ('completed') {
-                  <span class="badge badge-success badge-sm">Completed</span>
-                }
-                @case ('active') {
-                  <span class="badge badge-info badge-sm">In Progress</span>
-                }
-                @case ('available') {
-                  <span class="badge badge-warning badge-sm">Available</span>
-                }
-                @case ('locked') {
-                  <span class="badge badge-ghost badge-sm">Locked</span>
-                }
-              }
-            </div>
+      <!-- Main Content -->
+      <div class="flex flex-1 min-h-0">
+        <!-- Tree View -->
+        <div class="tree-panel flex-1 overflow-auto p-4">
+          <div class="tree-layout flex flex-col items-center gap-6">
+            @for (tierGroup of tierNodes(); track tierGroup.tier) {
+              <div class="tier-group">
+                <div class="tier-label text-xs opacity-50 mb-2 text-center">
+                  Tier {{ tierGroup.tier }}
+                </div>
+                <div class="tier-nodes flex gap-4 justify-center flex-wrap">
+                  @for (node of tierGroup.nodes; track node.id) {
+                    <button
+                      class="node-card"
+                      [class.node-completed]="node.nodeState === 'completed'"
+                      [class.node-active]="node.nodeState === 'active'"
+                      [class.node-available]="node.nodeState === 'available'"
+                      [class.node-locked]="node.nodeState === 'locked'"
+                      [class.node-selected]="selectedNodeId() === node.id"
+                      (click)="selectNode(node.id)"
+                    >
+                      <div class="node-name text-xs font-semibold">{{ node.name }}</div>
 
-            <!-- Description -->
-            <p class="text-xs opacity-70">{{ node.description }}</p>
+                      @if (node.nodeState === 'completed') {
+                        <div class="node-icon text-success">&check;</div>
+                      }
 
-            <!-- Tier & Branch -->
-            <div class="flex gap-2 text-xs">
-              <span class="badge badge-outline badge-xs">Tier {{ node.tier }}</span>
-              <span class="badge badge-outline badge-xs capitalize">{{ node.branch }}</span>
-            </div>
-
-            <!-- Cost -->
-            <div>
-              <div class="text-xs font-semibold mb-1">Cost:</div>
-              <div class="flex flex-wrap gap-1">
-                @for (cost of formatCost(node.cost); track cost.type) {
-                  <span class="badge badge-sm badge-outline capitalize">
-                    {{ cost.amount }} {{ cost.type }}
-                  </span>
-                }
-              </div>
-            </div>
-
-            <!-- Prerequisites -->
-            @if (node.prerequisiteResearchIds.length > 0) {
-              <div>
-                <div class="text-xs font-semibold mb-1">Prerequisites:</div>
-                @if (selectedNodeState() === 'locked') {
-                  <div class="text-xs text-error">
-                    Missing:
-                    @for (prereq of selectedNodeMissingPrereqs(); track prereq) {
-                      <span class="badge badge-error badge-xs ml-1">{{ prereq }}</span>
-                    }
-                  </div>
-                } @else {
-                  <div class="text-xs text-success">All prerequisites met</div>
-                }
-              </div>
-            }
-
-            <!-- Active Progress (US-007) -->
-            @if (selectedNodeState() === 'active') {
-              <div>
-                <div class="text-xs font-semibold mb-1">Progress:</div>
-                <progress
-                  class="progress progress-info w-full"
-                  [value]="progressPercent()"
-                  max="100"
-                ></progress>
-                <div class="text-xs opacity-70 mt-1">
-                  {{ progressPercent() | number:'1.0-0' }}% &middot; {{ estimatedTimeRemaining() }}
+                      @if (node.nodeState === 'active') {
+                        <div class="node-progress-mini">
+                          <progress
+                            class="progress progress-info w-full"
+                            [value]="getNodeProgressPercent(node.id)"
+                            max="100"
+                          ></progress>
+                        </div>
+                      }
+                    </button>
+                  }
                 </div>
               </div>
-            }
 
-            <!-- Actions (US-006) -->
-            @if (selectedNodeState() === 'available') {
-              <button
-                class="btn btn-sm btn-primary w-full"
-                [disabled]="!selectedNodeCanStart().canStart"
-                (click)="startResearch()"
-                [tp]="selectedNodeCanStart().canStart ? 'Start researching this node' : selectedNodeCanStart().error ?? ''"
-              >
-                Start Research
-              </button>
-              @if (!selectedNodeCanAfford()) {
-                <div class="text-xs text-error">Insufficient resources</div>
+              <!-- Connector lines between tiers -->
+              @if (!$last) {
+                <div class="tier-connector">
+                  <div class="connector-line"></div>
+                </div>
               }
-            }
-
-            @if (selectedNodeState() === 'active') {
-              <button
-                class="btn btn-sm btn-error btn-outline w-full"
-                (click)="cancelResearch()"
-              >
-                Cancel Research
-              </button>
-              <div class="text-xs opacity-50">Progress will be lost. No refund.</div>
-            }
-
-            @if (selectedNodeState() === 'completed') {
-              <div class="text-xs text-success font-semibold">
-                Research complete
-              </div>
             }
           </div>
         </div>
+
+        <!-- Detail Panel -->
+        @if (selectedNode(); as node) {
+          <div class="detail-panel w-72 flex-shrink-0 border-l border-base-300 overflow-y-auto p-4">
+            <div class="card bg-base-200">
+              <div class="card-body p-4 gap-3">
+                <!-- Node Name & State Badge -->
+                <div class="flex items-start justify-between">
+                  <h3 class="card-title text-sm">{{ node.name }}</h3>
+                  @switch (selectedNodeState()) {
+                    @case ('completed') {
+                      <span class="badge badge-success badge-sm">Completed</span>
+                    }
+                    @case ('active') {
+                      <span class="badge badge-info badge-sm">In Progress</span>
+                    }
+                    @case ('available') {
+                      <span class="badge badge-warning badge-sm">Available</span>
+                    }
+                    @case ('locked') {
+                      <span class="badge badge-ghost badge-sm">Locked</span>
+                    }
+                  }
+                </div>
+
+                <!-- Description -->
+                <p class="text-xs opacity-70">{{ node.description }}</p>
+
+                <!-- Tier & Branch -->
+                <div class="flex gap-2 text-xs">
+                  <span class="badge badge-outline badge-xs">Tier {{ node.tier }}</span>
+                  <span class="badge badge-outline badge-xs capitalize">{{ node.branch }}</span>
+                </div>
+
+                <!-- Cost -->
+                <div>
+                  <div class="text-xs font-semibold mb-1">Cost:</div>
+                  <div class="flex flex-wrap gap-1">
+                    @for (cost of formatCost(node.cost); track cost.type) {
+                      <span class="badge badge-sm badge-outline capitalize">
+                        {{ cost.amount }} {{ cost.type }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Prerequisites -->
+                @if (node.prerequisiteResearchIds.length > 0) {
+                  <div>
+                    <div class="text-xs font-semibold mb-1">Prerequisites:</div>
+                    @if (selectedNodeState() === 'locked') {
+                      <div class="text-xs text-error">
+                        Missing:
+                        @for (prereq of selectedNodeMissingPrereqs(); track prereq) {
+                          <span class="badge badge-error badge-xs ml-1">{{ prereq }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <div class="text-xs text-success">All prerequisites met</div>
+                    }
+                  </div>
+                }
+
+                <!-- Active Progress -->
+                @if (selectedNodeState() === 'active') {
+                  <div>
+                    <div class="text-xs font-semibold mb-1">Progress:</div>
+                    <progress
+                      class="progress progress-info w-full"
+                      [value]="progressPercent()"
+                      max="100"
+                    ></progress>
+                    <div class="text-xs opacity-70 mt-1">
+                      {{ progressPercent() | number:'1.0-0' }}% &middot; {{ estimatedTimeRemaining() }}
+                    </div>
+                  </div>
+                }
+
+                <!-- Actions -->
+                @if (selectedNodeState() === 'available') {
+                  <button
+                    class="btn btn-sm btn-primary w-full"
+                    [disabled]="!selectedNodeCanStart().canStart"
+                    (click)="startResearch()"
+                    [tp]="selectedNodeCanStart().canStart ? 'Start researching this node' : selectedNodeCanStart().error ?? ''"
+                  >
+                    Start Research
+                  </button>
+                  @if (!selectedNodeCanAfford()) {
+                    <div class="text-xs text-error">Insufficient resources</div>
+                  }
+                }
+
+                @if (selectedNodeState() === 'active') {
+                  <button
+                    class="btn btn-sm btn-error btn-outline w-full"
+                    (click)="cancelResearch()"
+                  >
+                    Cancel Research
+                  </button>
+                  <div class="text-xs opacity-50">Progress will be lost. No refund.</div>
+                }
+
+                @if (selectedNodeState() === 'completed') {
+                  <div class="text-xs text-success font-semibold">
+                    Research complete
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
       </div>
-    }
+    </div>
   </div>
-</div>
+</app-modal>

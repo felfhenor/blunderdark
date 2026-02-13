@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { GridComponent } from '@components/grid/grid.component';
@@ -17,6 +17,7 @@ import { PanelResearchSummaryComponent } from '@components/panel-research-summar
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { GameResearchComponent } from '@pages/game-research/game-research.component';
 import { optionsGet } from '@helpers';
 
 @Component({
@@ -25,6 +26,7 @@ import { optionsGet } from '@helpers';
     RouterModule,
     TeleportOutletDirective,
     GridComponent,
+    GameResearchComponent,
     MoraleBarComponent,
     PanelAltarComponent,
     PanelFloorSelectorComponent,
@@ -45,4 +47,5 @@ import { optionsGet } from '@helpers';
 })
 export class GamePlayComponent extends OptionsBaseComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
+  public showResearch = signal(false);
 }

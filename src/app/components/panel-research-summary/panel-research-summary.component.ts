@@ -1,6 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, output } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import {
@@ -18,7 +17,7 @@ import type { IsContentItem, ResearchNode } from '@interfaces';
       <div class="card-body p-4 gap-2">
         <div class="flex items-center justify-between">
           <h3 class="card-title text-sm">Research</h3>
-          <button class="btn btn-xs btn-outline" (click)="openResearch()">
+          <button class="btn btn-xs btn-outline" (click)="openResearch.emit()">
             Open
           </button>
         </div>
@@ -42,7 +41,7 @@ import type { IsContentItem, ResearchNode } from '@interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelResearchSummaryComponent {
-  private router = inject(Router);
+  public openResearch = output<void>();
 
   public activeNode = computed(() => {
     const activeId = gamestate().world.research.activeResearch;
@@ -72,8 +71,4 @@ export class PanelResearchSummaryComponent {
     const mins = Math.ceil(gameMinutes % 60);
     return `${hours}h ${mins}m`;
   });
-
-  public openResearch(): void {
-    this.router.navigate(['/game', 'research']);
-  }
 }

@@ -3,10 +3,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  model,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import {
@@ -31,13 +31,13 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
 
 @Component({
   selector: 'app-game-research',
-  imports: [DecimalPipe, TippyDirective],
+  imports: [DecimalPipe, ModalComponent, TippyDirective],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameResearchComponent {
-  private router = inject(Router);
+  public visible = model<boolean>(false);
 
   public selectedBranch = signal<ResearchBranch>('dark');
   public selectedNodeId = signal<string | undefined>(undefined);
@@ -184,8 +184,8 @@ export class GameResearchComponent {
     await researchCancel();
   }
 
-  public goBack(): void {
-    this.router.navigate(['/game']);
+  public close(): void {
+    this.visible.set(false);
   }
 
   public formatCost(cost: ResourceCost): { type: string; amount: number }[] {

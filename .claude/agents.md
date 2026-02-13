@@ -802,6 +802,7 @@ When adding build-time validation for a content type:
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
 - `BIOME_DATA` in `@interfaces/biome` provides display info (name, description, color) for UI rendering
 - Do not use `null` as a return type, optional type, or anywhere in the codebase — use `undefined` instead for consistency and to avoid confusion
+- Prefer to use popups/modals over separate pages for new features.
 
 ## Helper Function Naming Convention
 
@@ -832,79 +833,79 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 
 ### File-to-Prefix Mapping
 
-| File | Prefix (camelCase) | Prefix (SCREAMING_SNAKE) |
-|------|-------------------|--------------------------|
-| `adjacency.ts` | `adjacency` | `ADJACENCY` |
-| `altar-room.ts` | `altarRoom` | `ALTAR_ROOM` |
-| `analytics.ts` | `analytics` | `ANALYTICS` |
-| `assignment.ts` | `assignment` | `ASSIGNMENT` |
-| `biome-restrictions.ts` | `biomeRestriction` | `BIOME_RESTRICTION` |
-| `clipboard.ts` | `clipboard` | `CLIPBOARD` |
-| `combat.ts` | `combat` | `COMBAT` |
-| `combat-abilities.ts` | `combatAbility` | `COMBAT_ABILITY` |
-| `connections.ts` | `connection` | `CONNECTION` |
-| `content.ts` | `content` | `CONTENT` |
-| `corruption.ts` | `corruption` | `CORRUPTION` |
-| `corruption-thresholds.ts` | `corruptionThreshold` | `CORRUPTION_THRESHOLD` |
-| `day-night-modifiers.ts` | `dayNight` | `DAY_NIGHT` |
-| `debug.ts` | `debug` | `DEBUG` |
-| `defaults.ts` | `default` | `DEFAULT` |
-| `discord.ts` | `discord` | `DISCORD` |
-| `efficiency.ts` | `efficiency` | `EFFICIENCY` |
-| `fear-level.ts` | `fearLevel` | `FEAR_LEVEL` |
-| `floor.ts` | `floor` | `FLOOR` |
-| `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
-| `game-events.ts` | `gameEvent` | `GAME_EVENT` |
-| `game-init.ts` | `game` | `GAME` |
-| `game-time.ts` | `gameTime` | `GAME_TIME` |
-| `gameloop.ts` | `gameloop` | `GAMELOOP` |
-| `grid.ts` | `grid` | `GRID` |
-| `hallway-placement.ts` | `hallwayPlacement` | `HALLWAY_PLACEMENT` |
-| `hallways.ts` | `hallway` | `HALLWAY` |
-| `hunger.ts` | `hunger` | `HUNGER` |
-| `icons.ts` | `icon` | `ICON` |
-| `inhabitants.ts` | `inhabitant` | `INHABITANT` |
-| `invaders.ts` | `invader` | `INVADER` |
-| `invasion-combat.ts` | `invasionCombat` | `INVASION_COMBAT` |
-| `invasion-composition.ts` | `invasionComposition` | `INVASION_COMPOSITION` |
-| `invasion-objectives.ts` | `invasionObjective` | `INVASION_OBJECTIVE` |
-| `invasion-rewards.ts` | `invasionReward` | `INVASION_REWARD` |
-| `invasion-triggers.ts` | `invasionTrigger` | `INVASION_TRIGGER` |
-| `invasion-win-loss.ts` | `invasionWinLoss` | `INVASION_WIN_LOSS` |
-| `migrate.ts` | `migrate` | `MIGRATE` |
-| `morale.ts` | `morale` | `MORALE` |
-| `notify.ts` | `notify` | `NOTIFY` |
-| `pathfinding.ts` | `pathfinding` | `PATHFINDING` |
-| `production.ts` | `production` | `PRODUCTION` |
-| `production-modifiers.ts` | `productionModifier` | `PRODUCTION_MODIFIER` |
-| `recruitment.ts` | `recruitment` | `RECRUITMENT` |
-| `reputation.ts` | `reputation` | `REPUTATION` |
-| `resources.ts` | `resource` | `RESOURCE` |
-| `rng.ts` | `rng` | `RNG` |
-| `room-placement.ts` | `roomPlacement` | `ROOM_PLACEMENT` |
-| `room-removal.ts` | `roomRemoval` | `ROOM_REMOVAL` |
-| `room-roles.ts` | `roomRole` | `ROOM_ROLE` |
-| `room-shapes.ts` | `roomShape` | `ROOM_SHAPE` |
-| `room-upgrades.ts` | `roomUpgrade` | `ROOM_UPGRADE` |
-| `scheduler.ts` | `scheduler` | `SCHEDULER` |
-| `season.ts` | `season` | `SEASON` |
-| `season-bonuses.ts` | `seasonBonus` | `SEASON_BONUS` |
-| `setup.ts` | `setup` | `SETUP` |
-| `sfx.ts` | `sfx` | `SFX` |
-| `signal.ts` | `signal` | `SIGNAL` |
-| `state-game.ts` | `gamestate` | `GAMESTATE` |
-| `state-modifiers.ts` | `stateModifier` | `STATE_MODIFIER` |
-| `state-options.ts` | `options` | `OPTIONS` |
-| `synergy.ts` | `synergy` | `SYNERGY` |
-| `throne-room.ts` | `throneRoom` | `THRONE_ROOM` |
-| `timer.ts` | `timer` | `TIMER` |
-| `training.ts` | `training` | `TRAINING` |
-| `trap-workshop.ts` | `trapWorkshop` | `TRAP_WORKSHOP` |
-| `traps.ts` | `trap` | `TRAP` |
-| `ui.ts` | `ui` | `UI` |
-| `version.ts` | `version` | `VERSION` |
-| `world.ts` | `world` | `WORLD` |
-| `worldgen.ts` | `worldgen` | `WORLDGEN` |
+| File                       | Prefix (camelCase)    | Prefix (SCREAMING_SNAKE) |
+| -------------------------- | --------------------- | ------------------------ |
+| `adjacency.ts`             | `adjacency`           | `ADJACENCY`              |
+| `altar-room.ts`            | `altarRoom`           | `ALTAR_ROOM`             |
+| `analytics.ts`             | `analytics`           | `ANALYTICS`              |
+| `assignment.ts`            | `assignment`          | `ASSIGNMENT`             |
+| `biome-restrictions.ts`    | `biomeRestriction`    | `BIOME_RESTRICTION`      |
+| `clipboard.ts`             | `clipboard`           | `CLIPBOARD`              |
+| `combat.ts`                | `combat`              | `COMBAT`                 |
+| `combat-abilities.ts`      | `combatAbility`       | `COMBAT_ABILITY`         |
+| `connections.ts`           | `connection`          | `CONNECTION`             |
+| `content.ts`               | `content`             | `CONTENT`                |
+| `corruption.ts`            | `corruption`          | `CORRUPTION`             |
+| `corruption-thresholds.ts` | `corruptionThreshold` | `CORRUPTION_THRESHOLD`   |
+| `day-night-modifiers.ts`   | `dayNight`            | `DAY_NIGHT`              |
+| `debug.ts`                 | `debug`               | `DEBUG`                  |
+| `defaults.ts`              | `default`             | `DEFAULT`                |
+| `discord.ts`               | `discord`             | `DISCORD`                |
+| `efficiency.ts`            | `efficiency`          | `EFFICIENCY`             |
+| `fear-level.ts`            | `fearLevel`           | `FEAR_LEVEL`             |
+| `floor.ts`                 | `floor`               | `FLOOR`                  |
+| `floor-modifiers.ts`       | `floorModifier`       | `FLOOR_MODIFIER`         |
+| `game-events.ts`           | `gameEvent`           | `GAME_EVENT`             |
+| `game-init.ts`             | `game`                | `GAME`                   |
+| `game-time.ts`             | `gameTime`            | `GAME_TIME`              |
+| `gameloop.ts`              | `gameloop`            | `GAMELOOP`               |
+| `grid.ts`                  | `grid`                | `GRID`                   |
+| `hallway-placement.ts`     | `hallwayPlacement`    | `HALLWAY_PLACEMENT`      |
+| `hallways.ts`              | `hallway`             | `HALLWAY`                |
+| `hunger.ts`                | `hunger`              | `HUNGER`                 |
+| `icons.ts`                 | `icon`                | `ICON`                   |
+| `inhabitants.ts`           | `inhabitant`          | `INHABITANT`             |
+| `invaders.ts`              | `invader`             | `INVADER`                |
+| `invasion-combat.ts`       | `invasionCombat`      | `INVASION_COMBAT`        |
+| `invasion-composition.ts`  | `invasionComposition` | `INVASION_COMPOSITION`   |
+| `invasion-objectives.ts`   | `invasionObjective`   | `INVASION_OBJECTIVE`     |
+| `invasion-rewards.ts`      | `invasionReward`      | `INVASION_REWARD`        |
+| `invasion-triggers.ts`     | `invasionTrigger`     | `INVASION_TRIGGER`       |
+| `invasion-win-loss.ts`     | `invasionWinLoss`     | `INVASION_WIN_LOSS`      |
+| `migrate.ts`               | `migrate`             | `MIGRATE`                |
+| `morale.ts`                | `morale`              | `MORALE`                 |
+| `notify.ts`                | `notify`              | `NOTIFY`                 |
+| `pathfinding.ts`           | `pathfinding`         | `PATHFINDING`            |
+| `production.ts`            | `production`          | `PRODUCTION`             |
+| `production-modifiers.ts`  | `productionModifier`  | `PRODUCTION_MODIFIER`    |
+| `recruitment.ts`           | `recruitment`         | `RECRUITMENT`            |
+| `reputation.ts`            | `reputation`          | `REPUTATION`             |
+| `resources.ts`             | `resource`            | `RESOURCE`               |
+| `rng.ts`                   | `rng`                 | `RNG`                    |
+| `room-placement.ts`        | `roomPlacement`       | `ROOM_PLACEMENT`         |
+| `room-removal.ts`          | `roomRemoval`         | `ROOM_REMOVAL`           |
+| `room-roles.ts`            | `roomRole`            | `ROOM_ROLE`              |
+| `room-shapes.ts`           | `roomShape`           | `ROOM_SHAPE`             |
+| `room-upgrades.ts`         | `roomUpgrade`         | `ROOM_UPGRADE`           |
+| `scheduler.ts`             | `scheduler`           | `SCHEDULER`              |
+| `season.ts`                | `season`              | `SEASON`                 |
+| `season-bonuses.ts`        | `seasonBonus`         | `SEASON_BONUS`           |
+| `setup.ts`                 | `setup`               | `SETUP`                  |
+| `sfx.ts`                   | `sfx`                 | `SFX`                    |
+| `signal.ts`                | `signal`              | `SIGNAL`                 |
+| `state-game.ts`            | `gamestate`           | `GAMESTATE`              |
+| `state-modifiers.ts`       | `stateModifier`       | `STATE_MODIFIER`         |
+| `state-options.ts`         | `options`             | `OPTIONS`                |
+| `synergy.ts`               | `synergy`             | `SYNERGY`                |
+| `throne-room.ts`           | `throneRoom`          | `THRONE_ROOM`            |
+| `timer.ts`                 | `timer`               | `TIMER`                  |
+| `training.ts`              | `training`            | `TRAINING`               |
+| `trap-workshop.ts`         | `trapWorkshop`        | `TRAP_WORKSHOP`          |
+| `traps.ts`                 | `trap`                | `TRAP`                   |
+| `ui.ts`                    | `ui`                  | `UI`                     |
+| `version.ts`               | `version`             | `VERSION`                |
+| `world.ts`                 | `world`               | `WORLD`                  |
+| `worldgen.ts`              | `worldgen`            | `WORLDGEN`               |
 
 ### Examples
 
@@ -949,11 +950,11 @@ export type {Type}Content = IsContentItem &
 
 ### Naming Rules
 
-| Convention | Example |
-|---|---|
-| File name | `content-abilityeffect.ts`, `content-room.ts` |
-| Branded ID type | `AbilityEffectId`, `RoomId` |
-| Content type name | `AbilityEffectContent`, `RoomContent` |
+| Convention        | Example                                       |
+| ----------------- | --------------------------------------------- |
+| File name         | `content-abilityeffect.ts`, `content-room.ts` |
+| Branded ID type   | `AbilityEffectId`, `RoomId`                   |
+| Content type name | `AbilityEffectContent`, `RoomContent`         |
 
 ### Trait Extensions
 
@@ -964,27 +965,27 @@ export type {Type}Content = IsContentItem &
 
 ### Complete Content Type Mapping
 
-| ContentType | File | Branded ID | Content Type | Extends |
-|---|---|---|---|---|
-| `abilityeffect` | `content-abilityeffect.ts` | `AbilityEffectId` | `AbilityEffectContent` | `IsContentItem` |
-| `combatability` | `content-combatability.ts` | `CombatAbilityId` | `CombatAbilityContent` | `IsContentItem & HasDescription` |
-| `hero` | `content-hero.ts` | `HeroId` | `HeroContent` | `IsContentItem & HasDescription & HasAnimation` |
-| `inhabitant` | `content-inhabitant.ts` | `InhabitantId` | `InhabitantContent` | `IsContentItem & HasDescription` |
-| `invader` | `content-invader.ts` | `InvaderId` | `InvaderContent` | `IsContentItem & HasDescription & HasSprite` |
-| `invasion` | `content-invasion.ts` | `InvasionId` | `InvasionContent` | `IsContentItem` |
-| `item` | `content-item.ts` | `ItemId` | `ItemContent` | `IsContentItem & HasDescription & HasSprite` |
-| `monster` | `content-monster.ts` | `MonsterId` | `MonsterContent` | `IsContentItem & HasDescription & HasAnimation` |
-| `pet` | `content-pet.ts` | `PetId` | `PetContent` | `IsContentItem & HasDescription & HasAnimation` |
-| `reputationaction` | `content-reputationaction.ts` | `ReputationActionId` | `ReputationActionContent` | `IsContentItem & HasDescription` |
-| `research` | `content-research.ts` | `ResearchId` | `ResearchContent` | `IsContentItem & HasDescription` |
-| `room` | `content-room.ts` | `RoomId` | `RoomContent` | `IsContentItem & HasDescription` |
-| `roomshape` | `content-roomshape.ts` | `RoomShapeId` | `RoomShapeContent` | `IsContentItem` |
-| `seasonbonus` | `content-seasonbonus.ts` | `SeasonBonusId` | `SeasonBonusContent` | `IsContentItem & HasDescription` |
-| `stage` | `content-stage.ts` | `StageId` | `StageContent` | `IsContentItem & HasDescription` |
-| `synergy` | `content-synergy.ts` | `SynergyId` | `SynergyContent` | `IsContentItem & HasDescription` |
-| `trap` | `content-trap.ts` | `TrapId` | `TrapContent` | `IsContentItem & HasDescription & HasSprite` |
-| `trinket` | `content-trinket.ts` | `TrinketId` | `TrinketContent` | `IsContentItem & HasDescription & HasSprite` |
-| `weapon` | `content-weapon.ts` | `WeaponId` | `WeaponContent` | `IsContentItem & HasDescription & HasSprite` |
+| ContentType        | File                          | Branded ID           | Content Type              | Extends                                         |
+| ------------------ | ----------------------------- | -------------------- | ------------------------- | ----------------------------------------------- |
+| `abilityeffect`    | `content-abilityeffect.ts`    | `AbilityEffectId`    | `AbilityEffectContent`    | `IsContentItem`                                 |
+| `combatability`    | `content-combatability.ts`    | `CombatAbilityId`    | `CombatAbilityContent`    | `IsContentItem & HasDescription`                |
+| `hero`             | `content-hero.ts`             | `HeroId`             | `HeroContent`             | `IsContentItem & HasDescription & HasAnimation` |
+| `inhabitant`       | `content-inhabitant.ts`       | `InhabitantId`       | `InhabitantContent`       | `IsContentItem & HasDescription`                |
+| `invader`          | `content-invader.ts`          | `InvaderId`          | `InvaderContent`          | `IsContentItem & HasDescription & HasSprite`    |
+| `invasion`         | `content-invasion.ts`         | `InvasionId`         | `InvasionContent`         | `IsContentItem`                                 |
+| `item`             | `content-item.ts`             | `ItemId`             | `ItemContent`             | `IsContentItem & HasDescription & HasSprite`    |
+| `monster`          | `content-monster.ts`          | `MonsterId`          | `MonsterContent`          | `IsContentItem & HasDescription & HasAnimation` |
+| `pet`              | `content-pet.ts`              | `PetId`              | `PetContent`              | `IsContentItem & HasDescription & HasAnimation` |
+| `reputationaction` | `content-reputationaction.ts` | `ReputationActionId` | `ReputationActionContent` | `IsContentItem & HasDescription`                |
+| `research`         | `content-research.ts`         | `ResearchId`         | `ResearchContent`         | `IsContentItem & HasDescription`                |
+| `room`             | `content-room.ts`             | `RoomId`             | `RoomContent`             | `IsContentItem & HasDescription`                |
+| `roomshape`        | `content-roomshape.ts`        | `RoomShapeId`        | `RoomShapeContent`        | `IsContentItem`                                 |
+| `seasonbonus`      | `content-seasonbonus.ts`      | `SeasonBonusId`      | `SeasonBonusContent`      | `IsContentItem & HasDescription`                |
+| `stage`            | `content-stage.ts`            | `StageId`            | `StageContent`            | `IsContentItem & HasDescription`                |
+| `synergy`          | `content-synergy.ts`          | `SynergyId`          | `SynergyContent`          | `IsContentItem & HasDescription`                |
+| `trap`             | `content-trap.ts`             | `TrapId`             | `TrapContent`             | `IsContentItem & HasDescription & HasSprite`    |
+| `trinket`          | `content-trinket.ts`          | `TrinketId`          | `TrinketContent`          | `IsContentItem & HasDescription & HasSprite`    |
+| `weapon`           | `content-weapon.ts`           | `WeaponId`           | `WeaponContent`           | `IsContentItem & HasDescription & HasSprite`    |
 
 ### Adding a New Content Type
 

@@ -15,6 +15,7 @@ import {
   gameTimeSpeed,
   optionsGet,
   setupIs,
+  uiIsAnyModalOpen,
   uiIsShowingAnyMenu,
   gamestateSave,
   gameTimeSetSpeed,
@@ -113,6 +114,8 @@ export class NavbarComponent {
   }
 
   public uiCloseAllMenus() {
+    if (uiIsAnyModalOpen()) return;
+
     if (uiShowOptionsMenu()) {
       uiShowOptionsMenu.set(false);
       return;

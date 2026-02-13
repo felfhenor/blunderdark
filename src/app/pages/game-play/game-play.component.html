@@ -13,7 +13,7 @@
     <app-panel-training-grounds />
     <app-panel-altar />
     <app-panel-throne-room />
-    <app-panel-research-summary />
+    <app-panel-research-summary (openResearch)="showResearch.set(true)" />
     <app-panel-room-select />
     <app-panel-reputation />
   </div>
@@ -22,5 +22,7 @@
   </div>
   </div>
 </div>
+
+<app-game-research [(visible)]="showResearch" />
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

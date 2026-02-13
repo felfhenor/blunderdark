@@ -1,6 +1,6 @@
 @let isInReplacementMode = fullContainer.children.length !== 0;
 
-<dialog #modal class="modal" [open]="visible()">
+<dialog #modal class="modal" [open]="visible()" (cancel)="$event.preventDefault()">
   <div
     class="modal-box p-0"
     [ngClass]="[widthClass()]"
