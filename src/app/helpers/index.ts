@@ -26,6 +26,7 @@ export * from './game-time';
 export * from './gameloop';
 export * from './grid';
 export * from './hallway-placement';
+export * from './hallway-tile-removal';
 export * from './hallways';
 export * from './hunger';
 export * from './icons';

@@ -12,6 +12,7 @@ import {
   roomUpgradeGetEffectiveMaxInhabitants,
   roomRemovalGetInfo,
   connectionGetRoomConnections,
+  getEntityName,
   productionGetRoomDefinition,
   productionGetRoomRates,
   roomPlacementIsRemovable,
@@ -169,13 +170,7 @@ export class PanelRoomInfoComponent {
     if (!room || !floor) return [];
 
     const ids = connectionGetAdjacentUnconnected(floor, room.id);
-    return ids.map((id) => {
-      const placedRoom = floor.rooms.find((r) => r.id === id);
-      const def = placedRoom
-        ? productionGetRoomDefinition(placedRoom.roomTypeId)
-        : undefined;
-      return { id, name: def?.name ?? 'Unknown Room' };
-    });
+    return ids.map((id) => ({ id, name: getEntityName(floor, id) }));
   });
 
   public activeConnections = computed(() => {
@@ -187,14 +182,10 @@ export class PanelRoomInfoComponent {
     return connections.map((conn) => {
       const otherId =
         conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
-      const otherRoom = floor.rooms.find((r) => r.id === otherId);
-      const def = otherRoom
-        ? productionGetRoomDefinition(otherRoom.roomTypeId)
-        : undefined;
       return {
         connectionId: conn.id,
         otherRoomId: otherId,
-        otherRoomName: def?.name ?? 'Unknown Room',
+        otherRoomName: getEntityName(floor, otherId),
       };
     });
   });

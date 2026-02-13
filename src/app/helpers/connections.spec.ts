@@ -274,7 +274,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-a', 'room-a');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('Cannot connect a room to itself');
+    expect(result.error).toBe('Cannot connect an entity to itself');
   });
 
   it('should reject when room A not found', () => {
@@ -283,7 +283,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-x', 'room-b');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('One or both rooms not found on this floor');
+    expect(result.error).toBe('One or both entities not found on this floor');
   });
 
   it('should reject when room B not found', () => {
@@ -292,7 +292,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-a', 'room-y');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('One or both rooms not found on this floor');
+    expect(result.error).toBe('One or both entities not found on this floor');
   });
 
   it('should reject non-adjacent rooms', () => {
@@ -305,7 +305,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('Rooms are not adjacent');
+    expect(result.error).toBe('Entities are not adjacent');
   });
 
   it('should reject already connected rooms', () => {
@@ -319,7 +319,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('Rooms are already connected');
+    expect(result.error).toBe('Entities are already connected');
   });
 
   it('should reject already connected rooms in reverse order', () => {
@@ -332,7 +332,7 @@ describe('connectionValidate', () => {
     });
     const result = connectionValidate(floor, 'room-b', 'room-a');
     expect(result.valid).toBe(false);
-    expect(result.error).toBe('Rooms are already connected');
+    expect(result.error).toBe('Entities are already connected');
   });
 
   it('should accept valid adjacent unconnected rooms', () => {

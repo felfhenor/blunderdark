@@ -130,13 +130,12 @@
       </span>
     </div>
 
-    <div class="corruption-level-bar h-1.5 rounded-full overflow-hidden">
-      <div
-        class="corruption-level-fill h-full rounded-full transition-all"
-        [class]="'corruption-fill-' + corruptionInfo().level"
-        [style.--fill-width]="(corruptionInfo().value === 0 ? 0 : Math.min(100, (corruptionInfo().value / 200) * 100)) + '%'"
-      ></div>
-    </div>
+    <progress
+      class="progress w-full h-1.5"
+      [class]="'corruption-progress-' + corruptionInfo().level"
+      [value]="corruptionInfo().value === 0 ? 0 : Math.min(100, (corruptionInfo().value / 200) * 100)"
+      max="100"
+    ></progress>
 
     <div class="flex items-center justify-between mt-0.5">
       <span class="text-xs opacity-70">

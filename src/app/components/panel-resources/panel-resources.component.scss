@@ -13,22 +13,21 @@
   position: relative;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  border-left: 3px solid transparent;
   cursor: default;
 
   &.resource-low {
-    border-left-color: oklch(var(--wa));
+    border-left: 3px solid oklch(var(--wa));
     background: oklch(var(--wa) / 0.08);
   }
 
   &.resource-critical {
-    border-left-color: oklch(var(--er));
+    border-left: 3px solid oklch(var(--er));
     background: oklch(var(--er) / 0.08);
     animation: pulse-warning 1.5s ease-in-out infinite;
   }
 
   &.resource-empty {
-    border-left-color: oklch(var(--er));
+    border-left: 3px solid oklch(var(--er));
     background: oklch(var(--er) / 0.05);
   }
 }
@@ -48,28 +47,20 @@
   }
 }
 
-.corruption-level-bar {
-  background: oklch(var(--bc) / 0.1);
+.corruption-progress-low {
+  color: oklch(var(--su));
 }
 
-.corruption-level-fill {
-  width: var(--fill-width, 0%);
+.corruption-progress-medium {
+  color: oklch(var(--wa));
 }
 
-.corruption-fill-low {
-  background: oklch(var(--su));
+.corruption-progress-high {
+  color: oklch(0.7 0.15 50);
 }
 
-.corruption-fill-medium {
-  background: oklch(var(--wa));
-}
-
-.corruption-fill-high {
-  background: oklch(0.7 0.15 50);
-}
-
-.corruption-fill-critical {
-  background: oklch(var(--er));
+.corruption-progress-critical {
+  color: oklch(var(--er));
   animation: pulse-warning 1.5s ease-in-out infinite;
 }
 

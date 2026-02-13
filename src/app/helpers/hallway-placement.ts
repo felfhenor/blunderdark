@@ -1,11 +1,12 @@
 import { computed, signal } from '@angular/core';
+import { connectionAddToFloor, connectionValidate } from '@helpers/connections';
 import { floorCurrent } from '@helpers/floor';
 import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { updateGamestate } from '@helpers/state-game';
-import type { GridState, Hallway, TileOffset } from '@interfaces';
+import type { Floor, GridState, Hallway, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
 export type HallwayBuildStep =
@@ -23,6 +24,9 @@ export const hallwayPlacementIsBuildMode = computed(
 export const hallwayPlacementSourceRoomId = signal<string | undefined>(undefined);
 export const hallwayPlacementDestRoomId = signal<string | undefined>(undefined);
 
+const hallwayPlacementSourceTile = signal<TileOffset | undefined>(undefined);
+const hallwayPlacementDestTile = signal<TileOffset | undefined>(undefined);
+
 export const HALLWAY_PLACEMENT_COST_PER_TILE = 5;
 
 export function hallwayPlacementEnter(): void {
@@ -30,12 +34,16 @@ export function hallwayPlacementEnter(): void {
   hallwayPlacementBuildStep.set('selectSource');
   hallwayPlacementSourceRoomId.set(undefined);
   hallwayPlacementDestRoomId.set(undefined);
+  hallwayPlacementSourceTile.set(undefined);
+  hallwayPlacementDestTile.set(undefined);
 }
 
 export function hallwayPlacementExit(): void {
   hallwayPlacementBuildStep.set('inactive');
   hallwayPlacementSourceRoomId.set(undefined);
   hallwayPlacementDestRoomId.set(undefined);
+  hallwayPlacementSourceTile.set(undefined);
+  hallwayPlacementDestTile.set(undefined);
 }
 
 /**
@@ -53,10 +61,12 @@ export function hallwayPlacementHandleTileClick(x: number, y: number): void {
 
   if (step === 'selectSource') {
     hallwayPlacementSourceRoomId.set(tile.roomId);
+    hallwayPlacementSourceTile.set({ x, y });
     hallwayPlacementBuildStep.set('selectDestination');
   } else if (step === 'selectDestination' || step === 'preview') {
     if (tile.roomId === hallwayPlacementSourceRoomId()) return;
     hallwayPlacementDestRoomId.set(tile.roomId);
+    hallwayPlacementDestTile.set({ x, y });
     hallwayPlacementBuildStep.set('preview');
   }
 }
@@ -101,21 +111,55 @@ function findRoomAdjacentEmptyTiles(
 }
 
 /**
+ * Find empty tiles adjacent to a single specific tile.
+ */
+function findTileAdjacentEmptyTiles(
+  grid: GridState,
+  tile: TileOffset,
+): TileOffset[] {
+  const result: TileOffset[] = [];
+  const dirs = [
+    [0, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+  ];
+
+  for (const [dx, dy] of dirs) {
+    const nx = tile.x + dx;
+    const ny = tile.y + dy;
+    if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) continue;
+    if (!grid[ny][nx].occupied) {
+      result.push({ x: nx, y: ny });
+    }
+  }
+
+  return result;
+}
+
+/**
  * BFS pathfinding through empty tiles between two rooms.
- * Returns the shortest path of empty tiles, or undefined if unreachable.
+ * When sourceTile/destTile are provided, uses only empty tiles adjacent to
+ * those specific tiles as start/end points (tile-to-tile mode).
+ * Otherwise uses all room edge tiles (room-to-room mode).
  */
 export function hallwayPlacementFindPath(
   grid: GridState,
   sourceRoomId: string,
   destRoomId: string,
+  sourceTile?: TileOffset,
+  destTile?: TileOffset,
 ): TileOffset[] | undefined {
   if (sourceRoomId === destRoomId) return undefined;
 
-  const starts = findRoomAdjacentEmptyTiles(grid, sourceRoomId);
+  const starts = sourceTile
+    ? findTileAdjacentEmptyTiles(grid, sourceTile)
+    : findRoomAdjacentEmptyTiles(grid, sourceRoomId);
   const endSet = new Set(
-    findRoomAdjacentEmptyTiles(grid, destRoomId).map(
-      (t) => `${t.x},${t.y}`,
-    ),
+    (destTile
+      ? findTileAdjacentEmptyTiles(grid, destTile)
+      : findRoomAdjacentEmptyTiles(grid, destRoomId)
+    ).map((t) => `${t.x},${t.y}`),
   );
 
   if (starts.length === 0 || endSet.size === 0) return undefined;
@@ -176,7 +220,13 @@ export const hallwayPlacementPreviewPath = computed(() => {
   const floor = floorCurrent();
   if (!floor) return undefined;
 
-  return hallwayPlacementFindPath(floor.grid, sourceId, destId);
+  return hallwayPlacementFindPath(
+    floor.grid,
+    sourceId,
+    destId,
+    hallwayPlacementSourceTile(),
+    hallwayPlacementDestTile(),
+  );
 });
 
 /**
@@ -253,12 +303,25 @@ export async function hallwayPlacementConfirm(): Promise<boolean> {
     const updatedGrid = hallwayAddToGrid(floor.grid, hallway);
     const updatedHallways = hallwayAdd(floor.hallways, hallway);
 
-    const updatedFloors = [...state.world.floors];
-    updatedFloors[floorIndex] = {
+    let updatedFloor: Floor = {
       ...floor,
       grid: updatedGrid,
       hallways: updatedHallways,
     };
+
+    // Auto-connect hallway to both endpoint rooms
+    for (const roomId of [sourceId, destId]) {
+      const validation = connectionValidate(updatedFloor, hallway.id, roomId);
+      if (validation.valid && validation.edgeTiles) {
+        const result = connectionAddToFloor(updatedFloor, hallway.id, roomId, validation.edgeTiles);
+        if (result) {
+          updatedFloor = result.floor;
+        }
+      }
+    }
+
+    const updatedFloors = [...state.world.floors];
+    updatedFloors[floorIndex] = updatedFloor;
 
     return {
       ...state,

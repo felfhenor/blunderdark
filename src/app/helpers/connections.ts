@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent, adjacencyGetSharedEdges } from '@helpers/adjacency';
 import { floorCurrent } from '@helpers/floor';
+import { productionGetRoomDefinition } from '@helpers/production';
 import { rngUuid } from '@helpers/rng';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -20,6 +21,32 @@ function getRoomTiles(room: PlacedRoom): TileOffset[] {
 }
 
 /**
+ * Get the tiles for an entity (room or hallway) by ID.
+ */
+function getEntityTiles(floor: Floor, entityId: string): TileOffset[] | undefined {
+  const room = floor.rooms.find((r) => r.id === entityId);
+  if (room) return getRoomTiles(room);
+
+  const hallway = floor.hallways.find((h) => h.id === entityId);
+  if (hallway) return hallway.tiles;
+
+  return undefined;
+}
+
+/**
+ * Get the display name for an entity (room or hallway) by ID.
+ */
+export function getEntityName(floor: Floor, entityId: string): string {
+  const room = floor.rooms.find((r) => r.id === entityId);
+  if (room) return productionGetRoomDefinition(room.roomTypeId)?.name ?? 'Unknown';
+
+  const hallway = floor.hallways.find((h) => h.id === entityId);
+  if (hallway) return 'Corridor';
+
+  return 'Unknown';
+}
+
+/**
  * Validate whether a connection can be created between two rooms on a floor.
  * Checks: self-connection, room existence, adjacency, and duplicate connection.
  */
@@ -29,26 +56,23 @@ export function connectionValidate(
   roomBId: string,
 ): ConnectionValidationResult {
   if (roomAId === roomBId) {
-    return { valid: false, error: 'Cannot connect a room to itself' };
+    return { valid: false, error: 'Cannot connect an entity to itself' };
   }
 
-  const roomA = floor.rooms.find((r) => r.id === roomAId);
-  const roomB = floor.rooms.find((r) => r.id === roomBId);
+  const tilesA = getEntityTiles(floor, roomAId);
+  const tilesB = getEntityTiles(floor, roomBId);
 
-  if (!roomA || !roomB) {
-    return { valid: false, error: 'One or both rooms not found on this floor' };
+  if (!tilesA || !tilesB) {
+    return { valid: false, error: 'One or both entities not found on this floor' };
   }
-
-  const tilesA = getRoomTiles(roomA);
-  const tilesB = getRoomTiles(roomB);
 
   if (!adjacencyAreRoomsAdjacent(tilesA, tilesB)) {
-    return { valid: false, error: 'Rooms are not adjacent' };
+    return { valid: false, error: 'Entities are not adjacent' };
   }
 
   const existing = connectionFind(floor, roomAId, roomBId);
   if (existing) {
-    return { valid: false, error: 'Rooms are already connected' };
+    return { valid: false, error: 'Entities are already connected' };
   }
 
   const edges = adjacencyGetSharedEdges(tilesA, tilesB);
@@ -177,20 +201,28 @@ export function connectionRemoveRoomFromFloor(
  */
 export function connectionGetAdjacentUnconnected(
   floor: Floor,
-  roomId: string,
+  entityId: string,
 ): string[] {
-  const room = floor.rooms.find((r) => r.id === roomId);
-  if (!room) return [];
+  const sourceTiles = getEntityTiles(floor, entityId);
+  if (!sourceTiles) return [];
 
-  const roomTiles = getRoomTiles(room);
   const adjacent: string[] = [];
 
   for (const other of floor.rooms) {
-    if (other.id === roomId) continue;
+    if (other.id === entityId) continue;
     const otherTiles = getRoomTiles(other);
-    if (adjacencyAreRoomsAdjacent(roomTiles, otherTiles)) {
-      if (!connectionFind(floor, roomId, other.id)) {
+    if (adjacencyAreRoomsAdjacent(sourceTiles, otherTiles)) {
+      if (!connectionFind(floor, entityId, other.id)) {
         adjacent.push(other.id);
+      }
+    }
+  }
+
+  for (const hallway of floor.hallways) {
+    if (hallway.id === entityId) continue;
+    if (adjacencyAreRoomsAdjacent(sourceTiles, hallway.tiles)) {
+      if (!connectionFind(floor, entityId, hallway.id)) {
+        adjacent.push(hallway.id);
       }
     }
   }

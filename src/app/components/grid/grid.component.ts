@@ -232,7 +232,12 @@ export class GridComponent {
       { dx: -1, dy: 0, dir: 'left', opposite: 'right' },
     ];
 
+    const hallwayIds = new Set(floor.hallways.map((h) => h.id));
+
     for (const conn of floor.connections) {
+      // Skip hallway connections — handled by hallwayDoorwayMap
+      if (hallwayIds.has(conn.roomAId) || hallwayIds.has(conn.roomBId)) continue;
+
       for (const tile of conn.edgeTiles) {
         for (const { dx, dy, dir, opposite } of dirLookup) {
           const nx = tile.x + dx;
@@ -256,6 +261,62 @@ export class GridComponent {
 
   public getDoorways(x: number, y: number): Set<string> | undefined {
     return this.doorwayMap().get(`${x},${y}`);
+  }
+
+  /**
+   * Map of "x,y" → Set of directions for hallway-to-room doorway indicators.
+   * Only hallway tiles get markers, on the edge facing a connected entity.
+   * Door graphics only appear when there is an actual connection.
+   */
+  private hallwayDoorwayMap = computed(() => {
+    const floor = floorCurrent();
+    if (!floor) return new Map<string, Set<string>>();
+
+    const map = new Map<string, Set<string>>();
+    const grid = floor.grid;
+
+    const dirLookup: Array<{ dx: number; dy: number; dir: string; opposite: string }> = [
+      { dx: 0, dy: -1, dir: 'top', opposite: 'bottom' },
+      { dx: 1, dy: 0, dir: 'right', opposite: 'left' },
+      { dx: 0, dy: 1, dir: 'bottom', opposite: 'top' },
+      { dx: -1, dy: 0, dir: 'left', opposite: 'right' },
+    ];
+
+    for (const hallway of floor.hallways) {
+      // Build set of entity IDs actually connected to this hallway
+      const connectedIds = new Set<string>();
+      for (const conn of floor.connections) {
+        if (conn.roomAId === hallway.id) connectedIds.add(conn.roomBId);
+        else if (conn.roomBId === hallway.id) connectedIds.add(conn.roomAId);
+      }
+
+      for (const tile of hallway.tiles) {
+        for (const { dx, dy, dir, opposite } of dirLookup) {
+          const nx = tile.x + dx;
+          const ny = tile.y + dy;
+          const neighbor = grid[ny]?.[nx];
+          if (!neighbor) continue;
+
+          // Check if the neighbor is a room or hallway that is connected
+          const neighborEntityId = neighbor.roomId ?? neighbor.hallwayId;
+          if (neighborEntityId && connectedIds.has(neighborEntityId)) {
+            const key = `${tile.x},${tile.y}`;
+            if (!map.has(key)) map.set(key, new Set());
+            map.get(key)!.add(dir);
+
+            const neighborKey = `${nx},${ny}`;
+            if (!map.has(neighborKey)) map.set(neighborKey, new Set());
+            map.get(neighborKey)!.add(opposite);
+          }
+        }
+      }
+    }
+
+    return map;
+  });
+
+  public getHallwayDoorways(x: number, y: number): Set<string> | undefined {
+    return this.hallwayDoorwayMap().get(`${x},${y}`);
   }
 
   private roomBorderMap = computed(() => {
@@ -301,6 +362,12 @@ export class GridComponent {
     return this.grid()[sel.y]?.[sel.x]?.roomId;
   });
 
+  private selectedHallwayId = computed(() => {
+    const sel = this.gridSelectedTile();
+    if (!sel) return undefined;
+    return this.grid()[sel.y]?.[sel.x]?.hallwayId;
+  });
+
   public isSelected(x: number, y: number): boolean {
     const sel = this.gridSelectedTile();
     if (!sel) return false;
@@ -308,6 +375,11 @@ export class GridComponent {
     const selectedRoom = this.selectedRoomId();
     if (selectedRoom) {
       return this.grid()[y]?.[x]?.roomId === selectedRoom;
+    }
+
+    const selectedHallway = this.selectedHallwayId();
+    if (selectedHallway) {
+      return this.grid()[y]?.[x]?.hallwayId === selectedHallway;
     }
 
     return sel.x === x && sel.y === y;

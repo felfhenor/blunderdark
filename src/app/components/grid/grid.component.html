@@ -34,6 +34,20 @@
             <div class="doorway doorway-left"></div>
           }
         }
+        @if (getHallwayDoorways(colIdx, rowIdx); as hdirs) {
+          @if (hdirs.has('top')) {
+            <div class="doorway doorway-top"></div>
+          }
+          @if (hdirs.has('right')) {
+            <div class="doorway doorway-right"></div>
+          }
+          @if (hdirs.has('bottom')) {
+            <div class="doorway doorway-bottom"></div>
+          }
+          @if (hdirs.has('left')) {
+            <div class="doorway doorway-left"></div>
+          }
+        }
       </div>
     }
   }
