@@ -588,14 +588,24 @@ When multiple build modes exist (room placement, hallway build):
 
 ## Conditional Production Modifiers
 
-- `production-modifiers.ts` helper: registry-based production modifier system with time-of-day, floor depth, and biome modifiers — all data-driven from room definitions
+- `production-modifiers.ts` helper: registry-based production modifier system with time-of-day and biome modifiers — all data-driven from room definitions
 - `ProductionModifierContext`: `{ roomTypeId, floorDepth, floorBiome, hour }` — all data needed to evaluate modifiers
 - `productionModifierCalculate(context)` — multiplies all registry modifiers together, returns combined multiplier
 - `productionModifierEvaluate(context)` — returns array of active modifier results for UI display
 - Time-of-day and biome bonuses are read from `timeOfDayBonus` and `biomeBonuses` fields on `RoomDefinition` — not hardcoded
 - `productionModifierGetBiomeBonus(biome, roomTypeId)` — pure function returning multiplier (1.0 + bonus). Exported for direct use.
-- Depth: +5% per floor depth level (PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL = 0.05)
 - Production pipeline: `productionCalculateTotal(floors, hour?)` — optional `hour` param. When omitted, env modifiers = 1.0
+
+## Floor Depth Modifiers
+
+- `floor-modifiers.ts` helper: resource-specific production modifiers based on floor depth — defined in `FLOOR_MODIFIER_TIERS` config array
+- `floorModifierGet(depth)` returns `FloorDepthResourceModifier[]` for a given depth — each has `resourceType`, `percentage`, `description`
+- `floorModifierGetMultiplier(depth, resourceType)` returns the multiplier (1.0 + percentage) for a specific resource at a given depth
+- Depth modifiers are applied **per-resource** in the production pipeline (not as a generic multiplier) — this is different from time-of-day/biome which are per-room
+- Tier config: Floor 1 (+20% food, -10% corruption), Floors 2-3 (baseline), Floors 4-6 (+10% crystals/gold, +5% corruption, -15% food), Floors 7-9 (+20% crystals/gold, +10% corruption, -30% food), Floor 10 (+50% flux/essence/corruption, -50% food)
+- When adding or modifying floor depth modifiers, update `FLOOR_MODIFIER_TIERS` in `floor-modifiers.ts` — no code changes needed
+- Tests that don't test depth modifiers should use `depth: 0` (no tier match → 1.0 multiplier for all resources)
+- The old flat `PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL` (5% per depth) was removed and replaced by this per-resource system
 
 ## Research Tree YAML Conventions
 
@@ -683,6 +693,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `discord.ts` | `discord` | `DISCORD` |
 | `efficiency.ts` | `efficiency` | `EFFICIENCY` |
 | `floor.ts` | `floor` | `FLOOR` |
+| `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
 | `game-events.ts` | `gameEvent` | `GAME_EVENT` |
 | `game-init.ts` | `game` | `GAME` |
 | `game-time.ts` | `gameTime` | `GAME_TIME` |

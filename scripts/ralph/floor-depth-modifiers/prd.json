@@ -19,8 +19,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented as floorModifierGet() in floor-modifiers.ts with FLOOR_MODIFIER_TIERS config array"
     },
     {
       "id": "US-002",
@@ -35,8 +35,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Integrated into productionCalculateTotal, productionCalculateSingleRoom, and productionCalculateBreakdowns via floorModifierGetMultiplier(). Replaces old flat PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL."
     },
     {
       "id": "US-003",
@@ -52,8 +52,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added depthModifiers computed signal to PanelFloorSelectorComponent. Uses DaisyUI badge-success/badge-error for green/red coloring."
     },
     {
       "id": "US-004",
@@ -69,8 +69,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "35 tests covering all tiers, multiplier calculations, format helpers, edge cases. All passing."
     }
   ]
 }
