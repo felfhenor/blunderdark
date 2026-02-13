@@ -1,23 +1,16 @@
 export type ContentType =
   | 'abilityeffect'
   | 'combatability'
-  | 'hero'
   | 'inhabitant'
   | 'invader'
   | 'invasion'
-  | 'item'
-  | 'monster'
-  | 'pet'
   | 'reputationaction'
   | 'research'
   | 'room'
   | 'roomshape'
   | 'seasonbonus'
-  | 'stage'
   | 'synergy'
-  | 'trap'
-  | 'trinket'
-  | 'weapon';
+  | 'trap';
 
 export interface Identifiable {
   id: string;

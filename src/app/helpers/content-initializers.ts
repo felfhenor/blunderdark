@@ -4,32 +4,18 @@ import type {
   CombatAbility,
   CompositionWeightConfig,
   ContentType,
-  HeroContent,
-  HeroId,
   InhabitantDefinition,
   InvaderDefinition,
   IsContentItem,
-  ItemContent,
-  ItemId,
-  MonsterContent,
-  MonsterId,
-  PetContent,
-  PetId,
   ReputationAction,
   ResearchNode,
   RoomDefinition,
   RoomShape,
   Season,
   SeasonBonusDefinition,
-  StageContent,
-  StageId,
   StatBlock,
   SynergyDefinition,
   TrapDefinition,
-  TrinketContent,
-  TrinketId,
-  WeaponContent,
-  WeaponId,
 } from '@interfaces';
 
 // eat my ass, typescript
@@ -37,23 +23,16 @@ import type {
 const initializers: Record<ContentType, (entry: any) => any> = {
   abilityeffect: ensureAbilityEffect,
   combatability: ensureCombatAbility,
-  hero: ensureHero,
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
   invasion: ensureInvasion,
-  item: ensureItem,
-  monster: ensureMonster,
-  pet: ensurePet,
   reputationaction: ensureReputationAction,
   research: ensureResearch,
   room: ensureRoom,
   roomshape: ensureRoomShape,
   seasonbonus: ensureSeasonBonus,
-  stage: ensureStage,
   synergy: ensureSynergy,
   trap: ensureTrap,
-  trinket: ensureTrinket,
-  weapon: ensureWeapon,
 };
 
 function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
@@ -64,96 +43,6 @@ export function ensureContent<T extends IsContentItem>(content: T): T {
   const init = initializers[content.__type];
   if (!init) return content;
   return init(content) satisfies T;
-}
-
-function ensureHero(hero: Partial<HeroContent>): Required<HeroContent> {
-  return {
-    id: hero.id ?? ('UNKNOWN' as HeroId),
-    name: hero.name ?? 'UNKNOWN',
-    description: hero.description ?? 'UNKNOWN',
-    __type: 'hero',
-    sprite: hero.sprite ?? 'UNKNOWN',
-    frames: hero.frames ?? 4,
-    baseStats: ensureStats(hero.baseStats),
-    statsPerLevel: ensureStats(hero.statsPerLevel),
-    startingWeaponIds: hero.startingWeaponIds ?? [],
-  };
-}
-
-function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
-  return {
-    id: item.id ?? ('UNKNOWN' as ItemId),
-    name: item.name ?? 'UNKNOWN',
-    __type: 'item',
-    description: item.description ?? 'UNKNOWN',
-    sprite: item.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(item.baseStats),
-    statsPerLevel: ensureStats(item.statsPerLevel),
-  };
-}
-
-function ensureMonster(
-  monster: Partial<MonsterContent>,
-): Required<MonsterContent> {
-  return {
-    id: monster.id ?? ('UNKNOWN' as MonsterId),
-    name: monster.name ?? 'UNKNOWN',
-    __type: 'monster',
-    description: monster.description ?? 'UNKNOWN',
-    sprite: monster.sprite ?? 'UNKNOWN',
-    frames: monster.frames ?? 4,
-    baseStats: ensureStats(monster.baseStats),
-    statsPerLevel: ensureStats(monster.statsPerLevel),
-  };
-}
-
-function ensurePet(pet: Partial<PetContent>): Required<PetContent> {
-  return {
-    id: pet.id ?? ('UNKNOWN' as PetId),
-    name: pet.name ?? 'UNKNOWN',
-    __type: 'pet',
-    description: pet.description ?? 'UNKNOWN',
-    sprite: pet.sprite ?? 'UNKNOWN',
-    frames: pet.frames ?? 4,
-    baseStats: ensureStats(pet.baseStats),
-    statsPerLevel: ensureStats(pet.statsPerLevel),
-    itemIds: pet.itemIds ?? [],
-  };
-}
-
-function ensureStage(stage: Partial<StageContent>): Required<StageContent> {
-  return {
-    id: stage.id ?? ('UNKNOWN' as StageId),
-    name: stage.name ?? 'UNKNOWN',
-    __type: 'stage',
-    description: stage.description ?? 'UNKNOWN',
-  };
-}
-
-function ensureTrinket(
-  trinket: Partial<TrinketContent>,
-): Required<TrinketContent> {
-  return {
-    id: trinket.id ?? ('UNKNOWN' as TrinketId),
-    name: trinket.name ?? 'UNKNOWN',
-    __type: 'trinket',
-    description: trinket.description ?? 'UNKNOWN',
-    sprite: trinket.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(trinket.baseStats),
-    upgradeableStats: trinket.upgradeableStats ?? [],
-  };
-}
-
-function ensureWeapon(weapon: Partial<WeaponContent>): Required<WeaponContent> {
-  return {
-    id: weapon.id ?? ('UNKNOWN' as WeaponId),
-    name: weapon.name ?? 'UNKNOWN',
-    __type: 'weapon',
-    description: weapon.description ?? 'UNKNOWN',
-    sprite: weapon.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(weapon.baseStats),
-    upgradeableStats: weapon.upgradeableStats ?? [],
-  };
 }
 
 function ensureReputationAction(
@@ -301,9 +190,7 @@ function ensureAbilityEffect(
   };
 }
 
-function ensureCombatAbility(
-  ability: Partial<CombatAbility>,
-): CombatAbility {
+function ensureCombatAbility(ability: Partial<CombatAbility>): CombatAbility {
   return {
     id: ability.id ?? 'UNKNOWN',
     name: ability.name ?? 'UNKNOWN',
@@ -337,7 +224,14 @@ function ensureTrap(
   };
 }
 
-const defaultWeights = { warrior: 17, rogue: 17, mage: 17, cleric: 17, paladin: 16, ranger: 16 };
+const defaultWeights = {
+  warrior: 17,
+  rogue: 17,
+  mage: 17,
+  cleric: 17,
+  paladin: 16,
+  ranger: 16,
+};
 
 function ensureInvasion(
   config: Partial<CompositionWeightConfig & IsContentItem>,
