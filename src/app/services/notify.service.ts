@@ -5,7 +5,9 @@ import {
   reputationGetLevelLabel,
   notifyNotification$,
   reputationLevelUp$,
+  corruptionEffectEvent$,
 } from '@helpers';
+import type { CorruptionEffectEvent } from '@helpers/corruption-effects';
 import type { ReputationLevelUpEvent } from '@helpers/reputation';
 import type { ReputationType } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
@@ -44,6 +46,38 @@ export class NotifyService {
     reputationLevelUp$.subscribe((event: ReputationLevelUpEvent) => {
       this.showReputationLevelUp(event);
     });
+
+    corruptionEffectEvent$.subscribe((event: CorruptionEffectEvent) => {
+      this.showCorruptionEffect(event);
+    });
+  }
+
+  private showCorruptionEffect(event: CorruptionEffectEvent): void {
+    const titles: Record<CorruptionEffectEvent['type'], string> = {
+      dark_upgrade_unlocked: 'Dark Upgrades Unlocked',
+      mutation_applied: 'Corruption Mutation',
+      crusade_triggered: 'Crusade Triggered',
+    };
+
+    const title = titles[event.type];
+    this.logger.debug('Notify:CorruptionEffect', `${title} - ${event.description}`);
+
+    const isWarning = event.type === 'crusade_triggered';
+    if (isWarning) {
+      this.toast.warning(event.description, title, {
+        timeOut: 8000,
+        extendedTimeOut: 2000,
+        tapToDismiss: true,
+        progressBar: true,
+      });
+    } else {
+      this.toast.info(event.description, title, {
+        timeOut: 5000,
+        extendedTimeOut: 1000,
+        tapToDismiss: true,
+        progressBar: true,
+      });
+    }
   }
 
   private showReputationLevelUp(event: ReputationLevelUpEvent): void {

@@ -37,6 +37,7 @@ export function roomUpgradeGetAppliedEffects(
 export function roomUpgradeCanApply(
   placedRoom: PlacedRoom,
   upgradePathId: string,
+  darkUpgradeUnlocked = false,
 ): UpgradeValidation {
   if (placedRoom.appliedUpgradePathId) {
     return {
@@ -51,6 +52,13 @@ export function roomUpgradeCanApply(
     return {
       valid: false,
       reason: 'Invalid upgrade path for this room type',
+    };
+  }
+
+  if (path.requiresDarkUpgrade && !darkUpgradeUnlocked) {
+    return {
+      valid: false,
+      reason: 'Requires dark upgrades (50 Corruption)',
     };
   }
 
@@ -69,9 +77,37 @@ export function roomUpgradeApply(
 
 export function roomUpgradeGetAvailable(
   placedRoom: PlacedRoom,
+  darkUpgradeUnlocked = false,
 ): RoomUpgradePath[] {
   if (placedRoom.appliedUpgradePathId) return [];
-  return roomUpgradeGetPaths(placedRoom.roomTypeId);
+  return roomUpgradeGetPaths(placedRoom.roomTypeId).filter(
+    (p) => !p.requiresDarkUpgrade || darkUpgradeUnlocked,
+  );
+}
+
+export type VisibleUpgrade = {
+  path: RoomUpgradePath;
+  locked: boolean;
+  lockReason?: string;
+};
+
+/**
+ * Returns all upgrade paths for a room with lock status.
+ * Dark upgrades are visible but locked until corruption >= 50.
+ */
+export function roomUpgradeGetVisible(
+  placedRoom: PlacedRoom,
+  darkUpgradeUnlocked = false,
+): VisibleUpgrade[] {
+  if (placedRoom.appliedUpgradePathId) return [];
+  return roomUpgradeGetPaths(placedRoom.roomTypeId).map((path) => {
+    const locked = !!path.requiresDarkUpgrade && !darkUpgradeUnlocked;
+    return {
+      path,
+      locked,
+      lockReason: locked ? 'Requires 50 Corruption' : undefined,
+    };
+  });
 }
 
 /**

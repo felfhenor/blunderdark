@@ -127,6 +127,22 @@
         - type: secondaryProduction
           value: 0.2
           resource: flux
+    - id: 60431433-92ba-43c7-ad45-fb6b5aecb271
+      name: Corrupted Vein
+      description: Infuse the mine with dark energy. Crystal output doubles, but the corruption taints everything nearby.
+      requiresDarkUpgrade: true
+      cost:
+        crystals: 100
+        essence: 30
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: crystals
+        - type: secondaryProduction
+          value: 0.3
+          resource: corruption
+        - type: fearIncrease
+          value: 1
 
 - id: 7fb314ad-a447-469f-82df-4b8c68f9deff
   name: Mushroom Grove
@@ -179,6 +195,22 @@
         gold: 45
       effects:
         - type: fearReduction
+          value: 1
+    - id: 339a23a7-3753-4052-a388-6b7941e7c458
+      name: Blighted Growth
+      description: Corrupt the fungi with dark spores. Massively boosts food output but produces corruption and unsettles nearby inhabitants.
+      requiresDarkUpgrade: true
+      cost:
+        gold: 70
+        essence: 25
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: food
+        - type: secondaryProduction
+          value: 0.2
+          resource: corruption
+        - type: fearIncrease
           value: 1
 
 - id: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
@@ -248,6 +280,26 @@
           resource: research
         - type: fearIncrease
           value: 2
+    - id: 995465fb-aeda-468e-8e30-682b54064847
+      name: Necronomicon Wing
+      description: Open the sealed forbidden section. Triples research output and generates essence, but the eldritch knowledge spreads corruption and dread.
+      requiresDarkUpgrade: true
+      cost:
+        gold: 150
+        crystals: 100
+        essence: 50
+      effects:
+        - type: productionMultiplier
+          value: 3.0
+          resource: research
+        - type: secondaryProduction
+          value: 0.3
+          resource: essence
+        - type: secondaryProduction
+          value: 0.4
+          resource: corruption
+        - type: fearIncrease
+          value: 2
 
 - id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   name: Soul Well
@@ -309,6 +361,23 @@
           resource: essence
         - type: fearReduction
           value: 1
+    - id: a8710392-9176-41ff-a458-249277acd8ad
+      name: Abyssal Conduit
+      description: Tear open a rift to the abyss. The well becomes a conduit for raw dark power, massively boosting essence but flooding the area with corruption and terror.
+      requiresDarkUpgrade: true
+      cost:
+        gold: 140
+        crystals: 90
+        essence: 60
+      effects:
+        - type: productionMultiplier
+          value: 2.5
+          resource: essence
+        - type: secondaryProduction
+          value: 0.6
+          resource: corruption
+        - type: fearIncrease
+          value: 2
 
 - id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge

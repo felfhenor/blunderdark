@@ -21,6 +21,7 @@ export type RoomUpgradePath = {
   cost: ResourceCost;
   effects: RoomUpgradeEffect[];
   upgradeLevel?: number;
+  requiresDarkUpgrade?: boolean;
 };
 
 export type RoomDefinition = {

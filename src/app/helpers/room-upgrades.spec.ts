@@ -21,6 +21,7 @@ const {
   roomUpgradeCanApply,
   roomUpgradeApply,
   roomUpgradeGetAvailable,
+  roomUpgradeGetVisible,
   roomUpgradeGetEffectiveMaxInhabitants,
 } = await import('@helpers/room-upgrades');
 
@@ -55,6 +56,15 @@ const specializationPath: RoomUpgradePath = {
   ],
 };
 
+const darkUpgradePath: RoomUpgradePath = {
+  id: 'upgrade-dark',
+  name: 'Corrupted Vein',
+  description: 'Dark corruption doubles crystal output.',
+  cost: { crystals: 100, essence: 30 },
+  effects: [{ type: 'productionMultiplier', value: 2.0, resource: 'crystals' }],
+  requiresDarkUpgrade: true,
+};
+
 const crystalMineRoom: RoomDefinition & IsContentItem = {
   id: CRYSTAL_MINE_ID,
   name: 'Crystal Mine',
@@ -72,7 +82,7 @@ const crystalMineRoom: RoomDefinition & IsContentItem = {
   fearLevel: 1,
   fearReductionAura: 0,
   autoPlace: false,
-  upgradePaths: [efficiencyPath, capacityPath, specializationPath],
+  upgradePaths: [efficiencyPath, capacityPath, specializationPath, darkUpgradePath],
 };
 
 function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
@@ -96,10 +106,11 @@ beforeEach(() => {
 describe('roomUpgradeGetPaths', () => {
   it('should return upgrade paths for a valid room type', () => {
     const paths = roomUpgradeGetPaths(CRYSTAL_MINE_ID);
-    expect(paths).toHaveLength(3);
+    expect(paths).toHaveLength(4);
     expect(paths[0].name).toBe('Deep Vein Extraction');
     expect(paths[1].name).toBe('Expanded Tunnels');
     expect(paths[2].name).toBe('Crystal Resonance');
+    expect(paths[3].name).toBe('Corrupted Vein');
   });
 
   it('should return empty array for unknown room type', () => {
@@ -224,10 +235,29 @@ describe('roomUpgradeGetAppliedEffects', () => {
 });
 
 describe('roomUpgradeGetAvailable', () => {
-  it('should return all paths for a room with no upgrade', () => {
+  it('should return non-dark paths when dark upgrades not unlocked', () => {
     const room = createPlacedRoom();
     const available = roomUpgradeGetAvailable(room);
     expect(available).toHaveLength(3);
+    expect(available.every((p) => !p.requiresDarkUpgrade)).toBe(true);
+  });
+
+  it('should return all paths when dark upgrades are unlocked', () => {
+    const room = createPlacedRoom();
+    const available = roomUpgradeGetAvailable(room, true);
+    expect(available).toHaveLength(4);
+  });
+
+  it('should exclude dark upgrades by default', () => {
+    const room = createPlacedRoom();
+    const available = roomUpgradeGetAvailable(room);
+    expect(available.find((p) => p.id === 'upgrade-dark')).toBeUndefined();
+  });
+
+  it('should include dark upgrades when unlocked', () => {
+    const room = createPlacedRoom();
+    const available = roomUpgradeGetAvailable(room, true);
+    expect(available.find((p) => p.id === 'upgrade-dark')).toBeDefined();
   });
 
   it('should return empty array for a room with an upgrade applied', () => {
@@ -242,6 +272,66 @@ describe('roomUpgradeGetAvailable', () => {
     const room = createPlacedRoom({ roomTypeId: 'nonexistent' });
     const available = roomUpgradeGetAvailable(room);
     expect(available).toEqual([]);
+  });
+});
+
+describe('roomUpgradeGetVisible', () => {
+  it('should return all paths including dark ones with lock status', () => {
+    const room = createPlacedRoom();
+    const visible = roomUpgradeGetVisible(room);
+    expect(visible).toHaveLength(4);
+  });
+
+  it('should mark dark upgrades as locked when not unlocked', () => {
+    const room = createPlacedRoom();
+    const visible = roomUpgradeGetVisible(room);
+    const darkEntry = visible.find((v) => v.path.id === 'upgrade-dark');
+    expect(darkEntry).toBeDefined();
+    expect(darkEntry!.locked).toBe(true);
+    expect(darkEntry!.lockReason).toBe('Requires 50 Corruption');
+  });
+
+  it('should mark dark upgrades as unlocked when dark upgrades enabled', () => {
+    const room = createPlacedRoom();
+    const visible = roomUpgradeGetVisible(room, true);
+    const darkEntry = visible.find((v) => v.path.id === 'upgrade-dark');
+    expect(darkEntry).toBeDefined();
+    expect(darkEntry!.locked).toBe(false);
+    expect(darkEntry!.lockReason).toBeUndefined();
+  });
+
+  it('should mark non-dark upgrades as unlocked regardless', () => {
+    const room = createPlacedRoom();
+    const visible = roomUpgradeGetVisible(room);
+    const normalEntries = visible.filter((v) => !v.path.requiresDarkUpgrade);
+    expect(normalEntries.every((v) => !v.locked)).toBe(true);
+  });
+
+  it('should return empty array for room with upgrade applied', () => {
+    const room = createPlacedRoom({ appliedUpgradePathId: 'upgrade-efficiency' });
+    const visible = roomUpgradeGetVisible(room);
+    expect(visible).toEqual([]);
+  });
+});
+
+describe('dark upgrade gating in roomUpgradeCanApply', () => {
+  it('should reject dark upgrade when not unlocked', () => {
+    const room = createPlacedRoom();
+    const result = roomUpgradeCanApply(room, 'upgrade-dark');
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Requires dark upgrades (50 Corruption)');
+  });
+
+  it('should allow dark upgrade when unlocked', () => {
+    const room = createPlacedRoom();
+    const result = roomUpgradeCanApply(room, 'upgrade-dark', true);
+    expect(result.valid).toBe(true);
+  });
+
+  it('should still allow normal upgrades without dark flag', () => {
+    const room = createPlacedRoom();
+    const result = roomUpgradeCanApply(room, 'upgrade-efficiency');
+    expect(result.valid).toBe(true);
   });
 });
 
