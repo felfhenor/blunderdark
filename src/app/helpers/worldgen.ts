@@ -2,6 +2,7 @@ import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
 import { altarRoomAutoPlace } from '@helpers/altar-room';
 import {
+  defaultCorruptionEffectState,
   defaultFloor,
   defaultInvasionSchedule,
   defaultReputationState,
@@ -46,6 +47,7 @@ export async function worldgenGenerateWorld(): Promise<
     trapInventory: [],
     trapCraftingQueues: [],
     invasionSchedule: defaultInvasionSchedule(),
+    corruptionEffects: defaultCorruptionEffectState(),
     didFinish: true,
   };
 }

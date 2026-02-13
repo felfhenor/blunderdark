@@ -49,32 +49,48 @@ export const altarRoomHas = computed<boolean>(() => {
 
 /**
  * Auto-place all rooms with autoPlace: true on a floor during world generation.
- * Places each room at the center of the grid.
+ * Places each room at the center of the grid, falling back to adjacent offsets
+ * if the center is already occupied.
  */
 export function altarRoomAutoPlace(floor: Floor): Floor {
   const roomDefs = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
-  const altarRoomAutoPlace = roomDefs.filter((r) => r.autoPlace);
+  const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
 
   let floorCurrent = floor;
 
-  for (const roomDef of altarRoomAutoPlace) {
+  for (const roomDef of autoPlaceRooms) {
     const shape = contentGetEntry<RoomShape & IsContentItem>(roomDef.shapeId);
     if (!shape) continue;
 
-    const anchorX = Math.floor((GRID_SIZE - shape.width) / 2);
-    const anchorY = Math.floor((GRID_SIZE - shape.height) / 2);
+    const centerX = Math.floor((GRID_SIZE - shape.width) / 2);
+    const centerY = Math.floor((GRID_SIZE - shape.height) / 2);
 
-    const placedRoom: PlacedRoom = {
-      id: rngUuid(),
-      roomTypeId: roomDef.id,
-      shapeId: roomDef.shapeId,
-      anchorX,
-      anchorY,
-    };
+    // Try center first, then adjacent offsets
+    const offsets = [
+      { x: 0, y: 0 },
+      { x: shape.width, y: 0 },
+      { x: -shape.width, y: 0 },
+      { x: 0, y: shape.height },
+      { x: 0, y: -shape.height },
+    ];
 
-    const updated = roomPlacementPlaceOnFloor(floorCurrent, placedRoom, shape);
-    if (updated) {
-      floorCurrent = updated;
+    for (const offset of offsets) {
+      const anchorX = centerX + offset.x;
+      const anchorY = centerY + offset.y;
+
+      const placedRoom: PlacedRoom = {
+        id: rngUuid(),
+        roomTypeId: roomDef.id,
+        shapeId: roomDef.shapeId,
+        anchorX,
+        anchorY,
+      };
+
+      const updated = roomPlacementPlaceOnFloor(floorCurrent, placedRoom, shape);
+      if (updated) {
+        floorCurrent = updated;
+        break;
+      }
     }
   }
 

@@ -639,6 +639,22 @@
           value: 0.2
           resource: research
 
+- id: b3a7c1e9-5f82-4d6a-a1c3-9e4b2d7f8a05
+  name: Gold Vein
+  description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
+  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  cost: {}
+  production:
+    gold: 0.4
+  requiresWorkers: false
+  autoPlace: true
+  isUnique: true
+  removable: true
+  maxInhabitants: 0
+  fearLevel: 0
+  adjacencyBonuses: []
+  upgradePaths: []
+
 - id: 6d638daa-6e43-4569-a931-eb4710009da9
   name: Trap Workshop
   description: A compact 2x2 crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
