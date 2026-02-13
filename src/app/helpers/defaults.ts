@@ -80,7 +80,10 @@ export function defaultResearchState(): ResearchState {
  * @param depth Floor depth (defaults to 1)
  * @param biome Floor biome (defaults to 'neutral')
  */
-export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floor {
+export function defaultFloor(
+  depth = 1,
+  biome: Floor['biome'] = 'neutral',
+): Floor {
   return {
     id: rngUuid(),
     name: `Floor ${depth}`,
@@ -118,8 +121,8 @@ export function defaultCorruptionEffectState(): CorruptionEffectState {
 export function defaultResources(): ResourceMap {
   return {
     crystals: { current: 0, max: 500 },
-    food: { current: 0, max: 500 },
-    gold: { current: 0, max: 1000 },
+    food: { current: 50, max: 500 },
+    gold: { current: 100, max: 1000 },
     flux: { current: 0, max: 200 },
     research: { current: 0, max: 300 },
     essence: { current: 0, max: 200 },
