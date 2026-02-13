@@ -205,7 +205,7 @@
 .room-label {
   position: absolute;
   bottom: calc(100% + 2px);
-  left: 50%;
+  left: calc(50% + var(--room-center-offset, 0px));
   transform: translateX(-50%);
   font-size: 11px;
   font-weight: 700;
@@ -229,31 +229,18 @@
   pointer-events: auto;
 }
 
-.assignment-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 0 3px;
-  border-radius: 3px;
-  line-height: 14px;
-  pointer-events: none;
-  z-index: 2;
-  white-space: nowrap;
+.assignment-inline {
+  font-weight: 400;
 
   &.status-full {
-    background-color: oklch(var(--su));
-    color: oklch(var(--suc, 0.9 0.05 145));
+    color: oklch(var(--su));
   }
 
   &.status-partial {
-    background-color: oklch(var(--wa));
-    color: oklch(var(--wac, 0.9 0.05 80));
+    color: oklch(var(--wa));
   }
 
   &.status-empty {
-    background-color: oklch(var(--er));
-    color: oklch(var(--erc, 0.9 0.05 25));
+    color: oklch(var(--er));
   }
 }

@@ -150,22 +150,40 @@ export class GridComponent {
 
   private roomLabelTileMap = computed(() => {
     const grid = this.grid();
-    const map = new Map<string, string>();
+    const anchorMap = new Map<string, string>();
+    const tilesMap = new Map<string, { minX: number; maxX: number; anchorX: number }>();
 
     for (let x = 0; x < grid[0]?.length; x++) {
       for (let y = 0; y < grid.length; y++) {
         const roomId = grid[y][x].roomId;
-        if (roomId && !map.has(roomId)) {
-          map.set(roomId, `${x},${y}`);
+        if (!roomId) continue;
+
+        if (!anchorMap.has(roomId)) {
+          anchorMap.set(roomId, `${x},${y}`);
+          tilesMap.set(roomId, { minX: x, maxX: x, anchorX: x });
+        } else {
+          const entry = tilesMap.get(roomId)!;
+          if (x < entry.minX) entry.minX = x;
+          if (x > entry.maxX) entry.maxX = x;
         }
       }
     }
-    return map;
+    return { anchorMap, tilesMap };
   });
 
   public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {
     if (!roomId) return false;
-    return this.roomLabelTileMap().get(roomId) === `${x},${y}`;
+    return this.roomLabelTileMap().anchorMap.get(roomId) === `${x},${y}`;
+  }
+
+  public getRoomLabelOffset(roomId: string | undefined): string {
+    if (!roomId) return '0px';
+    const entry = this.roomLabelTileMap().tilesMap.get(roomId);
+    if (!entry) return '0px';
+    const centerX = (entry.minX + entry.maxX) / 2;
+    const offsetTiles = centerX - entry.anchorX;
+    // Each tile is 64px + 1px gap
+    return `${offsetTiles * 65}px`;
   }
 
 
