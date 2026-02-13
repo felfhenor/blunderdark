@@ -30,8 +30,11 @@ type RosterEntry = {
   roomName: string | undefined;
 };
 
+import { TippyDirective } from '@ngneat/helipopper';
+
 @Component({
   selector: 'app-panel-roster',
+  imports: [TippyDirective],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

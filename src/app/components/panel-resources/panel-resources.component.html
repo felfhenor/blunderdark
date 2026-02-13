@@ -220,7 +220,7 @@
         class="badge badge-xs"
         [class.badge-success]="isPositiveModifier(mod)"
         [class.badge-error]="!isPositiveModifier(mod)"
-        [title]="mod.description"
+        [tp]="mod.description"
       >
         {{ formatMultiplier(mod) }} {{ getResourceLabel(mod.resourceType) }}
       </span>
@@ -230,7 +230,7 @@
         class="badge badge-xs"
         [class.badge-success]="isPositiveModifier(mod)"
         [class.badge-error]="!isPositiveModifier(mod)"
-        [title]="mod.description"
+        [tp]="mod.description"
       >
         {{ formatMultiplier(mod) }} {{ mod.creatureType }}
       </span>

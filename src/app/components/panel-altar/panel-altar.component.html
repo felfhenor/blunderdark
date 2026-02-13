@@ -35,7 +35,7 @@
             <button
               class="btn btn-sm btn-primary mt-1"
               [disabled]="!canAffordUpgrade()"
-              [title]="canAffordUpgrade() ? 'Apply upgrade' : 'Insufficient resources'"
+              [tp]="canAffordUpgrade() ? 'Apply upgrade' : 'Insufficient resources'"
               (click)="onUpgrade()"
             >
               Upgrade to {{ upgrade.name }}
@@ -90,7 +90,7 @@
                   @if (entry.def.traits.length > 0) {
                     <div class="flex flex-wrap gap-1 mb-1">
                       @for (trait of entry.def.traits; track trait.id) {
-                        <span class="badge badge-xs badge-outline" [title]="trait.description">
+                        <span class="badge badge-xs badge-outline" [tp]="trait.description">
                           {{ trait.name }}
                         </span>
                       }
@@ -110,7 +110,7 @@
                   <button
                     class="btn btn-xs btn-primary w-full"
                     [disabled]="!entry.affordable || rosterFull()"
-                    [title]="getDisabledReason(entry)"
+                    [tp]="getDisabledReason(entry)"
                     (click)="onRecruit(entry.def)"
                   >
                     Recruit

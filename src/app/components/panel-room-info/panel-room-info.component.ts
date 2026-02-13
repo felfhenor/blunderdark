@@ -27,11 +27,12 @@ import {
   FEAR_LEVEL_MAX,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [SweetAlert2Module, HungerIndicatorComponent],
+  imports: [SweetAlert2Module, HungerIndicatorComponent, TippyDirective],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

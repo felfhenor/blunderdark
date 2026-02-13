@@ -26,6 +26,7 @@ import type {
   ResourceType,
   RoomUpgradePath,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 type RecruitableEntry = {
   def: InhabitantDefinition & IsContentItem;
@@ -37,6 +38,7 @@ type RecruitableEntry = {
 
 @Component({
   selector: 'app-panel-altar',
+  imports: [TippyDirective],
   templateUrl: './panel-altar.component.html',
   styleUrl: './panel-altar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -24,7 +24,7 @@
         <button
           class="btn btn-sm btn-success w-full"
           [disabled]="!hallwayPlacementCanAfford()"
-          [title]="hallwayPlacementCanAfford() ? 'Confirm hallway construction' : 'Insufficient Crystals'"
+          [tp]="hallwayPlacementCanAfford() ? 'Confirm hallway construction' : 'Insufficient Crystals'"
           (click)="confirmHallway()"
         >
           Confirm
@@ -35,7 +35,7 @@
     @if (selectedId()) {
       <button
         class="btn btn-sm btn-outline w-full"
-        title="Rotate placement (R key or Right-click)"
+        [tp]="'Rotate placement (R key or Right-click)'"
         (click)="rotate()"
       >
         Rotate (R)
@@ -54,7 +54,7 @@
           [class.room-unaffordable]="!isAffordable(room)"
           [class.room-biome-restricted]="isBiomeRestricted(room)"
           [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || isBiomeRestricted(room) || !hasAltar()"
-          [title]="isBiomeRestricted(room) ? getBiomeRestrictionTooltip(room) : isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
+          [tp]="isBiomeRestricted(room) ? getBiomeRestrictionTooltip(room) : isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">

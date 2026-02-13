@@ -24,9 +24,11 @@ import {
   roomPlacementSelectedTypeId,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-room-select',
+  imports: [TippyDirective],
   templateUrl: './panel-room-select.component.html',
   styleUrl: './panel-room-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

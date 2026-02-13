@@ -45,15 +45,15 @@
 
             <div class="flex items-center justify-between mt-0.5">
               <div class="stats-row">
-                <span class="stat-item" title="HP">{{ entry.def.stats.hp }}</span>
-                <span class="stat-item" title="ATK">{{ entry.def.stats.attack }}</span>
-                <span class="stat-item" title="DEF">{{ entry.def.stats.defense }}</span>
-                <span class="stat-item" title="SPD">{{ entry.def.stats.speed }}</span>
+                <span class="stat-item" [tp]="'HP'">{{ entry.def.stats.hp }}</span>
+                <span class="stat-item" [tp]="'ATK'">{{ entry.def.stats.attack }}</span>
+                <span class="stat-item" [tp]="'DEF'">{{ entry.def.stats.defense }}</span>
+                <span class="stat-item" [tp]="'SPD'">{{ entry.def.stats.speed }}</span>
                 <span
                   class="stat-item"
                   [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
                   [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
-                  title="Worker Efficiency"
+                  [tp]="'Worker Efficiency'"
                 >{{ entry.def.stats.workerEfficiency.toFixed(1) }}x</span>
               </div>
             </div>
@@ -61,7 +61,7 @@
             @if (entry.def.traits.length > 0) {
               <div class="flex flex-wrap gap-0.5 mt-0.5">
                 @for (trait of entry.def.traits; track trait.id) {
-                  <span class="badge badge-xs badge-outline opacity-70" [title]="trait.description">
+                  <span class="badge badge-xs badge-outline opacity-70" [tp]="trait.description">
                     {{ trait.name }}
                   </span>
                 }
