@@ -7,6 +7,81 @@
   grid-template-columns: repeat(20, 64px);
   grid-template-rows: repeat(20, 64px);
   gap: 1px;
+  position: relative;
+
+  // --- Corruption visual effects ---
+  // Medium (50-99): Subtle dark tinting on dungeon edges
+  &[data-corruption="medium"] {
+    box-shadow: inset 0 0 40px 10px oklch(0.2 0.15 300 / 0.3);
+
+    .grid-tile:not(.room-tile):not(.occupied) {
+      background-color: oklch(0.18 0.04 300);
+    }
+  }
+
+  // High (100-199): Purple veins on tiles
+  &[data-corruption="high"] {
+    box-shadow: inset 0 0 60px 20px oklch(0.2 0.2 300 / 0.5);
+
+    .grid-tile:not(.room-tile):not(.occupied) {
+      background-color: oklch(0.16 0.06 300);
+    }
+
+    .grid-tile {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 70%,
+          oklch(0.3 0.2 300 / 0.15) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+    }
+  }
+
+  // Critical (200+): Heavy corruption overlay, pulsing effects
+  &[data-corruption="critical"] {
+    box-shadow: inset 0 0 80px 30px oklch(0.15 0.25 300 / 0.6);
+    animation: corruption-pulse 3s ease-in-out infinite;
+
+    .grid-tile:not(.room-tile):not(.occupied) {
+      background-color: oklch(0.14 0.08 300);
+    }
+
+    .grid-tile {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            circle at 20% 80%,
+            oklch(0.25 0.25 300 / 0.2) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            oklch(0.25 0.2 320 / 0.15) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+    }
+  }
+}
+
+@keyframes corruption-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 80px 30px oklch(0.15 0.25 300 / 0.6);
+  }
+  50% {
+    box-shadow: inset 0 0 100px 40px oklch(0.2 0.3 300 / 0.7);
+  }
 }
 
 .grid-container.hallway-mode .grid-tile {

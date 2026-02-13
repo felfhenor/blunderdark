@@ -21,6 +21,7 @@ import {
   gridSelectedTile,
   gridSelectTile,
   roomPlacementUpdatePreviewPosition,
+  corruptionLevel,
 } from '@helpers';
 import { gridCreateEmpty } from '@helpers/grid';
 
@@ -72,6 +73,7 @@ export class GridComponent {
   public grid = computed(() => floorCurrent()?.grid ?? gridCreateEmpty());
   public gridSelectedTile = gridSelectedTile;
   public roomPlacementPreview = roomPlacementPreview;
+  public corruptionLevel = corruptionLevel;
 
   private roomInfoMap = computed(() => {
     const floor = floorCurrent();

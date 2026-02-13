@@ -1,4 +1,4 @@
-<div class="grid-container" [class.hallway-mode]="isHallwayMode()" (mouseleave)="onGridLeave()" (contextmenu)="onRightClick($event)">
+<div class="grid-container" [class.hallway-mode]="isHallwayMode()" [attr.data-corruption]="corruptionLevel()" (mouseleave)="onGridLeave()" (contextmenu)="onRightClick($event)">
   @for (row of grid(); track rowIdx; let rowIdx = $index) {
     @for (tile of row; track colIdx; let colIdx = $index) {
       <div
