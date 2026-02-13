@@ -583,7 +583,7 @@ When multiple build modes exist (room placement, hallway build):
 - `stateModifierIsInhabitantScared(inhabitant, roomFearLevel)`: scared when fear > tolerance. `STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT = 2`
 - `stateModifierGet(definitionId, state)`: returns creature-specific modifier or fallback default
 - `stateModifierCalculatePerCreatureProduction(assignedInhabitants)`: averages per-creature production multipliers (replaces old flat state multiplication)
-- Default fallbacks match old behavior: normal=1.0, scared=0.5, hungry=0.75 — creatures without YAML data get these
+- Default fallbacks: normal=1.0, scared=0.5, hungry=0.5, starving=0.1 — creatures without YAML data get these
 - Fear tolerance values: Slime=0, Goblin=1, Myconid=1, Kobold=2, Skeleton=4, Dragon=4, Lich=4, Demon Lord=4
 
 ## Conditional Production Modifiers
@@ -635,6 +635,22 @@ When multiple build modes exist (room placement, hallway build):
 - Gamedata content type `'seasonbonus'` with YAML at `gamedata/seasonbonus/base.yml` — 4 entries (one per season)
 - When mocking `gamestate()` in tests that call `recruitmentRecruit()`, the mock must include `world.season.currentSeason` — use a season with 1.0 recruitment multiplier (e.g., 'harvest') to avoid affecting existing cost assertions
 - File-to-prefix: `season-bonuses.ts` → `seasonBonus` / `SEASON_BONUS`
+
+## Hunger System
+
+- `hunger.ts` helper: tick-based food consumption and hunger state management
+- File-to-prefix: `hunger.ts` → `hunger` / `HUNGER`
+- `foodConsumptionRate` on `InhabitantDefinition` is in "food per game-hour" units — converted to per-tick via `rate / HUNGER_TICKS_PER_HOUR` (300 ticks/hour)
+- `hungerProcess(state)` runs each tick BEFORE `productionProcess(state)` so production penalties apply immediately
+- Inappetent inhabitants (`foodConsumptionRate <= 0`) are always 'normal' — Skeleton and Lich are inappetent (undead don't eat)
+- Hunger state transition: normal → hungry (30 game-minutes without food) → starving (60 game-minutes)
+- Recovery rate: 2 ticks of hunger recovered per tick when food is available (faster recovery than degradation)
+- Scared state is preserved — hunger system only overrides 'normal', 'hungry', 'starving' states
+- `floor.inhabitants` and `world.inhabitants` are SEPARATE copies — hunger system must sync state changes to both via `hungerSyncFloorInhabitants(state)` using a Map lookup
+- `hungerGetWarningLevel(foodCurrent, totalConsumptionPerTick)` is a pure function for testability — the RxJS Subject/Observable pattern for warnings doesn't work reliably in Vitest when the module is loaded with vi.mock'd dependencies
+- `InhabitantState` union includes `'starving'` — added alongside the existing `'normal' | 'scared' | 'hungry'`
+- `STATE_MODIFIER_DEFAULTS` in `state-modifiers.ts` includes `starving: { productionMultiplier: 0.1, foodConsumptionMultiplier: 0.5 }`
+- When adding optional fields to `InhabitantInstance` (like `hungerTicksWithoutFood`), update `inhabitantDeserialize()` to provide defaults via `??`
 
 ## Research Tree YAML Conventions
 
@@ -731,6 +747,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `grid.ts` | `grid` | `GRID` |
 | `hallway-placement.ts` | `hallwayPlacement` | `HALLWAY_PLACEMENT` |
 | `hallways.ts` | `hallway` | `HALLWAY` |
+| `hunger.ts` | `hunger` | `HUNGER` |
 | `icons.ts` | `icon` | `ICON` |
 | `inhabitants.ts` | `inhabitant` | `INHABITANT` |
 | `invaders.ts` | `invader` | `INVADER` |
