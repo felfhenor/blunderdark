@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented as FEAR_LEVEL_NONE/LOW/MEDIUM/HIGH/VERY_HIGH constants and FEAR_LEVEL_LABELS record in fear-level.ts. fearLevelGetLabel() returns human-readable labels. Exported via @helpers barrel (project convention for helper types)."
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Room YAML already has fearLevel field. Added fearModifier to InhabitantDefinition and all 8 inhabitants in base.yml. fearLevelCalculateInhabitantModifier sums modifiers, fearLevelCalculateEffective clamps to [0,4]. Also accounts for upgrade adjustments and altar aura reduction."
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "fearLevelBreakdownMap computed signal provides per-room FearLevelBreakdown derived from gamestate(). fearLevelRoomMap provides simplified roomId->effectiveFear for pathfinding. Both auto-update when gamestate changes (inhabitant assignment triggers signal cascade)."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added fear display section to panel-room-info with DaisyUI progress bar, color-coded label (opacity-50/success/warning/orange-400/error), and breakdown showing base, inhabitant modifier, upgrade adjustment, and altar aura reduction when any modifier is non-zero."
     }
   ]
 }

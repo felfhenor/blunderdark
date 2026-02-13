@@ -686,6 +686,21 @@ When adding build-time validation for a content type:
 - Restriction rules reference room names (strings) not IDs — if a room name changes in YAML, the restriction map must be updated too
 - Rooms that don't exist yet (e.g., Torture Chamber) are excluded from restriction rules until they're added to gamedata
 
+## Fear Level System
+
+- `fear-level.ts` helper: per-room effective fear calculation with breakdown (base, inhabitant modifier, upgrade adjustment, altar aura reduction)
+- File-to-prefix: `fear-level.ts` → `fearLevel` / `FEAR_LEVEL`
+- `fearModifier` on `InhabitantDefinition` — positive values increase room fear (Skeleton=1, Dragon=2, Lich=1, Demon Lord=2), negative values decrease it (Myconid=-1), zero for common workers (Goblin, Kobold, Slime)
+- `FearLevelBreakdown` type: `{ baseFear, inhabitantModifier, upgradeAdjustment, altarAuraReduction, effectiveFear }` — all components of the fear calculation
+- `fearLevelBreakdownMap` computed signal returns `Map<string, FearLevelBreakdown>` for all rooms across all floors — reads `gamestate()` so it auto-updates
+- `fearLevelRoomMap` computed signal returns simplified `Map<string, number>` (roomId → effectiveFear) — for pathfinding consumption
+- Fear is clamped to [0, 4]: None(0), Low(1), Medium(2), High(3), Very High(4)
+- Room YAML already had `fearLevel` field (number | 'variable') — 'variable' resolves via `throneRoomGetFearLevel()`
+- Upgrade effects: `fearReduction` (negative adjustment) and `fearIncrease` (positive adjustment) from `roomUpgradeGetAppliedEffects()`
+- Altar aura reduction only applies to rooms adjacent to the Altar — uses `altarRoomIsAdjacent()` and `altarRoomGetFearReductionAura()`
+- Fear is derived state (computed from existing gamestate), NOT stored as a new field — no migration needed
+- Dependencies: `@helpers/content`, `@helpers/room-upgrades`, `@helpers/altar-room`, `@helpers/throne-room`, `@helpers/state-game`, `@helpers/production` — no circular deps
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -738,6 +753,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `defaults.ts` | `default` | `DEFAULT` |
 | `discord.ts` | `discord` | `DISCORD` |
 | `efficiency.ts` | `efficiency` | `EFFICIENCY` |
+| `fear-level.ts` | `fearLevel` | `FEAR_LEVEL` |
 | `floor.ts` | `floor` | `FLOOR` |
 | `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
 | `game-events.ts` | `gameEvent` | `GAME_EVENT` |
