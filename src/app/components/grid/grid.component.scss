@@ -12,7 +12,7 @@
 
   // --- Corruption visual effects ---
   // Medium (50-99): Subtle dark tinting on dungeon edges
-  &[data-corruption="medium"] {
+  &.corruption-medium {
     box-shadow: inset 0 0 40px 10px oklch(0.2 0.15 300 / 0.3);
 
     .grid-tile:not(.room-tile):not(.occupied) {
@@ -21,7 +21,7 @@
   }
 
   // High (100-199): Purple veins on tiles
-  &[data-corruption="high"] {
+  &.corruption-high {
     box-shadow: inset 0 0 60px 20px oklch(0.2 0.2 300 / 0.5);
 
     .grid-tile:not(.room-tile):not(.occupied) {
@@ -45,7 +45,7 @@
   }
 
   // Critical (200+): Heavy corruption overlay, pulsing effects
-  &[data-corruption="critical"] {
+  &.corruption-critical {
     box-shadow: inset 0 0 80px 30px oklch(0.15 0.25 300 / 0.6);
     animation: corruption-pulse 3s ease-in-out infinite;
 
