@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import {
-  allContentById,
-  allIdsByName,
+  contentAllById,
+  contentAllIdsByName,
   ensureContent,
-  setAllContentById,
-  setAllIdsByName,
+  contentSetAllById,
+  contentSetAllIdsByName,
 } from '@helpers';
 import type { ContentType, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
@@ -98,8 +98,8 @@ export class ContentService {
   }
 
   private unfurlAssets(assets: Record<string, IsContentItem[]>) {
-    const allIdsByNameAssets: Map<string, string> = allIdsByName();
-    const allEntriesByIdAssets: Map<string, IsContentItem> = allContentById();
+    const allIdsByNameAssets: Map<string, string> = contentAllIdsByName();
+    const allEntriesByIdAssets: Map<string, IsContentItem> = contentAllById();
 
     Object.keys(assets).forEach((subtype) => {
       Object.values(assets[subtype]).forEach((entry) => {
@@ -133,7 +133,7 @@ export class ContentService {
       });
     });
 
-    setAllIdsByName(allIdsByNameAssets);
-    setAllContentById(allEntriesByIdAssets);
+    contentSetAllIdsByName(allIdsByNameAssets);
+    contentSetAllById(allEntriesByIdAssets);
   }
 }

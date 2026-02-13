@@ -1,5 +1,5 @@
-import { createEmptyGrid, setTile } from '@helpers/grid';
-import { findHallwayPath } from '@helpers/hallway-placement';
+import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
+import { hallwayPlacementFindPath } from '@helpers/hallway-placement';
 import type { GridState, GridTile } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -16,23 +16,23 @@ function roomTile(roomId: string): GridTile {
 function makeGridWithRooms(
   rooms: Array<{ id: string; tiles: Array<{ x: number; y: number }> }>,
 ): GridState {
-  let grid = createEmptyGrid();
+  let grid = gridCreateEmpty();
   for (const room of rooms) {
     for (const t of room.tiles) {
-      grid = setTile(grid, t.x, t.y, roomTile(room.id));
+      grid = gridSetTile(grid, t.x, t.y, roomTile(room.id));
     }
   }
   return grid;
 }
 
-describe('findHallwayPath', () => {
+describe('hallwayPlacementFindPath', () => {
   it('should find a straight path between two adjacent rooms with a gap', () => {
     const grid = makeGridWithRooms([
       { id: 'room-a', tiles: [{ x: 2, y: 5 }, { x: 3, y: 5 }] },
       { id: 'room-b', tiles: [{ x: 6, y: 5 }, { x: 7, y: 5 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeDefined();
     expect(path!.length).toBe(2);
     expect(path![0]).toEqual({ x: 4, y: 5 });
@@ -45,7 +45,7 @@ describe('findHallwayPath', () => {
       { id: 'room-b', tiles: [{ x: 5, y: 5 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeDefined();
     expect(path!.length).toBe(1);
     expect(path![0]).toEqual({ x: 4, y: 5 });
@@ -57,7 +57,7 @@ describe('findHallwayPath', () => {
       { id: 'room-b', tiles: [{ x: 4, y: 5 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeDefined();
     // Path routes through empty tiles adjacent to both rooms
     expect(path!.length).toBeGreaterThanOrEqual(2);
@@ -68,7 +68,7 @@ describe('findHallwayPath', () => {
       { id: 'room-a', tiles: [{ x: 3, y: 5 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-a');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-a');
     expect(path).toBeUndefined();
   });
 
@@ -83,7 +83,7 @@ describe('findHallwayPath', () => {
       },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeUndefined();
   });
 
@@ -100,7 +100,7 @@ describe('findHallwayPath', () => {
       { id: 'wall', tiles: wallTiles },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeDefined();
     expect(path!.length).toBeGreaterThan(2);
     // Path should go through the gap at (4,3)
@@ -112,7 +112,7 @@ describe('findHallwayPath', () => {
       { id: 'room-b', tiles: [{ x: 6, y: 5 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeUndefined();
   });
 
@@ -122,7 +122,7 @@ describe('findHallwayPath', () => {
       { id: 'room-b', tiles: [{ x: 3, y: 0 }] },
     ]);
 
-    const path = findHallwayPath(grid, 'room-a', 'room-b');
+    const path = hallwayPlacementFindPath(grid, 'room-a', 'room-b');
     expect(path).toBeDefined();
     expect(path!.length).toBe(2);
   });

@@ -3,20 +3,20 @@ import { GRID_SIZE } from '@interfaces/grid';
 import { describe, expect, it } from 'vitest';
 
 import {
-  createEmptyGrid,
-  deselectTile,
-  getTile,
-  isInBounds,
-  resetGrid,
-  selectedTile,
-  selectTile,
-  setTile,
+  gridCreateEmpty,
+  gridDeselectTile,
+  gridGetTile,
+  gridIsInBounds,
+  gridReset,
+  gridSelectedTile,
+  gridSelectTile,
+  gridSetTile,
 } from '@helpers/grid';
 
 describe('Grid Helpers', () => {
-  describe('createEmptyGrid', () => {
+  describe('gridCreateEmpty', () => {
     it('should create a 20x20 grid', () => {
-      const grid = createEmptyGrid();
+      const grid = gridCreateEmpty();
       expect(grid.length).toBe(GRID_SIZE);
       for (const row of grid) {
         expect(row.length).toBe(GRID_SIZE);
@@ -24,7 +24,7 @@ describe('Grid Helpers', () => {
     });
 
     it('should create tiles that are all unoccupied', () => {
-      const grid = createEmptyGrid();
+      const grid = gridCreateEmpty();
       for (const row of grid) {
         for (const tile of row) {
           expect(tile.occupied).toBe(false);
@@ -35,28 +35,28 @@ describe('Grid Helpers', () => {
     });
   });
 
-  describe('isInBounds', () => {
+  describe('gridIsInBounds', () => {
     it('should return true for valid coordinates', () => {
-      expect(isInBounds(0, 0)).toBe(true);
-      expect(isInBounds(19, 19)).toBe(true);
-      expect(isInBounds(10, 10)).toBe(true);
+      expect(gridIsInBounds(0, 0)).toBe(true);
+      expect(gridIsInBounds(19, 19)).toBe(true);
+      expect(gridIsInBounds(10, 10)).toBe(true);
     });
 
     it('should return false for negative coordinates', () => {
-      expect(isInBounds(-1, 0)).toBe(false);
-      expect(isInBounds(0, -1)).toBe(false);
+      expect(gridIsInBounds(-1, 0)).toBe(false);
+      expect(gridIsInBounds(0, -1)).toBe(false);
     });
 
     it('should return false for coordinates >= GRID_SIZE', () => {
-      expect(isInBounds(20, 0)).toBe(false);
-      expect(isInBounds(0, 20)).toBe(false);
+      expect(gridIsInBounds(20, 0)).toBe(false);
+      expect(gridIsInBounds(0, 20)).toBe(false);
     });
   });
 
-  describe('getTile', () => {
+  describe('gridGetTile', () => {
     it('should return the correct tile', () => {
-      const grid = createEmptyGrid();
-      const tile = getTile(grid, 5, 10);
+      const grid = gridCreateEmpty();
+      const tile = gridGetTile(grid, 5, 10);
       expect(tile).toEqual({
         occupied: false,
         occupiedBy: 'empty',
@@ -67,16 +67,16 @@ describe('Grid Helpers', () => {
     });
 
     it('should return undefined for out-of-bounds coordinates', () => {
-      const grid = createEmptyGrid();
-      expect(getTile(grid, -1, 0)).toBeUndefined();
-      expect(getTile(grid, 0, 20)).toBeUndefined();
-      expect(getTile(grid, 25, 25)).toBeUndefined();
+      const grid = gridCreateEmpty();
+      expect(gridGetTile(grid, -1, 0)).toBeUndefined();
+      expect(gridGetTile(grid, 0, 20)).toBeUndefined();
+      expect(gridGetTile(grid, 25, 25)).toBeUndefined();
     });
   });
 
-  describe('setTile', () => {
+  describe('gridSetTile', () => {
     it('should return a new grid with the updated tile', () => {
-      const grid = createEmptyGrid();
+      const grid = gridCreateEmpty();
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
@@ -85,14 +85,14 @@ describe('Grid Helpers', () => {
         connectionType: 'door',
       };
 
-      const newGrid = setTile(grid, 3, 7, newTile);
+      const newGrid = gridSetTile(grid, 3, 7, newTile);
 
       expect(newGrid).not.toBe(grid);
-      expect(getTile(newGrid, 3, 7)).toEqual(newTile);
+      expect(gridGetTile(newGrid, 3, 7)).toEqual(newTile);
     });
 
     it('should not modify the original grid', () => {
-      const grid = createEmptyGrid();
+      const grid = gridCreateEmpty();
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
@@ -101,13 +101,13 @@ describe('Grid Helpers', () => {
         connectionType: undefined,
       };
 
-      setTile(grid, 3, 7, newTile);
+      gridSetTile(grid, 3, 7, newTile);
 
-      expect(getTile(grid, 3, 7)?.occupied).toBe(false);
+      expect(gridGetTile(grid, 3, 7)?.occupied).toBe(false);
     });
 
     it('should return the same grid for out-of-bounds coordinates', () => {
-      const grid = createEmptyGrid();
+      const grid = gridCreateEmpty();
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
@@ -116,14 +116,14 @@ describe('Grid Helpers', () => {
         connectionType: undefined,
       };
 
-      const result = setTile(grid, -1, 0, newTile);
+      const result = gridSetTile(grid, -1, 0, newTile);
       expect(result).toBe(grid);
     });
   });
 
-  describe('resetGrid', () => {
+  describe('gridReset', () => {
     it('should produce an empty grid', () => {
-      const grid = resetGrid();
+      const grid = gridReset();
       expect(grid.length).toBe(GRID_SIZE);
       for (const row of grid) {
         for (const tile of row) {
@@ -133,32 +133,32 @@ describe('Grid Helpers', () => {
     });
   });
 
-  describe('selectedTile', () => {
+  describe('gridSelectedTile', () => {
     it('should toggle selection when clicking the same tile', () => {
-      selectTile(5, 5);
-      expect(selectedTile()).toEqual({ x: 5, y: 5 });
+      gridSelectTile(5, 5);
+      expect(gridSelectedTile()).toEqual({ x: 5, y: 5 });
 
-      selectTile(5, 5);
-      expect(selectedTile()).toBeUndefined();
+      gridSelectTile(5, 5);
+      expect(gridSelectedTile()).toBeUndefined();
     });
 
     it('should change selection to a different tile', () => {
-      selectTile(5, 5);
-      selectTile(10, 10);
-      expect(selectedTile()).toEqual({ x: 10, y: 10 });
+      gridSelectTile(5, 5);
+      gridSelectTile(10, 10);
+      expect(gridSelectedTile()).toEqual({ x: 10, y: 10 });
     });
 
     it('should deselect tile', () => {
-      selectTile(5, 5);
-      deselectTile();
-      expect(selectedTile()).toBeUndefined();
+      gridSelectTile(5, 5);
+      gridDeselectTile();
+      expect(gridSelectedTile()).toBeUndefined();
     });
   });
 
   describe('serialization round-trip', () => {
     it('should survive JSON round-trip', () => {
-      const grid = createEmptyGrid();
-      const modified = setTile(grid, 2, 3, {
+      const grid = gridCreateEmpty();
+      const modified = gridSetTile(grid, 2, 3, {
         occupied: true,
         occupiedBy: 'room',
         roomId: 'test-room',

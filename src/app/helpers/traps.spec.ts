@@ -21,10 +21,10 @@ const FEAR_GLYPH_ID = 'aa800001-0001-0001-0001-000000000005';
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -160,17 +160,17 @@ function makeTrapInstance(
 // --- Import after mocks ---
 
 import {
-  addToTrapInventory,
-  applyTrapTrigger,
-  canPlaceTrap,
-  getTrapAtTile,
-  getTrapInventoryCount,
-  getTrapsInHallway,
-  getTrapsOnFloor,
-  placeTrap,
-  removeFromTrapInventory,
-  removeTrap,
-  rollTrapTrigger,
+  trapAddToInventory,
+  trapApplyTrigger,
+  trapCanPlace,
+  trapGetAtTile,
+  trapGetInventoryCount,
+  trapGetInHallway,
+  trapGetOnFloor,
+  trapPlace,
+  trapRemoveFromInventory,
+  trapRemove,
+  trapRollTrigger,
 } from '@helpers/traps';
 
 // --- Tests ---
@@ -185,9 +185,9 @@ beforeEach(() => {
 });
 
 describe('Trap Inventory', () => {
-  describe('addToTrapInventory', () => {
+  describe('trapAddToInventory', () => {
     it('should add a new trap type to empty inventory', () => {
-      const result = addToTrapInventory([], PIT_TRAP_ID, 2);
+      const result = trapAddToInventory([], PIT_TRAP_ID, 2);
       expect(result).toEqual([{ trapTypeId: PIT_TRAP_ID, count: 2 }]);
     });
 
@@ -195,31 +195,31 @@ describe('Trap Inventory', () => {
       const inventory: TrapInventoryEntry[] = [
         { trapTypeId: PIT_TRAP_ID, count: 3 },
       ];
-      const result = addToTrapInventory(inventory, PIT_TRAP_ID, 2);
+      const result = trapAddToInventory(inventory, PIT_TRAP_ID, 2);
       expect(result).toEqual([{ trapTypeId: PIT_TRAP_ID, count: 5 }]);
     });
 
     it('should default to adding 1', () => {
-      const result = addToTrapInventory([], ARROW_TRAP_ID);
+      const result = trapAddToInventory([], ARROW_TRAP_ID);
       expect(result).toEqual([{ trapTypeId: ARROW_TRAP_ID, count: 1 }]);
     });
 
     it('should handle multiple trap types', () => {
       let inv: TrapInventoryEntry[] = [];
-      inv = addToTrapInventory(inv, PIT_TRAP_ID, 2);
-      inv = addToTrapInventory(inv, ARROW_TRAP_ID, 3);
+      inv = trapAddToInventory(inv, PIT_TRAP_ID, 2);
+      inv = trapAddToInventory(inv, ARROW_TRAP_ID, 3);
       expect(inv).toHaveLength(2);
-      expect(getTrapInventoryCount(inv, PIT_TRAP_ID)).toBe(2);
-      expect(getTrapInventoryCount(inv, ARROW_TRAP_ID)).toBe(3);
+      expect(trapGetInventoryCount(inv, PIT_TRAP_ID)).toBe(2);
+      expect(trapGetInventoryCount(inv, ARROW_TRAP_ID)).toBe(3);
     });
   });
 
-  describe('removeFromTrapInventory', () => {
+  describe('trapRemoveFromInventory', () => {
     it('should decrement count', () => {
       const inventory: TrapInventoryEntry[] = [
         { trapTypeId: PIT_TRAP_ID, count: 3 },
       ];
-      const result = removeFromTrapInventory(inventory, PIT_TRAP_ID, 1);
+      const result = trapRemoveFromInventory(inventory, PIT_TRAP_ID, 1);
       expect(result).toEqual([{ trapTypeId: PIT_TRAP_ID, count: 2 }]);
     });
 
@@ -227,7 +227,7 @@ describe('Trap Inventory', () => {
       const inventory: TrapInventoryEntry[] = [
         { trapTypeId: PIT_TRAP_ID, count: 1 },
       ];
-      const result = removeFromTrapInventory(inventory, PIT_TRAP_ID, 1);
+      const result = trapRemoveFromInventory(inventory, PIT_TRAP_ID, 1);
       expect(result).toEqual([]);
     });
 
@@ -235,32 +235,32 @@ describe('Trap Inventory', () => {
       const inventory: TrapInventoryEntry[] = [
         { trapTypeId: PIT_TRAP_ID, count: 1 },
       ];
-      const result = removeFromTrapInventory(inventory, PIT_TRAP_ID, 5);
+      const result = trapRemoveFromInventory(inventory, PIT_TRAP_ID, 5);
       expect(result).toBeUndefined();
     });
 
     it('should return null if trap type not in inventory', () => {
-      const result = removeFromTrapInventory([], PIT_TRAP_ID, 1);
+      const result = trapRemoveFromInventory([], PIT_TRAP_ID, 1);
       expect(result).toBeUndefined();
     });
   });
 
-  describe('getTrapInventoryCount', () => {
+  describe('trapGetInventoryCount', () => {
     it('should return 0 for missing trap type', () => {
-      expect(getTrapInventoryCount([], PIT_TRAP_ID)).toBe(0);
+      expect(trapGetInventoryCount([], PIT_TRAP_ID)).toBe(0);
     });
 
     it('should return correct count', () => {
       const inv: TrapInventoryEntry[] = [
         { trapTypeId: RUNE_TRAP_ID, count: 7 },
       ];
-      expect(getTrapInventoryCount(inv, RUNE_TRAP_ID)).toBe(7);
+      expect(trapGetInventoryCount(inv, RUNE_TRAP_ID)).toBe(7);
     });
   });
 });
 
 describe('Trap Placement', () => {
-  describe('canPlaceTrap', () => {
+  describe('trapCanPlace', () => {
     it('should allow placement on hallway tile', () => {
       const grid = makeGrid();
       grid[2][2] = makeTile({
@@ -270,13 +270,13 @@ describe('Trap Placement', () => {
       });
       const floor = makeFloor({ grid });
 
-      const result = canPlaceTrap(floor, 2, 2);
+      const result = trapCanPlace(floor, 2, 2);
       expect(result.canPlace).toBe(true);
     });
 
     it('should reject placement on empty tile', () => {
       const floor = makeFloor();
-      const result = canPlaceTrap(floor, 2, 2);
+      const result = trapCanPlace(floor, 2, 2);
       expect(result.canPlace).toBe(false);
       expect(result.reason).toContain('hallway');
     });
@@ -290,7 +290,7 @@ describe('Trap Placement', () => {
       });
       const floor = makeFloor({ grid });
 
-      const result = canPlaceTrap(floor, 2, 2);
+      const result = trapCanPlace(floor, 2, 2);
       expect(result.canPlace).toBe(false);
       expect(result.reason).toContain('hallway');
     });
@@ -305,20 +305,20 @@ describe('Trap Placement', () => {
       const existingTrap = makeTrapInstance({ tileX: 2, tileY: 2 });
       const floor = makeFloor({ grid, traps: [existingTrap] });
 
-      const result = canPlaceTrap(floor, 2, 2);
+      const result = trapCanPlace(floor, 2, 2);
       expect(result.canPlace).toBe(false);
       expect(result.reason).toContain('already exists');
     });
 
     it('should reject out-of-bounds coordinates', () => {
       const floor = makeFloor();
-      const result = canPlaceTrap(floor, 99, 99);
+      const result = trapCanPlace(floor, 99, 99);
       expect(result.canPlace).toBe(false);
       expect(result.reason).toContain('Invalid');
     });
   });
 
-  describe('placeTrap', () => {
+  describe('trapPlace', () => {
     it('should place a trap on a valid hallway tile', () => {
       const grid = makeGrid();
       grid[3][1] = makeTile({
@@ -328,7 +328,7 @@ describe('Trap Placement', () => {
       });
       const floor = makeFloor({ grid });
 
-      const result = placeTrap(floor, PIT_TRAP_ID, 1, 3);
+      const result = trapPlace(floor, PIT_TRAP_ID, 1, 3);
       expect(result).toBeDefined();
       expect(result!.trap.trapTypeId).toBe(PIT_TRAP_ID);
       expect(result!.trap.hallwayId).toBe('h-1');
@@ -341,7 +341,7 @@ describe('Trap Placement', () => {
 
     it('should return null for invalid placement', () => {
       const floor = makeFloor();
-      const result = placeTrap(floor, PIT_TRAP_ID, 0, 0);
+      const result = trapPlace(floor, PIT_TRAP_ID, 0, 0);
       expect(result).toBeUndefined();
     });
 
@@ -354,7 +354,7 @@ describe('Trap Placement', () => {
       });
       const floor = makeFloor({ grid });
 
-      const result = placeTrap(floor, 'nonexistent-id', 0, 0);
+      const result = trapPlace(floor, 'nonexistent-id', 0, 0);
       expect(result).toBeUndefined();
     });
 
@@ -367,17 +367,17 @@ describe('Trap Placement', () => {
       });
       const floor = makeFloor({ grid });
 
-      const result = placeTrap(floor, ARROW_TRAP_ID, 0, 0);
+      const result = trapPlace(floor, ARROW_TRAP_ID, 0, 0);
       expect(result!.trap.remainingCharges).toBe(5); // Arrow Trap has 5 charges
     });
   });
 
-  describe('removeTrap', () => {
+  describe('trapRemove', () => {
     it('should remove a trap and return it', () => {
       const trap = makeTrapInstance({ id: 'trap-to-remove' });
       const floor = makeFloor({ traps: [trap] });
 
-      const result = removeTrap(floor, 'trap-to-remove');
+      const result = trapRemove(floor, 'trap-to-remove');
       expect(result).toBeDefined();
       expect(result!.trap.id).toBe('trap-to-remove');
       expect(result!.floor.traps).toHaveLength(0);
@@ -385,7 +385,7 @@ describe('Trap Placement', () => {
 
     it('should return null for non-existent trap', () => {
       const floor = makeFloor();
-      const result = removeTrap(floor, 'nonexistent');
+      const result = trapRemove(floor, 'nonexistent');
       expect(result).toBeUndefined();
     });
 
@@ -394,7 +394,7 @@ describe('Trap Placement', () => {
       const trap2 = makeTrapInstance({ id: 'trap-2', tileX: 1, tileY: 1 });
       const floor = makeFloor({ traps: [trap1, trap2] });
 
-      const result = removeTrap(floor, 'trap-1');
+      const result = trapRemove(floor, 'trap-1');
       expect(result!.floor.traps).toHaveLength(1);
       expect(result!.floor.traps[0].id).toBe('trap-2');
     });
@@ -402,11 +402,11 @@ describe('Trap Placement', () => {
 });
 
 describe('Trap Trigger', () => {
-  describe('rollTrapTrigger', () => {
+  describe('trapRollTrigger', () => {
     it('should trigger when roll is below trigger chance', () => {
       const trap = makeTrapInstance({ trapTypeId: PIT_TRAP_ID });
       // Pit Trap has 80% trigger chance; roll 0.5 < 0.8 → triggers
-      const result = rollTrapTrigger(trap, false, 0.5);
+      const result = trapRollTrigger(trap, false, 0.5);
       expect(result.triggered).toBe(true);
       expect(result.damage).toBe(15);
       expect(result.effectType).toBe('physical');
@@ -417,20 +417,20 @@ describe('Trap Trigger', () => {
     it('should not trigger when roll exceeds trigger chance', () => {
       const trap = makeTrapInstance({ trapTypeId: PIT_TRAP_ID });
       // Pit Trap has 80% trigger chance; roll 0.9 >= 0.8 → fails
-      const result = rollTrapTrigger(trap, false, 0.9);
+      const result = trapRollTrigger(trap, false, 0.9);
       expect(result.triggered).toBe(false);
       expect(result.damage).toBe(0);
     });
 
     it('should not trigger when trap is disarmed', () => {
       const trap = makeTrapInstance({ isArmed: false });
-      const result = rollTrapTrigger(trap, false, 0.1);
+      const result = trapRollTrigger(trap, false, 0.1);
       expect(result.triggered).toBe(false);
     });
 
     it('should not trigger when no charges remain', () => {
       const trap = makeTrapInstance({ remainingCharges: 0 });
-      const result = rollTrapTrigger(trap, false, 0.1);
+      const result = trapRollTrigger(trap, false, 0.1);
       expect(result.triggered).toBe(false);
     });
 
@@ -439,7 +439,7 @@ describe('Trap Trigger', () => {
         trapTypeId: PIT_TRAP_ID,
         remainingCharges: 1,
       });
-      const result = rollTrapTrigger(trap, false, 0.1);
+      const result = trapRollTrigger(trap, false, 0.1);
       expect(result.triggered).toBe(true);
       expect(result.trapDestroyed).toBe(true);
     });
@@ -449,7 +449,7 @@ describe('Trap Trigger', () => {
         trapTypeId: PIT_TRAP_ID,
         remainingCharges: 3,
       });
-      const result = rollTrapTrigger(trap, false, 0.1);
+      const result = trapRollTrigger(trap, false, 0.1);
       expect(result.triggered).toBe(true);
       expect(result.trapDestroyed).toBe(false);
     });
@@ -458,7 +458,7 @@ describe('Trap Trigger', () => {
       it('should allow rogue to disarm with low roll', () => {
         const trap = makeTrapInstance({ trapTypeId: PIT_TRAP_ID });
         // Rogue disarm chance is 60%; roll 0.3 < 0.6 → disarmed
-        const result = rollTrapTrigger(trap, true, 0.3);
+        const result = trapRollTrigger(trap, true, 0.3);
         expect(result.triggered).toBe(false);
         expect(result.disarmed).toBe(true);
       });
@@ -467,7 +467,7 @@ describe('Trap Trigger', () => {
         const trap = makeTrapInstance({ trapTypeId: PIT_TRAP_ID });
         // Rogue disarm: roll 0.65 >= 0.6 → not disarmed
         // Trigger: roll 0.65 < 0.8 → triggers
-        const result = rollTrapTrigger(trap, true, 0.65);
+        const result = trapRollTrigger(trap, true, 0.65);
         expect(result.triggered).toBe(true);
         expect(result.disarmed).toBe(false);
       });
@@ -475,7 +475,7 @@ describe('Trap Trigger', () => {
       it('should NOT allow rogue to disarm Rune Trap (canBeDisarmed: false)', () => {
         const trap = makeTrapInstance({ trapTypeId: RUNE_TRAP_ID });
         // Rune Trap has canBeDisarmed: false; roll 0.1 should still trigger
-        const result = rollTrapTrigger(trap, true, 0.1);
+        const result = trapRollTrigger(trap, true, 0.1);
         expect(result.triggered).toBe(true);
         expect(result.disarmed).toBe(false);
         expect(result.effectType).toBe('magic');
@@ -485,7 +485,7 @@ describe('Trap Trigger', () => {
     describe('Fear Glyph morale penalty', () => {
       it('should apply morale penalty for Fear Glyph', () => {
         const trap = makeTrapInstance({ trapTypeId: FEAR_GLYPH_ID });
-        const result = rollTrapTrigger(trap, false, 0.1);
+        const result = trapRollTrigger(trap, false, 0.1);
         expect(result.triggered).toBe(true);
         expect(result.moralePenalty).toBe(10);
         expect(result.damage).toBe(8);
@@ -493,7 +493,7 @@ describe('Trap Trigger', () => {
 
       it('should not apply morale penalty for non-fear traps', () => {
         const trap = makeTrapInstance({ trapTypeId: PIT_TRAP_ID });
-        const result = rollTrapTrigger(trap, false, 0.1);
+        const result = trapRollTrigger(trap, false, 0.1);
         expect(result.moralePenalty).toBe(0);
       });
     });
@@ -501,7 +501,7 @@ describe('Trap Trigger', () => {
     describe('Trap effect types', () => {
       it('Arrow Trap: physical damage, no duration', () => {
         const trap = makeTrapInstance({ trapTypeId: ARROW_TRAP_ID });
-        const result = rollTrapTrigger(trap, false, 0.1);
+        const result = trapRollTrigger(trap, false, 0.1);
         expect(result.triggered).toBe(true);
         expect(result.damage).toBe(20);
         expect(result.effectType).toBe('physical');
@@ -510,7 +510,7 @@ describe('Trap Trigger', () => {
 
       it('Rune Trap: magic damage', () => {
         const trap = makeTrapInstance({ trapTypeId: RUNE_TRAP_ID });
-        const result = rollTrapTrigger(trap, false, 0.1);
+        const result = trapRollTrigger(trap, false, 0.1);
         expect(result.triggered).toBe(true);
         expect(result.damage).toBe(25);
         expect(result.effectType).toBe('magic');
@@ -518,7 +518,7 @@ describe('Trap Trigger', () => {
 
       it('Magic Trap: debuff with duration', () => {
         const trap = makeTrapInstance({ trapTypeId: MAGIC_TRAP_ID });
-        const result = rollTrapTrigger(trap, false, 0.1);
+        const result = trapRollTrigger(trap, false, 0.1);
         expect(result.triggered).toBe(true);
         expect(result.damage).toBe(0);
         expect(result.effectType).toBe('debuff');
@@ -527,100 +527,100 @@ describe('Trap Trigger', () => {
     });
   });
 
-  describe('applyTrapTrigger', () => {
+  describe('trapApplyTrigger', () => {
     it('should decrement charges on trigger', () => {
       const trap = makeTrapInstance({ id: 'trap-1', remainingCharges: 3 });
       const floor = makeFloor({ traps: [trap] });
-      const result = { triggered: true, disarmed: false, trapDestroyed: false } as ReturnType<typeof rollTrapTrigger>;
+      const result = { triggered: true, disarmed: false, trapDestroyed: false } as ReturnType<typeof trapRollTrigger>;
 
-      const updated = applyTrapTrigger(floor, 'trap-1', result);
+      const updated = trapApplyTrigger(floor, 'trap-1', result);
       expect(updated.traps[0].remainingCharges).toBe(2);
     });
 
     it('should remove trap when destroyed', () => {
       const trap = makeTrapInstance({ id: 'trap-1', remainingCharges: 1 });
       const floor = makeFloor({ traps: [trap] });
-      const result = { triggered: true, disarmed: false, trapDestroyed: true } as ReturnType<typeof rollTrapTrigger>;
+      const result = { triggered: true, disarmed: false, trapDestroyed: true } as ReturnType<typeof trapRollTrigger>;
 
-      const updated = applyTrapTrigger(floor, 'trap-1', result);
+      const updated = trapApplyTrigger(floor, 'trap-1', result);
       expect(updated.traps).toHaveLength(0);
     });
 
     it('should remove trap when disarmed', () => {
       const trap = makeTrapInstance({ id: 'trap-1' });
       const floor = makeFloor({ traps: [trap] });
-      const result = { triggered: false, disarmed: true, trapDestroyed: false } as ReturnType<typeof rollTrapTrigger>;
+      const result = { triggered: false, disarmed: true, trapDestroyed: false } as ReturnType<typeof trapRollTrigger>;
 
-      const updated = applyTrapTrigger(floor, 'trap-1', result);
+      const updated = trapApplyTrigger(floor, 'trap-1', result);
       expect(updated.traps).toHaveLength(0);
     });
 
     it('should not modify floor when trigger failed', () => {
       const trap = makeTrapInstance({ id: 'trap-1' });
       const floor = makeFloor({ traps: [trap] });
-      const result = { triggered: false, disarmed: false, trapDestroyed: false } as ReturnType<typeof rollTrapTrigger>;
+      const result = { triggered: false, disarmed: false, trapDestroyed: false } as ReturnType<typeof trapRollTrigger>;
 
-      const updated = applyTrapTrigger(floor, 'trap-1', result);
+      const updated = trapApplyTrigger(floor, 'trap-1', result);
       expect(updated).toBe(floor); // Same reference, no changes
     });
 
     it('should not modify floor for non-existent trap', () => {
       const floor = makeFloor();
-      const result = { triggered: true, disarmed: false, trapDestroyed: false } as ReturnType<typeof rollTrapTrigger>;
+      const result = { triggered: true, disarmed: false, trapDestroyed: false } as ReturnType<typeof trapRollTrigger>;
 
-      const updated = applyTrapTrigger(floor, 'nonexistent', result);
+      const updated = trapApplyTrigger(floor, 'nonexistent', result);
       expect(updated).toBe(floor);
     });
   });
 });
 
 describe('Query Helpers', () => {
-  describe('getTrapsOnFloor', () => {
+  describe('trapGetOnFloor', () => {
     it('should return all traps on the floor', () => {
       const traps = [
         makeTrapInstance({ id: 'trap-1' }),
         makeTrapInstance({ id: 'trap-2' }),
       ];
       const floor = makeFloor({ traps });
-      expect(getTrapsOnFloor(floor)).toHaveLength(2);
+      expect(trapGetOnFloor(floor)).toHaveLength(2);
     });
 
     it('should return empty array for floor with no traps', () => {
       const floor = makeFloor();
-      expect(getTrapsOnFloor(floor)).toHaveLength(0);
+      expect(trapGetOnFloor(floor)).toHaveLength(0);
     });
   });
 
-  describe('getTrapAtTile', () => {
+  describe('trapGetAtTile', () => {
     it('should find trap at specific tile', () => {
       const trap = makeTrapInstance({ tileX: 3, tileY: 4 });
       const floor = makeFloor({ traps: [trap] });
-      const found = getTrapAtTile(floor, 3, 4);
+      const found = trapGetAtTile(floor, 3, 4);
       expect(found).toBeDefined();
       expect(found!.tileX).toBe(3);
     });
 
     it('should return undefined for empty tile', () => {
       const floor = makeFloor();
-      expect(getTrapAtTile(floor, 0, 0)).toBeUndefined();
+      expect(trapGetAtTile(floor, 0, 0)).toBeUndefined();
     });
   });
 
-  describe('getTrapsInHallway', () => {
+  describe('trapGetInHallway', () => {
     it('should return traps for specific hallway', () => {
       const trap1 = makeTrapInstance({ id: 'trap-1', hallwayId: 'h-1' });
       const trap2 = makeTrapInstance({ id: 'trap-2', hallwayId: 'h-2' });
       const trap3 = makeTrapInstance({ id: 'trap-3', hallwayId: 'h-1' });
       const floor = makeFloor({ traps: [trap1, trap2, trap3] });
 
-      const result = getTrapsInHallway(floor, 'h-1');
+      const result = trapGetInHallway(floor, 'h-1');
       expect(result).toHaveLength(2);
       expect(result.map((t) => t.id)).toEqual(['trap-1', 'trap-3']);
     });
 
     it('should return empty array for hallway with no traps', () => {
       const floor = makeFloor();
-      expect(getTrapsInHallway(floor, 'h-1')).toHaveLength(0);
+      expect(trapGetInHallway(floor, 'h-1')).toHaveLength(0);
     });
   });
 });

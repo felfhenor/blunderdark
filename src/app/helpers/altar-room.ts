@@ -1,15 +1,15 @@
 import { computed } from '@angular/core';
-import { areRoomsAdjacent } from '@helpers/adjacency';
-import { getEntriesByType, getEntry } from '@helpers/content';
-import { canAfford, payCost } from '@helpers/resources';
-import { placeRoomOnFloor } from '@helpers/room-placement';
-import { findRoomIdByRole } from '@helpers/room-roles';
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
+import { roomRoleFindById } from '@helpers/room-roles';
 import { rngUuid } from '@helpers/rng';
-import { getAbsoluteTiles } from '@helpers/room-shapes';
+import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 import {
-  applyUpgrade,
-  getAppliedUpgradeEffects,
-  getUpgradePaths,
+  roomUpgradeApply,
+  roomUpgradeGetAppliedEffects,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -25,10 +25,10 @@ import { GRID_SIZE } from '@interfaces/grid';
 /**
  * Find the placed Altar Room across all floors.
  */
-export function findAltarRoom(
+export function altarRoomFind(
   floors: Floor[],
 ): { floor: Floor; room: PlacedRoom } | undefined {
-  const altarId = findRoomIdByRole('altar');
+  const altarId = roomRoleFindById('altar');
   if (!altarId) return undefined;
 
   for (const floor of floors) {
@@ -43,22 +43,22 @@ export function findAltarRoom(
 /**
  * Reactive signal: whether the Altar Room is placed.
  */
-export const hasAltarRoom = computed<boolean>(() => {
-  return findAltarRoom(gamestate().world.floors) !== undefined;
+export const altarRoomHas = computed<boolean>(() => {
+  return altarRoomFind(gamestate().world.floors) !== undefined;
 });
 
 /**
  * Auto-place all rooms with autoPlace: true on a floor during world generation.
  * Places each room at the center of the grid.
  */
-export function autoPlaceRooms(floor: Floor): Floor {
-  const roomDefs = getEntriesByType<RoomDefinition & IsContentItem>('room');
-  const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
+export function altarRoomAutoPlace(floor: Floor): Floor {
+  const roomDefs = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const altarRoomAutoPlace = roomDefs.filter((r) => r.autoPlace);
 
-  let currentFloor = floor;
+  let floorCurrent = floor;
 
-  for (const roomDef of autoPlaceRooms) {
-    const shape = getEntry<RoomShape & IsContentItem>(roomDef.shapeId);
+  for (const roomDef of altarRoomAutoPlace) {
+    const shape = contentGetEntry<RoomShape & IsContentItem>(roomDef.shapeId);
     if (!shape) continue;
 
     const anchorX = Math.floor((GRID_SIZE - shape.width) / 2);
@@ -72,29 +72,29 @@ export function autoPlaceRooms(floor: Floor): Floor {
       anchorY,
     };
 
-    const updated = placeRoomOnFloor(currentFloor, placedRoom, shape);
+    const updated = roomPlacementPlaceOnFloor(floorCurrent, placedRoom, shape);
     if (updated) {
-      currentFloor = updated;
+      floorCurrent = updated;
     }
   }
 
-  return currentFloor;
+  return floorCurrent;
 }
 
 /**
  * Get the Altar Room's current level (1 = base, 2 = Empowered, 3 = Ascendant).
  * Uses upgradeLevel field from upgrade path definitions.
  */
-export function getAltarLevel(floors: Floor[]): number {
-  const altar = findAltarRoom(floors);
+export function altarRoomGetLevel(floors: Floor[]): number {
+  const altar = altarRoomFind(floors);
   if (!altar) return 0;
 
   if (!altar.room.appliedUpgradePathId) return 1;
 
-  const altarId = findRoomIdByRole('altar');
+  const altarId = roomRoleFindById('altar');
   if (!altarId) return 1;
 
-  const paths = getUpgradePaths(altarId);
+  const paths = roomUpgradeGetPaths(altarId);
   const appliedPath = paths.find((p) => p.id === altar.room.appliedUpgradePathId);
   if (appliedPath?.upgradeLevel) return appliedPath.upgradeLevel;
 
@@ -106,23 +106,23 @@ export function getAltarLevel(floors: Floor[]): number {
 /**
  * Reactive signal for the Altar's current level.
  */
-export const altarLevel = computed<number>(() => {
-  return getAltarLevel(gamestate().world.floors);
+export const altarRoomLevel = computed<number>(() => {
+  return altarRoomGetLevel(gamestate().world.floors);
 });
 
 /**
  * Get the next available upgrade for the Altar Room.
  * Returns undefined if fully upgraded or no Altar exists.
  */
-export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | undefined {
-  const altar = findAltarRoom(floors);
+export function altarRoomGetNextUpgrade(floors: Floor[]): RoomUpgradePath | undefined {
+  const altar = altarRoomFind(floors);
   if (!altar) return undefined;
 
-  const altarId = findRoomIdByRole('altar');
+  const altarId = roomRoleFindById('altar');
   if (!altarId) return undefined;
 
-  const currentLevel = getAltarLevel(floors);
-  const paths = getUpgradePaths(altarId);
+  const currentLevel = altarRoomGetLevel(floors);
+  const paths = roomUpgradeGetPaths(altarId);
 
   const nextLevel = currentLevel + 1;
   // Find the path matching the next upgrade level
@@ -139,39 +139,39 @@ export function getNextAltarUpgrade(floors: Floor[]): RoomUpgradePath | undefine
 /**
  * Apply the next upgrade to the Altar Room.
  */
-export async function applyAltarUpgrade(
+export async function altarRoomApplyUpgrade(
   upgradePathId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const state = gamestate();
-  const altar = findAltarRoom(state.world.floors);
+  const altar = altarRoomFind(state.world.floors);
   if (!altar) return { success: false, error: 'No Altar found' };
 
-  const altarId = findRoomIdByRole('altar');
+  const altarId = roomRoleFindById('altar');
   if (!altarId) return { success: false, error: 'No Altar type found' };
 
-  const paths = getUpgradePaths(altarId);
+  const paths = roomUpgradeGetPaths(altarId);
   const path = paths.find((p) => p.id === upgradePathId);
   if (!path) return { success: false, error: 'Invalid upgrade path' };
 
   // Validate level ordering
-  const currentLevel = getAltarLevel(state.world.floors);
+  const currentLevel = altarRoomGetLevel(state.world.floors);
   const targetLevel = path.upgradeLevel ?? (paths.indexOf(path) + 2);
   if (targetLevel !== currentLevel + 1) {
     return { success: false, error: `Altar must be Level ${targetLevel - 1} to apply this upgrade` };
   }
 
-  if (!canAfford(path.cost)) {
+  if (!resourceCanAfford(path.cost)) {
     return { success: false, error: 'Not enough resources' };
   }
 
-  const paid = await payCost(path.cost);
+  const paid = await resourcePayCost(path.cost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   await updateGamestate((s) => {
     const newFloors = s.world.floors.map((floor) => ({
       ...floor,
       rooms: floor.rooms.map((room) =>
-        room.id === altar.room.id ? applyUpgrade(room, upgradePathId) : room,
+        room.id === altar.room.id ? roomUpgradeApply(room, upgradePathId) : room,
       ),
     }));
     return {
@@ -187,15 +187,15 @@ export async function applyAltarUpgrade(
  * Get the fear reduction aura value for the Altar Room.
  * Returns the base fearReductionAura, increased by upgrade effects.
  */
-export function getAltarFearReductionAura(floors: Floor[]): number {
-  const altar = findAltarRoom(floors);
+export function altarRoomGetFearReductionAura(floors: Floor[]): number {
+  const altar = altarRoomFind(floors);
   if (!altar) return 0;
 
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(altar.room.roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(altar.room.roomTypeId);
   if (!roomDef) return 0;
 
   // Check if upgrade overrides the fear reduction aura
-  const effects = getAppliedUpgradeEffects(altar.room);
+  const effects = roomUpgradeGetAppliedEffects(altar.room);
   for (const effect of effects) {
     if (effect.type === 'fearReductionAura') {
       return effect.value;
@@ -208,11 +208,11 @@ export function getAltarFearReductionAura(floors: Floor[]): number {
 /**
  * Check if a room is adjacent to the Altar Room on the same floor.
  */
-export function isAdjacentToAltar(
+export function altarRoomIsAdjacent(
   floor: Floor,
   room: PlacedRoom,
 ): boolean {
-  const altarId = findRoomIdByRole('altar');
+  const altarId = roomRoleFindById('altar');
   if (!altarId) return false;
 
   const altarPlaced = floor.rooms.find(
@@ -220,21 +220,21 @@ export function isAdjacentToAltar(
   );
   if (!altarPlaced) return false;
 
-  const roomShape = getEntry<RoomShape & IsContentItem>(room.shapeId);
-  const altarShape = getEntry<RoomShape & IsContentItem>(altarPlaced.shapeId);
+  const roomShape = contentGetEntry<RoomShape & IsContentItem>(room.shapeId);
+  const altarShape = contentGetEntry<RoomShape & IsContentItem>(altarPlaced.shapeId);
   if (!roomShape || !altarShape) return false;
 
-  const roomTiles = getAbsoluteTiles(roomShape, room.anchorX, room.anchorY);
-  const altarTiles = getAbsoluteTiles(altarShape, altarPlaced.anchorX, altarPlaced.anchorY);
+  const roomTiles = roomShapeGetAbsoluteTiles(roomShape, room.anchorX, room.anchorY);
+  const altarTiles = roomShapeGetAbsoluteTiles(altarShape, altarPlaced.anchorX, altarPlaced.anchorY);
 
-  return areRoomsAdjacent(roomTiles, altarTiles);
+  return adjacencyAreRoomsAdjacent(roomTiles, altarTiles);
 }
 
 /**
  * Reactive computed signal for the Altar Room's fear reduction aura value.
  */
-export const altarFearReductionAura = computed<number>(() => {
-  return getAltarFearReductionAura(gamestate().world.floors);
+export const altarRoomFearReductionAura = computed<number>(() => {
+  return altarRoomGetFearReductionAura(gamestate().world.floors);
 });
 
 /**
@@ -242,17 +242,17 @@ export const altarFearReductionAura = computed<number>(() => {
  * Returns the room's base fear level minus the Altar's aura if adjacent, clamped to 0.
  * For rooms with 'variable' fear level, returns the original value unchanged.
  */
-export function getEffectiveFearLevel(
+export function altarRoomGetEffectiveFearLevel(
   floor: Floor,
   room: PlacedRoom,
   baseFearLevel: number | 'variable',
 ): number | 'variable' {
   if (baseFearLevel === 'variable') return 'variable';
 
-  const aura = getAltarFearReductionAura([floor]);
+  const aura = altarRoomGetFearReductionAura([floor]);
   if (aura <= 0) return baseFearLevel;
 
-  if (!isAdjacentToAltar(floor, room)) return baseFearLevel;
+  if (!altarRoomIsAdjacent(floor, room)) return baseFearLevel;
 
   return Math.max(0, baseFearLevel - aura);
 }
@@ -261,6 +261,6 @@ export function getEffectiveFearLevel(
  * Reactive signal: whether recruitment is available (requires Altar at Level 1+).
  * The Altar's presence enables basic recruitment; upgrades may expand it later.
  */
-export const canRecruit = computed<boolean>(() => {
-  return findAltarRoom(gamestate().world.floors) !== undefined;
+export const altarRoomCanRecruit = computed<boolean>(() => {
+  return altarRoomFind(gamestate().world.floors) !== undefined;
 });

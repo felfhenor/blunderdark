@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  currentFloor,
-  findRoomIdByRole,
+  floorCurrent,
+  roomRoleFindById,
   gamestate,
-  getEntry,
-  getTrainingProgressPercent,
-  getTrainingRoomInfo,
-  selectedTile,
+  contentGetEntry,
+  trainingGetProgressPercent,
+  trainingGetRoomInfo,
+  gridSelectedTile,
 } from '@helpers';
-import { TICKS_PER_MINUTE } from '@helpers/game-time';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   InhabitantDefinition,
   IsContentItem,
@@ -23,17 +23,17 @@ import type {
 })
 export class PanelTrainingGroundsComponent {
   public trainingRoom = computed(() => {
-    const tile = selectedTile();
-    const floor = currentFloor();
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
     if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('trainingGrounds')) return undefined;
+    if (!room || room.roomTypeId !== roomRoleFindById('trainingGrounds')) return undefined;
 
-    return getTrainingRoomInfo(room.id);
+    return trainingGetRoomInfo(room.id);
   });
 
   public trainees = computed(() => {
@@ -44,11 +44,11 @@ export class PanelTrainingGroundsComponent {
     return state.world.inhabitants
       .filter((i) => i.assignedRoomId === info.placedRoom.id)
       .map((i) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         const progress = i.trainingProgress ?? 0;
-        const percent = getTrainingProgressPercent(
+        const percent = trainingGetProgressPercent(
           progress,
           info.targetTicks,
         );
@@ -66,7 +66,7 @@ export class PanelTrainingGroundsComponent {
   public trainingTimeMinutes = computed(() => {
     const info = this.trainingRoom();
     if (!info) return 0;
-    return info.targetTicks / TICKS_PER_MINUTE;
+    return info.targetTicks / GAME_TIME_TICKS_PER_MINUTE;
   });
 
   public expectedBonuses = computed<TrainingBonuses | undefined>(() => {

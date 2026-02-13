@@ -37,12 +37,12 @@ const MARK_TARGET_ID = 'ca000001-0000-4000-a000-000000000017';
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => [...mockContent.values()].filter(
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => [...mockContent.values()].filter(
     (v) => (v as IsContentItem).__type === 'invader',
   )),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -362,17 +362,17 @@ beforeEach(() => {
 // --- Import after mocks ---
 
 const {
-  getAllInvaderDefinitions,
-  getInvaderDefinitionById,
-  createInvaderInstance,
-  resolveInvaderAbility,
-  applyCooldown,
-  tickCooldowns,
-  applyStatusEffect,
-  tickStatusEffects,
-  hasStatusEffect,
-  clearStatusEffects,
-  applyHealing,
+  invaderGetAllDefinitions,
+  invaderGetDefinitionById,
+  invaderCreateInstance,
+  invaderResolveAbility,
+  invaderApplyCooldown,
+  invaderTickCooldowns,
+  invaderApplyStatusEffect,
+  invaderTickStatusEffects,
+  invaderHasStatusEffect,
+  invaderClearStatusEffects,
+  invaderApplyHealing,
 } = await import('@helpers/invaders');
 
 // ============================================================
@@ -381,13 +381,13 @@ const {
 
 describe('Invader definitions', () => {
   it('should load all 6 invader classes', () => {
-    const invaders = getAllInvaderDefinitions();
+    const invaders = invaderGetAllDefinitions();
     expect(invaders).toHaveLength(6);
   });
 
   it('all invader classes have valid stats (all > 0)', () => {
     for (const def of allInvaderDefs) {
-      const loaded = getInvaderDefinitionById(def.id);
+      const loaded = invaderGetDefinitionById(def.id);
       expect(loaded).toBeDefined();
       expect(loaded!.baseStats.hp).toBeGreaterThan(0);
       expect(loaded!.baseStats.attack).toBeGreaterThan(0);
@@ -397,7 +397,7 @@ describe('Invader definitions', () => {
   });
 
   it('Warrior has high HP and attack', () => {
-    const warrior = getInvaderDefinitionById(WARRIOR_ID)!;
+    const warrior = invaderGetDefinitionById(WARRIOR_ID)!;
     expect(warrior.invaderClass).toBe('warrior');
     expect(warrior.baseStats.hp).toBe(30);
     expect(warrior.baseStats.attack).toBe(8);
@@ -405,7 +405,7 @@ describe('Invader definitions', () => {
   });
 
   it('Rogue has high speed and two abilities', () => {
-    const rogue = getInvaderDefinitionById(ROGUE_ID)!;
+    const rogue = invaderGetDefinitionById(ROGUE_ID)!;
     expect(rogue.invaderClass).toBe('rogue');
     expect(rogue.baseStats.speed).toBe(10);
     expect(rogue.abilityIds).toContain(DISARM_TRAP_ID);
@@ -413,7 +413,7 @@ describe('Invader definitions', () => {
   });
 
   it('Mage has high attack and magic abilities', () => {
-    const mage = getInvaderDefinitionById(MAGE_ID)!;
+    const mage = invaderGetDefinitionById(MAGE_ID)!;
     expect(mage.invaderClass).toBe('mage');
     expect(mage.baseStats.attack).toBe(10);
     expect(mage.abilityIds).toContain(ARCANE_BOLT_ID);
@@ -421,7 +421,7 @@ describe('Invader definitions', () => {
   });
 
   it('Cleric has high defense and healing/anti-undead abilities', () => {
-    const cleric = getInvaderDefinitionById(CLERIC_ID)!;
+    const cleric = invaderGetDefinitionById(CLERIC_ID)!;
     expect(cleric.invaderClass).toBe('cleric');
     expect(cleric.baseStats.defense).toBe(8);
     expect(cleric.abilityIds).toContain(HEAL_ID);
@@ -429,7 +429,7 @@ describe('Invader definitions', () => {
   });
 
   it('Paladin has high HP/defense and anti-corruption abilities', () => {
-    const paladin = getInvaderDefinitionById(PALADIN_ID)!;
+    const paladin = invaderGetDefinitionById(PALADIN_ID)!;
     expect(paladin.invaderClass).toBe('paladin');
     expect(paladin.baseStats.hp).toBe(28);
     expect(paladin.baseStats.defense).toBe(9);
@@ -438,7 +438,7 @@ describe('Invader definitions', () => {
   });
 
   it('Ranger has high speed and scouting abilities', () => {
-    const ranger = getInvaderDefinitionById(RANGER_ID)!;
+    const ranger = invaderGetDefinitionById(RANGER_ID)!;
     expect(ranger.invaderClass).toBe('ranger');
     expect(ranger.baseStats.speed).toBe(9);
     expect(ranger.abilityIds).toContain(SCOUT_ID);
@@ -450,9 +450,9 @@ describe('Invader definitions', () => {
 // US-002: Instance creation and ability resolution
 // ============================================================
 
-describe('createInvaderInstance', () => {
+describe('invaderCreateInstance', () => {
   it('creates an instance with correct HP and empty status effects', () => {
-    const instance = createInvaderInstance(warriorDef);
+    const instance = invaderCreateInstance(warriorDef);
     expect(instance.definitionId).toBe(WARRIOR_ID);
     expect(instance.currentHp).toBe(30);
     expect(instance.maxHp).toBe(30);
@@ -460,7 +460,7 @@ describe('createInvaderInstance', () => {
   });
 
   it('initializes ability states with zero cooldown', () => {
-    const instance = createInvaderInstance(rogueDef);
+    const instance = invaderCreateInstance(rogueDef);
     expect(instance.abilityStates).toHaveLength(2);
     for (const state of instance.abilityStates) {
       expect(state.currentCooldown).toBe(0);
@@ -469,32 +469,32 @@ describe('createInvaderInstance', () => {
   });
 
   it('creates unique IDs for each instance', () => {
-    const a = createInvaderInstance(warriorDef);
-    const b = createInvaderInstance(warriorDef);
+    const a = invaderCreateInstance(warriorDef);
+    const b = invaderCreateInstance(warriorDef);
     expect(a.id).not.toBe(b.id);
   });
 });
 
-describe('resolveInvaderAbility', () => {
+describe('invaderResolveAbility', () => {
   it('returns null when ability is on cooldown', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
         { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
     expect(result).toBeUndefined();
   });
 
   it('returns null when ability state is missing', () => {
     const invader = makeInvaderInstance({ abilityStates: [] });
-    const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
     expect(result).toBeUndefined();
   });
 
   it('Shield Wall targets self and returns defense buff', () => {
     const invader = makeInvaderInstance();
-    const result = resolveInvaderAbility(invader, shieldWallAbility, ['enemy-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['enemy-1']);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Buff Defense');
     expect(result!.value).toBe(25);
@@ -510,7 +510,7 @@ describe('resolveInvaderAbility', () => {
         { abilityId: BACKSTAB_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, backstabAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, backstabAbility, ['target-1']);
     expect(result).toBeDefined();
     // Rogue attack = 6, value = 200% → 6 * 2 = 12
     expect(result!.value).toBe(12);
@@ -524,7 +524,7 @@ describe('resolveInvaderAbility', () => {
         { abilityId: ARCANE_BOLT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, arcaneBoltAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, arcaneBoltAbility, ['target-1']);
     expect(result).toBeDefined();
     // Mage attack = 10, value = 150% → 10 * 1.5 = 15
     expect(result!.value).toBe(15);
@@ -539,7 +539,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const targets = ['undead-1', 'undead-2', 'undead-3'];
-    const result = resolveInvaderAbility(invader, turnUndeadAbility, targets);
+    const result = invaderResolveAbility(invader, turnUndeadAbility, targets);
     expect(result).toBeDefined();
     // Cleric attack = 4, value = 150% → 4 * 1.5 = 6
     expect(result!.value).toBe(6);
@@ -554,7 +554,7 @@ describe('resolveInvaderAbility', () => {
       ],
     });
     const allies = ['ally-1', 'ally-2'];
-    const result = resolveInvaderAbility(invader, auraOfCourageAbility, allies);
+    const result = invaderResolveAbility(invader, auraOfCourageAbility, allies);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Fear Immunity');
     expect(result!.targetIds).toEqual(allies);
@@ -567,7 +567,7 @@ describe('resolveInvaderAbility', () => {
         { abilityId: SCOUT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, scoutAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, scoutAbility, ['target-1']);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Scout');
     expect(result!.value).toBe(2);
@@ -581,7 +581,7 @@ describe('resolveInvaderAbility', () => {
         { abilityId: MARK_TARGET_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, markTargetAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, markTargetAbility, ['target-1']);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Mark');
     expect(result!.value).toBe(20);
@@ -596,7 +596,7 @@ describe('resolveInvaderAbility', () => {
         { abilityId: DISPEL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, dispelAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, dispelAbility, ['target-1']);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Dispel');
     expect(result!.value).toBe(0);
@@ -617,7 +617,7 @@ describe('Rogue disarm', () => {
       ],
     });
     // rng returns 0.3 → roll = 30 → 30 <= 60 → success
-    const result = resolveInvaderAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.3);
+    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.3);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Disarm');
     expect(result!.value).toBe(1);
@@ -631,7 +631,7 @@ describe('Rogue disarm', () => {
       ],
     });
     // rng returns 0.8 → roll = 80 → 80 > 60 → failure
-    const result = resolveInvaderAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.8);
+    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.8);
     expect(result).toBeDefined();
     expect(result!.value).toBe(0);
   });
@@ -647,28 +647,28 @@ describe('Cleric heal', () => {
         { abilityId: HEAL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, healAbility, ['ally-1']);
+    const result = invaderResolveAbility(invader, healAbility, ['ally-1']);
     expect(result).toBeDefined();
     // maxHp = 20, value = 20% → 20 * 0.2 = 4
     expect(result!.value).toBe(4);
     expect(result!.effectType).toBe('Heal');
   });
 
-  it('applyHealing caps at maxHp', () => {
+  it('invaderApplyHealing caps at maxHp', () => {
     const invader = makeInvaderInstance({
       currentHp: 28,
       maxHp: 30,
     });
-    const healed = applyHealing(invader, 10);
+    const healed = invaderApplyHealing(invader, 10);
     expect(healed.currentHp).toBe(30);
   });
 
-  it('applyHealing adds correct amount', () => {
+  it('invaderApplyHealing adds correct amount', () => {
     const invader = makeInvaderInstance({
       currentHp: 10,
       maxHp: 30,
     });
-    const healed = applyHealing(invader, 6);
+    const healed = invaderApplyHealing(invader, 6);
     expect(healed.currentHp).toBe(16);
   });
 });
@@ -680,37 +680,37 @@ describe('Cooldown prevents ability reuse', () => {
         { abilityId: SHIELD_WALL_ID, currentCooldown: 2, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
     expect(result).toBeUndefined();
   });
 
-  it('applyCooldown sets cooldown on the correct ability', () => {
+  it('invaderApplyCooldown sets cooldown on the correct ability', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
         { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const updated = applyCooldown(invader, SHIELD_WALL_ID, 4);
+    const updated = invaderApplyCooldown(invader, SHIELD_WALL_ID, 4);
     expect(updated.abilityStates[0].currentCooldown).toBe(4);
   });
 
-  it('tickCooldowns decrements cooldowns by 1', () => {
+  it('invaderTickCooldowns decrements cooldowns by 1', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
         { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0 },
       ],
     });
-    const ticked = tickCooldowns(invader);
+    const ticked = invaderTickCooldowns(invader);
     expect(ticked.abilityStates[0].currentCooldown).toBe(2);
   });
 
-  it('tickCooldowns does not go below 0', () => {
+  it('invaderTickCooldowns does not go below 0', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
         { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const ticked = tickCooldowns(invader);
+    const ticked = invaderTickCooldowns(invader);
     expect(ticked.abilityStates[0].currentCooldown).toBe(0);
   });
 
@@ -721,12 +721,12 @@ describe('Cooldown prevents ability reuse', () => {
       ],
     });
     // Still on cooldown
-    expect(resolveInvaderAbility(invader, shieldWallAbility, ['t'])).toBeUndefined();
+    expect(invaderResolveAbility(invader, shieldWallAbility, ['t'])).toBeUndefined();
     // Tick down
-    invader = tickCooldowns(invader);
+    invader = invaderTickCooldowns(invader);
     expect(invader.abilityStates[0].currentCooldown).toBe(0);
     // Now it should work
-    const result = resolveInvaderAbility(invader, shieldWallAbility, ['t']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['t']);
     expect(result).toBeDefined();
   });
 });
@@ -739,7 +739,7 @@ describe('Paladin Smite Evil', () => {
         { abilityId: SMITE_EVIL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = resolveInvaderAbility(invader, smiteEvilAbility, ['corrupted-1']);
+    const result = invaderResolveAbility(invader, smiteEvilAbility, ['corrupted-1']);
     expect(result).toBeDefined();
     // Paladin attack = 7, value = 200% → 7 * 2 = 14
     expect(result!.value).toBe(14);
@@ -754,50 +754,50 @@ describe('Paladin Smite Evil', () => {
 // ============================================================
 
 describe('Status effects', () => {
-  it('applyStatusEffect adds a new status', () => {
+  it('invaderApplyStatusEffect adds a new status', () => {
     const invader = makeInvaderInstance();
-    const updated = applyStatusEffect(invader, 'shielded', 2);
+    const updated = invaderApplyStatusEffect(invader, 'shielded', 2);
     expect(updated.statusEffects).toHaveLength(1);
     expect(updated.statusEffects[0]).toEqual({ name: 'shielded', remainingDuration: 2 });
   });
 
-  it('applyStatusEffect refreshes existing status duration', () => {
+  it('invaderApplyStatusEffect refreshes existing status duration', () => {
     const invader = makeInvaderInstance({
       statusEffects: [{ name: 'shielded', remainingDuration: 1 }],
     });
-    const updated = applyStatusEffect(invader, 'shielded', 3);
+    const updated = invaderApplyStatusEffect(invader, 'shielded', 3);
     expect(updated.statusEffects).toHaveLength(1);
     expect(updated.statusEffects[0].remainingDuration).toBe(3);
   });
 
-  it('hasStatusEffect returns true when status is present', () => {
+  it('invaderHasStatusEffect returns true when status is present', () => {
     const invader = makeInvaderInstance({
       statusEffects: [{ name: 'courage', remainingDuration: 1 }],
     });
-    expect(hasStatusEffect(invader, 'courage')).toBe(true);
-    expect(hasStatusEffect(invader, 'marked')).toBe(false);
+    expect(invaderHasStatusEffect(invader, 'courage')).toBe(true);
+    expect(invaderHasStatusEffect(invader, 'marked')).toBe(false);
   });
 
-  it('tickStatusEffects decrements duration and removes expired', () => {
+  it('invaderTickStatusEffects decrements duration and removes expired', () => {
     const invader = makeInvaderInstance({
       statusEffects: [
         { name: 'shielded', remainingDuration: 2 },
         { name: 'marked', remainingDuration: 1 },
       ],
     });
-    const ticked = tickStatusEffects(invader);
+    const ticked = invaderTickStatusEffects(invader);
     expect(ticked.statusEffects).toHaveLength(1);
     expect(ticked.statusEffects[0]).toEqual({ name: 'shielded', remainingDuration: 1 });
   });
 
-  it('clearStatusEffects removes all statuses', () => {
+  it('invaderClearStatusEffects removes all statuses', () => {
     const invader = makeInvaderInstance({
       statusEffects: [
         { name: 'shielded', remainingDuration: 2 },
         { name: 'courage', remainingDuration: 5 },
       ],
     });
-    const cleared = clearStatusEffects(invader);
+    const cleared = invaderClearStatusEffects(invader);
     expect(cleared.statusEffects).toEqual([]);
   });
 });

@@ -1,6 +1,6 @@
 import { computed, type Signal } from '@angular/core';
-import { getEntry } from '@helpers/content';
-import { getEffectiveMaxInhabitants } from '@helpers/room-upgrades';
+import { contentGetEntry } from '@helpers/content';
+import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   InhabitantDefinition,
@@ -10,11 +10,11 @@ import type {
   RoomDefinition,
 } from '@interfaces';
 
-export function allInhabitants(): Signal<InhabitantInstance[]> {
+export function inhabitantAll(): Signal<InhabitantInstance[]> {
   return computed(() => gamestate().world.inhabitants);
 }
 
-export function getInhabitant(
+export function inhabitantGet(
   instanceId: string,
 ): Signal<InhabitantInstance | undefined> {
   return computed(() =>
@@ -22,7 +22,7 @@ export function getInhabitant(
   );
 }
 
-export async function addInhabitant(
+export async function inhabitantAdd(
   inhabitant: InhabitantInstance,
 ): Promise<void> {
   await updateGamestate((state) => ({
@@ -34,7 +34,7 @@ export async function addInhabitant(
   }));
 }
 
-export async function removeInhabitant(instanceId: string): Promise<void> {
+export async function inhabitantRemove(instanceId: string): Promise<void> {
   await updateGamestate((state) => ({
     ...state,
     world: {
@@ -46,13 +46,13 @@ export async function removeInhabitant(instanceId: string): Promise<void> {
   }));
 }
 
-export function serializeInhabitants(
+export function inhabitantSerialize(
   inhabitants: InhabitantInstance[],
 ): InhabitantInstance[] {
   return inhabitants.map((i) => ({ ...i }));
 }
 
-export function deserializeInhabitants(
+export function inhabitantDeserialize(
   data: InhabitantInstance[],
 ): InhabitantInstance[] {
   return data.map((i) => ({
@@ -74,7 +74,7 @@ export function deserializeInhabitants(
  * Returns true if the inhabitant is eligible for the restriction.
  * An undefined restriction means any inhabitant is allowed.
  */
-export function meetsInhabitantRestriction(
+export function inhabitantMeetsRestriction(
   inhabitantDef: InhabitantDefinition,
   restriction: string | undefined,
 ): boolean {
@@ -87,13 +87,13 @@ export function meetsInhabitantRestriction(
  * Validates restriction tags and max inhabitant capacity.
  * If a PlacedRoom is provided, uses effective capacity (base + upgrade bonuses).
  */
-export function canAssignInhabitantToRoom(
+export function inhabitantCanAssignToRoom(
   inhabitantDef: InhabitantDefinition,
   roomDef: RoomDefinition,
   currentAssignedCount: number,
   placedRoom?: PlacedRoom,
 ): { allowed: boolean; reason?: string } {
-  if (!meetsInhabitantRestriction(inhabitantDef, roomDef.inhabitantRestriction)) {
+  if (!inhabitantMeetsRestriction(inhabitantDef, roomDef.inhabitantRestriction)) {
     return {
       allowed: false,
       reason: `Only ${roomDef.inhabitantRestriction} creatures can be assigned to this room`,
@@ -101,7 +101,7 @@ export function canAssignInhabitantToRoom(
   }
 
   const maxCapacity = placedRoom
-    ? getEffectiveMaxInhabitants(placedRoom, roomDef)
+    ? roomUpgradeGetEffectiveMaxInhabitants(placedRoom, roomDef)
     : roomDef.maxInhabitants;
 
   if (maxCapacity >= 0 && currentAssignedCount >= maxCapacity) {
@@ -114,12 +114,12 @@ export function canAssignInhabitantToRoom(
 /**
  * Filter a list of inhabitant definitions to only those eligible for a room.
  */
-export function getEligibleInhabitants(
+export function inhabitantGetEligible(
   allDefs: InhabitantDefinition[],
   roomDef: RoomDefinition,
 ): InhabitantDefinition[] {
   return allDefs.filter((def) =>
-    meetsInhabitantRestriction(def, roomDef.inhabitantRestriction),
+    inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction),
   );
 }
 
@@ -128,7 +128,7 @@ export function getEligibleInhabitants(
 /**
  * Assign an inhabitant instance to a room, with restriction enforcement.
  */
-export async function assignInhabitantToRoom(
+export async function inhabitantAssignToRoom(
   instanceId: string,
   roomId: string,
   roomTypeId: string,
@@ -143,10 +143,10 @@ export async function assignInhabitantToRoom(
     return { success: false, error: 'Inhabitant is already assigned to a room' };
   }
 
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
 
-  const inhabitantDef = getEntry<InhabitantDefinition & IsContentItem>(
+  const inhabitantDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
     instance.definitionId,
   );
   if (!inhabitantDef) {
@@ -164,7 +164,7 @@ export async function assignInhabitantToRoom(
     if (placedRoom) break;
   }
 
-  const check = canAssignInhabitantToRoom(
+  const check = inhabitantCanAssignToRoom(
     inhabitantDef,
     roomDef,
     assignedCount,
@@ -190,7 +190,7 @@ export async function assignInhabitantToRoom(
 /**
  * Unassign an inhabitant from its current room.
  */
-export async function unassignInhabitantFromRoom(
+export async function inhabitantUnassignFromRoom(
   instanceId: string,
 ): Promise<boolean> {
   const state = gamestate();

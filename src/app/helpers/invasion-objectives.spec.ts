@@ -2,13 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { GameState } from '@interfaces';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
-  assignInvasionObjectives,
-  updateObjectiveProgress,
-  calculateSlayMonsterProgress,
-  calculateStealTreasureProgress,
-  calculateSealPortalProgress,
-  resolveInvasionOutcome,
-  resetInvasionObjectivesCache,
+  invasionObjectiveAssign,
+  invasionObjectiveUpdateProgress,
+  invasionObjectiveCalculateSlayMonsterProgress,
+  invasionObjectiveCalculateStealTreasureProgress,
+  invasionObjectiveCalculateSealPortalProgress,
+  invasionObjectiveResolveOutcome,
+  invasionObjectiveResetCache,
 } from '@helpers/invasion-objectives';
 
 vi.mock('@helpers/state-game', () => ({
@@ -33,19 +33,19 @@ const mockRoomDefs = [
 ];
 
 vi.mock('@helpers/content', () => ({
-  getEntry: vi.fn((id: string) => mockContent.get(id)),
-  getEntriesByType: vi.fn((type: string) => {
+  contentGetEntry: vi.fn((id: string) => mockContent.get(id)),
+  contentGetEntriesByType: vi.fn((type: string) => {
     if (type === 'room') return mockRoomDefs;
     return [];
   }),
 }));
 
 vi.mock('@helpers/room-roles', () => ({
-  findRoomIdByRole: vi.fn((role: string) => {
+  roomRoleFindById: vi.fn((role: string) => {
     if (role === 'altar') return ALTAR_ROOM_TYPE_ID;
     return undefined;
   }),
-  resetRoleCache: vi.fn(),
+  roomRoleResetCache: vi.fn(),
 }));
 
 function makeRoom(
@@ -189,17 +189,17 @@ describe('invasion-objectives', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockContent.clear();
-    resetInvasionObjectivesCache();
+    invasionObjectiveResetCache();
   });
 
-  // --- assignInvasionObjectives ---
+  // --- invasionObjectiveAssign ---
 
-  describe('assignInvasionObjectives', () => {
+  describe('invasionObjectiveAssign', () => {
     it('should always include a primary Destroy Altar objective', () => {
       const state = makeGameState({
         rooms: [{ id: 'altar-1', roomTypeId: ALTAR_ROOM_TYPE_ID }],
       });
-      const objectives = assignInvasionObjectives(state, 'test-seed');
+      const objectives = invasionObjectiveAssign(state, 'test-seed');
       const primary = objectives.find((o) => o.isPrimary);
       expect(primary).toBeDefined();
       expect(primary!.type).toBe('DestroyAltar');
@@ -216,7 +216,7 @@ describe('invasion-objectives', () => {
         ],
         inhabitants: [{ id: 'inhab-1', tier: 3 }],
       });
-      const objectives = assignInvasionObjectives(state, 'test-seed');
+      const objectives = invasionObjectiveAssign(state, 'test-seed');
       const secondaries = objectives.filter((o) => !o.isPrimary);
       expect(secondaries.length).toBe(2);
     });
@@ -229,7 +229,7 @@ describe('invasion-objectives', () => {
           { id: 'library-1', roomTypeId: SHADOW_LIBRARY_TYPE_ID },
         ],
       });
-      const objectives = assignInvasionObjectives(state, 'test-seed');
+      const objectives = invasionObjectiveAssign(state, 'test-seed');
       expect(objectives.length).toBe(3);
     });
 
@@ -243,7 +243,7 @@ describe('invasion-objectives', () => {
         ],
         inhabitants: [{ id: 'inhab-1', tier: 4 }],
       });
-      const objectives = assignInvasionObjectives(state, 'dup-check');
+      const objectives = invasionObjectiveAssign(state, 'dup-check');
       const types = objectives.map((o) => o.type);
       const uniqueTypes = new Set(types);
       expect(uniqueTypes.size).toBe(types.length);
@@ -254,7 +254,7 @@ describe('invasion-objectives', () => {
       const state = makeGameState({
         rooms: [{ id: 'altar-1', roomTypeId: ALTAR_ROOM_TYPE_ID }],
       });
-      const objectives = assignInvasionObjectives(state, 'ineligible-seed');
+      const objectives = invasionObjectiveAssign(state, 'ineligible-seed');
       const secondaries = objectives.filter((o) => !o.isPrimary);
       // Only ScoutDungeon should be eligible (always eligible)
       expect(secondaries.length).toBeLessThanOrEqual(2);
@@ -267,7 +267,7 @@ describe('invasion-objectives', () => {
     it('should select fewer secondaries if pool is too small', () => {
       // Empty dungeon — only ScoutDungeon eligible (1 unique type)
       const state = makeGameState({});
-      const objectives = assignInvasionObjectives(state, 'small-pool');
+      const objectives = invasionObjectiveAssign(state, 'small-pool');
       const secondaries = objectives.filter((o) => !o.isPrimary);
       expect(secondaries.length).toBe(1);
     });
@@ -282,8 +282,8 @@ describe('invasion-objectives', () => {
         ],
         inhabitants: [{ id: 'inhab-1', tier: 2 }],
       });
-      const obj1 = assignInvasionObjectives(state, 'same-seed');
-      const obj2 = assignInvasionObjectives(state, 'same-seed');
+      const obj1 = invasionObjectiveAssign(state, 'same-seed');
+      const obj2 = invasionObjectiveAssign(state, 'same-seed');
       expect(obj1.map((o) => o.type)).toEqual(obj2.map((o) => o.type));
     });
 
@@ -296,7 +296,7 @@ describe('invasion-objectives', () => {
           { id: 'nexus-1', roomTypeId: LEY_LINE_NEXUS_TYPE_ID },
         ],
       });
-      const objectives = assignInvasionObjectives(state, 'target-test');
+      const objectives = invasionObjectiveAssign(state, 'target-test');
       const roomObjectives = objectives.filter(
         (o) =>
           o.type === 'StealTreasure' ||
@@ -317,7 +317,7 @@ describe('invasion-objectives', () => {
           { id: 'strong-1', tier: 3 },
         ],
       });
-      const objectives = assignInvasionObjectives(state, 'slay-target');
+      const objectives = invasionObjectiveAssign(state, 'slay-target');
       const slayObj = objectives.find((o) => o.type === 'SlayMonster');
       if (slayObj) {
         expect(slayObj.targetId).toBe('strong-1');
@@ -336,7 +336,7 @@ describe('invasion-objectives', () => {
 
       // Run multiple times to confirm SlayMonster never appears
       for (let i = 0; i < 10; i++) {
-        const objectives = assignInvasionObjectives(
+        const objectives = invasionObjectiveAssign(
           state,
           `no-slay-${i}`,
         );
@@ -346,87 +346,87 @@ describe('invasion-objectives', () => {
     });
   });
 
-  // --- updateObjectiveProgress ---
+  // --- invasionObjectiveUpdateProgress ---
 
-  describe('updateObjectiveProgress', () => {
+  describe('invasionObjectiveUpdateProgress', () => {
     it('should update progress value', () => {
       const obj = makeObjective({ progress: 0 });
-      const updated = updateObjectiveProgress(obj, 50);
+      const updated = invasionObjectiveUpdateProgress(obj, 50);
       expect(updated.progress).toBe(50);
       expect(updated.isCompleted).toBe(false);
     });
 
     it('should mark as completed at 100%', () => {
       const obj = makeObjective({ progress: 0 });
-      const updated = updateObjectiveProgress(obj, 100);
+      const updated = invasionObjectiveUpdateProgress(obj, 100);
       expect(updated.progress).toBe(100);
       expect(updated.isCompleted).toBe(true);
     });
 
     it('should clamp progress to 0-100', () => {
       const obj = makeObjective();
-      expect(updateObjectiveProgress(obj, -10).progress).toBe(0);
-      expect(updateObjectiveProgress(obj, 150).progress).toBe(100);
+      expect(invasionObjectiveUpdateProgress(obj, -10).progress).toBe(0);
+      expect(invasionObjectiveUpdateProgress(obj, 150).progress).toBe(100);
     });
 
     it('should not mutate the original objective', () => {
       const obj = makeObjective({ progress: 0 });
-      updateObjectiveProgress(obj, 75);
+      invasionObjectiveUpdateProgress(obj, 75);
       expect(obj.progress).toBe(0);
     });
   });
 
   // --- Progress calculation helpers ---
 
-  describe('calculateSlayMonsterProgress', () => {
+  describe('invasionObjectiveCalculateSlayMonsterProgress', () => {
     it('should return 0 for full HP', () => {
-      expect(calculateSlayMonsterProgress(100, 100)).toBe(0);
+      expect(invasionObjectiveCalculateSlayMonsterProgress(100, 100)).toBe(0);
     });
 
     it('should return 50 for half HP lost', () => {
-      expect(calculateSlayMonsterProgress(50, 100)).toBe(50);
+      expect(invasionObjectiveCalculateSlayMonsterProgress(50, 100)).toBe(50);
     });
 
     it('should return 100 for zero HP', () => {
-      expect(calculateSlayMonsterProgress(0, 100)).toBe(100);
+      expect(invasionObjectiveCalculateSlayMonsterProgress(0, 100)).toBe(100);
     });
 
     it('should handle zero max HP gracefully', () => {
-      expect(calculateSlayMonsterProgress(0, 0)).toBe(0);
+      expect(invasionObjectiveCalculateSlayMonsterProgress(0, 0)).toBe(0);
     });
   });
 
-  describe('calculateStealTreasureProgress', () => {
+  describe('invasionObjectiveCalculateStealTreasureProgress', () => {
     it('should return 0 for no gold looted', () => {
-      expect(calculateStealTreasureProgress(0, 100)).toBe(0);
+      expect(invasionObjectiveCalculateStealTreasureProgress(0, 100)).toBe(0);
     });
 
     it('should return 50 for half target', () => {
-      expect(calculateStealTreasureProgress(50, 100)).toBe(50);
+      expect(invasionObjectiveCalculateStealTreasureProgress(50, 100)).toBe(50);
     });
 
     it('should cap at 100', () => {
-      expect(calculateStealTreasureProgress(200, 100)).toBe(100);
+      expect(invasionObjectiveCalculateStealTreasureProgress(200, 100)).toBe(100);
     });
   });
 
-  describe('calculateSealPortalProgress', () => {
+  describe('invasionObjectiveCalculateSealPortalProgress', () => {
     it('should return 0 for no turns spent', () => {
-      expect(calculateSealPortalProgress(0, 5)).toBe(0);
+      expect(invasionObjectiveCalculateSealPortalProgress(0, 5)).toBe(0);
     });
 
     it('should return 60 for 3/5 turns', () => {
-      expect(calculateSealPortalProgress(3, 5)).toBe(60);
+      expect(invasionObjectiveCalculateSealPortalProgress(3, 5)).toBe(60);
     });
 
     it('should cap at 100', () => {
-      expect(calculateSealPortalProgress(10, 5)).toBe(100);
+      expect(invasionObjectiveCalculateSealPortalProgress(10, 5)).toBe(100);
     });
   });
 
-  // --- resolveInvasionOutcome ---
+  // --- invasionObjectiveResolveOutcome ---
 
-  describe('resolveInvasionOutcome', () => {
+  describe('invasionObjectiveResolveOutcome', () => {
     it('should return defeat if altar is destroyed', () => {
       const objectives = [
         makeObjective({
@@ -447,7 +447,7 @@ describe('invasion-objectives', () => {
           isCompleted: false,
         }),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       expect(result.outcome).toBe('defeat');
       expect(result.altarDestroyed).toBe(true);
       expect(result.rewardMultiplier).toBe(0);
@@ -473,7 +473,7 @@ describe('invasion-objectives', () => {
           isCompleted: false,
         }),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       expect(result.outcome).toBe('victory');
       expect(result.altarDestroyed).toBe(false);
     });
@@ -494,7 +494,7 @@ describe('invasion-objectives', () => {
           isCompleted: false,
         }),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       // 1.0 + 2*0.25 - 0*0.25 = 1.5
       expect(result.rewardMultiplier).toBe(1.5);
       expect(result.secondariesCompleted).toBe(0);
@@ -517,7 +517,7 @@ describe('invasion-objectives', () => {
           isCompleted: true,
         }),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       // 1.0 + 0*0.25 - 2*0.25 = 0.5
       expect(result.rewardMultiplier).toBe(0.5);
       expect(result.secondariesCompleted).toBe(2);
@@ -539,7 +539,7 @@ describe('invasion-objectives', () => {
           isCompleted: false,
         }),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       // 1.0 + 1*0.25 - 1*0.25 = 1.0
       expect(result.rewardMultiplier).toBe(1);
       expect(result.secondariesCompleted).toBe(1);
@@ -558,7 +558,7 @@ describe('invasion-objectives', () => {
           }),
         ),
       ];
-      const result = resolveInvasionOutcome(objectives);
+      const result = invasionObjectiveResolveOutcome(objectives);
       expect(result.rewardMultiplier).toBeGreaterThanOrEqual(0);
     });
   });

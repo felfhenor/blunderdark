@@ -2,11 +2,11 @@ import { signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
 import { debug, error } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
-import { indexedDbSignal } from '@helpers/signal';
+import { signalIndexedDb } from '@helpers/signal';
 import { type GameState } from '@interfaces';
 
-export const isGameStateReady = signal<boolean>(false);
-export const hasGameStateLoaded = signal<boolean>(false);
+export const gamestateIsReady = signal<boolean>(false);
+export const gamestateHasLoaded = signal<boolean>(false);
 
 let tickGamestate: GameState | undefined = undefined;
 
@@ -16,24 +16,24 @@ export function gamestate() {
   return tickGamestate ?? _liveGameState();
 }
 
-const _savedGamestate = indexedDbSignal<GameState>(
+const _savedGamestate = signalIndexedDb<GameState>(
   'gamestate',
   defaultGameState(),
   (state: GameState) => {
-    if (hasGameStateLoaded()) return;
+    if (gamestateHasLoaded()) return;
 
     _liveGameState.set(state);
 
-    hasGameStateLoaded.set(true);
+    gamestateHasLoaded.set(true);
   },
 );
 
-export function setGameState(state: GameState, commit = true): void {
+export function gamestateSet(state: GameState, commit = true): void {
   _liveGameState.set(state);
 
   if (commit) {
     debug('GameState:Commit', 'Committing game state changes.');
-    saveGameState();
+    gamestateSave();
   }
 }
 
@@ -69,18 +69,18 @@ export async function updateGamestate(
     return;
   }
 
-  setGameState(structuredClone(res));
+  gamestateSet(structuredClone(res));
 }
 
-export function resetGameState(): void {
-  setGameState(defaultGameState());
+export function gamestateReset(): void {
+  gamestateSet(defaultGameState());
 }
 
-export function saveGameState(): void {
-  _savedGamestate.set(formatGameStateForSave(_liveGameState()));
+export function gamestateSave(): void {
+  _savedGamestate.set(gamestateFormatForSave(_liveGameState()));
 }
 
-export function formatGameStateForSave(gameState: GameState): GameState {
+export function gamestateFormatForSave(gameState: GameState): GameState {
   const optimized = structuredClone(gameState);
   return optimized;
 }

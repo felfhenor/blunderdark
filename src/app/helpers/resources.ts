@@ -8,15 +8,15 @@ import type {
   ResourceType,
 } from '@interfaces';
 
-export function getResource(type: ResourceType): Signal<ResourceState> {
+export function resourceGet(type: ResourceType): Signal<ResourceState> {
   return computed(() => gamestate().world.resources[type]);
 }
 
-export function allResources(): Signal<ResourceMap> {
+export function resourceAll(): Signal<ResourceMap> {
   return computed(() => gamestate().world.resources);
 }
 
-export async function addResource(
+export async function resourceAdd(
   type: ResourceType,
   amount: number,
 ): Promise<number> {
@@ -53,7 +53,7 @@ export async function addResource(
   return actualAdded;
 }
 
-export async function subtractResource(
+export async function resourceSubtract(
   type: ResourceType,
   amount: number,
 ): Promise<boolean> {
@@ -87,15 +87,15 @@ export async function subtractResource(
   return true;
 }
 
-export function canAfford(costs: ResourceCost): boolean {
+export function resourceCanAfford(costs: ResourceCost): boolean {
   const resources = gamestate().world.resources;
   return Object.entries(costs).every(
     ([type, amount]) => resources[type as ResourceType].current >= amount,
   );
 }
 
-export async function payCost(costs: ResourceCost): Promise<boolean> {
-  if (!canAfford(costs)) {
+export async function resourcePayCost(costs: ResourceCost): Promise<boolean> {
+  if (!resourceCanAfford(costs)) {
     return false;
   }
 
@@ -122,7 +122,7 @@ export async function payCost(costs: ResourceCost): Promise<boolean> {
   return true;
 }
 
-export function isResourceLow(
+export function resourceIsLow(
   type: ResourceType,
   threshold: number,
 ): Signal<boolean> {
@@ -132,14 +132,14 @@ export function isResourceLow(
   });
 }
 
-export function isResourceFull(type: ResourceType): Signal<boolean> {
+export function resourceIsFull(type: ResourceType): Signal<boolean> {
   return computed(() => {
     const resource = gamestate().world.resources[type];
     return resource.current === resource.max;
   });
 }
 
-export function migrateResources(
+export function resourceMigrate(
   saved: Partial<ResourceMap>,
 ): ResourceMap {
   const defaults = defaultResources();

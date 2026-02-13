@@ -1,20 +1,20 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  activeRulerBonuses,
-  assignInhabitantToRoom,
-  currentFloor,
-  findRoomIdByRole,
-  getEntry,
-  getRulerDefinition,
-  meetsInhabitantRestriction,
+  throneRoomActiveRulerBonuses,
+  inhabitantAssignToRoom,
+  floorCurrent,
+  roomRoleFindById,
+  contentGetEntry,
+  throneRoomGetRulerDefinition,
+  inhabitantMeetsRestriction,
   notifyError,
   notifySuccess,
-  seatedRuler,
-  selectedTile,
-  thronePositionalBonuses,
+  throneRoomSeatedRuler,
+  gridSelectedTile,
+  throneRoomPositionalBonuses,
   throneRoomFearLevel,
-  unassignInhabitantFromRoom,
+  inhabitantUnassignFromRoom,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 
@@ -27,33 +27,33 @@ import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 })
 export class PanelThroneRoomComponent {
   public throneRoom = computed(() => {
-    const tile = selectedTile();
-    const floor = currentFloor();
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
     if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('throne'))
+    if (!room || room.roomTypeId !== roomRoleFindById('throne'))
       return undefined;
 
     return room;
   });
 
   public rulerInfo = computed(() => {
-    const ruler = seatedRuler();
+    const ruler = throneRoomSeatedRuler();
     if (!ruler) return undefined;
 
-    const def = getRulerDefinition(ruler);
+    const def = throneRoomGetRulerDefinition(ruler);
     if (!def) return undefined;
 
     return { instance: ruler, definition: def };
   });
 
-  public bonuses = activeRulerBonuses;
+  public bonuses = throneRoomActiveRulerBonuses;
   public fearLevel = throneRoomFearLevel;
-  public positional = thronePositionalBonuses;
+  public positional = throneRoomPositionalBonuses;
 
   public bonusEntries = computed(() => {
     const b = this.bonuses();
@@ -61,19 +61,19 @@ export class PanelThroneRoomComponent {
   });
 
   public eligibleCreatures = computed(() => {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return [];
 
     return floor.inhabitants
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
-        return def ? meetsInhabitantRestriction(def, 'unique') : false;
+        return def ? inhabitantMeetsRestriction(def, 'unique') : false;
       })
       .map((i) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };
@@ -84,7 +84,7 @@ export class PanelThroneRoomComponent {
     const room = this.throneRoom();
     if (!room) return;
 
-    const result = await assignInhabitantToRoom(
+    const result = await inhabitantAssignToRoom(
       instanceId,
       room.id,
       room.roomTypeId,
@@ -97,10 +97,10 @@ export class PanelThroneRoomComponent {
   }
 
   public async onRemoveRuler(): Promise<void> {
-    const ruler = seatedRuler();
+    const ruler = throneRoomSeatedRuler();
     if (!ruler) return;
 
-    const removed = await unassignInhabitantFromRoom(ruler.instanceId);
+    const removed = await inhabitantUnassignFromRoom(ruler.instanceId);
     if (removed) {
       notifySuccess('Ruler removed from Throne Room');
     } else {

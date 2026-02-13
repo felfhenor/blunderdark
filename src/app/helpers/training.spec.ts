@@ -53,18 +53,18 @@ const specializedDrillsPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/room-roles', () => ({
-  findRoomIdByRole: vi.fn((role: string) => {
+  roomRoleFindById: vi.fn((role: string) => {
     if (role === 'trainingGrounds') return TRAINING_GROUNDS_ID;
     return undefined;
   }),
-  resetRoleCache: vi.fn(),
+  roomRoleResetCache: vi.fn(),
 }));
 
 const trainingGroundsRoom: RoomDefinition & IsContentItem = {
@@ -179,21 +179,21 @@ mockContent.set('shape-3x3', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionGetBase,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 import {
-  BASE_TRAINING_TICKS,
-  getTrainingBonusesForRoom,
-  getTrainingProgressPercent,
-  getTrainingTicksForRoom,
-  isTrainingGroundsRoom,
-  processTraining,
+  TRAINING_BASE_TICKS,
+  trainingGetBonusesForRoom,
+  trainingGetProgressPercent,
+  trainingGetTicksForRoom,
+  trainingIsGroundsRoom,
+  trainingProcess,
 } from '@helpers/training';
 
 // --- Helpers ---
@@ -327,19 +327,19 @@ describe('Training Grounds: definition', () => {
   });
 });
 
-describe('Training Grounds: isTrainingGroundsRoom', () => {
+describe('Training Grounds: trainingIsGroundsRoom', () => {
   it('should return true for Training Grounds type ID', () => {
-    expect(isTrainingGroundsRoom(TRAINING_GROUNDS_ID)).toBe(true);
+    expect(trainingIsGroundsRoom(TRAINING_GROUNDS_ID)).toBe(true);
   });
 
   it('should return false for other room types', () => {
-    expect(isTrainingGroundsRoom(BARRACKS_ID)).toBe(false);
+    expect(trainingIsGroundsRoom(BARRACKS_ID)).toBe(false);
   });
 });
 
 describe('Training Grounds: no production', () => {
   it('should have no base production', () => {
-    const production = getBaseProduction(TRAINING_GROUNDS_ID);
+    const production = productionGetBase(TRAINING_GROUNDS_ID);
     expect(production).toEqual({});
   });
 });
@@ -347,31 +347,31 @@ describe('Training Grounds: no production', () => {
 describe('Training Grounds: training ticks', () => {
   it('should return base ticks with no adjacency or upgrades', () => {
     const room = createPlacedTrainingGrounds();
-    const ticks = getTrainingTicksForRoom(room, new Set());
-    expect(ticks).toBe(BASE_TRAINING_TICKS);
+    const ticks = trainingGetTicksForRoom(room, new Set());
+    expect(ticks).toBe(TRAINING_BASE_TICKS);
   });
 
   it('should reduce time by 20% when adjacent to Barracks', () => {
     const room = createPlacedTrainingGrounds();
     const adjacentTypes = new Set([BARRACKS_ID]);
-    const ticks = getTrainingTicksForRoom(room, adjacentTypes);
-    expect(ticks).toBe(Math.round(BASE_TRAINING_TICKS * 0.8));
+    const ticks = trainingGetTicksForRoom(room, adjacentTypes);
+    expect(ticks).toBe(Math.round(TRAINING_BASE_TICKS * 0.8));
   });
 
   it('should apply Mass Training time reduction (0.7x)', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-mass-training',
     });
-    const ticks = getTrainingTicksForRoom(room, new Set());
-    expect(ticks).toBe(Math.round(BASE_TRAINING_TICKS * 0.7));
+    const ticks = trainingGetTicksForRoom(room, new Set());
+    expect(ticks).toBe(Math.round(TRAINING_BASE_TICKS * 0.7));
   });
 
   it('should apply Elite Training time increase (1.2x)', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-elite-training',
     });
-    const ticks = getTrainingTicksForRoom(room, new Set());
-    expect(ticks).toBe(Math.round(BASE_TRAINING_TICKS * 1.2));
+    const ticks = trainingGetTicksForRoom(room, new Set());
+    expect(ticks).toBe(Math.round(TRAINING_BASE_TICKS * 1.2));
   });
 
   it('should combine upgrade and adjacency time modifiers', () => {
@@ -379,9 +379,9 @@ describe('Training Grounds: training ticks', () => {
       appliedUpgradePathId: 'upgrade-mass-training',
     });
     const adjacentTypes = new Set([BARRACKS_ID]);
-    const ticks = getTrainingTicksForRoom(room, adjacentTypes);
+    const ticks = trainingGetTicksForRoom(room, adjacentTypes);
     // Mass Training: 25 * 0.7 = 17.5 → 18, then Barracks: 18 * 0.8 = 14.4 → 14
-    const expected = Math.round(Math.round(BASE_TRAINING_TICKS * 0.7) * 0.8);
+    const expected = Math.round(Math.round(TRAINING_BASE_TICKS * 0.7) * 0.8);
     expect(ticks).toBe(expected);
   });
 });
@@ -389,7 +389,7 @@ describe('Training Grounds: training ticks', () => {
 describe('Training Grounds: training bonuses', () => {
   it('should grant +1 defense by default', () => {
     const room = createPlacedTrainingGrounds();
-    const bonuses = getTrainingBonusesForRoom(room, new Set());
+    const bonuses = trainingGetBonusesForRoom(room, new Set());
     expect(bonuses).toEqual({ defense: 1, attack: 0 });
   });
 
@@ -397,7 +397,7 @@ describe('Training Grounds: training bonuses', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-elite-training',
     });
-    const bonuses = getTrainingBonusesForRoom(room, new Set());
+    const bonuses = trainingGetBonusesForRoom(room, new Set());
     expect(bonuses).toEqual({ defense: 1, attack: 1 });
   });
 
@@ -405,14 +405,14 @@ describe('Training Grounds: training bonuses', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-specialized-drills',
     });
-    const bonuses = getTrainingBonusesForRoom(room, new Set());
+    const bonuses = trainingGetBonusesForRoom(room, new Set());
     expect(bonuses).toEqual({ defense: 2, attack: 0 });
   });
 
   it('should grant +1 to all stats when adjacent to Altar', () => {
     const room = createPlacedTrainingGrounds();
     const adjacentTypes = new Set([ALTAR_ID]);
-    const bonuses = getTrainingBonusesForRoom(room, adjacentTypes);
+    const bonuses = trainingGetBonusesForRoom(room, adjacentTypes);
     expect(bonuses).toEqual({ defense: 2, attack: 1 });
   });
 
@@ -421,7 +421,7 @@ describe('Training Grounds: training bonuses', () => {
       appliedUpgradePathId: 'upgrade-elite-training',
     });
     const adjacentTypes = new Set([ALTAR_ID]);
-    const bonuses = getTrainingBonusesForRoom(room, adjacentTypes);
+    const bonuses = trainingGetBonusesForRoom(room, adjacentTypes);
     // Elite: +1 atk, base: +1 def, Altar: +1 all
     expect(bonuses).toEqual({ defense: 2, attack: 2 });
   });
@@ -429,28 +429,28 @@ describe('Training Grounds: training bonuses', () => {
 
 describe('Training Grounds: training progress percent', () => {
   it('should return 0 for no progress', () => {
-    expect(getTrainingProgressPercent(0, 25)).toBe(0);
+    expect(trainingGetProgressPercent(0, 25)).toBe(0);
   });
 
   it('should return 50 at halfway', () => {
-    expect(getTrainingProgressPercent(12, 25)).toBe(48);
-    expect(getTrainingProgressPercent(13, 25)).toBe(52);
+    expect(trainingGetProgressPercent(12, 25)).toBe(48);
+    expect(trainingGetProgressPercent(13, 25)).toBe(52);
   });
 
   it('should return 100 when complete', () => {
-    expect(getTrainingProgressPercent(25, 25)).toBe(100);
+    expect(trainingGetProgressPercent(25, 25)).toBe(100);
   });
 
   it('should cap at 100 even if over', () => {
-    expect(getTrainingProgressPercent(30, 25)).toBe(100);
+    expect(trainingGetProgressPercent(30, 25)).toBe(100);
   });
 
   it('should return 100 for zero target ticks', () => {
-    expect(getTrainingProgressPercent(0, 0)).toBe(100);
+    expect(trainingGetProgressPercent(0, 0)).toBe(100);
   });
 });
 
-describe('Training Grounds: processTraining', () => {
+describe('Training Grounds: trainingProcess', () => {
   it('should increment training progress for untrained inhabitants', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
@@ -459,7 +459,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trainingProgress).toBe(1);
     expect(state.world.inhabitants[0].trained).toBe(false);
@@ -476,7 +476,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trainingProgress).toBe(25);
   });
@@ -489,7 +489,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trainingProgress).toBe(0);
   });
@@ -498,12 +498,12 @@ describe('Training Grounds: processTraining', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
       assignedRoomId: 'placed-tg-1',
-      trainingProgress: BASE_TRAINING_TICKS - 1,
+      trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trained).toBe(true);
     expect(state.world.inhabitants[0].trainingBonuses).toEqual({
@@ -516,7 +516,7 @@ describe('Training Grounds: processTraining', () => {
     const tg = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-elite-training',
     });
-    const targetTicks = Math.round(BASE_TRAINING_TICKS * 1.2);
+    const targetTicks = Math.round(TRAINING_BASE_TICKS * 1.2);
     const inhabitant = createInhabitant({
       assignedRoomId: 'placed-tg-1',
       trainingProgress: targetTicks - 1,
@@ -524,7 +524,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trained).toBe(true);
     expect(state.world.inhabitants[0].trainingBonuses).toEqual({
@@ -544,12 +544,12 @@ describe('Training Grounds: processTraining', () => {
     };
     const inhabitant = createInhabitant({
       assignedRoomId: 'placed-tg-1',
-      trainingProgress: BASE_TRAINING_TICKS - 1,
+      trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg, altar], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trained).toBe(true);
     expect(state.world.inhabitants[0].trainingBonuses).toEqual({
@@ -567,7 +567,7 @@ describe('Training Grounds: processTraining', () => {
       anchorX: 3, // Adjacent: T-shape at (0,0) has tile at (2,0); barracks at (3,0)
       anchorY: 0,
     };
-    const reducedTicks = Math.round(BASE_TRAINING_TICKS * 0.8);
+    const reducedTicks = Math.round(TRAINING_BASE_TICKS * 0.8);
     const inhabitant = createInhabitant({
       assignedRoomId: 'placed-tg-1',
       trainingProgress: reducedTicks - 1,
@@ -575,7 +575,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([tg, barracks], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trained).toBe(true);
   });
@@ -591,17 +591,17 @@ describe('Training Grounds: processTraining', () => {
       instanceId: 'inst-2',
       name: 'Goblin 2',
       assignedRoomId: 'placed-tg-1',
-      trainingProgress: BASE_TRAINING_TICKS - 1,
+      trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg], [inh1, inh2]);
     const state = makeGameState([floor], [inh1, inh2]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trainingProgress).toBe(11);
     expect(state.world.inhabitants[0].trained).toBe(false);
     expect(state.world.inhabitants[1].trainingProgress).toBe(
-      BASE_TRAINING_TICKS,
+      TRAINING_BASE_TICKS,
     );
     expect(state.world.inhabitants[1].trained).toBe(true);
   });
@@ -620,7 +620,7 @@ describe('Training Grounds: processTraining', () => {
     const floor = makeFloor([barracks], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
 
-    processTraining(state);
+    trainingProcess(state);
 
     expect(state.world.inhabitants[0].trainingProgress).toBe(0);
   });
@@ -637,7 +637,7 @@ describe('Training Grounds: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [tg, barracks];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       tg,
       ['placed-barracks'],
       allRooms,
@@ -655,7 +655,7 @@ describe('Training Grounds: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [tg, altar];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       tg,
       ['placed-altar'],
       allRooms,
@@ -666,14 +666,14 @@ describe('Training Grounds: adjacency bonuses', () => {
 
 describe('Training Grounds: upgrade paths', () => {
   it('should have Elite Training upgrade', () => {
-    const paths = getUpgradePaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
     const elite = paths.find((p) => p.name === 'Elite Training');
     expect(elite).toBeDefined();
     expect(elite!.effects).toHaveLength(2);
   });
 
   it('should have Mass Training upgrade with maxInhabitantBonus', () => {
-    const paths = getUpgradePaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
     const mass = paths.find((p) => p.name === 'Mass Training');
     expect(mass).toBeDefined();
     const capacityEffect = mass!.effects.find(
@@ -687,18 +687,18 @@ describe('Training Grounds: upgrade paths', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-mass-training',
     });
-    const effective = getEffectiveMaxInhabitants(room, trainingGroundsRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, trainingGroundsRoom);
     expect(effective).toBe(6);
   });
 
   it('should keep capacity at 4 without upgrade', () => {
     const room = createPlacedTrainingGrounds();
-    const effective = getEffectiveMaxInhabitants(room, trainingGroundsRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, trainingGroundsRoom);
     expect(effective).toBe(4);
   });
 
   it('should have Specialized Drills with trainingDefenseBonus', () => {
-    const paths = getUpgradePaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
     const drills = paths.find((p) => p.name === 'Specialized Drills');
     expect(drills).toBeDefined();
     expect(drills!.effects[0].type).toBe('trainingDefenseBonus');
@@ -711,13 +711,13 @@ describe('Training Grounds: upgrade mutual exclusivity', () => {
     const room = createPlacedTrainingGrounds({
       appliedUpgradePathId: 'upgrade-elite-training',
     });
-    const result = canApplyUpgrade(room, 'upgrade-mass-training');
+    const result = roomUpgradeCanApply(room, 'upgrade-mass-training');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedTrainingGrounds();
-    const result = canApplyUpgrade(room, 'upgrade-elite-training');
+    const result = roomUpgradeCanApply(room, 'upgrade-elite-training');
     expect(result.valid).toBe(true);
   });
 });

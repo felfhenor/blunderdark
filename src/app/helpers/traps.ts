@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import type {
   Floor,
@@ -11,15 +11,15 @@ import type {
 
 // --- Trap Definition Lookup ---
 
-export function getTrapDefinition(
+export function trapGetDefinition(
   trapTypeId: string,
 ): (TrapDefinition & IsContentItem) | undefined {
-  return getEntry<TrapDefinition & IsContentItem>(trapTypeId);
+  return contentGetEntry<TrapDefinition & IsContentItem>(trapTypeId);
 }
 
 // --- Trap Inventory ---
 
-export function addToTrapInventory(
+export function trapAddToInventory(
   inventory: TrapInventoryEntry[],
   trapTypeId: string,
   count = 1,
@@ -34,7 +34,7 @@ export function addToTrapInventory(
   return updated;
 }
 
-export function removeFromTrapInventory(
+export function trapRemoveFromInventory(
   inventory: TrapInventoryEntry[],
   trapTypeId: string,
   count = 1,
@@ -49,7 +49,7 @@ export function removeFromTrapInventory(
     .filter((e) => e.count > 0);
 }
 
-export function getTrapInventoryCount(
+export function trapGetInventoryCount(
   inventory: TrapInventoryEntry[],
   trapTypeId: string,
 ): number {
@@ -58,7 +58,7 @@ export function getTrapInventoryCount(
 
 // --- Trap Placement ---
 
-export function canPlaceTrap(
+export function trapCanPlace(
   floor: Floor,
   tileX: number,
   tileY: number,
@@ -82,16 +82,16 @@ export function canPlaceTrap(
   return { canPlace: true };
 }
 
-export function placeTrap(
+export function trapPlace(
   floor: Floor,
   trapTypeId: string,
   tileX: number,
   tileY: number,
 ): { floor: Floor; trap: TrapInstance } | undefined {
-  const { canPlace } = canPlaceTrap(floor, tileX, tileY);
+  const { canPlace } = trapCanPlace(floor, tileX, tileY);
   if (!canPlace) return undefined;
 
-  const def = getTrapDefinition(trapTypeId);
+  const def = trapGetDefinition(trapTypeId);
   if (!def) return undefined;
 
   const tile = floor.grid[tileY]?.[tileX];
@@ -116,7 +116,7 @@ export function placeTrap(
   };
 }
 
-export function removeTrap(
+export function trapRemove(
   floor: Floor,
   trapId: string,
 ): { floor: Floor; trap: TrapInstance } | undefined {
@@ -145,12 +145,12 @@ export type TrapTriggerResult = {
   moralePenalty: number;
 };
 
-export function rollTrapTrigger(
+export function trapRollTrigger(
   trap: TrapInstance,
   isRogue: boolean,
   roll: number,
 ): TrapTriggerResult {
-  const def = getTrapDefinition(trap.trapTypeId);
+  const def = trapGetDefinition(trap.trapTypeId);
   if (!def || !trap.isArmed || trap.remainingCharges <= 0) {
     return {
       triggered: false,
@@ -211,7 +211,7 @@ export function rollTrapTrigger(
   };
 }
 
-export function applyTrapTrigger(
+export function trapApplyTrigger(
   floor: Floor,
   trapId: string,
   result: TrapTriggerResult,
@@ -245,11 +245,11 @@ export function applyTrapTrigger(
 
 // --- Query Helpers ---
 
-export function getTrapsOnFloor(floor: Floor): TrapInstance[] {
+export function trapGetOnFloor(floor: Floor): TrapInstance[] {
   return floor.traps ?? [];
 }
 
-export function getTrapAtTile(
+export function trapGetAtTile(
   floor: Floor,
   tileX: number,
   tileY: number,
@@ -259,7 +259,7 @@ export function getTrapAtTile(
   );
 }
 
-export function getTrapsInHallway(
+export function trapGetInHallway(
   floor: Floor,
   hallwayId: string,
 ): TrapInstance[] {
@@ -268,7 +268,7 @@ export function getTrapsInHallway(
 
 // --- State Mutation (for gameloop integration) ---
 
-export function processTraps(state: GameState): void {
+export function trapProcess(state: GameState): void {
   // Currently a no-op: traps are event-driven (triggered during invasions).
   // This hook exists for future tick-based trap mechanics (e.g., trap decay, recharging).
   void state;

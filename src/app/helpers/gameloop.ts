@@ -1,48 +1,48 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
-import { processScheduledEvents } from '@helpers/game-events';
-import { advanceClockTime } from '@helpers/game-time';
-import { processInvasionSchedule } from '@helpers/invasion-triggers';
-import { processProduction } from '@helpers/production';
-import { processTraining } from '@helpers/training';
-import { processTrapCrafting } from '@helpers/trap-workshop';
+import { gameEventProcess } from '@helpers/game-events';
+import { gameTimeAdvanceClock } from '@helpers/game-time';
+import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
+import { productionProcess } from '@helpers/production';
+import { trainingProcess } from '@helpers/training';
+import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
-import { isSetup } from '@helpers/setup';
+import { setupIs } from '@helpers/setup';
 import {
   gamestate,
   gamestateTickEnd,
   gamestateTickStart,
-  isGameStateReady,
-  saveGameState,
+  gamestateIsReady,
+  gamestateSave,
   updateGamestate,
 } from '@helpers/state-game';
-import { getOption } from '@helpers/state-options';
+import { optionsGet } from '@helpers/state-options';
 import { timerLastSaveTick, timerTicksElapsed } from '@helpers/timer';
 import { clamp } from 'es-toolkit/compat';
 
-export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
+export const gameloopIsPaused = computed(() => optionsGet('gameloopPaused'));
 
 export function gameloopShouldRun(): boolean {
   return window.location.toString().includes('/game');
 }
 
 export async function gameloop(totalTicks: number): Promise<void> {
-  if (!isSetup()) return;
-  if (!isGameStateReady()) return;
+  if (!setupIs()) return;
+  if (!gamestateIsReady()) return;
   if (!gameloopShouldRun()) return;
-  if (isGameloopPaused()) return;
+  if (gameloopIsPaused()) return;
 
   gamestateTickStart();
 
   const ticksToCalculate =
-    totalTicks * getOption('gameSpeed') * getOption('debugTickMultiplier');
+    totalTicks * optionsGet('gameSpeed') * optionsGet('debugTickMultiplier');
   const numTicks = clamp(ticksToCalculate, 1, 3600);
 
   const timer = new LoggerTimer({
     dumpThreshold: 100,
-    isActive: getOption('debugGameloopTimerUpdates'),
+    isActive: optionsGet('debugGameloopTimerUpdates'),
   });
 
   timer.startTimer('gameloop');
@@ -53,20 +53,20 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
   updateGamestate((state) => {
     state.clock.numTicks += numTicks;
-    state.clock = advanceClockTime(state.clock, numTicks);
-    processProduction(state);
-    processTraining(state);
-    processTrapCrafting(state);
-    processInvasionSchedule(state);
+    state.clock = gameTimeAdvanceClock(state.clock, numTicks);
+    productionProcess(state);
+    trainingProcess(state);
+    trapWorkshopProcess(state);
+    invasionTriggerProcessSchedule(state);
     return state;
   });
 
-  processScheduledEvents(gamestate().clock);
+  gameEventProcess(gamestate().clock);
 
   gamestateTickEnd();
 
   const currentTick = timerTicksElapsed();
-  const nextSaveTick = timerLastSaveTick() + getOption('debugSaveInterval');
+  const nextSaveTick = timerLastSaveTick() + optionsGet('debugSaveInterval');
   if (currentTick >= nextSaveTick) {
     updateGamestate((state) => {
       state.clock.lastSaveTick = currentTick;
@@ -74,7 +74,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     });
 
     await schedulerYield();
-    saveGameState();
+    gamestateSave();
     debug('Gameloop:Save', `Saving @ tick ${currentTick}`);
   }
 }

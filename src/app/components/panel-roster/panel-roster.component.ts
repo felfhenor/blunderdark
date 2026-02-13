@@ -5,13 +5,13 @@ import {
   signal,
 } from '@angular/core';
 import {
-  assignInhabitantToRoom,
-  canAssignToRoom,
-  getEntry,
-  getRoomDefinition,
+  inhabitantAssignToRoom,
+  assignmentCanAssignToRoom,
+  contentGetEntry,
+  productionGetRoomDefinition,
   notifyError,
   notifySuccess,
-  unassignInhabitantFromRoom,
+  inhabitantUnassignFromRoom,
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -47,7 +47,7 @@ export class PanelRosterComponent {
 
     return inhabitants
       .map((inst) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           inst.definitionId,
         );
         if (!def) return undefined;
@@ -59,7 +59,7 @@ export class PanelRosterComponent {
               (r) => r.id === inst.assignedRoomId,
             );
             if (room) {
-              const roomDef = getRoomDefinition(room.roomTypeId);
+              const roomDef = productionGetRoomDefinition(room.roomTypeId);
               roomName = roomDef?.name ?? 'Unknown Room';
               break;
             }
@@ -115,12 +115,12 @@ export class PanelRosterComponent {
 
     for (const floor of floors) {
       for (const room of floor.rooms) {
-        const roomDef = getEntry<RoomDefinition & IsContentItem>(
+        const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(
           room.roomTypeId,
         );
         if (!roomDef || roomDef.maxInhabitants === 0) continue;
 
-        const validation = canAssignToRoom(room.id);
+        const validation = assignmentCanAssignToRoom(room.id);
         rooms.push({
           room,
           roomDef,
@@ -158,10 +158,10 @@ export class PanelRosterComponent {
 
     // If already assigned, unassign first
     if (entry.instance.assignedRoomId !== undefined) {
-      await unassignInhabitantFromRoom(instanceId);
+      await inhabitantUnassignFromRoom(instanceId);
     }
 
-    const result = await assignInhabitantToRoom(instanceId, roomId, roomTypeId);
+    const result = await inhabitantAssignToRoom(instanceId, roomId, roomTypeId);
     if (!result.success && result.error) {
       notifyError(result.error);
     } else if (result.success) {
@@ -170,7 +170,7 @@ export class PanelRosterComponent {
   }
 
   public async onUnassign(instanceId: string): Promise<void> {
-    const removed = await unassignInhabitantFromRoom(instanceId);
+    const removed = await inhabitantUnassignFromRoom(instanceId);
     if (removed) {
       notifySuccess('Inhabitant unassigned');
     } else {

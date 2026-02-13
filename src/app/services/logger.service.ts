@@ -6,7 +6,7 @@ import {
   debug,
   error,
   info,
-  localVersion,
+  versionLocal,
   log,
   versionInfoToSemver,
   warn,
@@ -38,7 +38,7 @@ export class LoggerService {
     if (environment.rollbar.accessToken) {
       const rollbarConfig = structuredClone(environment.rollbar);
 
-      const realVersion = localVersion();
+      const realVersion = versionLocal();
       if (realVersion) {
         rollbarConfig.payload.client.javascript.code_version =
           versionInfoToSemver(realVersion) ?? 'UNKNOWN';

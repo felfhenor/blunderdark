@@ -3,19 +3,19 @@ import seedrandom from 'seedrandom';
 import type { GameState, InvasionSchedule } from '@interfaces';
 import type { GameTime } from '@helpers/game-time';
 import {
-  getInvasionInterval,
-  isInGracePeriod,
-  getLastInvasionDay,
-  calculateNextInvasionDay,
-  shouldTriggerInvasion,
-  shouldShowWarning,
-  addSpecialInvasion,
-  processInvasionSchedule,
-  DEFAULT_GRACE_PERIOD,
-  MIN_INVASION_INTERVAL,
-  MAX_VARIANCE,
-  MIN_DAYS_BETWEEN_INVASIONS,
-  WARNING_MINUTES,
+  invasionTriggerGetInterval,
+  invasionTriggerIsInGracePeriod,
+  invasionTriggerGetLastDay,
+  invasionTriggerCalculateNextDay,
+  invasionTriggerShouldTrigger,
+  invasionTriggerShouldShowWarning,
+  invasionTriggerAddSpecial,
+  invasionTriggerProcessSchedule,
+  INVASION_TRIGGER_DEFAULT_GRACE_PERIOD,
+  INVASION_TRIGGER_MIN_INTERVAL,
+  INVASION_TRIGGER_MAX_VARIANCE,
+  INVASION_TRIGGER_MIN_DAYS_BETWEEN,
+  INVASION_TRIGGER_WARNING_MINUTES,
 } from '@helpers/invasion-triggers';
 import { defaultInvasionSchedule } from '@helpers/defaults';
 
@@ -81,55 +81,55 @@ describe('invasion-triggers', () => {
     vi.clearAllMocks();
   });
 
-  // --- getInvasionInterval ---
+  // --- invasionTriggerGetInterval ---
 
-  describe('getInvasionInterval', () => {
+  describe('invasionTriggerGetInterval', () => {
     it('should return 15 for days before 60', () => {
-      expect(getInvasionInterval(30)).toBe(15);
-      expect(getInvasionInterval(45)).toBe(15);
-      expect(getInvasionInterval(59)).toBe(15);
+      expect(invasionTriggerGetInterval(30)).toBe(15);
+      expect(invasionTriggerGetInterval(45)).toBe(15);
+      expect(invasionTriggerGetInterval(59)).toBe(15);
     });
 
     it('should return 10 for days 60-99', () => {
-      expect(getInvasionInterval(60)).toBe(10);
-      expect(getInvasionInterval(75)).toBe(10);
-      expect(getInvasionInterval(99)).toBe(10);
+      expect(invasionTriggerGetInterval(60)).toBe(10);
+      expect(invasionTriggerGetInterval(75)).toBe(10);
+      expect(invasionTriggerGetInterval(99)).toBe(10);
     });
 
     it('should return 7 for days 100+', () => {
-      expect(getInvasionInterval(100)).toBe(7);
-      expect(getInvasionInterval(200)).toBe(7);
+      expect(invasionTriggerGetInterval(100)).toBe(7);
+      expect(invasionTriggerGetInterval(200)).toBe(7);
     });
 
-    it('should never return less than MIN_INVASION_INTERVAL', () => {
+    it('should never return less than INVASION_TRIGGER_MIN_INTERVAL', () => {
       for (const day of [1, 30, 60, 100, 500]) {
-        expect(getInvasionInterval(day)).toBeGreaterThanOrEqual(
-          MIN_INVASION_INTERVAL,
+        expect(invasionTriggerGetInterval(day)).toBeGreaterThanOrEqual(
+          INVASION_TRIGGER_MIN_INTERVAL,
         );
       }
     });
   });
 
-  // --- isInGracePeriod ---
+  // --- invasionTriggerIsInGracePeriod ---
 
-  describe('isInGracePeriod', () => {
+  describe('invasionTriggerIsInGracePeriod', () => {
     it('should return true when before grace period end', () => {
-      expect(isInGracePeriod(1, 30)).toBe(true);
-      expect(isInGracePeriod(29, 30)).toBe(true);
+      expect(invasionTriggerIsInGracePeriod(1, 30)).toBe(true);
+      expect(invasionTriggerIsInGracePeriod(29, 30)).toBe(true);
     });
 
     it('should return false when at or past grace period end', () => {
-      expect(isInGracePeriod(30, 30)).toBe(false);
-      expect(isInGracePeriod(31, 30)).toBe(false);
+      expect(invasionTriggerIsInGracePeriod(30, 30)).toBe(false);
+      expect(invasionTriggerIsInGracePeriod(31, 30)).toBe(false);
     });
   });
 
-  // --- getLastInvasionDay ---
+  // --- invasionTriggerGetLastDay ---
 
-  describe('getLastInvasionDay', () => {
+  describe('invasionTriggerGetLastDay', () => {
     it('should return null for empty history', () => {
       const schedule = makeSchedule();
-      expect(getLastInvasionDay(schedule)).toBeUndefined();
+      expect(invasionTriggerGetLastDay(schedule)).toBeUndefined();
     });
 
     it('should return the day of the last invasion', () => {
@@ -139,26 +139,26 @@ describe('invasion-triggers', () => {
           { day: 45, type: 'scheduled' },
         ],
       });
-      expect(getLastInvasionDay(schedule)).toBe(45);
+      expect(invasionTriggerGetLastDay(schedule)).toBe(45);
     });
   });
 
-  // --- calculateNextInvasionDay ---
+  // --- invasionTriggerCalculateNextDay ---
 
-  describe('calculateNextInvasionDay', () => {
+  describe('invasionTriggerCalculateNextDay', () => {
     it('should schedule based on interval + variance', () => {
       const rng = seedrandom('fixed-seed');
-      const result = calculateNextInvasionDay(30, undefined, 30, rng);
-      expect(result.day).toBeGreaterThanOrEqual(30 + 15 - MAX_VARIANCE);
-      expect(result.day).toBeLessThanOrEqual(30 + 15 + MAX_VARIANCE);
-      expect(result.variance).toBeGreaterThanOrEqual(-MAX_VARIANCE);
-      expect(result.variance).toBeLessThanOrEqual(MAX_VARIANCE);
+      const result = invasionTriggerCalculateNextDay(30, undefined, 30, rng);
+      expect(result.day).toBeGreaterThanOrEqual(30 + 15 - INVASION_TRIGGER_MAX_VARIANCE);
+      expect(result.day).toBeLessThanOrEqual(30 + 15 + INVASION_TRIGGER_MAX_VARIANCE);
+      expect(result.variance).toBeGreaterThanOrEqual(-INVASION_TRIGGER_MAX_VARIANCE);
+      expect(result.variance).toBeLessThanOrEqual(INVASION_TRIGGER_MAX_VARIANCE);
     });
 
     it('should not push invasion before grace period', () => {
       // Use day 28 with a large negative variance — result should be >= 30
       const rng = seedrandom('push-before-grace');
-      const result = calculateNextInvasionDay(28, undefined, 30, rng);
+      const result = invasionTriggerCalculateNextDay(28, undefined, 30, rng);
       expect(result.day).toBeGreaterThanOrEqual(30);
     });
 
@@ -166,106 +166,106 @@ describe('invasion-triggers', () => {
       const rng = seedrandom('min-gap');
       // Last invasion on day 44, scheduling from day 45
       // Even with 15-day interval, enforce min gap from lastInvasionDay
-      const result = calculateNextInvasionDay(45, 44, 30, rng);
-      expect(result.day - 44).toBeGreaterThanOrEqual(MIN_DAYS_BETWEEN_INVASIONS);
+      const result = invasionTriggerCalculateNextDay(45, 44, 30, rng);
+      expect(result.day - 44).toBeGreaterThanOrEqual(INVASION_TRIGGER_MIN_DAYS_BETWEEN);
     });
 
     it('should use correct interval for day 60+', () => {
       const rng = seedrandom('day-60');
-      const result = calculateNextInvasionDay(60, undefined, 30, rng);
+      const result = invasionTriggerCalculateNextDay(60, undefined, 30, rng);
       // Interval is 10 at day 60, so day should be ~70 +/- 2
-      expect(result.day).toBeGreaterThanOrEqual(60 + 10 - MAX_VARIANCE);
-      expect(result.day).toBeLessThanOrEqual(60 + 10 + MAX_VARIANCE);
+      expect(result.day).toBeGreaterThanOrEqual(60 + 10 - INVASION_TRIGGER_MAX_VARIANCE);
+      expect(result.day).toBeLessThanOrEqual(60 + 10 + INVASION_TRIGGER_MAX_VARIANCE);
     });
 
     it('should use correct interval for day 100+', () => {
       const rng = seedrandom('day-100');
-      const result = calculateNextInvasionDay(100, undefined, 30, rng);
+      const result = invasionTriggerCalculateNextDay(100, undefined, 30, rng);
       // Interval is 7 at day 100, so day should be ~107 +/- 2
-      expect(result.day).toBeGreaterThanOrEqual(100 + 7 - MAX_VARIANCE);
-      expect(result.day).toBeLessThanOrEqual(100 + 7 + MAX_VARIANCE);
+      expect(result.day).toBeGreaterThanOrEqual(100 + 7 - INVASION_TRIGGER_MAX_VARIANCE);
+      expect(result.day).toBeLessThanOrEqual(100 + 7 + INVASION_TRIGGER_MAX_VARIANCE);
     });
 
     it('should produce deterministic results with same seed', () => {
       const rng1 = seedrandom('deterministic');
       const rng2 = seedrandom('deterministic');
-      const result1 = calculateNextInvasionDay(30, undefined, 30, rng1);
-      const result2 = calculateNextInvasionDay(30, undefined, 30, rng2);
+      const result1 = invasionTriggerCalculateNextDay(30, undefined, 30, rng1);
+      const result2 = invasionTriggerCalculateNextDay(30, undefined, 30, rng2);
       expect(result1).toEqual(result2);
     });
   });
 
-  // --- shouldTriggerInvasion ---
+  // --- invasionTriggerShouldTrigger ---
 
-  describe('shouldTriggerInvasion', () => {
+  describe('invasionTriggerShouldTrigger', () => {
     it('should return false when no invasion scheduled', () => {
       const schedule = makeSchedule({ nextInvasionDay: undefined });
-      expect(shouldTriggerInvasion(schedule, 50)).toBe(false);
+      expect(invasionTriggerShouldTrigger(schedule, 50)).toBe(false);
     });
 
     it('should return false before scheduled day', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
-      expect(shouldTriggerInvasion(schedule, 44)).toBe(false);
+      expect(invasionTriggerShouldTrigger(schedule, 44)).toBe(false);
     });
 
     it('should return true on scheduled day', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
-      expect(shouldTriggerInvasion(schedule, 45)).toBe(true);
+      expect(invasionTriggerShouldTrigger(schedule, 45)).toBe(true);
     });
 
     it('should return true after scheduled day (past-due)', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
-      expect(shouldTriggerInvasion(schedule, 50)).toBe(true);
+      expect(invasionTriggerShouldTrigger(schedule, 50)).toBe(true);
     });
   });
 
-  // --- shouldShowWarning ---
+  // --- invasionTriggerShouldShowWarning ---
 
-  describe('shouldShowWarning', () => {
+  describe('invasionTriggerShouldShowWarning', () => {
     it('should return false when no invasion scheduled', () => {
       const schedule = makeSchedule({ nextInvasionDay: undefined });
       const time: GameTime = { day: 44, hour: 23, minute: 58 };
-      expect(shouldShowWarning(schedule, time)).toBe(false);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(false);
     });
 
     it('should return true within warning window', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
       // 2 minutes before day 45 start = day 44, 23:58
       const time: GameTime = { day: 44, hour: 23, minute: 58 };
-      expect(shouldShowWarning(schedule, time)).toBe(true);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(true);
     });
 
     it('should return true at exactly warning start', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
       const time: GameTime = { day: 44, hour: 23, minute: 58 };
-      expect(shouldShowWarning(schedule, time)).toBe(true);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(true);
     });
 
     it('should return true 1 minute before invasion', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
       const time: GameTime = { day: 44, hour: 23, minute: 59 };
-      expect(shouldShowWarning(schedule, time)).toBe(true);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(true);
     });
 
     it('should return false at invasion time', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
       const time: GameTime = { day: 45, hour: 0, minute: 0 };
-      expect(shouldShowWarning(schedule, time)).toBe(false);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(false);
     });
 
     it('should return false well before warning window', () => {
       const schedule = makeSchedule({ nextInvasionDay: 45 });
       const time: GameTime = { day: 44, hour: 23, minute: 55 };
-      expect(shouldShowWarning(schedule, time)).toBe(false);
+      expect(invasionTriggerShouldShowWarning(schedule, time)).toBe(false);
     });
   });
 
-  // --- addSpecialInvasion ---
+  // --- invasionTriggerAddSpecial ---
 
-  describe('addSpecialInvasion', () => {
+  describe('invasionTriggerAddSpecial', () => {
     it('should add a special invasion with default delay of 1', () => {
       const schedule = makeSchedule();
-      const result = addSpecialInvasion(schedule, 'crusade', 50);
+      const result = invasionTriggerAddSpecial(schedule, 'crusade', 50);
       expect(result.pendingSpecialInvasions).toHaveLength(1);
       expect(result.pendingSpecialInvasions[0]).toEqual({
         type: 'crusade',
@@ -275,7 +275,7 @@ describe('invasion-triggers', () => {
 
     it('should add a special invasion with custom delay', () => {
       const schedule = makeSchedule();
-      const result = addSpecialInvasion(schedule, 'raid', 50, 3);
+      const result = invasionTriggerAddSpecial(schedule, 'raid', 50, 3);
       expect(result.pendingSpecialInvasions[0]).toEqual({
         type: 'raid',
         triggerDay: 53,
@@ -284,25 +284,25 @@ describe('invasion-triggers', () => {
 
     it('should not mutate the original schedule', () => {
       const schedule = makeSchedule();
-      addSpecialInvasion(schedule, 'bounty_hunter', 50);
+      invasionTriggerAddSpecial(schedule, 'bounty_hunter', 50);
       expect(schedule.pendingSpecialInvasions).toHaveLength(0);
     });
   });
 
-  // --- processInvasionSchedule ---
+  // --- invasionTriggerProcessSchedule ---
 
-  describe('processInvasionSchedule', () => {
+  describe('invasionTriggerProcessSchedule', () => {
     it('should do nothing during grace period', () => {
       const state = makeGameState({ day: 15 });
       const rng = seedrandom('grace');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
     });
 
     it('should schedule first invasion when grace period ends', () => {
       const state = makeGameState({ day: 30 });
       const rng = seedrandom('first-schedule');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.nextInvasionDay).toBeDefined();
       expect(
         state.world.invasionSchedule.nextInvasionDay!,
@@ -315,7 +315,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('no-reschedule');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.nextInvasionDay).toBe(45);
     });
 
@@ -325,7 +325,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('trigger');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       // Should have recorded the invasion
       expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
       expect(state.world.invasionSchedule.invasionHistory[0]).toEqual({
@@ -344,7 +344,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('past-due');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
       expect(state.world.invasionSchedule.invasionHistory[0].day).toBe(50);
     });
@@ -357,7 +357,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('warning');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.warningActive).toBe(true);
     });
 
@@ -369,7 +369,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45, warningDismissed: true },
       });
       const rng = seedrandom('warning-dismissed');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       // warningActive should remain false since dismissed
       expect(state.world.invasionSchedule.warningActive).toBe(false);
     });
@@ -383,7 +383,7 @@ describe('invasion-triggers', () => {
         },
       });
       const rng = seedrandom('special');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
       expect(state.world.invasionSchedule.invasionHistory[0]).toEqual({
         day: 50,
@@ -403,7 +403,7 @@ describe('invasion-triggers', () => {
         },
       });
       const rng = seedrandom('special-not-yet');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.invasionHistory).toHaveLength(0);
       expect(
         state.world.invasionSchedule.pendingSpecialInvasions,
@@ -415,15 +415,15 @@ describe('invasion-triggers', () => {
       const state = makeGameState({ day: 30 });
 
       // First scheduling
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       const firstDay = state.world.invasionSchedule.nextInvasionDay!;
-      expect(firstDay).toBeGreaterThanOrEqual(30 + 15 - MAX_VARIANCE);
-      expect(firstDay).toBeLessThanOrEqual(30 + 15 + MAX_VARIANCE);
+      expect(firstDay).toBeGreaterThanOrEqual(30 + 15 - INVASION_TRIGGER_MAX_VARIANCE);
+      expect(firstDay).toBeLessThanOrEqual(30 + 15 + INVASION_TRIGGER_MAX_VARIANCE);
 
       // Advance to first invasion day
       state.clock.day = firstDay;
       const rng2 = seedrandom('escalation-2');
-      processInvasionSchedule(state, rng2);
+      invasionTriggerProcessSchedule(state, rng2);
 
       // Next invasion should be scheduled from a higher day
       const secondDay = state.world.invasionSchedule.nextInvasionDay!;
@@ -436,7 +436,7 @@ describe('invasion-triggers', () => {
         schedule: { nextInvasionDay: 45, warningActive: true },
       });
       const rng = seedrandom('clear-warning');
-      processInvasionSchedule(state, rng);
+      invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.warningActive).toBe(false);
       expect(state.world.invasionSchedule.warningDismissed).toBe(false);
     });
@@ -446,11 +446,11 @@ describe('invasion-triggers', () => {
 
   describe('constants', () => {
     it('should have correct default values', () => {
-      expect(DEFAULT_GRACE_PERIOD).toBe(30);
-      expect(MIN_INVASION_INTERVAL).toBe(5);
-      expect(MAX_VARIANCE).toBe(2);
-      expect(MIN_DAYS_BETWEEN_INVASIONS).toBe(3);
-      expect(WARNING_MINUTES).toBe(2);
+      expect(INVASION_TRIGGER_DEFAULT_GRACE_PERIOD).toBe(30);
+      expect(INVASION_TRIGGER_MIN_INTERVAL).toBe(5);
+      expect(INVASION_TRIGGER_MAX_VARIANCE).toBe(2);
+      expect(INVASION_TRIGGER_MIN_DAYS_BETWEEN).toBe(3);
+      expect(INVASION_TRIGGER_WARNING_MINUTES).toBe(2);
     });
   });
 

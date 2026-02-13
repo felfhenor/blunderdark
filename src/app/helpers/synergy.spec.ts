@@ -136,15 +136,15 @@ vi.mock('@helpers/content', () => {
   });
 
   return {
-    getEntry: vi.fn((id: string) => entries.get(id)),
-    getEntriesByType: vi.fn(() => []),
+    contentGetEntry: vi.fn((id: string) => entries.get(id)),
+    contentGetEntriesByType: vi.fn(() => []),
     getEntries: vi.fn(),
-    allIdsByName: vi.fn(() => new Map()),
+    contentAllIdsByName: vi.fn(() => new Map()),
   };
 });
 
 vi.mock('@helpers/production', () => ({
-  getRoomDefinition: vi.fn((id: string) => {
+  productionGetRoomDefinition: vi.fn((id: string) => {
     const rooms: Record<string, { name: string }> = {
       'room-dark-forge': { name: 'Dark Forge' },
       'room-soul-well': { name: 'Soul Well' },
@@ -166,11 +166,11 @@ import type {
   SynergyDefinition,
 } from '@interfaces';
 import {
-  evaluateCondition,
-  evaluateAllSynergies,
-  evaluateSynergiesForRoom,
-  formatSynergyEffect,
-  getPotentialSynergiesForRoom,
+  synergyEvaluateCondition,
+  synergyEvaluateAll,
+  synergyEvaluateForRoom,
+  synergyFormatEffect,
+  synergyGetPotentialForRoom,
 } from '@helpers/synergy';
 
 function makeFloor(
@@ -192,7 +192,7 @@ function makeFloor(
   };
 }
 
-describe('evaluateCondition', () => {
+describe('synergyEvaluateCondition', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine',
     roomTypeId: 'room-crystal-mine',
@@ -213,7 +213,7 @@ describe('evaluateCondition', () => {
     it('should return true when room type matches', () => {
       const floor = makeFloor([mine]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'roomType', roomTypeId: 'room-crystal-mine' },
           mine,
           floor,
@@ -225,7 +225,7 @@ describe('evaluateCondition', () => {
     it('should return false when room type does not match', () => {
       const floor = makeFloor([mine]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'roomType', roomTypeId: 'room-dark-forge' },
           mine,
           floor,
@@ -239,7 +239,7 @@ describe('evaluateCondition', () => {
     it('should return true when adjacent room type matches', () => {
       const floor = makeFloor([mine, forge]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
           mine,
           floor,
@@ -251,7 +251,7 @@ describe('evaluateCondition', () => {
     it('should return false when no adjacent room matches', () => {
       const floor = makeFloor([mine, forge]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'adjacentRoomType', roomTypeId: 'room-soul-well' },
           mine,
           floor,
@@ -263,7 +263,7 @@ describe('evaluateCondition', () => {
     it('should return false when room is not adjacent', () => {
       const floor = makeFloor([mine, forge]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
           mine,
           floor,
@@ -283,7 +283,7 @@ describe('evaluateCondition', () => {
       };
       const floor = makeFloor([mine, forge], [], [conn]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
           mine,
           floor,
@@ -301,7 +301,7 @@ describe('evaluateCondition', () => {
       };
       const floor = makeFloor([mine, forge], [], [conn]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'connectedRoomType', roomTypeId: 'room-crystal-mine' },
           forge,
           floor,
@@ -313,7 +313,7 @@ describe('evaluateCondition', () => {
     it('should return false when not connected', () => {
       const floor = makeFloor([mine, forge]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
           mine,
           floor,
@@ -336,7 +336,7 @@ describe('evaluateCondition', () => {
       ];
       const floor = makeFloor([mine], inhabitants);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'inhabitantType', inhabitantType: 'creature' },
           mine,
           floor,
@@ -357,7 +357,7 @@ describe('evaluateCondition', () => {
       ];
       const floor = makeFloor([mine], inhabitants);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'inhabitantType', inhabitantType: 'creature' },
           mine,
           floor,
@@ -369,7 +369,7 @@ describe('evaluateCondition', () => {
     it('should return false when no inhabitants are assigned', () => {
       const floor = makeFloor([mine]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'inhabitantType', inhabitantType: 'creature' },
           mine,
           floor,
@@ -390,7 +390,7 @@ describe('evaluateCondition', () => {
       ];
       const floor = makeFloor([mine, forge], inhabitants);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'inhabitantType', inhabitantType: 'creature' },
           mine,
           floor,
@@ -420,7 +420,7 @@ describe('evaluateCondition', () => {
       ];
       const floor = makeFloor([mine], inhabitants);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'minInhabitants', count: 2 },
           mine,
           floor,
@@ -441,7 +441,7 @@ describe('evaluateCondition', () => {
       ];
       const floor = makeFloor([mine], inhabitants);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'minInhabitants', count: 2 },
           mine,
           floor,
@@ -453,7 +453,7 @@ describe('evaluateCondition', () => {
     it('should return false when no inhabitants assigned', () => {
       const floor = makeFloor([mine]);
       expect(
-        evaluateCondition(
+        synergyEvaluateCondition(
           { type: 'minInhabitants', count: 1 },
           mine,
           floor,
@@ -464,7 +464,7 @@ describe('evaluateCondition', () => {
   });
 });
 
-describe('evaluateSynergiesForRoom', () => {
+describe('synergyEvaluateForRoom', () => {
   const testSynergies: SynergyDefinition[] = [
     {
       id: 'test-mine-forge',
@@ -516,7 +516,7 @@ describe('evaluateSynergiesForRoom', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const active = evaluateSynergiesForRoom(
+    const active = synergyEvaluateForRoom(
       mine,
       floor,
       ['placed-forge'],
@@ -529,7 +529,7 @@ describe('evaluateSynergiesForRoom', () => {
   it('should not activate synergy when a condition is not met', () => {
     // No inhabitants — inhabitantType condition fails
     const floor = makeFloor([mine, forge]);
-    const active = evaluateSynergiesForRoom(
+    const active = synergyEvaluateForRoom(
       mine,
       floor,
       ['placed-forge'],
@@ -550,7 +550,7 @@ describe('evaluateSynergiesForRoom', () => {
     ];
     const floor = makeFloor([mine, forge], inhabitants);
     // Forge doesn't match mine-forge synergy's roomType condition
-    const active = evaluateSynergiesForRoom(
+    const active = synergyEvaluateForRoom(
       forge,
       floor,
       ['placed-mine'],
@@ -582,7 +582,7 @@ describe('evaluateSynergiesForRoom', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const active = evaluateSynergiesForRoom(
+    const active = synergyEvaluateForRoom(
       mine,
       floor,
       ['placed-forge'],
@@ -592,7 +592,7 @@ describe('evaluateSynergiesForRoom', () => {
   });
 });
 
-describe('evaluateAllSynergies', () => {
+describe('synergyEvaluateAll', () => {
   const testSynergies: SynergyDefinition[] = [
     {
       id: 'test-mine-forge',
@@ -634,7 +634,7 @@ describe('evaluateAllSynergies', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const result = evaluateAllSynergies([floor], testSynergies);
+    const result = synergyEvaluateAll([floor], testSynergies);
     expect(result.get('placed-mine')).toHaveLength(1);
     expect(result.get('placed-mine')![0].id).toBe('test-mine-forge');
     expect(result.has('placed-forge')).toBe(false);
@@ -642,7 +642,7 @@ describe('evaluateAllSynergies', () => {
 
   it('should return empty map when no synergies activate', () => {
     const floor = makeFloor([mine, forge]);
-    const result = evaluateAllSynergies([floor], testSynergies);
+    const result = synergyEvaluateAll([floor], testSynergies);
     expect(result.size).toBe(0);
   });
 
@@ -659,7 +659,7 @@ describe('evaluateAllSynergies', () => {
     // Mine on floor 1, forge on floor 2 — adjacency not met
     const floor1 = makeFloor([mine], inhabitants);
     const floor2 = makeFloor([forge]);
-    const result = evaluateAllSynergies([floor1, floor2], testSynergies);
+    const result = synergyEvaluateAll([floor1, floor2], testSynergies);
     expect(result.size).toBe(0);
   });
 });
@@ -716,14 +716,14 @@ describe('synergy re-evaluation scenarios', () => {
       },
     ];
     // Before forge placed: no adjacency synergy
-    const beforePlacement = evaluateAllSynergies(
+    const beforePlacement = synergyEvaluateAll(
       [makeFloor([mine], inhabitants)],
       testSynergies,
     );
     expect(beforePlacement.size).toBe(0);
 
     // After forge placed: synergy activates
-    const afterPlacement = evaluateAllSynergies(
+    const afterPlacement = synergyEvaluateAll(
       [makeFloor([mine, forge], inhabitants)],
       testSynergies,
     );
@@ -735,7 +735,7 @@ describe('synergy re-evaluation scenarios', () => {
 
   it('should activate on inhabitant assignment', () => {
     const floor = makeFloor([mine, forge]);
-    const before = evaluateAllSynergies([floor], testSynergies);
+    const before = synergyEvaluateAll([floor], testSynergies);
     expect(before.size).toBe(0);
 
     // Assign goblin (creature type)
@@ -748,7 +748,7 @@ describe('synergy re-evaluation scenarios', () => {
         assignedRoomId: 'placed-mine',
       },
     ];
-    const after = evaluateAllSynergies(
+    const after = synergyEvaluateAll(
       [makeFloor([mine, forge], inhabitants)],
       testSynergies,
     );
@@ -765,7 +765,7 @@ describe('synergy re-evaluation scenarios', () => {
         assignedRoomId: 'placed-mine',
       },
     ];
-    const active = evaluateAllSynergies(
+    const active = synergyEvaluateAll(
       [makeFloor([mine, forge], inhabitants)],
       testSynergies,
     );
@@ -781,7 +781,7 @@ describe('synergy re-evaluation scenarios', () => {
         assignedRoomId: undefined,
       },
     ];
-    const inactive = evaluateAllSynergies(
+    const inactive = synergyEvaluateAll(
       [makeFloor([mine, forge], unassigned)],
       testSynergies,
     );
@@ -789,7 +789,7 @@ describe('synergy re-evaluation scenarios', () => {
   });
 
   it('should activate connection-based synergy when rooms are connected', () => {
-    const before = evaluateAllSynergies(
+    const before = synergyEvaluateAll(
       [makeFloor([mine, forge])],
       testSynergies,
     );
@@ -801,7 +801,7 @@ describe('synergy re-evaluation scenarios', () => {
       roomBId: 'placed-forge',
       edgeTiles: [],
     };
-    const after = evaluateAllSynergies(
+    const after = synergyEvaluateAll(
       [makeFloor([mine, forge], [], [conn])],
       testSynergies,
     );
@@ -816,14 +816,14 @@ describe('synergy re-evaluation scenarios', () => {
       roomBId: 'placed-forge',
       edgeTiles: [],
     };
-    const connected = evaluateAllSynergies(
+    const connected = synergyEvaluateAll(
       [makeFloor([mine, forge], [], [conn])],
       testSynergies,
     );
     expect(connected.get('placed-mine')).toHaveLength(1);
 
     // Remove connection
-    const disconnected = evaluateAllSynergies(
+    const disconnected = synergyEvaluateAll(
       [makeFloor([mine, forge])],
       testSynergies,
     );
@@ -840,14 +840,14 @@ describe('synergy re-evaluation scenarios', () => {
         assignedRoomId: 'placed-mine',
       },
     ];
-    const withForge = evaluateAllSynergies(
+    const withForge = synergyEvaluateAll(
       [makeFloor([mine, forge], inhabitants)],
       testSynergies,
     );
     expect(withForge.get('placed-mine')).toHaveLength(1);
 
     // Remove forge
-    const withoutForge = evaluateAllSynergies(
+    const withoutForge = synergyEvaluateAll(
       [makeFloor([mine], inhabitants)],
       testSynergies,
     );
@@ -855,9 +855,9 @@ describe('synergy re-evaluation scenarios', () => {
   });
 });
 
-describe('formatSynergyEffect', () => {
+describe('synergyFormatEffect', () => {
   it('should format production bonus with resource', () => {
-    const result = formatSynergyEffect({
+    const result = synergyFormatEffect({
       type: 'productionBonus',
       value: 0.15,
       resource: 'crystals',
@@ -866,7 +866,7 @@ describe('formatSynergyEffect', () => {
   });
 
   it('should format production bonus without resource', () => {
-    const result = formatSynergyEffect({
+    const result = synergyFormatEffect({
       type: 'productionBonus',
       value: 0.2,
     });
@@ -874,7 +874,7 @@ describe('formatSynergyEffect', () => {
   });
 
   it('should format fear reduction', () => {
-    const result = formatSynergyEffect({
+    const result = synergyFormatEffect({
       type: 'fearReduction',
       value: 5,
     });
@@ -882,7 +882,7 @@ describe('formatSynergyEffect', () => {
   });
 
   it('should round percentage correctly', () => {
-    const result = formatSynergyEffect({
+    const result = synergyFormatEffect({
       type: 'productionBonus',
       value: 0.333,
       resource: 'gold',
@@ -891,7 +891,7 @@ describe('formatSynergyEffect', () => {
   });
 });
 
-describe('getPotentialSynergiesForRoom', () => {
+describe('synergyGetPotentialForRoom', () => {
   const testSynergies: SynergyDefinition[] = [
     {
       id: 'test-mine-forge',
@@ -945,7 +945,7 @@ describe('getPotentialSynergiesForRoom', () => {
   it('should return potential synergies with missing conditions', () => {
     // Mine exists but no forge adjacent and no creature worker
     const floor = makeFloor([mine]);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       mine,
       floor,
       [],
@@ -965,7 +965,7 @@ describe('getPotentialSynergiesForRoom', () => {
   it('should not return synergies for non-matching room types', () => {
     // Mine doesn't match forge-staff or library-well synergies
     const floor = makeFloor([mine]);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       mine,
       floor,
       [],
@@ -987,7 +987,7 @@ describe('getPotentialSynergiesForRoom', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       mine,
       floor,
       ['placed-forge'],
@@ -1000,7 +1000,7 @@ describe('getPotentialSynergiesForRoom', () => {
   it('should show remaining missing conditions when some are met', () => {
     // Mine with forge adjacent but no creature worker
     const floor = makeFloor([mine, forge]);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       mine,
       floor,
       ['placed-forge'],
@@ -1023,7 +1023,7 @@ describe('getPotentialSynergiesForRoom', () => {
       anchorY: 0,
     };
     const floor = makeFloor([library]);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       library,
       floor,
       [],
@@ -1038,7 +1038,7 @@ describe('getPotentialSynergiesForRoom', () => {
 
   it('should describe minInhabitants conditions', () => {
     const floor = makeFloor([forge]);
-    const potentials = getPotentialSynergiesForRoom(
+    const potentials = synergyGetPotentialForRoom(
       forge,
       floor,
       [],

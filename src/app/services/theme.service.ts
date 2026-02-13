@@ -1,5 +1,5 @@
 import { effect, Injectable } from '@angular/core';
-import { getOption, windowHeight, windowWidth } from '@helpers';
+import { optionsGet, uiWindowHeight, uiWindowWidth } from '@helpers';
 
 @Injectable({
   providedIn: 'root',
@@ -7,14 +7,14 @@ import { getOption, windowHeight, windowWidth } from '@helpers';
 export class ThemeService {
   constructor() {
     effect(() => {
-      const theme = getOption('uiTheme');
+      const theme = optionsGet('uiTheme');
       document.documentElement.setAttribute('data-theme', theme);
     });
   }
 
   private handleResize() {
-    windowWidth.set(window.innerWidth);
-    windowHeight.set(window.innerHeight);
+    uiWindowWidth.set(window.innerWidth);
+    uiWindowHeight.set(window.innerHeight);
   }
 
   init() {

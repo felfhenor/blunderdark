@@ -1,8 +1,8 @@
 import { computed } from '@angular/core';
-import { areRoomsAdjacent } from '@helpers/adjacency';
-import { getEntry } from '@helpers/content';
-import { findRoomIdByRole } from '@helpers/room-roles';
-import { getAbsoluteTiles, getShapeBounds } from '@helpers/room-shapes';
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { contentGetEntry } from '@helpers/content';
+import { roomRoleFindById } from '@helpers/room-roles';
+import { roomShapeGetAbsoluteTiles, roomShapeGetBounds } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import {
   GRID_SIZE,
@@ -22,10 +22,10 @@ import {
  * Find the placed Throne Room across all floors.
  * Returns the floor and room if found.
  */
-export function findThroneRoom(
+export function throneRoomFind(
   floors: Floor[],
 ): { floor: Floor; room: PlacedRoom } | undefined {
-  const throneId = findRoomIdByRole('throne');
+  const throneId = roomRoleFindById('throne');
   if (!throneId) return undefined;
 
   for (const floor of floors) {
@@ -40,7 +40,7 @@ export function findThroneRoom(
 /**
  * Get the seated ruler instance from a floor's inhabitants.
  */
-export function getSeatedRulerInstance(
+export function throneRoomGetSeatedRulerInstance(
   floor: Floor,
   throneRoomId: string,
 ): InhabitantInstance | undefined {
@@ -52,24 +52,24 @@ export function getSeatedRulerInstance(
 /**
  * Get the ruler definition for a seated ruler instance.
  */
-export function getRulerDefinition(
+export function throneRoomGetRulerDefinition(
   instance: InhabitantInstance,
 ): (InhabitantDefinition & IsContentItem) | undefined {
-  return getEntry<InhabitantDefinition & IsContentItem>(instance.definitionId) ?? undefined;
+  return contentGetEntry<InhabitantDefinition & IsContentItem>(instance.definitionId) ?? undefined;
 }
 
 /**
  * Get the active ruler bonuses from the current game state floors.
  * Returns an empty record if no Throne Room or no seated ruler.
  */
-export function getActiveRulerBonuses(floors: Floor[]): RulerBonuses {
-  const throne = findThroneRoom(floors);
+export function throneRoomGetActiveRulerBonuses(floors: Floor[]): RulerBonuses {
+  const throne = throneRoomFind(floors);
   if (!throne) return {};
 
-  const ruler = getSeatedRulerInstance(throne.floor, throne.room.id);
+  const ruler = throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
   if (!ruler) return {};
 
-  const def = getRulerDefinition(ruler);
+  const def = throneRoomGetRulerDefinition(ruler);
   if (!def) return {};
 
   return { ...def.rulerBonuses };
@@ -78,11 +78,11 @@ export function getActiveRulerBonuses(floors: Floor[]): RulerBonuses {
 /**
  * Get a specific ruler bonus value. Returns 0 if not active.
  */
-export function getRulerBonusValue(
+export function throneRoomGetRulerBonusValue(
   floors: Floor[],
   bonusType: string,
 ): number {
-  const bonuses = getActiveRulerBonuses(floors);
+  const bonuses = throneRoomGetActiveRulerBonuses(floors);
   return bonuses[bonusType] ?? 0;
 }
 
@@ -91,46 +91,46 @@ export function getRulerBonusValue(
 /**
  * The currently seated ruler instance, or null if no Throne Room or empty.
  */
-export const seatedRuler = computed<InhabitantInstance | undefined>(() => {
+export const throneRoomSeatedRuler = computed<InhabitantInstance | undefined>(() => {
   const floors = gamestate().world.floors;
-  const throne = findThroneRoom(floors);
+  const throne = throneRoomFind(floors);
   if (!throne) return undefined;
-  return getSeatedRulerInstance(throne.floor, throne.room.id);
+  return throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
 });
 
 /**
  * The active ruler bonuses as a reactive signal.
  */
-export const activeRulerBonuses = computed<RulerBonuses>(() => {
-  return getActiveRulerBonuses(gamestate().world.floors);
+export const throneRoomActiveRulerBonuses = computed<RulerBonuses>(() => {
+  return throneRoomGetActiveRulerBonuses(gamestate().world.floors);
 });
 
 /**
  * Get a specific bonus type's value reactively.
  */
-export function rulerBonus(bonusType: string): number {
-  return activeRulerBonuses()[bonusType] ?? 0;
+export function throneRoomRulerBonus(bonusType: string): number {
+  return throneRoomActiveRulerBonuses()[bonusType] ?? 0;
 }
 
 // --- Fear level ---
 
-export const EMPTY_THRONE_FEAR_LEVEL = 1;
+export const THRONE_ROOM_EMPTY_FEAR_LEVEL = 1;
 
 /**
  * Get the Throne Room's effective fear level.
- * Returns EMPTY_THRONE_FEAR_LEVEL (1) if no Throne Room or no ruler seated.
+ * Returns THRONE_ROOM_EMPTY_FEAR_LEVEL (1) if no Throne Room or no ruler seated.
  * Returns the ruler's rulerFearLevel if a ruler is seated.
  * Returns null if the Throne Room is not placed.
  */
-export function getThroneRoomFearLevel(floors: Floor[]): number | undefined {
-  const throne = findThroneRoom(floors);
+export function throneRoomGetFearLevel(floors: Floor[]): number | undefined {
+  const throne = throneRoomFind(floors);
   if (!throne) return undefined;
 
-  const ruler = getSeatedRulerInstance(throne.floor, throne.room.id);
-  if (!ruler) return EMPTY_THRONE_FEAR_LEVEL;
+  const ruler = throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
+  if (!ruler) return THRONE_ROOM_EMPTY_FEAR_LEVEL;
 
-  const def = getRulerDefinition(ruler);
-  if (!def || def.rulerFearLevel <= 0) return EMPTY_THRONE_FEAR_LEVEL;
+  const def = throneRoomGetRulerDefinition(ruler);
+  if (!def || def.rulerFearLevel <= 0) return THRONE_ROOM_EMPTY_FEAR_LEVEL;
 
   return def.rulerFearLevel;
 }
@@ -140,13 +140,13 @@ export function getThroneRoomFearLevel(floors: Floor[]): number | undefined {
  * Returns null if no Throne Room is placed.
  */
 export const throneRoomFearLevel = computed<number | undefined>(() => {
-  return getThroneRoomFearLevel(gamestate().world.floors);
+  return throneRoomGetFearLevel(gamestate().world.floors);
 });
 
 // --- Adjacency & centrality bonuses ---
 
-export const CENTRALITY_THRESHOLD = 5;
-export const CENTRALITY_RULER_BONUS_MULTIPLIER = 0.1;
+export const THRONE_ROOM_CENTRALITY_THRESHOLD = 5;
+export const THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER = 0.1;
 
 export type ThronePositionalBonuses = {
   vaultAdjacent: boolean;
@@ -158,7 +158,7 @@ export type ThronePositionalBonuses = {
 /**
  * Check if a room's center is within a Manhattan distance threshold of the grid center.
  */
-export function isRoomCentral(
+export function throneRoomIsRoomCentral(
   anchorX: number,
   anchorY: number,
   shapeWidth: number,
@@ -179,7 +179,7 @@ export function isRoomCentral(
  * Get positional bonuses for the Throne Room.
  * Checks adjacent rooms for throneAdjacencyEffects and central placement.
  */
-export function getThroneRoomPositionalBonuses(
+export function throneRoomGetPositionalBonuses(
   floors: Floor[],
 ): ThronePositionalBonuses {
   const defaultBonuses: ThronePositionalBonuses = {
@@ -189,15 +189,15 @@ export function getThroneRoomPositionalBonuses(
     rulerBonusMultiplier: 0,
   };
 
-  const throne = findThroneRoom(floors);
+  const throne = throneRoomFind(floors);
   if (!throne) return defaultBonuses;
 
-  const throneShape = getEntry<RoomShape & IsContentItem>(
+  const throneShape = contentGetEntry<RoomShape & IsContentItem>(
     throne.room.shapeId,
   );
   if (!throneShape) return defaultBonuses;
 
-  const throneTiles = getAbsoluteTiles(
+  const throneTiles = roomShapeGetAbsoluteTiles(
     throneShape,
     throne.room.anchorX,
     throne.room.anchorY,
@@ -208,12 +208,12 @@ export function getThroneRoomPositionalBonuses(
   let vaultAdjacent = false;
   for (const adjRoom of throne.floor.rooms) {
     if (adjRoom.id === throne.room.id) continue;
-    const adjShape = getEntry<RoomShape & IsContentItem>(adjRoom.shapeId);
+    const adjShape = contentGetEntry<RoomShape & IsContentItem>(adjRoom.shapeId);
     if (!adjShape) continue;
-    const adjTiles = getAbsoluteTiles(adjShape, adjRoom.anchorX, adjRoom.anchorY);
-    if (!areRoomsAdjacent(throneTiles, adjTiles)) continue;
+    const adjTiles = roomShapeGetAbsoluteTiles(adjShape, adjRoom.anchorX, adjRoom.anchorY);
+    if (!adjacencyAreRoomsAdjacent(throneTiles, adjTiles)) continue;
 
-    const adjDef = getEntry<RoomDefinition & IsContentItem>(adjRoom.roomTypeId);
+    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjRoom.roomTypeId);
     if (adjDef?.throneAdjacencyEffects?.goldProductionBonus) {
       vaultAdjacent = true;
       goldProductionBonus += adjDef.throneAdjacencyEffects.goldProductionBonus;
@@ -221,29 +221,29 @@ export function getThroneRoomPositionalBonuses(
   }
 
   // Check centrality
-  const bounds = getShapeBounds(throneShape);
-  const central = isRoomCentral(
+  const bounds = roomShapeGetBounds(throneShape);
+  const central = throneRoomIsRoomCentral(
     throne.room.anchorX,
     throne.room.anchorY,
     bounds.width,
     bounds.height,
     GRID_SIZE,
-    CENTRALITY_THRESHOLD,
+    THRONE_ROOM_CENTRALITY_THRESHOLD,
   );
 
   return {
     vaultAdjacent,
     central,
     goldProductionBonus,
-    rulerBonusMultiplier: central ? CENTRALITY_RULER_BONUS_MULTIPLIER : 0,
+    rulerBonusMultiplier: central ? THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER : 0,
   };
 }
 
 /**
  * Reactive computed signal for the Throne Room's positional bonuses.
  */
-export const thronePositionalBonuses = computed<ThronePositionalBonuses>(
+export const throneRoomPositionalBonuses = computed<ThronePositionalBonuses>(
   () => {
-    return getThroneRoomPositionalBonuses(gamestate().world.floors);
+    return throneRoomGetPositionalBonuses(gamestate().world.floors);
   },
 );

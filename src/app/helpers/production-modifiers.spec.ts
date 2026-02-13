@@ -23,22 +23,22 @@ const mockRoomDefs = [
 ];
 
 vi.mock('@helpers/content', () => ({
-  getEntriesByType: vi.fn((type: string) => {
+  contentGetEntriesByType: vi.fn((type: string) => {
     if (type === 'room') return mockRoomDefs;
     return [];
   }),
 }));
 
 import {
-  DEPTH_BONUS_PER_LEVEL,
-  applyModifiers,
-  calculateProductionModifiers,
-  evaluateModifiers,
-  getBiomeBonus,
-  getModifierRegistry,
-  isDayTime,
-  isNightTime,
-  resetProductionModifierCache,
+  PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL,
+  productionModifierApply,
+  productionModifierCalculate,
+  productionModifierEvaluate,
+  productionModifierGetBiomeBonus,
+  productionModifierGetRegistry,
+  productionModifierIsDayTime,
+  productionModifierIsNightTime,
+  productionModifierResetCache,
 } from '@helpers/production-modifiers';
 import type { ProductionModifierContext } from '@helpers/production-modifiers';
 
@@ -53,85 +53,85 @@ function makeContext(overrides: Partial<ProductionModifierContext> = {}): Produc
 }
 
 beforeEach(() => {
-  resetProductionModifierCache();
+  productionModifierResetCache();
 });
 
 // --- Time helpers ---
 
-describe('isNightTime', () => {
+describe('productionModifierIsNightTime', () => {
   it('should return true for hours >= 18', () => {
-    expect(isNightTime(18)).toBe(true);
-    expect(isNightTime(20)).toBe(true);
-    expect(isNightTime(23)).toBe(true);
+    expect(productionModifierIsNightTime(18)).toBe(true);
+    expect(productionModifierIsNightTime(20)).toBe(true);
+    expect(productionModifierIsNightTime(23)).toBe(true);
   });
 
   it('should return true for hours < 6', () => {
-    expect(isNightTime(0)).toBe(true);
-    expect(isNightTime(3)).toBe(true);
-    expect(isNightTime(5)).toBe(true);
+    expect(productionModifierIsNightTime(0)).toBe(true);
+    expect(productionModifierIsNightTime(3)).toBe(true);
+    expect(productionModifierIsNightTime(5)).toBe(true);
   });
 
   it('should return false for day hours', () => {
-    expect(isNightTime(6)).toBe(false);
-    expect(isNightTime(12)).toBe(false);
-    expect(isNightTime(17)).toBe(false);
+    expect(productionModifierIsNightTime(6)).toBe(false);
+    expect(productionModifierIsNightTime(12)).toBe(false);
+    expect(productionModifierIsNightTime(17)).toBe(false);
   });
 });
 
-describe('isDayTime', () => {
+describe('productionModifierIsDayTime', () => {
   it('should return true for day hours', () => {
-    expect(isDayTime(6)).toBe(true);
-    expect(isDayTime(12)).toBe(true);
-    expect(isDayTime(17)).toBe(true);
+    expect(productionModifierIsDayTime(6)).toBe(true);
+    expect(productionModifierIsDayTime(12)).toBe(true);
+    expect(productionModifierIsDayTime(17)).toBe(true);
   });
 
   it('should return false for night hours', () => {
-    expect(isDayTime(0)).toBe(false);
-    expect(isDayTime(5)).toBe(false);
-    expect(isDayTime(18)).toBe(false);
-    expect(isDayTime(23)).toBe(false);
+    expect(productionModifierIsDayTime(0)).toBe(false);
+    expect(productionModifierIsDayTime(5)).toBe(false);
+    expect(productionModifierIsDayTime(18)).toBe(false);
+    expect(productionModifierIsDayTime(23)).toBe(false);
   });
 });
 
 // --- Registry ---
 
-describe('getModifierRegistry', () => {
+describe('productionModifierGetRegistry', () => {
   it('should return all registered modifiers', () => {
-    const registry = getModifierRegistry();
+    const registry = productionModifierGetRegistry();
     expect(registry.length).toBe(3);
     expect(registry.map((m) => m.type)).toEqual(['time_of_day', 'floor_depth', 'biome']);
   });
 
   it('should have unique ids', () => {
-    const registry = getModifierRegistry();
+    const registry = productionModifierGetRegistry();
     const ids = new Set(registry.map((m) => m.id));
     expect(ids.size).toBe(registry.length);
   });
 });
 
-// --- applyModifiers ---
+// --- productionModifierApply ---
 
-describe('applyModifiers', () => {
+describe('productionModifierApply', () => {
   it('should return base when no modifiers', () => {
-    expect(applyModifiers(10, [])).toBe(10);
+    expect(productionModifierApply(10, [])).toBe(10);
   });
 
   it('should apply a single modifier', () => {
-    expect(applyModifiers(10, [1.2])).toBeCloseTo(12);
+    expect(productionModifierApply(10, [1.2])).toBeCloseTo(12);
   });
 
   it('should multiply two modifiers', () => {
-    expect(applyModifiers(10, [1.2, 0.5])).toBeCloseTo(6);
+    expect(productionModifierApply(10, [1.2, 0.5])).toBeCloseTo(6);
   });
 
   it('should multiply five modifiers', () => {
     // 10 * 1.1 * 1.2 * 0.8 * 1.5 * 0.9
-    const result = applyModifiers(10, [1.1, 1.2, 0.8, 1.5, 0.9]);
+    const result = productionModifierApply(10, [1.1, 1.2, 0.8, 1.5, 0.9]);
     expect(result).toBeCloseTo(10 * 1.1 * 1.2 * 0.8 * 1.5 * 0.9);
   });
 
   it('should handle zero modifier', () => {
-    expect(applyModifiers(10, [0])).toBe(0);
+    expect(productionModifierApply(10, [0])).toBe(0);
   });
 });
 
@@ -140,64 +140,64 @@ describe('applyModifiers', () => {
 describe('time-of-day modifiers', () => {
   it('should give Shadow Library +20% bonus at night', () => {
     const context = makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.20);
   });
 
   it('should give Soul Well +15% bonus at night', () => {
     const context = makeContext({ roomTypeId: SOUL_WELL, hour: 0 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.15);
   });
 
   it('should give Mushroom Grove +15% bonus during day', () => {
     const context = makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 12 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.15);
   });
 
   it('should give Crystal Mine +10% bonus during day', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, hour: 10 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.10);
   });
 
   it('should give no time bonus to unrelated room during day', () => {
     const context = makeContext({ roomTypeId: THRONE_ROOM, hour: 12 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBe(1.0);
   });
 
   it('should give no time bonus to unrelated room at night', () => {
     const context = makeContext({ roomTypeId: THRONE_ROOM, hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBe(1.0);
   });
 
   it('should not give Shadow Library day bonus', () => {
     const context = makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 12 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBe(1.0);
   });
 
   it('should not give Mushroom Grove night bonus', () => {
     const context = makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBe(1.0);
   });
 
   it('should transition at night start boundary (hour 18)', () => {
     // hour 17 = day, hour 18 = night
-    const day = calculateProductionModifiers(makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 17 }));
-    const night = calculateProductionModifiers(makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 18 }));
+    const day = productionModifierCalculate(makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 17 }));
+    const night = productionModifierCalculate(makeContext({ roomTypeId: SHADOW_LIBRARY, hour: 18 }));
     expect(day).toBe(1.0);
     expect(night).toBeCloseTo(1.20);
   });
 
   it('should transition at night end boundary (hour 6)', () => {
     // hour 5 = night, hour 6 = day
-    const night = calculateProductionModifiers(makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 5 }));
-    const day = calculateProductionModifiers(makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 6 }));
+    const night = productionModifierCalculate(makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 5 }));
+    const day = productionModifierCalculate(makeContext({ roomTypeId: MUSHROOM_GROVE, hour: 6 }));
     expect(night).toBe(1.0);
     expect(day).toBeCloseTo(1.15);
   });
@@ -208,29 +208,29 @@ describe('time-of-day modifiers', () => {
 describe('floor depth modifiers', () => {
   it('should give no bonus at depth 0', () => {
     const context = makeContext({ floorDepth: 0 });
-    expect(calculateProductionModifiers(context)).toBe(1.0);
+    expect(productionModifierCalculate(context)).toBe(1.0);
   });
 
   it('should give +5% at depth 1', () => {
     const context = makeContext({ floorDepth: 1 });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.05);
+    expect(productionModifierCalculate(context)).toBeCloseTo(1.05);
   });
 
   it('should give +10% at depth 2', () => {
     const context = makeContext({ floorDepth: 2 });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.10);
+    expect(productionModifierCalculate(context)).toBeCloseTo(1.10);
   });
 
   it('should give +25% at depth 5', () => {
     const context = makeContext({ floorDepth: 5 });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.25);
+    expect(productionModifierCalculate(context)).toBeCloseTo(1.25);
   });
 
   it('should scale linearly with depth', () => {
     for (let d = 0; d <= 9; d++) {
       const context = makeContext({ floorDepth: d });
-      const expected = 1.0 + d * DEPTH_BONUS_PER_LEVEL;
-      expect(calculateProductionModifiers(context)).toBeCloseTo(expected);
+      const expected = 1.0 + d * PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL;
+      expect(productionModifierCalculate(context)).toBeCloseTo(expected);
     }
   });
 });
@@ -243,60 +243,60 @@ describe('biome modifiers', () => {
 
   it('should give Dark Forge +50% in volcanic biome', () => {
     const context = makeContext({ roomTypeId: DARK_FORGE, floorBiome: 'volcanic' });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.50);
   });
 
   it('should give Crystal Mine +15% in volcanic biome', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, floorBiome: 'volcanic', hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.15);
   });
 
   it('should give Mushroom Grove +60% in fungal biome', () => {
     const context = makeContext({ roomTypeId: MUSHROOM_GROVE, floorBiome: 'fungal', hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.60);
   });
 
   it('should give Crystal Mine +40% in crystal biome', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, floorBiome: 'crystal', hour: 22 });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.40);
   });
 
   it('should give Ley Line Nexus +10% in crystal biome', () => {
     const context = makeContext({ roomTypeId: LEY_LINE_NEXUS, floorBiome: 'crystal' });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.10);
   });
 
   it('should give Soul Well +100% in corrupted biome', () => {
     const context = makeContext({ roomTypeId: SOUL_WELL, floorBiome: 'corrupted' });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(2.00);
   });
 
   it('should give Shadow Library +100% in corrupted biome', () => {
     const context = makeContext({ roomTypeId: SHADOW_LIBRARY, floorBiome: 'corrupted' });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(2.00);
   });
 
   it('should give Underground Lake +50% in flooded biome', () => {
     const context = makeContext({ roomTypeId: UNDERGROUND_LAKE, floorBiome: 'flooded' });
-    const result = calculateProductionModifiers(context);
+    const result = productionModifierCalculate(context);
     expect(result).toBeCloseTo(1.50);
   });
 
   it('should give no biome bonus in neutral biome', () => {
     const context = makeContext({ roomTypeId: CRYSTAL_MINE, floorBiome: 'neutral', hour: 22 });
-    expect(calculateProductionModifiers(context)).toBe(1.0);
+    expect(productionModifierCalculate(context)).toBe(1.0);
   });
 
   it('should give no biome bonus to unrelated room type', () => {
     const context = makeContext({ roomTypeId: THRONE_ROOM, floorBiome: 'volcanic' });
-    expect(calculateProductionModifiers(context)).toBe(1.0);
+    expect(productionModifierCalculate(context)).toBe(1.0);
   });
 });
 
@@ -310,7 +310,7 @@ describe('multiplicative stacking', () => {
       hour: 22,
       floorDepth: 2,
     });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.32);
+    expect(productionModifierCalculate(context)).toBeCloseTo(1.32);
   });
 
   it('should multiply time-of-day and biome modifiers', () => {
@@ -320,7 +320,7 @@ describe('multiplicative stacking', () => {
       hour: 22,
       floorBiome: 'corrupted',
     });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(2.40);
+    expect(productionModifierCalculate(context)).toBeCloseTo(2.40);
   });
 
   it('should multiply all three modifiers', () => {
@@ -332,7 +332,7 @@ describe('multiplicative stacking', () => {
       floorDepth: 3,
       floorBiome: 'corrupted',
     });
-    expect(calculateProductionModifiers(context)).toBeCloseTo(1.15 * 1.15 * 2.00);
+    expect(productionModifierCalculate(context)).toBeCloseTo(1.15 * 1.15 * 2.00);
   });
 
   it('should return 1.0 when no modifiers apply', () => {
@@ -342,13 +342,13 @@ describe('multiplicative stacking', () => {
       floorDepth: 0,
       floorBiome: 'neutral',
     });
-    expect(calculateProductionModifiers(context)).toBe(1.0);
+    expect(productionModifierCalculate(context)).toBe(1.0);
   });
 });
 
-// --- evaluateModifiers ---
+// --- productionModifierEvaluate ---
 
-describe('evaluateModifiers', () => {
+describe('productionModifierEvaluate', () => {
   it('should return empty array when no modifiers apply', () => {
     const context = makeContext({
       roomTypeId: THRONE_ROOM,
@@ -356,7 +356,7 @@ describe('evaluateModifiers', () => {
       floorDepth: 0,
       floorBiome: 'neutral',
     });
-    expect(evaluateModifiers(context)).toEqual([]);
+    expect(productionModifierEvaluate(context)).toEqual([]);
   });
 
   it('should return only active modifiers', () => {
@@ -366,7 +366,7 @@ describe('evaluateModifiers', () => {
       floorDepth: 0,
       floorBiome: 'neutral',
     });
-    const results = evaluateModifiers(context);
+    const results = productionModifierEvaluate(context);
     expect(results).toHaveLength(1);
     expect(results[0].type).toBe('time_of_day');
     expect(results[0].multiplier).toBeCloseTo(1.20);
@@ -379,7 +379,7 @@ describe('evaluateModifiers', () => {
       floorDepth: 2,
       floorBiome: 'corrupted',
     });
-    const results = evaluateModifiers(context);
+    const results = productionModifierEvaluate(context);
     expect(results).toHaveLength(3);
     const types = results.map((r) => r.type);
     expect(types).toContain('time_of_day');
@@ -392,49 +392,49 @@ describe('evaluateModifiers', () => {
       roomTypeId: SHADOW_LIBRARY,
       hour: 22,
     });
-    const results = evaluateModifiers(context);
+    const results = productionModifierEvaluate(context);
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].description).toBeTruthy();
   });
 });
 
-// --- getBiomeBonus ---
+// --- productionModifierGetBiomeBonus ---
 
-describe('getBiomeBonus', () => {
+describe('productionModifierGetBiomeBonus', () => {
   it('should return 1.0 for neutral biome', () => {
-    expect(getBiomeBonus('neutral', CRYSTAL_MINE)).toBe(1.0);
+    expect(productionModifierGetBiomeBonus('neutral', CRYSTAL_MINE)).toBe(1.0);
   });
 
   it('should return 1.0 for unrelated room type', () => {
-    expect(getBiomeBonus('volcanic', THRONE_ROOM)).toBe(1.0);
+    expect(productionModifierGetBiomeBonus('volcanic', THRONE_ROOM)).toBe(1.0);
   });
 
   it('should return correct bonus for Dark Forge in volcanic', () => {
-    expect(getBiomeBonus('volcanic', DARK_FORGE)).toBeCloseTo(1.50);
+    expect(productionModifierGetBiomeBonus('volcanic', DARK_FORGE)).toBeCloseTo(1.50);
   });
 
   it('should return correct bonus for Crystal Mine in volcanic', () => {
-    expect(getBiomeBonus('volcanic', CRYSTAL_MINE)).toBeCloseTo(1.15);
+    expect(productionModifierGetBiomeBonus('volcanic', CRYSTAL_MINE)).toBeCloseTo(1.15);
   });
 
   it('should return correct bonus for Mushroom Grove in fungal', () => {
-    expect(getBiomeBonus('fungal', MUSHROOM_GROVE)).toBeCloseTo(1.60);
+    expect(productionModifierGetBiomeBonus('fungal', MUSHROOM_GROVE)).toBeCloseTo(1.60);
   });
 
   it('should return correct bonus for Crystal Mine in crystal', () => {
-    expect(getBiomeBonus('crystal', CRYSTAL_MINE)).toBeCloseTo(1.40);
+    expect(productionModifierGetBiomeBonus('crystal', CRYSTAL_MINE)).toBeCloseTo(1.40);
   });
 
   it('should return correct bonus for Soul Well in corrupted', () => {
-    expect(getBiomeBonus('corrupted', SOUL_WELL)).toBeCloseTo(2.00);
+    expect(productionModifierGetBiomeBonus('corrupted', SOUL_WELL)).toBeCloseTo(2.00);
   });
 
   it('should return correct bonus for Shadow Library in corrupted', () => {
-    expect(getBiomeBonus('corrupted', SHADOW_LIBRARY)).toBeCloseTo(2.00);
+    expect(productionModifierGetBiomeBonus('corrupted', SHADOW_LIBRARY)).toBeCloseTo(2.00);
   });
 
   it('should return correct bonus for Underground Lake in flooded', () => {
-    expect(getBiomeBonus('flooded', UNDERGROUND_LAKE)).toBeCloseTo(1.50);
+    expect(productionModifierGetBiomeBonus('flooded', UNDERGROUND_LAKE)).toBeCloseTo(1.50);
   });
 });
 

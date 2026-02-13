@@ -1,11 +1,11 @@
 import { computed } from '@angular/core';
 import { gamestate } from '@helpers/state-game';
-import { getOption, setOption } from '@helpers/state-options';
+import { optionsGet, optionsSet } from '@helpers/state-options';
 import type { GameSpeed, GameStateClock } from '@interfaces';
 
-export const MINUTES_PER_HOUR = 60;
-export const HOURS_PER_DAY = 24;
-export const TICKS_PER_MINUTE = 5;
+export const GAME_TIME_MINUTES_PER_HOUR = 60;
+export const GAME_TIME_HOURS_PER_DAY = 24;
+export const GAME_TIME_TICKS_PER_MINUTE = 5;
 
 export type GameTime = {
   day: number;
@@ -13,53 +13,53 @@ export type GameTime = {
   minute: number;
 };
 
-export function advanceTime(
+export function gameTimeAdvance(
   clock: GameTime,
   numTicks: number,
 ): GameTime {
   let { day, hour, minute } = clock;
 
-  const minutesToAdd = Math.floor(numTicks / TICKS_PER_MINUTE);
+  const minutesToAdd = Math.floor(numTicks / GAME_TIME_TICKS_PER_MINUTE);
   minute += minutesToAdd;
 
-  if (minute >= MINUTES_PER_HOUR) {
-    hour += Math.floor(minute / MINUTES_PER_HOUR);
-    minute = minute % MINUTES_PER_HOUR;
+  if (minute >= GAME_TIME_MINUTES_PER_HOUR) {
+    hour += Math.floor(minute / GAME_TIME_MINUTES_PER_HOUR);
+    minute = minute % GAME_TIME_MINUTES_PER_HOUR;
   }
 
-  if (hour >= HOURS_PER_DAY) {
-    day += Math.floor(hour / HOURS_PER_DAY);
-    hour = hour % HOURS_PER_DAY;
+  if (hour >= GAME_TIME_HOURS_PER_DAY) {
+    day += Math.floor(hour / GAME_TIME_HOURS_PER_DAY);
+    hour = hour % GAME_TIME_HOURS_PER_DAY;
   }
 
   return { day, hour, minute };
 }
 
-export function advanceClockTime(
+export function gameTimeAdvanceClock(
   clock: GameStateClock,
   numTicks: number,
 ): GameStateClock {
-  const { day, hour, minute } = advanceTime(clock, numTicks);
+  const { day, hour, minute } = gameTimeAdvance(clock, numTicks);
   return { ...clock, day, hour, minute };
 }
 
-export const gameDay = computed(() => gamestate().clock.day);
-export const gameHour = computed(() => gamestate().clock.hour);
-export const gameMinute = computed(() => gamestate().clock.minute);
+export const gameTimeDay = computed(() => gamestate().clock.day);
+export const gameTimeHour = computed(() => gamestate().clock.hour);
+export const gameTimeMinute = computed(() => gamestate().clock.minute);
 
-export const formattedGameTime = computed(() => {
-  const d = gameDay();
-  const h = gameHour();
-  const m = gameMinute();
+export const gameTimeFormatted = computed(() => {
+  const d = gameTimeDay();
+  const h = gameTimeHour();
+  const m = gameTimeMinute();
   const hh = String(h).padStart(2, '0');
   const mm = String(m).padStart(2, '0');
   return `Day ${d} - ${hh}:${mm}`;
 });
 
-export const GAME_SPEEDS: GameSpeed[] = [1, 2, 4];
+export const GAME_TIME_SPEEDS: GameSpeed[] = [1, 2, 4];
 
-export const gameSpeed = computed(() => getOption('gameSpeed'));
+export const gameTimeSpeed = computed(() => optionsGet('gameSpeed'));
 
-export function setGameSpeed(speed: GameSpeed): void {
-  setOption('gameSpeed', speed);
+export function gameTimeSetSpeed(speed: GameSpeed): void {
+  optionsSet('gameSpeed', speed);
 }

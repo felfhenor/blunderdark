@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
@@ -35,7 +35,7 @@ export const reputationAward$ = reputationAward.asObservable();
 const reputationLevelUp = new Subject<ReputationLevelUpEvent>();
 export const reputationLevelUp$ = reputationLevelUp.asObservable();
 
-export function getReputationLevel(points: number): ReputationLevel {
+export function reputationGetLevel(points: number): ReputationLevel {
   if (points >= REPUTATION_THRESHOLDS.legendary) return 'legendary';
   if (points >= REPUTATION_THRESHOLDS.high) return 'high';
   if (points >= REPUTATION_THRESHOLDS.medium) return 'medium';
@@ -43,14 +43,14 @@ export function getReputationLevel(points: number): ReputationLevel {
   return 'none';
 }
 
-export function getReputation(
+export function reputationGet(
   state: ReputationState,
   type: ReputationType,
 ): number {
   return state[type];
 }
 
-export function addReputation(
+export function reputationAdd(
   state: ReputationState,
   type: ReputationType,
   points: number,
@@ -61,7 +61,7 @@ export function addReputation(
   };
 }
 
-export function resetReputation(): ReputationState {
+export function reputationReset(): ReputationState {
   return {
     terror: 0,
     wealth: 0,
@@ -71,7 +71,7 @@ export function resetReputation(): ReputationState {
   };
 }
 
-export function getReputationLevelLabel(level: ReputationLevel): string {
+export function reputationGetLevelLabel(level: ReputationLevel): string {
   const labels: Record<ReputationLevel, string> = {
     none: 'None',
     low: 'Low',
@@ -90,10 +90,10 @@ export function getReputationLevelLabel(level: ReputationLevel): string {
  * @param actionId - The ID or name of the reputation action from gamedata
  * @returns true if the action was found and reputation was awarded, false otherwise
  */
-export async function awardReputationForAction(
+export async function reputationAwardForAction(
   actionId: string,
 ): Promise<boolean> {
-  const action = getEntry<ReputationAction & IsContentItem>(actionId);
+  const action = contentGetEntry<ReputationAction & IsContentItem>(actionId);
   if (!action) {
     return false;
   }
@@ -113,8 +113,8 @@ export async function awardReputationForAction(
   ][]) {
     const previousPoints = currentState[type];
     const newPoints = Math.max(0, previousPoints + points);
-    const previousLevel = getReputationLevel(previousPoints);
-    const newLevel = getReputationLevel(newPoints);
+    const previousLevel = reputationGetLevel(previousPoints);
+    const newLevel = reputationGetLevel(newPoints);
 
     if (newLevel !== previousLevel) {
       levelUpEvents.push({
@@ -133,7 +133,7 @@ export async function awardReputationForAction(
       ReputationType,
       number,
     ][]) {
-      newReputation = addReputation(newReputation, type, points);
+      newReputation = reputationAdd(newReputation, type, points);
     }
     return {
       ...state,
@@ -162,8 +162,8 @@ export async function awardReputationForAction(
 /**
  * Get a reputation action by ID or name.
  */
-export function getReputationAction(
+export function reputationGetAction(
   actionIdOrName: string,
 ): (ReputationAction & IsContentItem) | undefined {
-  return getEntry<ReputationAction & IsContentItem>(actionIdOrName);
+  return contentGetEntry<ReputationAction & IsContentItem>(actionIdOrName);
 }

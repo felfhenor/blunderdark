@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import type {
   CapturedPrisoner,
@@ -18,15 +18,15 @@ import type { ResourceType } from '@interfaces/resource';
 
 // --- Constants ---
 
-export const BASE_REPUTATION_GAIN = 5;
-export const REPUTATION_PER_KILL = 1;
-export const ALL_SECONDARIES_PREVENTED_BONUS = 3;
-export const DEFEAT_REPUTATION_LOSS = 3;
-export const DEFEAT_GOLD_LOSS_PERCENT = 0.2;
-export const PRISONER_CAPTURE_CHANCE = 0.3;
-export const BASE_EXPERIENCE_PER_INVADER = 10;
+export const INVASION_REWARD_BASE_REPUTATION_GAIN = 5;
+export const INVASION_REWARD_REPUTATION_PER_KILL = 1;
+export const INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS = 3;
+export const INVASION_REWARD_DEFEAT_REPUTATION_LOSS = 3;
+export const INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT = 0.2;
+export const INVASION_REWARD_PRISONER_CAPTURE_CHANCE = 0.3;
+export const INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER = 10;
 
-export const ALTAR_REBUILD_COST: Partial<Record<ResourceType, number>> = {
+export const INVASION_REWARD_ALTAR_REBUILD_COST: Partial<Record<ResourceType, number>> = {
   crystals: 100,
   gold: 50,
   flux: 20,
@@ -79,21 +79,21 @@ const RANSOM_GOLD: Record<InvaderClassType, number> = {
  * Gold/resources: class-based loot from killed invaders.
  * Experience: 10 per invader, scaled by reward multiplier.
  */
-export function calculateDefenseRewards(
+export function invasionRewardCalculateDefenseRewards(
   result: DetailedInvasionResult,
   killedInvaderClasses: InvaderClassType[],
   rng: () => number = Math.random,
 ): DefenseRewards {
   // Reputation
-  let reputationGain = BASE_REPUTATION_GAIN;
-  reputationGain += result.invadersKilled * REPUTATION_PER_KILL;
+  let reputationGain = INVASION_REWARD_BASE_REPUTATION_GAIN;
+  reputationGain += result.invadersKilled * INVASION_REWARD_REPUTATION_PER_KILL;
   if (result.objectivesCompleted === 0 && result.objectivesTotal > 0) {
-    reputationGain += ALL_SECONDARIES_PREVENTED_BONUS;
+    reputationGain += INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS;
   }
 
   // Experience
   const experienceGain = Math.round(
-    result.invaderCount * BASE_EXPERIENCE_PER_INVADER * result.rewardMultiplier,
+    result.invaderCount * INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER * result.rewardMultiplier,
   );
 
   // Loot from killed invaders
@@ -124,12 +124,12 @@ export function calculateDefenseRewards(
  * Calculate penalties for a failed defense.
  * 20% gold looted, -3 reputation, resource losses from completed secondaries.
  */
-export function calculateDefensePenalties(
+export function invasionRewardCalculateDefensePenalties(
   result: DetailedInvasionResult,
   currentGold: number,
 ): DefensePenalties {
-  const goldLost = Math.round(currentGold * DEFEAT_GOLD_LOSS_PERCENT);
-  const reputationLoss = DEFEAT_REPUTATION_LOSS;
+  const goldLost = Math.round(currentGold * INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT);
+  const reputationLoss = INVASION_REWARD_DEFEAT_REPUTATION_LOSS;
 
   // Resource losses scale with secondaries completed
   const resourceLosses: Partial<Record<ResourceType, number>> = {};
@@ -151,14 +151,14 @@ export function calculateDefensePenalties(
 /**
  * Get the loot table entry for an invader class.
  */
-export function getClassLoot(invaderClass: InvaderClassType): ClassLoot {
+export function invasionRewardGetClassLoot(invaderClass: InvaderClassType): ClassLoot {
   return CLASS_LOOT[invaderClass];
 }
 
 /**
  * Roll loot for a single killed invader based on their class.
  */
-export function rollInvaderLoot(
+export function invasionRewardRollLoot(
   invaderClass: InvaderClassType,
   rng: () => number = Math.random,
 ): { gold: number; bonusResource: ResourceType; bonusAmount: number } {
@@ -176,7 +176,7 @@ export function rollInvaderLoot(
  * Determine which retreating invaders are captured as prisoners.
  * Each has a 30% capture chance.
  */
-export function rollPrisonerCaptures(
+export function invasionRewardRollPrisonerCaptures(
   retreatingInvaders: InvaderInstance[],
   day: number,
   rng: () => number = Math.random,
@@ -184,8 +184,8 @@ export function rollPrisonerCaptures(
   const prisoners: CapturedPrisoner[] = [];
 
   for (const invader of retreatingInvaders) {
-    if (rng() < PRISONER_CAPTURE_CHANCE) {
-      const def = getEntry<InvaderDefinition & IsContentItem>(
+    if (rng() < INVASION_REWARD_PRISONER_CAPTURE_CHANCE) {
+      const def = contentGetEntry<InvaderDefinition & IsContentItem>(
         invader.definitionId,
       );
       if (!def) continue;
@@ -208,7 +208,7 @@ export function rollPrisonerCaptures(
 /**
  * Execute a prisoner: +2 fear, +1 reputation, -5 future invader morale.
  */
-export function handleExecute(): PrisonerHandlingResult {
+export function invasionRewardHandleExecute(): PrisonerHandlingResult {
   return {
     action: 'execute',
     success: true,
@@ -222,7 +222,7 @@ export function handleExecute(): PrisonerHandlingResult {
 /**
  * Ransom a prisoner: gold scales with class tier, -1 reputation.
  */
-export function handleRansom(
+export function invasionRewardHandleRansom(
   prisoner: CapturedPrisoner,
 ): PrisonerHandlingResult {
   const gold = RANSOM_GOLD[prisoner.invaderClass];
@@ -240,7 +240,7 @@ export function handleRansom(
  * Convert a prisoner: success rate by class, costs corruption.
  * Success = new tier 1 inhabitant; failure = escape.
  */
-export function handleConvert(
+export function invasionRewardHandleConvert(
   prisoner: CapturedPrisoner,
   rng: () => number = Math.random,
 ): PrisonerHandlingResult {
@@ -260,7 +260,7 @@ export function handleConvert(
 /**
  * Sacrifice a prisoner at the Altar: grants random boon, +5 corruption, +2 reputation.
  */
-export function handleSacrifice(
+export function invasionRewardHandleSacrifice(
   rng: () => number = Math.random,
 ): PrisonerHandlingResult {
   // Random boon: flux, essence, or research
@@ -282,7 +282,7 @@ export function handleSacrifice(
 /**
  * Experiment on a prisoner: grants research points, +3 corruption.
  */
-export function handleExperiment(
+export function invasionRewardHandleExperiment(
   prisoner: CapturedPrisoner,
 ): PrisonerHandlingResult {
   // Research scales with invader stats
@@ -303,44 +303,44 @@ export function handleExperiment(
 /**
  * Handle a prisoner action. Dispatches to the appropriate handler.
  */
-export function handlePrisoner(
+export function invasionRewardHandlePrisoner(
   action: PrisonerAction,
   prisoner: CapturedPrisoner,
   rng: () => number = Math.random,
 ): PrisonerHandlingResult {
   switch (action) {
     case 'execute':
-      return handleExecute();
+      return invasionRewardHandleExecute();
     case 'ransom':
-      return handleRansom(prisoner);
+      return invasionRewardHandleRansom(prisoner);
     case 'convert':
-      return handleConvert(prisoner, rng);
+      return invasionRewardHandleConvert(prisoner, rng);
     case 'sacrifice':
-      return handleSacrifice(rng);
+      return invasionRewardHandleSacrifice(rng);
     case 'experiment':
-      return handleExperiment(prisoner);
+      return invasionRewardHandleExperiment(prisoner);
   }
 }
 
 /**
  * Get the convert success rate for a given invader class.
  */
-export function getConvertSuccessRate(invaderClass: InvaderClassType): number {
+export function invasionRewardGetConvertSuccessRate(invaderClass: InvaderClassType): number {
   return CONVERT_SUCCESS_RATES[invaderClass];
 }
 
 /**
  * Get the ransom gold value for a given invader class.
  */
-export function getRansomGoldValue(invaderClass: InvaderClassType): number {
+export function invasionRewardGetRansomGoldValue(invaderClass: InvaderClassType): number {
   return RANSOM_GOLD[invaderClass];
 }
 
 /**
  * Get the altar rebuild cost.
  */
-export function getAltarRebuildCost(): Partial<Record<ResourceType, number>> {
-  return { ...ALTAR_REBUILD_COST };
+export function invasionRewardGetAltarRebuildCost(): Partial<Record<ResourceType, number>> {
+  return { ...INVASION_REWARD_ALTAR_REBUILD_COST };
 }
 
 // --- Internal helpers ---

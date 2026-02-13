@@ -1,22 +1,22 @@
-import { createEmptyGrid, setTile } from '@helpers/grid';
-import { placeRoomOnFloor, removeRoomFromFloor } from '@helpers/room-placement';
-import { calculateRefund } from '@helpers/room-removal';
+import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
+import { roomPlacementPlaceOnFloor, roomPlacementRemoveFromFloor } from '@helpers/room-placement';
+import { roomRemovalCalculateRefund } from '@helpers/room-removal';
 import type { Floor, InhabitantInstance, PlacedRoom, RoomShape } from '@interfaces';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-// --- Mock getEntry to control removable/cost for isRoomRemovable ---
+// --- Mock contentGetEntry to control removable/cost for roomPlacementIsRemovable ---
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id),
-  getEntriesByType: () => [],
+  contentGetEntry: (id: string) => mockContent.get(id),
+  contentGetEntriesByType: () => [],
 }));
 
 vi.mock('@helpers/room-upgrades', () => ({
-  getEffectiveMaxInhabitants: (_room: PlacedRoom, def: { maxInhabitants: number }) =>
+  roomUpgradeGetEffectiveMaxInhabitants: (_room: PlacedRoom, def: { maxInhabitants: number }) =>
     def.maxInhabitants,
-  getAppliedUpgradeEffects: () => [],
-  getUpgradePaths: () => [],
+  roomUpgradeGetAppliedEffects: () => [],
+  roomUpgradeGetPaths: () => [],
 }));
 
 // --- Test shapes ---
@@ -56,7 +56,7 @@ const square3x3: RoomShape = {
 
 function makeFloor(
   rooms: PlacedRoom[] = [],
-  grid = createEmptyGrid(),
+  grid = gridCreateEmpty(),
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
@@ -152,24 +152,24 @@ beforeEach(() => {
 // --- US-001: Altar Cannot Be Removed ---
 
 describe('US-001: Altar Cannot Be Removed', () => {
-  it('should flag altar as non-removable via isRoomRemovable', async () => {
-    const { isRoomRemovable } = await import('@helpers/room-placement');
-    expect(isRoomRemovable(ALTAR_ROOM_TYPE_ID)).toBe(false);
+  it('should flag altar as non-removable via roomPlacementIsRemovable', async () => {
+    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    expect(roomPlacementIsRemovable(ALTAR_ROOM_TYPE_ID)).toBe(false);
   });
 
-  it('should allow removal of regular rooms via isRoomRemovable', async () => {
-    const { isRoomRemovable } = await import('@helpers/room-placement');
-    expect(isRoomRemovable(CRYSTAL_MINE_TYPE_ID)).toBe(true);
+  it('should allow removal of regular rooms via roomPlacementIsRemovable', async () => {
+    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    expect(roomPlacementIsRemovable(CRYSTAL_MINE_TYPE_ID)).toBe(true);
   });
 
   it('should allow removal of unique non-altar rooms', async () => {
-    const { isRoomRemovable } = await import('@helpers/room-placement');
-    expect(isRoomRemovable(THRONE_ROOM_TYPE_ID)).toBe(true);
+    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    expect(roomPlacementIsRemovable(THRONE_ROOM_TYPE_ID)).toBe(true);
   });
 
   it('should return true for unknown room types (safe default)', async () => {
-    const { isRoomRemovable } = await import('@helpers/room-placement');
-    expect(isRoomRemovable('nonexistent-room-type')).toBe(true);
+    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    expect(roomPlacementIsRemovable('nonexistent-room-type')).toBe(true);
   });
 });
 
@@ -177,37 +177,37 @@ describe('US-001: Altar Cannot Be Removed', () => {
 
 describe('US-002: Resource Refund on Removal', () => {
   it('should refund 50% of cost rounded down', () => {
-    const refund = calculateRefund({ gold: 50 });
+    const refund = roomRemovalCalculateRefund({ gold: 50 });
     expect(refund).toEqual({ gold: 25 });
   });
 
   it('should refund 50% of multiple resource types', () => {
-    const refund = calculateRefund({ gold: 100, crystals: 50 });
+    const refund = roomRemovalCalculateRefund({ gold: 100, crystals: 50 });
     expect(refund).toEqual({ gold: 50, crystals: 25 });
   });
 
   it('should floor fractional refund values', () => {
-    const refund = calculateRefund({ gold: 33 });
+    const refund = roomRemovalCalculateRefund({ gold: 33 });
     expect(refund).toEqual({ gold: 16 });
   });
 
   it('should floor odd single-unit costs to zero', () => {
-    const refund = calculateRefund({ gold: 1 });
+    const refund = roomRemovalCalculateRefund({ gold: 1 });
     expect(refund).toEqual({ gold: 0 });
   });
 
   it('should return empty object for zero-cost rooms', () => {
-    const refund = calculateRefund({});
+    const refund = roomRemovalCalculateRefund({});
     expect(refund).toEqual({});
   });
 
   it('should return empty object for altar room (no cost)', () => {
-    const refund = calculateRefund({});
+    const refund = roomRemovalCalculateRefund({});
     expect(refund).toEqual({});
   });
 
   it('should handle large costs correctly', () => {
-    const refund = calculateRefund({ gold: 1000, crystals: 500, essence: 250 });
+    const refund = roomRemovalCalculateRefund({ gold: 1000, crystals: 500, essence: 250 });
     expect(refund).toEqual({ gold: 500, crystals: 250, essence: 125 });
   });
 });
@@ -224,10 +224,10 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorX: 5,
       anchorY: 5,
     };
-    const placed = placeRoomOnFloor(floor, room, square2x2)!;
+    const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
     expect(placed).toBeDefined();
 
-    const result = removeRoomFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
 
@@ -258,10 +258,10 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorX: 5,
       anchorY: 5,
     };
-    let placed = placeRoomOnFloor(floor, room1, square2x2)!;
-    placed = placeRoomOnFloor(placed, room2, square2x2)!;
+    let placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
+    placed = roomPlacementPlaceOnFloor(placed, room2, square2x2)!;
 
-    const result = removeRoomFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
@@ -274,30 +274,30 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
   });
 
   it('should preserve hallway data on tiles when removing a room', () => {
-    let grid = createEmptyGrid();
+    let grid = gridCreateEmpty();
     // Simulate a tile that has both a room and a hallway
-    grid = setTile(grid, 5, 5, {
+    grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: 'hallway-1',
       connectionType: undefined,
     });
-    grid = setTile(grid, 6, 5, {
+    grid = gridSetTile(grid, 6, 5, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
       connectionType: undefined,
     });
-    grid = setTile(grid, 5, 6, {
+    grid = gridSetTile(grid, 5, 6, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
       connectionType: undefined,
     });
-    grid = setTile(grid, 6, 6, {
+    grid = gridSetTile(grid, 6, 6, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
@@ -314,7 +314,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     };
     const floor = makeFloor([room], grid);
 
-    const result = removeRoomFromFloor(floor, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(floor, 'room-1', square2x2);
     expect(result).toBeDefined();
     // Hallway data should be preserved
     expect(result!.grid[5][5].hallwayId).toBe('hallway-1');
@@ -324,7 +324,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
 
   it('should return undefined when trying to remove non-existent room', () => {
     const floor = makeFloor();
-    const result = removeRoomFromFloor(floor, 'nonexistent', square2x2);
+    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent', square2x2);
     expect(result).toBeUndefined();
   });
 
@@ -337,8 +337,8 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorX: 5,
       anchorY: 5,
     };
-    const placed = placeRoomOnFloor(floor, room, square2x2)!;
-    const removed = removeRoomFromFloor(placed, 'room-1', square2x2)!;
+    const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
+    const removed = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2)!;
 
     // Place a new room in the same spot
     const newRoom: PlacedRoom = {
@@ -348,7 +348,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorX: 5,
       anchorY: 5,
     };
-    const rePlaced = placeRoomOnFloor(removed, newRoom, square2x2);
+    const rePlaced = roomPlacementPlaceOnFloor(removed, newRoom, square2x2);
     expect(rePlaced).toBeDefined();
     expect(rePlaced!.rooms).toHaveLength(1);
     expect(rePlaced!.rooms[0].id).toBe('room-new');
@@ -357,23 +357,23 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
 
 // --- US-004: Inhabitant Displacement on Removal ---
 
-describe('US-004: Inhabitant Displacement - getRemovalInfo', () => {
+describe('US-004: Inhabitant Displacement - roomRemovalGetInfo', () => {
   // These tests verify the pure calculation functions.
-  // The full executeRoomRemoval function requires mocking gamestate/updateGamestate
+  // The full roomRemovalExecute function requires mocking gamestate/updateGamestate
   // which is complex, so we test the building blocks.
 
   it('should calculate refund for rooms with costs', () => {
-    const refund = calculateRefund({ gold: 100, crystals: 50 });
+    const refund = roomRemovalCalculateRefund({ gold: 100, crystals: 50 });
     expect(refund).toEqual({ gold: 50, crystals: 25 });
   });
 
   it('should return no refund for rooms with no cost', () => {
-    const refund = calculateRefund({});
+    const refund = roomRemovalCalculateRefund({});
     expect(refund).toEqual({});
   });
 
   it('should handle multi-resource costs', () => {
-    const refund = calculateRefund({ gold: 80, crystals: 30, essence: 15 });
+    const refund = roomRemovalCalculateRefund({ gold: 80, crystals: 30, essence: 15 });
     expect(refund).toEqual({ gold: 40, crystals: 15, essence: 7 });
   });
 });

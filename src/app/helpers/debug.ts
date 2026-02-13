@@ -1,5 +1,5 @@
-import { setOption } from '@helpers/state-options';
+import { optionsSet } from '@helpers/state-options';
 
 export function debugToggle() {
-  setOption('showDebug', true);
+  optionsSet('showDebug', true);
 }

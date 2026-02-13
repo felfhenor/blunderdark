@@ -8,13 +8,13 @@
           <label class="label cursor-pointer label-checkbox">
             <input
               type="checkbox"
-              [checked]="getOption('debugConsoleLogStateUpdates') === true"
+              [checked]="optionsGet('debugConsoleLogStateUpdates') === true"
               class="checkbox checkbox-secondary"
               appAnalyticsClick="Options:Debug:LogStateUpdates"
               (click)="
-                setOption(
+                optionsSet(
                   'debugConsoleLogStateUpdates',
-                  !getOption('debugConsoleLogStateUpdates')
+                  !optionsGet('debugConsoleLogStateUpdates')
                 )
               "
             />
@@ -26,13 +26,13 @@
           <label class="label cursor-pointer label-checkbox">
             <input
               type="checkbox"
-              [checked]="getOption('debugGameloopTimerUpdates') === true"
+              [checked]="optionsGet('debugGameloopTimerUpdates') === true"
               class="checkbox checkbox-secondary"
               appAnalyticsClick="Options:Debug:LogTimerUpdates"
               (click)="
-                setOption(
+                optionsSet(
                   'debugGameloopTimerUpdates',
-                  !getOption('debugGameloopTimerUpdates')
+                  !optionsGet('debugGameloopTimerUpdates')
                 )
               "
             />
@@ -50,13 +50,13 @@
           <label class="label cursor-pointer label-checkbox">
             <input
               type="checkbox"
-              [checked]="getOption('debugAllowBackgroundOperations') === true"
+              [checked]="optionsGet('debugAllowBackgroundOperations') === true"
               class="checkbox checkbox-secondary"
               appAnalyticsClick="Options:Debug:AllowBackgroundOperations"
               (click)="
-                setOption(
+                optionsSet(
                   'debugAllowBackgroundOperations',
-                  !getOption('debugAllowBackgroundOperations')
+                  !optionsGet('debugAllowBackgroundOperations')
                 )
               "
             />
@@ -80,13 +80,13 @@
               type="range"
               [min]="1"
               [max]="100"
-              [value]="getOption('debugTickMultiplier')"
+              [value]="optionsGet('debugTickMultiplier')"
               (change)="
-                setOption('debugTickMultiplier', tickMultiplier.valueAsNumber)
+                optionsSet('debugTickMultiplier', tickMultiplier.valueAsNumber)
               "
               class="range range-secondary"
             />
-            <span class="ml-2">{{ getOption('debugTickMultiplier') }}x</span>
+            <span class="ml-2">{{ optionsGet('debugTickMultiplier') }}x</span>
           </label>
         </div>
 
@@ -98,13 +98,13 @@
               type="range"
               [min]="1"
               [max]="60"
-              [value]="getOption('debugSaveInterval')"
+              [value]="optionsGet('debugSaveInterval')"
               (change)="
-                setOption('debugSaveInterval', saveInterval.valueAsNumber)
+                optionsSet('debugSaveInterval', saveInterval.valueAsNumber)
               "
               class="range range-secondary"
             />
-            <span class="ml-2">{{ getOption('debugSaveInterval') }}s</span>
+            <span class="ml-2">{{ optionsGet('debugSaveInterval') }}s</span>
           </label>
         </div>
       </div>

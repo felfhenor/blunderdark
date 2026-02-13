@@ -1,13 +1,13 @@
-import { getTile, isInBounds, setTile } from '@helpers/grid';
+import { gridGetTile, gridIsInBounds, gridSetTile } from '@helpers/grid';
 import type { GridState, GridTile } from '@interfaces/grid';
 import type { Hallway, HallwayUpgrade } from '@interfaces/hallway';
 import type { TileOffset } from '@interfaces/room-shape';
 
-export function addHallwayToGrid(grid: GridState, hallway: Hallway): GridState {
+export function hallwayAddToGrid(grid: GridState, hallway: Hallway): GridState {
   let result = grid;
 
   for (const tile of hallway.tiles) {
-    if (!isInBounds(tile.x, tile.y)) continue;
+    if (!gridIsInBounds(tile.x, tile.y)) continue;
 
     const newTile: GridTile = {
       occupied: true,
@@ -16,22 +16,22 @@ export function addHallwayToGrid(grid: GridState, hallway: Hallway): GridState {
       hallwayId: hallway.id,
       connectionType: 'hallway',
     };
-    result = setTile(result, tile.x, tile.y, newTile);
+    result = gridSetTile(result, tile.x, tile.y, newTile);
   }
 
   return result;
 }
 
-export function removeHallwayFromGrid(
+export function hallwayRemoveFromGrid(
   grid: GridState,
   hallway: Hallway,
 ): GridState {
   let result = grid;
 
   for (const tile of hallway.tiles) {
-    if (!isInBounds(tile.x, tile.y)) continue;
+    if (!gridIsInBounds(tile.x, tile.y)) continue;
 
-    const existing = getTile(result, tile.x, tile.y);
+    const existing = gridGetTile(result, tile.x, tile.y);
     if (existing?.hallwayId !== hallway.id) continue;
 
     const emptyTile: GridTile = {
@@ -41,23 +41,23 @@ export function removeHallwayFromGrid(
       hallwayId: undefined,
       connectionType: undefined,
     };
-    result = setTile(result, tile.x, tile.y, emptyTile);
+    result = gridSetTile(result, tile.x, tile.y, emptyTile);
   }
 
   return result;
 }
 
-export function isTileBlockedForHallway(
+export function hallwayIsTileBlocked(
   grid: GridState,
   x: number,
   y: number,
 ): boolean {
-  if (!isInBounds(x, y)) return true;
-  const tile = getTile(grid, x, y);
+  if (!gridIsInBounds(x, y)) return true;
+  const tile = gridGetTile(grid, x, y);
   return tile?.occupied ?? true;
 }
 
-export function getHallwaysBetween(
+export function hallwayGetBetween(
   hallways: Hallway[],
   roomAId: string,
   roomBId: string,
@@ -69,18 +69,18 @@ export function getHallwaysBetween(
   );
 }
 
-export function addHallway(hallways: Hallway[], hallway: Hallway): Hallway[] {
+export function hallwayAdd(hallways: Hallway[], hallway: Hallway): Hallway[] {
   return [...hallways, hallway];
 }
 
-export function removeHallway(
+export function hallwayRemove(
   hallways: Hallway[],
   hallwayId: string,
 ): Hallway[] {
   return hallways.filter((h) => h.id !== hallwayId);
 }
 
-export function addUpgradeToHallway(
+export function hallwayAddUpgrade(
   hallway: Hallway,
   upgrade: HallwayUpgrade,
 ): Hallway {
@@ -90,7 +90,7 @@ export function addUpgradeToHallway(
   };
 }
 
-export function removeUpgradeFromHallway(
+export function hallwayRemoveUpgrade(
   hallway: Hallway,
   upgradeId: string,
 ): Hallway {
@@ -100,7 +100,7 @@ export function removeUpgradeFromHallway(
   };
 }
 
-export function serializeHallways(hallways: Hallway[]): Hallway[] {
+export function hallwaySerialize(hallways: Hallway[]): Hallway[] {
   return hallways.map((h) => ({
     ...h,
     tiles: [...h.tiles],
@@ -108,7 +108,7 @@ export function serializeHallways(hallways: Hallway[]): Hallway[] {
   }));
 }
 
-export function deserializeHallways(data: unknown[]): Hallway[] {
+export function hallwayDeserialize(data: unknown[]): Hallway[] {
   if (!Array.isArray(data)) return [];
 
   return data.map((item) => {

@@ -1,6 +1,6 @@
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
-export function isSetup(): boolean {
+export function setupIs(): boolean {
   return gamestate().meta.isSetup;
 }
 

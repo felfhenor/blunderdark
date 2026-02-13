@@ -1,8 +1,8 @@
 import { computed } from '@angular/core';
-import { areRoomsAdjacent } from '@helpers/adjacency';
-import { getEntriesByType, getEntry } from '@helpers/content';
-import { getRoomDefinition } from '@helpers/production';
-import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { productionGetRoomDefinition } from '@helpers/production';
+import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import type {
   Connection,
@@ -15,8 +15,8 @@ import type {
   TileOffset,
 } from '@interfaces';
 
-export function getSynergyDefinitions(): SynergyDefinition[] {
-  return getEntriesByType<SynergyDefinition & IsContentItem>('synergy');
+export function synergyGetDefinitions(): SynergyDefinition[] {
+  return contentGetEntriesByType<SynergyDefinition & IsContentItem>('synergy');
 }
 
 function buildAdjacencyMap(
@@ -24,10 +24,10 @@ function buildAdjacencyMap(
 ): Map<string, { adjacentIds: string[]; tiles: TileOffset[] }> {
   const roomTiles = new Map<string, TileOffset[]>();
   for (const room of floor.rooms) {
-    const shape = resolveRoomShape(room);
+    const shape = roomShapeResolve(room);
     roomTiles.set(
       room.id,
-      getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+      roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
     );
   }
 
@@ -41,7 +41,7 @@ function buildAdjacencyMap(
     for (const other of floor.rooms) {
       if (other.id === room.id) continue;
       const otherTiles = roomTiles.get(other.id) ?? [];
-      if (areRoomsAdjacent(thisTiles, otherTiles)) {
+      if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
         adjacentIds.push(other.id);
       }
     }
@@ -67,7 +67,7 @@ function isConnectedTo(
   return false;
 }
 
-export function evaluateCondition(
+export function synergyEvaluateCondition(
   condition: SynergyCondition,
   room: PlacedRoom,
   floor: Floor,
@@ -97,7 +97,7 @@ export function evaluateCondition(
         (i) => i.assignedRoomId === room.id,
       );
       return assigned.some((i) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         return def?.type === condition.inhabitantType;
@@ -116,21 +116,21 @@ export function evaluateCondition(
   }
 }
 
-export function evaluateSynergiesForRoom(
+export function synergyEvaluateForRoom(
   room: PlacedRoom,
   floor: Floor,
   adjacentRoomIds: string[],
   synergies?: SynergyDefinition[],
 ): SynergyDefinition[] {
-  const defs = synergies ?? getSynergyDefinitions();
+  const defs = synergies ?? synergyGetDefinitions();
   return defs.filter((synergy) =>
     synergy.conditions.every((c) =>
-      evaluateCondition(c, room, floor, adjacentRoomIds),
+      synergyEvaluateCondition(c, room, floor, adjacentRoomIds),
     ),
   );
 }
 
-export function evaluateAllSynergies(
+export function synergyEvaluateAll(
   floors: Floor[],
   synergies?: SynergyDefinition[],
 ): Map<string, SynergyDefinition[]> {
@@ -142,7 +142,7 @@ export function evaluateAllSynergies(
     for (const room of floor.rooms) {
       const adjInfo = adjacencyMap.get(room.id);
       const adjacentRoomIds = adjInfo?.adjacentIds ?? [];
-      const active = evaluateSynergiesForRoom(
+      const active = synergyEvaluateForRoom(
         room,
         floor,
         adjacentRoomIds,
@@ -157,14 +157,14 @@ export function evaluateAllSynergies(
   return result;
 }
 
-export function getActiveSynergies(
+export function synergyGetActive(
   roomId: string,
 ): SynergyDefinition[] {
-  return activeSynergyMap().get(roomId) ?? [];
+  return synergyActiveMap().get(roomId) ?? [];
 }
 
-export const activeSynergyMap = computed(() => {
-  return evaluateAllSynergies(gamestate().world.floors);
+export const synergyActiveMap = computed(() => {
+  return synergyEvaluateAll(gamestate().world.floors);
 });
 
 export type PotentialSynergy = {
@@ -175,11 +175,11 @@ export type PotentialSynergy = {
 function describeCondition(condition: SynergyCondition): string {
   switch (condition.type) {
     case 'adjacentRoomType': {
-      const def = getRoomDefinition(condition.roomTypeId!);
+      const def = productionGetRoomDefinition(condition.roomTypeId!);
       return `Place ${def?.name ?? 'a room'} adjacent`;
     }
     case 'connectedRoomType': {
-      const def = getRoomDefinition(condition.roomTypeId!);
+      const def = productionGetRoomDefinition(condition.roomTypeId!);
       return `Connect to ${def?.name ?? 'a room'}`;
     }
     case 'inhabitantType':
@@ -191,13 +191,13 @@ function describeCondition(condition: SynergyCondition): string {
   }
 }
 
-export function getPotentialSynergiesForRoom(
+export function synergyGetPotentialForRoom(
   room: PlacedRoom,
   floor: Floor,
   adjacentRoomIds: string[],
   synergies?: SynergyDefinition[],
 ): PotentialSynergy[] {
-  const defs = synergies ?? getSynergyDefinitions();
+  const defs = synergies ?? synergyGetDefinitions();
   const potentials: PotentialSynergy[] = [];
 
   for (const synergy of defs) {
@@ -210,7 +210,7 @@ export function getPotentialSynergiesForRoom(
 
     const conditionResults = synergy.conditions.map((c) => ({
       condition: c,
-      met: evaluateCondition(c, room, floor, adjacentRoomIds),
+      met: synergyEvaluateCondition(c, room, floor, adjacentRoomIds),
     }));
 
     const allMet = conditionResults.every((r) => r.met);
@@ -229,7 +229,7 @@ export function getPotentialSynergiesForRoom(
   return potentials;
 }
 
-export function formatSynergyEffect(
+export function synergyFormatEffect(
   effect: SynergyDefinition['effects'][0],
 ): string {
   if (effect.type === 'productionBonus') {

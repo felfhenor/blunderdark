@@ -1,4 +1,4 @@
-import { createEmptyGrid } from '@helpers/grid';
+import { gridCreateEmpty } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import type {
   Floor,
@@ -29,7 +29,7 @@ export function defaultGameState(): GameState {
       minute: 0,
     },
     world: {
-      grid: createEmptyGrid(),
+      grid: gridCreateEmpty(),
       resources: defaultResources(),
       inhabitants: [],
       hallways: [],
@@ -84,7 +84,7 @@ export function defaultFloor(depth = 1, biome: Floor['biome'] = 'neutral'): Floo
     name: `Floor ${depth}`,
     depth,
     biome,
-    grid: createEmptyGrid(),
+    grid: gridCreateEmpty(),
     rooms: [],
     hallways: [],
     inhabitants: [],

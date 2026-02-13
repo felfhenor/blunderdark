@@ -12,11 +12,11 @@ export type SeasonTransitionEvent = {
 const seasonTransition = new Subject<SeasonTransitionEvent>();
 export const seasonTransition$ = seasonTransition.asObservable();
 
-export const currentSeason = computed(
+export const seasonCurrent = computed(
   () => gamestate().world.season.currentSeason,
 );
 
-export const dayInSeason = computed(
+export const seasonDayInSeason = computed(
   () => gamestate().world.season.dayInSeason,
 );
 
@@ -24,15 +24,15 @@ export const seasonProgress = computed(
   () => ((gamestate().world.season.dayInSeason - 1) / DAYS_PER_SEASON) * 100,
 );
 
-export const totalSeasonCycles = computed(
+export const seasonTotalCycles = computed(
   () => gamestate().world.season.totalSeasonCycles,
 );
 
-export function isSeason(season: Season): boolean {
+export function seasonIs(season: Season): boolean {
   return gamestate().world.season.currentSeason === season;
 }
 
-export function getSeasonLabel(season: Season): string {
+export function seasonGetLabel(season: Season): string {
   const labels: Record<Season, string> = {
     growth: 'Growth',
     harvest: 'Harvest',
@@ -42,7 +42,7 @@ export function getSeasonLabel(season: Season): string {
   return labels[season];
 }
 
-export function advanceDay(seasonState: SeasonState): SeasonState {
+export function seasonAdvanceDay(seasonState: SeasonState): SeasonState {
   const newDay = seasonState.dayInSeason + 1;
 
   if (newDay > DAYS_PER_SEASON) {
@@ -65,11 +65,11 @@ export function advanceDay(seasonState: SeasonState): SeasonState {
   };
 }
 
-export async function advanceGameDay(): Promise<void> {
+export async function seasonAdvanceGameDay(): Promise<void> {
   const oldSeason = gamestate().world.season.currentSeason;
 
   await updateGamestate((state) => {
-    const newSeason = advanceDay(state.world.season);
+    const newSeason = seasonAdvanceDay(state.world.season);
     return {
       ...state,
       world: {

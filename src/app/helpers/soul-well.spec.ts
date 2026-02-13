@@ -45,10 +45,10 @@ const essenceMasteryPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
@@ -156,16 +156,16 @@ mockContent.set('def-skeleton', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -235,7 +235,7 @@ describe('Soul Well: definition', () => {
 
 describe('Soul Well: base production', () => {
   it('should have base production of 0.3 essence/tick (1.5 essence/min)', () => {
-    const production = getBaseProduction(SOUL_WELL_ID);
+    const production = productionGetBase(SOUL_WELL_ID);
     expect(production).toEqual({ essence: 0.3 });
     expect(productionPerMinute(production['essence']!)).toBeCloseTo(1.5);
   });
@@ -243,7 +243,7 @@ describe('Soul Well: base production', () => {
   it('should produce essence even without workers (passive)', () => {
     const well = createPlacedWell();
     const floor = makeFloor([well]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production['essence']).toBeCloseTo(0.3);
   });
 });
@@ -259,7 +259,7 @@ describe('Soul Well: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [well, grove];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       well,
       ['placed-grove-1'],
       allRooms,
@@ -277,7 +277,7 @@ describe('Soul Well: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [well, library];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       well,
       ['placed-library-1'],
       allRooms,
@@ -295,7 +295,7 @@ describe('Soul Well: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [well1, well2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       well1,
       ['placed-well-2'],
       allRooms,
@@ -320,7 +320,7 @@ describe('Soul Well: adjacency bonuses', () => {
       anchorY: 3,
     };
     const allRooms = [well, grove, library];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       well,
       ['placed-grove-1', 'placed-library-1'],
       allRooms,
@@ -332,7 +332,7 @@ describe('Soul Well: adjacency bonuses', () => {
 
 describe('Soul Well: Necrotic Enhancement upgrade', () => {
   it('should have productionMultiplier 1.5 and maxInhabitantBonus 1', () => {
-    const paths = getUpgradePaths(SOUL_WELL_ID);
+    const paths = roomUpgradeGetPaths(SOUL_WELL_ID);
     const necrotic = paths.find((p) => p.name === 'Necrotic Enhancement');
     expect(necrotic).toBeDefined();
     expect(necrotic!.effects).toHaveLength(2);
@@ -355,14 +355,14 @@ describe('Soul Well: Necrotic Enhancement upgrade', () => {
     const room = createPlacedWell({
       appliedUpgradePathId: 'upgrade-necrotic-enhancement',
     });
-    const effective = getEffectiveMaxInhabitants(room, soulWellRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(3);
   });
 });
 
 describe('Soul Well: Essence Mastery upgrade', () => {
   it('should have productionMultiplier 1.75 and fearReduction 1', () => {
-    const paths = getUpgradePaths(SOUL_WELL_ID);
+    const paths = roomUpgradeGetPaths(SOUL_WELL_ID);
     const mastery = paths.find((p) => p.name === 'Essence Mastery');
     expect(mastery).toBeDefined();
     expect(mastery!.effects).toHaveLength(2);
@@ -385,7 +385,7 @@ describe('Soul Well: Essence Mastery upgrade', () => {
     const room = createPlacedWell({
       appliedUpgradePathId: 'upgrade-essence-mastery',
     });
-    const effective = getEffectiveMaxInhabitants(room, soulWellRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(2);
   });
 });
@@ -395,13 +395,13 @@ describe('Soul Well: upgrade mutual exclusivity', () => {
     const room = createPlacedWell({
       appliedUpgradePathId: 'upgrade-necrotic-enhancement',
     });
-    const result = canApplyUpgrade(room, 'upgrade-essence-mastery');
+    const result = roomUpgradeCanApply(room, 'upgrade-essence-mastery');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedWell();
-    const result = canApplyUpgrade(room, 'upgrade-necrotic-enhancement');
+    const result = roomUpgradeCanApply(room, 'upgrade-necrotic-enhancement');
     expect(result.valid).toBe(true);
   });
 });
@@ -417,7 +417,7 @@ describe('Soul Well: full production with adjacency', () => {
       anchorY: 0,
     };
     const floor = makeFloor([well, grove]);
-    const production = calculateSingleRoomProduction(well, floor);
+    const production = productionCalculateSingleRoom(well, floor);
     // Base 0.3 * (1 + 0.2 adjacency) * 1.0 = 0.3 * 1.2 = 0.36
     expect(production['essence']).toBeCloseTo(0.36);
   });
@@ -434,7 +434,7 @@ describe('Soul Well: full production with adjacency', () => {
       },
     ];
     const floor = makeFloor([well], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Passive room (requiresWorkers: false) still produces with or without workers
     // Worker efficiency: 0.7 - 1.0 = -0.3 bonus
     // Base 0.3 * (1 + (-0.3)) = 0.3 * 0.7 = 0.21

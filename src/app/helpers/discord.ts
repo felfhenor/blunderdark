@@ -1,6 +1,6 @@
 import type { DiscordPresenceOpts } from '@interfaces';
 
-export function isInElectron() {
+export function discordIsInElectron() {
   return navigator.userAgent.toLowerCase().includes(' electron/');
 }
 
@@ -18,7 +18,7 @@ export function discordSetStatus(status: DiscordPresenceOpts) {
 }
 
 export function discordUpdateStatus() {
-  if (!isInElectron()) return;
+  if (!discordIsInElectron()) return;
 
   discordSetStatus({
     state: 'In game',

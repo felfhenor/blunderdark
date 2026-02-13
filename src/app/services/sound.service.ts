@@ -1,5 +1,5 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { getOption, sfx$ } from '@helpers';
+import { optionsGet, sfx$ } from '@helpers';
 import type { BGM, SFX } from '@interfaces';
 import { zip } from 'es-toolkit/compat';
 
@@ -52,10 +52,10 @@ export class SoundService {
   private lastBGMVolume = signal<number>(0);
 
   private bgmVolume = computed(() =>
-    getOption<'bgmPlay'>('bgmPlay') ? getOption<'bgmVolume'>('bgmVolume') : 0,
+    optionsGet<'bgmPlay'>('bgmPlay') ? optionsGet<'bgmVolume'>('bgmVolume') : 0,
   );
 
-  private sfxVolume = computed(() => 0.5 * getOption<'sfxVolume'>('sfxVolume'));
+  private sfxVolume = computed(() => 0.5 * optionsGet<'sfxVolume'>('sfxVolume'));
 
   constructor() {
     effect(() => {
@@ -68,7 +68,7 @@ export class SoundService {
   }
 
   async init() {
-    this.lastBGMVolume.set(getOption<'bgmVolume'>('bgmVolume'));
+    this.lastBGMVolume.set(optionsGet<'bgmVolume'>('bgmVolume'));
     this.setupUserInteractionListeners();
     await this.loadSFX();
     await this.loadBGM();
@@ -154,7 +154,7 @@ export class SoundService {
   }
 
   public playSound(soundName: SFX, rate: number) {
-    if (!getOption('sfxPlay')) return;
+    if (!optionsGet('sfxPlay')) return;
 
     const sound = this.audioRefs[soundName]!;
 
@@ -177,7 +177,7 @@ export class SoundService {
   }
 
   public playBGM(bgmName: BGM) {
-    if (!getOption('bgmPlay')) return;
+    if (!optionsGet('bgmPlay')) return;
 
     this.stopBGM();
 

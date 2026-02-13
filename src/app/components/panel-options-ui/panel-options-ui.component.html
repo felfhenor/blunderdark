@@ -17,15 +17,15 @@
             <label class="label cursor-pointer label-checkbox">
               <input
                 type="checkbox"
-                [checked]="getOption('bgmPlay')"
+                [checked]="optionsGet('bgmPlay')"
                 class="checkbox checkbox-secondary"
-                (click)="setOption('bgmPlay', !getOption('bgmPlay'))"
+                (click)="optionsSet('bgmPlay', !optionsGet('bgmPlay'))"
               />
               <span class="label-text">Play Background Music</span>
             </label>
           </div>
 
-          @if (getOption('bgmPlay')) {
+          @if (optionsGet('bgmPlay')) {
             <div class="form-control">
               <label class="label cursor-pointer label-checkbox">
                 <span class="label-text !ml-0 mr-2">
@@ -37,12 +37,12 @@
                   [min]="0"
                   [max]="1"
                   [step]="0.05"
-                  [value]="getOption('bgmVolume')"
-                  (change)="setOption('bgmVolume', bgmVolume.valueAsNumber)"
+                  [value]="optionsGet('bgmVolume')"
+                  (change)="optionsSet('bgmVolume', bgmVolume.valueAsNumber)"
                   class="range range-secondary"
                 />
                 <span class="ml-2">
-                  {{ getOption('bgmVolume') * 100 | number: '1.0-0' }}%
+                  {{ optionsGet('bgmVolume') * 100 | number: '1.0-0' }}%
                 </span>
               </label>
             </div>
@@ -52,15 +52,15 @@
             <label class="label cursor-pointer label-checkbox">
               <input
                 type="checkbox"
-                [checked]="getOption('sfxPlay')"
+                [checked]="optionsGet('sfxPlay')"
                 class="checkbox checkbox-secondary"
-                (click)="setOption('sfxPlay', !getOption('sfxPlay'))"
+                (click)="optionsSet('sfxPlay', !optionsGet('sfxPlay'))"
               />
               <span class="label-text">Play Sound Effects</span>
             </label>
           </div>
 
-          @if (getOption('sfxPlay')) {
+          @if (optionsGet('sfxPlay')) {
             <div class="form-control">
               <label class="label cursor-pointer label-checkbox">
                 <span class="label-text !ml-0 mr-2">Sound Effects Volume</span>
@@ -70,12 +70,12 @@
                   [min]="0"
                   [max]="1"
                   [step]="0.05"
-                  [value]="getOption('sfxVolume')"
-                  (change)="setOption('sfxVolume', sfxVolume.valueAsNumber)"
+                  [value]="optionsGet('sfxVolume')"
+                  (change)="optionsSet('sfxVolume', sfxVolume.valueAsNumber)"
                   class="range range-secondary"
                 />
                 <span class="ml-2">
-                  {{ getOption('sfxVolume') * 100 | number: '1.0-0' }}%
+                  {{ optionsGet('sfxVolume') * 100 | number: '1.0-0' }}%
                 </span>
               </label>
             </div>
@@ -97,7 +97,7 @@
           <select
             class="select select-bordered select-xs mx-1"
             [(ngModel)]="currentTheme"
-            (ngModelChange)="setOption('uiTheme', $event)"
+            (ngModelChange)="optionsSet('uiTheme', $event)"
           >
             @for (theme of themes; track $index) {
               <option [value]="theme.name">

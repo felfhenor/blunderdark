@@ -1,9 +1,9 @@
 import type { Signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { localStorageSignal } from '@helpers/signal';
+import { signalLocalStorage } from '@helpers/signal';
 import type { GameOptions } from '@interfaces';
 
-export function defaultOptions(): GameOptions {
+export function optionsDefault(): GameOptions {
   return {
     showDebug: !environment.production,
     debugConsoleLogStateUpdates: false,
@@ -26,14 +26,14 @@ export function defaultOptions(): GameOptions {
   };
 }
 
-const _options = localStorageSignal<GameOptions>('options', defaultOptions());
+const _options = signalLocalStorage<GameOptions>('options', optionsDefault());
 export const options: Signal<GameOptions> = _options.asReadonly();
 
-export function setOptions(options: GameOptions) {
+export function optionsSetAll(options: GameOptions) {
   _options.set(options);
 }
 
-export function setOption<T extends keyof GameOptions>(
+export function optionsSet<T extends keyof GameOptions>(
   option: T,
   value: GameOptions[T],
 ): void {
@@ -43,7 +43,7 @@ export function setOption<T extends keyof GameOptions>(
   }));
 }
 
-export function getOption<T extends keyof GameOptions>(
+export function optionsGet<T extends keyof GameOptions>(
   option: T,
 ): GameOptions[T] {
   return options()[option];

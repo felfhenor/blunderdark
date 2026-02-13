@@ -4,7 +4,7 @@ import type { TileOffset } from '@interfaces';
  * Checks if two sets of tiles share at least one edge (horizontal or vertical).
  * Diagonal (corner) touching does NOT count as adjacent.
  */
-export function areRoomsAdjacent(
+export function adjacencyAreRoomsAdjacent(
   tilesA: TileOffset[],
   tilesB: TileOffset[],
 ): boolean {
@@ -32,7 +32,7 @@ export function areRoomsAdjacent(
  * Finds all shared edge tile pairs between two sets of tiles.
  * Returns pairs of [tileFromA, tileFromB] that share an edge.
  */
-export function getSharedEdges(
+export function adjacencyGetSharedEdges(
   tilesA: TileOffset[],
   tilesB: TileOffset[],
 ): Array<[TileOffset, TileOffset]> {
@@ -65,11 +65,11 @@ export function getSharedEdges(
 
 export type AdjacencyMap = Record<string, string[]>;
 
-export function createAdjacencyMap(): AdjacencyMap {
+export function adjacencyCreateMap(): AdjacencyMap {
   return {};
 }
 
-export function addRoomToAdjacencyMap(
+export function adjacencyAddRoom(
   map: AdjacencyMap,
   roomId: string,
   roomTiles: TileOffset[],
@@ -81,7 +81,7 @@ export function addRoomToAdjacencyMap(
   for (const other of allRooms) {
     if (other.id === roomId) continue;
 
-    if (areRoomsAdjacent(roomTiles, other.tiles)) {
+    if (adjacencyAreRoomsAdjacent(roomTiles, other.tiles)) {
       result[roomId].push(other.id);
 
       if (!result[other.id]) {
@@ -94,7 +94,7 @@ export function addRoomToAdjacencyMap(
   return result;
 }
 
-export function removeRoomFromAdjacencyMap(
+export function adjacencyRemoveRoom(
   map: AdjacencyMap,
   roomId: string,
 ): AdjacencyMap {
@@ -112,7 +112,7 @@ export function removeRoomFromAdjacencyMap(
   return result;
 }
 
-export function getAdjacentRooms(
+export function adjacencyGetAdjacentRooms(
   map: AdjacencyMap,
   roomId: string,
 ): string[] {

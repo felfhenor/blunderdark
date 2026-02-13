@@ -1,5 +1,5 @@
 import { Directive, HostListener, input } from '@angular/core';
-import { playSFX } from '@helpers/sfx';
+import { sfxPlay } from '@helpers/sfx';
 import type { SFX } from '@interfaces';
 
 type SFXTrigger = 'click' | 'hover';
@@ -15,12 +15,12 @@ export class SFXDirective {
   @HostListener('click')
   click() {
     if (!this.sfxTrigger().includes('click')) return;
-    playSFX(this.appSfx(), 1 + this.sfxOffset());
+    sfxPlay(this.appSfx(), 1 + this.sfxOffset());
   }
 
   @HostListener('mouseenter')
   mouseenter() {
     if (!this.sfxTrigger().includes('hover')) return;
-    playSFX('ui-hover', 1 + this.sfxOffset());
+    sfxPlay('ui-hover', 1 + this.sfxOffset());
   }
 }

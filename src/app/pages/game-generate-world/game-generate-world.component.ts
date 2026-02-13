@@ -2,10 +2,10 @@ import type { AfterViewInit, OnDestroy } from '@angular/core';
 import { Component, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { gameStart } from '@helpers/game-init';
-import { isSetup } from '@helpers/setup';
+import { setupIs } from '@helpers/setup';
 import {
-  cancelWorldGeneration,
-  currentWorldGenStatus,
+  worldgenCancelGeneration,
+  worldgenCurrentStatus,
 } from '@helpers/worldgen';
 import { SoundService } from '@services/sound.service';
 
@@ -19,11 +19,11 @@ export class GameGenerateWorldComponent implements AfterViewInit, OnDestroy {
   private router = inject(Router);
   private soundService = inject(SoundService);
 
-  public worldGenStatus = computed(() => currentWorldGenStatus());
+  public worldGenStatus = computed(() => worldgenCurrentStatus());
 
   constructor() {
     effect(() => {
-      const isReady = isSetup();
+      const isReady = setupIs();
       if (isReady) {
         this.router.navigate(['/game']);
         this.soundService.stopSFX();
@@ -39,6 +39,6 @@ export class GameGenerateWorldComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    cancelWorldGeneration();
+    worldgenCancelGeneration();
   }
 }

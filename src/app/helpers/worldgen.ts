@@ -1,6 +1,6 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
-import { autoPlaceRooms } from '@helpers/altar-room';
+import { altarRoomAutoPlace } from '@helpers/altar-room';
 import {
   defaultFloor,
   defaultInvasionSchedule,
@@ -9,18 +9,18 @@ import {
   defaultResources,
   defaultSeasonState,
 } from '@helpers/defaults';
-import { createEmptyGrid } from '@helpers/grid';
-import { resolveStartingBiome } from '@helpers/world';
+import { gridCreateEmpty } from '@helpers/grid';
+import { worldResolveStartingBiome } from '@helpers/world';
 import type { GameStateWorld } from '@interfaces';
 import { Subject } from 'rxjs';
 
 const _currentWorldGenStatus = signal<string>('');
-export const currentWorldGenStatus: Signal<string> =
+export const worldgenCurrentStatus: Signal<string> =
   _currentWorldGenStatus.asReadonly();
 
 const cancelWorldGen = new Subject<void>();
 
-export function cancelWorldGeneration(): void {
+export function worldgenCancelGeneration(): void {
   cancelWorldGen.next();
 }
 
@@ -28,13 +28,13 @@ export async function worldgenGenerateWorld(): Promise<
   GameStateWorld & { didFinish?: boolean }
 > {
   // Resolve the starting biome (handles 'random' selection)
-  const startingBiome = resolveStartingBiome();
+  const startingBiome = worldResolveStartingBiome();
 
   // Create the starting floor and auto-place initial rooms (e.g., Altar)
-  const startingFloor = autoPlaceRooms(defaultFloor(1, startingBiome));
+  const startingFloor = altarRoomAutoPlace(defaultFloor(1, startingBiome));
 
   return {
-    grid: createEmptyGrid(),
+    grid: gridCreateEmpty(),
     resources: defaultResources(),
     inhabitants: [],
     hallways: [],

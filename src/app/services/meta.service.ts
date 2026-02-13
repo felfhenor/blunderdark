@@ -1,9 +1,9 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import {
-  isInElectron,
-  liveVersion,
-  localVersion,
+  discordIsInElectron,
+  versionLive,
+  versionLocal,
   versionInfoToSemver,
 } from '@helpers';
 import { LoggerService } from '@services/logger.service';
@@ -17,14 +17,14 @@ export class MetaService {
   private logger = inject(LoggerService);
 
   public versionString = computed(() => {
-    const local = localVersion();
+    const local = versionLocal();
     if (!local) return '';
 
     return versionInfoToSemver(local);
   });
 
   public liveVersionString = computed(() => {
-    const live = liveVersion();
+    const live = versionLive();
     if (!live) return '';
 
     return versionInfoToSemver(live);
@@ -65,7 +65,7 @@ export class MetaService {
     try {
       const response = await fetch('version.json');
       const versionInfo = await response.json();
-      localVersion.set(versionInfo);
+      versionLocal.set(versionInfo);
 
       this.logger.log(
         'Meta:Version',
@@ -118,7 +118,7 @@ export class MetaService {
         'https://blunderdark.felfhenor.com/version.json',
       );
       const liveVersionData = await liveVersionFile.json();
-      liveVersion.set(liveVersionData);
+      versionLive.set(liveVersionData);
 
       this.logger.log(
         'Meta:Version',
@@ -133,7 +133,7 @@ export class MetaService {
   }
 
   public update() {
-    if (!isInElectron()) {
+    if (!discordIsInElectron()) {
       window.location.reload();
       return;
     }

@@ -10,16 +10,16 @@ import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
-  closeAllMenus,
-  GAME_SPEEDS,
-  gameSpeed,
-  getOption,
-  isSetup,
-  isShowingAnyMenu,
-  saveGameState,
-  setGameSpeed,
-  setOption,
-  showOptionsMenu,
+  uiCloseAllMenus,
+  GAME_TIME_SPEEDS,
+  gameTimeSpeed,
+  optionsGet,
+  setupIs,
+  uiIsShowingAnyMenu,
+  gamestateSave,
+  gameTimeSetSpeed,
+  optionsSet,
+  uiShowOptionsMenu,
 } from '@helpers';
 import type { GameSpeed, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -57,9 +57,9 @@ export class NavbarComponent {
 
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
 
-  public isPaused = computed(() => getOption('gameloopPaused'));
-  public gameSpeed = gameSpeed;
-  public gameSpeeds = GAME_SPEEDS;
+  public isPaused = computed(() => optionsGet('gameloopPaused'));
+  public gameTimeSpeed = gameTimeSpeed;
+  public gameSpeeds = GAME_TIME_SPEEDS;
 
   public readonly panelConfigs: Array<{
     name: string;
@@ -69,52 +69,52 @@ export class NavbarComponent {
   }> = [];
 
   public toggleOptions() {
-    if (showOptionsMenu()) {
-      showOptionsMenu.set(false);
+    if (uiShowOptionsMenu()) {
+      uiShowOptionsMenu.set(false);
       return;
     }
 
-    closeAllMenus();
-    showOptionsMenu.set(!showOptionsMenu());
+    uiCloseAllMenus();
+    uiShowOptionsMenu.set(!uiShowOptionsMenu());
   }
 
   public togglePause() {
     if (this.showPauseMenu()) return;
-    setOption('gameloopPaused', !this.isPaused());
+    optionsSet('gameloopPaused', !this.isPaused());
   }
 
   public setSpeed(speed: GameSpeed) {
-    setGameSpeed(speed);
+    gameTimeSetSpeed(speed);
   }
 
   public goToHome() {
-    saveGameState();
-    closeAllMenus();
+    gamestateSave();
+    uiCloseAllMenus();
     this.router.navigate(['..']);
   }
 
   public closePauseMenu() {
     this.showPauseMenu.set(false);
     if (!this.wasPausedBeforeOpeningMenu()) {
-      setOption('gameloopPaused', false);
+      optionsSet('gameloopPaused', false);
     }
   }
 
   public openPauseMenu() {
-    if (!isSetup()) return;
+    if (!setupIs()) return;
 
     this.showPauseMenu.set(true);
     if (this.isPaused()) {
       this.wasPausedBeforeOpeningMenu.set(true);
     } else {
       this.wasPausedBeforeOpeningMenu.set(false);
-      setOption('gameloopPaused', true);
+      optionsSet('gameloopPaused', true);
     }
   }
 
-  public closeAllMenus() {
-    if (showOptionsMenu()) {
-      showOptionsMenu.set(false);
+  public uiCloseAllMenus() {
+    if (uiShowOptionsMenu()) {
+      uiShowOptionsMenu.set(false);
       return;
     }
 
@@ -123,11 +123,11 @@ export class NavbarComponent {
       return;
     }
 
-    if (!isShowingAnyMenu()) {
+    if (!uiIsShowingAnyMenu()) {
       this.openPauseMenu();
       return;
     }
 
-    closeAllMenus(true);
+    uiCloseAllMenus(true);
   }
 }

@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
-import { getEntry } from '@helpers/content';
-import { getRoomDefinition } from '@helpers/production';
+import { contentGetEntry } from '@helpers/content';
+import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantDefinition,
@@ -38,7 +38,7 @@ export type RoomEfficiencyBreakdown = {
 /**
  * Extract efficiency-related traits (production_bonus) from an inhabitant definition.
  */
-export function getEfficiencyTraits(
+export function efficiencyGetTraits(
   def: InhabitantDefinition,
 ): EfficiencyTrait[] {
   return def.traits
@@ -55,7 +55,7 @@ export function getEfficiencyTraits(
  * A trait with no targetResourceType (or 'all') applies to any producing room.
  * A trait with a specific targetResourceType only applies if the room produces that resource.
  */
-export function doesTraitApplyToRoom(
+export function efficiencyDoesTraitApply(
   trait: InhabitantTrait,
   roomProduction: RoomProduction,
 ): boolean {
@@ -70,11 +70,11 @@ export function doesTraitApplyToRoom(
  * Calculate the efficiency bonus for a single inhabitant in a specific room,
  * considering trait-room matching.
  */
-export function calculateInhabitantContribution(
+export function efficiencyCalculateInhabitantContribution(
   instance: InhabitantInstance,
   roomProduction: RoomProduction,
 ): InhabitantContribution | undefined {
-  const def = getEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
     instance.definitionId,
   );
   if (!def) return undefined;
@@ -84,7 +84,7 @@ export function calculateInhabitantContribution(
   const traitBonuses = def.traits
     .filter((t) => t.effectType === 'production_bonus')
     .map((t) => {
-      const applies = doesTraitApplyToRoom(t, roomProduction);
+      const applies = efficiencyDoesTraitApply(t, roomProduction);
       return {
         traitName: t.name,
         bonus: t.effectValue,
@@ -109,11 +109,11 @@ export function calculateInhabitantContribution(
  * Calculate the full efficiency breakdown for a room.
  * Returns base efficiency (1.0), per-inhabitant contributions, and total multiplier.
  */
-export function calculateRoomEfficiency(
+export function efficiencyCalculateRoom(
   room: PlacedRoom,
   inhabitants: InhabitantInstance[],
 ): RoomEfficiencyBreakdown {
-  const roomDef = getRoomDefinition(room.roomTypeId);
+  const roomDef = productionGetRoomDefinition(room.roomTypeId);
   const roomProduction = roomDef?.production ?? {};
 
   const assigned = inhabitants.filter(
@@ -122,7 +122,7 @@ export function calculateRoomEfficiency(
 
   const inhabitantBonuses: InhabitantContribution[] = [];
   for (const inst of assigned) {
-    const contribution = calculateInhabitantContribution(inst, roomProduction);
+    const contribution = efficiencyCalculateInhabitantContribution(inst, roomProduction);
     if (contribution) {
       inhabitantBonuses.push(contribution);
     }
@@ -144,11 +144,11 @@ export function calculateRoomEfficiency(
  * Calculate the inhabitant bonus for a room using trait-room matching.
  * This is the matching-aware version used by the production system.
  */
-export function calculateMatchedInhabitantBonus(
+export function efficiencyCalculateMatchedInhabitantBonus(
   placedRoom: PlacedRoom,
   inhabitants: InhabitantInstance[],
 ): { bonus: number; hasWorkers: boolean } {
-  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   const roomProduction = roomDef?.production ?? {};
 
   const assigned = inhabitants.filter(
@@ -161,7 +161,7 @@ export function calculateMatchedInhabitantBonus(
 
   let totalBonus = 0;
   for (const inst of assigned) {
-    const def = getEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
       inst.definitionId,
     );
     if (!def) continue;
@@ -170,7 +170,7 @@ export function calculateMatchedInhabitantBonus(
 
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {
-        if (doesTraitApplyToRoom(trait, roomProduction)) {
+        if (efficiencyDoesTraitApply(trait, roomProduction)) {
           totalBonus += trait.effectValue;
         }
       }
@@ -185,12 +185,12 @@ export function calculateMatchedInhabitantBonus(
 /**
  * Get the efficiency breakdown for a specific room by ID.
  */
-export function getRoomEfficiency(roomId: string): RoomEfficiencyBreakdown | undefined {
+export function efficiencyGetRoom(roomId: string): RoomEfficiencyBreakdown | undefined {
   const floors = gamestate().world.floors;
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return calculateRoomEfficiency(room, floor.inhabitants);
+      return efficiencyCalculateRoom(room, floor.inhabitants);
     }
   }
   return undefined;
@@ -199,17 +199,17 @@ export function getRoomEfficiency(roomId: string): RoomEfficiencyBreakdown | und
 /**
  * Average efficiency multiplier across all production rooms.
  */
-export const averageDungeonEfficiency = computed<number>(() => {
+export const efficiencyAverageDungeon = computed<number>(() => {
   const floors = gamestate().world.floors;
   let totalMultiplier = 0;
   let roomCount = 0;
 
   for (const floor of floors) {
     for (const room of floor.rooms) {
-      const roomDef = getRoomDefinition(room.roomTypeId);
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef || !roomDef.production || Object.keys(roomDef.production).length === 0) continue;
 
-      const breakdown = calculateRoomEfficiency(room, floor.inhabitants);
+      const breakdown = efficiencyCalculateRoom(room, floor.inhabitants);
       totalMultiplier += breakdown.totalMultiplier;
       roomCount++;
     }
@@ -221,16 +221,16 @@ export const averageDungeonEfficiency = computed<number>(() => {
 /**
  * Sum of all efficiency bonuses for a specific resource across all rooms.
  */
-export function totalEfficiencyBonusForResource(resourceType: string): number {
+export function efficiencyTotalBonusForResource(resourceType: string): number {
   const floors = gamestate().world.floors;
   let totalBonus = 0;
 
   for (const floor of floors) {
     for (const room of floor.rooms) {
-      const roomDef = getRoomDefinition(room.roomTypeId);
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef?.production?.[resourceType]) continue;
 
-      const breakdown = calculateRoomEfficiency(room, floor.inhabitants);
+      const breakdown = efficiencyCalculateRoom(room, floor.inhabitants);
       totalBonus += breakdown.totalMultiplier - 1.0;
     }
   }

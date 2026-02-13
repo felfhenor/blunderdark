@@ -10,19 +10,19 @@ import type {
 const mockEntries = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockEntries.get(id) ?? undefined,
+  contentGetEntry: (id: string) => mockEntries.get(id) ?? undefined,
 }));
 
 import {
-  DEFAULT_FEAR_TOLERANCE,
-  calculatePerCreatureProductionModifier,
-  getAttackMultiplier,
-  getDefenseMultiplier,
-  getFearTolerance,
-  getFoodConsumptionMultiplier,
-  getProductionMultiplier,
-  getStateModifier,
-  isInhabitantScared,
+  STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT,
+  stateModifierCalculatePerCreatureProduction,
+  stateModifierGetAttackMultiplier,
+  stateModifierGetDefenseMultiplier,
+  stateModifierGetFearTolerance,
+  stateModifierGetFoodConsumptionMultiplier,
+  stateModifierGetProductionMultiplier,
+  stateModifierGet,
+  stateModifierIsInhabitantScared,
 } from '@helpers/state-modifiers';
 
 function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
@@ -61,78 +61,78 @@ beforeEach(() => {
   mockEntries.clear();
 });
 
-// --- isInhabitantScared ---
+// --- stateModifierIsInhabitantScared ---
 
-describe('isInhabitantScared', () => {
+describe('stateModifierIsInhabitantScared', () => {
   it('should return true when room fear exceeds tolerance', () => {
     registerDef('goblin', { fearTolerance: 1 });
     const inhabitant = makeInhabitant({ definitionId: 'goblin' });
-    expect(isInhabitantScared(inhabitant, 2)).toBe(true);
+    expect(stateModifierIsInhabitantScared(inhabitant, 2)).toBe(true);
   });
 
   it('should return false when room fear equals tolerance', () => {
     registerDef('goblin', { fearTolerance: 2 });
     const inhabitant = makeInhabitant({ definitionId: 'goblin' });
-    expect(isInhabitantScared(inhabitant, 2)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 2)).toBe(false);
   });
 
   it('should return false when room fear is below tolerance', () => {
     registerDef('goblin', { fearTolerance: 3 });
     const inhabitant = makeInhabitant({ definitionId: 'goblin' });
-    expect(isInhabitantScared(inhabitant, 1)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 1)).toBe(false);
   });
 
   it('should use default tolerance when not defined on creature', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin' });
     // Default tolerance is 2, so fear level 3 should scare
-    expect(isInhabitantScared(inhabitant, 3)).toBe(true);
+    expect(stateModifierIsInhabitantScared(inhabitant, 3)).toBe(true);
     // Fear level 2 should not scare (equals tolerance)
-    expect(isInhabitantScared(inhabitant, 2)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 2)).toBe(false);
   });
 
   it('should use default tolerance when definition not found', () => {
     const inhabitant = makeInhabitant({ definitionId: 'missing' });
-    expect(isInhabitantScared(inhabitant, 3)).toBe(true);
-    expect(isInhabitantScared(inhabitant, 2)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 3)).toBe(true);
+    expect(stateModifierIsInhabitantScared(inhabitant, 2)).toBe(false);
   });
 
   it('should handle zero fear tolerance (always scared at fear > 0)', () => {
     registerDef('slime', { fearTolerance: 0 });
     const inhabitant = makeInhabitant({ definitionId: 'slime' });
-    expect(isInhabitantScared(inhabitant, 1)).toBe(true);
-    expect(isInhabitantScared(inhabitant, 0)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 1)).toBe(true);
+    expect(stateModifierIsInhabitantScared(inhabitant, 0)).toBe(false);
   });
 
   it('should handle high fear tolerance (rarely scared)', () => {
     registerDef('skeleton', { fearTolerance: 4 });
     const inhabitant = makeInhabitant({ definitionId: 'skeleton' });
-    expect(isInhabitantScared(inhabitant, 4)).toBe(false);
-    expect(isInhabitantScared(inhabitant, 5)).toBe(true);
+    expect(stateModifierIsInhabitantScared(inhabitant, 4)).toBe(false);
+    expect(stateModifierIsInhabitantScared(inhabitant, 5)).toBe(true);
   });
 });
 
-// --- getFearTolerance ---
+// --- stateModifierGetFearTolerance ---
 
-describe('getFearTolerance', () => {
+describe('stateModifierGetFearTolerance', () => {
   it('should return creature fear tolerance', () => {
     registerDef('goblin', { fearTolerance: 1 });
-    expect(getFearTolerance('goblin')).toBe(1);
+    expect(stateModifierGetFearTolerance('goblin')).toBe(1);
   });
 
   it('should return default when not defined', () => {
     registerDef('goblin', {});
-    expect(getFearTolerance('goblin')).toBe(DEFAULT_FEAR_TOLERANCE);
+    expect(stateModifierGetFearTolerance('goblin')).toBe(STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT);
   });
 
   it('should return default when definition not found', () => {
-    expect(getFearTolerance('missing')).toBe(DEFAULT_FEAR_TOLERANCE);
+    expect(stateModifierGetFearTolerance('missing')).toBe(STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT);
   });
 });
 
-// --- getStateModifier ---
+// --- stateModifierGet ---
 
-describe('getStateModifier', () => {
+describe('stateModifierGet', () => {
   it('should return creature-specific modifier when defined', () => {
     const scaredMod: StateModifier = {
       productionMultiplier: 1.1,
@@ -144,13 +144,13 @@ describe('getStateModifier', () => {
       stateModifiers: { scared: scaredMod },
     });
 
-    const result = getStateModifier('kobold', 'scared');
+    const result = stateModifierGet('kobold', 'scared');
     expect(result).toEqual(scaredMod);
   });
 
   it('should return default modifier when creature has no stateModifiers', () => {
     registerDef('goblin', {});
-    const result = getStateModifier('goblin', 'scared');
+    const result = stateModifierGet('goblin', 'scared');
     expect(result.productionMultiplier).toBe(0.5);
     expect(result.foodConsumptionMultiplier).toBe(1.0);
   });
@@ -161,26 +161,26 @@ describe('getStateModifier', () => {
         normal: { productionMultiplier: 1.0, foodConsumptionMultiplier: 1.0 },
       },
     });
-    const result = getStateModifier('goblin', 'hungry');
+    const result = stateModifierGet('goblin', 'hungry');
     expect(result.productionMultiplier).toBe(0.75);
   });
 
   it('should return default modifier when definition not found', () => {
-    const result = getStateModifier('missing', 'normal');
+    const result = stateModifierGet('missing', 'normal');
     expect(result.productionMultiplier).toBe(1.0);
   });
 
   it('should return normal defaults for normal state', () => {
     registerDef('goblin', {});
-    const result = getStateModifier('goblin', 'normal');
+    const result = stateModifierGet('goblin', 'normal');
     expect(result.productionMultiplier).toBe(1.0);
     expect(result.foodConsumptionMultiplier).toBe(1.0);
   });
 });
 
-// --- getProductionMultiplier ---
+// --- stateModifierGetProductionMultiplier ---
 
-describe('getProductionMultiplier', () => {
+describe('stateModifierGetProductionMultiplier', () => {
   it('should return creature-specific production multiplier', () => {
     registerDef('kobold', {
       stateModifiers: {
@@ -188,25 +188,25 @@ describe('getProductionMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'kobold', state: 'scared' });
-    expect(getProductionMultiplier(inhabitant)).toBe(1.1);
+    expect(stateModifierGetProductionMultiplier(inhabitant)).toBe(1.1);
   });
 
   it('should return default for normal state', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'normal' });
-    expect(getProductionMultiplier(inhabitant)).toBe(1.0);
+    expect(stateModifierGetProductionMultiplier(inhabitant)).toBe(1.0);
   });
 
   it('should return default scared multiplier when no creature data', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'scared' });
-    expect(getProductionMultiplier(inhabitant)).toBe(0.5);
+    expect(stateModifierGetProductionMultiplier(inhabitant)).toBe(0.5);
   });
 });
 
-// --- getFoodConsumptionMultiplier ---
+// --- stateModifierGetFoodConsumptionMultiplier ---
 
-describe('getFoodConsumptionMultiplier', () => {
+describe('stateModifierGetFoodConsumptionMultiplier', () => {
   it('should return creature-specific food multiplier', () => {
     registerDef('goblin', {
       stateModifiers: {
@@ -214,19 +214,19 @@ describe('getFoodConsumptionMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'scared' });
-    expect(getFoodConsumptionMultiplier(inhabitant)).toBe(1.5);
+    expect(stateModifierGetFoodConsumptionMultiplier(inhabitant)).toBe(1.5);
   });
 
   it('should return 1.0 for normal state', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'normal' });
-    expect(getFoodConsumptionMultiplier(inhabitant)).toBe(1.0);
+    expect(stateModifierGetFoodConsumptionMultiplier(inhabitant)).toBe(1.0);
   });
 });
 
-// --- getAttackMultiplier ---
+// --- stateModifierGetAttackMultiplier ---
 
-describe('getAttackMultiplier', () => {
+describe('stateModifierGetAttackMultiplier', () => {
   it('should return creature-specific attack multiplier', () => {
     registerDef('goblin', {
       stateModifiers: {
@@ -234,7 +234,7 @@ describe('getAttackMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'scared' });
-    expect(getAttackMultiplier(inhabitant)).toBe(0.7);
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(0.7);
   });
 
   it('should return 1.0 when attack multiplier not defined', () => {
@@ -244,19 +244,19 @@ describe('getAttackMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'scared' });
-    expect(getAttackMultiplier(inhabitant)).toBe(1.0);
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(1.0);
   });
 
   it('should return 1.0 for normal state with no combat modifiers', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'normal' });
-    expect(getAttackMultiplier(inhabitant)).toBe(1.0);
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(1.0);
   });
 });
 
-// --- getDefenseMultiplier ---
+// --- stateModifierGetDefenseMultiplier ---
 
-describe('getDefenseMultiplier', () => {
+describe('stateModifierGetDefenseMultiplier', () => {
   it('should return creature-specific defense multiplier', () => {
     registerDef('kobold', {
       stateModifiers: {
@@ -264,7 +264,7 @@ describe('getDefenseMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'kobold', state: 'scared' });
-    expect(getDefenseMultiplier(inhabitant)).toBe(0.8);
+    expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(0.8);
   });
 
   it('should return 1.0 when defense multiplier not defined', () => {
@@ -274,15 +274,15 @@ describe('getDefenseMultiplier', () => {
       },
     });
     const inhabitant = makeInhabitant({ definitionId: 'goblin', state: 'hungry' });
-    expect(getDefenseMultiplier(inhabitant)).toBe(1.0);
+    expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(1.0);
   });
 });
 
-// --- calculatePerCreatureProductionModifier ---
+// --- stateModifierCalculatePerCreatureProduction ---
 
-describe('calculatePerCreatureProductionModifier', () => {
+describe('stateModifierCalculatePerCreatureProduction', () => {
   it('should return 1.0 for empty list', () => {
-    expect(calculatePerCreatureProductionModifier([])).toBe(1.0);
+    expect(stateModifierCalculatePerCreatureProduction([])).toBe(1.0);
   });
 
   it('should return single inhabitant multiplier', () => {
@@ -292,7 +292,7 @@ describe('calculatePerCreatureProductionModifier', () => {
       },
     });
     const inhabitants = [makeInhabitant({ definitionId: 'goblin', state: 'scared' })];
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBe(0.5);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(0.5);
   });
 
   it('should average multipliers across inhabitants', () => {
@@ -307,7 +307,7 @@ describe('calculatePerCreatureProductionModifier', () => {
       makeInhabitant({ instanceId: 'i2', definitionId: 'goblin', state: 'normal' }),
     ];
     // (0.5 + 1.0) / 2 = 0.75
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBe(0.75);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(0.75);
   });
 
   it('should handle mixed creature types', () => {
@@ -326,14 +326,14 @@ describe('calculatePerCreatureProductionModifier', () => {
       makeInhabitant({ instanceId: 'i2', definitionId: 'kobold', state: 'scared' }),
     ];
     // (0.5 + 1.1) / 2 = 0.8
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBeCloseTo(0.8);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBeCloseTo(0.8);
   });
 
   it('should use default multipliers when creature has no stateModifiers', () => {
     registerDef('goblin', {});
     const inhabitants = [makeInhabitant({ definitionId: 'goblin', state: 'hungry' })];
     // Default hungry = 0.75
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBe(0.75);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(0.75);
   });
 
   it('should handle all normal inhabitants returning 1.0', () => {
@@ -346,7 +346,7 @@ describe('calculatePerCreatureProductionModifier', () => {
       makeInhabitant({ instanceId: 'i1', definitionId: 'goblin', state: 'normal' }),
       makeInhabitant({ instanceId: 'i2', definitionId: 'goblin', state: 'normal' }),
     ];
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBe(1.0);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(1.0);
   });
 
   it('should handle kobold scared boost (>1.0 multiplier)', () => {
@@ -356,6 +356,6 @@ describe('calculatePerCreatureProductionModifier', () => {
       },
     });
     const inhabitants = [makeInhabitant({ definitionId: 'kobold', state: 'scared' })];
-    expect(calculatePerCreatureProductionModifier(inhabitants)).toBe(1.1);
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(1.1);
   });
 });

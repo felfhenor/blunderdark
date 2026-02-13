@@ -48,13 +48,13 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 vi.mock('@helpers/altar-room', () => ({
-  canRecruit: () => mockHasAltar,
+  altarRoomCanRecruit: () => mockHasAltar,
 }));
 
 vi.mock('@helpers/content', () => ({
-  getEntriesByType: vi.fn(() => mockContentEntries),
-  getEntry: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentGetEntriesByType: vi.fn(() => mockContentEntries),
+  contentGetEntry: vi.fn(),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 let uuidCounter = 0;
@@ -137,13 +137,13 @@ const tier2Def: InhabitantDefinition & IsContentItem = {
 // --- Import module under test (after mocks) ---
 
 const {
-  getRecruitableInhabitants,
-  getRecruitShortfall,
-  recruitInhabitant,
-  DEFAULT_MAX_INHABITANTS,
+  recruitmentGetRecruitable,
+  recruitmentGetShortfall,
+  recruitmentRecruit,
+  RECRUITMENT_DEFAULT_MAX_INHABITANTS,
 } = await import('@helpers/recruitment');
 
-// canAffordRecruit just wraps canAfford, test it via recruitInhabitant
+// canAffordRecruit just wraps resourceCanAfford, test it via recruitmentRecruit
 
 describe('recruitment helper', () => {
   beforeEach(() => {
@@ -154,34 +154,34 @@ describe('recruitment helper', () => {
     uuidCounter = 0;
   });
 
-  describe('getRecruitableInhabitants', () => {
+  describe('recruitmentGetRecruitable', () => {
     it('should exclude unique/ruler inhabitants', () => {
-      const result = getRecruitableInhabitants();
+      const result = recruitmentGetRecruitable();
       expect(result.map((d) => d.name)).not.toContain('Dragon');
     });
 
     it('should include non-unique inhabitants', () => {
-      const result = getRecruitableInhabitants();
+      const result = recruitmentGetRecruitable();
       expect(result.map((d) => d.name)).toContain('Goblin');
       expect(result.map((d) => d.name)).toContain('Skeleton');
     });
 
     it('should sort by tier then name', () => {
-      const result = getRecruitableInhabitants();
+      const result = recruitmentGetRecruitable();
       const names = result.map((d) => d.name);
       expect(names).toEqual(['Goblin', 'Skeleton', 'Dark Elf']);
     });
   });
 
-  describe('getRecruitShortfall', () => {
+  describe('recruitmentGetShortfall', () => {
     it('should return empty array when all resources sufficient', () => {
-      expect(getRecruitShortfall(goblinDef.cost, mockResources)).toEqual([]);
+      expect(recruitmentGetShortfall(goblinDef.cost, mockResources)).toEqual([]);
     });
 
     it('should return shortfall for insufficient resources', () => {
       mockResources.gold.current = 30;
       mockResources.food.current = 5;
-      const shortfall = getRecruitShortfall(
+      const shortfall = recruitmentGetShortfall(
         goblinDef.cost,
         mockResources,
       );
@@ -194,7 +194,7 @@ describe('recruitment helper', () => {
     it('should only list resources that are short', () => {
       mockResources.gold.current = 30;
       // food is 100, which is enough for 20
-      const shortfall = getRecruitShortfall(
+      const shortfall = recruitmentGetShortfall(
         goblinDef.cost,
         mockResources,
       );
@@ -203,9 +203,9 @@ describe('recruitment helper', () => {
     });
   });
 
-  describe('recruitInhabitant', () => {
+  describe('recruitmentRecruit', () => {
     it('should create an inhabitant and deduct resources', async () => {
-      const result = await recruitInhabitant(goblinDef);
+      const result = await recruitmentRecruit(goblinDef);
       expect(result.success).toBe(true);
       expect(mockInhabitants).toHaveLength(1);
       expect(mockInhabitants[0].definitionId).toBe('goblin-001');
@@ -216,21 +216,21 @@ describe('recruitment helper', () => {
 
     it('should fail when altar is not placed', async () => {
       mockHasAltar = false;
-      const result = await recruitInhabitant(goblinDef);
+      const result = await recruitmentRecruit(goblinDef);
       expect(result.success).toBe(false);
       expect(result.error).toContain('Altar');
     });
 
     it('should fail when cannot afford', async () => {
       mockResources.gold.current = 0;
-      const result = await recruitInhabitant(goblinDef);
+      const result = await recruitmentRecruit(goblinDef);
       expect(result.success).toBe(false);
       expect(result.error).toContain('resources');
     });
 
     it('should fail when roster is full', async () => {
       mockInhabitants = Array.from(
-        { length: DEFAULT_MAX_INHABITANTS },
+        { length: RECRUITMENT_DEFAULT_MAX_INHABITANTS },
         (_, i) => ({
           instanceId: `inst-${i}`,
           definitionId: 'goblin-001',
@@ -239,26 +239,26 @@ describe('recruitment helper', () => {
           assignedRoomId: undefined,
         }),
       );
-      const result = await recruitInhabitant(goblinDef);
+      const result = await recruitmentRecruit(goblinDef);
       expect(result.success).toBe(false);
       expect(result.error).toContain('Roster full');
     });
 
     it('should fail when tier is too high', async () => {
-      const result = await recruitInhabitant(tier2Def);
+      const result = await recruitmentRecruit(tier2Def);
       expect(result.success).toBe(false);
       expect(result.error).toContain('Tier 2');
     });
 
     it('should deduct resources on successful recruit', async () => {
-      await recruitInhabitant(goblinDef);
+      await recruitmentRecruit(goblinDef);
       expect(mockResources.gold.current).toBe(150); // 200 - 50
       expect(mockResources.food.current).toBe(80); // 100 - 20
     });
 
     it('should assign unique instanceId to each recruit', async () => {
-      await recruitInhabitant(goblinDef);
-      await recruitInhabitant(goblinDef);
+      await recruitmentRecruit(goblinDef);
+      await recruitmentRecruit(goblinDef);
       expect(mockInhabitants[0].instanceId).not.toBe(
         mockInhabitants[1].instanceId,
       );

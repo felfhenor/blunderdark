@@ -51,10 +51,10 @@ const forbiddenKnowledgePath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
@@ -157,17 +157,17 @@ mockContent.set('def-skeleton', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getAppliedUpgradeEffects,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetAppliedEffects,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -239,7 +239,7 @@ describe('Shadow Library: definition', () => {
 
 describe('Shadow Library: base production', () => {
   it('should have base production of 0.6 research/tick (3 research/min)', () => {
-    const production = getBaseProduction(SHADOW_LIBRARY_ID);
+    const production = productionGetBase(SHADOW_LIBRARY_ID);
     expect(production).toEqual({ research: 0.6 });
     expect(productionPerMinute(production['research']!)).toBeCloseTo(3.0);
   });
@@ -247,7 +247,7 @@ describe('Shadow Library: base production', () => {
   it('should produce 0 research when no workers are assigned', () => {
     const library = createPlacedLibrary();
     const floor = makeFloor([library]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -263,7 +263,7 @@ describe('Shadow Library: base production', () => {
       },
     ];
     const floor = makeFloor([library], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Base 0.6 * (1 + (0.7 - 1.0) workerEfficiency) = 0.6 * 0.7 = 0.42
     expect(production['research']).toBeCloseTo(0.42);
   });
@@ -280,7 +280,7 @@ describe('Shadow Library: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [library, well];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       library,
       ['placed-well-1'],
       allRooms,
@@ -298,7 +298,7 @@ describe('Shadow Library: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [library, mine];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       library,
       ['placed-mine-1'],
       allRooms,
@@ -316,7 +316,7 @@ describe('Shadow Library: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [library1, library2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       library1,
       ['placed-library-2'],
       allRooms,
@@ -341,7 +341,7 @@ describe('Shadow Library: adjacency bonuses', () => {
       anchorY: 3,
     };
     const allRooms = [library, well, mine];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       library,
       ['placed-well-1', 'placed-mine-1'],
       allRooms,
@@ -353,7 +353,7 @@ describe('Shadow Library: adjacency bonuses', () => {
 
 describe('Shadow Library: Arcane Focus upgrade', () => {
   it('should have productionMultiplier effect of 1.75 for research', () => {
-    const paths = getUpgradePaths(SHADOW_LIBRARY_ID);
+    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID);
     const arcane = paths.find((p) => p.name === 'Arcane Focus');
     expect(arcane).toBeDefined();
     expect(arcane!.effects).toHaveLength(1);
@@ -366,7 +366,7 @@ describe('Shadow Library: Arcane Focus upgrade', () => {
     const room = createPlacedLibrary({
       appliedUpgradePathId: 'upgrade-arcane-focus',
     });
-    const effects = getAppliedUpgradeEffects(room);
+    const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
     expect(effects[0].type).toBe('productionMultiplier');
     expect(effects[0].value).toBe(1.75);
@@ -378,20 +378,20 @@ describe('Shadow Library: Expanded Archives upgrade', () => {
     const room = createPlacedLibrary({
       appliedUpgradePathId: 'upgrade-expanded-archives',
     });
-    const effective = getEffectiveMaxInhabitants(room, shadowLibraryRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, shadowLibraryRoom);
     expect(effective).toBe(3);
   });
 
   it('should keep capacity at 1 without upgrade', () => {
     const room = createPlacedLibrary();
-    const effective = getEffectiveMaxInhabitants(room, shadowLibraryRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, shadowLibraryRoom);
     expect(effective).toBe(1);
   });
 });
 
 describe('Shadow Library: Forbidden Knowledge upgrade', () => {
   it('should have productionMultiplier of 2.0 and fearIncrease of 2', () => {
-    const paths = getUpgradePaths(SHADOW_LIBRARY_ID);
+    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID);
     const forbidden = paths.find((p) => p.name === 'Forbidden Knowledge');
     expect(forbidden).toBeDefined();
     expect(forbidden!.effects).toHaveLength(2);
@@ -414,7 +414,7 @@ describe('Shadow Library: Forbidden Knowledge upgrade', () => {
     const room = createPlacedLibrary({
       appliedUpgradePathId: 'upgrade-forbidden-knowledge',
     });
-    const effects = getAppliedUpgradeEffects(room);
+    const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(2);
   });
 });
@@ -424,13 +424,13 @@ describe('Shadow Library: upgrade mutual exclusivity', () => {
     const room = createPlacedLibrary({
       appliedUpgradePathId: 'upgrade-arcane-focus',
     });
-    const result = canApplyUpgrade(room, 'upgrade-expanded-archives');
+    const result = roomUpgradeCanApply(room, 'upgrade-expanded-archives');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedLibrary();
-    const result = canApplyUpgrade(room, 'upgrade-arcane-focus');
+    const result = roomUpgradeCanApply(room, 'upgrade-arcane-focus');
     expect(result.valid).toBe(true);
   });
 });
@@ -455,7 +455,7 @@ describe('Shadow Library: full production with adjacency', () => {
       },
     ];
     const floor = makeFloor([library, well], inhabitants);
-    const production = calculateSingleRoomProduction(library, floor);
+    const production = productionCalculateSingleRoom(library, floor);
     // Base 0.6 * (1 + (0.7-1.0) workerEff + 0.15 adjacency) = 0.6 * 0.85 = 0.51
     expect(production['research']).toBeCloseTo(0.51);
   });

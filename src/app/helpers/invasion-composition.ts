@@ -1,7 +1,7 @@
-import { getEntriesByType } from '@helpers/content';
+import { contentGetEntriesByType } from '@helpers/content';
 import {
-  createInvaderInstance,
-  getAllInvaderDefinitions,
+  invaderCreateInstance,
+  invaderGetAllDefinitions,
 } from '@helpers/invaders';
 import { rngChoice } from '@helpers/rng';
 import type {
@@ -36,12 +36,12 @@ let invasionProfileCache:
   | Map<string, { dimension: string; weight: number }>
   | undefined = undefined;
 
-function getInvasionProfileMap(): Map<
+function invasionCompositionGetProfileMap(): Map<
   string,
   { dimension: string; weight: number }
 > {
   if (!invasionProfileCache) {
-    const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+    const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
     invasionProfileCache = new Map();
     for (const room of rooms) {
       if (room.invasionProfile) {
@@ -52,7 +52,7 @@ function getInvasionProfileMap(): Map<
   return invasionProfileCache;
 }
 
-export function resetInvasionCompositionCache(): void {
+export function invasionCompositionResetCache(): void {
   invasionProfileCache = undefined;
 }
 
@@ -62,10 +62,10 @@ export function resetInvasionCompositionCache(): void {
  * Calculate a dungeon profile from game state.
  * Returns corruption/wealth/knowledge (0-100), size (room count), and threat level.
  */
-export function calculateDungeonProfile(state: GameState): DungeonProfile {
+export function invasionCompositionCalculateDungeonProfile(state: GameState): DungeonProfile {
   const floors = state.world.floors;
   const resources = state.world.resources;
-  const profileMap = getInvasionProfileMap();
+  const profileMap = invasionCompositionGetProfileMap();
 
   // Count rooms across all floors and accumulate profile dimension weights
   let totalRooms = 0;
@@ -120,10 +120,10 @@ export function calculateDungeonProfile(state: GameState): DungeonProfile {
 
 // --- Weight configuration ---
 
-export function getCompositionWeightConfig():
+export function invasionCompositionGetWeightConfig():
   | CompositionWeightConfig
   | undefined {
-  const entries = getEntriesByType<CompositionWeightConfig & IsContentItem>(
+  const entries = contentGetEntriesByType<CompositionWeightConfig & IsContentItem>(
     'invasion',
   );
   return entries[0];
@@ -135,7 +135,7 @@ export function getCompositionWeightConfig():
  * If multiple are high, weights are averaged.
  * If none are high (balanced), uses balanced weights.
  */
-export function getCompositionWeights(
+export function invasionCompositionGetWeights(
   profile: DungeonProfile,
   config: CompositionWeightConfig,
 ): InvaderClassWeights {
@@ -178,7 +178,7 @@ export function getCompositionWeights(
  * Determine party size based on dungeon room count.
  * Small (1-10): 3-5, Medium (11-25): 6-10, Large (26+): 11-15.
  */
-export function getPartySize(roomCount: number, rng: () => number): number {
+export function invasionCompositionGetPartySize(roomCount: number, rng: () => number): number {
   if (roomCount <= 10) return 3 + Math.floor(rng() * 3); // 3-5
   if (roomCount <= 25) return 6 + Math.floor(rng() * 5); // 6-10
   return 11 + Math.floor(rng() * 5); // 11-15
@@ -190,14 +190,14 @@ export function getPartySize(roomCount: number, rng: () => number): number {
  * Select invader definitions for a party based on weights.
  * Guarantees: at least 1 warrior, no class >50%, balanced profiles have 3+ classes.
  */
-export function selectPartyComposition(
+export function invasionCompositionSelectParty(
   profile: DungeonProfile,
   invaderDefs: InvaderDefinition[],
   weights: InvaderClassWeights,
   seed: string,
 ): InvaderDefinition[] {
   const rng = seedrandom(seed);
-  const partySize = getPartySize(profile.size, rng);
+  const partySize = invasionCompositionGetPartySize(profile.size, rng);
   const maxPerClass = Math.floor(partySize * 0.5);
 
   // Group definitions by class
@@ -342,16 +342,16 @@ function ensureClassDiversity(
  * Generate a full invasion party from dungeon profile.
  * Returns InvaderInstance[] ready for combat.
  */
-export function generateInvasionParty(
+export function invasionCompositionGenerateParty(
   profile: DungeonProfile,
   seed: string,
 ): InvaderInstance[] {
-  const invaderDefs = getAllInvaderDefinitions();
-  const config = getCompositionWeightConfig();
+  const invaderDefs = invaderGetAllDefinitions();
+  const config = invasionCompositionGetWeightConfig();
   if (!config || invaderDefs.length === 0) return [];
 
-  const weights = getCompositionWeights(profile, config);
-  const selected = selectPartyComposition(profile, invaderDefs, weights, seed);
+  const weights = invasionCompositionGetWeights(profile, config);
+  const selected = invasionCompositionSelectParty(profile, invaderDefs, weights, seed);
 
-  return selected.map((def) => createInvaderInstance(def));
+  return selected.map((def) => invaderCreateInstance(def));
 }

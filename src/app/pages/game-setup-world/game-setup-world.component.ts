@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
-import { discordSetStatus, gameReset, setWorldSeed } from '@helpers';
-import { setStartingBiome } from '@helpers/world';
+import { discordSetStatus, gameReset, worldSetSeed } from '@helpers';
+import { worldSetStartingBiome } from '@helpers/world';
 import { BIOME_DATA, type BiomeType } from '@interfaces/biome';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -88,8 +88,8 @@ export class GameSetupWorldComponent implements OnInit {
 
   public async createWorld() {
     gameReset();
-    setWorldSeed(this.worldSeed());
-    setStartingBiome(this.selectedBiome());
+    worldSetSeed(this.worldSeed());
+    worldSetStartingBiome(this.selectedBiome());
 
     await this.router.navigate(['/setup', 'generate']);
   }

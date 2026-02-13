@@ -1,4 +1,4 @@
-import { resolveInvasionOutcome } from '@helpers/invasion-objectives';
+import { invasionObjectiveResolveOutcome } from '@helpers/invasion-objectives';
 import { rngUuid } from '@helpers/rng';
 import type {
   DetailedInvasionResult,
@@ -10,16 +10,16 @@ import type { InvasionObjective } from '@interfaces/invasion-objective';
 
 // --- Constants ---
 
-export const ALTAR_MAX_HP = 100;
-export const MAX_INVASION_TURNS = 30;
-export const SECONDARY_OBJECTIVES_FOR_VICTORY = 2;
+export const INVASION_WIN_LOSS_ALTAR_MAX_HP = 100;
+export const INVASION_WIN_LOSS_MAX_TURNS = 30;
+export const INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY = 2;
 
 // --- State creation ---
 
 /**
  * Create initial invasion state for a new invasion.
  */
-export function createInvasionState(
+export function invasionWinLossCreateState(
   invaders: InvaderInstance[],
   objectives: InvasionObjective[],
   defenderCount: number,
@@ -27,9 +27,9 @@ export function createInvasionState(
   return {
     invasionId: rngUuid(),
     currentTurn: 0,
-    maxTurns: MAX_INVASION_TURNS,
-    altarHp: ALTAR_MAX_HP,
-    altarMaxHp: ALTAR_MAX_HP,
+    maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
+    altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
+    altarMaxHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
     invaders: [...invaders],
     objectives: [...objectives],
     defenderCount,
@@ -44,33 +44,33 @@ export function createInvasionState(
 /**
  * Check if all invaders are eliminated (dead: HP <= 0).
  */
-export function areAllInvadersEliminated(state: InvasionState): boolean {
+export function invasionWinLossAreAllEliminated(state: InvasionState): boolean {
   return state.invaders.every((i) => i.currentHp <= 0);
 }
 
 /**
  * Check if the altar has been destroyed (HP <= 0).
  */
-export function isAltarDestroyed(state: InvasionState): boolean {
+export function invasionWinLossIsAltarDestroyed(state: InvasionState): boolean {
   return state.altarHp <= 0;
 }
 
 /**
  * Check if invaders completed enough secondary objectives to win.
- * Requires SECONDARY_OBJECTIVES_FOR_VICTORY (2) completed secondaries.
+ * Requires INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY (2) completed secondaries.
  */
-export function areSecondaryObjectivesCompleted(
+export function invasionWinLossAreSecondaryObjectivesCompleted(
   state: InvasionState,
 ): boolean {
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
   const completedCount = secondaries.filter((o) => o.isCompleted).length;
-  return completedCount >= SECONDARY_OBJECTIVES_FOR_VICTORY;
+  return completedCount >= INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY;
 }
 
 /**
  * Check if the turn limit has been reached.
  */
-export function isTurnLimitReached(state: InvasionState): boolean {
+export function invasionWinLossIsTurnLimitReached(state: InvasionState): boolean {
   return state.currentTurn >= state.maxTurns;
 }
 
@@ -80,18 +80,18 @@ export function isTurnLimitReached(state: InvasionState): boolean {
  * Check if the invasion should end. Returns the end reason, or undefined if ongoing.
  * Priority: altar destroyed > objectives completed > all invaders eliminated > turn limit.
  */
-export function checkInvasionEnd(
+export function invasionWinLossCheckEnd(
   state: InvasionState,
 ): InvasionEndReason | undefined {
   if (!state.isActive) return undefined;
 
   // Invader victory conditions (checked first — losing takes priority)
-  if (isAltarDestroyed(state)) return 'altar_destroyed';
-  if (areSecondaryObjectivesCompleted(state)) return 'objectives_completed';
+  if (invasionWinLossIsAltarDestroyed(state)) return 'altar_destroyed';
+  if (invasionWinLossAreSecondaryObjectivesCompleted(state)) return 'objectives_completed';
 
   // Defender victory conditions
-  if (areAllInvadersEliminated(state)) return 'all_invaders_eliminated';
-  if (isTurnLimitReached(state)) return 'turn_limit_reached';
+  if (invasionWinLossAreAllEliminated(state)) return 'all_invaders_eliminated';
+  if (invasionWinLossIsTurnLimitReached(state)) return 'turn_limit_reached';
 
   return undefined;
 }
@@ -102,7 +102,7 @@ export function checkInvasionEnd(
  * Apply damage to the altar. Clamps HP to 0 minimum.
  * Returns a new InvasionState (does not mutate).
  */
-export function damageAltar(
+export function invasionWinLossDamageAltar(
   state: InvasionState,
   damage: number,
 ): InvasionState {
@@ -130,7 +130,7 @@ export function damageAltar(
  * Advance the invasion turn counter by 1.
  * Returns a new InvasionState (does not mutate).
  */
-export function advanceInvasionTurn(state: InvasionState): InvasionState {
+export function invasionWinLossAdvanceTurn(state: InvasionState): InvasionState {
   return {
     ...state,
     currentTurn: state.currentTurn + 1,
@@ -141,7 +141,7 @@ export function advanceInvasionTurn(state: InvasionState): InvasionState {
  * Mark an invader as killed (HP set to 0) and increment kill counter.
  * Returns a new InvasionState (does not mutate).
  */
-export function markInvaderKilled(
+export function invasionWinLossMarkKilled(
   state: InvasionState,
   invaderId: string,
 ): InvasionState {
@@ -161,7 +161,7 @@ export function markInvaderKilled(
  * Record a defender loss.
  * Returns a new InvasionState (does not mutate).
  */
-export function recordDefenderLoss(state: InvasionState): InvasionState {
+export function invasionWinLossRecordDefenderLoss(state: InvasionState): InvasionState {
   return {
     ...state,
     defendersLost: state.defendersLost + 1,
@@ -172,7 +172,7 @@ export function recordDefenderLoss(state: InvasionState): InvasionState {
  * End the invasion (mark as inactive).
  * Returns a new InvasionState (does not mutate).
  */
-export function endInvasion(state: InvasionState): InvasionState {
+export function invasionWinLossEnd(state: InvasionState): InvasionState {
   return {
     ...state,
     isActive: false,
@@ -183,14 +183,14 @@ export function endInvasion(state: InvasionState): InvasionState {
 
 /**
  * Resolve the final detailed result for an invasion.
- * Uses resolveInvasionOutcome from objectives system for reward multiplier.
+ * Uses invasionObjectiveResolveOutcome from objectives system for reward multiplier.
  */
-export function resolveDetailedResult(
+export function invasionWinLossResolveDetailedResult(
   state: InvasionState,
   day: number,
   endReason: InvasionEndReason,
 ): DetailedInvasionResult {
-  const objectiveResult = resolveInvasionOutcome(state.objectives);
+  const objectiveResult = invasionObjectiveResolveOutcome(state.objectives);
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
   const completedSecondaries = secondaries.filter(
     (o) => o.isCompleted,
@@ -216,7 +216,7 @@ export function resolveDetailedResult(
  * Append a detailed result to the invasion schedule's history.
  * Returns a new history entry for the schedule system.
  */
-export function createHistoryEntry(
+export function invasionWinLossCreateHistoryEntry(
   result: DetailedInvasionResult,
 ): {
   day: number;

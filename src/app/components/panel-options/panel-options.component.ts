@@ -7,7 +7,7 @@ import { PanelOptionsSavefileComponent } from '@components/panel-options-savefil
 import { PanelOptionsUIComponent } from '@components/panel-options-ui/panel-options-ui.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
-import { options, showOptionsMenu } from '@helpers';
+import { options, uiShowOptionsMenu } from '@helpers';
 import type { OptionsTab, OptionsTabLink } from '@interfaces';
 
 @Component({
@@ -28,7 +28,7 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
   public activeTab = computed(() => options()['optionsTab']);
 
   public changeActiveTab(tab: OptionsTab): void {
-    this.setOption('optionsTab', tab);
+    this.optionsSet('optionsTab', tab);
   }
 
   public readonly tabs: OptionsTabLink[] = [
@@ -46,6 +46,6 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
   ];
 
   closeMenu() {
-    showOptionsMenu.set(false);
+    uiShowOptionsMenu.set(false);
   }
 }

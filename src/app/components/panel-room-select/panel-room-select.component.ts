@@ -1,27 +1,27 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  canAfford,
-  canAffordHallway,
-  canBuildRoomOnFloor,
-  confirmHallwayBuild,
-  currentFloor,
-  enterHallwayBuildMode,
-  enterPlacementMode,
-  exitHallwayBuildMode,
-  exitPlacementMode,
-  getEntriesByType,
-  getRoomBiomeRestrictionInfo,
-  getRoomShape,
-  getRotatedShape,
-  hallwayPreviewCost,
-  hallwayPreviewPath,
-  hallwayStatusMessage,
-  hasAltarRoom,
-  isHallwayBuildMode,
-  placedRoomTypeIds,
-  placementRotation,
-  rotatePlacement,
-  selectedRoomTypeId,
+  resourceCanAfford,
+  hallwayPlacementCanAfford,
+  biomeRestrictionCanBuild,
+  hallwayPlacementConfirm,
+  floorCurrent,
+  hallwayPlacementEnter,
+  roomPlacementEnterMode,
+  hallwayPlacementExit,
+  roomPlacementExitMode,
+  contentGetEntriesByType,
+  biomeRestrictionGetRoomInfo,
+  roomShapeGet,
+  roomShapeGetRotated,
+  hallwayPlacementPreviewCost,
+  hallwayPlacementPreviewPath,
+  hallwayPlacementStatusMessage,
+  altarRoomHas,
+  hallwayPlacementIsBuildMode,
+  roomPlacementPlacedTypeIds,
+  roomPlacementRotation,
+  roomPlacementRotate,
+  roomPlacementSelectedTypeId,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
 
@@ -33,54 +33,54 @@ import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    getEntriesByType<RoomDefinition & IsContentItem>('room').filter(
+    contentGetEntriesByType<RoomDefinition & IsContentItem>('room').filter(
       (r) => !r.autoPlace,
     ),
   );
 
-  public hasAltar = hasAltarRoom;
+  public hasAltar = altarRoomHas;
 
-  public selectedId = selectedRoomTypeId;
-  public isHallwayMode = isHallwayBuildMode;
-  public hallwayStatus = hallwayStatusMessage;
-  public hallwayCost = hallwayPreviewCost;
-  public hallwayPath = hallwayPreviewPath;
-  public canAffordHallway = canAffordHallway;
+  public selectedId = roomPlacementSelectedTypeId;
+  public isHallwayMode = hallwayPlacementIsBuildMode;
+  public hallwayStatus = hallwayPlacementStatusMessage;
+  public hallwayCost = hallwayPlacementPreviewCost;
+  public hallwayPath = hallwayPlacementPreviewPath;
+  public hallwayPlacementCanAfford = hallwayPlacementCanAfford;
 
-  public placedRoomTypeIds = placedRoomTypeIds;
-  public rotation = placementRotation;
+  public roomPlacementPlacedTypeIds = roomPlacementPlacedTypeIds;
+  public rotation = roomPlacementRotation;
 
   public isSelected(roomId: string): boolean {
     return this.selectedId() === roomId;
   }
 
   public isAffordable(room: RoomDefinition): boolean {
-    return canAfford(room.cost);
+    return resourceCanAfford(room.cost);
   }
 
   public isUniqueAndPlaced(room: RoomDefinition): boolean {
     if (!room.isUnique) return false;
-    return this.placedRoomTypeIds().has(room.id);
+    return this.roomPlacementPlacedTypeIds().has(room.id);
   }
 
   public isBiomeRestricted(room: RoomDefinition): boolean {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return false;
-    const result = canBuildRoomOnFloor(room.id, floor.biome, floor);
+    const result = biomeRestrictionCanBuild(room.id, floor.biome, floor);
     return !result.allowed;
   }
 
   public getBiomeRestrictionTooltip(room: RoomDefinition): string {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return '';
-    const info = getRoomBiomeRestrictionInfo(room.id, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(room.id, floor.biome, floor);
     return info.reason ?? '';
   }
 
   public getBiomeLimitLabel(room: RoomDefinition): string | undefined {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return undefined;
-    const info = getRoomBiomeRestrictionInfo(room.id, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(room.id, floor.biome, floor);
     if (info.maxCount !== undefined && info.currentCount !== undefined) {
       return `${info.currentCount}/${info.maxCount}`;
     }
@@ -90,7 +90,7 @@ export class PanelRoomSelectComponent {
   public getRoomShapeForPreview(
     room: RoomDefinition,
   ): (RoomShape & IsContentItem) | undefined {
-    return getRoomShape(room.shapeId);
+    return roomShapeGet(room.shapeId);
   }
 
   public getCostEntries(
@@ -102,10 +102,10 @@ export class PanelRoomSelectComponent {
   }
 
   private getEffectiveShape(room: RoomDefinition): RoomShape | undefined {
-    const base = getRoomShape(room.shapeId);
+    const base = roomShapeGet(room.shapeId);
     if (!base) return undefined;
     if (this.isSelected(room.id)) {
-      return getRotatedShape(base, this.rotation());
+      return roomShapeGetRotated(base, this.rotation());
     }
     return base;
   }
@@ -131,31 +131,31 @@ export class PanelRoomSelectComponent {
 
   public selectRoom(room: RoomDefinition): void {
     if (this.isSelected(room.id)) {
-      exitPlacementMode();
+      roomPlacementExitMode();
       return;
     }
 
-    exitHallwayBuildMode();
-    const shape = getRoomShape(room.shapeId);
+    hallwayPlacementExit();
+    const shape = roomShapeGet(room.shapeId);
     if (!shape) return;
 
-    enterPlacementMode(room.id, shape);
+    roomPlacementEnterMode(room.id, shape);
   }
 
   public toggleHallwayMode(): void {
-    if (isHallwayBuildMode()) {
-      exitHallwayBuildMode();
+    if (hallwayPlacementIsBuildMode()) {
+      hallwayPlacementExit();
     } else {
-      enterHallwayBuildMode();
+      hallwayPlacementEnter();
     }
   }
 
   public async confirmHallway(): Promise<void> {
-    await confirmHallwayBuild();
+    await hallwayPlacementConfirm();
   }
 
   public rotate(): void {
-    rotatePlacement();
+    roomPlacementRotate();
   }
 
   public capitalizeFirst(str: string): string {

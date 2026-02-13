@@ -1,14 +1,14 @@
 import { computed, signal } from '@angular/core';
-import { findAltarRoom } from '@helpers/altar-room';
-import { canBuildRoomOnFloor } from '@helpers/biome-restrictions';
-import { getEntry } from '@helpers/content';
-import { currentFloor } from '@helpers/floor';
-import { canAfford, payCost } from '@helpers/resources';
+import { altarRoomFind } from '@helpers/altar-room';
+import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
+import { contentGetEntry } from '@helpers/content';
+import { floorCurrent } from '@helpers/floor';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import {
-  getAbsoluteTiles,
-  getRotatedShape,
-  getRoomShape,
+  roomShapeGetAbsoluteTiles,
+  roomShapeGetRotated,
+  roomShapeGet,
 } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -37,13 +37,13 @@ export type PlacementValidationResult = {
   errors: string[];
 };
 
-export function validateBounds(
+export function roomPlacementValidateBounds(
   shape: RoomShape,
   anchorX: number,
   anchorY: number,
   gridSize: number = GRID_SIZE,
 ): ValidationResult {
-  const tiles = getAbsoluteTiles(shape, anchorX, anchorY);
+  const tiles = roomShapeGetAbsoluteTiles(shape, anchorX, anchorY);
   const outOfBounds = tiles.some(
     (t) => t.x < 0 || t.x >= gridSize || t.y < 0 || t.y >= gridSize,
   );
@@ -55,13 +55,13 @@ export function validateBounds(
   return { valid: true };
 }
 
-export function validateNoOverlap(
+export function roomPlacementValidateNoOverlap(
   shape: RoomShape,
   anchorX: number,
   anchorY: number,
   grid: GridState,
 ): OverlapValidationResult {
-  const tiles = getAbsoluteTiles(shape, anchorX, anchorY);
+  const tiles = roomShapeGetAbsoluteTiles(shape, anchorX, anchorY);
   const conflicting = tiles.filter(
     (t) =>
       t.y >= 0 &&
@@ -82,7 +82,7 @@ export function validateNoOverlap(
   return { valid: true };
 }
 
-export function validatePlacement(
+export function roomPlacementValidate(
   shape: RoomShape,
   anchorX: number,
   anchorY: number,
@@ -90,12 +90,12 @@ export function validatePlacement(
 ): PlacementValidationResult {
   const errors: string[] = [];
 
-  const boundsResult = validateBounds(shape, anchorX, anchorY);
+  const boundsResult = roomPlacementValidateBounds(shape, anchorX, anchorY);
   if (!boundsResult.valid && boundsResult.error) {
     errors.push(boundsResult.error);
   }
 
-  const overlapResult = validateNoOverlap(shape, anchorX, anchorY, grid);
+  const overlapResult = roomPlacementValidateNoOverlap(shape, anchorX, anchorY, grid);
   if (!overlapResult.valid && overlapResult.error) {
     errors.push(overlapResult.error);
   }
@@ -112,7 +112,7 @@ export function validatePlacement(
  * Check if a room type is already placed on any floor in the dungeon.
  * Used to enforce unique room constraints (e.g., only one Throne Room per dungeon).
  */
-export function isUniqueRoomTypePlaced(
+export function roomPlacementIsUniqueTypePlaced(
   floors: Floor[],
   roomTypeId: string,
 ): boolean {
@@ -125,7 +125,7 @@ export function isUniqueRoomTypePlaced(
  * Set of room type IDs that are currently placed on any floor.
  * Used by the UI to gray out unique rooms that are already built.
  */
-export const placedRoomTypeIds = computed(() => {
+export const roomPlacementPlacedTypeIds = computed(() => {
   const state = gamestate();
   const placed = new Set<string>();
   for (const floor of state.world.floors) {
@@ -138,35 +138,35 @@ export const placedRoomTypeIds = computed(() => {
 
 // --- Placement mode state ---
 
-export const selectedRoomTypeId = signal<string | undefined>(undefined);
-export const placementRotation = signal<Rotation>(0);
+export const roomPlacementSelectedTypeId = signal<string | undefined>(undefined);
+export const roomPlacementRotation = signal<Rotation>(0);
 
 /** The base (unrotated) shape for the current placement. */
 const placementBaseShape = signal<RoomShape | undefined>(undefined);
 
-export function enterPlacementMode(roomTypeId: string, shape: RoomShape): void {
-  selectedRoomTypeId.set(roomTypeId);
+export function roomPlacementEnterMode(roomTypeId: string, shape: RoomShape): void {
+  roomPlacementSelectedTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
-  placementRotation.set(0);
-  placementPreviewShape.set(shape);
-  placementPreviewPosition.set(undefined);
+  roomPlacementRotation.set(0);
+  roomPlacementPreviewShape.set(shape);
+  roomPlacementPreviewPosition.set(undefined);
 }
 
-export function exitPlacementMode(): void {
-  selectedRoomTypeId.set(undefined);
+export function roomPlacementExitMode(): void {
+  roomPlacementSelectedTypeId.set(undefined);
   placementBaseShape.set(undefined);
-  placementRotation.set(0);
-  placementPreviewShape.set(undefined);
-  placementPreviewPosition.set(undefined);
+  roomPlacementRotation.set(0);
+  roomPlacementPreviewShape.set(undefined);
+  roomPlacementPreviewPosition.set(undefined);
 }
 
 /** Rotate the placement preview by 90° clockwise. */
-export function rotatePlacement(): void {
+export function roomPlacementRotate(): void {
   const base = placementBaseShape();
   if (!base) return;
-  const next = ((placementRotation() + 1) % 4) as Rotation;
-  placementRotation.set(next);
-  placementPreviewShape.set(getRotatedShape(base, next));
+  const next = ((roomPlacementRotation() + 1) % 4) as Rotation;
+  roomPlacementRotation.set(next);
+  roomPlacementPreviewShape.set(roomShapeGetRotated(base, next));
 }
 
 // --- Placement preview state ---
@@ -175,20 +175,20 @@ export type PreviewTile = TileOffset & {
   inBounds: boolean;
 };
 
-export const placementPreviewShape = signal<RoomShape | undefined>(undefined);
-export const placementPreviewPosition = signal<TileOffset | undefined>(undefined);
+export const roomPlacementPreviewShape = signal<RoomShape | undefined>(undefined);
+export const roomPlacementPreviewPosition = signal<TileOffset | undefined>(undefined);
 
-export const placementPreview = computed(() => {
-  const shape = placementPreviewShape();
-  const position = placementPreviewPosition();
+export const roomPlacementPreview = computed(() => {
+  const shape = roomPlacementPreviewShape();
+  const position = roomPlacementPreviewPosition();
   if (!shape || !position) return undefined;
 
-  const floor = currentFloor();
+  const floor = floorCurrent();
   if (!floor) return undefined;
 
   const grid = floor.grid;
-  const validation = validatePlacement(shape, position.x, position.y, grid);
-  const tiles = getAbsoluteTiles(shape, position.x, position.y);
+  const validation = roomPlacementValidate(shape, position.x, position.y, grid);
+  const tiles = roomShapeGetAbsoluteTiles(shape, position.x, position.y);
 
   return {
     tiles: tiles.map((t) => ({
@@ -200,26 +200,26 @@ export const placementPreview = computed(() => {
   };
 });
 
-export function setPlacementPreview(
+export function roomPlacementSetPreview(
   shape: RoomShape | undefined,
   position?: TileOffset | undefined,
 ): void {
-  placementPreviewShape.set(shape);
-  placementPreviewPosition.set(position ?? undefined);
+  roomPlacementPreviewShape.set(shape);
+  roomPlacementPreviewPosition.set(position ?? undefined);
 }
 
-export function updatePreviewPosition(x: number, y: number): void {
-  if (!placementPreviewShape()) return;
-  placementPreviewPosition.set({ x, y });
+export function roomPlacementUpdatePreviewPosition(x: number, y: number): void {
+  if (!roomPlacementPreviewShape()) return;
+  roomPlacementPreviewPosition.set({ x, y });
 }
 
-export function clearPreviewPosition(): void {
-  placementPreviewPosition.set(undefined);
+export function roomPlacementClearPreviewPosition(): void {
+  roomPlacementPreviewPosition.set(undefined);
 }
 
-export function clearPlacementPreview(): void {
-  placementPreviewShape.set(undefined);
-  placementPreviewPosition.set(undefined);
+export function roomPlacementClearPreview(): void {
+  roomPlacementPreviewShape.set(undefined);
+  roomPlacementPreviewPosition.set(undefined);
 }
 
 // --- Placement error messages ---
@@ -233,90 +233,90 @@ function toPlayerFriendlyError(error: string): string {
   return PLAYER_FRIENDLY_ERRORS[error] ?? error.toLowerCase();
 }
 
-export function formatPlacementErrors(errors: string[]): string {
+export function roomPlacementFormatErrors(errors: string[]): string {
   if (errors.length === 0) return '';
 
   const friendly = errors.map(toPlayerFriendlyError);
   return `Cannot place room: ${friendly.join(', ')}`;
 }
 
-export function attemptPlacement(
+export function roomPlacementAttempt(
   x: number,
   y: number,
 ): { placed: boolean; errors: string[]; message: string } {
-  const shape = placementPreviewShape();
+  const shape = roomPlacementPreviewShape();
   if (!shape) return { placed: false, errors: [], message: '' };
 
   const grid = gamestate().world.grid;
-  const result = validatePlacement(shape, x, y, grid);
+  const result = roomPlacementValidate(shape, x, y, grid);
 
   if (!result.valid) {
     return {
       placed: false,
       errors: result.errors,
-      message: formatPlacementErrors(result.errors),
+      message: roomPlacementFormatErrors(result.errors),
     };
   }
 
   return { placed: true, errors: [], message: '' };
 }
 
-export async function executeRoomPlacement(
+export async function roomPlacementExecute(
   x: number,
   y: number,
 ): Promise<{ success: boolean; error?: string }> {
-  const shape = placementPreviewShape();
-  const roomTypeId = selectedRoomTypeId();
+  const shape = roomPlacementPreviewShape();
+  const roomTypeId = roomPlacementSelectedTypeId();
   if (!shape || !roomTypeId) return { success: false };
 
-  const floor = currentFloor();
+  const floor = floorCurrent();
   if (!floor) return { success: false, error: 'No active floor' };
 
-  const validation = validatePlacement(shape, x, y, floor.grid);
+  const validation = roomPlacementValidate(shape, x, y, floor.grid);
   if (!validation.valid) {
     return {
       success: false,
-      error: formatPlacementErrors(validation.errors),
+      error: roomPlacementFormatErrors(validation.errors),
     };
   }
 
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
 
   // Non-autoPlace rooms require the Altar to be present
   if (!roomDef.autoPlace) {
-    const allFloors = gamestate().world.floors;
-    if (!findAltarRoom(allFloors)) {
+    const floorAll = gamestate().world.floors;
+    if (!altarRoomFind(floorAll)) {
       return { success: false, error: 'An Altar is required to build rooms' };
     }
   }
 
   if (roomDef.isUnique) {
-    const allFloors = gamestate().world.floors;
-    if (isUniqueRoomTypePlaced(allFloors, roomTypeId)) {
+    const floorAll = gamestate().world.floors;
+    if (roomPlacementIsUniqueTypePlaced(floorAll, roomTypeId)) {
       return { success: false, error: 'This unique room is already built' };
     }
   }
 
   // Check biome restrictions
-  const biomeCheck = canBuildRoomOnFloor(roomTypeId, floor.biome, floor);
+  const biomeCheck = biomeRestrictionCanBuild(roomTypeId, floor.biome, floor);
   if (!biomeCheck.allowed) {
     return { success: false, error: biomeCheck.reason };
   }
 
-  if (!canAfford(roomDef.cost)) {
+  if (!resourceCanAfford(roomDef.cost)) {
     return { success: false, error: 'Not enough resources' };
   }
 
-  const paid = await payCost(roomDef.cost);
+  const paid = await resourcePayCost(roomDef.cost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
-  const placed = await placeRoom(
+  const placed = await roomPlacementPlace(
     roomTypeId,
     roomDef.shapeId,
     x,
     y,
-    placementRotation(),
+    roomPlacementRotation(),
   );
   if (!placed) return { success: false, error: 'Failed to place room' };
 
@@ -325,12 +325,12 @@ export async function executeRoomPlacement(
 
 // --- Room placement on floor ---
 
-export function placeRoomOnFloor(
+export function roomPlacementPlaceOnFloor(
   floor: Floor,
   room: PlacedRoom,
   shape: RoomShape,
 ): Floor | undefined {
-  const validation = validatePlacement(
+  const validation = roomPlacementValidate(
     shape,
     room.anchorX,
     room.anchorY,
@@ -338,7 +338,7 @@ export function placeRoomOnFloor(
   );
   if (!validation.valid) return undefined;
 
-  const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
+  const tiles = roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY);
   const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
 
   for (const t of tiles) {
@@ -358,7 +358,7 @@ export function placeRoomOnFloor(
   };
 }
 
-export function removeRoomFromFloor(
+export function roomPlacementRemoveFromFloor(
   floor: Floor,
   roomId: string,
   shape: RoomShape,
@@ -366,7 +366,7 @@ export function removeRoomFromFloor(
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return undefined;
 
-  const tiles = getAbsoluteTiles(shape, room.anchorX, room.anchorY);
+  const tiles = roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY);
   const newGrid = floor.grid.map((row) => row.map((tile) => ({ ...tile })));
 
   for (const t of tiles) {
@@ -396,17 +396,17 @@ export function removeRoomFromFloor(
   };
 }
 
-export async function placeRoom(
+export async function roomPlacementPlace(
   roomTypeId: string,
   shapeId: string,
   anchorX: number,
   anchorY: number,
   rotation: Rotation = 0,
 ): Promise<PlacedRoom | undefined> {
-  const baseShape = getRoomShape(shapeId);
+  const baseShape = roomShapeGet(shapeId);
   if (!baseShape) return undefined;
 
-  const shape = getRotatedShape(baseShape, rotation);
+  const shape = roomShapeGetRotated(baseShape, rotation);
 
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
@@ -422,7 +422,7 @@ export async function placeRoom(
     rotation: rotation || undefined,
   };
 
-  const updatedFloor = placeRoomOnFloor(floor, room, shape);
+  const updatedFloor = roomPlacementPlaceOnFloor(floor, room, shape);
   if (!updatedFloor) return undefined;
 
   await updateGamestate((s) => {
@@ -444,13 +444,13 @@ export async function placeRoom(
  * Check if a placed room can be removed based on its definition.
  * Returns false for rooms with removable: false (e.g., Altar Room).
  */
-export function isRoomRemovable(roomTypeId: string): boolean {
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+export function roomPlacementIsRemovable(roomTypeId: string): boolean {
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return true;
   return roomDef.removable;
 }
 
-export async function removeRoom(roomId: string): Promise<boolean> {
+export async function roomPlacementRemove(roomId: string): Promise<boolean> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
@@ -459,14 +459,14 @@ export async function removeRoom(roomId: string): Promise<boolean> {
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return false;
 
-  if (!isRoomRemovable(room.roomTypeId)) return false;
+  if (!roomPlacementIsRemovable(room.roomTypeId)) return false;
 
-  const baseShape = getRoomShape(room.shapeId);
+  const baseShape = roomShapeGet(room.shapeId);
   if (!baseShape) return false;
 
-  const shape = getRotatedShape(baseShape, room.rotation ?? 0);
+  const shape = roomShapeGetRotated(baseShape, room.rotation ?? 0);
 
-  const updatedFloor = removeRoomFromFloor(floor, roomId, shape);
+  const updatedFloor = roomPlacementRemoveFromFloor(floor, roomId, shape);
   if (!updatedFloor) return false;
 
   await updateGamestate((s) => {

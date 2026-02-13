@@ -46,10 +46,10 @@ const tranquilGardenPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const mushroomGroveRoom: RoomDefinition & IsContentItem = {
@@ -179,17 +179,17 @@ mockContent.set('def-goblin', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getAppliedUpgradeEffects,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetAppliedEffects,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -234,7 +234,7 @@ beforeEach(() => {
 
 describe('Mushroom Grove: base production', () => {
   it('should have base production of 1.6 food/tick (8 food/min)', () => {
-    const production = getBaseProduction(MUSHROOM_GROVE_ID);
+    const production = productionGetBase(MUSHROOM_GROVE_ID);
     expect(production).toEqual({ food: 1.6 });
     expect(productionPerMinute(production['food']!)).toBeCloseTo(8.0);
   });
@@ -242,7 +242,7 @@ describe('Mushroom Grove: base production', () => {
   it('should produce 0 food when no workers are assigned', () => {
     const grove = createPlacedRoom();
     const floor = makeFloor([grove]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -258,7 +258,7 @@ describe('Mushroom Grove: base production', () => {
       },
     ];
     const floor = makeFloor([grove], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Base 1.6 * (1 + 0.2 goblin bonus) * 1.0 = 1.92
     expect(production['food']).toBeCloseTo(1.92);
   });
@@ -275,7 +275,7 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
       anchorY: 0,
     };
     const allRooms = [grove, soulWell];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       grove,
       ['placed-well-1'],
       allRooms,
@@ -300,7 +300,7 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
       anchorY: 2,
     };
     const allRooms = [grove, well1, well2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       grove,
       ['placed-well-1', 'placed-well-2'],
       allRooms,
@@ -320,7 +320,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
       anchorY: 0,
     };
     const allRooms = [grove, library];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       grove,
       ['placed-library-1'],
       allRooms,
@@ -338,7 +338,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
       anchorY: 0,
     };
     const allRooms = [grove, forge];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       grove,
       ['placed-forge-1'],
       allRooms,
@@ -363,7 +363,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
       anchorY: 2,
     };
     const allRooms = [grove, well, library];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       grove,
       ['placed-well-1', 'placed-library-1'],
       allRooms,
@@ -375,7 +375,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
 
 describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
   it('should have productionMultiplier effect of 1.5 for food', () => {
-    const paths = getUpgradePaths(MUSHROOM_GROVE_ID);
+    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID);
     const bountiful = paths.find((p) => p.name === 'Bountiful Harvest');
     expect(bountiful).toBeDefined();
     expect(bountiful!.effects).toHaveLength(1);
@@ -388,7 +388,7 @@ describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-bountiful-harvest',
     });
-    const effects = getAppliedUpgradeEffects(room);
+    const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
     expect(effects[0].type).toBe('productionMultiplier');
     expect(effects[0].value).toBe(1.5);
@@ -400,20 +400,20 @@ describe('Mushroom Grove: Expanded Growth upgrade', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-expanded-growth',
     });
-    const effective = getEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
     expect(effective).toBe(5);
   });
 
   it('should keep capacity at 3 without upgrade', () => {
     const room = createPlacedRoom();
-    const effective = getEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
     expect(effective).toBe(3);
   });
 });
 
 describe('Mushroom Grove: Tranquil Garden upgrade', () => {
   it('should have fearReduction effect of 1', () => {
-    const paths = getUpgradePaths(MUSHROOM_GROVE_ID);
+    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID);
     const tranquil = paths.find((p) => p.name === 'Tranquil Garden');
     expect(tranquil).toBeDefined();
     expect(tranquil!.effects).toHaveLength(1);
@@ -425,7 +425,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-tranquil-garden',
     });
-    const effects = getAppliedUpgradeEffects(room);
+    const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
     expect(effects[0].type).toBe('fearReduction');
     expect(effects[0].value).toBe(1);
@@ -435,7 +435,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-tranquil-garden',
     });
-    const effective = getEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
     expect(effective).toBe(3);
   });
 });
@@ -445,13 +445,13 @@ describe('Mushroom Grove: upgrade mutual exclusivity', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-bountiful-harvest',
     });
-    const result = canApplyUpgrade(room, 'upgrade-expanded-growth');
+    const result = roomUpgradeCanApply(room, 'upgrade-expanded-growth');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedRoom();
-    const result = canApplyUpgrade(room, 'upgrade-bountiful-harvest');
+    const result = roomUpgradeCanApply(room, 'upgrade-bountiful-harvest');
     expect(result.valid).toBe(true);
   });
 });
@@ -477,7 +477,7 @@ describe('Mushroom Grove: full production with adjacency', () => {
       },
     ];
     const floor = makeFloor([grove, well], inhabitants);
-    const production = calculateSingleRoomProduction(grove, floor);
+    const production = productionCalculateSingleRoom(grove, floor);
     // Base 1.6 * (1 + 0.2 goblin + 0.4 adjacency) * 1.0 = 1.6 * 1.6 = 2.56
     expect(production['food']).toBeCloseTo(2.56);
   });

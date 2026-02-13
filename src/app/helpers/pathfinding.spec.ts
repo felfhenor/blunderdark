@@ -3,11 +3,11 @@ import type { DungeonGraph, PathEdge, PathNode } from '@helpers/pathfinding';
 import type { Floor } from '@interfaces';
 
 const {
-  buildDungeonGraph,
-  findPath,
-  getPathCost,
-  findPathWithObjectives,
-  recalculatePath,
+  pathfindingBuildDungeonGraph,
+  pathfindingFindPath,
+  pathfindingGetCost,
+  pathfindingFindWithObjectives,
+  pathfindingRecalculate,
 } = await import('@helpers/pathfinding');
 
 // --- Test helpers ---
@@ -60,7 +60,7 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
 // US-001: Connection graph representation
 // ============================================================
 
-describe('buildDungeonGraph', () => {
+describe('pathfindingBuildDungeonGraph', () => {
   it('creates nodes from floor rooms', () => {
     const floor = makeFloor({
       rooms: [
@@ -69,7 +69,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.nodes.size).toBe(2);
     expect(graph.nodes.get('r1')!.roomTypeId).toBe('type-a');
     expect(graph.nodes.get('r2')!.x).toBe(5);
@@ -86,7 +86,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     const r1Edges = graph.adjacency.get('r1')!;
     const r2Edges = graph.adjacency.get('r2')!;
     expect(r1Edges).toHaveLength(1);
@@ -106,7 +106,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.adjacency.get('r1')!).toHaveLength(1);
     expect(graph.adjacency.get('r2')!).toHaveLength(1);
   });
@@ -125,7 +125,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.adjacency.get('r1')!).toHaveLength(1);
   });
 
@@ -137,7 +137,7 @@ describe('buildDungeonGraph', () => {
     });
 
     const fearMap = new Map([['r1', 5]]);
-    const graph = buildDungeonGraph(floor, fearMap);
+    const graph = pathfindingBuildDungeonGraph(floor, fearMap);
     expect(graph.nodes.get('r1')!.fearLevel).toBe(5);
   });
 
@@ -148,7 +148,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.nodes.get('r1')!.fearLevel).toBe(0);
   });
 
@@ -163,7 +163,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph = buildDungeonGraph(floor);
+    const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.adjacency.get('r1')![0].baseCost).toBe(1);
   });
 
@@ -176,7 +176,7 @@ describe('buildDungeonGraph', () => {
       connections: [],
     });
 
-    const graph1 = buildDungeonGraph(floor1);
+    const graph1 = pathfindingBuildDungeonGraph(floor1);
     expect(graph1.adjacency.get('r1')!).toHaveLength(0);
 
     const floor2 = makeFloor({
@@ -186,7 +186,7 @@ describe('buildDungeonGraph', () => {
       ],
     });
 
-    const graph2 = buildDungeonGraph(floor2);
+    const graph2 = pathfindingBuildDungeonGraph(floor2);
     expect(graph2.adjacency.get('r1')!).toHaveLength(1);
   });
 });
@@ -195,7 +195,7 @@ describe('buildDungeonGraph', () => {
 // US-002: A* pathfinding with fear-based cost
 // ============================================================
 
-describe('findPath', () => {
+describe('pathfindingFindPath', () => {
   it('finds direct path on simple linear dungeon (spawn → room → altar)', () => {
     //  spawn -- room1 -- room2 -- altar
     const graph = makeGraph(
@@ -212,7 +212,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar');
+    const path = pathfindingFindPath(graph, 'spawn', 'altar');
     expect(path).toEqual(['spawn', 'room1', 'room2', 'altar']);
   });
 
@@ -236,7 +236,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar');
+    const path = pathfindingFindPath(graph, 'spawn', 'altar');
     expect(path).toEqual(['spawn', 'A', 'altar']);
   });
 
@@ -253,7 +253,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'island');
+    const path = pathfindingFindPath(graph, 'spawn', 'island');
     expect(path).toEqual([]);
   });
 
@@ -263,7 +263,7 @@ describe('findPath', () => {
       [],
     );
 
-    const path = findPath(graph, 'spawn', 'spawn');
+    const path = pathfindingFindPath(graph, 'spawn', 'spawn');
     expect(path).toEqual(['spawn']);
   });
 
@@ -273,7 +273,7 @@ describe('findPath', () => {
       [],
     );
 
-    expect(findPath(graph, 'missing', 'altar')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'missing', 'altar')).toEqual([]);
   });
 
   it('returns empty array for non-existent goal node', () => {
@@ -282,7 +282,7 @@ describe('findPath', () => {
       [],
     );
 
-    expect(findPath(graph, 'spawn', 'missing')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'spawn', 'missing')).toEqual([]);
   });
 
   it('respects blocked nodes', () => {
@@ -303,7 +303,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar', {
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
       blockedNodes: new Set(['A']),
     });
     expect(path).toEqual(['spawn', 'B', 'altar']);
@@ -327,7 +327,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar', {
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
       blockedNodes: new Set(['blocked']),
     });
     expect(path).toEqual(['spawn', 'detour', 'altar']);
@@ -347,7 +347,7 @@ describe('findPath', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar', {
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
       blockedNodes: new Set(['A']),
     });
     expect(path).toEqual([]);
@@ -378,7 +378,7 @@ describe('Fear-based cost modification', () => {
     );
 
     // With low morale: avoids scary room (cost 3) and goes through safe (cost 1)
-    const pathWithFear = findPath(graph, 'spawn', 'altar', { morale: 2 });
+    const pathWithFear = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 2 });
     expect(pathWithFear).toEqual(['spawn', 'safe', 'altar']);
   });
 
@@ -396,7 +396,7 @@ describe('Fear-based cost modification', () => {
       ],
     );
 
-    const path = findPath(graph, 'spawn', 'altar', { morale: 1 });
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 1 });
     expect(path).toEqual(['spawn', 'scary', 'altar']);
   });
 
@@ -421,7 +421,7 @@ describe('Fear-based cost modification', () => {
     );
 
     // High morale (10 > fear 3): goes through scary (shorter)
-    const path = findPath(graph, 'spawn', 'altar', { morale: 10 });
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 10 });
     expect(path).toEqual(['spawn', 'scary', 'altar']);
   });
 
@@ -451,7 +451,7 @@ describe('Fear-based cost modification', () => {
 
     // With 5x fear multiplier, scary costs 5; alternate costs 5 (same)
     // With 6x, scary costs 6; alternate costs 5 (prefer alternate)
-    const path = findPath(graph, 'spawn', 'altar', {
+    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
       morale: 1,
       fearCostMultiplier: 6,
     });
@@ -459,15 +459,15 @@ describe('Fear-based cost modification', () => {
   });
 });
 
-describe('getPathCost', () => {
+describe('pathfindingGetCost', () => {
   it('returns 0 for single-node path', () => {
     const graph = makeGraph([['A', 'generic', 0, 0, 0]], []);
-    expect(getPathCost(graph, ['A'])).toBe(0);
+    expect(pathfindingGetCost(graph, ['A'])).toBe(0);
   });
 
   it('returns 0 for empty path', () => {
     const graph = makeGraph([], []);
-    expect(getPathCost(graph, [])).toBe(0);
+    expect(pathfindingGetCost(graph, [])).toBe(0);
   });
 
   it('sums edge costs along path', () => {
@@ -483,7 +483,7 @@ describe('getPathCost', () => {
       ],
     );
 
-    expect(getPathCost(graph, ['A', 'B', 'C'])).toBe(2);
+    expect(pathfindingGetCost(graph, ['A', 'B', 'C'])).toBe(2);
   });
 
   it('applies fear cost in path cost calculation', () => {
@@ -500,9 +500,9 @@ describe('getPathCost', () => {
     );
 
     // Without fear: cost = 2
-    expect(getPathCost(graph, ['A', 'B', 'C'])).toBe(2);
+    expect(pathfindingGetCost(graph, ['A', 'B', 'C'])).toBe(2);
     // With low morale: entering B costs 3, then B→C costs 1 = 4
-    expect(getPathCost(graph, ['A', 'B', 'C'], { morale: 1 })).toBe(4);
+    expect(pathfindingGetCost(graph, ['A', 'B', 'C'], { morale: 1 })).toBe(4);
   });
 });
 
@@ -510,7 +510,7 @@ describe('getPathCost', () => {
 // US-003: Secondary objectives and dynamic recalculation
 // ============================================================
 
-describe('findPathWithObjectives', () => {
+describe('pathfindingFindWithObjectives', () => {
   it('returns direct path when no secondary objectives', () => {
     const graph = makeGraph(
       [
@@ -520,7 +520,7 @@ describe('findPathWithObjectives', () => {
       [['spawn', 'altar']],
     );
 
-    const path = findPathWithObjectives(graph, 'spawn', 'altar', []);
+    const path = pathfindingFindWithObjectives(graph, 'spawn', 'altar', []);
     expect(path).toEqual(['spawn', 'altar']);
   });
 
@@ -546,7 +546,7 @@ describe('findPathWithObjectives', () => {
       ],
     );
 
-    const path = findPathWithObjectives(
+    const path = pathfindingFindWithObjectives(
       graph, 'spawn', 'altar',
       [{ roomId: 'vault', priority: 5 }],
     );
@@ -579,7 +579,7 @@ describe('findPathWithObjectives', () => {
       ],
     );
 
-    const path = findPathWithObjectives(
+    const path = pathfindingFindWithObjectives(
       graph, 'spawn', 'altar',
       [{ roomId: 'vault', priority: 5 }],
     );
@@ -608,7 +608,7 @@ describe('findPathWithObjectives', () => {
       ],
     );
 
-    const path = findPathWithObjectives(
+    const path = pathfindingFindWithObjectives(
       graph, 'spawn', 'altar',
       [
         { roomId: 'throne', priority: 3 },
@@ -628,7 +628,7 @@ describe('findPathWithObjectives', () => {
       [], // no edges
     );
 
-    const path = findPathWithObjectives(graph, 'spawn', 'altar', []);
+    const path = pathfindingFindWithObjectives(graph, 'spawn', 'altar', []);
     expect(path).toEqual([]);
   });
 
@@ -642,7 +642,7 @@ describe('findPathWithObjectives', () => {
       [['spawn', 'altar']],
     );
 
-    const path = findPathWithObjectives(
+    const path = pathfindingFindWithObjectives(
       graph, 'spawn', 'altar',
       [{ roomId: 'island', priority: 10 }],
     );
@@ -650,7 +650,7 @@ describe('findPathWithObjectives', () => {
   });
 });
 
-describe('recalculatePath', () => {
+describe('pathfindingRecalculate', () => {
   it('finds alternate path when node is blocked', () => {
     //  current -- A -- altar
     //  current -- B -- altar
@@ -669,7 +669,7 @@ describe('recalculatePath', () => {
       ],
     );
 
-    const path = recalculatePath(graph, 'current', 'altar', 'A');
+    const path = pathfindingRecalculate(graph, 'current', 'altar', 'A');
     expect(path).toEqual(['current', 'B', 'altar']);
   });
 
@@ -687,7 +687,7 @@ describe('recalculatePath', () => {
       ],
     );
 
-    const path = recalculatePath(graph, 'current', 'altar', 'A');
+    const path = pathfindingRecalculate(graph, 'current', 'altar', 'A');
     expect(path).toEqual([]);
   });
 
@@ -714,7 +714,7 @@ describe('recalculatePath', () => {
     );
 
     // A already blocked, now also block B → only C remains
-    const path = recalculatePath(graph, 'current', 'altar', 'B', {
+    const path = pathfindingRecalculate(graph, 'current', 'altar', 'B', {
       blockedNodes: new Set(['A']),
     });
     expect(path).toEqual(['current', 'C', 'altar']);
@@ -739,7 +739,7 @@ describe('recalculatePath', () => {
     );
 
     // Block nothing new, but low morale should still prefer safe path
-    const path = recalculatePath(graph, 'current', 'altar', 'nonexistent', {
+    const path = pathfindingRecalculate(graph, 'current', 'altar', 'nonexistent', {
       morale: 1,
     });
     expect(path).toEqual(['current', 'safe', 'altar']);
@@ -776,7 +776,7 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    const path = findPath(graph, 'S', 'goal');
+    const path = pathfindingFindPath(graph, 'S', 'goal');
     expect(path).toHaveLength(5); // S → A → B/C → D → goal
     expect(path[0]).toBe('S');
     expect(path[path.length - 1]).toBe('goal');
@@ -805,10 +805,10 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    const pathFearful = findPath(graph, 'S', 'goal', { morale: 1 });
+    const pathFearful = pathfindingFindPath(graph, 'S', 'goal', { morale: 1 });
     expect(pathFearful).toEqual(['S', 'A', 'B', 'goal']);
 
-    const pathBrave = findPath(graph, 'S', 'goal', { morale: 10 });
+    const pathBrave = pathfindingFindPath(graph, 'S', 'goal', { morale: 10 });
     expect(pathBrave).toEqual(['S', 'scary', 'goal']);
   });
 
@@ -826,8 +826,8 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    expect(findPath(graph, 'A', 'D')).toEqual([]);
-    expect(findPath(graph, 'C', 'D')).toEqual(['C', 'D']);
+    expect(pathfindingFindPath(graph, 'A', 'D')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'C', 'D')).toEqual(['C', 'D']);
   });
 
   it('handles graph with no edges', () => {
@@ -839,6 +839,6 @@ describe('Complex graph scenarios', () => {
       [],
     );
 
-    expect(findPath(graph, 'A', 'B')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'A', 'B')).toEqual([]);
   });
 });

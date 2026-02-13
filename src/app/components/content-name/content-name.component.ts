@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { getEntry } from '@helpers';
+import { contentGetEntry } from '@helpers';
 
 @Component({
   selector: 'app-content-name',
@@ -10,5 +10,5 @@ import { getEntry } from '@helpers';
 export class ContentNameComponent {
   public id = input.required<string>();
 
-  public display = computed(() => getEntry(this.id())?.name ?? 'UNKNOWN!');
+  public display = computed(() => contentGetEntry(this.id())?.name ?? 'UNKNOWN!');
 }

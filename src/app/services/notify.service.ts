@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import {
-  getReputationLevelLabel,
-  notification$,
+  reputationGetLevelLabel,
+  notifyNotification$,
   reputationLevelUp$,
 } from '@helpers';
 import type { ReputationLevelUpEvent } from '@helpers/reputation';
@@ -34,7 +34,7 @@ export class NotifyService {
   private toast = inject(ToastrService);
 
   async init() {
-    notification$.subscribe((messageData) => {
+    notifyNotification$.subscribe((messageData) => {
       const { message, type } = messageData;
       this.logger.debug(`Notify:${type}`, message);
 
@@ -48,7 +48,7 @@ export class NotifyService {
 
   private showReputationLevelUp(event: ReputationLevelUpEvent): void {
     const categoryLabel = REPUTATION_LABELS[event.type];
-    const levelLabel = getReputationLevelLabel(event.newLevel);
+    const levelLabel = reputationGetLevelLabel(event.newLevel);
     const flavorText = REPUTATION_FLAVOR_TEXT[event.type];
 
     const title = `${categoryLabel} Reputation: ${levelLabel}!`;

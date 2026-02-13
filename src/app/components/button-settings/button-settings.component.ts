@@ -3,7 +3,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { PanelOptionsComponent } from '@components/panel-options/panel-options.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportToDirective } from '@directives/teleport.to.directive';
-import { showOptionsMenu } from '@helpers/ui';
+import { uiShowOptionsMenu } from '@helpers/ui';
 
 @Component({
   selector: 'app-button-settings',
@@ -17,9 +17,9 @@ import { showOptionsMenu } from '@helpers/ui';
   styleUrl: './button-settings.component.scss',
 })
 export class ButtonSettingsComponent {
-  public showSettings = computed(() => showOptionsMenu());
+  public showSettings = computed(() => uiShowOptionsMenu());
 
   public showOptions() {
-    showOptionsMenu.set(true);
+    uiShowOptionsMenu.set(true);
   }
 }

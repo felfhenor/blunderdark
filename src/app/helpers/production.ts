@@ -1,10 +1,10 @@
 import { computed } from '@angular/core';
-import { areRoomsAdjacent } from '@helpers/adjacency';
-import { getEntry } from '@helpers/content';
-import { TICKS_PER_MINUTE } from '@helpers/game-time';
-import { calculateProductionModifiers } from '@helpers/production-modifiers';
-import { getAbsoluteTiles, resolveRoomShape } from '@helpers/room-shapes';
-import { calculatePerCreatureProductionModifier } from '@helpers/state-modifiers';
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { contentGetEntry } from '@helpers/content';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { productionModifierCalculate } from '@helpers/production-modifiers';
+import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
@@ -24,25 +24,25 @@ export type InhabitantBonusResult = {
   hasWorkers: boolean;
 };
 
-export function getBaseProduction(roomTypeId: string): RoomProduction {
-  const room = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+export function productionGetBase(roomTypeId: string): RoomProduction {
+  const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!room) return {};
   return room.production ?? {};
 }
 
-export function getRoomDefinition(
+export function productionGetRoomDefinition(
   roomTypeId: string,
 ): (RoomDefinition & IsContentItem) | undefined {
-  return getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  return contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
 }
 
-export function getInhabitantDefinition(
+export function productionGetInhabitantDefinition(
   definitionId: string,
 ): (InhabitantDefinition & IsContentItem) | undefined {
-  return getEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  return contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
 }
 
-export function calculateInhabitantBonus(
+export function productionCalculateInhabitantBonus(
   placedRoom: PlacedRoom,
   inhabitants: InhabitantInstance[],
 ): InhabitantBonusResult {
@@ -54,13 +54,13 @@ export function calculateInhabitantBonus(
     return { bonus: 0, hasWorkers: false };
   }
 
-  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   const roomProduction = roomDef?.production ?? {};
 
   let totalBonus = 0;
 
   for (const inhabitant of assignedInhabitants) {
-    const def = getEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
       inhabitant.definitionId,
     );
     if (!def) continue;
@@ -85,12 +85,12 @@ export function calculateInhabitantBonus(
   return { bonus: totalBonus, hasWorkers: true };
 }
 
-export function calculateAdjacencyBonus(
+export function productionCalculateAdjacencyBonus(
   placedRoom: PlacedRoom,
   adjacentRoomIds: string[],
   allPlacedRooms: PlacedRoom[],
 ): number {
-  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   if (!roomDef) return 0;
 
   const bonusRules = roomDef.adjacencyBonuses;
@@ -120,11 +120,11 @@ export type ActiveAdjacencyBonus = {
   description: string;
 };
 
-export function getActiveAdjacencyBonuses(
+export function productionGetActiveAdjacencyBonuses(
   placedRoom: PlacedRoom,
   floor: Floor,
 ): ActiveAdjacencyBonus[] {
-  const roomDef = getRoomDefinition(placedRoom.roomTypeId);
+  const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   if (!roomDef) return [];
 
   const bonusRules = roomDef.adjacencyBonuses;
@@ -132,10 +132,10 @@ export function getActiveAdjacencyBonuses(
 
   const roomTiles = new Map<string, TileOffset[]>();
   for (const room of floor.rooms) {
-    const shape = resolveRoomShape(room);
+    const shape = roomShapeResolve(room);
     roomTiles.set(
       room.id,
-      getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+      roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
     );
   }
 
@@ -145,11 +145,11 @@ export function getActiveAdjacencyBonuses(
   for (const other of floor.rooms) {
     if (other.id === placedRoom.id) continue;
     const otherTiles = roomTiles.get(other.id) ?? [];
-    if (!areRoomsAdjacent(thisTiles, otherTiles)) continue;
+    if (!adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) continue;
 
     for (const rule of bonusRules) {
       if (rule.adjacentRoomType === other.roomTypeId) {
-        const otherDef = getRoomDefinition(other.roomTypeId);
+        const otherDef = productionGetRoomDefinition(other.roomTypeId);
         activeBonuses.push({
           sourceRoomId: other.id,
           sourceRoomName: otherDef?.name ?? 'Unknown Room',
@@ -163,7 +163,7 @@ export function getActiveAdjacencyBonuses(
   return activeBonuses;
 }
 
-export function calculateConditionalModifiers(
+export function productionCalculateConditionalModifiers(
   placedRoom: PlacedRoom,
   inhabitants: InhabitantInstance[],
 ): number {
@@ -173,30 +173,30 @@ export function calculateConditionalModifiers(
 
   if (assigned.length === 0) return 1.0;
 
-  return calculatePerCreatureProductionModifier(assigned);
+  return stateModifierCalculatePerCreatureProduction(assigned);
 }
 
-export function calculateTotalProduction(floors: Floor[], hour?: number): RoomProduction {
+export function productionCalculateTotal(floors: Floor[], hour?: number): RoomProduction {
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
     const roomTiles = new Map<string, TileOffset[]>();
     for (const room of floor.rooms) {
-      const shape = resolveRoomShape(room);
+      const shape = roomShapeResolve(room);
       roomTiles.set(
         room.id,
-        getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+        roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
       );
     }
 
     for (const room of floor.rooms) {
-      const roomDef = getRoomDefinition(room.roomTypeId);
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef) continue;
 
       const base = roomDef.production;
       if (!base || Object.keys(base).length === 0) continue;
 
-      const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+      const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
         room,
         floor.inhabitants,
       );
@@ -208,19 +208,19 @@ export function calculateTotalProduction(floors: Floor[], hour?: number): RoomPr
       for (const other of floor.rooms) {
         if (other.id === room.id) continue;
         const otherTiles = roomTiles.get(other.id) ?? [];
-        if (areRoomsAdjacent(thisTiles, otherTiles)) {
+        if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
           adjacentRoomIds.push(other.id);
         }
       }
 
-      const adjacencyBonus = calculateAdjacencyBonus(
+      const adjacencyBonus = productionCalculateAdjacencyBonus(
         room,
         adjacentRoomIds,
         floor.rooms,
       );
-      const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
       const envModifier = hour !== undefined
-        ? calculateProductionModifiers({
+        ? productionModifierCalculate({
             roomTypeId: room.roomTypeId,
             floorDepth: floor.depth,
             floorBiome: floor.biome,
@@ -241,18 +241,18 @@ export function calculateTotalProduction(floors: Floor[], hour?: number): RoomPr
   return totalProduction;
 }
 
-export function calculateSingleRoomProduction(
+export function productionCalculateSingleRoom(
   room: PlacedRoom,
   floor: Floor,
   hour?: number,
 ): RoomProduction {
-  const roomDef = getRoomDefinition(room.roomTypeId);
+  const roomDef = productionGetRoomDefinition(room.roomTypeId);
   if (!roomDef) return {};
 
   const base = roomDef.production;
   if (!base || Object.keys(base).length === 0) return {};
 
-  const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+  const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
     room,
     floor.inhabitants,
   );
@@ -261,8 +261,8 @@ export function calculateSingleRoomProduction(
 
   const roomTiles = new Map<string, TileOffset[]>();
   for (const r of floor.rooms) {
-    const shape = resolveRoomShape(r);
-    roomTiles.set(r.id, getAbsoluteTiles(shape, r.anchorX, r.anchorY));
+    const shape = roomShapeResolve(r);
+    roomTiles.set(r.id, roomShapeGetAbsoluteTiles(shape, r.anchorX, r.anchorY));
   }
 
   const thisTiles = roomTiles.get(room.id) ?? [];
@@ -270,19 +270,19 @@ export function calculateSingleRoomProduction(
   for (const other of floor.rooms) {
     if (other.id === room.id) continue;
     const otherTiles = roomTiles.get(other.id) ?? [];
-    if (areRoomsAdjacent(thisTiles, otherTiles)) {
+    if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
       adjacentRoomIds.push(other.id);
     }
   }
 
-  const adjacencyBonus = calculateAdjacencyBonus(
+  const adjacencyBonus = productionCalculateAdjacencyBonus(
     room,
     adjacentRoomIds,
     floor.rooms,
   );
-  const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+  const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
   const envModifier = hour !== undefined
-    ? calculateProductionModifiers({
+    ? productionModifierCalculate({
         roomTypeId: room.roomTypeId,
         floorDepth: floor.depth,
         floorBiome: floor.biome,
@@ -302,19 +302,19 @@ export function calculateSingleRoomProduction(
 
 export const productionRates = computed<RoomProduction>(() => {
   const state = gamestate();
-  return calculateTotalProduction(state.world.floors, state.clock.hour);
+  return productionCalculateTotal(state.world.floors, state.clock.hour);
 });
 
 export function productionPerMinute(perTickRate: number): number {
-  return perTickRate * TICKS_PER_MINUTE;
+  return perTickRate * GAME_TIME_TICKS_PER_MINUTE;
 }
 
-export function getRoomProductionRates(roomId: string): RoomProduction {
+export function productionGetRoomRates(roomId: string): RoomProduction {
   const state = gamestate();
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return calculateSingleRoomProduction(room, floor, state.clock.hour);
+      return productionCalculateSingleRoom(room, floor, state.clock.hour);
     }
   }
   return {};
@@ -328,7 +328,7 @@ export type ResourceProductionBreakdown = {
   final: number;
 };
 
-export function calculateProductionBreakdowns(
+export function productionCalculateBreakdowns(
   floors: Floor[],
   hour?: number,
 ): Record<string, ResourceProductionBreakdown> {
@@ -337,21 +337,21 @@ export function calculateProductionBreakdowns(
   for (const floor of floors) {
     const roomTiles = new Map<string, TileOffset[]>();
     for (const room of floor.rooms) {
-      const shape = resolveRoomShape(room);
+      const shape = roomShapeResolve(room);
       roomTiles.set(
         room.id,
-        getAbsoluteTiles(shape, room.anchorX, room.anchorY),
+        roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
       );
     }
 
     for (const room of floor.rooms) {
-      const roomDef = getRoomDefinition(room.roomTypeId);
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef) continue;
 
       const base = roomDef.production;
       if (!base || Object.keys(base).length === 0) continue;
 
-      const { bonus: inhabitantBonus, hasWorkers } = calculateInhabitantBonus(
+      const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
         room,
         floor.inhabitants,
       );
@@ -363,19 +363,19 @@ export function calculateProductionBreakdowns(
       for (const other of floor.rooms) {
         if (other.id === room.id) continue;
         const otherTiles = roomTiles.get(other.id) ?? [];
-        if (areRoomsAdjacent(thisTiles, otherTiles)) {
+        if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
           adjacentRoomIds.push(other.id);
         }
       }
 
-      const adjacencyBonusVal = calculateAdjacencyBonus(
+      const adjacencyBonusVal = productionCalculateAdjacencyBonus(
         room,
         adjacentRoomIds,
         floor.rooms,
       );
-      const stateModifier = calculateConditionalModifiers(room, floor.inhabitants);
+      const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
       const envModifier = hour !== undefined
-        ? calculateProductionModifiers({
+        ? productionModifierCalculate({
             roomTypeId: room.roomTypeId,
             floorDepth: floor.depth,
             floorBiome: floor.biome,
@@ -416,11 +416,11 @@ export function calculateProductionBreakdowns(
 
 export const productionBreakdowns = computed(() => {
   const state = gamestate();
-  return calculateProductionBreakdowns(state.world.floors, state.clock.hour);
+  return productionCalculateBreakdowns(state.world.floors, state.clock.hour);
 });
 
-export function processProduction(state: GameState): void {
-  const production = calculateTotalProduction(state.world.floors, state.clock.hour);
+export function productionProcess(state: GameState): void {
+  const production = productionCalculateTotal(state.world.floors, state.clock.hour);
 
   for (const [type, amount] of Object.entries(production)) {
     if (!amount || amount <= 0) continue;

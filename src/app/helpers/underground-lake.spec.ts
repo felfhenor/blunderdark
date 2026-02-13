@@ -49,10 +49,10 @@ const darkWatersPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const undergroundLakeRoom: RoomDefinition & IsContentItem = {
@@ -154,16 +154,16 @@ mockContent.set('def-goblin', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -233,7 +233,7 @@ describe('Underground Lake: definition', () => {
 
 describe('Underground Lake: base production', () => {
   it('should have base production of 1.0 food/tick (5 food/min)', () => {
-    const production = getBaseProduction(UNDERGROUND_LAKE_ID);
+    const production = productionGetBase(UNDERGROUND_LAKE_ID);
     expect(production).toEqual({ food: 1.0 });
     expect(productionPerMinute(production['food']!)).toBeCloseTo(5.0);
   });
@@ -241,7 +241,7 @@ describe('Underground Lake: base production', () => {
   it('should produce 0 food when no workers are assigned', () => {
     const lake = createPlacedLake();
     const floor = makeFloor([lake]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -257,7 +257,7 @@ describe('Underground Lake: base production', () => {
       },
     ];
     const floor = makeFloor([lake], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Base 1.0 * (1 + 0 goblin no traits) * 1.0 = 1.0
     expect(production['food']).toBeCloseTo(1.0);
   });
@@ -274,7 +274,7 @@ describe('Underground Lake: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [lake, grove];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       lake,
       ['placed-grove-1'],
       allRooms,
@@ -292,7 +292,7 @@ describe('Underground Lake: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [lake, well];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       lake,
       ['placed-well-1'],
       allRooms,
@@ -310,7 +310,7 @@ describe('Underground Lake: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [lake1, lake2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       lake1,
       ['placed-lake-2'],
       allRooms,
@@ -335,7 +335,7 @@ describe('Underground Lake: adjacency bonuses', () => {
       anchorY: 2,
     };
     const allRooms = [lake, grove, well];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       lake,
       ['placed-grove-1', 'placed-well-1'],
       allRooms,
@@ -347,7 +347,7 @@ describe('Underground Lake: adjacency bonuses', () => {
 
 describe('Underground Lake: Deep Fishing upgrade', () => {
   it('should have productionMultiplier 1.6 for food', () => {
-    const paths = getUpgradePaths(UNDERGROUND_LAKE_ID);
+    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID);
     const deep = paths.find((p) => p.name === 'Deep Fishing');
     expect(deep).toBeDefined();
     expect(deep!.effects).toHaveLength(1);
@@ -362,20 +362,20 @@ describe('Underground Lake: Expanded Lake upgrade', () => {
     const room = createPlacedLake({
       appliedUpgradePathId: 'upgrade-expanded-lake',
     });
-    const effective = getEffectiveMaxInhabitants(room, undergroundLakeRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, undergroundLakeRoom);
     expect(effective).toBe(5);
   });
 
   it('should keep capacity at 3 without upgrade', () => {
     const room = createPlacedLake();
-    const effective = getEffectiveMaxInhabitants(room, undergroundLakeRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, undergroundLakeRoom);
     expect(effective).toBe(3);
   });
 });
 
 describe('Underground Lake: Dark Waters upgrade', () => {
   it('should have productionMultiplier, fearIncrease, and secondaryProduction', () => {
-    const paths = getUpgradePaths(UNDERGROUND_LAKE_ID);
+    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID);
     const dark = paths.find((p) => p.name === 'Dark Waters');
     expect(dark).toBeDefined();
     expect(dark!.effects).toHaveLength(3);
@@ -402,13 +402,13 @@ describe('Underground Lake: upgrade mutual exclusivity', () => {
     const room = createPlacedLake({
       appliedUpgradePathId: 'upgrade-deep-fishing',
     });
-    const result = canApplyUpgrade(room, 'upgrade-expanded-lake');
+    const result = roomUpgradeCanApply(room, 'upgrade-expanded-lake');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedLake();
-    const result = canApplyUpgrade(room, 'upgrade-deep-fishing');
+    const result = roomUpgradeCanApply(room, 'upgrade-deep-fishing');
     expect(result.valid).toBe(true);
   });
 });
@@ -433,7 +433,7 @@ describe('Underground Lake: full production with adjacency', () => {
       },
     ];
     const floor = makeFloor([lake, grove], inhabitants);
-    const production = calculateSingleRoomProduction(lake, floor);
+    const production = productionCalculateSingleRoom(lake, floor);
     // Base 1.0 * (1 + 0 goblin + 0.3 adjacency) * 1.0 = 1.0 * 1.3 = 1.3
     expect(production['food']).toBeCloseTo(1.3);
   });

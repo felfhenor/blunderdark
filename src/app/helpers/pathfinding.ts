@@ -44,7 +44,7 @@ function addBidirectionalEdge(
  * @param floor The floor to build from
  * @param roomFearLevels Map of roomId → fear level (from RoomDefinition lookups)
  */
-export function buildDungeonGraph(
+export function pathfindingBuildDungeonGraph(
   floor: Floor,
   roomFearLevels?: Map<string, number>,
 ): DungeonGraph {
@@ -105,7 +105,7 @@ function getTraversalCost(
  * making Manhattan distance inadmissible as a heuristic.
  * Returns an ordered list of room IDs from start to goal, or empty array if no path.
  */
-export function findPath(
+export function pathfindingFindPath(
   graph: DungeonGraph,
   startRoomId: string,
   goalRoomId: string,
@@ -166,7 +166,7 @@ export function findPath(
 /**
  * Get the total traversal cost of a path.
  */
-export function getPathCost(
+export function pathfindingGetCost(
   graph: DungeonGraph,
   path: string[],
   options: PathfindingOptions = {},
@@ -196,27 +196,27 @@ export type SecondaryObjective = {
  * Find a path that may detour through a secondary objective if cost-effective.
  * Detour threshold: path via secondary must be less than 2x the direct path cost.
  */
-export function findPathWithObjectives(
+export function pathfindingFindWithObjectives(
   graph: DungeonGraph,
   startRoomId: string,
   primaryGoalId: string,
   secondaryObjectives: SecondaryObjective[],
   options: PathfindingOptions = {},
 ): string[] {
-  const directPath = findPath(graph, startRoomId, primaryGoalId, options);
+  const directPath = pathfindingFindPath(graph, startRoomId, primaryGoalId, options);
   if (directPath.length === 0) return [];
 
-  const directCost = getPathCost(graph, directPath, options);
+  const directCost = pathfindingGetCost(graph, directPath, options);
   const detourThreshold = directCost * 2;
 
   let bestDetourPath: string[] = [];
   let bestDetourPriority = -1;
 
   for (const objective of secondaryObjectives) {
-    const pathToObj = findPath(graph, startRoomId, objective.roomId, options);
+    const pathToObj = pathfindingFindPath(graph, startRoomId, objective.roomId, options);
     if (pathToObj.length === 0) continue;
 
-    const pathFromObj = findPath(
+    const pathFromObj = pathfindingFindPath(
       graph,
       objective.roomId,
       primaryGoalId,
@@ -225,8 +225,8 @@ export function findPathWithObjectives(
     if (pathFromObj.length === 0) continue;
 
     const detourCost =
-      getPathCost(graph, pathToObj, options) +
-      getPathCost(graph, pathFromObj, options);
+      pathfindingGetCost(graph, pathToObj, options) +
+      pathfindingGetCost(graph, pathFromObj, options);
 
     if (detourCost < detourThreshold && objective.priority > bestDetourPriority) {
       bestDetourPath = [...pathToObj, ...pathFromObj.slice(1)];
@@ -243,7 +243,7 @@ export function findPathWithObjectives(
  * Recalculate path from current position with a newly blocked node.
  * Returns new path, or empty array if no path exists (invader enters 'confused' state).
  */
-export function recalculatePath(
+export function pathfindingRecalculate(
   graph: DungeonGraph,
   currentRoomId: string,
   goalRoomId: string,
@@ -253,7 +253,7 @@ export function recalculatePath(
   const blocked = new Set(options.blockedNodes ?? []);
   blocked.add(newBlockedNodeId);
 
-  return findPath(graph, currentRoomId, goalRoomId, {
+  return pathfindingFindPath(graph, currentRoomId, goalRoomId, {
     ...options,
     blockedNodes: blocked,
   });

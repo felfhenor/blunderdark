@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import type {
   InhabitantDefinition,
   InhabitantInstance,
@@ -9,7 +9,7 @@ import type {
 
 // --- Default fallback modifiers (backwards-compatible with old flat STATE_MODIFIERS) ---
 
-const DEFAULT_STATE_MODIFIERS: Record<InhabitantState, StateModifier> = {
+const STATE_MODIFIER_DEFAULTS: Record<InhabitantState, StateModifier> = {
   normal: {
     productionMultiplier: 1.0,
     foodConsumptionMultiplier: 1.0,
@@ -29,20 +29,20 @@ const DEFAULT_STATE_MODIFIERS: Record<InhabitantState, StateModifier> = {
 /**
  * Default fear tolerance when not defined on the creature.
  */
-export const DEFAULT_FEAR_TOLERANCE = 2;
+export const STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT = 2;
 
 /**
  * Check if an inhabitant is scared based on their fear tolerance and room fear level.
  * An inhabitant is scared when the room's fear level exceeds their tolerance.
  */
-export function isInhabitantScared(
+export function stateModifierIsInhabitantScared(
   inhabitant: InhabitantInstance,
   roomFearLevel: number,
 ): boolean {
-  const def = getEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
     inhabitant.definitionId,
   );
-  const tolerance = def?.fearTolerance ?? DEFAULT_FEAR_TOLERANCE;
+  const tolerance = def?.fearTolerance ?? STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT;
   return roomFearLevel > tolerance;
 }
 
@@ -50,11 +50,11 @@ export function isInhabitantScared(
  * Get the fear tolerance for an inhabitant definition.
  * Returns the default if not defined.
  */
-export function getFearTolerance(
+export function stateModifierGetFearTolerance(
   definitionId: string,
 ): number {
-  const def = getEntry<InhabitantDefinition & IsContentItem>(definitionId);
-  return def?.fearTolerance ?? DEFAULT_FEAR_TOLERANCE;
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  return def?.fearTolerance ?? STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT;
 }
 
 // --- State modifier lookup ---
@@ -63,33 +63,33 @@ export function getFearTolerance(
  * Get the state modifier for a specific inhabitant in a given state.
  * Falls back to default modifiers if no per-creature data is defined.
  */
-export function getStateModifier(
+export function stateModifierGet(
   definitionId: string,
   state: InhabitantState,
 ): StateModifier {
-  const def = getEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
   const creatureModifier = def?.stateModifiers?.[state];
   if (creatureModifier) return creatureModifier;
-  return DEFAULT_STATE_MODIFIERS[state];
+  return STATE_MODIFIER_DEFAULTS[state];
 }
 
 /**
  * Get the production multiplier for a specific inhabitant in its current state.
  */
-export function getProductionMultiplier(
+export function stateModifierGetProductionMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
-  const modifier = getStateModifier(inhabitant.definitionId, inhabitant.state);
+  const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
   return modifier.productionMultiplier;
 }
 
 /**
  * Get the food consumption multiplier for a specific inhabitant in its current state.
  */
-export function getFoodConsumptionMultiplier(
+export function stateModifierGetFoodConsumptionMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
-  const modifier = getStateModifier(inhabitant.definitionId, inhabitant.state);
+  const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
   return modifier.foodConsumptionMultiplier;
 }
 
@@ -97,10 +97,10 @@ export function getFoodConsumptionMultiplier(
  * Get the attack multiplier for a specific inhabitant in its current state.
  * Returns 1.0 if no combat modifier is defined.
  */
-export function getAttackMultiplier(
+export function stateModifierGetAttackMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
-  const modifier = getStateModifier(inhabitant.definitionId, inhabitant.state);
+  const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
   return modifier.attackMultiplier ?? 1.0;
 }
 
@@ -108,10 +108,10 @@ export function getAttackMultiplier(
  * Get the defense multiplier for a specific inhabitant in its current state.
  * Returns 1.0 if no combat modifier is defined.
  */
-export function getDefenseMultiplier(
+export function stateModifierGetDefenseMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
-  const modifier = getStateModifier(inhabitant.definitionId, inhabitant.state);
+  const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
   return modifier.defenseMultiplier ?? 1.0;
 }
 
@@ -122,14 +122,14 @@ export function getDefenseMultiplier(
  * Uses per-creature state modifiers when available, falls back to defaults.
  * This replaces the old flat STATE_MODIFIERS approach.
  */
-export function calculatePerCreatureProductionModifier(
+export function stateModifierCalculatePerCreatureProduction(
   assignedInhabitants: InhabitantInstance[],
 ): number {
   if (assignedInhabitants.length === 0) return 1.0;
 
   let totalMultiplier = 0;
   for (const inhabitant of assignedInhabitants) {
-    totalMultiplier += getProductionMultiplier(inhabitant);
+    totalMultiplier += stateModifierGetProductionMultiplier(inhabitant);
   }
 
   return totalMultiplier / assignedInhabitants.length;

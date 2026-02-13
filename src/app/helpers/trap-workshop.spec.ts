@@ -56,18 +56,18 @@ const enchantedTrapsPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/room-roles', () => ({
-  findRoomIdByRole: vi.fn((role: string) => {
+  roomRoleFindById: vi.fn((role: string) => {
     if (role === 'trapWorkshop') return TRAP_WORKSHOP_ID;
     return undefined;
   }),
-  resetRoleCache: vi.fn(),
+  roomRoleResetCache: vi.fn(),
 }));
 
 // --- Trap definitions ---
@@ -224,14 +224,14 @@ function makeGameState(overrides: {
 // --- Import after mocks ---
 
 import {
-  addJobToQueue,
-  BASE_CRAFTING_TICKS,
-  canQueueTrap,
-  getCraftingCostForRoom,
-  getCraftingTicksForRoom,
-  getQueueForRoom,
-  processTrapCrafting,
-  removeJobFromQueue,
+  trapWorkshopAddJob,
+  TRAP_WORKSHOP_BASE_CRAFTING_TICKS,
+  trapWorkshopCanQueue,
+  trapWorkshopGetCraftingCost,
+  trapWorkshopGetCraftingTicks,
+  trapWorkshopGetQueue,
+  trapWorkshopProcess,
+  trapWorkshopRemoveJob,
 } from '@helpers/trap-workshop';
 
 // --- Setup ---
@@ -271,7 +271,7 @@ describe('Trap Workshop Room Definition', () => {
 describe('Crafting Cost', () => {
   it('should return base cost when no upgrade applied', () => {
     const room = makeRoom();
-    const cost = getCraftingCostForRoom(room, { gold: 30, crystals: 10 });
+    const cost = trapWorkshopGetCraftingCost(room, { gold: 30, crystals: 10 });
     expect(cost).toEqual({ gold: 30, crystals: 10 });
   });
 
@@ -279,7 +279,7 @@ describe('Crafting Cost', () => {
     const room = makeRoom({
       appliedUpgradePathId: 'upgrade-efficient-assembly',
     });
-    const cost = getCraftingCostForRoom(room, { gold: 40, crystals: 16 });
+    const cost = trapWorkshopGetCraftingCost(room, { gold: 40, crystals: 16 });
     // 0.75 multiplier: gold 40*0.75=30, crystals 16*0.75=12
     expect(cost.gold).toBe(30);
     expect(cost.crystals).toBe(12);
@@ -289,7 +289,7 @@ describe('Crafting Cost', () => {
     const room = makeRoom({
       appliedUpgradePathId: 'upgrade-efficient-assembly',
     });
-    const cost = getCraftingCostForRoom(room, { gold: 30, crystals: 10 });
+    const cost = trapWorkshopGetCraftingCost(room, { gold: 30, crystals: 10 });
     // gold 30*0.75=22.5→23, crystals 10*0.75=7.5→8
     expect(cost.gold).toBe(23);
     expect(cost.crystals).toBe(8);
@@ -299,79 +299,79 @@ describe('Crafting Cost', () => {
 describe('Crafting Time', () => {
   it('should return base time with 1 worker and no upgrades', () => {
     const room = makeRoom();
-    const ticks = getCraftingTicksForRoom(room, 1);
-    expect(ticks).toBe(BASE_CRAFTING_TICKS);
+    const ticks = trapWorkshopGetCraftingTicks(room, 1);
+    expect(ticks).toBe(TRAP_WORKSHOP_BASE_CRAFTING_TICKS);
   });
 
   it('should reduce time with 2 workers (20% faster)', () => {
     const room = makeRoom();
-    const ticks = getCraftingTicksForRoom(room, 2);
+    const ticks = trapWorkshopGetCraftingTicks(room, 2);
     // 1 extra worker: 1 - 0.2 = 0.8, so 15 * 0.8 = 12
-    expect(ticks).toBe(Math.round(BASE_CRAFTING_TICKS * 0.8));
+    expect(ticks).toBe(Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.8));
   });
 
   it('should reduce time with 3 workers (40% faster)', () => {
     const room = makeRoom();
-    const ticks = getCraftingTicksForRoom(room, 3);
+    const ticks = trapWorkshopGetCraftingTicks(room, 3);
     // 2 extra workers: 1 - 0.4 = 0.6, so 15 * 0.6 = 9
-    expect(ticks).toBe(Math.round(BASE_CRAFTING_TICKS * 0.6));
+    expect(ticks).toBe(Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.6));
   });
 
   it('should cap worker bonus at 60% reduction (0.4 floor)', () => {
     const room = makeRoom();
-    const ticks = getCraftingTicksForRoom(room, 10);
+    const ticks = trapWorkshopGetCraftingTicks(room, 10);
     // Many workers: capped at 0.4 multiplier, so 15 * 0.4 = 6
-    expect(ticks).toBe(Math.round(BASE_CRAFTING_TICKS * 0.4));
+    expect(ticks).toBe(Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.4));
   });
 
   it('should apply Efficient Assembly speed upgrade', () => {
     const room = makeRoom({
       appliedUpgradePathId: 'upgrade-efficient-assembly',
     });
-    const ticks = getCraftingTicksForRoom(room, 1);
+    const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 0.7 multiplier: 15 * 0.7 = 10.5 → 11
-    expect(ticks).toBe(Math.round(BASE_CRAFTING_TICKS * 0.7));
+    expect(ticks).toBe(Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.7));
   });
 
   it('should apply Master Trapper speed upgrade (slower)', () => {
     const room = makeRoom({
       appliedUpgradePathId: 'upgrade-master-trapper',
     });
-    const ticks = getCraftingTicksForRoom(room, 1);
+    const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 1.2 multiplier: 15 * 1.2 = 18
-    expect(ticks).toBe(Math.round(BASE_CRAFTING_TICKS * 1.2));
+    expect(ticks).toBe(Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 1.2));
   });
 
   it('should combine upgrade and worker bonuses', () => {
     const room = makeRoom({
       appliedUpgradePathId: 'upgrade-efficient-assembly',
     });
-    const ticks = getCraftingTicksForRoom(room, 2);
+    const ticks = trapWorkshopGetCraftingTicks(room, 2);
     // 0.7 upgrade * 0.8 worker: 15 * 0.7 = 10.5 → 11 (rounded from upgrade)
     // Then 11 * 0.8 = 8.8 → 9 (rounded from worker)
-    const afterUpgrade = Math.round(BASE_CRAFTING_TICKS * 0.7);
+    const afterUpgrade = Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.7);
     expect(ticks).toBe(Math.round(afterUpgrade * 0.8));
   });
 });
 
 describe('Queue Management', () => {
-  describe('getQueueForRoom', () => {
+  describe('trapWorkshopGetQueue', () => {
     it('should find queue for existing room', () => {
       const queues: TrapCraftingQueue[] = [
         { roomId: 'room-1', jobs: [] },
         { roomId: 'room-2', jobs: [] },
       ];
-      expect(getQueueForRoom(queues, 'room-1')?.roomId).toBe('room-1');
+      expect(trapWorkshopGetQueue(queues, 'room-1')?.roomId).toBe('room-1');
     });
 
     it('should return undefined for missing room', () => {
-      expect(getQueueForRoom([], 'nonexistent')).toBeUndefined();
+      expect(trapWorkshopGetQueue([], 'nonexistent')).toBeUndefined();
     });
   });
 
-  describe('addJobToQueue', () => {
+  describe('trapWorkshopAddJob', () => {
     it('should create new queue entry for room without existing queue', () => {
-      const result = addJobToQueue([], 'room-1', PIT_TRAP_ID, 15);
+      const result = trapWorkshopAddJob([], 'room-1', PIT_TRAP_ID, 15);
       expect(result).toHaveLength(1);
       expect(result[0].roomId).toBe('room-1');
       expect(result[0].jobs).toHaveLength(1);
@@ -387,7 +387,7 @@ describe('Queue Management', () => {
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 5, targetTicks: 15 }],
         },
       ];
-      const result = addJobToQueue(queues, 'room-1', ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(queues, 'room-1', ARROW_TRAP_ID, 20);
       expect(result[0].jobs).toHaveLength(2);
       expect(result[0].jobs[1].trapTypeId).toBe(ARROW_TRAP_ID);
     });
@@ -399,14 +399,14 @@ describe('Queue Management', () => {
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
         },
       ];
-      const result = addJobToQueue(queues, 'room-1', ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(queues, 'room-1', ARROW_TRAP_ID, 20);
       expect(result).toHaveLength(2);
       expect(result[0].roomId).toBe('room-other');
       expect(result[0].jobs).toHaveLength(1);
     });
   });
 
-  describe('removeJobFromQueue', () => {
+  describe('trapWorkshopRemoveJob', () => {
     it('should remove job at specified index', () => {
       const queues: TrapCraftingQueue[] = [
         {
@@ -417,7 +417,7 @@ describe('Queue Management', () => {
           ],
         },
       ];
-      const result = removeJobFromQueue(queues, 'room-1', 0);
+      const result = trapWorkshopRemoveJob(queues, 'room-1', 0);
       expect(result[0].jobs).toHaveLength(1);
       expect(result[0].jobs[0].trapTypeId).toBe(ARROW_TRAP_ID);
     });
@@ -429,19 +429,19 @@ describe('Queue Management', () => {
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
         },
       ];
-      const result = removeJobFromQueue(queues, 'room-1', 0);
+      const result = trapWorkshopRemoveJob(queues, 'room-1', 0);
       expect(result).toHaveLength(0);
     });
   });
 });
 
-describe('canQueueTrap', () => {
+describe('trapWorkshopCanQueue', () => {
   it('should allow queuing with assigned worker', () => {
     const workshop = makeRoom();
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
     const floor = makeFloor([workshop], [worker]);
 
-    const result = canQueueTrap(workshop.id, [floor]);
+    const result = trapWorkshopCanQueue(workshop.id, [floor]);
     expect(result.canQueue).toBe(true);
     expect(result.room).toBeDefined();
   });
@@ -450,7 +450,7 @@ describe('canQueueTrap', () => {
     const workshop = makeRoom();
     const floor = makeFloor([workshop], []);
 
-    const result = canQueueTrap(workshop.id, [floor]);
+    const result = trapWorkshopCanQueue(workshop.id, [floor]);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('inhabitant');
   });
@@ -460,20 +460,20 @@ describe('canQueueTrap', () => {
     const worker = makeInhabitant({ assignedRoomId: room.id });
     const floor = makeFloor([room], [worker]);
 
-    const result = canQueueTrap(room.id, [floor]);
+    const result = trapWorkshopCanQueue(room.id, [floor]);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not a Trap Workshop');
   });
 
   it('should return not found for missing room', () => {
     const floor = makeFloor();
-    const result = canQueueTrap('nonexistent', [floor]);
+    const result = trapWorkshopCanQueue('nonexistent', [floor]);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not found');
   });
 });
 
-describe('processTrapCrafting', () => {
+describe('trapWorkshopProcess', () => {
   it('should advance progress on first job in queue', () => {
     const workshop = makeRoom();
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
@@ -488,7 +488,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     const queue = state.world.trapCraftingQueues[0];
     expect(queue.jobs[0].progress).toBe(1);
@@ -508,7 +508,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     // Job should be removed, queue cleaned up
     expect(state.world.trapCraftingQueues).toHaveLength(0);
@@ -531,7 +531,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(0);
   });
@@ -553,7 +553,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(1);
     expect(state.world.trapCraftingQueues[0].jobs[1].progress).toBe(0);
@@ -582,7 +582,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(1);
     expect(state.world.trapCraftingQueues[1].jobs[0].progress).toBe(1);
@@ -603,7 +603,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     expect(state.world.trapInventory[0].count).toBe(3);
   });
@@ -625,7 +625,7 @@ describe('processTrapCrafting', () => {
       ],
     });
 
-    processTrapCrafting(state);
+    trapWorkshopProcess(state);
 
     // First job completed and removed
     expect(state.world.trapCraftingQueues[0].jobs).toHaveLength(1);

@@ -51,8 +51,8 @@
         @for (speed of gameSpeeds; track speed; let idx = $index) {
           <button
             class="btn btn-xs"
-            [class.btn-primary]="gameSpeed() === speed"
-            [class.btn-ghost]="gameSpeed() !== speed"
+            [class.btn-primary]="gameTimeSpeed() === speed"
+            [class.btn-ghost]="gameTimeSpeed() !== speed"
             [tp]="speed + 'x Speed [' + (idx + 1) + ']'"
             (click)="setSpeed(speed)"
             [hotkeys]="'' + (idx + 1)"
@@ -84,12 +84,12 @@
         <button
           class="btn btn-xs btn-accent"
           [tp]="'Open Menu [ESC]'"
-          (click)="closeAllMenus()"
+          (click)="uiCloseAllMenus()"
           appSfx="ui-click"
           [sfxOffset]="panelConfigs.length + 2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'ESCAPE'"
-          (hotkey)="closeAllMenus()"
+          (hotkey)="uiCloseAllMenus()"
           isGlobal
         >
           <app-icon

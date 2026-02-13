@@ -19,21 +19,21 @@ const _startingBiome = signal<BiomeType | 'random'>('neutral');
  * Set the starting biome for the next world generation.
  * Use 'random' to pick from the 5 non-neutral biomes with equal probability.
  */
-export function setStartingBiome(biome: BiomeType | 'random'): void {
+export function worldSetStartingBiome(biome: BiomeType | 'random'): void {
   _startingBiome.set(biome);
 }
 
 /**
  * Get the starting biome selection.
  */
-export function getStartingBiome(): BiomeType | 'random' {
+export function worldGetStartingBiome(): BiomeType | 'random' {
   return _startingBiome();
 }
 
 /**
  * Resolve the starting biome - if 'random', pick one from the random pool.
  */
-export function resolveStartingBiome(): BiomeType {
+export function worldResolveStartingBiome(): BiomeType {
   const selection = _startingBiome();
   if (selection === 'random') {
     return rngChoice(RANDOM_BIOMES);
@@ -41,14 +41,14 @@ export function resolveStartingBiome(): BiomeType {
   return selection;
 }
 
-export function setWorld(world: GameStateWorld): void {
+export function worldSet(world: GameStateWorld): void {
   updateGamestate((gs) => {
     gs.world = world;
     return gs;
   });
 }
 
-export function setWorldSeed(seed: string | undefined): void {
+export function worldSetSeed(seed: string | undefined): void {
   if (!seed) seed = rngUuid();
 
   updateGamestate((gs) => {

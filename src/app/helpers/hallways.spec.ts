@@ -1,15 +1,15 @@
-import { createEmptyGrid, getTile, setTile } from '@helpers/grid';
+import { gridCreateEmpty, gridGetTile, gridSetTile } from '@helpers/grid';
 import {
-  addHallway,
-  addHallwayToGrid,
-  addUpgradeToHallway,
-  deserializeHallways,
-  getHallwaysBetween,
-  isTileBlockedForHallway,
-  removeHallway,
-  removeHallwayFromGrid,
-  removeUpgradeFromHallway,
-  serializeHallways,
+  hallwayAdd,
+  hallwayAddToGrid,
+  hallwayAddUpgrade,
+  hallwayDeserialize,
+  hallwayGetBetween,
+  hallwayIsTileBlocked,
+  hallwayRemove,
+  hallwayRemoveFromGrid,
+  hallwayRemoveUpgrade,
+  hallwaySerialize,
 } from '@helpers/hallways';
 import type { Hallway } from '@interfaces';
 import { describe, expect, it } from 'vitest';
@@ -26,39 +26,39 @@ const testHallway: Hallway = {
   upgrades: [],
 };
 
-describe('addHallwayToGrid', () => {
+describe('hallwayAddToGrid', () => {
   it('should mark hallway tiles as occupied on the grid', () => {
-    const grid = createEmptyGrid();
-    const result = addHallwayToGrid(grid, testHallway);
+    const grid = gridCreateEmpty();
+    const result = hallwayAddToGrid(grid, testHallway);
 
-    const tile = getTile(result, 5, 5);
+    const tile = gridGetTile(result, 5, 5);
     expect(tile?.occupied).toBe(true);
     expect(tile?.occupiedBy).toBe('hallway');
     expect(tile?.hallwayId).toBe('hallway-1');
 
-    const tile2 = getTile(result, 6, 5);
+    const tile2 = gridGetTile(result, 6, 5);
     expect(tile2?.occupied).toBe(true);
     expect(tile2?.occupiedBy).toBe('hallway');
   });
 
   it('should not modify surrounding tiles', () => {
-    const grid = createEmptyGrid();
-    const result = addHallwayToGrid(grid, testHallway);
+    const grid = gridCreateEmpty();
+    const result = hallwayAddToGrid(grid, testHallway);
 
-    const adjacent = getTile(result, 4, 5);
+    const adjacent = gridGetTile(result, 4, 5);
     expect(adjacent?.occupied).toBe(false);
     expect(adjacent?.occupiedBy).toBe('empty');
   });
 });
 
-describe('removeHallwayFromGrid', () => {
+describe('hallwayRemoveFromGrid', () => {
   it('should free hallway tiles on the grid', () => {
-    let grid = createEmptyGrid();
-    grid = addHallwayToGrid(grid, testHallway);
-    grid = removeHallwayFromGrid(grid, testHallway);
+    let grid = gridCreateEmpty();
+    grid = hallwayAddToGrid(grid, testHallway);
+    grid = hallwayRemoveFromGrid(grid, testHallway);
 
     for (const t of testHallway.tiles) {
-      const tile = getTile(grid, t.x, t.y);
+      const tile = gridGetTile(grid, t.x, t.y);
       expect(tile?.occupied).toBe(false);
       expect(tile?.occupiedBy).toBe('empty');
       expect(tile?.hallwayId).toBeUndefined();
@@ -66,49 +66,49 @@ describe('removeHallwayFromGrid', () => {
   });
 
   it('should not free tiles belonging to a different hallway', () => {
-    let grid = createEmptyGrid();
+    let grid = gridCreateEmpty();
     const otherHallway: Hallway = {
       ...testHallway,
       id: 'hallway-2',
       tiles: [{ x: 5, y: 5 }],
     };
-    grid = addHallwayToGrid(grid, otherHallway);
+    grid = hallwayAddToGrid(grid, otherHallway);
 
     // Try to remove testHallway (different id) from that tile
-    grid = removeHallwayFromGrid(grid, testHallway);
+    grid = hallwayRemoveFromGrid(grid, testHallway);
 
-    const tile = getTile(grid, 5, 5);
+    const tile = gridGetTile(grid, 5, 5);
     expect(tile?.occupied).toBe(true);
     expect(tile?.hallwayId).toBe('hallway-2');
   });
 });
 
-describe('isTileBlockedForHallway', () => {
+describe('hallwayIsTileBlocked', () => {
   it('should return false for empty tiles', () => {
-    const grid = createEmptyGrid();
-    expect(isTileBlockedForHallway(grid, 5, 5)).toBe(false);
+    const grid = gridCreateEmpty();
+    expect(hallwayIsTileBlocked(grid, 5, 5)).toBe(false);
   });
 
   it('should return true for occupied tiles', () => {
-    let grid = createEmptyGrid();
-    grid = setTile(grid, 5, 5, {
+    let grid = gridCreateEmpty();
+    grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
       connectionType: undefined,
     });
-    expect(isTileBlockedForHallway(grid, 5, 5)).toBe(true);
+    expect(hallwayIsTileBlocked(grid, 5, 5)).toBe(true);
   });
 
   it('should return true for out-of-bounds coordinates', () => {
-    const grid = createEmptyGrid();
-    expect(isTileBlockedForHallway(grid, -1, 0)).toBe(true);
-    expect(isTileBlockedForHallway(grid, 20, 0)).toBe(true);
+    const grid = gridCreateEmpty();
+    expect(hallwayIsTileBlocked(grid, -1, 0)).toBe(true);
+    expect(hallwayIsTileBlocked(grid, 20, 0)).toBe(true);
   });
 });
 
-describe('getHallwaysBetween', () => {
+describe('hallwayGetBetween', () => {
   const hallways: Hallway[] = [
     { ...testHallway, id: 'h1', startRoomId: 'a', endRoomId: 'b' },
     { ...testHallway, id: 'h2', startRoomId: 'b', endRoomId: 'a' },
@@ -116,39 +116,39 @@ describe('getHallwaysBetween', () => {
   ];
 
   it('should find hallways in both directions', () => {
-    const result = getHallwaysBetween(hallways, 'a', 'b');
+    const result = hallwayGetBetween(hallways, 'a', 'b');
     expect(result).toHaveLength(2);
   });
 
   it('should return empty array when no hallways connect rooms', () => {
-    const result = getHallwaysBetween(hallways, 'b', 'c');
+    const result = hallwayGetBetween(hallways, 'b', 'c');
     expect(result).toHaveLength(0);
   });
 });
 
-describe('addHallway / removeHallway', () => {
+describe('hallwayAdd / hallwayRemove', () => {
   it('should add a hallway to the collection', () => {
-    const result = addHallway([], testHallway);
+    const result = hallwayAdd([], testHallway);
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe('hallway-1');
   });
 
   it('should remove a hallway by id', () => {
-    const hallways = addHallway([], testHallway);
-    const result = removeHallway(hallways, 'hallway-1');
+    const hallways = hallwayAdd([], testHallway);
+    const result = hallwayRemove(hallways, 'hallway-1');
     expect(result).toHaveLength(0);
   });
 
   it('should not remove hallways with different ids', () => {
-    const hallways = addHallway([], testHallway);
-    const result = removeHallway(hallways, 'nonexistent');
+    const hallways = hallwayAdd([], testHallway);
+    const result = hallwayRemove(hallways, 'nonexistent');
     expect(result).toHaveLength(1);
   });
 });
 
 describe('hallway upgrades', () => {
   it('should add an upgrade to a hallway', () => {
-    const upgraded = addUpgradeToHallway(testHallway, {
+    const upgraded = hallwayAddUpgrade(testHallway, {
       id: 'u1',
       name: 'Speed Boost',
     });
@@ -164,13 +164,13 @@ describe('hallway upgrades', () => {
         { id: 'u2', name: 'Defense' },
       ],
     };
-    const result = removeUpgradeFromHallway(hallway, 'u1');
+    const result = hallwayRemoveUpgrade(hallway, 'u1');
     expect(result.upgrades).toHaveLength(1);
     expect(result.upgrades[0].id).toBe('u2');
   });
 
   it('should not mutate original hallway', () => {
-    addUpgradeToHallway(testHallway, { id: 'u1', name: 'Test' });
+    hallwayAddUpgrade(testHallway, { id: 'u1', name: 'Test' });
     expect(testHallway.upgrades).toHaveLength(0);
   });
 });
@@ -184,8 +184,8 @@ describe('serialization', () => {
       },
     ];
 
-    const serialized = JSON.stringify(serializeHallways(hallways));
-    const deserialized = deserializeHallways(JSON.parse(serialized));
+    const serialized = JSON.stringify(hallwaySerialize(hallways));
+    const deserialized = hallwayDeserialize(JSON.parse(serialized));
 
     expect(deserialized).toHaveLength(1);
     expect(deserialized[0].id).toBe('hallway-1');
@@ -195,7 +195,7 @@ describe('serialization', () => {
   });
 
   it('should handle empty input', () => {
-    const result = deserializeHallways([]);
+    const result = hallwayDeserialize([]);
     expect(result).toHaveLength(0);
   });
 });

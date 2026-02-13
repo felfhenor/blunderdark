@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import type { BiomeType, Floor, IsContentItem, RoomDefinition } from '@interfaces';
 
 /**
@@ -22,7 +22,7 @@ export type BiomeRestrictionRule = {
  * Fungal: No specific restrictions
  * Neutral: No restrictions
  */
-export const BIOME_RESTRICTIONS: Record<
+export const BIOME_RESTRICTION_MAP: Record<
   BiomeType,
   Record<string, BiomeRestrictionRule>
 > = {
@@ -52,7 +52,7 @@ export type BiomeRestrictionResult = {
 /**
  * Count how many rooms of a given type are placed on a floor.
  */
-export function countRoomTypeOnFloor(
+export function biomeRestrictionCountRoomType(
   floor: Floor,
   roomTypeId: string,
 ): number {
@@ -68,15 +68,15 @@ export function countRoomTypeOnFloor(
  * @param biome - The floor's biome type
  * @param floor - The floor to check room counts against (for maxPerFloor rules)
  */
-export function canBuildRoomOnFloor(
+export function biomeRestrictionCanBuild(
   roomTypeId: string,
   biome: BiomeType,
   floor: Floor,
 ): BiomeRestrictionResult {
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { allowed: true };
 
-  const restrictions = BIOME_RESTRICTIONS[biome];
+  const restrictions = BIOME_RESTRICTION_MAP[biome];
   if (!restrictions) return { allowed: true };
 
   const rule = restrictions[roomDef.name];
@@ -90,7 +90,7 @@ export function canBuildRoomOnFloor(
   }
 
   if (rule.maxPerFloor !== undefined) {
-    const currentCount = countRoomTypeOnFloor(floor, roomTypeId);
+    const currentCount = biomeRestrictionCountRoomType(floor, roomTypeId);
     if (currentCount >= rule.maxPerFloor) {
       return {
         allowed: false,
@@ -106,7 +106,7 @@ export function canBuildRoomOnFloor(
  * Get the restriction status of a room type on a floor for UI display.
  * Returns the rule and current count info for count-limited rooms.
  */
-export function getRoomBiomeRestrictionInfo(
+export function biomeRestrictionGetRoomInfo(
   roomTypeId: string,
   biome: BiomeType,
   floor: Floor,
@@ -116,10 +116,10 @@ export function getRoomBiomeRestrictionInfo(
   currentCount?: number;
   maxCount?: number;
 } {
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return { restricted: false };
 
-  const restrictions = BIOME_RESTRICTIONS[biome];
+  const restrictions = BIOME_RESTRICTION_MAP[biome];
   if (!restrictions) return { restricted: false };
 
   const rule = restrictions[roomDef.name];
@@ -133,7 +133,7 @@ export function getRoomBiomeRestrictionInfo(
   }
 
   if (rule.maxPerFloor !== undefined) {
-    const currentCount = countRoomTypeOnFloor(floor, roomTypeId);
+    const currentCount = biomeRestrictionCountRoomType(floor, roomTypeId);
     const atLimit = currentCount >= rule.maxPerFloor;
     return {
       restricted: atLimit,

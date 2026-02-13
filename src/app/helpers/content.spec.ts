@@ -1,10 +1,10 @@
 import {
-  allContentById,
-  allIdsByName,
-  getEntriesByType,
-  getEntry,
-  setAllContentById,
-  setAllIdsByName,
+  contentAllById,
+  contentAllIdsByName,
+  contentGetEntriesByType,
+  contentGetEntry,
+  contentSetAllById,
+  contentSetAllIdsByName,
 } from '@helpers/content';
 import type { ContentType, IsContentItem } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -62,20 +62,20 @@ describe('Content Functions', () => {
     vi.clearAllMocks();
 
     // Reset the content state before each test
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
+    contentSetAllIdsByName(new Map());
+    contentSetAllById(new Map());
   });
 
-  describe('setAllIdsByName', () => {
+  describe('contentSetAllIdsByName', () => {
     it('should set the name-to-id mapping', () => {
       const nameToIdMap = new Map([
         ['Iron Sword', 'sword-1'],
         ['Fireball', 'skill-1'],
       ]);
 
-      setAllIdsByName(nameToIdMap);
+      contentSetAllIdsByName(nameToIdMap);
 
-      const result = allIdsByName();
+      const result = contentAllIdsByName();
       expect(result.get('Iron Sword')).toBe('sword-1');
       expect(result.get('Fireball')).toBe('skill-1');
     });
@@ -83,17 +83,17 @@ describe('Content Functions', () => {
     it('should create a new Map instance (not reference)', () => {
       const originalMap = new Map([['Test Item', 'test-1']]);
 
-      setAllIdsByName(originalMap);
+      contentSetAllIdsByName(originalMap);
 
-      const storedMap = allIdsByName();
+      const storedMap = contentAllIdsByName();
       expect(storedMap).not.toBe(originalMap);
       expect(storedMap.get('Test Item')).toBe('test-1');
     });
 
     it('should handle empty map', () => {
-      setAllIdsByName(new Map());
+      contentSetAllIdsByName(new Map());
 
-      const result = allIdsByName();
+      const result = contentAllIdsByName();
       expect(result.size).toBe(0);
     });
 
@@ -101,25 +101,25 @@ describe('Content Functions', () => {
       const firstMap = new Map([['Item A', 'id-1']]);
       const secondMap = new Map([['Item B', 'id-2']]);
 
-      setAllIdsByName(firstMap);
-      expect(allIdsByName().get('Item A')).toBe('id-1');
+      contentSetAllIdsByName(firstMap);
+      expect(contentAllIdsByName().get('Item A')).toBe('id-1');
 
-      setAllIdsByName(secondMap);
-      expect(allIdsByName().get('Item A')).toBeUndefined();
-      expect(allIdsByName().get('Item B')).toBe('id-2');
+      contentSetAllIdsByName(secondMap);
+      expect(contentAllIdsByName().get('Item A')).toBeUndefined();
+      expect(contentAllIdsByName().get('Item B')).toBe('id-2');
     });
   });
 
-  describe('setAllContentById', () => {
+  describe('contentSetAllById', () => {
     it('should set the id-to-content mapping', () => {
       const contentMap = new Map([
         ['sword-1', mockWeapon],
         ['skill-1', mockSkill],
       ]);
 
-      setAllContentById(contentMap);
+      contentSetAllById(contentMap);
 
-      const result = allContentById();
+      const result = contentAllById();
       expect(result.get('sword-1')).toEqual(mockWeapon);
       expect(result.get('skill-1')).toEqual(mockSkill);
     });
@@ -127,17 +127,17 @@ describe('Content Functions', () => {
     it('should create a new Map instance (not reference)', () => {
       const originalMap = new Map([['test-1', mockWeapon]]);
 
-      setAllContentById(originalMap);
+      contentSetAllById(originalMap);
 
-      const storedMap = allContentById();
+      const storedMap = contentAllById();
       expect(storedMap).not.toBe(originalMap);
       expect(storedMap.get('test-1')).toEqual(mockWeapon);
     });
 
     it('should handle empty map', () => {
-      setAllContentById(new Map());
+      contentSetAllById(new Map());
 
-      const result = allContentById();
+      const result = contentAllById();
       expect(result.size).toBe(0);
     });
 
@@ -145,16 +145,16 @@ describe('Content Functions', () => {
       const firstMap = new Map([['item-1', mockWeapon]]);
       const secondMap = new Map([['item-2', mockArmor]]);
 
-      setAllContentById(firstMap);
-      expect(allContentById().get('item-1')).toEqual(mockWeapon);
+      contentSetAllById(firstMap);
+      expect(contentAllById().get('item-1')).toEqual(mockWeapon);
 
-      setAllContentById(secondMap);
-      expect(allContentById().get('item-1')).toBeUndefined();
-      expect(allContentById().get('item-2')).toEqual(mockArmor);
+      contentSetAllById(secondMap);
+      expect(contentAllById().get('item-1')).toBeUndefined();
+      expect(contentAllById().get('item-2')).toEqual(mockArmor);
     });
   });
 
-  describe('getEntriesByType', () => {
+  describe('contentGetEntriesByType', () => {
     beforeEach(() => {
       // Set up test data
       const contentMap = new Map([
@@ -164,11 +164,11 @@ describe('Content Functions', () => {
         ['skill-2', mockSkill2],
         ['guardian-1', mockGuardian],
       ]);
-      setAllContentById(contentMap);
+      contentSetAllById(contentMap);
     });
 
     it('should return all entries of a specific type', () => {
-      const skills = getEntriesByType<IsContentItem>('pet');
+      const skills = contentGetEntriesByType<IsContentItem>('pet');
 
       expect(skills).toHaveLength(2);
       expect(skills).toContain(mockSkill);
@@ -176,28 +176,28 @@ describe('Content Functions', () => {
     });
 
     it('should return empty array for non-existent type', () => {
-      const currency = getEntriesByType<IsContentItem>('currency');
+      const currency = contentGetEntriesByType<IsContentItem>('currency');
 
       expect(currency).toHaveLength(0);
       expect(Array.isArray(currency)).toBe(true);
     });
 
     it('should return only weapons when filtering by weapon type', () => {
-      const weapons = getEntriesByType<IsContentItem>('weapon');
+      const weapons = contentGetEntriesByType<IsContentItem>('weapon');
 
       expect(weapons).toHaveLength(1);
       expect(weapons[0]).toEqual(mockWeapon);
     });
 
     it('should return only armor when filtering by armor type', () => {
-      const armor = getEntriesByType<IsContentItem>('trinket');
+      const armor = contentGetEntriesByType<IsContentItem>('trinket');
 
       expect(armor).toHaveLength(1);
       expect(armor[0]).toEqual(mockArmor);
     });
 
     it('should return only guardians when filtering by guardian type', () => {
-      const guardians = getEntriesByType<IsContentItem>('monster');
+      const guardians = contentGetEntriesByType<IsContentItem>('monster');
 
       expect(guardians).toHaveLength(1);
       expect(guardians[0]).toEqual(mockGuardian);
@@ -221,19 +221,19 @@ describe('Content Functions', () => {
 
       // Should not throw for any content type
       allTypes.forEach((type) => {
-        expect(() => getEntriesByType<IsContentItem>(type)).not.toThrow();
+        expect(() => contentGetEntriesByType<IsContentItem>(type)).not.toThrow();
       });
     });
 
     it('should return empty array when no content is loaded', () => {
-      setAllContentById(new Map());
+      contentSetAllById(new Map());
 
-      const skills = getEntriesByType<IsContentItem>('pet');
+      const skills = contentGetEntriesByType<IsContentItem>('pet');
       expect(skills).toHaveLength(0);
     });
   });
 
-  describe('getEntry', () => {
+  describe('contentGetEntry', () => {
     beforeEach(() => {
       // Set up test data
       const nameToIdMap = new Map([
@@ -249,42 +249,42 @@ describe('Content Functions', () => {
         ['guardian-1', mockGuardian],
       ]);
 
-      setAllIdsByName(nameToIdMap);
-      setAllContentById(contentMap);
+      contentSetAllIdsByName(nameToIdMap);
+      contentSetAllById(contentMap);
     });
 
     it('should return entry when queried by id', () => {
-      const result = getEntry<IsContentItem>('sword-1');
+      const result = contentGetEntry<IsContentItem>('sword-1');
       expect(result).toEqual(mockWeapon);
     });
 
     it('should return entry when queried by name', () => {
-      const result = getEntry<IsContentItem>('Iron Sword');
+      const result = contentGetEntry<IsContentItem>('Iron Sword');
       expect(result).toEqual(mockWeapon);
     });
 
     it('should return undefined for non-existent id', () => {
-      const result = getEntry<IsContentItem>('non-existent-id');
+      const result = contentGetEntry<IsContentItem>('non-existent-id');
       expect(result).toBeUndefined();
     });
 
     it('should return undefined for non-existent name', () => {
-      const result = getEntry<IsContentItem>('Non-existent Item');
+      const result = contentGetEntry<IsContentItem>('Non-existent Item');
       expect(result).toBeUndefined();
     });
 
     it('should return undefined for empty string', () => {
-      const result = getEntry<IsContentItem>('');
+      const result = contentGetEntry<IsContentItem>('');
       expect(result).toBeUndefined();
     });
 
     it('should return undefined for null input', () => {
-      const result = getEntry<IsContentItem>(null as unknown as string);
+      const result = contentGetEntry<IsContentItem>(null as unknown as string);
       expect(result).toBeUndefined();
     });
 
     it('should return undefined for undefined input', () => {
-      const result = getEntry<IsContentItem>(undefined as unknown as string);
+      const result = contentGetEntry<IsContentItem>(undefined as unknown as string);
       expect(result).toBeUndefined();
     });
 
@@ -300,27 +300,27 @@ describe('Content Functions', () => {
         ['sword-1', mockWeapon],
         ['Iron Sword', conflictItem],
       ]);
-      setAllContentById(contentMap);
+      contentSetAllById(contentMap);
 
-      const result = getEntry<IsContentItem>('Iron Sword');
+      const result = contentGetEntry<IsContentItem>('Iron Sword');
       expect(result).toEqual(mockWeapon); // Should return the name lookup result, not direct id
     });
 
     it('should handle name lookup when id lookup fails', () => {
-      const result = getEntry<IsContentItem>('Fireball');
+      const result = contentGetEntry<IsContentItem>('Fireball');
       expect(result).toEqual(mockSkill);
     });
 
     it('should handle multiple entries of same type correctly', () => {
-      const skillResult = getEntry<IsContentItem>('skill-1');
+      const skillResult = contentGetEntry<IsContentItem>('skill-1');
       expect(skillResult).toEqual(mockSkill);
       expect(skillResult?.__type).toBe('pet');
     });
 
     it('should handle case-sensitive lookups', () => {
-      const lowerCase = getEntry<IsContentItem>('iron sword');
-      const upperCase = getEntry<IsContentItem>('IRON SWORD');
-      const correctCase = getEntry<IsContentItem>('Iron Sword');
+      const lowerCase = contentGetEntry<IsContentItem>('iron sword');
+      const upperCase = contentGetEntry<IsContentItem>('IRON SWORD');
+      const correctCase = contentGetEntry<IsContentItem>('Iron Sword');
 
       expect(lowerCase).toBeUndefined();
       expect(upperCase).toBeUndefined();
@@ -338,9 +338,9 @@ describe('Content Functions', () => {
       };
 
       const contentMap = new Map([['sword-1', typedWeapon]]);
-      setAllContentById(contentMap);
+      contentSetAllById(contentMap);
 
-      const result = getEntry<MockWeaponItem>('sword-1');
+      const result = contentGetEntry<MockWeaponItem>('sword-1');
       expect(result).toEqual(typedWeapon);
       expect(result?.damage).toBe(10);
     });
@@ -371,12 +371,12 @@ describe('Content Functions', () => {
         ['lightning-skill-1', lightningBolt],
       ]);
 
-      setAllIdsByName(nameToIdMap);
-      setAllContentById(contentMap);
+      contentSetAllIdsByName(nameToIdMap);
+      contentSetAllById(contentMap);
 
       // Test filtering by type
-      const weapons = getEntriesByType<IsContentItem>('weapon');
-      const skills = getEntriesByType<IsContentItem>('pet');
+      const weapons = contentGetEntriesByType<IsContentItem>('weapon');
+      const skills = contentGetEntriesByType<IsContentItem>('pet');
 
       expect(weapons).toHaveLength(1);
       expect(weapons[0]).toEqual(magicSword);
@@ -384,10 +384,10 @@ describe('Content Functions', () => {
       expect(skills[0]).toEqual(lightningBolt);
 
       // Test getting by name and id
-      expect(getEntry<IsContentItem>('Magic Sword')).toEqual(magicSword);
-      expect(getEntry<IsContentItem>('magic-sword-1')).toEqual(magicSword);
-      expect(getEntry<IsContentItem>('Lightning Bolt')).toEqual(lightningBolt);
-      expect(getEntry<IsContentItem>('lightning-skill-1')).toEqual(
+      expect(contentGetEntry<IsContentItem>('Magic Sword')).toEqual(magicSword);
+      expect(contentGetEntry<IsContentItem>('magic-sword-1')).toEqual(magicSword);
+      expect(contentGetEntry<IsContentItem>('Lightning Bolt')).toEqual(lightningBolt);
+      expect(contentGetEntry<IsContentItem>('lightning-skill-1')).toEqual(
         lightningBolt,
       );
     });
@@ -397,20 +397,20 @@ describe('Content Functions', () => {
       const initialNameMap = new Map([['Item A', 'item-1']]);
       const initialContentMap = new Map([['item-1', mockWeapon]]);
 
-      setAllIdsByName(initialNameMap);
-      setAllContentById(initialContentMap);
+      contentSetAllIdsByName(initialNameMap);
+      contentSetAllById(initialContentMap);
 
-      expect(getEntry<IsContentItem>('Item A')).toEqual(mockWeapon);
+      expect(contentGetEntry<IsContentItem>('Item A')).toEqual(mockWeapon);
 
       // Update content
       const updatedNameMap = new Map([['Item B', 'item-2']]);
       const updatedContentMap = new Map([['item-2', mockArmor]]);
 
-      setAllIdsByName(updatedNameMap);
-      setAllContentById(updatedContentMap);
+      contentSetAllIdsByName(updatedNameMap);
+      contentSetAllById(updatedContentMap);
 
-      expect(getEntry<IsContentItem>('Item A')).toBeUndefined();
-      expect(getEntry<IsContentItem>('Item B')).toEqual(mockArmor);
+      expect(contentGetEntry<IsContentItem>('Item A')).toBeUndefined();
+      expect(contentGetEntry<IsContentItem>('Item B')).toEqual(mockArmor);
     });
 
     it('should maintain data integrity across multiple operations', () => {
@@ -428,16 +428,16 @@ describe('Content Functions', () => {
         largeContentMap.set(`item-${i}`, item);
       }
 
-      setAllIdsByName(largeNameMap);
-      setAllContentById(largeContentMap);
+      contentSetAllIdsByName(largeNameMap);
+      contentSetAllById(largeContentMap);
 
       // Test random access
-      expect(getEntry<IsContentItem>('Item 50')).toBeDefined();
-      expect(getEntry<IsContentItem>('item-75')).toBeDefined();
+      expect(contentGetEntry<IsContentItem>('Item 50')).toBeDefined();
+      expect(contentGetEntry<IsContentItem>('item-75')).toBeDefined();
 
       // Test filtering
-      const weapons = getEntriesByType<IsContentItem>('weapon');
-      const armor = getEntriesByType<IsContentItem>('trinket');
+      const weapons = contentGetEntriesByType<IsContentItem>('weapon');
+      const armor = contentGetEntriesByType<IsContentItem>('trinket');
 
       expect(weapons.length).toBe(50);
       expect(armor.length).toBe(50);

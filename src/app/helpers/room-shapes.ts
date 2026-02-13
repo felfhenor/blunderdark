@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import type {
   GRID_SIZE,
   IsContentItem,
@@ -8,17 +8,17 @@ import type {
   TileOffset,
 } from '@interfaces';
 
-export function allRoomShapes(): (RoomShape & IsContentItem)[] {
-  return getEntriesByType<RoomShape & IsContentItem>('roomshape');
+export function roomShapeAll(): (RoomShape & IsContentItem)[] {
+  return contentGetEntriesByType<RoomShape & IsContentItem>('roomshape');
 }
 
-export function getRoomShape(
+export function roomShapeGet(
   idOrName: string,
 ): (RoomShape & IsContentItem) | undefined {
-  return getEntry<RoomShape & IsContentItem>(idOrName);
+  return contentGetEntry<RoomShape & IsContentItem>(idOrName);
 }
 
-export function getAbsoluteTiles(
+export function roomShapeGetAbsoluteTiles(
   shape: RoomShape,
   anchorX: number,
   anchorY: number,
@@ -29,7 +29,7 @@ export function getAbsoluteTiles(
   }));
 }
 
-export function getShapeBounds(shape: RoomShape): {
+export function roomShapeGetBounds(shape: RoomShape): {
   width: number;
   height: number;
 } {
@@ -48,13 +48,13 @@ export function getShapeBounds(shape: RoomShape): {
   return { width: maxX + 1, height: maxY + 1 };
 }
 
-export function shapeFitsInGrid(
+export function roomShapeFitsInGrid(
   shape: RoomShape,
   anchorX: number,
   anchorY: number,
   gridSize: typeof GRID_SIZE | number,
 ): boolean {
-  return getAbsoluteTiles(shape, anchorX, anchorY).every(
+  return roomShapeGetAbsoluteTiles(shape, anchorX, anchorY).every(
     (tile) =>
       tile.x >= 0 && tile.x < gridSize && tile.y >= 0 && tile.y < gridSize,
   );
@@ -64,7 +64,7 @@ export function shapeFitsInGrid(
  * Rotate a single tile 90° clockwise around the origin within a bounding box.
  * For a shape of size (w, h), rotating 90° CW maps (x, y) → (h - 1 - y, x).
  */
-export function rotateTile90(
+export function roomShapeRotateTile90(
   tile: TileOffset,
   height: number,
 ): TileOffset {
@@ -75,7 +75,7 @@ export function rotateTile90(
  * Rotate all tiles by the given number of 90° clockwise steps (0–3).
  * Returns new tiles and updated width/height.
  */
-export function rotateTiles(
+export function roomShapeRotateTiles(
   tiles: TileOffset[],
   width: number,
   height: number,
@@ -86,7 +86,7 @@ export function rotateTiles(
   let h = height;
 
   for (let i = 0; i < rotation; i++) {
-    currentTiles = currentTiles.map((t) => rotateTile90(t, h));
+    currentTiles = currentTiles.map((t) => roomShapeRotateTile90(t, h));
     [w, h] = [h, w];
   }
 
@@ -97,13 +97,13 @@ export function rotateTiles(
  * Return a new RoomShape with tiles rotated by the given rotation.
  * If rotation is 0, returns the original shape unchanged.
  */
-export function getRotatedShape(
+export function roomShapeGetRotated(
   shape: RoomShape,
   rotation: Rotation,
 ): RoomShape {
   if (rotation === 0) return shape;
 
-  const rotated = rotateTiles(shape.tiles, shape.width, shape.height, rotation);
+  const rotated = roomShapeRotateTiles(shape.tiles, shape.width, shape.height, rotation);
 
   return {
     ...shape,
@@ -121,7 +121,7 @@ const FALLBACK_SHAPE: RoomShape = {
   height: 1,
 };
 
-export function resolveRoomShape(placedRoom: PlacedRoom): RoomShape {
-  const base = getRoomShape(placedRoom.shapeId) ?? FALLBACK_SHAPE;
-  return getRotatedShape(base, placedRoom.rotation ?? 0);
+export function roomShapeResolve(placedRoom: PlacedRoom): RoomShape {
+  const base = roomShapeGet(placedRoom.shapeId) ?? FALLBACK_SHAPE;
+  return roomShapeGetRotated(base, placedRoom.rotation ?? 0);
 }

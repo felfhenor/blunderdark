@@ -49,10 +49,10 @@ const arcaneOverchargePath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const leyLineNexusRoom: RoomDefinition & IsContentItem = {
@@ -173,16 +173,16 @@ mockContent.set('def-goblin', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -256,7 +256,7 @@ describe('Ley Line Nexus: definition', () => {
 
 describe('Ley Line Nexus: base production', () => {
   it('should have base production of 2.0 flux/tick (10 flux/min)', () => {
-    const production = getBaseProduction(LEY_LINE_NEXUS_ID);
+    const production = productionGetBase(LEY_LINE_NEXUS_ID);
     expect(production).toEqual({ flux: 2.0 });
     expect(productionPerMinute(production['flux']!)).toBeCloseTo(10.0);
   });
@@ -264,7 +264,7 @@ describe('Ley Line Nexus: base production', () => {
   it('should produce 0 flux when no workers are assigned', () => {
     const nexus = createPlacedNexus();
     const floor = makeFloor([nexus]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -280,7 +280,7 @@ describe('Ley Line Nexus: base production', () => {
       },
     ];
     const floor = makeFloor([nexus], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production['flux']).toBeCloseTo(2.0);
   });
 });
@@ -296,7 +296,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [nexus, library];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       nexus,
       ['placed-library-1'],
       allRooms,
@@ -314,7 +314,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [nexus, well];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       nexus,
       ['placed-well-1'],
       allRooms,
@@ -332,7 +332,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [nexus1, nexus2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       nexus1,
       ['placed-nexus-2'],
       allRooms,
@@ -357,7 +357,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
       anchorY: 2,
     };
     const allRooms = [nexus, library, well];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       nexus,
       ['placed-library-1', 'placed-well-1'],
       allRooms,
@@ -369,7 +369,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
 
 describe('Ley Line Nexus: Flux Amplifier upgrade', () => {
   it('should have productionMultiplier 1.5 for flux', () => {
-    const paths = getUpgradePaths(LEY_LINE_NEXUS_ID);
+    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID);
     const amplifier = paths.find((p) => p.name === 'Flux Amplifier');
     expect(amplifier).toBeDefined();
     expect(amplifier!.effects).toHaveLength(1);
@@ -384,20 +384,20 @@ describe('Ley Line Nexus: Expanded Nexus upgrade', () => {
     const room = createPlacedNexus({
       appliedUpgradePathId: 'upgrade-expanded-nexus',
     });
-    const effective = getEffectiveMaxInhabitants(room, leyLineNexusRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, leyLineNexusRoom);
     expect(effective).toBe(3);
   });
 
   it('should keep capacity at 2 without upgrade', () => {
     const room = createPlacedNexus();
-    const effective = getEffectiveMaxInhabitants(room, leyLineNexusRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, leyLineNexusRoom);
     expect(effective).toBe(2);
   });
 });
 
 describe('Ley Line Nexus: Arcane Overcharge upgrade', () => {
   it('should have productionMultiplier, fearIncrease, and secondaryProduction', () => {
-    const paths = getUpgradePaths(LEY_LINE_NEXUS_ID);
+    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID);
     const overcharge = paths.find((p) => p.name === 'Arcane Overcharge');
     expect(overcharge).toBeDefined();
     expect(overcharge!.effects).toHaveLength(3);
@@ -424,13 +424,13 @@ describe('Ley Line Nexus: upgrade mutual exclusivity', () => {
     const room = createPlacedNexus({
       appliedUpgradePathId: 'upgrade-flux-amplifier',
     });
-    const result = canApplyUpgrade(room, 'upgrade-expanded-nexus');
+    const result = roomUpgradeCanApply(room, 'upgrade-expanded-nexus');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedNexus();
-    const result = canApplyUpgrade(room, 'upgrade-flux-amplifier');
+    const result = roomUpgradeCanApply(room, 'upgrade-flux-amplifier');
     expect(result.valid).toBe(true);
   });
 });
@@ -455,7 +455,7 @@ describe('Ley Line Nexus: full production with adjacency', () => {
       },
     ];
     const floor = makeFloor([nexus, library], inhabitants);
-    const production = calculateSingleRoomProduction(nexus, floor);
+    const production = productionCalculateSingleRoom(nexus, floor);
     // Base 2.0 * (1 + 0 goblin + 0.2 adjacency) * 1.0 = 2.0 * 1.2 = 2.4
     expect(production['flux']).toBeCloseTo(2.4);
   });

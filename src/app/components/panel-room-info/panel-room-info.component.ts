@@ -1,25 +1,25 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  assignInhabitantToRoom,
-  calculateRoomEfficiency,
-  createConnection,
-  currentFloor,
-  executeRoomRemoval,
-  getAdjacentUnconnectedRooms,
-  getEntry,
-  getEffectiveMaxInhabitants,
-  getRemovalInfo,
-  getRoomConnections,
-  getRoomDefinition,
-  getRoomProductionRates,
-  isRoomRemovable,
-  meetsInhabitantRestriction,
+  inhabitantAssignToRoom,
+  efficiencyCalculateRoom,
+  connectionCreate,
+  floorCurrent,
+  roomRemovalExecute,
+  connectionGetAdjacentUnconnected,
+  contentGetEntry,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomRemovalGetInfo,
+  connectionGetRoomConnections,
+  productionGetRoomDefinition,
+  productionGetRoomRates,
+  roomPlacementIsRemovable,
+  inhabitantMeetsRestriction,
   notifyError,
   notifySuccess,
   productionPerMinute,
-  removeConnection,
-  selectedTile,
-  unassignInhabitantFromRoom,
+  connectionRemove,
+  gridSelectedTile,
+  inhabitantUnassignFromRoom,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -33,8 +33,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 })
 export class PanelRoomInfoComponent {
   public selectedRoom = computed(() => {
-    const tile = selectedTile();
-    const floor = currentFloor();
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
     if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
@@ -43,10 +43,10 @@ export class PanelRoomInfoComponent {
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
     if (!room) return undefined;
 
-    const def = getRoomDefinition(room.roomTypeId);
+    const def = productionGetRoomDefinition(room.roomTypeId);
     if (!def) return undefined;
 
-    const effectiveMax = getEffectiveMaxInhabitants(room, def);
+    const effectiveMax = roomUpgradeGetEffectiveMaxInhabitants(room, def);
 
     return {
       id: room.id,
@@ -59,13 +59,13 @@ export class PanelRoomInfoComponent {
 
   public assignedInhabitants = computed(() => {
     const room = this.selectedRoom();
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!room || !floor) return [];
 
     return floor.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };
@@ -77,7 +77,7 @@ export class PanelRoomInfoComponent {
   public roomProduction = computed(() => {
     const room = this.selectedRoom();
     if (!room) return [];
-    const rates = getRoomProductionRates(room.id);
+    const rates = productionGetRoomRates(room.id);
     return Object.entries(rates)
       .filter(([, v]) => v && v !== 0)
       .map(([type, perTick]) => ({
@@ -88,35 +88,35 @@ export class PanelRoomInfoComponent {
 
   public efficiencyBreakdown = computed(() => {
     const room = this.selectedRoom();
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!room || !floor) return undefined;
 
-    const roomDef = getRoomDefinition(room.roomTypeId);
+    const roomDef = productionGetRoomDefinition(room.roomTypeId);
     if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return undefined;
 
-    return calculateRoomEfficiency(room.placedRoom, floor.inhabitants);
+    return efficiencyCalculateRoom(room.placedRoom, floor.inhabitants);
   });
 
   public eligibleUnassigned = computed(() => {
     const room = this.selectedRoom();
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!room || !floor || room.maxInhabitants === 0) return [];
 
-    const roomDef = getRoomDefinition(room.roomTypeId);
+    const roomDef = productionGetRoomDefinition(room.roomTypeId);
     if (!roomDef) return [];
 
     return floor.inhabitants
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         return def
-          ? meetsInhabitantRestriction(def, roomDef.inhabitantRestriction)
+          ? inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction)
           : false;
       })
       .map((i) => {
-        const def = getEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };
@@ -125,14 +125,14 @@ export class PanelRoomInfoComponent {
 
   public adjacentUnconnected = computed(() => {
     const room = this.selectedRoom();
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!room || !floor) return [];
 
-    const ids = getAdjacentUnconnectedRooms(floor, room.id);
+    const ids = connectionGetAdjacentUnconnected(floor, room.id);
     return ids.map((id) => {
       const placedRoom = floor.rooms.find((r) => r.id === id);
       const def = placedRoom
-        ? getRoomDefinition(placedRoom.roomTypeId)
+        ? productionGetRoomDefinition(placedRoom.roomTypeId)
         : undefined;
       return { id, name: def?.name ?? 'Unknown Room' };
     });
@@ -140,16 +140,16 @@ export class PanelRoomInfoComponent {
 
   public activeConnections = computed(() => {
     const room = this.selectedRoom();
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!room || !floor) return [];
 
-    const connections = getRoomConnections(floor, room.id);
+    const connections = connectionGetRoomConnections(floor, room.id);
     return connections.map((conn) => {
       const otherId =
         conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
       const otherRoom = floor.rooms.find((r) => r.id === otherId);
       const def = otherRoom
-        ? getRoomDefinition(otherRoom.roomTypeId)
+        ? productionGetRoomDefinition(otherRoom.roomTypeId)
         : undefined;
       return {
         connectionId: conn.id,
@@ -163,7 +163,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const result = await createConnection(room.id, otherRoomId);
+    const result = await connectionCreate(room.id, otherRoomId);
     if (result.error) {
       notifyError(result.error);
     } else {
@@ -172,7 +172,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onDisconnect(connectionId: string): Promise<void> {
-    const removed = await removeConnection(connectionId);
+    const removed = await connectionRemove(connectionId);
     if (removed) {
       notifySuccess('Connection removed');
     } else {
@@ -184,7 +184,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const result = await assignInhabitantToRoom(
+    const result = await inhabitantAssignToRoom(
       instanceId,
       room.id,
       room.roomTypeId,
@@ -197,7 +197,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onUnassignInhabitant(instanceId: string): Promise<void> {
-    const removed = await unassignInhabitantFromRoom(instanceId);
+    const removed = await inhabitantUnassignFromRoom(instanceId);
     if (removed) {
       notifySuccess('Inhabitant unassigned');
     } else {
@@ -208,13 +208,13 @@ export class PanelRoomInfoComponent {
   public canRemoveRoom = computed(() => {
     const room = this.selectedRoom();
     if (!room) return false;
-    return isRoomRemovable(room.roomTypeId);
+    return roomPlacementIsRemovable(room.roomTypeId);
   });
 
   public removalInfo = computed(() => {
     const room = this.selectedRoom();
     if (!room) return undefined;
-    return getRemovalInfo(room.id);
+    return roomRemovalGetInfo(room.id);
   });
 
   public removalSwalTitle = computed(() => {
@@ -253,7 +253,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const result = await executeRoomRemoval(room.id);
+    const result = await roomRemovalExecute(room.id);
     if (result.success) {
       let message = `${room.name} demolished`;
       if (result.displacedNames && result.displacedNames.length > 0) {

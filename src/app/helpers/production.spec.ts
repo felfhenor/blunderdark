@@ -141,10 +141,10 @@ vi.mock('@helpers/content', () => {
   });
 
   return {
-    getEntry: vi.fn((id: string) => entries.get(id)),
-    getEntriesByType: vi.fn(() => []),
+    contentGetEntry: vi.fn((id: string) => entries.get(id)),
+    contentGetEntriesByType: vi.fn(() => []),
     getEntries: vi.fn(),
-    allIdsByName: vi.fn(() => new Map()),
+    contentAllIdsByName: vi.fn(() => new Map()),
   };
 });
 
@@ -155,56 +155,56 @@ import type {
   PlacedRoom,
 } from '@interfaces';
 import {
-  calculateAdjacencyBonus,
-  calculateConditionalModifiers,
-  calculateInhabitantBonus,
-  calculateProductionBreakdowns,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getActiveAdjacencyBonuses,
-  getBaseProduction,
-  getRoomDefinition,
-  processProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateConditionalModifiers,
+  productionCalculateInhabitantBonus,
+  productionCalculateBreakdowns,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetActiveAdjacencyBonuses,
+  productionGetBase,
+  productionGetRoomDefinition,
+  productionProcess,
   productionPerMinute,
 } from '@helpers/production';
 
-describe('getBaseProduction', () => {
+describe('productionGetBase', () => {
   it('should return production for a room type with production', () => {
-    const production = getBaseProduction('room-crystal-mine');
+    const production = productionGetBase('room-crystal-mine');
     expect(production).toEqual({ crystals: 1.0 });
   });
 
   it('should return production for throne room', () => {
-    const production = getBaseProduction('room-throne');
+    const production = productionGetBase('room-throne');
     expect(production).toEqual({ gold: 0.5 });
   });
 
   it('should return empty object for room with no production', () => {
-    const production = getBaseProduction('room-barracks');
+    const production = productionGetBase('room-barracks');
     expect(production).toEqual({});
   });
 
   it('should return empty object for non-existent room type', () => {
-    const production = getBaseProduction('room-nonexistent');
+    const production = productionGetBase('room-nonexistent');
     expect(production).toEqual({});
   });
 });
 
-describe('getRoomDefinition', () => {
+describe('productionGetRoomDefinition', () => {
   it('should return room definition for valid id', () => {
-    const room = getRoomDefinition('room-crystal-mine');
+    const room = productionGetRoomDefinition('room-crystal-mine');
     expect(room).toBeDefined();
     expect(room!.name).toBe('Crystal Mine');
     expect(room!.requiresWorkers).toBe(true);
   });
 
   it('should return undefined for non-existent id', () => {
-    const room = getRoomDefinition('room-nonexistent');
+    const room = productionGetRoomDefinition('room-nonexistent');
     expect(room).toBeUndefined();
   });
 });
 
-describe('calculateInhabitantBonus', () => {
+describe('productionCalculateInhabitantBonus', () => {
   const placedRoom: PlacedRoom = {
     id: 'placed-room-1',
     roomTypeId: 'room-crystal-mine',
@@ -214,7 +214,7 @@ describe('calculateInhabitantBonus', () => {
   };
 
   it('should return 0 bonus and hasWorkers false when no inhabitants assigned', () => {
-    const result = calculateInhabitantBonus(placedRoom, []);
+    const result = productionCalculateInhabitantBonus(placedRoom, []);
     expect(result.bonus).toBe(0);
     expect(result.hasWorkers).toBe(false);
   });
@@ -229,7 +229,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-other',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     expect(result.bonus).toBe(0);
     expect(result.hasWorkers).toBe(false);
   });
@@ -244,7 +244,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Goblin: workerEfficiency 1.0 → (1.0 - 1.0) = 0, plus production_bonus 0.2 = 0.2
     expect(result.bonus).toBeCloseTo(0.2);
     expect(result.hasWorkers).toBe(true);
@@ -267,7 +267,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Two Goblins: (0 + 0.2) * 2 = 0.4
     expect(result.bonus).toBeCloseTo(0.4);
     expect(result.hasWorkers).toBe(true);
@@ -290,7 +290,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Goblin: (1.0-1.0) + 0.2 = 0.2
     // Myconid: (1.3-1.0) + 0.15 = 0.45
     // Total: 0.65
@@ -308,7 +308,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Skeleton: (0.7-1.0) = -0.3, no production_bonus trait (defense_bonus ignored)
     expect(result.bonus).toBeCloseTo(-0.3);
     expect(result.hasWorkers).toBe(true);
@@ -324,7 +324,7 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Skeleton has defense_bonus trait, not production_bonus — should be ignored
     // Only workerEfficiency contributes: (0.7 - 1.0) = -0.3
     expect(result.bonus).toBeCloseTo(-0.3);
@@ -340,14 +340,14 @@ describe('calculateInhabitantBonus', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateInhabitantBonus(placedRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Unknown definition is skipped, but inhabitant was assigned so hasWorkers is true
     expect(result.bonus).toBe(0);
     expect(result.hasWorkers).toBe(true);
   });
 });
 
-describe('calculateAdjacencyBonus', () => {
+describe('productionCalculateAdjacencyBonus', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1',
     roomTypeId: 'room-crystal-mine',
@@ -383,18 +383,18 @@ describe('calculateAdjacencyBonus', () => {
   const allRooms = [crystalMine, darkForge, throne, barracks];
 
   it('should return 0 when room has no adjacency bonus rules', () => {
-    const bonus = calculateAdjacencyBonus(throne, ['placed-mine-1'], allRooms);
+    const bonus = productionCalculateAdjacencyBonus(throne, ['placed-mine-1'], allRooms);
     expect(bonus).toBe(0);
   });
 
   it('should return 0 when room has no adjacent rooms', () => {
-    const bonus = calculateAdjacencyBonus(crystalMine, [], allRooms);
+    const bonus = productionCalculateAdjacencyBonus(crystalMine, [], allRooms);
     expect(bonus).toBe(0);
   });
 
   it('should return bonus when adjacent to a matching room type', () => {
     // Crystal Mine gets +10% when adjacent to Dark Forge
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       crystalMine,
       ['placed-forge-1'],
       allRooms,
@@ -404,7 +404,7 @@ describe('calculateAdjacencyBonus', () => {
 
   it('should return 0 when adjacent rooms do not match bonus rules', () => {
     // Crystal Mine only has bonus for Dark Forge, not Throne Room
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       crystalMine,
       ['placed-throne-1'],
       allRooms,
@@ -422,7 +422,7 @@ describe('calculateAdjacencyBonus', () => {
     };
     const rooms = [...allRooms, secondForge];
     // Crystal Mine adjacent to two Dark Forges: 0.1 + 0.1 = 0.2
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       crystalMine,
       ['placed-forge-1', 'placed-forge-2'],
       rooms,
@@ -432,7 +432,7 @@ describe('calculateAdjacencyBonus', () => {
 
   it('should work for Dark Forge adjacent to Crystal Mine', () => {
     // Dark Forge gets +15% when adjacent to Crystal Mine
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       darkForge,
       ['placed-mine-1'],
       allRooms,
@@ -448,7 +448,7 @@ describe('calculateAdjacencyBonus', () => {
       anchorX: 0,
       anchorY: 0,
     };
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       unknownRoom,
       ['placed-forge-1'],
       allRooms,
@@ -457,7 +457,7 @@ describe('calculateAdjacencyBonus', () => {
   });
 });
 
-describe('calculateConditionalModifiers', () => {
+describe('productionCalculateConditionalModifiers', () => {
   const placedRoom: PlacedRoom = {
     id: 'placed-room-1',
     roomTypeId: 'room-crystal-mine',
@@ -467,7 +467,7 @@ describe('calculateConditionalModifiers', () => {
   };
 
   it('should return 1.0 when no inhabitants are assigned', () => {
-    const result = calculateConditionalModifiers(placedRoom, []);
+    const result = productionCalculateConditionalModifiers(placedRoom, []);
     expect(result).toBe(1.0);
   });
 
@@ -488,7 +488,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     expect(result).toBe(1.0);
   });
 
@@ -502,7 +502,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     expect(result).toBe(0.5);
   });
 
@@ -516,7 +516,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     expect(result).toBe(0.75);
   });
 
@@ -537,7 +537,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     // Per-creature averaging: scared (0.5) + hungry (0.75) / 2 = 0.625
     expect(result).toBeCloseTo(0.625);
   });
@@ -559,7 +559,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     // Two scared inhabitants: (0.5 + 0.5) / 2 = 0.5
     expect(result).toBe(0.5);
   });
@@ -574,7 +574,7 @@ describe('calculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-other',
       },
     ];
-    const result = calculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
     expect(result).toBe(1.0);
   });
 });
@@ -655,10 +655,10 @@ function makeGameState(
   };
 }
 
-describe('calculateTotalProduction', () => {
+describe('productionCalculateTotal', () => {
   it('should return empty production when no floors have rooms', () => {
     const floor = makeFloor([]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -671,7 +671,7 @@ describe('calculateTotalProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([throne]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({ gold: 0.5 });
   });
 
@@ -684,7 +684,7 @@ describe('calculateTotalProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([mine]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 
@@ -706,7 +706,7 @@ describe('calculateTotalProduction', () => {
       },
     ];
     const floor = makeFloor([mine], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 modifier = 1.2
     expect(production['crystals']).toBeCloseTo(1.2);
   });
@@ -727,7 +727,7 @@ describe('calculateTotalProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([throne, throne2]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Two thrones: 0.5 + 0.5 = 1.0 gold
     expect(production['gold']).toBeCloseTo(1.0);
   });
@@ -767,7 +767,7 @@ describe('calculateTotalProduction', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     // Mine: base 1.0 * (1 + (-0.3 skeleton) + 0.1 adj) * 1.0 = 1.0 * 0.8 = 0.8
     // Forge: base 1.2 * (1 + (-0.3 skeleton) + 0.15 adj) * 1.0 = 1.2 * 0.85 = 1.02
     expect(production['crystals']).toBeCloseTo(0.8);
@@ -775,7 +775,7 @@ describe('calculateTotalProduction', () => {
   });
 });
 
-describe('processProduction', () => {
+describe('productionProcess', () => {
   it('should add production to resources', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne',
@@ -786,7 +786,7 @@ describe('processProduction', () => {
     };
     const floor = makeFloor([throne]);
     const state = makeGameState([floor]);
-    processProduction(state);
+    productionProcess(state);
     // Throne produces 0.5 gold
     expect(state.world.resources.gold.current).toBeCloseTo(0.5);
   });
@@ -801,7 +801,7 @@ describe('processProduction', () => {
     };
     const floor = makeFloor([throne]);
     const state = makeGameState([floor], { gold: { current: 999.8, max: 1000 } });
-    processProduction(state);
+    productionProcess(state);
     // Should cap at 1000, not 1000.3
     expect(state.world.resources.gold.current).toBe(1000);
   });
@@ -816,13 +816,13 @@ describe('processProduction', () => {
     };
     const floor = makeFloor([barracks]);
     const state = makeGameState([floor]);
-    processProduction(state);
+    productionProcess(state);
     expect(state.world.resources.gold.current).toBe(0);
     expect(state.world.resources.crystals.current).toBe(0);
   });
 });
 
-describe('calculateSingleRoomProduction', () => {
+describe('productionCalculateSingleRoom', () => {
   it('should return production for a passive room', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne',
@@ -832,7 +832,7 @@ describe('calculateSingleRoomProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([throne]);
-    const production = calculateSingleRoomProduction(throne, floor);
+    const production = productionCalculateSingleRoom(throne, floor);
     expect(production['gold']).toBeCloseTo(0.5);
   });
 
@@ -845,7 +845,7 @@ describe('calculateSingleRoomProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([mine]);
-    const production = calculateSingleRoomProduction(mine, floor);
+    const production = productionCalculateSingleRoom(mine, floor);
     expect(production).toEqual({});
   });
 
@@ -867,7 +867,7 @@ describe('calculateSingleRoomProduction', () => {
       },
     ];
     const floor = makeFloor([mine], inhabitants);
-    const production = calculateSingleRoomProduction(mine, floor);
+    const production = productionCalculateSingleRoom(mine, floor);
     // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 = 1.2
     expect(production['crystals']).toBeCloseTo(1.2);
   });
@@ -897,7 +897,7 @@ describe('calculateSingleRoomProduction', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const production = calculateSingleRoomProduction(mine, floor);
+    const production = productionCalculateSingleRoom(mine, floor);
     // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
     expect(production['crystals']).toBeCloseTo(1.3);
   });
@@ -911,7 +911,7 @@ describe('calculateSingleRoomProduction', () => {
       anchorY: 0,
     };
     const floor = makeFloor([unknown]);
-    const production = calculateSingleRoomProduction(unknown, floor);
+    const production = productionCalculateSingleRoom(unknown, floor);
     expect(production).toEqual({});
   });
 });
@@ -928,7 +928,7 @@ describe('production changes on assignment state changes', () => {
 
     // No inhabitants assigned
     const floorEmpty = makeFloor([mine], []);
-    const prodEmpty = calculateSingleRoomProduction(mine, floorEmpty);
+    const prodEmpty = productionCalculateSingleRoom(mine, floorEmpty);
     expect(prodEmpty).toEqual({});
 
     // Assign one inhabitant
@@ -941,7 +941,7 @@ describe('production changes on assignment state changes', () => {
         assignedRoomId: 'placed-mine',
       },
     ]);
-    const prodAssigned = calculateSingleRoomProduction(mine, floorAssigned);
+    const prodAssigned = productionCalculateSingleRoom(mine, floorAssigned);
     expect(prodAssigned['crystals']).toBeCloseTo(1.2);
   });
 
@@ -971,7 +971,7 @@ describe('production changes on assignment state changes', () => {
         assignedRoomId: 'placed-mine',
       },
     ]);
-    const prodTwo = calculateSingleRoomProduction(mine, floorTwo);
+    const prodTwo = productionCalculateSingleRoom(mine, floorTwo);
     // Base 1.0 * (1 + 0.2 + 0.2) = 1.4
     expect(prodTwo['crystals']).toBeCloseTo(1.4);
 
@@ -992,7 +992,7 @@ describe('production changes on assignment state changes', () => {
         assignedRoomId: undefined,
       },
     ]);
-    const prodOne = calculateSingleRoomProduction(mine, floorOne);
+    const prodOne = productionCalculateSingleRoom(mine, floorOne);
     // Base 1.0 * (1 + 0.2) = 1.2
     expect(prodOne['crystals']).toBeCloseTo(1.2);
   });
@@ -1008,7 +1008,7 @@ describe('production changes on assignment state changes', () => {
 
     // No inhabitants — worker room produces nothing
     const floorsEmpty = [makeFloor([mine], [])];
-    const totalEmpty = calculateTotalProduction(floorsEmpty);
+    const totalEmpty = productionCalculateTotal(floorsEmpty);
     expect(totalEmpty).toEqual({});
 
     // Assign inhabitant — now produces
@@ -1023,14 +1023,14 @@ describe('production changes on assignment state changes', () => {
         },
       ]),
     ];
-    const totalAssigned = calculateTotalProduction(floorsAssigned);
+    const totalAssigned = productionCalculateTotal(floorsAssigned);
     expect(totalAssigned['crystals']).toBeCloseTo(1.2);
   });
 });
 
 describe('productionPerMinute', () => {
   it('should convert per-tick rate to per-minute', () => {
-    // TICKS_PER_MINUTE = 5
+    // GAME_TIME_TICKS_PER_MINUTE = 5
     expect(productionPerMinute(1.0)).toBe(5.0);
   });
 
@@ -1043,7 +1043,7 @@ describe('productionPerMinute', () => {
   });
 });
 
-describe('getActiveAdjacencyBonuses', () => {
+describe('productionGetActiveAdjacencyBonuses', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1',
     roomTypeId: 'room-crystal-mine',
@@ -1070,20 +1070,20 @@ describe('getActiveAdjacencyBonuses', () => {
 
   it('should return empty array when room has no bonus rules', () => {
     const floor = makeFloor([throne, crystalMine]);
-    const bonuses = getActiveAdjacencyBonuses(throne, floor);
+    const bonuses = productionGetActiveAdjacencyBonuses(throne, floor);
     expect(bonuses).toEqual([]);
   });
 
   it('should return empty array when no matching adjacent rooms', () => {
     const floor = makeFloor([crystalMine, throne]);
-    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    const bonuses = productionGetActiveAdjacencyBonuses(crystalMine, floor);
     expect(bonuses).toEqual([]);
   });
 
   it('should return active bonus when adjacent to matching room', () => {
     // Mine at (0,0)-(1,0), Forge at (2,0)-(3,0) — adjacent
     const floor = makeFloor([crystalMine, darkForge]);
-    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    const bonuses = productionGetActiveAdjacencyBonuses(crystalMine, floor);
     expect(bonuses).toHaveLength(1);
     expect(bonuses[0].sourceRoomId).toBe('placed-forge-1');
     expect(bonuses[0].sourceRoomName).toBe('Dark Forge');
@@ -1093,7 +1093,7 @@ describe('getActiveAdjacencyBonuses', () => {
 
   it('should return bonuses bidirectionally', () => {
     const floor = makeFloor([crystalMine, darkForge]);
-    const forgeBonuses = getActiveAdjacencyBonuses(darkForge, floor);
+    const forgeBonuses = productionGetActiveAdjacencyBonuses(darkForge, floor);
     expect(forgeBonuses).toHaveLength(1);
     expect(forgeBonuses[0].sourceRoomName).toBe('Crystal Mine');
     expect(forgeBonuses[0].bonus).toBeCloseTo(0.15);
@@ -1108,7 +1108,7 @@ describe('getActiveAdjacencyBonuses', () => {
       anchorY: 1,
     };
     const floor = makeFloor([crystalMine, darkForge, secondForge]);
-    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    const bonuses = productionGetActiveAdjacencyBonuses(crystalMine, floor);
     expect(bonuses).toHaveLength(2);
     expect(bonuses.every((b) => b.bonus === 0.1)).toBe(true);
   });
@@ -1122,7 +1122,7 @@ describe('getActiveAdjacencyBonuses', () => {
       anchorY: 10,
     };
     const floor = makeFloor([crystalMine, farForge]);
-    const bonuses = getActiveAdjacencyBonuses(crystalMine, floor);
+    const bonuses = productionGetActiveAdjacencyBonuses(crystalMine, floor);
     expect(bonuses).toEqual([]);
   });
 });
@@ -1155,13 +1155,13 @@ describe('adjacency bonus deactivation on removal', () => {
 
     // With forge adjacent: bonus applies
     const floorWithForge = makeFloor([mine, forge], inhabitants);
-    const prodWith = calculateSingleRoomProduction(mine, floorWithForge);
+    const prodWith = productionCalculateSingleRoom(mine, floorWithForge);
     // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
     expect(prodWith['crystals']).toBeCloseTo(1.3);
 
     // After removing forge: bonus gone
     const floorWithoutForge = makeFloor([mine], inhabitants);
-    const prodWithout = calculateSingleRoomProduction(mine, floorWithoutForge);
+    const prodWithout = productionCalculateSingleRoom(mine, floorWithoutForge);
     // Base 1.0 * (1 + 0.2 goblin) * 1.0 = 1.2
     expect(prodWithout['crystals']).toBeCloseTo(1.2);
   });
@@ -1194,17 +1194,17 @@ describe('adjacency bonus deactivation on removal', () => {
     // Mine on floor 1, forge on floor 2 — no cross-floor adjacency
     const floor1 = makeFloor([mine], inhabitants);
     const floor2 = makeFloor([forge]);
-    const production = calculateTotalProduction([floor1, floor2]);
+    const production = productionCalculateTotal([floor1, floor2]);
     // Mine gets NO adjacency bonus (forge is on different floor)
     // Base 1.0 * (1 + 0.2 goblin) = 1.2
     expect(production['crystals']).toBeCloseTo(1.2);
   });
 });
 
-describe('calculateProductionBreakdowns', () => {
+describe('productionCalculateBreakdowns', () => {
   it('should return empty object when no rooms produce', () => {
     const floor = makeFloor([]);
-    const breakdowns = calculateProductionBreakdowns([floor]);
+    const breakdowns = productionCalculateBreakdowns([floor]);
     expect(breakdowns).toEqual({});
   });
 
@@ -1217,7 +1217,7 @@ describe('calculateProductionBreakdowns', () => {
       anchorY: 0,
     };
     const floor = makeFloor([throne]);
-    const breakdowns = calculateProductionBreakdowns([floor]);
+    const breakdowns = productionCalculateBreakdowns([floor]);
     expect(breakdowns['gold']).toBeDefined();
     expect(breakdowns['gold'].base).toBeCloseTo(0.5);
     expect(breakdowns['gold'].inhabitantBonus).toBe(0);
@@ -1244,7 +1244,7 @@ describe('calculateProductionBreakdowns', () => {
       },
     ];
     const floor = makeFloor([mine], inhabitants);
-    const breakdowns = calculateProductionBreakdowns([floor]);
+    const breakdowns = productionCalculateBreakdowns([floor]);
     expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
     expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
     expect(breakdowns['crystals'].final).toBeCloseTo(1.2);
@@ -1282,7 +1282,7 @@ describe('calculateProductionBreakdowns', () => {
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
-    const breakdowns = calculateProductionBreakdowns([floor]);
+    const breakdowns = productionCalculateBreakdowns([floor]);
     // Mine: base 1.0, iBonus 0.2, aBonus 0.1, final = 1.0 * (1 + 0.2 + 0.1) = 1.3
     expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
     expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);

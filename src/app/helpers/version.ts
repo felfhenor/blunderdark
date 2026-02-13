@@ -1,8 +1,8 @@
 import { signal } from '@angular/core';
 import type { VersionInfo } from '@interfaces';
 
-export const localVersion = signal<VersionInfo | undefined>(undefined);
-export const liveVersion = signal<VersionInfo | undefined>(undefined);
+export const versionLocal = signal<VersionInfo | undefined>(undefined);
+export const versionLive = signal<VersionInfo | undefined>(undefined);
 
 export function versionInfoToSemver(versionInfo: VersionInfo) {
   if (versionInfo.distance >= 0 && versionInfo.tag) {

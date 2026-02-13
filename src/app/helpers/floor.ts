@@ -1,7 +1,7 @@
 import { computed } from '@angular/core';
 import { defaultFloor } from '@helpers/defaults';
-import { createEmptyGrid } from '@helpers/grid';
-import { canAfford, payCost } from '@helpers/resources';
+import { gridCreateEmpty } from '@helpers/grid';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
@@ -10,9 +10,9 @@ const CRYSTALS_PER_DEPTH = 50;
 const GOLD_PER_DEPTH = 30;
 
 /**
- * Get the current floor based on currentFloorIndex.
+ * Get the current floor based on floorCurrentIndex.
  */
-export const currentFloor = computed<Floor | undefined>(() => {
+export const floorCurrent = computed<Floor | undefined>(() => {
   const state = gamestate();
   const index = state.world.currentFloorIndex;
   return state.world.floors[index];
@@ -21,22 +21,22 @@ export const currentFloor = computed<Floor | undefined>(() => {
 /**
  * Get the biome of the current floor.
  */
-export const currentFloorBiome = computed<BiomeType>(() => {
-  const floor = currentFloor();
+export const floorCurrentBiome = computed<BiomeType>(() => {
+  const floor = floorCurrent();
   return floor?.biome ?? 'neutral';
 });
 
 /**
  * Get all floors.
  */
-export const allFloors = computed<Floor[]>(() => {
+export const floorAll = computed<Floor[]>(() => {
   return gamestate().world.floors;
 });
 
 /**
  * Get a floor by its ID.
  */
-export function getFloor(floorId: string): Floor | undefined {
+export function floorGet(floorId: string): Floor | undefined {
   return gamestate().world.floors.find((f) => f.id === floorId);
 }
 
@@ -44,8 +44,8 @@ export function getFloor(floorId: string): Floor | undefined {
  * Get the biome of a specific floor by ID.
  * Returns 'neutral' if floor not found.
  */
-export function getFloorBiome(floorId: string): BiomeType {
-  const floor = getFloor(floorId);
+export function floorGetBiome(floorId: string): BiomeType {
+  const floor = floorGet(floorId);
   return floor?.biome ?? 'neutral';
 }
 
@@ -53,14 +53,14 @@ export function getFloorBiome(floorId: string): BiomeType {
  * Get a floor by its depth (1-based).
  * Returns undefined if no floor exists at that depth.
  */
-export function getFloorByDepth(depth: number): Floor | undefined {
+export function floorGetByDepth(depth: number): Floor | undefined {
   return gamestate().world.floors.find((f) => f.depth === depth);
 }
 
 /**
  * Get the current floor index.
  */
-export const currentFloorIndex = computed<number>(() => {
+export const floorCurrentIndex = computed<number>(() => {
   return gamestate().world.currentFloorIndex;
 });
 
@@ -68,7 +68,7 @@ export const currentFloorIndex = computed<number>(() => {
  * Set the current floor by index.
  * Returns false if index is out of bounds.
  */
-export async function setCurrentFloorByIndex(index: number): Promise<boolean> {
+export async function floorSetCurrentByIndex(index: number): Promise<boolean> {
   const floors = gamestate().world.floors;
   if (index < 0 || index >= floors.length) {
     return false;
@@ -88,21 +88,21 @@ export async function setCurrentFloorByIndex(index: number): Promise<boolean> {
  * Set the current floor by floor ID.
  * Returns false if floor not found.
  */
-export async function setCurrentFloorById(floorId: string): Promise<boolean> {
+export async function floorSetCurrentById(floorId: string): Promise<boolean> {
   const floors = gamestate().world.floors;
   const index = floors.findIndex((f) => f.id === floorId);
   if (index === -1) {
     return false;
   }
 
-  return setCurrentFloorByIndex(index);
+  return floorSetCurrentByIndex(index);
 }
 
 /**
  * Calculate the resource cost to create a floor at the given depth.
  * Costs scale linearly: 50 crystals + 30 gold per depth level.
  */
-export function getFloorCreationCost(depth: number): ResourceCost {
+export function floorGetCreationCost(depth: number): ResourceCost {
   return {
     crystals: CRYSTALS_PER_DEPTH * depth,
     gold: GOLD_PER_DEPTH * depth,
@@ -113,7 +113,7 @@ export function getFloorCreationCost(depth: number): ResourceCost {
  * Check whether a new floor can be created.
  * Returns an object with whether creation is possible and a reason if not.
  */
-export function canCreateFloor(): { canCreate: boolean; reason?: string } {
+export function floorCanCreate(): { canCreate: boolean; reason?: string } {
   const floors = gamestate().world.floors;
 
   if (floors.length >= MAX_FLOORS) {
@@ -121,9 +121,9 @@ export function canCreateFloor(): { canCreate: boolean; reason?: string } {
   }
 
   const nextDepth = floors.length + 1;
-  const cost = getFloorCreationCost(nextDepth);
+  const cost = floorGetCreationCost(nextDepth);
 
-  if (!canAfford(cost)) {
+  if (!resourceCanAfford(cost)) {
     return { canCreate: false, reason: 'Insufficient resources' };
   }
 
@@ -135,18 +135,18 @@ export function canCreateFloor(): { canCreate: boolean; reason?: string } {
  * Deducts resource costs and adds the floor to the game state.
  * Returns the new floor on success, or undefined if creation failed.
  */
-export async function createFloor(
+export async function floorCreate(
   biome: BiomeType = 'neutral',
 ): Promise<Floor | undefined> {
-  const { canCreate } = canCreateFloor();
+  const { canCreate } = floorCanCreate();
   if (!canCreate) {
     return undefined;
   }
 
   const nextDepth = gamestate().world.floors.length + 1;
-  const cost = getFloorCreationCost(nextDepth);
+  const cost = floorGetCreationCost(nextDepth);
 
-  const paid = await payCost(cost);
+  const paid = await resourcePayCost(cost);
   if (!paid) {
     return undefined;
   }
@@ -172,7 +172,7 @@ export async function createFloor(
  * - Incomplete floor objects: fills missing fields from defaults
  * - Invalid currentFloorIndex: clamps to valid range
  */
-export function migrateFloors(world: Partial<GameStateWorld>): {
+export function floorMigrate(world: Partial<GameStateWorld>): {
   floors: Floor[];
   currentFloorIndex: number;
 } {
@@ -184,7 +184,7 @@ export function migrateFloors(world: Partial<GameStateWorld>): {
     // Old save format or empty: create floor 1 from top-level world data
     const floor: Floor = {
       ...defaultFloor(1),
-      grid: world.grid ?? createEmptyGrid(),
+      grid: world.grid ?? gridCreateEmpty(),
       hallways: world.hallways ?? [],
       inhabitants: world.inhabitants ?? [],
     };

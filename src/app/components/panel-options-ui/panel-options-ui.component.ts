@@ -10,7 +10,7 @@ import { OptionsBaseComponent } from '@components/panel-options/option-base-page
   styleUrl: './panel-options-ui.component.scss',
 })
 export class PanelOptionsUIComponent extends OptionsBaseComponent {
-  public currentTheme = signal<string>(this.getOption('uiTheme') as string);
+  public currentTheme = signal<string>(this.optionsGet('uiTheme') as string);
 
   public readonly themes = [
     { name: 'acid', type: 'light' },

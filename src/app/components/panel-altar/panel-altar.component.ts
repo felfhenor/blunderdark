@@ -1,24 +1,24 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  altarFearReductionAura,
-  altarLevel,
-  applyAltarUpgrade,
-  canAfford,
-  canRecruit,
-  currentFloor,
-  currentInhabitantCount,
-  findRoomIdByRole,
+  altarRoomFearReductionAura,
+  altarRoomLevel,
+  altarRoomApplyUpgrade,
+  resourceCanAfford,
+  altarRoomCanRecruit,
+  floorCurrent,
+  recruitmentCurrentInhabitantCount,
+  roomRoleFindById,
   gamestate,
-  getNextAltarUpgrade,
-  getRecruitableInhabitants,
-  getRecruitShortfall,
-  isRosterFull,
-  maxInhabitantCount,
+  altarRoomGetNextUpgrade,
+  recruitmentGetRecruitable,
+  recruitmentGetShortfall,
+  recruitmentIsRosterFull,
+  recruitmentMaxInhabitantCount,
   notifyError,
   notifySuccess,
-  recruitInhabitant,
-  selectedTile,
-  unlockedTier,
+  recruitmentRecruit,
+  gridSelectedTile,
+  recruitmentUnlockedTier,
 } from '@helpers';
 import type {
   InhabitantDefinition,
@@ -43,48 +43,48 @@ type RecruitableEntry = {
 })
 export class PanelAltarComponent {
   public altarRoom = computed(() => {
-    const tile = selectedTile();
-    const floor = currentFloor();
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
     if (!tile || !floor) return undefined;
 
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
     const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('altar')) return undefined;
+    if (!room || room.roomTypeId !== roomRoleFindById('altar')) return undefined;
 
     return room;
   });
 
-  public fearReduction = altarFearReductionAura;
-  public recruitmentAvailable = canRecruit;
-  public level = altarLevel;
-  public rosterFull = isRosterFull;
-  public inhabitantCount = currentInhabitantCount;
-  public maxInhabitants = maxInhabitantCount;
-  public tierUnlocked = unlockedTier;
+  public fearReduction = altarRoomFearReductionAura;
+  public recruitmentAvailable = altarRoomCanRecruit;
+  public level = altarRoomLevel;
+  public rosterFull = recruitmentIsRosterFull;
+  public inhabitantCount = recruitmentCurrentInhabitantCount;
+  public maxInhabitants = recruitmentMaxInhabitantCount;
+  public tierUnlocked = recruitmentUnlockedTier;
 
   public nextUpgrade = computed<RoomUpgradePath | undefined>(() => {
-    return getNextAltarUpgrade(gamestate().world.floors);
+    return altarRoomGetNextUpgrade(gamestate().world.floors);
   });
 
   public canAffordUpgrade = computed(() => {
     const upgrade = this.nextUpgrade();
     if (!upgrade) return false;
-    return canAfford(upgrade.cost);
+    return resourceCanAfford(upgrade.cost);
   });
 
   public recruitableInhabitants = computed<RecruitableEntry[]>(() => {
     const state = gamestate();
-    const defs = getRecruitableInhabitants();
+    const defs = recruitmentGetRecruitable();
     const tier = this.tierUnlocked();
 
     return defs.map((def) => {
       const locked = def.tier > tier;
-      const affordable = !locked && canAfford(def.cost);
+      const affordable = !locked && resourceCanAfford(def.cost);
       const shortfall =
         !locked && !affordable
-          ? getRecruitShortfall(def.cost, state.world.resources)
+          ? recruitmentGetShortfall(def.cost, state.world.resources)
           : [];
       const costEntries = Object.entries(def.cost)
         .filter(([, amount]) => amount && amount > 0)
@@ -126,7 +126,7 @@ export class PanelAltarComponent {
     const upgrade = this.nextUpgrade();
     if (!upgrade) return;
 
-    const result = await applyAltarUpgrade(upgrade.id);
+    const result = await altarRoomApplyUpgrade(upgrade.id);
     if (result.success) {
       notifySuccess(`Altar upgraded to ${upgrade.name}`);
     } else if (result.error) {
@@ -135,7 +135,7 @@ export class PanelAltarComponent {
   }
 
   public async onRecruit(def: InhabitantDefinition): Promise<void> {
-    const result = await recruitInhabitant(def);
+    const result = await recruitmentRecruit(def);
     if (result.success) {
       notifySuccess(`Recruited ${def.name}!`);
     } else if (result.error) {

@@ -1,26 +1,26 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  clearPreviewPosition,
-  currentFloor,
-  deselectTile,
-  executeRoomPlacement,
-  exitHallwayBuildMode,
-  exitPlacementMode,
-  getEffectiveMaxInhabitants,
-  getRoomDefinition,
-  hallwayPreviewTileSet,
-  hallwaySourceRoomId,
-  handleHallwayTileClick,
-  isHallwayBuildMode,
+  roomPlacementClearPreviewPosition,
+  floorCurrent,
+  gridDeselectTile,
+  roomPlacementExecute,
+  hallwayPlacementExit,
+  roomPlacementExitMode,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  productionGetRoomDefinition,
+  hallwayPlacementPreviewTileSet,
+  hallwayPlacementSourceRoomId,
+  hallwayPlacementHandleTileClick,
+  hallwayPlacementIsBuildMode,
   notifyError,
-  placementPreview,
-  placementPreviewShape,
-  rotatePlacement,
-  selectedTile,
-  selectTile,
-  updatePreviewPosition,
+  roomPlacementPreview,
+  roomPlacementPreviewShape,
+  roomPlacementRotate,
+  gridSelectedTile,
+  gridSelectTile,
+  roomPlacementUpdatePreviewPosition,
 } from '@helpers';
-import { createEmptyGrid } from '@helpers/grid';
+import { gridCreateEmpty } from '@helpers/grid';
 
 const ROOM_COLORS: Record<string, string> = {};
 const COLOR_PALETTE = [
@@ -53,17 +53,17 @@ function getRoomColor(roomTypeId: string): string {
   },
 })
 export class GridComponent {
-  public grid = computed(() => currentFloor()?.grid ?? createEmptyGrid());
-  public selectedTile = selectedTile;
-  public placementPreview = placementPreview;
+  public grid = computed(() => floorCurrent()?.grid ?? gridCreateEmpty());
+  public gridSelectedTile = gridSelectedTile;
+  public roomPlacementPreview = roomPlacementPreview;
 
   private roomInfoMap = computed(() => {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return new Map<string, { color: string; name: string }>();
 
     const map = new Map<string, { color: string; name: string }>();
     for (const room of floor.rooms) {
-      const def = getRoomDefinition(room.roomTypeId);
+      const def = productionGetRoomDefinition(room.roomTypeId);
       map.set(room.id, {
         color: getRoomColor(room.roomTypeId),
         name: def?.name ?? 'Room',
@@ -73,7 +73,7 @@ export class GridComponent {
   });
 
   public roomAssignmentMap = computed(() => {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor)
       return new Map<
         string,
@@ -86,10 +86,10 @@ export class GridComponent {
     >();
 
     for (const room of floor.rooms) {
-      const def = getRoomDefinition(room.roomTypeId);
+      const def = productionGetRoomDefinition(room.roomTypeId);
       if (!def) continue;
 
-      const maxCapacity = getEffectiveMaxInhabitants(room, def);
+      const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(room, def);
       if (maxCapacity === 0) continue;
 
       const currentCount = floor.inhabitants.filter(
@@ -129,14 +129,14 @@ export class GridComponent {
 
   public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {
     if (!roomId) return false;
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return false;
     const room = floor.rooms.find((r) => r.id === roomId);
     return room?.anchorX === x && room?.anchorY === y;
   }
 
   private previewTileSet = computed(() => {
-    const preview = this.placementPreview();
+    const preview = this.roomPlacementPreview();
     if (!preview) return undefined;
     const set = new Set<string>();
     for (const t of preview.tiles) {
@@ -152,7 +152,7 @@ export class GridComponent {
    * Both sides of a shared edge get a doorway marker.
    */
   private doorwayMap = computed(() => {
-    const floor = currentFloor();
+    const floor = floorCurrent();
     if (!floor) return new Map<string, Set<string>>();
 
     const map = new Map<string, Set<string>>();
@@ -197,7 +197,7 @@ export class GridComponent {
   }
 
   public isSelected(x: number, y: number): boolean {
-    const sel = this.selectedTile();
+    const sel = this.gridSelectedTile();
     return sel?.x === x && sel?.y === y;
   }
 
@@ -212,35 +212,35 @@ export class GridComponent {
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
-    if (isHallwayBuildMode()) {
-      handleHallwayTileClick(x, y);
+    if (hallwayPlacementIsBuildMode()) {
+      hallwayPlacementHandleTileClick(x, y);
       return;
     }
-    if (placementPreviewShape()) {
-      const result = await executeRoomPlacement(x, y);
+    if (roomPlacementPreviewShape()) {
+      const result = await roomPlacementExecute(x, y);
       if (!result.success && result.error) {
         notifyError(result.error);
       }
       return;
     }
-    selectTile(x, y);
+    gridSelectTile(x, y);
   }
 
   public onTileHover(x: number, y: number): void {
-    if (placementPreviewShape()) {
-      updatePreviewPosition(x, y);
+    if (roomPlacementPreviewShape()) {
+      roomPlacementUpdatePreviewPosition(x, y);
     }
   }
 
   public onGridLeave(): void {
-    if (placementPreviewShape()) {
-      clearPreviewPosition();
+    if (roomPlacementPreviewShape()) {
+      roomPlacementClearPreviewPosition();
     }
   }
 
-  public isHallwayMode = isHallwayBuildMode;
-  public hallwaySourceId = hallwaySourceRoomId;
-  private hallwayPathSet = hallwayPreviewTileSet;
+  public isHallwayMode = hallwayPlacementIsBuildMode;
+  public hallwaySourceId = hallwayPlacementSourceRoomId;
+  private hallwayPathSet = hallwayPlacementPreviewTileSet;
 
   public isHallwayPathTile(x: number, y: number): boolean {
     return this.hallwayPathSet().has(`${x},${y}`);
@@ -248,32 +248,32 @@ export class GridComponent {
 
   public isHallwaySourceRoom(roomId: string | undefined): boolean {
     if (!roomId) return false;
-    return hallwaySourceRoomId() === roomId;
+    return hallwayPlacementSourceRoomId() === roomId;
   }
 
   public onRightClick(event: MouseEvent): void {
-    if (isHallwayBuildMode()) {
+    if (hallwayPlacementIsBuildMode()) {
       event.preventDefault();
-      exitHallwayBuildMode();
-    } else if (placementPreviewShape()) {
+      hallwayPlacementExit();
+    } else if (roomPlacementPreviewShape()) {
       event.preventDefault();
-      rotatePlacement();
+      roomPlacementRotate();
     }
   }
 
   public onRotateKey(): void {
-    if (placementPreviewShape()) {
-      rotatePlacement();
+    if (roomPlacementPreviewShape()) {
+      roomPlacementRotate();
     }
   }
 
   public onEscapeKey(): void {
-    if (isHallwayBuildMode()) {
-      exitHallwayBuildMode();
-    } else if (placementPreviewShape()) {
-      exitPlacementMode();
+    if (hallwayPlacementIsBuildMode()) {
+      hallwayPlacementExit();
+    } else if (roomPlacementPreviewShape()) {
+      roomPlacementExitMode();
     } else {
-      deselectTile();
+      gridDeselectTile();
     }
   }
 }

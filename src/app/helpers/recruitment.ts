@@ -1,8 +1,8 @@
 import { computed } from '@angular/core';
-import { canRecruit } from '@helpers/altar-room';
-import { getEntriesByType } from '@helpers/content';
-import { addInhabitant } from '@helpers/inhabitants';
-import { canAfford, payCost } from '@helpers/resources';
+import { altarRoomCanRecruit } from '@helpers/altar-room';
+import { contentGetEntriesByType } from '@helpers/content';
+import { inhabitantAdd } from '@helpers/inhabitants';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -12,45 +12,45 @@ import type {
   ResourceType,
 } from '@interfaces';
 
-export const DEFAULT_MAX_INHABITANTS = 50;
+export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
 
 /**
  * Signal for the currently unlocked recruitment tier.
  * Tier 1 is always unlocked. Higher tiers will be unlockable
  * via research or other progression systems in the future.
  */
-export const unlockedTier = computed<number>(() => {
+export const recruitmentUnlockedTier = computed<number>(() => {
   return 1;
 });
 
 /**
  * Signal for the maximum number of total inhabitants allowed.
  */
-export const maxInhabitantCount = computed<number>(() => {
-  return DEFAULT_MAX_INHABITANTS;
+export const recruitmentMaxInhabitantCount = computed<number>(() => {
+  return RECRUITMENT_DEFAULT_MAX_INHABITANTS;
 });
 
 /**
  * Signal for the current total inhabitant count.
  */
-export const currentInhabitantCount = computed<number>(() => {
+export const recruitmentCurrentInhabitantCount = computed<number>(() => {
   return gamestate().world.inhabitants.length;
 });
 
 /**
  * Whether the roster is full (at max capacity).
  */
-export const isRosterFull = computed<boolean>(() => {
-  return currentInhabitantCount() >= maxInhabitantCount();
+export const recruitmentIsRosterFull = computed<boolean>(() => {
+  return recruitmentCurrentInhabitantCount() >= recruitmentMaxInhabitantCount();
 });
 
 /**
  * Get all inhabitant definitions available for display in the recruitment panel.
  * Filters out unique/ruler inhabitants and sorts by tier then name.
  */
-export function getRecruitableInhabitants(): (InhabitantDefinition &
+export function recruitmentGetRecruitable(): (InhabitantDefinition &
   IsContentItem)[] {
-  const allDefs = getEntriesByType<InhabitantDefinition & IsContentItem>(
+  const allDefs = contentGetEntriesByType<InhabitantDefinition & IsContentItem>(
     'inhabitant',
   );
 
@@ -66,7 +66,7 @@ export function getRecruitableInhabitants(): (InhabitantDefinition &
  * Get the resource shortfall for recruiting an inhabitant.
  * Returns an array of { type, needed } for each resource the player is short on.
  */
-export function getRecruitShortfall(
+export function recruitmentGetShortfall(
   cost: Partial<Record<ResourceType, number>>,
   resources: Record<ResourceType, { current: number }>,
 ): { type: ResourceType; needed: number }[] {
@@ -87,16 +87,16 @@ export function getRecruitShortfall(
  * Recruit a new inhabitant by paying the cost and creating an instance.
  * Returns the result with success/error info.
  */
-export async function recruitInhabitant(
+export async function recruitmentRecruit(
   def: InhabitantDefinition,
 ): Promise<{ success: boolean; error?: string }> {
-  if (!canRecruit()) {
+  if (!altarRoomCanRecruit()) {
     return { success: false, error: 'Altar required for recruitment' };
   }
 
   const state = gamestate();
   const totalInhabitants = state.world.inhabitants.length;
-  if (totalInhabitants >= DEFAULT_MAX_INHABITANTS) {
+  if (totalInhabitants >= RECRUITMENT_DEFAULT_MAX_INHABITANTS) {
     return { success: false, error: 'Roster full' };
   }
 
@@ -105,11 +105,11 @@ export async function recruitInhabitant(
     return { success: false, error: `Requires Tier ${def.tier}` };
   }
 
-  if (!canAfford(def.cost)) {
+  if (!resourceCanAfford(def.cost)) {
     return { success: false, error: 'Not enough resources' };
   }
 
-  const paid = await payCost(def.cost);
+  const paid = await resourcePayCost(def.cost);
   if (!paid) {
     return { success: false, error: 'Not enough resources' };
   }
@@ -122,7 +122,7 @@ export async function recruitInhabitant(
     assignedRoomId: undefined,
   };
 
-  await addInhabitant(instance);
+  await inhabitantAdd(instance);
 
   return { success: true };
 }

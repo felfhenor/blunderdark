@@ -2,7 +2,7 @@ import type { WritableSignal } from '@angular/core';
 import { signal } from '@angular/core';
 import { error } from '@helpers/logging';
 
-export function localStorageSignal<T>(
+export function signalLocalStorage<T>(
   localStorageKey: string,
   initialValue: T,
   onLoad?: (value: T) => void,
@@ -48,7 +48,7 @@ export function localStorageSignal<T>(
  * @param onLoad Optional callback called when a value is loaded from IndexedDB
  * @returns A writable signal that automatically persists changes to IndexedDB
  */
-export function indexedDbSignal<T>(
+export function signalIndexedDb<T>(
   indexedDbKey: string,
   initialValue: T,
   onLoad?: (value: T) => void,

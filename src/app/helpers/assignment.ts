@@ -1,5 +1,5 @@
-import { getEntry } from '@helpers/content';
-import { getEffectiveMaxInhabitants } from '@helpers/room-upgrades';
+import { contentGetEntry } from '@helpers/content';
+import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
@@ -18,7 +18,7 @@ export type AssignmentValidation = {
  * Check whether a given room (by roomId) can accept another inhabitant.
  * Returns capacity info plus allowed/reason for UI feedback.
  */
-export function canAssignToRoom(roomId: string): AssignmentValidation {
+export function assignmentCanAssignToRoom(roomId: string): AssignmentValidation {
   const state = gamestate();
 
   let placedRoom: PlacedRoom | undefined;
@@ -31,12 +31,12 @@ export function canAssignToRoom(roomId: string): AssignmentValidation {
     return { allowed: false, reason: 'Room not found', currentCount: 0, maxCapacity: 0 };
   }
 
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
   if (!roomDef) {
     return { allowed: false, reason: 'Unknown room type', currentCount: 0, maxCapacity: 0 };
   }
 
-  const maxCapacity = getEffectiveMaxInhabitants(placedRoom, roomDef);
+  const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(placedRoom, roomDef);
 
   if (maxCapacity === 0) {
     return { allowed: false, reason: 'Room does not accept inhabitants', currentCount: 0, maxCapacity: 0 };
@@ -56,7 +56,7 @@ export function canAssignToRoom(roomId: string): AssignmentValidation {
 /**
  * Get the current assignment count for a room.
  */
-export function getAssignmentCount(roomId: string): number {
+export function assignmentGetCount(roomId: string): number {
   return gamestate().world.inhabitants.filter(
     (i) => i.assignedRoomId === roomId,
   ).length;
@@ -65,7 +65,7 @@ export function getAssignmentCount(roomId: string): number {
 /**
  * Check if an inhabitant instance is already assigned to any room.
  */
-export function isInhabitantAssigned(instanceId: string): boolean {
+export function assignmentIsInhabitantAssigned(instanceId: string): boolean {
   const instance = gamestate().world.inhabitants.find(
     (i) => i.instanceId === instanceId,
   );
@@ -76,7 +76,7 @@ export function isInhabitantAssigned(instanceId: string): boolean {
  * Get assignment info for a specific room: current count and max capacity.
  * Returns undefined if room is not found or does not accept inhabitants.
  */
-export function getRoomAssignmentInfo(
+export function assignmentGetRoomInfo(
   roomId: string,
 ): { currentCount: number; maxCapacity: number } | undefined {
   const state = gamestate();
@@ -89,10 +89,10 @@ export function getRoomAssignmentInfo(
 
   if (!placedRoom) return undefined;
 
-  const roomDef = getEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
   if (!roomDef) return undefined;
 
-  const maxCapacity = getEffectiveMaxInhabitants(placedRoom, roomDef);
+  const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(placedRoom, roomDef);
   if (maxCapacity === 0) return undefined;
 
   const currentCount = state.world.inhabitants.filter(

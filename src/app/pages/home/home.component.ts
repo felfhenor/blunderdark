@@ -8,7 +8,7 @@ import { ConnectButtonsComponent } from '@components/connect-buttons/connect-but
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetStatus, gameReset, isSetup } from '@helpers';
+import { discordSetStatus, gameReset, setupIs } from '@helpers';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
 
   public resetGameSwal = viewChild<SwalComponent>('newGameSwal');
 
-  public hasStartedGame = computed(() => isSetup());
+  public hasStartedGame = computed(() => setupIs());
 
   ngOnInit() {
     discordSetStatus({
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
   }
 
   async newGame() {
-    if (isSetup()) {
+    if (setupIs()) {
       const res = await this.resetGameSwal()?.fire();
       if (!res) return;
 

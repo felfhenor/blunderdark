@@ -4,7 +4,7 @@ import type { CombatResult, CombatUnit } from '@interfaces';
  * Roll a d20 (1-20) using the provided RNG function.
  * RNG should return a value in [0, 1).
  */
-export function rollD20(rng: () => number): number {
+export function combatRollD20(rng: () => number): number {
   return Math.floor(rng() * 20) + 1;
 }
 
@@ -14,7 +14,7 @@ export function rollD20(rng: () => number): number {
  * - Natural 1 always misses.
  * - Otherwise: roll + attacker.attack >= defender.defense + 10
  */
-export function doesAttackHit(
+export function combatDoesAttackHit(
   roll: number,
   attacker: CombatUnit,
   defender: CombatUnit,
@@ -28,7 +28,7 @@ export function doesAttackHit(
  * Calculate damage on a hit.
  * damage = attacker.attack - defender.defense, minimum 1 on a hit.
  */
-export function calculateDamage(
+export function combatCalculateDamage(
   attacker: CombatUnit,
   defender: CombatUnit,
 ): number {
@@ -43,14 +43,14 @@ export function calculateDamage(
  * @param rng - RNG function returning [0, 1) for testability
  * @returns CombatResult with hit, roll, damage, defenderHp, defenderDead
  */
-export function resolveCombat(
+export function combatResolve(
   attacker: CombatUnit,
   defender: CombatUnit,
   rng: () => number,
 ): CombatResult {
-  const roll = rollD20(rng);
-  const hit = doesAttackHit(roll, attacker, defender);
-  const damage = hit ? calculateDamage(attacker, defender) : 0;
+  const roll = combatRollD20(rng);
+  const hit = combatDoesAttackHit(roll, attacker, defender);
+  const damage = hit ? combatCalculateDamage(attacker, defender) : 0;
   const defenderHp = Math.max(0, defender.hp - damage);
   const defenderDead = defenderHp === 0;
 

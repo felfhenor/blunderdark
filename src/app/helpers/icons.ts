@@ -41,7 +41,7 @@ import {
   tablerX,
 } from '@ng-icons/tabler-icons';
 
-export const ALL_ICONS = {
+export const ICON_ALL = {
   gameExitDoor,
   gameHumanTarget,
   gameAges,

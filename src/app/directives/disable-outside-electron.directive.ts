@@ -1,5 +1,5 @@
 import { computed, Directive } from '@angular/core';
-import { isInElectron } from '@helpers';
+import { discordIsInElectron } from '@helpers';
 import { hostBinding } from 'ngxtension/host-binding';
 
 @Directive({
@@ -8,11 +8,11 @@ import { hostBinding } from 'ngxtension/host-binding';
 export class DisableOutsideElectronDirective {
   public disabled = hostBinding(
     'class.disabled',
-    computed(() => !isInElectron()),
+    computed(() => !discordIsInElectron()),
   );
 
   public disabledAttr = hostBinding(
     'attr.disabled',
-    computed(() => !isInElectron()),
+    computed(() => !discordIsInElectron()),
   );
 }

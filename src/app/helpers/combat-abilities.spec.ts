@@ -7,13 +7,13 @@ import type {
 import { describe, expect, it, vi } from 'vitest';
 
 import {
-  applyBerserkBuff,
-  applyShieldBuff,
-  checkEvasion,
-  initAbilityStates,
-  isAbilityReady,
-  tickAbilityStates,
-  tryActivateAbility,
+  combatAbilityApplyBerserkBuff,
+  combatAbilityApplyShieldBuff,
+  combatAbilityCheckEvasion,
+  combatAbilityInitStates,
+  combatAbilityIsReady,
+  combatAbilityTickStates,
+  combatAbilityTryActivate,
 } from '@helpers/combat-abilities';
 
 // --- Effect definitions (mirrors gamedata/abilityeffect/base.yml) ---
@@ -70,14 +70,14 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
 };
 
 vi.mock('@helpers/content', () => ({
-  getEntry: vi.fn((nameOrId: string) => {
+  contentGetEntry: vi.fn((nameOrId: string) => {
     return effectDefinitions[nameOrId] ?? Object.values(effectDefinitions).find((e) => e.id === nameOrId);
   }),
-  getEntriesByType: vi.fn(() => []),
-  allIdsByName: vi.fn(() => new Map()),
-  allContentById: vi.fn(() => new Map()),
-  setAllIdsByName: vi.fn(),
-  setAllContentById: vi.fn(),
+  contentGetEntriesByType: vi.fn(() => []),
+  contentAllIdsByName: vi.fn(() => new Map()),
+  contentAllById: vi.fn(() => new Map()),
+  contentSetAllIdsByName: vi.fn(),
+  contentSetAllById: vi.fn(),
 }));
 
 // --- Helpers ---
@@ -176,9 +176,9 @@ const deathBolt: CombatAbility = {
 
 // --- Tests ---
 
-describe('initAbilityStates', () => {
+describe('combatAbilityInitStates', () => {
   it('should create states for all abilities with 0 cooldown', () => {
-    const states = initAbilityStates([breathWeapon, petrifyingGaze]);
+    const states = combatAbilityInitStates([breathWeapon, petrifyingGaze]);
     expect(states).toHaveLength(2);
     expect(states[0].abilityId).toBe('ability-breath-weapon');
     expect(states[0].currentCooldown).toBe(0);
@@ -187,16 +187,16 @@ describe('initAbilityStates', () => {
   });
 
   it('should return empty array for no abilities', () => {
-    expect(initAbilityStates([])).toEqual([]);
+    expect(combatAbilityInitStates([])).toEqual([]);
   });
 });
 
-describe('tickAbilityStates', () => {
+describe('combatAbilityTickStates', () => {
   it('should decrement cooldowns by 1', () => {
     const states: AbilityState[] = [
       { abilityId: 'a', currentCooldown: 3, isActive: false, remainingDuration: 0 },
     ];
-    const ticked = tickAbilityStates(states);
+    const ticked = combatAbilityTickStates(states);
     expect(ticked[0].currentCooldown).toBe(2);
   });
 
@@ -204,7 +204,7 @@ describe('tickAbilityStates', () => {
     const states: AbilityState[] = [
       { abilityId: 'a', currentCooldown: 0, isActive: false, remainingDuration: 0 },
     ];
-    const ticked = tickAbilityStates(states);
+    const ticked = combatAbilityTickStates(states);
     expect(ticked[0].currentCooldown).toBe(0);
   });
 
@@ -212,7 +212,7 @@ describe('tickAbilityStates', () => {
     const states: AbilityState[] = [
       { abilityId: 'a', currentCooldown: 0, isActive: true, remainingDuration: 1 },
     ];
-    const ticked = tickAbilityStates(states);
+    const ticked = combatAbilityTickStates(states);
     expect(ticked[0].isActive).toBe(false);
     expect(ticked[0].remainingDuration).toBe(0);
   });
@@ -221,7 +221,7 @@ describe('tickAbilityStates', () => {
     const states: AbilityState[] = [
       { abilityId: 'a', currentCooldown: 0, isActive: true, remainingDuration: 3 },
     ];
-    const ticked = tickAbilityStates(states);
+    const ticked = combatAbilityTickStates(states);
     expect(ticked[0].isActive).toBe(true);
     expect(ticked[0].remainingDuration).toBe(2);
   });
@@ -230,36 +230,36 @@ describe('tickAbilityStates', () => {
     const states: AbilityState[] = [
       { abilityId: 'a', currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
-    tickAbilityStates(states);
+    combatAbilityTickStates(states);
     expect(states[0].currentCooldown).toBe(2);
   });
 });
 
-describe('isAbilityReady', () => {
+describe('combatAbilityIsReady', () => {
   it('should return true when cooldown is 0', () => {
     const states: AbilityState[] = [
       { abilityId: 'ability-breath-weapon', currentCooldown: 0, isActive: false, remainingDuration: 0 },
     ];
-    expect(isAbilityReady(breathWeapon, states)).toBe(true);
+    expect(combatAbilityIsReady(breathWeapon, states)).toBe(true);
   });
 
   it('should return false when cooldown > 0', () => {
     const states: AbilityState[] = [
       { abilityId: 'ability-breath-weapon', currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
-    expect(isAbilityReady(breathWeapon, states)).toBe(false);
+    expect(combatAbilityIsReady(breathWeapon, states)).toBe(false);
   });
 
   it('should return false when ability not found in states', () => {
-    expect(isAbilityReady(breathWeapon, [])).toBe(false);
+    expect(combatAbilityIsReady(breathWeapon, [])).toBe(false);
   });
 });
 
-describe('tryActivateAbility: damage abilities', () => {
+describe('combatAbilityTryActivate: damage abilities', () => {
   it('should activate breath weapon with AOE damage', () => {
-    const states = initAbilityStates([breathWeapon]);
+    const states = combatAbilityInitStates([breathWeapon]);
     const attacker = makeUnit({ attack: 80 });
-    const result = tryActivateAbility(breathWeapon, states, attacker, 3, fixedRng(0.5));
+    const result = combatAbilityTryActivate(breathWeapon, states, attacker, 3, fixedRng(0.5));
     expect(result).toBeDefined();
     expect(result!.activation.abilityName).toBe('Breath Weapon');
     expect(result!.activation.damage).toBe(120); // 80 * 150/100
@@ -268,9 +268,9 @@ describe('tryActivateAbility: damage abilities', () => {
   });
 
   it('should put ability on cooldown after activation', () => {
-    const states = initAbilityStates([breathWeapon]);
+    const states = combatAbilityInitStates([breathWeapon]);
     const attacker = makeUnit({ attack: 80 });
-    const result = tryActivateAbility(breathWeapon, states, attacker, 3, fixedRng(0.5));
+    const result = combatAbilityTryActivate(breathWeapon, states, attacker, 3, fixedRng(0.5));
     const updatedState = result!.updatedStates.find((s) => s.abilityId === 'ability-breath-weapon');
     expect(updatedState!.currentCooldown).toBe(3);
   });
@@ -280,45 +280,45 @@ describe('tryActivateAbility: damage abilities', () => {
       { abilityId: 'ability-breath-weapon', currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
     const attacker = makeUnit({ attack: 80 });
-    const result = tryActivateAbility(breathWeapon, states, attacker, 3, fixedRng(0.5));
+    const result = combatAbilityTryActivate(breathWeapon, states, attacker, 3, fixedRng(0.5));
     expect(result).toBeUndefined();
   });
 
   it('should activate death bolt with single target damage', () => {
-    const states = initAbilityStates([deathBolt]);
+    const states = combatAbilityInitStates([deathBolt]);
     const attacker = makeUnit({ attack: 40 });
-    const result = tryActivateAbility(deathBolt, states, attacker, 5, fixedRng(0.5));
+    const result = combatAbilityTryActivate(deathBolt, states, attacker, 5, fixedRng(0.5));
     expect(result).toBeDefined();
     expect(result!.activation.damage).toBe(80); // 40 * 200/100
     expect(result!.activation.targetsHit).toBe(1); // single target
   });
 });
 
-describe('tryActivateAbility: stun (petrifying gaze)', () => {
+describe('combatAbilityTryActivate: stun (petrifying gaze)', () => {
   it('should apply stun when proc succeeds', () => {
-    const states = initAbilityStates([petrifyingGaze]);
+    const states = combatAbilityInitStates([petrifyingGaze]);
     const attacker = makeUnit();
     // 10% chance, roll 5 (5 <= 10, success)
-    const result = tryActivateAbility(petrifyingGaze, states, attacker, 1, fixedRng(0.05));
+    const result = combatAbilityTryActivate(petrifyingGaze, states, attacker, 1, fixedRng(0.05));
     expect(result).toBeDefined();
     expect(result!.activation.statusApplied).toBe('stunned');
     expect(result!.activation.statusDuration).toBe(3);
   });
 
   it('should not proc when roll exceeds chance', () => {
-    const states = initAbilityStates([petrifyingGaze]);
+    const states = combatAbilityInitStates([petrifyingGaze]);
     const attacker = makeUnit();
     // 10% chance, roll 50 (50 > 10, fail)
-    const result = tryActivateAbility(petrifyingGaze, states, attacker, 1, fixedRng(0.5));
+    const result = combatAbilityTryActivate(petrifyingGaze, states, attacker, 1, fixedRng(0.5));
     expect(result).toBeUndefined();
   });
 });
 
-describe('tryActivateAbility: shield buff', () => {
+describe('combatAbilityTryActivate: shield buff', () => {
   it('should activate shield with duration', () => {
-    const states = initAbilityStates([lichShield]);
+    const states = combatAbilityInitStates([lichShield]);
     const attacker = makeUnit();
-    const result = tryActivateAbility(lichShield, states, attacker, 0, fixedRng(0.5));
+    const result = combatAbilityTryActivate(lichShield, states, attacker, 0, fixedRng(0.5));
     expect(result).toBeDefined();
     expect(result!.activation.statusApplied).toBe('shielded');
     const shieldState = result!.updatedStates.find((s) => s.abilityId === 'ability-shield');
@@ -328,62 +328,62 @@ describe('tryActivateAbility: shield buff', () => {
   });
 });
 
-describe('checkEvasion', () => {
+describe('combatAbilityCheckEvasion', () => {
   it('should evade when roll is within chance', () => {
-    const states = initAbilityStates([wraithEvasion]);
+    const states = combatAbilityInitStates([wraithEvasion]);
     // 50% chance, roll 25 (25 <= 50, evade)
-    expect(checkEvasion([wraithEvasion], states, fixedRng(0.25))).toBe(true);
+    expect(combatAbilityCheckEvasion([wraithEvasion], states, fixedRng(0.25))).toBe(true);
   });
 
   it('should not evade when roll exceeds chance', () => {
-    const states = initAbilityStates([wraithEvasion]);
+    const states = combatAbilityInitStates([wraithEvasion]);
     // 50% chance, roll 75 (75 > 50, no evade)
-    expect(checkEvasion([wraithEvasion], states, fixedRng(0.75))).toBe(false);
+    expect(combatAbilityCheckEvasion([wraithEvasion], states, fixedRng(0.75))).toBe(false);
   });
 
   it('should not evade when no evasion ability exists', () => {
-    expect(checkEvasion([breathWeapon], [], fixedRng(0.1))).toBe(false);
+    expect(combatAbilityCheckEvasion([breathWeapon], [], fixedRng(0.1))).toBe(false);
   });
 
   it('should evade at exactly the threshold', () => {
-    const states = initAbilityStates([wraithEvasion]);
+    const states = combatAbilityInitStates([wraithEvasion]);
     // 50% chance, roll 50 (50 <= 50, evade)
-    expect(checkEvasion([wraithEvasion], states, fixedRng(0.5))).toBe(true);
+    expect(combatAbilityCheckEvasion([wraithEvasion], states, fixedRng(0.5))).toBe(true);
   });
 });
 
-describe('applyBerserkBuff', () => {
+describe('combatAbilityApplyBerserkBuff', () => {
   it('should double attack when HP is below threshold', () => {
     const unit = makeUnit({ attack: 20, hp: 10, maxHp: 30 }); // 33% HP
-    const result = applyBerserkBuff(20, [berserkRage], [], unit);
+    const result = combatAbilityApplyBerserkBuff(20, [berserkRage], [], unit);
     expect(result).toBe(40); // 20 * (1 + 100/100)
   });
 
   it('should not buff when HP is above threshold', () => {
     const unit = makeUnit({ attack: 20, hp: 25, maxHp: 30 }); // 83% HP
-    const result = applyBerserkBuff(20, [berserkRage], [], unit);
+    const result = combatAbilityApplyBerserkBuff(20, [berserkRage], [], unit);
     expect(result).toBe(20);
   });
 
   it('should activate at exactly 50% HP', () => {
     const unit = makeUnit({ attack: 20, hp: 15, maxHp: 30 }); // 50% HP
-    const result = applyBerserkBuff(20, [berserkRage], [], unit);
+    const result = combatAbilityApplyBerserkBuff(20, [berserkRage], [], unit);
     expect(result).toBe(40);
   });
 
   it('should return base attack when no berserk ability', () => {
     const unit = makeUnit({ attack: 20, hp: 5, maxHp: 30 });
-    const result = applyBerserkBuff(20, [breathWeapon], [], unit);
+    const result = combatAbilityApplyBerserkBuff(20, [breathWeapon], [], unit);
     expect(result).toBe(20);
   });
 });
 
-describe('applyShieldBuff', () => {
+describe('combatAbilityApplyShieldBuff', () => {
   it('should increase defense when shield is active', () => {
     const states: AbilityState[] = [
       { abilityId: 'ability-shield', currentCooldown: 4, isActive: true, remainingDuration: 2 },
     ];
-    const result = applyShieldBuff(30, [lichShield], states);
+    const result = combatAbilityApplyShieldBuff(30, [lichShield], states);
     expect(result).toBe(45); // 30 * (1 + 50/100)
   });
 
@@ -391,70 +391,70 @@ describe('applyShieldBuff', () => {
     const states: AbilityState[] = [
       { abilityId: 'ability-shield', currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
-    const result = applyShieldBuff(30, [lichShield], states);
+    const result = combatAbilityApplyShieldBuff(30, [lichShield], states);
     expect(result).toBe(30);
   });
 
   it('should return base defense when no shield ability', () => {
-    const result = applyShieldBuff(30, [breathWeapon], []);
+    const result = combatAbilityApplyShieldBuff(30, [breathWeapon], []);
     expect(result).toBe(30);
   });
 });
 
 describe('full cooldown lifecycle', () => {
   it('should go through activate → cooldown → ready cycle', () => {
-    let states = initAbilityStates([breathWeapon]);
+    let states = combatAbilityInitStates([breathWeapon]);
     const attacker = makeUnit({ attack: 80 });
 
     // Turn 1: activate (cooldown 0 → fires → cooldown set to 3)
-    const result = tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5));
+    const result = combatAbilityTryActivate(breathWeapon, states, attacker, 2, fixedRng(0.5));
     expect(result).toBeDefined();
     states = result!.updatedStates;
     expect(states[0].currentCooldown).toBe(3);
 
     // Turn 2: tick (3→2), can't fire
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].currentCooldown).toBe(2);
-    expect(tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5))).toBeUndefined();
+    expect(combatAbilityTryActivate(breathWeapon, states, attacker, 2, fixedRng(0.5))).toBeUndefined();
 
     // Turn 3: tick (2→1)
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].currentCooldown).toBe(1);
 
     // Turn 4: tick (1→0), now ready
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].currentCooldown).toBe(0);
-    expect(isAbilityReady(breathWeapon, states)).toBe(true);
+    expect(combatAbilityIsReady(breathWeapon, states)).toBe(true);
 
     // Turn 5: can activate again
-    const result2 = tryActivateAbility(breathWeapon, states, attacker, 2, fixedRng(0.5));
+    const result2 = combatAbilityTryActivate(breathWeapon, states, attacker, 2, fixedRng(0.5));
     expect(result2).toBeDefined();
   });
 });
 
 describe('duration lifecycle', () => {
   it('should deactivate after duration expires', () => {
-    let states = initAbilityStates([lichShield]);
+    let states = combatAbilityInitStates([lichShield]);
     const attacker = makeUnit();
 
     // Activate shield (duration 3)
-    const result = tryActivateAbility(lichShield, states, attacker, 0, fixedRng(0.5));
+    const result = combatAbilityTryActivate(lichShield, states, attacker, 0, fixedRng(0.5));
     states = result!.updatedStates;
     expect(states[0].isActive).toBe(true);
     expect(states[0].remainingDuration).toBe(3);
 
     // Tick 1: 3→2
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].isActive).toBe(true);
     expect(states[0].remainingDuration).toBe(2);
 
     // Tick 2: 2→1
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].isActive).toBe(true);
     expect(states[0].remainingDuration).toBe(1);
 
     // Tick 3: 1→0, deactivates
-    states = tickAbilityStates(states);
+    states = combatAbilityTickStates(states);
     expect(states[0].isActive).toBe(false);
     expect(states[0].remainingDuration).toBe(0);
   });

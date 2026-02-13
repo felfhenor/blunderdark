@@ -1,4 +1,4 @@
-import { resolveCombat } from '@helpers/combat';
+import { combatResolve } from '@helpers/combat';
 import type {
   ActionResult,
   Combatant,
@@ -13,7 +13,7 @@ import type {
 /**
  * Create a combatant for the turn queue.
  */
-export function createCombatant(
+export function invasionCombatCreateCombatant(
   id: string,
   side: CombatantSide,
   name: string,
@@ -40,7 +40,7 @@ export function createCombatant(
  * Build a turn queue from combatants, sorted by speed (highest first).
  * Ties broken by defenders first.
  */
-export function buildTurnQueue(combatants: Combatant[]): TurnQueue {
+export function invasionCombatBuildTurnQueue(combatants: Combatant[]): TurnQueue {
   const sorted = [...combatants].sort((a, b) => {
     if (b.speed !== a.speed) return b.speed - a.speed;
     // Defenders go first on ties
@@ -59,7 +59,7 @@ export function buildTurnQueue(combatants: Combatant[]): TurnQueue {
 /**
  * Get the current actor in the queue. Returns undefined if queue is empty or all dead.
  */
-export function getCurrentActor(queue: TurnQueue): Combatant | undefined {
+export function invasionCombatGetCurrentActor(queue: TurnQueue): Combatant | undefined {
   if (queue.combatants.length === 0) return undefined;
 
   // Find next alive, non-acted combatant from currentIndex
@@ -75,7 +75,7 @@ export function getCurrentActor(queue: TurnQueue): Combatant | undefined {
  * Advance to the next actor after the current one acts.
  * Returns a new TurnQueue (does not mutate).
  */
-export function advanceTurn(queue: TurnQueue): TurnQueue {
+export function invasionCombatAdvanceTurn(queue: TurnQueue): TurnQueue {
   const updated = {
     ...queue,
     combatants: queue.combatants.map((c, i) =>
@@ -97,7 +97,7 @@ export function advanceTurn(queue: TurnQueue): TurnQueue {
 /**
  * Check if the current round is complete (all alive combatants have acted).
  */
-export function isRoundComplete(queue: TurnQueue): boolean {
+export function invasionCombatIsRoundComplete(queue: TurnQueue): boolean {
   return queue.combatants
     .filter((c) => c.hp > 0)
     .every((c) => c.hasActed);
@@ -107,7 +107,7 @@ export function isRoundComplete(queue: TurnQueue): boolean {
  * Start a new round: reset hasActed, re-sort by speed, increment round counter.
  * Returns a new TurnQueue (does not mutate).
  */
-export function startNewRound(queue: TurnQueue): TurnQueue {
+export function invasionCombatStartNewRound(queue: TurnQueue): TurnQueue {
   const aliveCombatants = queue.combatants
     .filter((c) => c.hp > 0)
     .map((c) => ({ ...c, hasActed: false }));
@@ -129,7 +129,7 @@ export function startNewRound(queue: TurnQueue): TurnQueue {
 /**
  * Get alive combatants.
  */
-export function getAliveCombatants(queue: TurnQueue): Combatant[] {
+export function invasionCombatGetAliveCombatants(queue: TurnQueue): Combatant[] {
   return queue.combatants.filter((c) => c.hp > 0);
 }
 
@@ -138,7 +138,7 @@ export function getAliveCombatants(queue: TurnQueue): Combatant[] {
 /**
  * Check if two positions are adjacent (cardinal directions only).
  */
-export function arePositionsAdjacent(
+export function invasionCombatArePositionsAdjacent(
   a: TilePosition,
   b: TilePosition,
 ): boolean {
@@ -150,7 +150,7 @@ export function arePositionsAdjacent(
 /**
  * Get cardinal adjacent positions.
  */
-export function getAdjacentPositions(pos: TilePosition): TilePosition[] {
+export function invasionCombatGetAdjacentPositions(pos: TilePosition): TilePosition[] {
   return [
     { x: pos.x, y: pos.y - 1 },
     { x: pos.x, y: pos.y + 1 },
@@ -164,7 +164,7 @@ export function getAdjacentPositions(pos: TilePosition): TilePosition[] {
 /**
  * Get valid move targets for an actor (adjacent unoccupied tiles).
  */
-export function getValidMoveTargets(
+export function invasionCombatGetValidMoveTargets(
   actor: Combatant,
   allCombatants: Combatant[],
 ): TilePosition[] {
@@ -176,7 +176,7 @@ export function getValidMoveTargets(
       .map((c) => `${c.position!.x},${c.position!.y}`),
   );
 
-  return getAdjacentPositions(actor.position).filter(
+  return invasionCombatGetAdjacentPositions(actor.position).filter(
     (pos) => pos.x >= 0 && pos.y >= 0 && !occupiedPositions.has(`${pos.x},${pos.y}`),
   );
 }
@@ -184,7 +184,7 @@ export function getValidMoveTargets(
 /**
  * Get valid attack targets for an actor (adjacent enemies).
  */
-export function getValidAttackTargets(
+export function invasionCombatGetValidAttackTargets(
   actor: Combatant,
   allCombatants: Combatant[],
 ): Combatant[] {
@@ -195,24 +195,24 @@ export function getValidAttackTargets(
       c.hp > 0 &&
       c.side !== actor.side &&
       c.position !== undefined &&
-      arePositionsAdjacent(actor.position!, c.position),
+      invasionCombatArePositionsAdjacent(actor.position!, c.position),
   );
 }
 
 /**
  * Get available actions for a combatant.
  */
-export function getAvailableActions(
+export function invasionCombatGetAvailableActions(
   actor: Combatant,
   allCombatants: Combatant[],
 ): TurnAction[] {
   const actions: TurnAction[] = ['wait'];
 
-  if (getValidMoveTargets(actor, allCombatants).length > 0) {
+  if (invasionCombatGetValidMoveTargets(actor, allCombatants).length > 0) {
     actions.unshift('move');
   }
 
-  if (getValidAttackTargets(actor, allCombatants).length > 0) {
+  if (invasionCombatGetValidAttackTargets(actor, allCombatants).length > 0) {
     actions.unshift('attack');
   }
 
@@ -228,7 +228,7 @@ export function getAvailableActions(
  * Execute a move action. Returns updated queue and action result.
  * Does not mutate inputs.
  */
-export function executeMove(
+export function invasionCombatExecuteMove(
   queue: TurnQueue,
   actorId: string,
   target: TilePosition,
@@ -254,7 +254,7 @@ export function executeMove(
  * Delegates to combat system for damage resolution.
  * Does not mutate inputs.
  */
-export function executeAttack(
+export function invasionCombatExecuteAttack(
   queue: TurnQueue,
   actorId: string,
   targetId: string,
@@ -276,7 +276,7 @@ export function executeAttack(
     };
   }
 
-  const combatResult = resolveCombat(
+  const combatResult = combatResolve(
     { attack: attacker.attack, defense: attacker.defense, hp: attacker.hp, maxHp: attacker.maxHp },
     { attack: defender.attack, defense: defender.defense, hp: defender.hp, maxHp: defender.maxHp },
     rng,
@@ -303,7 +303,7 @@ export function executeAttack(
 /**
  * Execute a wait action. Returns action result.
  */
-export function executeWait(actorId: string): ActionResult {
+export function invasionCombatExecuteWait(actorId: string): ActionResult {
   return {
     action: 'wait',
     actorId,
@@ -319,12 +319,12 @@ export function executeWait(actorId: string): ActionResult {
  * Determine the best AI action for an invader.
  * Priority: Attack adjacent defender > Move toward nearest defender > Wait.
  */
-export function resolveAiAction(
+export function invasionCombatResolveAiAction(
   actor: Combatant,
   allCombatants: Combatant[],
 ): { action: TurnAction; targetId: string | undefined; targetPosition: TilePosition | undefined } {
   // 1. Attack adjacent defender if possible
-  const attackTargets = getValidAttackTargets(actor, allCombatants);
+  const attackTargets = invasionCombatGetValidAttackTargets(actor, allCombatants);
   if (attackTargets.length > 0) {
     // Attack the weakest target
     const weakest = attackTargets.reduce((a, b) => (a.hp <= b.hp ? a : b));
@@ -336,7 +336,7 @@ export function resolveAiAction(
     (c) => c.hp > 0 && c.side !== actor.side && c.position !== undefined,
   );
   if (enemies.length > 0 && actor.position) {
-    const moveTargets = getValidMoveTargets(actor, allCombatants);
+    const moveTargets = invasionCombatGetValidMoveTargets(actor, allCombatants);
     if (moveTargets.length > 0) {
       // Find closest enemy and move toward them
       const nearestEnemy = findNearestEnemy(actor.position, enemies);
@@ -360,35 +360,35 @@ export function resolveAiAction(
  * Execute an AI turn: determine action and apply it.
  * Returns updated queue and action result.
  */
-export function executeAiTurn(
+export function invasionCombatExecuteAiTurn(
   queue: TurnQueue,
   rng: () => number,
 ): { queue: TurnQueue; result: ActionResult } {
-  const actor = getCurrentActor(queue);
+  const actor = invasionCombatGetCurrentActor(queue);
   if (!actor) {
     return {
       queue,
-      result: executeWait('unknown'),
+      result: invasionCombatExecuteWait('unknown'),
     };
   }
 
-  const decision = resolveAiAction(actor, queue.combatants);
+  const decision = invasionCombatResolveAiAction(actor, queue.combatants);
 
   switch (decision.action) {
     case 'attack':
       if (decision.targetId) {
-        return executeAttack(queue, actor.id, decision.targetId, rng);
+        return invasionCombatExecuteAttack(queue, actor.id, decision.targetId, rng);
       }
-      return { queue, result: executeWait(actor.id) };
+      return { queue, result: invasionCombatExecuteWait(actor.id) };
 
     case 'move':
       if (decision.targetPosition) {
-        return executeMove(queue, actor.id, decision.targetPosition);
+        return invasionCombatExecuteMove(queue, actor.id, decision.targetPosition);
       }
-      return { queue, result: executeWait(actor.id) };
+      return { queue, result: invasionCombatExecuteWait(actor.id) };
 
     default:
-      return { queue, result: executeWait(actor.id) };
+      return { queue, result: invasionCombatExecuteWait(actor.id) };
   }
 }
 

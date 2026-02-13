@@ -2,8 +2,8 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   gamestate,
-  getReputationLevel,
-  getReputationLevelLabel,
+  reputationGetLevel,
+  reputationGetLevelLabel,
 } from '@helpers';
 import type { ReputationLevel, ReputationType } from '@interfaces';
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
@@ -40,11 +40,11 @@ export class PanelReputationComponent {
   }
 
   public getLevel(type: ReputationType): ReputationLevel {
-    return getReputationLevel(this.getPoints(type));
+    return reputationGetLevel(this.getPoints(type));
   }
 
   public getLevelLabel(type: ReputationType): string {
-    return getReputationLevelLabel(this.getLevel(type));
+    return reputationGetLevelLabel(this.getLevel(type));
   }
 
   public getProgressPercent(type: ReputationType): number {

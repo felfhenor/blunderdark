@@ -1,5 +1,5 @@
 import { computed, Directive } from '@angular/core';
-import { isInElectron } from '@helpers';
+import { discordIsInElectron } from '@helpers';
 import { hostBinding } from 'ngxtension/host-binding';
 
 @Directive({
@@ -8,6 +8,6 @@ import { hostBinding } from 'ngxtension/host-binding';
 export class HideInElectronDirective {
   public hidden = hostBinding(
     'class.hidden',
-    computed(() => isInElectron()),
+    computed(() => discordIsInElectron()),
   );
 }

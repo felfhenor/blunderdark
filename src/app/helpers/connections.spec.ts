@@ -1,12 +1,12 @@
 import {
-  addConnectionToFloor,
-  areRoomsConnected,
-  findConnection,
-  getConnectedRooms,
-  getFloorConnections,
-  removeConnectionFromFloor,
-  removeRoomConnectionsFromFloor,
-  validateConnection,
+  connectionAddToFloor,
+  connectionAreConnected,
+  connectionFind,
+  connectionGetConnectedRooms,
+  connectionGetFloorConnections,
+  connectionRemoveFromFloor,
+  connectionRemoveRoomFromFloor,
+  connectionValidate,
 } from '@helpers/connections';
 import type { Connection, Floor, PlacedRoom } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -23,14 +23,14 @@ vi.mock('@helpers/rng', () => ({
 }));
 
 vi.mock('@helpers/room-shapes', () => ({
-  resolveRoomShape: (room: PlacedRoom) => ({
+  roomShapeResolve: (room: PlacedRoom) => ({
     id: room.shapeId,
     name: 'Test Shape',
     tiles: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
     width: 2,
     height: 1,
   }),
-  getAbsoluteTiles: (_shape: unknown, anchorX: number, anchorY: number) => [
+  roomShapeGetAbsoluteTiles: (_shape: unknown, anchorX: number, anchorY: number) => [
     { x: anchorX, y: anchorY },
     { x: anchorX + 1, y: anchorY },
   ],
@@ -92,9 +92,9 @@ beforeEach(() => {
   mockGamestate.mockReturnValue(defaultState());
 });
 
-describe('getFloorConnections', () => {
+describe('connectionGetFloorConnections', () => {
   it('should return all connections on the current floor', () => {
-    const connections = getFloorConnections();
+    const connections = connectionGetFloorConnections();
     expect(connections).toHaveLength(2);
   });
 
@@ -102,59 +102,59 @@ describe('getFloorConnections', () => {
     mockGamestate.mockReturnValue({
       world: { floors: [], currentFloorIndex: 0 },
     });
-    const connections = getFloorConnections();
+    const connections = connectionGetFloorConnections();
     expect(connections).toEqual([]);
   });
 });
 
-describe('getConnectedRooms', () => {
+describe('connectionGetConnectedRooms', () => {
   it('should return rooms connected to a room via roomAId', () => {
-    const connected = getConnectedRooms('room-a');
+    const connected = connectionGetConnectedRooms('room-a');
     expect(connected).toEqual(['room-b']);
   });
 
   it('should return rooms connected to a room via roomBId', () => {
-    const connected = getConnectedRooms('room-c');
+    const connected = connectionGetConnectedRooms('room-c');
     expect(connected).toEqual(['room-b']);
   });
 
   it('should return multiple connected rooms', () => {
-    const connected = getConnectedRooms('room-b');
+    const connected = connectionGetConnectedRooms('room-b');
     expect(connected).toHaveLength(2);
     expect(connected).toContain('room-a');
     expect(connected).toContain('room-c');
   });
 
   it('should return empty array for unconnected room', () => {
-    const connected = getConnectedRooms('room-z');
+    const connected = connectionGetConnectedRooms('room-z');
     expect(connected).toEqual([]);
   });
 });
 
-describe('areRoomsConnected', () => {
+describe('connectionAreConnected', () => {
   it('should return true for connected rooms (A→B order)', () => {
-    expect(areRoomsConnected('room-a', 'room-b')).toBe(true);
+    expect(connectionAreConnected('room-a', 'room-b')).toBe(true);
   });
 
   it('should return true for connected rooms (B→A order)', () => {
-    expect(areRoomsConnected('room-b', 'room-a')).toBe(true);
+    expect(connectionAreConnected('room-b', 'room-a')).toBe(true);
   });
 
   it('should return false for unconnected rooms', () => {
-    expect(areRoomsConnected('room-a', 'room-c')).toBe(false);
+    expect(connectionAreConnected('room-a', 'room-c')).toBe(false);
   });
 
   it('should return false for nonexistent rooms', () => {
-    expect(areRoomsConnected('room-x', 'room-y')).toBe(false);
+    expect(connectionAreConnected('room-x', 'room-y')).toBe(false);
   });
 });
 
-describe('findConnection', () => {
+describe('connectionFind', () => {
   it('should find connection in A→B order', () => {
     const floor = makeFloor({
       connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = findConnection(floor, 'room-a', 'room-b');
+    const result = connectionFind(floor, 'room-a', 'room-b');
     expect(result).toBeDefined();
     expect(result?.id).toBe('conn-1');
   });
@@ -163,22 +163,22 @@ describe('findConnection', () => {
     const floor = makeFloor({
       connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = findConnection(floor, 'room-b', 'room-a');
+    const result = connectionFind(floor, 'room-b', 'room-a');
     expect(result).toBeDefined();
     expect(result?.id).toBe('conn-1');
   });
 
   it('should return undefined for nonexistent connection', () => {
     const floor = makeFloor({ connections: [] });
-    const result = findConnection(floor, 'room-a', 'room-b');
+    const result = connectionFind(floor, 'room-a', 'room-b');
     expect(result).toBeUndefined();
   });
 });
 
-describe('addConnectionToFloor', () => {
+describe('connectionAddToFloor', () => {
   it('should add a new connection', () => {
     const floor = makeFloor({ connections: [] });
-    const result = addConnectionToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
     expect(result).toBeDefined();
     expect(result!.floor.connections).toHaveLength(1);
     expect(result!.connection.roomAId).toBe('room-a');
@@ -190,7 +190,7 @@ describe('addConnectionToFloor', () => {
     const floor = makeFloor({
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = addConnectionToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
     expect(result).toBeUndefined();
   });
 
@@ -198,18 +198,18 @@ describe('addConnectionToFloor', () => {
     const floor = makeFloor({
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = addConnectionToFloor(floor, 'room-b', 'room-a', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-b', 'room-a', [{ x: 2, y: 0 }]);
     expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {
     const floor = makeFloor({ connections: [] });
-    addConnectionToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
     expect(floor.connections).toHaveLength(0);
   });
 });
 
-describe('removeConnectionFromFloor', () => {
+describe('connectionRemoveFromFloor', () => {
   it('should remove a connection by ID', () => {
     const floor = makeFloor({
       connections: [
@@ -217,7 +217,7 @@ describe('removeConnectionFromFloor', () => {
         makeConnection({ id: 'conn-2', roomAId: 'room-c', roomBId: 'room-d' }),
       ],
     });
-    const result = removeConnectionFromFloor(floor, 'conn-1');
+    const result = connectionRemoveFromFloor(floor, 'conn-1');
     expect(result).toBeDefined();
     expect(result!.connections).toHaveLength(1);
     expect(result!.connections[0].id).toBe('conn-2');
@@ -225,18 +225,18 @@ describe('removeConnectionFromFloor', () => {
 
   it('should return undefined for nonexistent connection ID', () => {
     const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' })] });
-    const result = removeConnectionFromFloor(floor, 'conn-99');
+    const result = connectionRemoveFromFloor(floor, 'conn-99');
     expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {
     const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' })] });
-    removeConnectionFromFloor(floor, 'conn-1');
+    connectionRemoveFromFloor(floor, 'conn-1');
     expect(floor.connections).toHaveLength(1);
   });
 });
 
-describe('removeRoomConnectionsFromFloor', () => {
+describe('connectionRemoveRoomFromFloor', () => {
   it('should remove all connections involving a room', () => {
     const floor = makeFloor({
       connections: [
@@ -245,7 +245,7 @@ describe('removeRoomConnectionsFromFloor', () => {
         makeConnection({ id: 'conn-3', roomAId: 'room-c', roomBId: 'room-d' }),
       ],
     });
-    const result = removeRoomConnectionsFromFloor(floor, 'room-b');
+    const result = connectionRemoveRoomFromFloor(floor, 'room-b');
     expect(result.connections).toHaveLength(1);
     expect(result.connections[0].id).toBe('conn-3');
   });
@@ -254,7 +254,7 @@ describe('removeRoomConnectionsFromFloor', () => {
     const floor = makeFloor({
       connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = removeRoomConnectionsFromFloor(floor, 'room-z');
+    const result = connectionRemoveRoomFromFloor(floor, 'room-z');
     expect(result.connections).toHaveLength(1);
   });
 
@@ -262,17 +262,17 @@ describe('removeRoomConnectionsFromFloor', () => {
     const floor = makeFloor({
       connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    removeRoomConnectionsFromFloor(floor, 'room-a');
+    connectionRemoveRoomFromFloor(floor, 'room-a');
     expect(floor.connections).toHaveLength(1);
   });
 });
 
-describe('validateConnection', () => {
+describe('connectionValidate', () => {
   it('should reject self-connection', () => {
     const floor = makeFloor({
       rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
     });
-    const result = validateConnection(floor, 'room-a', 'room-a');
+    const result = connectionValidate(floor, 'room-a', 'room-a');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Cannot connect a room to itself');
   });
@@ -281,7 +281,7 @@ describe('validateConnection', () => {
     const floor = makeFloor({
       rooms: [makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 })],
     });
-    const result = validateConnection(floor, 'room-x', 'room-b');
+    const result = connectionValidate(floor, 'room-x', 'room-b');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('One or both rooms not found on this floor');
   });
@@ -290,7 +290,7 @@ describe('validateConnection', () => {
     const floor = makeFloor({
       rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
     });
-    const result = validateConnection(floor, 'room-a', 'room-y');
+    const result = connectionValidate(floor, 'room-a', 'room-y');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('One or both rooms not found on this floor');
   });
@@ -303,7 +303,7 @@ describe('validateConnection', () => {
         makeRoom({ id: 'room-b', anchorX: 5, anchorY: 0 }),
       ],
     });
-    const result = validateConnection(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Rooms are not adjacent');
   });
@@ -317,7 +317,7 @@ describe('validateConnection', () => {
       ],
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = validateConnection(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Rooms are already connected');
   });
@@ -330,7 +330,7 @@ describe('validateConnection', () => {
       ],
       connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
     });
-    const result = validateConnection(floor, 'room-b', 'room-a');
+    const result = connectionValidate(floor, 'room-b', 'room-a');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Rooms are already connected');
   });
@@ -343,7 +343,7 @@ describe('validateConnection', () => {
         makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
       ],
     });
-    const result = validateConnection(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(true);
     expect(result.edgeTiles).toBeDefined();
     expect(result.edgeTiles!.length).toBeGreaterThan(0);
@@ -357,7 +357,7 @@ describe('validateConnection', () => {
         makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
       ],
     });
-    const result = validateConnection(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a', 'room-b');
     expect(result.valid).toBe(true);
     expect(result.edgeTiles).toEqual([{ x: 1, y: 0 }]);
   });

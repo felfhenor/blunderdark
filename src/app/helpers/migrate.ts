@@ -1,33 +1,33 @@
 import { defaultGameState } from '@helpers/defaults';
-import { migrateFloors } from '@helpers/floor';
-import { migrateResources } from '@helpers/resources';
+import { floorMigrate } from '@helpers/floor';
+import { resourceMigrate } from '@helpers/resources';
 import {
   gamestate,
   gamestateTickEnd,
   gamestateTickStart,
-  saveGameState,
-  setGameState,
+  gamestateSave,
+  gamestateSet,
 } from '@helpers/state-game';
-import { defaultOptions, options, setOptions } from '@helpers/state-options';
+import { optionsDefault, options, optionsSetAll } from '@helpers/state-options';
 import { merge } from 'es-toolkit/compat';
 
 export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
-  newState.world.resources = migrateResources(state.world.resources);
-  const { floors, currentFloorIndex } = migrateFloors(state.world);
+  newState.world.resources = resourceMigrate(state.world.resources);
+  const { floors, currentFloorIndex } = floorMigrate(state.world);
   newState.world.floors = floors;
   newState.world.currentFloorIndex = currentFloorIndex;
-  setGameState(newState);
+  gamestateSet(newState);
   gamestateTickStart();
   gamestateTickEnd();
-  saveGameState();
+  gamestateSave();
 }
 
 export function migrateOptionsState() {
   const state = options();
 
-  const newState = merge(defaultOptions(), state);
+  const newState = merge(optionsDefault(), state);
 
-  setOptions(newState);
+  optionsSetAll(newState);
 }

@@ -1,13 +1,13 @@
 import { Component, computed, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { hostBinding } from 'ngxtension/host-binding';
-import { ALL_ICONS } from '@helpers';
+import { ICON_ALL } from '@helpers';
 import type { Icon } from '@interfaces';
 
 @Component({
   selector: 'app-icon',
   imports: [NgIcon],
-  providers: [provideIcons(ALL_ICONS)],
+  providers: [provideIcons(ICON_ALL)],
   templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss',
 })
@@ -17,7 +17,7 @@ export class IconComponent {
   public color = input<string>('');
 
   public icon = computed(() => {
-    return ALL_ICONS[this.name()];
+    return ICON_ALL[this.name()];
   });
 
   maxHeight = hostBinding(

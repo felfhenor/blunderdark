@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import type {
   AbilityEffectDefinition,
@@ -13,20 +13,20 @@ import type {
 
 // --- Content access ---
 
-export function getAllInvaderDefinitions(): (InvaderDefinition &
+export function invaderGetAllDefinitions(): (InvaderDefinition &
   IsContentItem)[] {
-  return getEntriesByType<InvaderDefinition & IsContentItem>('invader');
+  return contentGetEntriesByType<InvaderDefinition & IsContentItem>('invader');
 }
 
-export function getInvaderDefinitionById(
+export function invaderGetDefinitionById(
   id: string,
 ): (InvaderDefinition & IsContentItem) | undefined {
-  return getEntry<InvaderDefinition & IsContentItem>(id);
+  return contentGetEntry<InvaderDefinition & IsContentItem>(id);
 }
 
 // --- Instance creation ---
 
-export function createInvaderInstance(
+export function invaderCreateInstance(
   definition: InvaderDefinition,
 ): InvaderInstance {
   return {
@@ -36,7 +36,7 @@ export function createInvaderInstance(
     maxHp: definition.baseStats.hp,
     statusEffects: [],
     abilityStates: definition.abilityIds.map((abilityName) => {
-      const ability = getEntry<CombatAbility & IsContentItem>(abilityName);
+      const ability = contentGetEntry<CombatAbility & IsContentItem>(abilityName);
       return {
         abilityId: ability?.id ?? abilityName,
         currentCooldown: 0,
@@ -54,7 +54,7 @@ export function createInvaderInstance(
  * Returns null if the ability is on cooldown or effect definition is missing.
  * Pure function — caller applies results to state.
  */
-export function resolveInvaderAbility(
+export function invaderResolveAbility(
   invader: InvaderInstance,
   ability: CombatAbility,
   targetIds: string[],
@@ -65,7 +65,7 @@ export function resolveInvaderAbility(
   if (!state || state.currentCooldown > 0) return undefined;
 
   // Look up effect definition by ability's effectType (name-based lookup)
-  const effect = getEntry<AbilityEffectDefinition & IsContentItem>(
+  const effect = contentGetEntry<AbilityEffectDefinition & IsContentItem>(
     ability.effectType,
   );
   if (!effect) return undefined;
@@ -74,7 +74,7 @@ export function resolveInvaderAbility(
 
   if (effect.dealsDamage) {
     // Damage abilities: value based on invader attack * ability value percentage
-    const definition = getInvaderDefinitionById(invader.definitionId);
+    const definition = invaderGetDefinitionById(invader.definitionId);
     const attack = definition?.baseStats.attack ?? 0;
     value = Math.round(attack * (ability.value / 100));
   } else if (effect.statusName === 'healing') {
@@ -122,7 +122,7 @@ export function resolveInvaderAbility(
  * Apply cooldown to a specific ability on an invader instance.
  * Returns a new instance (does not mutate).
  */
-export function applyCooldown(
+export function invaderApplyCooldown(
   invader: InvaderInstance,
   abilityId: string,
   cooldown: number,
@@ -139,7 +139,7 @@ export function applyCooldown(
  * Tick all ability cooldowns down by 1 (min 0).
  * Returns a new instance (does not mutate).
  */
-export function tickCooldowns(invader: InvaderInstance): InvaderInstance {
+export function invaderTickCooldowns(invader: InvaderInstance): InvaderInstance {
   return {
     ...invader,
     abilityStates: invader.abilityStates.map((s) => ({
@@ -154,7 +154,7 @@ export function tickCooldowns(invader: InvaderInstance): InvaderInstance {
 /**
  * Apply or refresh a status effect on an invader.
  */
-export function applyStatusEffect(
+export function invaderApplyStatusEffect(
   invader: InvaderInstance,
   statusName: string,
   duration: number,
@@ -182,7 +182,7 @@ export function applyStatusEffect(
 /**
  * Tick all status effects and remove expired ones.
  */
-export function tickStatusEffects(invader: InvaderInstance): InvaderInstance {
+export function invaderTickStatusEffects(invader: InvaderInstance): InvaderInstance {
   return {
     ...invader,
     statusEffects: invader.statusEffects
@@ -194,7 +194,7 @@ export function tickStatusEffects(invader: InvaderInstance): InvaderInstance {
 /**
  * Check if an invader has a specific status effect.
  */
-export function hasStatusEffect(
+export function invaderHasStatusEffect(
   invader: InvaderInstance,
   statusName: string,
 ): boolean {
@@ -204,14 +204,14 @@ export function hasStatusEffect(
 /**
  * Remove all status effects from an invader (for Dispel).
  */
-export function clearStatusEffects(invader: InvaderInstance): InvaderInstance {
+export function invaderClearStatusEffects(invader: InvaderInstance): InvaderInstance {
   return { ...invader, statusEffects: [] };
 }
 
 /**
  * Apply healing to an invader (capped at maxHp).
  */
-export function applyHealing(
+export function invaderApplyHealing(
   invader: InvaderInstance,
   amount: number,
 ): InvaderInstance {

@@ -2,10 +2,10 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import {
   gameloop,
   gamestate,
-  getOption,
-  hasGameStateLoaded,
-  isGameStateReady,
-  isPageVisible,
+  optionsGet,
+  gamestateHasLoaded,
+  gamestateIsReady,
+  uiIsPageVisible,
   migrateGameState,
   migrateOptionsState,
 } from '@helpers';
@@ -27,7 +27,7 @@ export class GamestateService {
       if (
         !this.contentService.hasLoaded() ||
         this.hasLoaded() ||
-        !hasGameStateLoaded()
+        !gamestateHasLoaded()
       )
         return;
       this.logger.info('GameState', 'Migrating gamestate...');
@@ -37,7 +37,7 @@ export class GamestateService {
 
       this.logger.info('GameState', 'Gamestate migrated & loaded.');
       this.hasLoaded.set(true);
-      isGameStateReady.set(true);
+      gamestateIsReady.set(true);
     });
 
     effect(() => {
@@ -45,7 +45,7 @@ export class GamestateService {
 
       const state = gamestate();
 
-      if (getOption('debugConsoleLogStateUpdates')) {
+      if (optionsGet('debugConsoleLogStateUpdates')) {
         this.logger.debug('GameState Update', state);
       }
     });
@@ -68,7 +68,7 @@ export class GamestateService {
     interval(1000).subscribe(() => {
       if (lastRunTime <= 0 || !this.hasLoaded()) return;
 
-      if (!isPageVisible() && !getOption('debugAllowBackgroundOperations')) {
+      if (!uiIsPageVisible() && !optionsGet('debugAllowBackgroundOperations')) {
         return;
       }
 

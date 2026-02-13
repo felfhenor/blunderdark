@@ -3,22 +3,22 @@ import type { InvasionState } from '@interfaces/invasion';
 import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
-  ALTAR_MAX_HP,
-  MAX_INVASION_TURNS,
-  SECONDARY_OBJECTIVES_FOR_VICTORY,
-  advanceInvasionTurn,
-  areAllInvadersEliminated,
-  areSecondaryObjectivesCompleted,
-  checkInvasionEnd,
-  createHistoryEntry,
-  createInvasionState,
-  damageAltar,
-  endInvasion,
-  isAltarDestroyed,
-  isTurnLimitReached,
-  markInvaderKilled,
-  recordDefenderLoss,
-  resolveDetailedResult,
+  INVASION_WIN_LOSS_ALTAR_MAX_HP,
+  INVASION_WIN_LOSS_MAX_TURNS,
+  INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY,
+  invasionWinLossAdvanceTurn,
+  invasionWinLossAreAllEliminated,
+  invasionWinLossAreSecondaryObjectivesCompleted,
+  invasionWinLossCheckEnd,
+  invasionWinLossCreateHistoryEntry,
+  invasionWinLossCreateState,
+  invasionWinLossDamageAltar,
+  invasionWinLossEnd,
+  invasionWinLossIsAltarDestroyed,
+  invasionWinLossIsTurnLimitReached,
+  invasionWinLossMarkKilled,
+  invasionWinLossRecordDefenderLoss,
+  invasionWinLossResolveDetailedResult,
 } from '@helpers/invasion-win-loss';
 
 vi.mock('@helpers/rng', () => ({
@@ -26,7 +26,7 @@ vi.mock('@helpers/rng', () => ({
 }));
 
 vi.mock('@helpers/invasion-objectives', () => ({
-  resolveInvasionOutcome: (objectives: InvasionObjective[]) => {
+  invasionObjectiveResolveOutcome: (objectives: InvasionObjective[]) => {
     const primary = objectives.find((o) => o.isPrimary);
     const secondaries = objectives.filter((o) => !o.isPrimary);
     const altarDestroyed = primary?.isCompleted ?? false;
@@ -99,9 +99,9 @@ function makeInvasionState(overrides: Partial<InvasionState> = {}): InvasionStat
   return {
     invasionId: 'inv-1',
     currentTurn: 0,
-    maxTurns: MAX_INVASION_TURNS,
-    altarHp: ALTAR_MAX_HP,
-    altarMaxHp: ALTAR_MAX_HP,
+    maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
+    altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
+    altarMaxHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
     invaders: [makeInvader('inv-a'), makeInvader('inv-b')],
     objectives: [
       makePrimaryObjective(),
@@ -121,30 +121,30 @@ function makeInvasionState(overrides: Partial<InvasionState> = {}): InvasionStat
 describe('invasion-win-loss', () => {
   describe('constants', () => {
     it('should have altar max HP of 100', () => {
-      expect(ALTAR_MAX_HP).toBe(100);
+      expect(INVASION_WIN_LOSS_ALTAR_MAX_HP).toBe(100);
     });
 
     it('should have max invasion turns of 30', () => {
-      expect(MAX_INVASION_TURNS).toBe(30);
+      expect(INVASION_WIN_LOSS_MAX_TURNS).toBe(30);
     });
 
     it('should require 2 secondary objectives for invader victory', () => {
-      expect(SECONDARY_OBJECTIVES_FOR_VICTORY).toBe(2);
+      expect(INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY).toBe(2);
     });
   });
 
-  describe('createInvasionState', () => {
+  describe('invasionWinLossCreateState', () => {
     it('should create initial state with correct defaults', () => {
       const invaders = [makeInvader('a'), makeInvader('b')];
       const objectives = [makePrimaryObjective(), makeSecondaryObjective('StealTreasure')];
 
-      const state = createInvasionState(invaders, objectives, 3);
+      const state = invasionWinLossCreateState(invaders, objectives, 3);
 
       expect(state.invasionId).toBe('test-uuid');
       expect(state.currentTurn).toBe(0);
-      expect(state.maxTurns).toBe(MAX_INVASION_TURNS);
-      expect(state.altarHp).toBe(ALTAR_MAX_HP);
-      expect(state.altarMaxHp).toBe(ALTAR_MAX_HP);
+      expect(state.maxTurns).toBe(INVASION_WIN_LOSS_MAX_TURNS);
+      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
+      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
       expect(state.invaders).toHaveLength(2);
       expect(state.objectives).toHaveLength(2);
       expect(state.defenderCount).toBe(3);
@@ -157,7 +157,7 @@ describe('invasion-win-loss', () => {
       const invaders = [makeInvader('a')];
       const objectives = [makePrimaryObjective()];
 
-      const state = createInvasionState(invaders, objectives, 1);
+      const state = invasionWinLossCreateState(invaders, objectives, 1);
       invaders.push(makeInvader('b'));
       objectives.push(makeSecondaryObjective('StealTreasure'));
 
@@ -166,53 +166,53 @@ describe('invasion-win-loss', () => {
     });
   });
 
-  describe('areAllInvadersEliminated', () => {
+  describe('invasionWinLossAreAllEliminated', () => {
     it('should return false when invaders have HP', () => {
       const state = makeInvasionState();
-      expect(areAllInvadersEliminated(state)).toBe(false);
+      expect(invasionWinLossAreAllEliminated(state)).toBe(false);
     });
 
     it('should return true when all invaders have 0 HP', () => {
       const state = makeInvasionState({
         invaders: [makeInvader('a', 0), makeInvader('b', 0)],
       });
-      expect(areAllInvadersEliminated(state)).toBe(true);
+      expect(invasionWinLossAreAllEliminated(state)).toBe(true);
     });
 
     it('should return false when some invaders are alive', () => {
       const state = makeInvasionState({
         invaders: [makeInvader('a', 0), makeInvader('b', 5)],
       });
-      expect(areAllInvadersEliminated(state)).toBe(false);
+      expect(invasionWinLossAreAllEliminated(state)).toBe(false);
     });
 
     it('should return true for empty invader list', () => {
       const state = makeInvasionState({ invaders: [] });
-      expect(areAllInvadersEliminated(state)).toBe(true);
+      expect(invasionWinLossAreAllEliminated(state)).toBe(true);
     });
   });
 
-  describe('isAltarDestroyed', () => {
+  describe('invasionWinLossIsAltarDestroyed', () => {
     it('should return false when altar has HP', () => {
       const state = makeInvasionState({ altarHp: 50 });
-      expect(isAltarDestroyed(state)).toBe(false);
+      expect(invasionWinLossIsAltarDestroyed(state)).toBe(false);
     });
 
     it('should return true when altar HP is 0', () => {
       const state = makeInvasionState({ altarHp: 0 });
-      expect(isAltarDestroyed(state)).toBe(true);
+      expect(invasionWinLossIsAltarDestroyed(state)).toBe(true);
     });
 
     it('should return true when altar HP is negative', () => {
       const state = makeInvasionState({ altarHp: -10 });
-      expect(isAltarDestroyed(state)).toBe(true);
+      expect(invasionWinLossIsAltarDestroyed(state)).toBe(true);
     });
   });
 
-  describe('areSecondaryObjectivesCompleted', () => {
+  describe('invasionWinLossAreSecondaryObjectivesCompleted', () => {
     it('should return false when no secondaries completed', () => {
       const state = makeInvasionState();
-      expect(areSecondaryObjectivesCompleted(state)).toBe(false);
+      expect(invasionWinLossAreSecondaryObjectivesCompleted(state)).toBe(false);
     });
 
     it('should return false when only 1 secondary completed', () => {
@@ -223,7 +223,7 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', false),
         ],
       });
-      expect(areSecondaryObjectivesCompleted(state)).toBe(false);
+      expect(invasionWinLossAreSecondaryObjectivesCompleted(state)).toBe(false);
     });
 
     it('should return true when 2 secondaries completed', () => {
@@ -234,7 +234,7 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', true),
         ],
       });
-      expect(areSecondaryObjectivesCompleted(state)).toBe(true);
+      expect(invasionWinLossAreSecondaryObjectivesCompleted(state)).toBe(true);
     });
 
     it('should not count primary objective', () => {
@@ -245,41 +245,41 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', false),
         ],
       });
-      expect(areSecondaryObjectivesCompleted(state)).toBe(false);
+      expect(invasionWinLossAreSecondaryObjectivesCompleted(state)).toBe(false);
     });
   });
 
-  describe('isTurnLimitReached', () => {
+  describe('invasionWinLossIsTurnLimitReached', () => {
     it('should return false before turn limit', () => {
       const state = makeInvasionState({ currentTurn: 29 });
-      expect(isTurnLimitReached(state)).toBe(false);
+      expect(invasionWinLossIsTurnLimitReached(state)).toBe(false);
     });
 
     it('should return true at turn limit', () => {
       const state = makeInvasionState({ currentTurn: 30 });
-      expect(isTurnLimitReached(state)).toBe(true);
+      expect(invasionWinLossIsTurnLimitReached(state)).toBe(true);
     });
 
     it('should return true past turn limit', () => {
       const state = makeInvasionState({ currentTurn: 35 });
-      expect(isTurnLimitReached(state)).toBe(true);
+      expect(invasionWinLossIsTurnLimitReached(state)).toBe(true);
     });
   });
 
-  describe('checkInvasionEnd', () => {
+  describe('invasionWinLossCheckEnd', () => {
     it('should return null when invasion is ongoing', () => {
       const state = makeInvasionState();
-      expect(checkInvasionEnd(state)).toBeUndefined();
+      expect(invasionWinLossCheckEnd(state)).toBeUndefined();
     });
 
     it('should return null when invasion is already inactive', () => {
       const state = makeInvasionState({ isActive: false, altarHp: 0 });
-      expect(checkInvasionEnd(state)).toBeUndefined();
+      expect(invasionWinLossCheckEnd(state)).toBeUndefined();
     });
 
     it('should return altar_destroyed when altar HP is 0', () => {
       const state = makeInvasionState({ altarHp: 0 });
-      expect(checkInvasionEnd(state)).toBe('altar_destroyed');
+      expect(invasionWinLossCheckEnd(state)).toBe('altar_destroyed');
     });
 
     it('should return objectives_completed when 2 secondaries done', () => {
@@ -290,19 +290,19 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', true),
         ],
       });
-      expect(checkInvasionEnd(state)).toBe('objectives_completed');
+      expect(invasionWinLossCheckEnd(state)).toBe('objectives_completed');
     });
 
     it('should return all_invaders_eliminated when all dead', () => {
       const state = makeInvasionState({
         invaders: [makeInvader('a', 0), makeInvader('b', 0)],
       });
-      expect(checkInvasionEnd(state)).toBe('all_invaders_eliminated');
+      expect(invasionWinLossCheckEnd(state)).toBe('all_invaders_eliminated');
     });
 
     it('should return turn_limit_reached at max turns', () => {
       const state = makeInvasionState({ currentTurn: 30 });
-      expect(checkInvasionEnd(state)).toBe('turn_limit_reached');
+      expect(invasionWinLossCheckEnd(state)).toBe('turn_limit_reached');
     });
 
     it('should prioritize altar_destroyed over all_invaders_eliminated', () => {
@@ -310,7 +310,7 @@ describe('invasion-win-loss', () => {
         altarHp: 0,
         invaders: [makeInvader('a', 0)],
       });
-      expect(checkInvasionEnd(state)).toBe('altar_destroyed');
+      expect(invasionWinLossCheckEnd(state)).toBe('altar_destroyed');
     });
 
     it('should prioritize altar_destroyed over turn_limit_reached', () => {
@@ -318,7 +318,7 @@ describe('invasion-win-loss', () => {
         altarHp: 0,
         currentTurn: 30,
       });
-      expect(checkInvasionEnd(state)).toBe('altar_destroyed');
+      expect(invasionWinLossCheckEnd(state)).toBe('altar_destroyed');
     });
 
     it('should prioritize objectives_completed over all_invaders_eliminated', () => {
@@ -330,7 +330,7 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', true),
         ],
       });
-      expect(checkInvasionEnd(state)).toBe('objectives_completed');
+      expect(invasionWinLossCheckEnd(state)).toBe('objectives_completed');
     });
 
     it('should prioritize all_invaders_eliminated over turn_limit_reached', () => {
@@ -338,26 +338,26 @@ describe('invasion-win-loss', () => {
         invaders: [makeInvader('a', 0)],
         currentTurn: 30,
       });
-      expect(checkInvasionEnd(state)).toBe('all_invaders_eliminated');
+      expect(invasionWinLossCheckEnd(state)).toBe('all_invaders_eliminated');
     });
   });
 
-  describe('damageAltar', () => {
+  describe('invasionWinLossDamageAltar', () => {
     it('should reduce altar HP by damage amount', () => {
       const state = makeInvasionState();
-      const result = damageAltar(state, 25);
+      const result = invasionWinLossDamageAltar(state, 25);
       expect(result.altarHp).toBe(75);
     });
 
     it('should clamp altar HP to 0', () => {
       const state = makeInvasionState({ altarHp: 10 });
-      const result = damageAltar(state, 50);
+      const result = invasionWinLossDamageAltar(state, 50);
       expect(result.altarHp).toBe(0);
     });
 
     it('should update DestroyAltar objective progress', () => {
       const state = makeInvasionState();
-      const result = damageAltar(state, 40);
+      const result = invasionWinLossDamageAltar(state, 40);
       const altarObj = result.objectives.find((o) => o.type === 'DestroyAltar');
       expect(altarObj?.progress).toBe(40);
       expect(altarObj?.isCompleted).toBe(false);
@@ -365,7 +365,7 @@ describe('invasion-win-loss', () => {
 
     it('should mark DestroyAltar as completed at 0 HP', () => {
       const state = makeInvasionState();
-      const result = damageAltar(state, 100);
+      const result = invasionWinLossDamageAltar(state, 100);
       const altarObj = result.objectives.find((o) => o.type === 'DestroyAltar');
       expect(altarObj?.progress).toBe(100);
       expect(altarObj?.isCompleted).toBe(true);
@@ -373,36 +373,36 @@ describe('invasion-win-loss', () => {
 
     it('should not mutate original state', () => {
       const state = makeInvasionState();
-      damageAltar(state, 50);
-      expect(state.altarHp).toBe(ALTAR_MAX_HP);
+      invasionWinLossDamageAltar(state, 50);
+      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
     });
 
     it('should not modify non-DestroyAltar objectives', () => {
       const state = makeInvasionState();
-      const result = damageAltar(state, 50);
+      const result = invasionWinLossDamageAltar(state, 50);
       const secondary = result.objectives.find((o) => o.type === 'StealTreasure');
       expect(secondary?.progress).toBe(0);
     });
   });
 
-  describe('advanceInvasionTurn', () => {
+  describe('invasionWinLossAdvanceTurn', () => {
     it('should increment turn counter', () => {
       const state = makeInvasionState({ currentTurn: 5 });
-      const result = advanceInvasionTurn(state);
+      const result = invasionWinLossAdvanceTurn(state);
       expect(result.currentTurn).toBe(6);
     });
 
     it('should not mutate original state', () => {
       const state = makeInvasionState({ currentTurn: 5 });
-      advanceInvasionTurn(state);
+      invasionWinLossAdvanceTurn(state);
       expect(state.currentTurn).toBe(5);
     });
   });
 
-  describe('markInvaderKilled', () => {
+  describe('invasionWinLossMarkKilled', () => {
     it('should set invader HP to 0 and increment kill counter', () => {
       const state = makeInvasionState();
-      const result = markInvaderKilled(state, 'inv-a');
+      const result = invasionWinLossMarkKilled(state, 'inv-a');
       const invader = result.invaders.find((i) => i.id === 'inv-a');
       expect(invader?.currentHp).toBe(0);
       expect(result.invadersKilled).toBe(1);
@@ -410,7 +410,7 @@ describe('invasion-win-loss', () => {
 
     it('should not modify other invaders', () => {
       const state = makeInvasionState();
-      const result = markInvaderKilled(state, 'inv-a');
+      const result = invasionWinLossMarkKilled(state, 'inv-a');
       const other = result.invaders.find((i) => i.id === 'inv-b');
       expect(other?.currentHp).toBe(10);
     });
@@ -420,53 +420,53 @@ describe('invasion-win-loss', () => {
         invaders: [makeInvader('a', 0), makeInvader('b', 10)],
         invadersKilled: 1,
       });
-      const result = markInvaderKilled(state, 'a');
+      const result = invasionWinLossMarkKilled(state, 'a');
       expect(result.invadersKilled).toBe(1);
     });
 
     it('should return same state for unknown invader', () => {
       const state = makeInvasionState();
-      const result = markInvaderKilled(state, 'nonexistent');
+      const result = invasionWinLossMarkKilled(state, 'nonexistent');
       expect(result).toBe(state);
     });
 
     it('should not mutate original state', () => {
       const state = makeInvasionState();
-      markInvaderKilled(state, 'inv-a');
+      invasionWinLossMarkKilled(state, 'inv-a');
       expect(state.invadersKilled).toBe(0);
       expect(state.invaders[0].currentHp).toBe(10);
     });
   });
 
-  describe('recordDefenderLoss', () => {
+  describe('invasionWinLossRecordDefenderLoss', () => {
     it('should increment defenders lost counter', () => {
       const state = makeInvasionState({ defendersLost: 2 });
-      const result = recordDefenderLoss(state);
+      const result = invasionWinLossRecordDefenderLoss(state);
       expect(result.defendersLost).toBe(3);
     });
 
     it('should not mutate original state', () => {
       const state = makeInvasionState();
-      recordDefenderLoss(state);
+      invasionWinLossRecordDefenderLoss(state);
       expect(state.defendersLost).toBe(0);
     });
   });
 
-  describe('endInvasion', () => {
+  describe('invasionWinLossEnd', () => {
     it('should set isActive to false', () => {
       const state = makeInvasionState();
-      const result = endInvasion(state);
+      const result = invasionWinLossEnd(state);
       expect(result.isActive).toBe(false);
     });
 
     it('should not mutate original state', () => {
       const state = makeInvasionState();
-      endInvasion(state);
+      invasionWinLossEnd(state);
       expect(state.isActive).toBe(true);
     });
   });
 
-  describe('resolveDetailedResult', () => {
+  describe('invasionWinLossResolveDetailedResult', () => {
     it('should produce victory result when invaders eliminated', () => {
       const state = makeInvasionState({
         invaders: [makeInvader('a', 0)],
@@ -476,7 +476,7 @@ describe('invasion-win-loss', () => {
         defendersLost: 1,
       });
 
-      const result = resolveDetailedResult(state, 42, 'all_invaders_eliminated');
+      const result = invasionWinLossResolveDetailedResult(state, 42, 'all_invaders_eliminated');
 
       expect(result.invasionId).toBe('inv-1');
       expect(result.day).toBe(42);
@@ -503,7 +503,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 10,
       });
 
-      const result = resolveDetailedResult(state, 50, 'altar_destroyed');
+      const result = invasionWinLossResolveDetailedResult(state, 50, 'altar_destroyed');
 
       expect(result.outcome).toBe('defeat');
       expect(result.endReason).toBe('altar_destroyed');
@@ -522,7 +522,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 20,
       });
 
-      const result = resolveDetailedResult(state, 60, 'all_invaders_eliminated');
+      const result = invasionWinLossResolveDetailedResult(state, 60, 'all_invaders_eliminated');
 
       expect(result.objectivesCompleted).toBe(1);
       expect(result.objectivesTotal).toBe(2);
@@ -534,7 +534,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 30,
       });
 
-      const result = resolveDetailedResult(state, 70, 'turn_limit_reached');
+      const result = invasionWinLossResolveDetailedResult(state, 70, 'turn_limit_reached');
 
       expect(result.outcome).toBe('victory');
       expect(result.endReason).toBe('turn_limit_reached');
@@ -542,9 +542,9 @@ describe('invasion-win-loss', () => {
     });
   });
 
-  describe('createHistoryEntry', () => {
+  describe('invasionWinLossCreateHistoryEntry', () => {
     it('should create history entry from detailed result', () => {
-      const result: ReturnType<typeof resolveDetailedResult> = {
+      const result: ReturnType<typeof invasionWinLossResolveDetailedResult> = {
         invasionId: 'inv-1',
         day: 42,
         outcome: 'victory',
@@ -559,7 +559,7 @@ describe('invasion-win-loss', () => {
         rewardMultiplier: 1.5,
       };
 
-      const entry = createHistoryEntry(result);
+      const entry = invasionWinLossCreateHistoryEntry(result);
 
       expect(entry.day).toBe(42);
       expect(entry.type).toBe('scheduled');
@@ -573,7 +573,7 @@ describe('invasion-win-loss', () => {
     });
 
     it('should create defeat history entry', () => {
-      const result: ReturnType<typeof resolveDetailedResult> = {
+      const result: ReturnType<typeof invasionWinLossResolveDetailedResult> = {
         invasionId: 'inv-2',
         day: 50,
         outcome: 'defeat',
@@ -588,7 +588,7 @@ describe('invasion-win-loss', () => {
         rewardMultiplier: 0,
       };
 
-      const entry = createHistoryEntry(result);
+      const entry = invasionWinLossCreateHistoryEntry(result);
 
       expect(entry.outcome).toBe('defeat');
       expect(entry.endReason).toBe('altar_destroyed');
@@ -604,22 +604,22 @@ describe('invasion-win-loss', () => {
         makeSecondaryObjective('SlayMonster'),
       ];
 
-      let state = createInvasionState(invaders, objectives, 3);
+      let state = invasionWinLossCreateState(invaders, objectives, 3);
 
       // Turn 1: kill first invader
-      state = advanceInvasionTurn(state);
-      state = markInvaderKilled(state, 'a');
-      expect(checkInvasionEnd(state)).toBeUndefined();
+      state = invasionWinLossAdvanceTurn(state);
+      state = invasionWinLossMarkKilled(state, 'a');
+      expect(invasionWinLossCheckEnd(state)).toBeUndefined();
 
       // Turn 2: kill second invader
-      state = advanceInvasionTurn(state);
-      state = markInvaderKilled(state, 'b');
-      const endReason = checkInvasionEnd(state);
+      state = invasionWinLossAdvanceTurn(state);
+      state = invasionWinLossMarkKilled(state, 'b');
+      const endReason = invasionWinLossCheckEnd(state);
       expect(endReason).toBe('all_invaders_eliminated');
 
       // Resolve
-      state = endInvasion(state);
-      const result = resolveDetailedResult(state, 35, endReason!);
+      state = invasionWinLossEnd(state);
+      const result = invasionWinLossResolveDetailedResult(state, 35, endReason!);
       expect(result.outcome).toBe('victory');
       expect(result.turnsTaken).toBe(2);
       expect(result.invadersKilled).toBe(2);
@@ -633,19 +633,19 @@ describe('invasion-win-loss', () => {
         makeSecondaryObjective('SlayMonster'),
       ];
 
-      let state = createInvasionState(invaders, objectives, 3);
+      let state = invasionWinLossCreateState(invaders, objectives, 3);
 
       // Turns of altar damage
       for (let i = 0; i < 10; i++) {
-        state = advanceInvasionTurn(state);
-        state = damageAltar(state, 10);
+        state = invasionWinLossAdvanceTurn(state);
+        state = invasionWinLossDamageAltar(state, 10);
       }
 
-      const endReason = checkInvasionEnd(state);
+      const endReason = invasionWinLossCheckEnd(state);
       expect(endReason).toBe('altar_destroyed');
 
-      state = endInvasion(state);
-      const result = resolveDetailedResult(state, 40, endReason!);
+      state = invasionWinLossEnd(state);
+      const result = invasionWinLossResolveDetailedResult(state, 40, endReason!);
       expect(result.outcome).toBe('defeat');
       expect(result.endReason).toBe('altar_destroyed');
       expect(result.turnsTaken).toBe(10);
@@ -659,20 +659,20 @@ describe('invasion-win-loss', () => {
         makeSecondaryObjective('SlayMonster'),
       ];
 
-      let state = createInvasionState(invaders, objectives, 3);
+      let state = invasionWinLossCreateState(invaders, objectives, 3);
 
       // Advance to turn limit
-      for (let i = 0; i < MAX_INVASION_TURNS; i++) {
-        state = advanceInvasionTurn(state);
+      for (let i = 0; i < INVASION_WIN_LOSS_MAX_TURNS; i++) {
+        state = invasionWinLossAdvanceTurn(state);
       }
 
-      const endReason = checkInvasionEnd(state);
+      const endReason = invasionWinLossCheckEnd(state);
       expect(endReason).toBe('turn_limit_reached');
 
-      state = endInvasion(state);
-      const result = resolveDetailedResult(state, 45, endReason!);
+      state = invasionWinLossEnd(state);
+      const result = invasionWinLossResolveDetailedResult(state, 45, endReason!);
       expect(result.outcome).toBe('victory');
-      expect(result.turnsTaken).toBe(MAX_INVASION_TURNS);
+      expect(result.turnsTaken).toBe(INVASION_WIN_LOSS_MAX_TURNS);
     });
   });
 });

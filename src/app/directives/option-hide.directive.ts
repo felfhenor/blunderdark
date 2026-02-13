@@ -1,6 +1,6 @@
 import { computed, Directive, input } from '@angular/core';
 import { hostBinding } from 'ngxtension/host-binding';
-import { getOption } from '@helpers';
+import { optionsGet } from '@helpers';
 import type { GameOption } from '@interfaces';
 
 @Directive({
@@ -11,6 +11,6 @@ export class ShowIfOptionDirective {
 
   public hidden = hostBinding(
     'class.hidden',
-    computed(() => !getOption(this.appShowIfOption())),
+    computed(() => !optionsGet(this.appShowIfOption())),
   );
 }

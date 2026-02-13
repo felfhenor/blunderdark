@@ -1,4 +1,4 @@
-import { getEntriesByType } from '@helpers/content';
+import { contentGetEntriesByType } from '@helpers/content';
 import type { BiomeType, IsContentItem, RoomDefinition } from '@interfaces';
 
 // --- Types ---
@@ -31,11 +31,11 @@ export type ProductionModifierDefinition = {
 // --- Constants ---
 
 // Time thresholds
-export const NIGHT_START = 18;
-export const NIGHT_END = 6;
+export const PRODUCTION_MODIFIER_NIGHT_START = 18;
+export const PRODUCTION_MODIFIER_NIGHT_END = 6;
 
 // Depth bonus
-export const DEPTH_BONUS_PER_LEVEL = 0.05;
+export const PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL = 0.05;
 
 // --- Lazy lookup maps built from room data ---
 
@@ -43,7 +43,7 @@ let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | und
 let biomeMap: Map<string, Map<string, number>> | undefined = undefined;
 
 function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
-  const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
   const day = new Map<string, number>();
   const night = new Map<string, number>();
   for (const room of rooms) {
@@ -66,7 +66,7 @@ function getTimeOfDayMap(): { day: Map<string, number>; night: Map<string, numbe
 }
 
 function buildBiomeMap(): Map<string, Map<string, number>> {
-  const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
   const map = new Map<string, Map<string, number>>();
   for (const room of rooms) {
     if (room.biomeBonuses) {
@@ -89,26 +89,26 @@ function getBiomeMap(): Map<string, Map<string, number>> {
   return biomeMap;
 }
 
-export function resetProductionModifierCache(): void {
+export function productionModifierResetCache(): void {
   timeOfDayMap = undefined;
   biomeMap = undefined;
 }
 
 // --- Time-of-day helpers ---
 
-export function isNightTime(hour: number): boolean {
-  return hour >= NIGHT_START || hour < NIGHT_END;
+export function productionModifierIsNightTime(hour: number): boolean {
+  return hour >= PRODUCTION_MODIFIER_NIGHT_START || hour < PRODUCTION_MODIFIER_NIGHT_END;
 }
 
-export function isDayTime(hour: number): boolean {
-  return !isNightTime(hour);
+export function productionModifierIsDayTime(hour: number): boolean {
+  return !productionModifierIsNightTime(hour);
 }
 
 // --- Time-of-day modifier ---
 
 function evaluateTimeOfDay(context: ProductionModifierContext): number {
   const map = getTimeOfDayMap();
-  if (isNightTime(context.hour)) {
+  if (productionModifierIsNightTime(context.hour)) {
     return 1.0 + (map.night.get(context.roomTypeId) ?? 0);
   }
   return 1.0 + (map.day.get(context.roomTypeId) ?? 0);
@@ -117,7 +117,7 @@ function evaluateTimeOfDay(context: ProductionModifierContext): number {
 // --- Floor depth modifier ---
 
 function evaluateFloorDepth(context: ProductionModifierContext): number {
-  return 1.0 + context.floorDepth * DEPTH_BONUS_PER_LEVEL;
+  return 1.0 + context.floorDepth * PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL;
 }
 
 // --- Biome modifier ---
@@ -126,7 +126,7 @@ function evaluateFloorDepth(context: ProductionModifierContext): number {
  * Get the biome bonus multiplier for a specific room type on a specific biome.
  * Returns 1.0 for rooms not affected by the biome or for neutral biome.
  */
-export function getBiomeBonus(biome: BiomeType, roomTypeId: string): number {
+export function productionModifierGetBiomeBonus(biome: BiomeType, roomTypeId: string): number {
   const map = getBiomeMap();
   const biomeRooms = map.get(biome);
   if (!biomeRooms) return 1.0;
@@ -134,7 +134,7 @@ export function getBiomeBonus(biome: BiomeType, roomTypeId: string): number {
 }
 
 function evaluateBiome(context: ProductionModifierContext): number {
-  return getBiomeBonus(context.floorBiome, context.roomTypeId);
+  return productionModifierGetBiomeBonus(context.floorBiome, context.roomTypeId);
 }
 
 // --- Modifier registry ---
@@ -163,7 +163,7 @@ const MODIFIER_REGISTRY: ProductionModifierDefinition[] = [
 /**
  * Get all registered production modifier definitions.
  */
-export function getModifierRegistry(): readonly ProductionModifierDefinition[] {
+export function productionModifierGetRegistry(): readonly ProductionModifierDefinition[] {
   return MODIFIER_REGISTRY;
 }
 
@@ -173,7 +173,7 @@ export function getModifierRegistry(): readonly ProductionModifierDefinition[] {
  * Evaluate all registered modifiers for a given context.
  * Returns individual modifier results.
  */
-export function evaluateModifiers(
+export function productionModifierEvaluate(
   context: ProductionModifierContext,
 ): ProductionModifierResult[] {
   const results: ProductionModifierResult[] = [];
@@ -195,7 +195,7 @@ export function evaluateModifiers(
 /**
  * Apply modifiers multiplicatively: base * mod1 * mod2 * ... * modN.
  */
-export function applyModifiers(base: number, modifiers: number[]): number {
+export function productionModifierApply(base: number, modifiers: number[]): number {
   let result = base;
   for (const mod of modifiers) {
     result *= mod;
@@ -207,7 +207,7 @@ export function applyModifiers(base: number, modifiers: number[]): number {
  * Calculate the combined production modifier multiplier for a room in context.
  * Multiplies all applicable modifiers together.
  */
-export function calculateProductionModifiers(
+export function productionModifierCalculate(
   context: ProductionModifierContext,
 ): number {
   let combined = 1.0;

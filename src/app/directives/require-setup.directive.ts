@@ -1,5 +1,5 @@
 import { computed, Directive } from '@angular/core';
-import { isSetup } from '@helpers';
+import { setupIs } from '@helpers';
 import { hostBinding } from 'ngxtension/host-binding';
 
 @Directive({
@@ -8,6 +8,6 @@ import { hostBinding } from 'ngxtension/host-binding';
 export class RequireSetupDirective {
   public hidden = hostBinding(
     'class.hidden',
-    computed(() => !isSetup()),
+    computed(() => !setupIs()),
   );
 }

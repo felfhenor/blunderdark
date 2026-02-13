@@ -1,7 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
-import { gameloopShouldRun, getOption } from '@helpers';
+import { gameloopShouldRun, optionsGet } from '@helpers';
 import type { BGM } from '@interfaces/sfx';
 import { SoundService } from '@services/sound.service';
 
@@ -16,8 +16,8 @@ export class BGMService {
   private currentPlace = signal<'menu' | 'game' | ''>('');
   private lastBGM = signal<BGM | undefined>(undefined);
 
-  private lastBGMPlaySetting = signal<boolean>(getOption('bgmPlay'));
-  private curBGMPlaySetting = computed(() => getOption('bgmPlay'));
+  private lastBGMPlaySetting = signal<boolean>(optionsGet('bgmPlay'));
+  private curBGMPlaySetting = computed(() => optionsGet('bgmPlay'));
 
   constructor() {
     effect(() => {

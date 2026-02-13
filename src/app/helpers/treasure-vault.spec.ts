@@ -55,10 +55,10 @@ const dragonsHoardPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const treasureVaultRoom: RoomDefinition & IsContentItem = {
@@ -186,16 +186,16 @@ mockContent.set('def-goblin', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateSingleRoomProduction,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateSingleRoom,
+  productionCalculateTotal,
+  productionGetBase,
   productionPerMinute,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -266,7 +266,7 @@ describe('Treasure Vault: definition', () => {
 
 describe('Treasure Vault: base production', () => {
   it('should have base production of 0.8 gold/tick (4 gold/min)', () => {
-    const production = getBaseProduction(TREASURE_VAULT_ID);
+    const production = productionGetBase(TREASURE_VAULT_ID);
     expect(production).toEqual({ gold: 0.8 });
     expect(productionPerMinute(production['gold']!)).toBeCloseTo(4.0);
   });
@@ -274,7 +274,7 @@ describe('Treasure Vault: base production', () => {
   it('should produce gold even without workers (passive)', () => {
     const vault = createPlacedVault();
     const floor = makeFloor([vault]);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production['gold']).toBeCloseTo(0.8);
   });
 });
@@ -290,7 +290,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [vault, forge];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       vault,
       ['placed-forge-1'],
       allRooms,
@@ -308,7 +308,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [vault, altar];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       vault,
       ['placed-altar-1'],
       allRooms,
@@ -326,7 +326,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [vault, throne];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       vault,
       ['placed-throne-1'],
       allRooms,
@@ -344,7 +344,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [vault1, vault2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       vault1,
       ['placed-vault-2'],
       allRooms,
@@ -369,7 +369,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
       anchorY: 3,
     };
     const allRooms = [vault, forge, altar];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       vault,
       ['placed-forge-1', 'placed-altar-1'],
       allRooms,
@@ -381,7 +381,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
 
 describe('Treasure Vault: Reinforced Vault upgrade', () => {
   it('should have productionMultiplier 1.5 and fearReduction 1', () => {
-    const paths = getUpgradePaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
     const reinforced = paths.find((p) => p.name === 'Reinforced Vault');
     expect(reinforced).toBeDefined();
     expect(reinforced!.effects).toHaveLength(2);
@@ -401,7 +401,7 @@ describe('Treasure Vault: Reinforced Vault upgrade', () => {
 
 describe('Treasure Vault: Investment Vault upgrade', () => {
   it('should have productionMultiplier 2.0 and maxInhabitantBonus 1', () => {
-    const paths = getUpgradePaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
     const investment = paths.find((p) => p.name === 'Investment Vault');
     expect(investment).toBeDefined();
     expect(investment!.effects).toHaveLength(2);
@@ -421,14 +421,14 @@ describe('Treasure Vault: Investment Vault upgrade', () => {
     const room = createPlacedVault({
       appliedUpgradePathId: 'upgrade-investment-vault',
     });
-    const effective = getEffectiveMaxInhabitants(room, treasureVaultRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
     expect(effective).toBe(2);
   });
 });
 
 describe("Treasure Vault: Dragon's Hoard upgrade", () => {
   it('should have productionMultiplier 2.5 and fearIncrease 2', () => {
-    const paths = getUpgradePaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
     const hoard = paths.find((p) => p.name === "Dragon's Hoard");
     expect(hoard).toBeDefined();
     expect(hoard!.effects).toHaveLength(2);
@@ -448,7 +448,7 @@ describe("Treasure Vault: Dragon's Hoard upgrade", () => {
     const room = createPlacedVault({
       appliedUpgradePathId: 'upgrade-dragons-hoard',
     });
-    const effective = getEffectiveMaxInhabitants(room, treasureVaultRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
     expect(effective).toBe(1);
   });
 });
@@ -458,13 +458,13 @@ describe('Treasure Vault: upgrade mutual exclusivity', () => {
     const room = createPlacedVault({
       appliedUpgradePathId: 'upgrade-reinforced-vault',
     });
-    const result = canApplyUpgrade(room, 'upgrade-investment-vault');
+    const result = roomUpgradeCanApply(room, 'upgrade-investment-vault');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedVault();
-    const result = canApplyUpgrade(room, 'upgrade-reinforced-vault');
+    const result = roomUpgradeCanApply(room, 'upgrade-reinforced-vault');
     expect(result.valid).toBe(true);
   });
 });
@@ -480,7 +480,7 @@ describe('Treasure Vault: full production with adjacency', () => {
       anchorY: 0,
     };
     const floor = makeFloor([vault, altar]);
-    const production = calculateSingleRoomProduction(vault, floor);
+    const production = productionCalculateSingleRoom(vault, floor);
     // Base 0.8 * (1 + 0.25 adjacency) * 1.0 = 0.8 * 1.25 = 1.0
     expect(production['gold']).toBeCloseTo(1.0);
   });

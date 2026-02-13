@@ -3,37 +3,37 @@ import { signal } from '@angular/core';
 import type { ContentType, IsContentItem } from '@interfaces';
 
 const _allIdsByName = signal<Map<string, string>>(new Map());
-export const allIdsByName: Signal<Map<string, string>> =
+export const contentAllIdsByName: Signal<Map<string, string>> =
   _allIdsByName.asReadonly();
 
 const _allContentById = signal<Map<string, IsContentItem>>(new Map());
-export const allContentById: Signal<Map<string, Readonly<IsContentItem>>> =
+export const contentAllById: Signal<Map<string, Readonly<IsContentItem>>> =
   _allContentById.asReadonly();
 
-export function setAllIdsByName(state: Map<string, string>): void {
+export function contentSetAllIdsByName(state: Map<string, string>): void {
   _allIdsByName.set(new Map(state));
 }
 
-export function setAllContentById(state: Map<string, IsContentItem>): void {
+export function contentSetAllById(state: Map<string, IsContentItem>): void {
   _allContentById.set(new Map(state));
 }
 
-export function getEntriesByType<T>(type: ContentType): T[] {
+export function contentGetEntriesByType<T>(type: ContentType): T[] {
   return (
-    [...allContentById()]
+    [...contentAllById()]
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, entry]) => entry.__type === type)
       .map((e) => e[1]) as T[]
   );
 }
 
-export function getEntry<T extends IsContentItem>(
+export function contentGetEntry<T extends IsContentItem>(
   entryIdOrName: string,
 ): T | undefined {
   if (!entryIdOrName) return undefined;
 
-  const idHash = allIdsByName();
-  const entriesHash = allContentById();
+  const idHash = contentAllIdsByName();
+  const entriesHash = contentAllById();
 
   let ret: T = entriesHash.get(entryIdOrName) as T;
 

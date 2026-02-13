@@ -6,11 +6,11 @@ import type {
 } from '@interfaces';
 import type { InvaderClassType, InvaderDefinition } from '@interfaces/invader';
 import {
-  calculateDungeonProfile,
-  getCompositionWeights,
-  getPartySize,
-  selectPartyComposition,
-  resetInvasionCompositionCache,
+  invasionCompositionCalculateDungeonProfile,
+  invasionCompositionGetWeights,
+  invasionCompositionGetPartySize,
+  invasionCompositionSelectParty,
+  invasionCompositionResetCache,
 } from '@helpers/invasion-composition';
 import seedrandom from 'seedrandom';
 
@@ -30,16 +30,16 @@ const mockRoomDefs = [
 ];
 
 vi.mock('@helpers/content', () => ({
-  getEntriesByType: vi.fn((type: string) => {
+  contentGetEntriesByType: vi.fn((type: string) => {
     if (type === 'room') return mockRoomDefs;
     return [];
   }),
-  getEntry: vi.fn(() => undefined),
+  contentGetEntry: vi.fn(() => undefined),
 }));
 
 vi.mock('@helpers/invaders', () => ({
-  getAllInvaderDefinitions: vi.fn(() => []),
-  createInvaderInstance: vi.fn((def: InvaderDefinition) => ({
+  invaderGetAllDefinitions: vi.fn(() => []),
+  invaderCreateInstance: vi.fn((def: InvaderDefinition) => ({
     id: `instance-${def.id}`,
     definitionId: def.id,
     currentHp: def.baseStats.hp,
@@ -219,15 +219,15 @@ function makeGameState(overrides: {
 describe('invasion-composition', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetInvasionCompositionCache();
+    invasionCompositionResetCache();
   });
 
-  // --- calculateDungeonProfile ---
+  // --- invasionCompositionCalculateDungeonProfile ---
 
-  describe('calculateDungeonProfile', () => {
+  describe('invasionCompositionCalculateDungeonProfile', () => {
     it('should return zero profile for empty dungeon', () => {
       const state = makeGameState({});
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.corruption).toBe(0);
       expect(profile.wealth).toBe(0);
       expect(profile.knowledge).toBe(0);
@@ -237,13 +237,13 @@ describe('invasion-composition', () => {
 
     it('should calculate corruption from resources', () => {
       const state = makeGameState({ corruption: 75 });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.corruption).toBe(75);
     });
 
     it('should cap corruption at 100', () => {
       const state = makeGameState({ corruption: 150 });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.corruption).toBe(100);
     });
 
@@ -255,7 +255,7 @@ describe('invasion-composition', () => {
           { roomTypeId: 'aa100001-0001-0001-0001-000000000008' }, // Treasure Vault
         ],
       });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       // Gold: 500/1000 * 50 = 25
       // Room: 1 vault * 15 = 15
       // Total: 40
@@ -269,7 +269,7 @@ describe('invasion-composition', () => {
           { roomTypeId: 'aa100001-0001-0001-0001-000000000004' }, // Shadow Library
         ],
       });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       // Research: 3 * 10 = 30
       // Room: 1 library * 15 = 15
       // Total: 45
@@ -284,20 +284,20 @@ describe('invasion-composition', () => {
           { roomTypeId: 'room-c' },
         ],
       });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.size).toBe(3);
     });
 
     it('should calculate threat level from day', () => {
       const state = makeGameState({ day: 100 });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       // (100-1)/3 = 33
       expect(profile.threatLevel).toBe(33);
     });
 
     it('should cap threat level at 100', () => {
       const state = makeGameState({ day: 400 });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.threatLevel).toBe(100);
     });
 
@@ -313,45 +313,45 @@ describe('invasion-composition', () => {
           { roomTypeId: 'aa100001-0001-0001-0001-000000000002' },
         ],
       });
-      const profile = calculateDungeonProfile(state);
+      const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.wealth).toBeLessThanOrEqual(100);
     });
   });
 
-  // --- getCompositionWeights ---
+  // --- invasionCompositionGetWeights ---
 
-  describe('getCompositionWeights', () => {
+  describe('invasionCompositionGetWeights', () => {
     it('should return balanced weights when all profiles are low', () => {
       const profile = makeProfile({
         corruption: 20,
         wealth: 30,
         knowledge: 10,
       });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       expect(weights).toEqual(defaultWeightConfig.balanced);
     });
 
     it('should return high corruption weights when corruption > 60', () => {
       const profile = makeProfile({ corruption: 80 });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       expect(weights).toEqual(defaultWeightConfig.highCorruption);
     });
 
     it('should return high wealth weights when wealth > 60', () => {
       const profile = makeProfile({ wealth: 80 });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       expect(weights).toEqual(defaultWeightConfig.highWealth);
     });
 
     it('should return high knowledge weights when knowledge > 60', () => {
       const profile = makeProfile({ knowledge: 80 });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       expect(weights).toEqual(defaultWeightConfig.highKnowledge);
     });
 
     it('should average weights when multiple profiles are high', () => {
       const profile = makeProfile({ corruption: 80, wealth: 80 });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       // Average of highCorruption and highWealth
       expect(weights.warrior).toBe(
         Math.round(
@@ -371,18 +371,18 @@ describe('invasion-composition', () => {
 
     it('should not trigger on exactly 60 (requires > 60)', () => {
       const profile = makeProfile({ corruption: 60 });
-      const weights = getCompositionWeights(profile, defaultWeightConfig);
+      const weights = invasionCompositionGetWeights(profile, defaultWeightConfig);
       expect(weights).toEqual(defaultWeightConfig.balanced);
     });
   });
 
-  // --- getPartySize ---
+  // --- invasionCompositionGetPartySize ---
 
-  describe('getPartySize', () => {
+  describe('invasionCompositionGetPartySize', () => {
     it('should return 3-5 for small dungeons (1-10 rooms)', () => {
       for (let i = 0; i < 20; i++) {
         const rng = seedrandom(`small-${i}`);
-        const size = getPartySize(5, rng);
+        const size = invasionCompositionGetPartySize(5, rng);
         expect(size).toBeGreaterThanOrEqual(3);
         expect(size).toBeLessThanOrEqual(5);
       }
@@ -391,7 +391,7 @@ describe('invasion-composition', () => {
     it('should return 6-10 for medium dungeons (11-25 rooms)', () => {
       for (let i = 0; i < 20; i++) {
         const rng = seedrandom(`medium-${i}`);
-        const size = getPartySize(15, rng);
+        const size = invasionCompositionGetPartySize(15, rng);
         expect(size).toBeGreaterThanOrEqual(6);
         expect(size).toBeLessThanOrEqual(10);
       }
@@ -400,7 +400,7 @@ describe('invasion-composition', () => {
     it('should return 11-15 for large dungeons (26+ rooms)', () => {
       for (let i = 0; i < 20; i++) {
         const rng = seedrandom(`large-${i}`);
-        const size = getPartySize(30, rng);
+        const size = invasionCompositionGetPartySize(30, rng);
         expect(size).toBeGreaterThanOrEqual(11);
         expect(size).toBeLessThanOrEqual(15);
       }
@@ -408,18 +408,18 @@ describe('invasion-composition', () => {
 
     it('should respect min 3 for single-room dungeon', () => {
       const rng = seedrandom('tiny');
-      const size = getPartySize(1, rng);
+      const size = invasionCompositionGetPartySize(1, rng);
       expect(size).toBeGreaterThanOrEqual(3);
     });
   });
 
-  // --- selectPartyComposition ---
+  // --- invasionCompositionSelectParty ---
 
-  describe('selectPartyComposition', () => {
+  describe('invasionCompositionSelectParty', () => {
     it('should always include at least one warrior', () => {
       for (let i = 0; i < 10; i++) {
         const profile = makeProfile({ size: 10 });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.balanced,
@@ -433,7 +433,7 @@ describe('invasion-composition', () => {
     it('should not exceed 50% of party for any single class', () => {
       for (let i = 0; i < 20; i++) {
         const profile = makeProfile({ size: 20 });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.balanced,
@@ -455,13 +455,13 @@ describe('invasion-composition', () => {
 
     it('should produce deterministic results with same seed', () => {
       const profile = makeProfile({ size: 15 });
-      const party1 = selectPartyComposition(
+      const party1 = invasionCompositionSelectParty(
         profile,
         allDefs,
         defaultWeightConfig.balanced,
         'deterministic-seed',
       );
-      const party2 = selectPartyComposition(
+      const party2 = invasionCompositionSelectParty(
         profile,
         allDefs,
         defaultWeightConfig.balanced,
@@ -472,13 +472,13 @@ describe('invasion-composition', () => {
 
     it('should produce different results with different seeds', () => {
       const profile = makeProfile({ size: 20 });
-      const party1 = selectPartyComposition(
+      const party1 = invasionCompositionSelectParty(
         profile,
         allDefs,
         defaultWeightConfig.balanced,
         'seed-a',
       );
-      const party2 = selectPartyComposition(
+      const party2 = invasionCompositionSelectParty(
         profile,
         allDefs,
         defaultWeightConfig.balanced,
@@ -493,7 +493,7 @@ describe('invasion-composition', () => {
     it('should have at least 3 different classes for balanced profiles', () => {
       for (let i = 0; i < 20; i++) {
         const profile = makeProfile({ size: 15 });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.balanced,
@@ -507,7 +507,7 @@ describe('invasion-composition', () => {
     it('should respect party size bounds (min 3, max 15)', () => {
       for (let size = 1; size <= 50; size += 5) {
         const profile = makeProfile({ size });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.balanced,
@@ -528,7 +528,7 @@ describe('invasion-composition', () => {
           corruption: 80,
           size: 20,
         });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.highCorruption,
@@ -555,7 +555,7 @@ describe('invasion-composition', () => {
           wealth: 80,
           size: 20,
         });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.highWealth,
@@ -582,7 +582,7 @@ describe('invasion-composition', () => {
           knowledge: 80,
           size: 20,
         });
-        const party = selectPartyComposition(
+        const party = invasionCompositionSelectParty(
           profile,
           allDefs,
           defaultWeightConfig.highKnowledge,

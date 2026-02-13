@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import type { GridState, GridTile } from '@interfaces/grid';
 import { GRID_SIZE } from '@interfaces/grid';
 
-export function createEmptyGrid(): GridState {
+export function gridCreateEmpty(): GridState {
   return Array.from({ length: GRID_SIZE }, () =>
     Array.from({ length: GRID_SIZE }, () => ({
       occupied: false,
@@ -14,46 +14,46 @@ export function createEmptyGrid(): GridState {
   );
 }
 
-export function isInBounds(x: number, y: number): boolean {
+export function gridIsInBounds(x: number, y: number): boolean {
   return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
 }
 
-export function getTile(
+export function gridGetTile(
   grid: GridState,
   x: number,
   y: number,
 ): GridTile | undefined {
-  if (!isInBounds(x, y)) return undefined;
+  if (!gridIsInBounds(x, y)) return undefined;
   return grid[y][x];
 }
 
-export function setTile(
+export function gridSetTile(
   grid: GridState,
   x: number,
   y: number,
   tile: GridTile,
 ): GridState {
-  if (!isInBounds(x, y)) return grid;
+  if (!gridIsInBounds(x, y)) return grid;
   const newGrid = grid.map((row) => [...row]);
   newGrid[y][x] = { ...tile };
   return newGrid;
 }
 
-export function resetGrid(): GridState {
-  return createEmptyGrid();
+export function gridReset(): GridState {
+  return gridCreateEmpty();
 }
 
-export const selectedTile = signal<{ x: number; y: number } | undefined>(undefined);
+export const gridSelectedTile = signal<{ x: number; y: number } | undefined>(undefined);
 
-export function selectTile(x: number, y: number): void {
-  const current = selectedTile();
+export function gridSelectTile(x: number, y: number): void {
+  const current = gridSelectedTile();
   if (current?.x === x && current?.y === y) {
-    selectedTile.set(undefined);
+    gridSelectedTile.set(undefined);
   } else {
-    selectedTile.set({ x, y });
+    gridSelectedTile.set({ x, y });
   }
 }
 
-export function deselectTile(): void {
-  selectedTile.set(undefined);
+export function gridDeselectTile(): void {
+  gridSelectedTile.set(undefined);
 }

@@ -14,7 +14,7 @@ import { PanelTrainingGroundsComponent } from '@components/panel-training-ground
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { getOption } from '@helpers';
+import { optionsGet } from '@helpers';
 
 @Component({
   selector: 'app-game-play',
@@ -38,5 +38,5 @@ import { getOption } from '@helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamePlayComponent extends OptionsBaseComponent {
-  public isPaused = computed(() => getOption('gameloopPaused'));
+  public isPaused = computed(() => optionsGet('gameloopPaused'));
 }

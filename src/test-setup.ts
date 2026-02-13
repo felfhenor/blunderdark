@@ -150,10 +150,10 @@ vi.mock('@helpers/signal', () => {
   };
 
   return {
-    localStorageSignal: vi.fn((key: string, initialValue: unknown) =>
+    signalLocalStorage: vi.fn((key: string, initialValue: unknown) =>
       mockSignal(initialValue),
     ),
-    indexedDbSignal: vi.fn((key: string, initialValue: unknown) =>
+    signalIndexedDb: vi.fn((key: string, initialValue: unknown) =>
       mockSignal(initialValue),
     ),
   };

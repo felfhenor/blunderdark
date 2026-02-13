@@ -20,7 +20,7 @@ const mockFloors: Floor[] = [];
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -28,24 +28,24 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 vi.mock('@helpers/room-roles', () => ({
-  findRoomIdByRole: vi.fn((role: string) => {
+  roomRoleFindById: vi.fn((role: string) => {
     if (role === 'throne') return THRONE_ROOM_TYPE_ID;
     return undefined;
   }),
-  resetRoleCache: vi.fn(),
+  roomRoleResetCache: vi.fn(),
 }));
 
 const {
-  EMPTY_THRONE_FEAR_LEVEL,
-  CENTRALITY_THRESHOLD,
-  CENTRALITY_RULER_BONUS_MULTIPLIER,
-  findThroneRoom,
-  getSeatedRulerInstance,
-  getActiveRulerBonuses,
-  getRulerBonusValue,
-  getThroneRoomFearLevel,
-  isRoomCentral,
-  getThroneRoomPositionalBonuses,
+  THRONE_ROOM_EMPTY_FEAR_LEVEL,
+  THRONE_ROOM_CENTRALITY_THRESHOLD,
+  THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER,
+  throneRoomFind,
+  throneRoomGetSeatedRulerInstance,
+  throneRoomGetActiveRulerBonuses,
+  throneRoomGetRulerBonusValue,
+  throneRoomGetFearLevel,
+  throneRoomIsRoomCentral,
+  throneRoomGetPositionalBonuses,
 } = await import('@helpers/throne-room');
 
 // --- Test helpers ---
@@ -100,7 +100,7 @@ function createInhabitantDef(
   } as InhabitantDefinition & IsContentItem;
 }
 
-function createFloor(overrides: Partial<Floor> = {}): Floor {
+function floorCreate(overrides: Partial<Floor> = {}): Floor {
   return {
     id: 'floor-1',
     name: 'Floor 1',
@@ -117,13 +117,13 @@ function createFloor(overrides: Partial<Floor> = {}): Floor {
 
 // --- Tests ---
 
-describe('findThroneRoom', () => {
+describe('throneRoomFind', () => {
   it('should return undefined when no floors exist', () => {
-    expect(findThroneRoom([])).toBeUndefined();
+    expect(throneRoomFind([])).toBeUndefined();
   });
 
   it('should return undefined when Throne Room is not placed', () => {
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({
           id: 'room-other',
@@ -131,72 +131,72 @@ describe('findThroneRoom', () => {
         }),
       ],
     });
-    expect(findThroneRoom([floor])).toBeUndefined();
+    expect(throneRoomFind([floor])).toBeUndefined();
   });
 
   it('should find Throne Room on the first floor', () => {
     const throneRoom = createPlacedRoom();
-    const floor = createFloor({ rooms: [throneRoom] });
-    const result = findThroneRoom([floor]);
+    const floor = floorCreate({ rooms: [throneRoom] });
+    const result = throneRoomFind([floor]);
     expect(result).toBeDefined();
     expect(result!.room.id).toBe('room-001');
     expect(result!.floor.id).toBe('floor-1');
   });
 
   it('should find Throne Room on a deeper floor', () => {
-    const floor1 = createFloor({ id: 'floor-1', rooms: [] });
+    const floor1 = floorCreate({ id: 'floor-1', rooms: [] });
     const throneRoom = createPlacedRoom();
-    const floor2 = createFloor({
+    const floor2 = floorCreate({
       id: 'floor-2',
       depth: 2,
       rooms: [throneRoom],
     });
-    const result = findThroneRoom([floor1, floor2]);
+    const result = throneRoomFind([floor1, floor2]);
     expect(result).toBeDefined();
     expect(result!.floor.id).toBe('floor-2');
   });
 });
 
-describe('getSeatedRulerInstance', () => {
+describe('throneRoomGetSeatedRulerInstance', () => {
   it('should return undefined when no inhabitants are assigned', () => {
-    const floor = createFloor({ inhabitants: [] });
-    expect(getSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
+    const floor = floorCreate({ inhabitants: [] });
+    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
   });
 
   it('should return undefined when no inhabitant is assigned to the throne room', () => {
-    const floor = createFloor({
+    const floor = floorCreate({
       inhabitants: [
         createInhabitantInstance({ assignedRoomId: 'other-room' }),
       ],
     });
-    expect(getSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
+    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
   });
 
   it('should return the seated ruler', () => {
     const ruler = createInhabitantInstance({ assignedRoomId: 'room-001' });
-    const floor = createFloor({ inhabitants: [ruler] });
-    const result = getSeatedRulerInstance(floor, 'room-001');
+    const floor = floorCreate({ inhabitants: [ruler] });
+    const result = throneRoomGetSeatedRulerInstance(floor, 'room-001');
     expect(result).toBeDefined();
     expect(result!.instanceId).toBe('ruler-001');
   });
 });
 
-describe('getActiveRulerBonuses', () => {
+describe('throneRoomGetActiveRulerBonuses', () => {
   beforeEach(() => {
     mockContent.clear();
   });
 
   it('should return empty bonuses when no Throne Room exists', () => {
-    const bonuses = getActiveRulerBonuses([createFloor()]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floorCreate()]);
     expect(bonuses).toEqual({});
   });
 
   it('should return empty bonuses when Throne Room is empty', () => {
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [],
     });
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses).toEqual({});
   });
 
@@ -207,7 +207,7 @@ describe('getActiveRulerBonuses', () => {
     });
     mockContent.set('def-dragon', dragonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -217,7 +217,7 @@ describe('getActiveRulerBonuses', () => {
       ],
     });
 
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses['attack']).toBe(0.1);
     expect(bonuses['fear']).toBe(0.05);
   });
@@ -230,7 +230,7 @@ describe('getActiveRulerBonuses', () => {
     });
     mockContent.set('def-lich', lichDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -242,7 +242,7 @@ describe('getActiveRulerBonuses', () => {
       ],
     });
 
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses['researchSpeed']).toBe(0.2);
     expect(bonuses['fluxProduction']).toBe(0.15);
   });
@@ -255,7 +255,7 @@ describe('getActiveRulerBonuses', () => {
     });
     mockContent.set('def-demon', demonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -267,7 +267,7 @@ describe('getActiveRulerBonuses', () => {
       ],
     });
 
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses['corruptionGeneration']).toBe(0.25);
     expect(bonuses['fear']).toBe(0.1);
     expect(bonuses['invaderMorale']).toBe(-0.1);
@@ -277,19 +277,19 @@ describe('getActiveRulerBonuses', () => {
     const dragonDef = createInhabitantDef();
     mockContent.set('def-dragon', dragonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({ assignedRoomId: undefined }),
       ],
     });
 
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses).toEqual({});
   });
 
   it('should return empty bonuses when ruler definition is unknown', () => {
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -299,18 +299,18 @@ describe('getActiveRulerBonuses', () => {
       ],
     });
 
-    const bonuses = getActiveRulerBonuses([floor]);
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses).toEqual({});
   });
 });
 
-describe('getRulerBonusValue', () => {
+describe('throneRoomGetRulerBonusValue', () => {
   beforeEach(() => {
     mockContent.clear();
   });
 
   it('should return 0 for a bonus type when no ruler is seated', () => {
-    expect(getRulerBonusValue([createFloor()], 'attack')).toBe(0);
+    expect(throneRoomGetRulerBonusValue([floorCreate()], 'attack')).toBe(0);
   });
 
   it('should return the correct bonus value for a specific type', () => {
@@ -319,7 +319,7 @@ describe('getRulerBonusValue', () => {
     });
     mockContent.set('def-dragon', dragonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -329,28 +329,28 @@ describe('getRulerBonusValue', () => {
       ],
     });
 
-    expect(getRulerBonusValue([floor], 'attack')).toBe(0.1);
-    expect(getRulerBonusValue([floor], 'fear')).toBe(0.05);
-    expect(getRulerBonusValue([floor], 'researchSpeed')).toBe(0);
+    expect(throneRoomGetRulerBonusValue([floor], 'attack')).toBe(0.1);
+    expect(throneRoomGetRulerBonusValue([floor], 'fear')).toBe(0.05);
+    expect(throneRoomGetRulerBonusValue([floor], 'researchSpeed')).toBe(0);
   });
 });
 
-describe('getThroneRoomFearLevel', () => {
+describe('throneRoomGetFearLevel', () => {
   beforeEach(() => {
     mockContent.clear();
   });
 
   it('should return undefined when no Throne Room exists', () => {
-    expect(getThroneRoomFearLevel([createFloor()])).toBeUndefined();
+    expect(throneRoomGetFearLevel([floorCreate()])).toBeUndefined();
   });
 
-  it('should return EMPTY_THRONE_FEAR_LEVEL when Throne Room has no ruler', () => {
-    const floor = createFloor({
+  it('should return THRONE_ROOM_EMPTY_FEAR_LEVEL when Throne Room has no ruler', () => {
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [],
     });
-    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
-    expect(EMPTY_THRONE_FEAR_LEVEL).toBe(1);
+    expect(throneRoomGetFearLevel([floor])).toBe(THRONE_ROOM_EMPTY_FEAR_LEVEL);
+    expect(THRONE_ROOM_EMPTY_FEAR_LEVEL).toBe(1);
   });
 
   it('should return fear level 4 for Dragon ruler', () => {
@@ -360,7 +360,7 @@ describe('getThroneRoomFearLevel', () => {
     });
     mockContent.set('def-dragon', dragonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -370,7 +370,7 @@ describe('getThroneRoomFearLevel', () => {
       ],
     });
 
-    expect(getThroneRoomFearLevel([floor])).toBe(4);
+    expect(throneRoomGetFearLevel([floor])).toBe(4);
   });
 
   it('should return fear level 3 for Lich ruler', () => {
@@ -381,7 +381,7 @@ describe('getThroneRoomFearLevel', () => {
     });
     mockContent.set('def-lich', lichDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -392,7 +392,7 @@ describe('getThroneRoomFearLevel', () => {
       ],
     });
 
-    expect(getThroneRoomFearLevel([floor])).toBe(3);
+    expect(throneRoomGetFearLevel([floor])).toBe(3);
   });
 
   it('should return fear level 5 for Demon Lord ruler', () => {
@@ -403,7 +403,7 @@ describe('getThroneRoomFearLevel', () => {
     });
     mockContent.set('def-demon', demonDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -414,11 +414,11 @@ describe('getThroneRoomFearLevel', () => {
       ],
     });
 
-    expect(getThroneRoomFearLevel([floor])).toBe(5);
+    expect(throneRoomGetFearLevel([floor])).toBe(5);
   });
 
-  it('should return EMPTY_THRONE_FEAR_LEVEL when ruler definition is unknown', () => {
-    const floor = createFloor({
+  it('should return THRONE_ROOM_EMPTY_FEAR_LEVEL when ruler definition is unknown', () => {
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -428,17 +428,17 @@ describe('getThroneRoomFearLevel', () => {
       ],
     });
 
-    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
+    expect(throneRoomGetFearLevel([floor])).toBe(THRONE_ROOM_EMPTY_FEAR_LEVEL);
   });
 
-  it('should return EMPTY_THRONE_FEAR_LEVEL when ruler has rulerFearLevel 0', () => {
+  it('should return THRONE_ROOM_EMPTY_FEAR_LEVEL when ruler has rulerFearLevel 0', () => {
     const weakDef = createInhabitantDef({
       id: 'def-weak',
       rulerFearLevel: 0,
     });
     mockContent.set('def-weak', weakDef);
 
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom()],
       inhabitants: [
         createInhabitantInstance({
@@ -448,7 +448,7 @@ describe('getThroneRoomFearLevel', () => {
       ],
     });
 
-    expect(getThroneRoomFearLevel([floor])).toBe(EMPTY_THRONE_FEAR_LEVEL);
+    expect(throneRoomGetFearLevel([floor])).toBe(THRONE_ROOM_EMPTY_FEAR_LEVEL);
   });
 });
 
@@ -500,34 +500,34 @@ function createVaultRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 
 // --- Adjacency & centrality tests ---
 
-describe('isRoomCentral', () => {
+describe('throneRoomIsRoomCentral', () => {
   it('should return true when room center is at grid center', () => {
     // 4x4 room at anchor (8,8): center = (10, 10), grid center = (10, 10)
-    expect(isRoomCentral(8, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+    expect(throneRoomIsRoomCentral(8, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
   });
 
   it('should return true when room center is within threshold', () => {
     // 4x4 room at anchor (6,6): center = (8, 8), distance = 4
-    expect(isRoomCentral(6, 6, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+    expect(throneRoomIsRoomCentral(6, 6, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
   });
 
   it('should return false when room center is beyond threshold', () => {
     // 4x4 room at anchor (0,0): center = (2, 2), distance = 16
-    expect(isRoomCentral(0, 0, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(false);
+    expect(throneRoomIsRoomCentral(0, 0, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(false);
   });
 
   it('should return true at exactly the threshold distance', () => {
     // 4x4 room at anchor (3,8): center = (5, 10), distance = |5-10| + |10-10| = 5
-    expect(isRoomCentral(3, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(true);
+    expect(throneRoomIsRoomCentral(3, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
   });
 
   it('should return false just beyond the threshold', () => {
     // 4x4 room at anchor (2,8): center = (4, 10), distance = |4-10| + |10-10| = 6
-    expect(isRoomCentral(2, 8, 4, 4, 20, CENTRALITY_THRESHOLD)).toBe(false);
+    expect(throneRoomIsRoomCentral(2, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(false);
   });
 });
 
-describe('getThroneRoomPositionalBonuses', () => {
+describe('throneRoomGetPositionalBonuses', () => {
   beforeEach(() => {
     mockContent.clear();
     mockContent.set(TREASURE_VAULT_TYPE_ID, {
@@ -538,7 +538,7 @@ describe('getThroneRoomPositionalBonuses', () => {
   });
 
   it('should return default bonuses when no Throne Room exists', () => {
-    const result = getThroneRoomPositionalBonuses([createFloor()]);
+    const result = throneRoomGetPositionalBonuses([floorCreate()]);
     expect(result.vaultAdjacent).toBe(false);
     expect(result.central).toBe(false);
     expect(result.goldProductionBonus).toBe(0);
@@ -546,10 +546,10 @@ describe('getThroneRoomPositionalBonuses', () => {
   });
 
   it('should return default bonuses when throne shape is unknown', () => {
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom({ shapeId: 'nonexistent-shape' })],
     });
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(false);
     expect(result.central).toBe(false);
   });
@@ -561,14 +561,14 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-3x3', vaultShape);
 
     // Throne at (5,5), vault at (9,5) — vault left edge touches throne right edge
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({ anchorX: 5, anchorY: 5 }),
         createVaultRoom({ anchorX: 9, anchorY: 5 }),
       ],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(true);
     expect(result.goldProductionBonus).toBe(VAULT_ADJACENCY_GOLD_BONUS);
   });
@@ -580,14 +580,14 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-3x3', vaultShape);
 
     // Throne at (5,5), vault at (15,15) — not adjacent
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({ anchorX: 5, anchorY: 5 }),
         createVaultRoom({ anchorX: 15, anchorY: 15 }),
       ],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(false);
     expect(result.goldProductionBonus).toBe(0);
   });
@@ -599,14 +599,14 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-3x3', vaultShape);
 
     // Throne at (5,5) occupies (5,5)-(8,8). Vault at (9,9) — only diagonal
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({ anchorX: 5, anchorY: 5 }),
         createVaultRoom({ anchorX: 9, anchorY: 9 }),
       ],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(false);
   });
 
@@ -615,13 +615,13 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-4x4', throneShape);
 
     // Throne at (8,8): center = (10,10), distance = 0
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom({ anchorX: 8, anchorY: 8 })],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.central).toBe(true);
-    expect(result.rulerBonusMultiplier).toBe(CENTRALITY_RULER_BONUS_MULTIPLIER);
+    expect(result.rulerBonusMultiplier).toBe(THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER);
   });
 
   it('should not detect central placement when far from center', () => {
@@ -629,11 +629,11 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-4x4', throneShape);
 
     // Throne at (0,0): center = (2,2), distance = 16
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [createPlacedRoom({ anchorX: 0, anchorY: 0 })],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.central).toBe(false);
     expect(result.rulerBonusMultiplier).toBe(0);
   });
@@ -645,18 +645,18 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-3x3', vaultShape);
 
     // Throne at (8,8) is central, vault at (12,8) is adjacent
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({ anchorX: 8, anchorY: 8 }),
         createVaultRoom({ anchorX: 12, anchorY: 8 }),
       ],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(true);
     expect(result.central).toBe(true);
     expect(result.goldProductionBonus).toBe(VAULT_ADJACENCY_GOLD_BONUS);
-    expect(result.rulerBonusMultiplier).toBe(CENTRALITY_RULER_BONUS_MULTIPLIER);
+    expect(result.rulerBonusMultiplier).toBe(THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER);
   });
 
   it('should ignore non-vault rooms for adjacency', () => {
@@ -666,7 +666,7 @@ describe('getThroneRoomPositionalBonuses', () => {
     mockContent.set('shape-3x3', otherShape);
 
     // Adjacent room is NOT a vault
-    const floor = createFloor({
+    const floor = floorCreate({
       rooms: [
         createPlacedRoom({ anchorX: 5, anchorY: 5 }),
         {
@@ -679,7 +679,7 @@ describe('getThroneRoomPositionalBonuses', () => {
       ],
     });
 
-    const result = getThroneRoomPositionalBonuses([floor]);
+    const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(false);
   });
 });

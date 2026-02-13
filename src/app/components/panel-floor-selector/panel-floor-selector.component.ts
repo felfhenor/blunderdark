@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  allFloors,
-  canCreateFloor,
-  createFloor,
-  currentFloor,
-  currentFloorIndex,
-  getFloorCreationCost,
-  setCurrentFloorByIndex,
+  floorAll,
+  floorCanCreate,
+  floorCreate,
+  floorCurrent,
+  floorCurrentIndex,
+  floorGetCreationCost,
+  floorSetCurrentByIndex,
 } from '@helpers';
 import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
@@ -20,9 +20,9 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelFloorSelectorComponent {
-  public floors = allFloors;
-  public currentIndex = currentFloorIndex;
-  public selectedFloor = currentFloor;
+  public floors = floorAll;
+  public currentIndex = floorCurrentIndex;
+  public selectedFloor = floorCurrent;
 
   public selectedFloorBiome = computed(() => {
     const floor = this.selectedFloor();
@@ -32,11 +32,11 @@ export class PanelFloorSelectorComponent {
 
   public nextFloorCost = computed(() => {
     const nextDepth = this.floors().length + 1;
-    return getFloorCreationCost(nextDepth);
+    return floorGetCreationCost(nextDepth);
   });
 
   public canCreate = computed(() => {
-    return canCreateFloor();
+    return floorCanCreate();
   });
 
   public isMaxFloors = computed(() => {
@@ -72,11 +72,11 @@ export class PanelFloorSelectorComponent {
   }
 
   public async selectFloor(index: number): Promise<void> {
-    await setCurrentFloorByIndex(index);
+    await floorSetCurrentByIndex(index);
   }
 
   public async onConfirmCreateFloor(): Promise<void> {
-    await createFloor();
+    await floorCreate();
   }
 
   public trackByFloorId(_index: number, floor: Floor): string {

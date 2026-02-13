@@ -6,12 +6,12 @@ import type {
   CombatUnit,
 } from '@interfaces';
 
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 
 /**
  * Create initial ability states for a set of abilities (all off cooldown).
  */
-export function initAbilityStates(
+export function combatAbilityInitStates(
   abilities: CombatAbility[],
 ): AbilityState[] {
   return abilities.map((a) => ({
@@ -28,7 +28,7 @@ export function initAbilityStates(
  * - Decrements active durations; deactivates when duration reaches 0.
  * Returns new array (does not mutate input).
  */
-export function tickAbilityStates(
+export function combatAbilityTickStates(
   states: AbilityState[],
 ): AbilityState[] {
   return states.map((s) => {
@@ -55,7 +55,7 @@ export function tickAbilityStates(
 /**
  * Check if an ability is ready to use (off cooldown).
  */
-export function isAbilityReady(
+export function combatAbilityIsReady(
   ability: CombatAbility,
   states: AbilityState[],
 ): boolean {
@@ -71,21 +71,21 @@ export function isAbilityReady(
 function getEffectDefinition(
   ability: CombatAbility,
 ): AbilityEffectDefinition | undefined {
-  return getEntry<AbilityEffectDefinition>(ability.effectType);
+  return contentGetEntry<AbilityEffectDefinition>(ability.effectType);
 }
 
 /**
  * Try to activate an ability based on its proc chance.
  * Returns null if the ability doesn't proc or is on cooldown.
  */
-export function tryActivateAbility(
+export function combatAbilityTryActivate(
   ability: CombatAbility,
   states: AbilityState[],
   attacker: CombatUnit,
   targetCount: number,
   rng: () => number,
 ): { activation: AbilityActivation; updatedStates: AbilityState[] } | undefined {
-  if (!isAbilityReady(ability, states)) return undefined;
+  if (!combatAbilityIsReady(ability, states)) return undefined;
 
   // Check proc chance
   const roll = rng() * 100;
@@ -145,7 +145,7 @@ export function tryActivateAbility(
  * Check if a unit has an active evasion ability that blocks an incoming attack.
  * Returns true if the attack is evaded.
  */
-export function checkEvasion(
+export function combatAbilityCheckEvasion(
   abilities: CombatAbility[],
   states: AbilityState[],
   rng: () => number,
@@ -165,7 +165,7 @@ export function checkEvasion(
  * Apply berserk buff: returns modified attack stat.
  * value is the percentage bonus (e.g. 100 = +100% attack).
  */
-export function applyBerserkBuff(
+export function combatAbilityApplyBerserkBuff(
   baseAttack: number,
   abilities: CombatAbility[],
   states: AbilityState[],
@@ -189,7 +189,7 @@ export function applyBerserkBuff(
  * Apply shield buff: returns modified defense stat.
  * Only applies if the shield ability is currently active.
  */
-export function applyShieldBuff(
+export function combatAbilityApplyShieldBuff(
   baseDefense: number,
   abilities: CombatAbility[],
   states: AbilityState[],

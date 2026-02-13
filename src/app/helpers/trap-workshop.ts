@@ -1,8 +1,8 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
-import { TICKS_PER_MINUTE } from '@helpers/game-time';
-import { findRoomIdByRole } from '@helpers/room-roles';
-import { getAppliedUpgradeEffects } from '@helpers/room-upgrades';
-import { addToTrapInventory } from '@helpers/traps';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { roomRoleFindById } from '@helpers/room-roles';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { trapAddToInventory } from '@helpers/traps';
 import type {
   GameState,
   IsContentItem,
@@ -14,15 +14,15 @@ import type {
 import type { ResourceCost } from '@interfaces/resource';
 
 /** Base crafting time: 3 game-minutes = 15 ticks */
-export const BASE_CRAFTING_TICKS = TICKS_PER_MINUTE * 3;
+export const TRAP_WORKSHOP_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3;
 
 // --- Crafting cost/time helpers ---
 
-export function getCraftingCostForRoom(
+export function trapWorkshopGetCraftingCost(
   placedRoom: PlacedRoom,
   baseCost: ResourceCost,
 ): ResourceCost {
-  const effects = getAppliedUpgradeEffects(placedRoom);
+  const effects = roomUpgradeGetAppliedEffects(placedRoom);
   let costMultiplier = 1;
   for (const effect of effects) {
     if (effect.type === 'craftingCostMultiplier') {
@@ -43,13 +43,13 @@ export function getCraftingCostForRoom(
   return adjusted;
 }
 
-export function getCraftingTicksForRoom(
+export function trapWorkshopGetCraftingTicks(
   placedRoom: PlacedRoom,
   assignedWorkerCount: number,
 ): number {
-  let ticks = BASE_CRAFTING_TICKS;
+  let ticks = TRAP_WORKSHOP_BASE_CRAFTING_TICKS;
 
-  const effects = getAppliedUpgradeEffects(placedRoom);
+  const effects = roomUpgradeGetAppliedEffects(placedRoom);
   for (const effect of effects) {
     if (effect.type === 'craftingSpeedMultiplier') {
       ticks = Math.round(ticks * effect.value);
@@ -67,14 +67,14 @@ export function getCraftingTicksForRoom(
 
 // --- Queue management ---
 
-export function getQueueForRoom(
+export function trapWorkshopGetQueue(
   queues: TrapCraftingQueue[],
   roomId: string,
 ): TrapCraftingQueue | undefined {
   return queues.find((q) => q.roomId === roomId);
 }
 
-export function addJobToQueue(
+export function trapWorkshopAddJob(
   queues: TrapCraftingQueue[],
   roomId: string,
   trapTypeId: string,
@@ -96,7 +96,7 @@ export function addJobToQueue(
   return [...queues, { roomId, jobs: [job] }];
 }
 
-export function removeJobFromQueue(
+export function trapWorkshopRemoveJob(
   queues: TrapCraftingQueue[],
   roomId: string,
   jobIndex: number,
@@ -112,7 +112,7 @@ export function removeJobFromQueue(
 
 // --- Validation ---
 
-export function canQueueTrap(
+export function trapWorkshopCanQueue(
   roomId: string,
   floors: GameState['world']['floors'],
 ): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
@@ -120,7 +120,7 @@ export function canQueueTrap(
     const room = floor.rooms.find((r) => r.id === roomId);
     if (!room) continue;
 
-    if (room.roomTypeId !== findRoomIdByRole('trapWorkshop')) {
+    if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) {
       return { canQueue: false, reason: 'Room is not a Trap Workshop' };
     }
 
@@ -142,10 +142,10 @@ export function canQueueTrap(
 
 // --- Tick processing ---
 
-export function processTrapCrafting(state: GameState): void {
+export function trapWorkshopProcess(state: GameState): void {
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
-      if (room.roomTypeId !== findRoomIdByRole('trapWorkshop')) continue;
+      if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
 
       const queueIndex = state.world.trapCraftingQueues.findIndex(
         (q) => q.roomId === room.id,
@@ -166,7 +166,7 @@ export function processTrapCrafting(state: GameState): void {
 
       if (job.progress >= job.targetTicks) {
         // Job complete: add to inventory and remove from queue
-        state.world.trapInventory = addToTrapInventory(
+        state.world.trapInventory = trapAddToInventory(
           state.world.trapInventory,
           job.trapTypeId,
         );
@@ -191,26 +191,26 @@ export type TrapWorkshopInfo = {
   availableTraps: (TrapDefinition & IsContentItem)[];
 };
 
-export function getTrapWorkshopInfo(
+export function trapWorkshopGetInfo(
   roomId: string,
   state: GameState,
 ): TrapWorkshopInfo | undefined {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
-    if (!room || room.roomTypeId !== findRoomIdByRole('trapWorkshop')) continue;
+    if (!room || room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
 
     const assignedWorkerCount = floor.inhabitants.filter(
       (i) => i.assignedRoomId === roomId,
     ).length;
 
-    const craftingTicks = getCraftingTicksForRoom(room, assignedWorkerCount);
+    const craftingTicks = trapWorkshopGetCraftingTicks(room, assignedWorkerCount);
 
-    const queueEntry = getQueueForRoom(
+    const queueEntry = trapWorkshopGetQueue(
       state.world.trapCraftingQueues,
       roomId,
     );
 
-    const allTraps = getEntriesByType<TrapDefinition & IsContentItem>('trap');
+    const allTraps = contentGetEntriesByType<TrapDefinition & IsContentItem>('trap');
 
     return {
       placedRoom: room,
@@ -223,8 +223,8 @@ export function getTrapWorkshopInfo(
   return undefined;
 }
 
-export function getTrapDefinitionById(
+export function trapWorkshopGetDefinitionById(
   trapTypeId: string,
 ): (TrapDefinition & IsContentItem) | undefined {
-  return getEntry<TrapDefinition & IsContentItem>(trapTypeId);
+  return contentGetEntry<TrapDefinition & IsContentItem>(trapTypeId);
 }

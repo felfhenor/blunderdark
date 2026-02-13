@@ -1,5 +1,5 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
-import { findRoomIdByRole } from '@helpers/room-roles';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { roomRoleFindById } from '@helpers/room-roles';
 import { rngShuffle, rngUuid } from '@helpers/rng';
 import type {
   GameState,
@@ -16,8 +16,8 @@ import seedrandom from 'seedrandom';
 
 // --- Helpers ---
 
-function getInhabitantTier(definitionId: string): number {
-  const def = getEntry<InhabitantDefinition & IsContentItem>(definitionId);
+function invasionObjectiveGetInhabitantTier(definitionId: string): number {
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
   return def?.tier ?? 1;
 }
 
@@ -25,9 +25,9 @@ function getInhabitantTier(definitionId: string): number {
 
 let objectiveTypeCache: Map<string, string[]> | undefined = undefined;
 
-function getObjectiveTypeMap(): Map<string, string[]> {
+function invasionObjectiveGetTypeMap(): Map<string, string[]> {
   if (!objectiveTypeCache) {
-    const rooms = getEntriesByType<RoomDefinition & IsContentItem>('room');
+    const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
     objectiveTypeCache = new Map();
     for (const room of rooms) {
       if (room.objectiveTypes) {
@@ -43,15 +43,15 @@ function getObjectiveTypeMap(): Map<string, string[]> {
   return objectiveTypeCache;
 }
 
-export function resetInvasionObjectivesCache(): void {
+export function invasionObjectiveResetCache(): void {
   objectiveTypeCache = undefined;
 }
 
-function findRoomByObjectiveType(
+function invasionObjectiveFindRoomByType(
   state: GameState,
   objectiveType: string,
 ): string | undefined {
-  const map = getObjectiveTypeMap();
+  const map = invasionObjectiveGetTypeMap();
   const roomTypeIds = map.get(objectiveType);
   if (!roomTypeIds || roomTypeIds.length === 0) return undefined;
 
@@ -65,11 +65,11 @@ function findRoomByObjectiveType(
   return undefined;
 }
 
-function hasRoomWithObjectiveType(
+function invasionObjectiveHasRoomWithType(
   state: GameState,
   objectiveType: string,
 ): boolean {
-  return findRoomByObjectiveType(state, objectiveType) !== undefined;
+  return invasionObjectiveFindRoomByType(state, objectiveType) !== undefined;
 }
 
 // --- Objective definitions ---
@@ -88,10 +88,10 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
     name: 'Slay Monster',
     description: 'Kill a powerful creature defending the dungeon.',
     isEligible: (state) =>
-      state.world.inhabitants.some((i) => getInhabitantTier(i.definitionId) >= 2),
+      state.world.inhabitants.some((i) => invasionObjectiveGetInhabitantTier(i.definitionId) >= 2),
     getTargetId: (state) => {
       const target = state.world.inhabitants.find(
-        (i) => getInhabitantTier(i.definitionId) >= 2,
+        (i) => invasionObjectiveGetInhabitantTier(i.definitionId) >= 2,
       );
       return target?.instanceId ?? undefined;
     },
@@ -100,29 +100,29 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
     type: 'StealTreasure',
     name: 'Steal Treasure',
     description: 'Loot gold from the dungeon treasury.',
-    isEligible: (state) => hasRoomWithObjectiveType(state, 'StealTreasure'),
-    getTargetId: (state) => findRoomByObjectiveType(state, 'StealTreasure'),
+    isEligible: (state) => invasionObjectiveHasRoomWithType(state, 'StealTreasure'),
+    getTargetId: (state) => invasionObjectiveFindRoomByType(state, 'StealTreasure'),
   },
   {
     type: 'DefileLibrary',
     name: 'Defile Library',
     description: 'Destroy forbidden knowledge stored in the shadow library.',
-    isEligible: (state) => hasRoomWithObjectiveType(state, 'DefileLibrary'),
-    getTargetId: (state) => findRoomByObjectiveType(state, 'DefileLibrary'),
+    isEligible: (state) => invasionObjectiveHasRoomWithType(state, 'DefileLibrary'),
+    getTargetId: (state) => invasionObjectiveFindRoomByType(state, 'DefileLibrary'),
   },
   {
     type: 'SealPortal',
     name: 'Seal Portal',
     description: 'Seal a dark energy nexus to weaken the dungeon.',
-    isEligible: (state) => hasRoomWithObjectiveType(state, 'SealPortal'),
-    getTargetId: (state) => findRoomByObjectiveType(state, 'SealPortal'),
+    isEligible: (state) => invasionObjectiveHasRoomWithType(state, 'SealPortal'),
+    getTargetId: (state) => invasionObjectiveFindRoomByType(state, 'SealPortal'),
   },
   {
     type: 'PlunderVault',
     name: 'Plunder Vault',
     description: 'Break into the treasure vault and carry away riches.',
-    isEligible: (state) => hasRoomWithObjectiveType(state, 'PlunderVault'),
-    getTargetId: (state) => findRoomByObjectiveType(state, 'PlunderVault'),
+    isEligible: (state) => invasionObjectiveHasRoomWithType(state, 'PlunderVault'),
+    getTargetId: (state) => invasionObjectiveFindRoomByType(state, 'PlunderVault'),
   },
   {
     type: 'RescuePrisoner',
@@ -147,7 +147,7 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
  * Secondary objectives are selected from eligible pool based on game state.
  * Seed ensures deterministic selection.
  */
-export function assignInvasionObjectives(
+export function invasionObjectiveAssign(
   state: GameState,
   seed: string,
 ): InvasionObjective[] {
@@ -155,7 +155,7 @@ export function assignInvasionObjectives(
   const objectives: InvasionObjective[] = [];
 
   // Primary: Destroy Altar
-  const altarId = findAltarRoomId(state);
+  const altarId = invasionObjectiveFindAltarRoomId(state);
   objectives.push({
     id: rngUuid(),
     type: 'DestroyAltar',
@@ -197,8 +197,8 @@ export function assignInvasionObjectives(
   return objectives;
 }
 
-function findAltarRoomId(state: GameState): string | undefined {
-  const altarTypeId = findRoomIdByRole('altar');
+function invasionObjectiveFindAltarRoomId(state: GameState): string | undefined {
+  const altarTypeId = roomRoleFindById('altar');
   if (!altarTypeId) return undefined;
 
   for (const floor of state.world.floors) {
@@ -216,7 +216,7 @@ function findAltarRoomId(state: GameState): string | undefined {
  * Update objective progress. Progress is clamped to 0-100.
  * Returns a new objective (does not mutate).
  */
-export function updateObjectiveProgress(
+export function invasionObjectiveUpdateProgress(
   objective: InvasionObjective,
   progress: number,
 ): InvasionObjective {
@@ -231,7 +231,7 @@ export function updateObjectiveProgress(
 /**
  * Calculate SlayMonster progress from HP lost percentage.
  */
-export function calculateSlayMonsterProgress(
+export function invasionObjectiveCalculateSlayMonsterProgress(
   currentHp: number,
   maxHp: number,
 ): number {
@@ -242,7 +242,7 @@ export function calculateSlayMonsterProgress(
 /**
  * Calculate StealTreasure progress from gold looted.
  */
-export function calculateStealTreasureProgress(
+export function invasionObjectiveCalculateStealTreasureProgress(
   goldLooted: number,
   goldTarget: number,
 ): number {
@@ -253,7 +253,7 @@ export function calculateStealTreasureProgress(
 /**
  * Calculate SealPortal progress from turns spent.
  */
-export function calculateSealPortalProgress(
+export function invasionObjectiveCalculateSealPortalProgress(
   turnsSpent: number,
   turnsRequired: number,
 ): number {
@@ -269,7 +269,7 @@ export function calculateSealPortalProgress(
  * - All invaders killed with Altar intact = victory
  * - Reward multiplier: 1.0 base, +0.25 per prevented secondary, -0.25 per completed secondary
  */
-export function resolveInvasionOutcome(
+export function invasionObjectiveResolveOutcome(
   objectives: InvasionObjective[],
 ): InvasionResult {
   const primary = objectives.find((o) => o.isPrimary);

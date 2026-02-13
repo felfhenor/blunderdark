@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import type {
   IsContentItem,
   PlacedRoom,
@@ -12,29 +12,29 @@ export type UpgradeValidation = {
   reason?: string;
 };
 
-export function getUpgradePaths(roomTypeId: string): RoomUpgradePath[] {
-  const room = getEntry<RoomDefinition & IsContentItem>(roomTypeId);
+export function roomUpgradeGetPaths(roomTypeId: string): RoomUpgradePath[] {
+  const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!room) return [];
   return room.upgradePaths ?? [];
 }
 
-export function getAppliedUpgrade(
+export function roomUpgradeGetApplied(
   placedRoom: PlacedRoom,
 ): RoomUpgradePath | undefined {
   if (!placedRoom.appliedUpgradePathId) return undefined;
 
-  const paths = getUpgradePaths(placedRoom.roomTypeId);
+  const paths = roomUpgradeGetPaths(placedRoom.roomTypeId);
   return paths.find((p) => p.id === placedRoom.appliedUpgradePathId) ?? undefined;
 }
 
-export function getAppliedUpgradeEffects(
+export function roomUpgradeGetAppliedEffects(
   placedRoom: PlacedRoom,
 ): RoomUpgradeEffect[] {
-  const upgrade = getAppliedUpgrade(placedRoom);
+  const upgrade = roomUpgradeGetApplied(placedRoom);
   return upgrade?.effects ?? [];
 }
 
-export function canApplyUpgrade(
+export function roomUpgradeCanApply(
   placedRoom: PlacedRoom,
   upgradePathId: string,
 ): UpgradeValidation {
@@ -45,7 +45,7 @@ export function canApplyUpgrade(
     };
   }
 
-  const paths = getUpgradePaths(placedRoom.roomTypeId);
+  const paths = roomUpgradeGetPaths(placedRoom.roomTypeId);
   const path = paths.find((p) => p.id === upgradePathId);
   if (!path) {
     return {
@@ -57,7 +57,7 @@ export function canApplyUpgrade(
   return { valid: true };
 }
 
-export function applyUpgrade(
+export function roomUpgradeApply(
   placedRoom: PlacedRoom,
   upgradePathId: string,
 ): PlacedRoom {
@@ -67,11 +67,11 @@ export function applyUpgrade(
   };
 }
 
-export function getAvailableUpgrades(
+export function roomUpgradeGetAvailable(
   placedRoom: PlacedRoom,
 ): RoomUpgradePath[] {
   if (placedRoom.appliedUpgradePathId) return [];
-  return getUpgradePaths(placedRoom.roomTypeId);
+  return roomUpgradeGetPaths(placedRoom.roomTypeId);
 }
 
 /**
@@ -79,13 +79,13 @@ export function getAvailableUpgrades(
  * accounting for upgrade bonuses (maxInhabitantBonus).
  * Returns -1 for unlimited capacity.
  */
-export function getEffectiveMaxInhabitants(
+export function roomUpgradeGetEffectiveMaxInhabitants(
   placedRoom: PlacedRoom,
   roomDef: RoomDefinition,
 ): number {
   if (roomDef.maxInhabitants < 0) return -1;
 
-  const effects = getAppliedUpgradeEffects(placedRoom);
+  const effects = roomUpgradeGetAppliedEffects(placedRoom);
   let bonus = 0;
   for (const effect of effects) {
     if (effect.type === 'maxInhabitantBonus') {

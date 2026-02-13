@@ -7,6 +7,6 @@ const sfx = new Subject<{
 }>();
 export const sfx$ = sfx.asObservable();
 
-export function playSFX(sfxName: SFX, shiftIndex: number): void {
+export function sfxPlay(sfxName: SFX, shiftIndex: number): void {
   sfx.next({ sfx: sfxName, rate: shiftIndex * 25 });
 }

@@ -45,10 +45,10 @@ const warRoomPath: RoomUpgradePath = {
 const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
-  getEntry: (id: string) => mockContent.get(id) ?? undefined,
-  getEntriesByType: vi.fn(() => []),
+  contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: vi.fn(() => []),
   getEntries: vi.fn(),
-  allIdsByName: vi.fn(() => new Map()),
+  contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 const barracksRoom: RoomDefinition & IsContentItem = {
@@ -177,14 +177,14 @@ mockContent.set('def-goblin', {
 // --- Imports after mocks ---
 
 import {
-  calculateAdjacencyBonus,
-  calculateTotalProduction,
-  getBaseProduction,
+  productionCalculateAdjacencyBonus,
+  productionCalculateTotal,
+  productionGetBase,
 } from '@helpers/production';
 import {
-  canApplyUpgrade,
-  getEffectiveMaxInhabitants,
-  getUpgradePaths,
+  roomUpgradeCanApply,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetPaths,
 } from '@helpers/room-upgrades';
 
 // --- Helpers ---
@@ -258,7 +258,7 @@ describe('Barracks: definition', () => {
 
 describe('Barracks: no production', () => {
   it('should have no base production', () => {
-    const production = getBaseProduction(BARRACKS_ID);
+    const production = productionGetBase(BARRACKS_ID);
     expect(production).toEqual({});
   });
 
@@ -274,7 +274,7 @@ describe('Barracks: no production', () => {
       },
     ];
     const floor = makeFloor([barracks], inhabitants);
-    const production = calculateTotalProduction([floor]);
+    const production = productionCalculateTotal([floor]);
     expect(production).toEqual({});
   });
 });
@@ -290,7 +290,7 @@ describe('Barracks: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [barracks, forge];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       barracks,
       ['placed-forge-1'],
       allRooms,
@@ -308,7 +308,7 @@ describe('Barracks: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [barracks, throne];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       barracks,
       ['placed-throne-1'],
       allRooms,
@@ -326,7 +326,7 @@ describe('Barracks: adjacency bonuses', () => {
       anchorY: 0,
     };
     const allRooms = [barracks1, barracks2];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       barracks1,
       ['placed-barracks-2'],
       allRooms,
@@ -351,7 +351,7 @@ describe('Barracks: adjacency bonuses', () => {
       anchorY: 3,
     };
     const allRooms = [barracks, forge, throne];
-    const bonus = calculateAdjacencyBonus(
+    const bonus = productionCalculateAdjacencyBonus(
       barracks,
       ['placed-forge-1', 'placed-throne-1'],
       allRooms,
@@ -363,7 +363,7 @@ describe('Barracks: adjacency bonuses', () => {
 
 describe('Barracks: Fortified Barracks upgrade', () => {
   it('should have maxInhabitantBonus of 4', () => {
-    const paths = getUpgradePaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID);
     const fortified = paths.find((p) => p.name === 'Fortified Barracks');
     expect(fortified).toBeDefined();
     expect(fortified!.effects).toHaveLength(1);
@@ -375,20 +375,20 @@ describe('Barracks: Fortified Barracks upgrade', () => {
     const room = createPlacedBarracks({
       appliedUpgradePathId: 'upgrade-fortified-barracks',
     });
-    const effective = getEffectiveMaxInhabitants(room, barracksRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, barracksRoom);
     expect(effective).toBe(10);
   });
 
   it('should keep capacity at 6 without upgrade', () => {
     const room = createPlacedBarracks();
-    const effective = getEffectiveMaxInhabitants(room, barracksRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, barracksRoom);
     expect(effective).toBe(6);
   });
 });
 
 describe('Barracks: Comfortable Quarters upgrade', () => {
   it('should have fearReduction of 1', () => {
-    const paths = getUpgradePaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID);
     const comfortable = paths.find((p) => p.name === 'Comfortable Quarters');
     expect(comfortable).toBeDefined();
     expect(comfortable!.effects).toHaveLength(1);
@@ -399,7 +399,7 @@ describe('Barracks: Comfortable Quarters upgrade', () => {
 
 describe('Barracks: War Room upgrade', () => {
   it('should have fearIncrease of 1', () => {
-    const paths = getUpgradePaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID);
     const warRoom = paths.find((p) => p.name === 'War Room');
     expect(warRoom).toBeDefined();
     expect(warRoom!.effects).toHaveLength(1);
@@ -413,13 +413,13 @@ describe('Barracks: upgrade mutual exclusivity', () => {
     const room = createPlacedBarracks({
       appliedUpgradePathId: 'upgrade-fortified-barracks',
     });
-    const result = canApplyUpgrade(room, 'upgrade-comfortable-quarters');
+    const result = roomUpgradeCanApply(room, 'upgrade-comfortable-quarters');
     expect(result.valid).toBe(false);
   });
 
   it('should allow applying an upgrade to an un-upgraded room', () => {
     const room = createPlacedBarracks();
-    const result = canApplyUpgrade(room, 'upgrade-fortified-barracks');
+    const result = roomUpgradeCanApply(room, 'upgrade-fortified-barracks');
     expect(result.valid).toBe(true);
   });
 });

@@ -1,11 +1,11 @@
 import {
-  canCreateFloor,
-  createFloor,
-  getFloor,
-  getFloorBiome,
-  getFloorByDepth,
-  getFloorCreationCost,
-  migrateFloors,
+  floorCanCreate,
+  floorCreate,
+  floorGet,
+  floorGetBiome,
+  floorGetByDepth,
+  floorGetCreationCost,
+  floorMigrate,
 } from '@helpers/floor';
 import type { Floor } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,8 +21,8 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 vi.mock('@helpers/resources', () => ({
-  canAfford: (...args: unknown[]) => mockCanAfford(...args),
-  payCost: (...args: unknown[]) => mockPayCost(...args),
+  resourceCanAfford: (...args: unknown[]) => mockCanAfford(...args),
+  resourcePayCost: (...args: unknown[]) => mockPayCost(...args),
 }));
 
 vi.mock('@helpers/defaults', () => ({
@@ -40,7 +40,7 @@ vi.mock('@helpers/defaults', () => ({
 }));
 
 vi.mock('@helpers/grid', () => ({
-  createEmptyGrid: () => [['empty-grid']],
+  gridCreateEmpty: () => [['empty-grid']],
 }));
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
@@ -77,89 +77,89 @@ beforeEach(() => {
   mockPayCost.mockResolvedValue(true);
 });
 
-describe('getFloor', () => {
+describe('floorGet', () => {
   it('should return floor by ID', () => {
-    const floor = getFloor('floor-1');
+    const floor = floorGet('floor-1');
     expect(floor).toBeDefined();
     expect(floor?.name).toBe('Floor 1');
     expect(floor?.biome).toBe('neutral');
   });
 
   it('should return floor-2 by ID', () => {
-    const floor = getFloor('floor-2');
+    const floor = floorGet('floor-2');
     expect(floor).toBeDefined();
     expect(floor?.biome).toBe('volcanic');
   });
 
   it('should return undefined for non-existent floor', () => {
-    const floor = getFloor('nonexistent');
+    const floor = floorGet('nonexistent');
     expect(floor).toBeUndefined();
   });
 });
 
-describe('getFloorBiome', () => {
+describe('floorGetBiome', () => {
   it('should return biome for existing floor', () => {
-    expect(getFloorBiome('floor-1')).toBe('neutral');
-    expect(getFloorBiome('floor-2')).toBe('volcanic');
-    expect(getFloorBiome('floor-3')).toBe('crystal');
+    expect(floorGetBiome('floor-1')).toBe('neutral');
+    expect(floorGetBiome('floor-2')).toBe('volcanic');
+    expect(floorGetBiome('floor-3')).toBe('crystal');
   });
 
   it('should return neutral for non-existent floor', () => {
-    expect(getFloorBiome('nonexistent')).toBe('neutral');
+    expect(floorGetBiome('nonexistent')).toBe('neutral');
   });
 });
 
-describe('getFloorByDepth', () => {
+describe('floorGetByDepth', () => {
   it('should return floor at depth 1', () => {
-    const floor = getFloorByDepth(1);
+    const floor = floorGetByDepth(1);
     expect(floor).toBeDefined();
     expect(floor?.id).toBe('floor-1');
     expect(floor?.biome).toBe('neutral');
   });
 
   it('should return floor at depth 2', () => {
-    const floor = getFloorByDepth(2);
+    const floor = floorGetByDepth(2);
     expect(floor).toBeDefined();
     expect(floor?.id).toBe('floor-2');
     expect(floor?.biome).toBe('volcanic');
   });
 
   it('should return floor at depth 3', () => {
-    const floor = getFloorByDepth(3);
+    const floor = floorGetByDepth(3);
     expect(floor).toBeDefined();
     expect(floor?.id).toBe('floor-3');
     expect(floor?.biome).toBe('crystal');
   });
 
   it('should return undefined for non-existent depth', () => {
-    expect(getFloorByDepth(99)).toBeUndefined();
+    expect(floorGetByDepth(99)).toBeUndefined();
   });
 
   it('should return undefined for depth 0', () => {
-    expect(getFloorByDepth(0)).toBeUndefined();
+    expect(floorGetByDepth(0)).toBeUndefined();
   });
 });
 
-describe('getFloorCreationCost', () => {
+describe('floorGetCreationCost', () => {
   it('should return cost scaling with depth 1', () => {
-    const cost = getFloorCreationCost(1);
+    const cost = floorGetCreationCost(1);
     expect(cost).toEqual({ crystals: 50, gold: 30 });
   });
 
   it('should return cost scaling with depth 5', () => {
-    const cost = getFloorCreationCost(5);
+    const cost = floorGetCreationCost(5);
     expect(cost).toEqual({ crystals: 250, gold: 150 });
   });
 
   it('should return cost scaling with depth 10', () => {
-    const cost = getFloorCreationCost(10);
+    const cost = floorGetCreationCost(10);
     expect(cost).toEqual({ crystals: 500, gold: 300 });
   });
 });
 
-describe('canCreateFloor', () => {
+describe('floorCanCreate', () => {
   it('should return canCreate true when under max and can afford', () => {
-    const result = canCreateFloor();
+    const result = floorCanCreate();
     expect(result.canCreate).toBe(true);
     expect(result.reason).toBeUndefined();
   });
@@ -174,7 +174,7 @@ describe('canCreateFloor', () => {
       },
     });
 
-    const result = canCreateFloor();
+    const result = floorCanCreate();
     expect(result.canCreate).toBe(false);
     expect(result.reason).toBe('Maximum number of floors reached');
   });
@@ -182,21 +182,21 @@ describe('canCreateFloor', () => {
   it('should return false when insufficient resources', () => {
     mockCanAfford.mockReturnValue(false);
 
-    const result = canCreateFloor();
+    const result = floorCanCreate();
     expect(result.canCreate).toBe(false);
     expect(result.reason).toBe('Insufficient resources');
   });
 
   it('should check cost for next depth based on current floor count', () => {
-    canCreateFloor();
+    floorCanCreate();
     // 3 floors exist, so next depth is 4: 50*4=200 crystals, 30*4=120 gold
     expect(mockCanAfford).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
   });
 });
 
-describe('createFloor', () => {
+describe('floorCreate', () => {
   it('should create floor at next depth with default neutral biome', async () => {
-    const floor = await createFloor();
+    const floor = await floorCreate();
     expect(floor).toBeDefined();
     expect(floor?.depth).toBe(4);
     expect(floor?.biome).toBe('neutral');
@@ -206,7 +206,7 @@ describe('createFloor', () => {
   });
 
   it('should create floor with specified biome', async () => {
-    const floor = await createFloor('volcanic');
+    const floor = await floorCreate('volcanic');
     expect(floor).toBeDefined();
     expect(floor?.biome).toBe('volcanic');
   });
@@ -221,28 +221,28 @@ describe('createFloor', () => {
       },
     });
 
-    const floor = await createFloor();
+    const floor = await floorCreate();
     expect(floor).toBeUndefined();
     expect(mockPayCost).not.toHaveBeenCalled();
   });
 
-  it('should return undefined when payCost fails', async () => {
+  it('should return undefined when resourcePayCost fails', async () => {
     mockPayCost.mockResolvedValue(false);
 
-    const floor = await createFloor();
+    const floor = await floorCreate();
     expect(floor).toBeUndefined();
     expect(mockUpdateGamestate).not.toHaveBeenCalled();
   });
 
   it('should deduct resources before adding floor', async () => {
-    await createFloor();
-    // payCost should be called with cost for depth 4
+    await floorCreate();
+    // resourcePayCost should be called with cost for depth 4
     expect(mockPayCost).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
     expect(mockUpdateGamestate).toHaveBeenCalled();
   });
 
   it('should call updateGamestate to add the new floor', async () => {
-    await createFloor('crystal');
+    await floorCreate('crystal');
     expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
 
     // Execute the updater function to verify it appends the floor
@@ -255,7 +255,7 @@ describe('createFloor', () => {
   });
 });
 
-describe('migrateFloors', () => {
+describe('floorMigrate', () => {
   it('should create floor from top-level world data when floors is missing', () => {
     const world = {
       grid: [['saved-grid']] as unknown as Floor['grid'],
@@ -263,7 +263,7 @@ describe('migrateFloors', () => {
       inhabitants: [{ instanceId: 'i1' }] as unknown as Floor['inhabitants'],
     };
 
-    const result = migrateFloors(world);
+    const result = floorMigrate(world);
     expect(result.floors).toHaveLength(1);
     expect(result.floors[0].depth).toBe(1);
     expect(result.floors[0].grid).toEqual([['saved-grid']]);
@@ -273,7 +273,7 @@ describe('migrateFloors', () => {
   });
 
   it('should create floor with empty grid when no world data exists', () => {
-    const result = migrateFloors({});
+    const result = floorMigrate({});
     expect(result.floors).toHaveLength(1);
     expect(result.floors[0].depth).toBe(1);
     expect(result.floors[0].grid).toEqual([['empty-grid']]);
@@ -282,7 +282,7 @@ describe('migrateFloors', () => {
   });
 
   it('should create floor from empty floors array', () => {
-    const result = migrateFloors({ floors: [] });
+    const result = floorMigrate({ floors: [] });
     expect(result.floors).toHaveLength(1);
     expect(result.floors[0].depth).toBe(1);
   });
@@ -293,7 +293,7 @@ describe('migrateFloors', () => {
       makeFloor({ id: 'f2', depth: 2, biome: 'crystal' }),
     ];
 
-    const result = migrateFloors({ floors });
+    const result = floorMigrate({ floors });
     expect(result.floors).toHaveLength(2);
     expect(result.floors[0].id).toBe('f1');
     expect(result.floors[0].biome).toBe('volcanic');
@@ -303,7 +303,7 @@ describe('migrateFloors', () => {
 
   it('should fill missing fields on saved floors with defaults', () => {
     const partialFloor = { id: 'f1', depth: 2 } as unknown as Floor;
-    const result = migrateFloors({ floors: [partialFloor] });
+    const result = floorMigrate({ floors: [partialFloor] });
     expect(result.floors[0].id).toBe('f1');
     expect(result.floors[0].depth).toBe(2);
     expect(result.floors[0].name).toBe('Floor 2');
@@ -311,25 +311,25 @@ describe('migrateFloors', () => {
     expect(result.floors[0].rooms).toEqual([]);
   });
 
-  it('should clamp currentFloorIndex to valid range', () => {
+  it('should clamp floorCurrentIndex to valid range', () => {
     const floors = [makeFloor({ id: 'f1', depth: 1 })];
-    const result = migrateFloors({ floors, currentFloorIndex: 5 });
+    const result = floorMigrate({ floors, currentFloorIndex: 5 });
     expect(result.currentFloorIndex).toBe(0);
   });
 
-  it('should clamp negative currentFloorIndex to 0', () => {
+  it('should clamp negative floorCurrentIndex to 0', () => {
     const floors = [makeFloor({ id: 'f1', depth: 1 })];
-    const result = migrateFloors({ floors, currentFloorIndex: -1 });
+    const result = floorMigrate({ floors, currentFloorIndex: -1 });
     expect(result.currentFloorIndex).toBe(0);
   });
 
-  it('should preserve valid currentFloorIndex', () => {
+  it('should preserve valid floorCurrentIndex', () => {
     const floors = [
       makeFloor({ id: 'f1', depth: 1 }),
       makeFloor({ id: 'f2', depth: 2 }),
       makeFloor({ id: 'f3', depth: 3 }),
     ];
-    const result = migrateFloors({ floors, currentFloorIndex: 2 });
+    const result = floorMigrate({ floors, currentFloorIndex: 2 });
     expect(result.currentFloorIndex).toBe(2);
   });
 
@@ -340,7 +340,7 @@ describe('migrateFloors', () => {
     };
     const floorsCopy = JSON.parse(JSON.stringify(original));
 
-    migrateFloors(original);
+    floorMigrate(original);
     expect(original).toEqual(floorsCopy);
   });
 });

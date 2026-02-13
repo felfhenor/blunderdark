@@ -80,7 +80,7 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 export class PanelResourcesComponent {
   public readonly resources = RESOURCE_DISPLAY;
 
-  public allResources = computed(() => gamestate().world.resources);
+  public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
   public breakdowns = productionBreakdowns;
 
@@ -88,15 +88,15 @@ export class PanelResourcesComponent {
   private tooltipTimer: ReturnType<typeof setTimeout> | undefined = undefined;
 
   public getCurrent(type: ResourceType): number {
-    return this.allResources()[type].current;
+    return this.resourceAll()[type].current;
   }
 
   public getMax(type: ResourceType): number {
-    return this.allResources()[type].max;
+    return this.resourceAll()[type].max;
   }
 
   public getPercent(type: ResourceType): number {
-    const res = this.allResources()[type];
+    const res = this.resourceAll()[type];
     if (res.max === 0) return 0;
     return (res.current / res.max) * 100;
   }
@@ -107,12 +107,12 @@ export class PanelResourcesComponent {
   }
 
   public isFull(type: ResourceType): boolean {
-    const res = this.allResources()[type];
+    const res = this.resourceAll()[type];
     return res.max > 0 && res.current >= res.max;
   }
 
   public getWarningClass(type: ResourceType): string {
-    const res = this.allResources()[type];
+    const res = this.resourceAll()[type];
     if (res.max === 0) return '';
     const ratio = res.current / res.max;
 

@@ -1,6 +1,6 @@
 import { setupFinish } from '@helpers/setup';
-import { resetGameState } from '@helpers/state-game';
-import { setWorld } from '@helpers/world';
+import { gamestateReset } from '@helpers/state-game';
+import { worldSet } from '@helpers/world';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -9,7 +9,7 @@ export async function gameStart(): Promise<void> {
 
   delete world.didFinish;
 
-  setWorld(world);
+  worldSet(world);
 
   setTimeout(() => {
     setupFinish();
@@ -17,5 +17,5 @@ export async function gameStart(): Promise<void> {
 }
 
 export function gameReset(): void {
-  resetGameState();
+  gamestateReset();
 }
