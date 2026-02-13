@@ -6,8 +6,11 @@ import {
   floorCurrent,
   floorCurrentIndex,
   floorGetCreationCost,
+  floorModifierFormatPercentage,
+  floorModifierGet,
   floorSetCurrentByIndex,
 } from '@helpers';
+import type { FloorDepthResourceModifier } from '@helpers/floor-modifiers';
 import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -28,6 +31,12 @@ export class PanelFloorSelectorComponent {
     const floor = this.selectedFloor();
     if (!floor) return BIOME_DATA.neutral;
     return BIOME_DATA[floor.biome];
+  });
+
+  public depthModifiers = computed<FloorDepthResourceModifier[]>(() => {
+    const floor = this.selectedFloor();
+    if (!floor) return [];
+    return floorModifierGet(floor.depth);
   });
 
   public nextFloorCost = computed(() => {
@@ -77,6 +86,23 @@ export class PanelFloorSelectorComponent {
 
   public async onConfirmCreateFloor(): Promise<void> {
     await floorCreate();
+  }
+
+  public formatModifier(percentage: number): string {
+    return floorModifierFormatPercentage(percentage);
+  }
+
+  public getResourceLabel(resourceType: string): string {
+    const labels: Record<string, string> = {
+      crystals: 'Crystals',
+      food: 'Food',
+      gold: 'Gold',
+      flux: 'Flux',
+      essence: 'Essence',
+      corruption: 'Corruption',
+      research: 'Research',
+    };
+    return labels[resourceType] ?? resourceType;
   }
 
   public trackByFloorId(_index: number, floor: Floor): string {

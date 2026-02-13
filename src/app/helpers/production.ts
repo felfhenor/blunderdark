@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
+import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
@@ -230,8 +231,9 @@ export function productionCalculateTotal(floors: Floor[], hour?: number): RoomPr
 
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
+        const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier;
         totalProduction[resourceType] =
           (totalProduction[resourceType] ?? 0) + final;
       }
@@ -293,8 +295,9 @@ export function productionCalculateSingleRoom(
   const production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
     if (!baseAmount) continue;
+    const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier;
   }
 
   return production;
@@ -382,11 +385,11 @@ export function productionCalculateBreakdowns(
             hour,
           })
         : 1.0;
-      const modifier = stateModifier * envModifier;
-
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
 
+        const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
+        const modifier = stateModifier * envModifier * depthModifier;
         const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal);
         const finalAmount = withBonuses * modifier;
 

@@ -30,7 +30,6 @@ vi.mock('@helpers/content', () => ({
 }));
 
 import {
-  PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL,
   productionModifierApply,
   productionModifierCalculate,
   productionModifierEvaluate,
@@ -98,8 +97,8 @@ describe('productionModifierIsDayTime', () => {
 describe('productionModifierGetRegistry', () => {
   it('should return all registered modifiers', () => {
     const registry = productionModifierGetRegistry();
-    expect(registry.length).toBe(3);
-    expect(registry.map((m) => m.type)).toEqual(['time_of_day', 'floor_depth', 'biome']);
+    expect(registry.length).toBe(2);
+    expect(registry.map((m) => m.type)).toEqual(['time_of_day', 'biome']);
   });
 
   it('should have unique ids', () => {
@@ -203,37 +202,7 @@ describe('time-of-day modifiers', () => {
   });
 });
 
-// --- Floor depth modifiers ---
-
-describe('floor depth modifiers', () => {
-  it('should give no bonus at depth 0', () => {
-    const context = makeContext({ floorDepth: 0 });
-    expect(productionModifierCalculate(context)).toBe(1.0);
-  });
-
-  it('should give +5% at depth 1', () => {
-    const context = makeContext({ floorDepth: 1 });
-    expect(productionModifierCalculate(context)).toBeCloseTo(1.05);
-  });
-
-  it('should give +10% at depth 2', () => {
-    const context = makeContext({ floorDepth: 2 });
-    expect(productionModifierCalculate(context)).toBeCloseTo(1.10);
-  });
-
-  it('should give +25% at depth 5', () => {
-    const context = makeContext({ floorDepth: 5 });
-    expect(productionModifierCalculate(context)).toBeCloseTo(1.25);
-  });
-
-  it('should scale linearly with depth', () => {
-    for (let d = 0; d <= 9; d++) {
-      const context = makeContext({ floorDepth: d });
-      const expected = 1.0 + d * PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL;
-      expect(productionModifierCalculate(context)).toBeCloseTo(expected);
-    }
-  });
-});
+// Floor depth modifiers moved to floor-modifiers.spec.ts (resource-specific depth modifiers)
 
 // --- Biome modifiers ---
 
@@ -303,16 +272,6 @@ describe('biome modifiers', () => {
 // --- Combined modifiers (multiplicative stacking) ---
 
 describe('multiplicative stacking', () => {
-  it('should multiply time-of-day and depth modifiers', () => {
-    // Shadow Library at night (1.20) at depth 2 (1.10) = 1.20 * 1.10 = 1.32
-    const context = makeContext({
-      roomTypeId: SHADOW_LIBRARY,
-      hour: 22,
-      floorDepth: 2,
-    });
-    expect(productionModifierCalculate(context)).toBeCloseTo(1.32);
-  });
-
   it('should multiply time-of-day and biome modifiers', () => {
     // Shadow Library at night (1.20) in corrupted biome (2.00) = 1.20 * 2.00 = 2.40
     const context = makeContext({
@@ -321,18 +280,6 @@ describe('multiplicative stacking', () => {
       floorBiome: 'corrupted',
     });
     expect(productionModifierCalculate(context)).toBeCloseTo(2.40);
-  });
-
-  it('should multiply all three modifiers', () => {
-    // Soul Well at night (1.15) at depth 3 (1.15) in corrupted biome (2.00)
-    // = 1.15 * 1.15 * 2.00 = 2.645
-    const context = makeContext({
-      roomTypeId: SOUL_WELL,
-      hour: 0,
-      floorDepth: 3,
-      floorBiome: 'corrupted',
-    });
-    expect(productionModifierCalculate(context)).toBeCloseTo(1.15 * 1.15 * 2.00);
   });
 
   it('should return 1.0 when no modifiers apply', () => {
@@ -380,10 +327,9 @@ describe('productionModifierEvaluate', () => {
       floorBiome: 'corrupted',
     });
     const results = productionModifierEvaluate(context);
-    expect(results).toHaveLength(3);
+    expect(results).toHaveLength(2);
     const types = results.map((r) => r.type);
     expect(types).toContain('time_of_day');
-    expect(types).toContain('floor_depth');
     expect(types).toContain('biome');
   });
 

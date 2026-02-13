@@ -14,6 +14,7 @@ export * from './defaults';
 export * from './discord';
 export * from './efficiency';
 export * from './floor';
+export * from './floor-modifiers';
 export * from './game-events';
 export * from './game-init';
 export * from './game-time';

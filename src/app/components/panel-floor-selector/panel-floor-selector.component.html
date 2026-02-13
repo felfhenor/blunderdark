@@ -92,6 +92,27 @@
             }
           }
         </div>
+
+        @if (depthModifiers().length > 0) {
+          <div class="depth-modifiers mt-2">
+            <p class="text-xs font-semibold opacity-70 mb-1">Depth Modifiers</p>
+            <div class="flex flex-wrap gap-1">
+              @for (mod of depthModifiers(); track mod.resourceType) {
+                <span
+                  class="badge badge-sm"
+                  [class.badge-success]="mod.percentage > 0"
+                  [class.badge-error]="mod.percentage < 0"
+                >
+                  {{ formatModifier(mod.percentage) }} {{ getResourceLabel(mod.resourceType) }}
+                </span>
+              }
+            </div>
+          </div>
+        } @else if (selectedFloor()) {
+          <div class="depth-modifiers mt-2">
+            <p class="text-xs opacity-50">No depth modifiers (baseline)</p>
+          </div>
+        }
       </div>
     }
   </div>

@@ -5,7 +5,6 @@ import type { BiomeType, IsContentItem, RoomDefinition } from '@interfaces';
 
 export type ProductionModifierType =
   | 'time_of_day'
-  | 'floor_depth'
   | 'biome';
 
 export type ProductionModifierContext = {
@@ -33,9 +32,6 @@ export type ProductionModifierDefinition = {
 // Time thresholds
 export const PRODUCTION_MODIFIER_NIGHT_START = 18;
 export const PRODUCTION_MODIFIER_NIGHT_END = 6;
-
-// Depth bonus
-export const PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL = 0.05;
 
 // --- Lazy lookup maps built from room data ---
 
@@ -114,12 +110,6 @@ function evaluateTimeOfDay(context: ProductionModifierContext): number {
   return 1.0 + (map.day.get(context.roomTypeId) ?? 0);
 }
 
-// --- Floor depth modifier ---
-
-function evaluateFloorDepth(context: ProductionModifierContext): number {
-  return 1.0 + context.floorDepth * PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL;
-}
-
 // --- Biome modifier ---
 
 /**
@@ -145,12 +135,6 @@ const MODIFIER_REGISTRY: ProductionModifierDefinition[] = [
     type: 'time_of_day',
     description: 'Time-of-day production bonus',
     evaluate: evaluateTimeOfDay,
-  },
-  {
-    id: 'floor-depth',
-    type: 'floor_depth',
-    description: 'Deeper floors grant production bonuses',
-    evaluate: evaluateFloorDepth,
   },
   {
     id: 'biome',

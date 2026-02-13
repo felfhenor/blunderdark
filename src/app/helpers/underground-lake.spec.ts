@@ -175,7 +175,7 @@ function makeFloor(
   return {
     id: 'floor-1',
     name: 'Floor 1',
-    depth: 1,
+    depth: 0,
     biome: 'neutral',
     grid: { tiles: [] } as unknown as Floor['grid'],
     rooms,
