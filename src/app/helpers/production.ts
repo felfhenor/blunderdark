@@ -6,6 +6,7 @@ import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -18,6 +19,7 @@ import type {
   ResourceType,
   RoomDefinition,
   RoomProduction,
+  Season,
   TileOffset,
 } from '@interfaces';
 
@@ -178,7 +180,7 @@ export function productionCalculateConditionalModifiers(
   return stateModifierCalculatePerCreatureProduction(assigned);
 }
 
-export function productionCalculateTotal(floors: Floor[], hour?: number): RoomProduction {
+export function productionCalculateTotal(floors: Floor[], hour?: number, season?: Season): RoomProduction {
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
@@ -239,8 +241,11 @@ export function productionCalculateTotal(floors: Floor[], hour?: number): RoomPr
         const dayNightResourceMod = hour !== undefined
           ? dayNightGetResourceModifier(hour, resourceType)
           : 1.0;
+        const seasonMod = season
+          ? seasonBonusGetResourceModifier(season, resourceType)
+          : 1.0;
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
         totalProduction[resourceType] =
           (totalProduction[resourceType] ?? 0) + final;
       }
@@ -254,6 +259,7 @@ export function productionCalculateSingleRoom(
   room: PlacedRoom,
   floor: Floor,
   hour?: number,
+  season?: Season,
 ): RoomProduction {
   const roomDef = productionGetRoomDefinition(room.roomTypeId);
   if (!roomDef) return {};
@@ -309,8 +315,11 @@ export function productionCalculateSingleRoom(
     const dayNightResourceMod = hour !== undefined
       ? dayNightGetResourceModifier(hour, resourceType)
       : 1.0;
+    const seasonMod = season
+      ? seasonBonusGetResourceModifier(season, resourceType)
+      : 1.0;
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
   }
 
   return production;
@@ -318,7 +327,7 @@ export function productionCalculateSingleRoom(
 
 export const productionRates = computed<RoomProduction>(() => {
   const state = gamestate();
-  return productionCalculateTotal(state.world.floors, state.clock.hour);
+  return productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
 });
 
 export function productionPerMinute(perTickRate: number): number {
@@ -330,7 +339,7 @@ export function productionGetRoomRates(roomId: string): RoomProduction {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return productionCalculateSingleRoom(room, floor, state.clock.hour);
+      return productionCalculateSingleRoom(room, floor, state.clock.hour, state.world.season.currentSeason);
     }
   }
   return {};
@@ -347,6 +356,7 @@ export type ResourceProductionBreakdown = {
 export function productionCalculateBreakdowns(
   floors: Floor[],
   hour?: number,
+  season?: Season,
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
 
@@ -408,7 +418,10 @@ export function productionCalculateBreakdowns(
         const dayNightResourceMod = hour !== undefined
           ? dayNightGetResourceModifier(hour, resourceType)
           : 1.0;
-        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * creatureModifier;
+        const seasonMod = season
+          ? seasonBonusGetResourceModifier(season, resourceType)
+          : 1.0;
+        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
         const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal);
         const finalAmount = withBonuses * modifier;
 
@@ -438,11 +451,11 @@ export function productionCalculateBreakdowns(
 
 export const productionBreakdowns = computed(() => {
   const state = gamestate();
-  return productionCalculateBreakdowns(state.world.floors, state.clock.hour);
+  return productionCalculateBreakdowns(state.world.floors, state.clock.hour, state.world.season.currentSeason);
 });
 
 export function productionProcess(state: GameState): void {
-  const production = productionCalculateTotal(state.world.floors, state.clock.hour);
+  const production = productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
 
   for (const [type, amount] of Object.entries(production)) {
     if (!amount || amount <= 0) continue;

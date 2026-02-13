@@ -14,3 +14,17 @@ export const SEASON_ORDER: readonly Season[] = [
 ] as const;
 
 export const DAYS_PER_SEASON = 7;
+
+export type SeasonBonusModifier = {
+  resourceType: string;
+  multiplier: number;
+  description: string;
+};
+
+export type SeasonBonusDefinition = {
+  season: Season;
+  description: string;
+  resourceModifiers: SeasonBonusModifier[];
+  recruitmentCostMultiplier: number;
+  flags: string[];
+};

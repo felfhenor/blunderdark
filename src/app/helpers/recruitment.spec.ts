@@ -29,6 +29,7 @@ vi.mock('@helpers/state-game', () => ({
       inhabitants: mockInhabitants,
       resources: mockResources,
       floors: [],
+      season: { currentSeason: 'harvest', dayInSeason: 1, totalSeasonCycles: 0 },
     },
   }),
   updateGamestate: vi.fn(async (fn: (state: GameState) => GameState) => {
@@ -37,6 +38,7 @@ vi.mock('@helpers/state-game', () => ({
         inhabitants: mockInhabitants,
         resources: mockResources,
         floors: [],
+        season: { currentSeason: 'harvest', dayInSeason: 1, totalSeasonCycles: 0 },
       },
     } as unknown as GameState;
     const result = fn(fakeState);

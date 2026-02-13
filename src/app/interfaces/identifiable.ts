@@ -12,6 +12,7 @@ export type ContentType =
   | 'research'
   | 'room'
   | 'roomshape'
+  | 'seasonbonus'
   | 'stage'
   | 'synergy'
   | 'trap'

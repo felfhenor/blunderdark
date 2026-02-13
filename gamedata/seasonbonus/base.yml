@@ -1,0 +1,68 @@
+- id: b5a10001-0001-0001-0001-000000000001
+  name: Season of Growth
+  __type: seasonbonus
+  season: growth
+  description: Abundant food growth and cheaper recruitment
+  resourceModifiers:
+    - resourceType: food
+      multiplier: 1.50
+      description: Growth season food bonus (+50%)
+  recruitmentCostMultiplier: 0.75
+  flags: []
+
+- id: b5a10001-0001-0001-0001-000000000002
+  name: Season of Harvest
+  __type: seasonbonus
+  season: harvest
+  description: Boosted production across all resources with merchant visits
+  resourceModifiers:
+    - resourceType: crystals
+      multiplier: 1.20
+      description: Harvest season crystal bonus (+20%)
+    - resourceType: food
+      multiplier: 1.20
+      description: Harvest season food bonus (+20%)
+    - resourceType: gold
+      multiplier: 1.20
+      description: Harvest season gold bonus (+20%)
+    - resourceType: flux
+      multiplier: 1.20
+      description: Harvest season flux bonus (+20%)
+    - resourceType: research
+      multiplier: 1.20
+      description: Harvest season research bonus (+20%)
+    - resourceType: essence
+      multiplier: 1.20
+      description: Harvest season essence bonus (+20%)
+    - resourceType: corruption
+      multiplier: 1.20
+      description: Harvest season corruption bonus (+20%)
+  recruitmentCostMultiplier: 1.0
+  flags:
+    - merchant_visit
+
+- id: b5a10001-0001-0001-0001-000000000003
+  name: Season of Darkness
+  __type: seasonbonus
+  season: darkness
+  description: Surging corruption and empowered dark creatures
+  resourceModifiers:
+    - resourceType: corruption
+      multiplier: 2.00
+      description: Darkness season corruption surge (+100%)
+  recruitmentCostMultiplier: 1.0
+  flags:
+    - dark_spawn_boost
+
+- id: b5a10001-0001-0001-0001-000000000004
+  name: Season of Storms
+  __type: seasonbonus
+  season: storms
+  description: Volatile flux production and random events
+  resourceModifiers:
+    - resourceType: flux
+      multiplier: 1.80
+      description: Storms season flux surge (+80%)
+  recruitmentCostMultiplier: 1.0
+  flags:
+    - random_events

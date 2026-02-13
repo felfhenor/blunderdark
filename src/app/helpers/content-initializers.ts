@@ -19,6 +19,8 @@ import type {
   ResearchNode,
   RoomDefinition,
   RoomShape,
+  Season,
+  SeasonBonusDefinition,
   StageContent,
   StageId,
   StatBlock,
@@ -46,6 +48,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   research: ensureResearch,
   room: ensureRoom,
   roomshape: ensureRoomShape,
+  seasonbonus: ensureSeasonBonus,
   stage: ensureStage,
   synergy: ensureSynergy,
   trap: ensureTrap,
@@ -344,5 +347,24 @@ function ensureInvasion(
     highCorruption: config.highCorruption ?? { ...defaultWeights },
     highWealth: config.highWealth ?? { ...defaultWeights },
     highKnowledge: config.highKnowledge ?? { ...defaultWeights },
+  };
+}
+
+function ensureSeasonBonus(
+  bonus: Partial<SeasonBonusDefinition & IsContentItem>,
+): SeasonBonusDefinition & IsContentItem {
+  return {
+    id: bonus.id ?? 'UNKNOWN',
+    name: bonus.name ?? 'UNKNOWN',
+    __type: 'seasonbonus',
+    season: bonus.season ?? ('growth' as Season),
+    description: bonus.description ?? '',
+    resourceModifiers: (bonus.resourceModifiers ?? []).map((m) => ({
+      resourceType: m.resourceType ?? '',
+      multiplier: m.multiplier ?? 1.0,
+      description: m.description ?? '',
+    })),
+    recruitmentCostMultiplier: bonus.recruitmentCostMultiplier ?? 1.0,
+    flags: bonus.flags ?? [],
   };
 }

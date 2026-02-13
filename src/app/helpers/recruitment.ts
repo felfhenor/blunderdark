@@ -4,12 +4,15 @@ import { contentGetEntriesByType } from '@helpers/content';
 import { inhabitantAdd } from '@helpers/inhabitants';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
+import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantDefinition,
   InhabitantInstance,
   IsContentItem,
+  ResourceCost,
   ResourceType,
+  Season,
 } from '@interfaces';
 
 export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
@@ -84,6 +87,25 @@ export function recruitmentGetShortfall(
 }
 
 /**
+ * Apply season recruitment cost multiplier to a base cost.
+ * Uses Math.ceil to round up adjusted costs.
+ */
+export function recruitmentGetAdjustedCost(
+  cost: ResourceCost,
+  season: Season,
+): ResourceCost {
+  const multiplier = seasonBonusGetRecruitmentCostMultiplier(season);
+  if (multiplier === 1.0) return cost;
+
+  const adjusted: ResourceCost = {};
+  for (const [type, amount] of Object.entries(cost)) {
+    if (!amount) continue;
+    adjusted[type as ResourceType] = Math.ceil(amount * multiplier);
+  }
+  return adjusted;
+}
+
+/**
  * Recruit a new inhabitant by paying the cost and creating an instance.
  * Returns the result with success/error info.
  */
@@ -105,11 +127,16 @@ export async function recruitmentRecruit(
     return { success: false, error: `Requires Tier ${def.tier}` };
   }
 
-  if (!resourceCanAfford(def.cost)) {
+  const adjustedCost = recruitmentGetAdjustedCost(
+    def.cost,
+    state.world.season.currentSeason,
+  );
+
+  if (!resourceCanAfford(adjustedCost)) {
     return { success: false, error: 'Not enough resources' };
   }
 
-  const paid = await resourcePayCost(def.cost);
+  const paid = await resourcePayCost(adjustedCost);
   if (!paid) {
     return { success: false, error: 'Not enough resources' };
   }
