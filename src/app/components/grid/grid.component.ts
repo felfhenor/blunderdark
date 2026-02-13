@@ -10,7 +10,8 @@ import {
   roomUpgradeGetEffectiveMaxInhabitants,
   productionGetRoomDefinition,
   hallwayPlacementPreviewTileSet,
-  hallwayPlacementSourceRoomId,
+  hallwayPlacementSourceTile,
+  hallwayPlacementDestTile,
   hallwayPlacementHandleTileClick,
   hallwayPlacementIsBuildMode,
   inhabitantAll,
@@ -428,16 +429,20 @@ export class GridComponent {
   }
 
   public isHallwayMode = hallwayPlacementIsBuildMode;
-  public hallwaySourceId = hallwayPlacementSourceRoomId;
   private hallwayPathSet = hallwayPlacementPreviewTileSet;
 
   public isHallwayPathTile(x: number, y: number): boolean {
     return this.hallwayPathSet().has(`${x},${y}`);
   }
 
-  public isHallwaySourceRoom(roomId: string | undefined): boolean {
-    if (!roomId) return false;
-    return hallwayPlacementSourceRoomId() === roomId;
+  public isHallwayStartTile(x: number, y: number): boolean {
+    const source = hallwayPlacementSourceTile();
+    return source !== undefined && source.x === x && source.y === y;
+  }
+
+  public isHallwayEndTile(x: number, y: number): boolean {
+    const dest = hallwayPlacementDestTile();
+    return dest !== undefined && dest.x === x && dest.y === y;
   }
 
   public onRightClick(event: MouseEvent): void {

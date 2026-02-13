@@ -66,10 +66,6 @@ export function pathfindingBuildDungeonGraph(
     addBidirectionalEdge(adjacency, conn.roomAId, conn.roomBId);
   }
 
-  for (const hallway of floor.hallways) {
-    addBidirectionalEdge(adjacency, hallway.startRoomId, hallway.endRoomId);
-  }
-
   return { nodes, adjacency };
 }
 

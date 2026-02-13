@@ -7,8 +7,8 @@ export type HallwayUpgrade = {
 
 export type Hallway = {
   id: string;
-  startRoomId: string;
-  endRoomId: string;
+  startRoomId?: string;
+  endRoomId?: string;
   tiles: TileOffset[];
   upgrades: HallwayUpgrade[];
 };

@@ -23,11 +23,13 @@ import {
         <div class="card-body p-4">
           <h3 class="card-title text-sm">Corridor</h3>
 
-          <div class="text-xs opacity-50">
-            <span>{{ info.startRoomName }}</span>
-            <span> — </span>
-            <span>{{ info.endRoomName }}</span>
-          </div>
+          @if (info.startRoomName && info.endRoomName) {
+            <div class="text-xs opacity-50">
+              <span>{{ info.startRoomName }}</span>
+              <span> — </span>
+              <span>{{ info.endRoomName }}</span>
+            </div>
+          }
 
           @if (adjacentUnconnected().length > 0) {
             <div class="mt-2">
@@ -95,8 +97,12 @@ export class PanelHallwayInfoComponent {
     const hallway = floor.hallways.find((h) => h.id === gridTile.hallwayId);
     if (!hallway) return undefined;
 
-    const startRoom = floor.rooms.find((r) => r.id === hallway.startRoomId);
-    const endRoom = floor.rooms.find((r) => r.id === hallway.endRoomId);
+    const startRoom = hallway.startRoomId
+      ? floor.rooms.find((r) => r.id === hallway.startRoomId)
+      : undefined;
+    const endRoom = hallway.endRoomId
+      ? floor.rooms.find((r) => r.id === hallway.endRoomId)
+      : undefined;
 
     const startDef = startRoom
       ? productionGetRoomDefinition(startRoom.roomTypeId)
@@ -109,8 +115,8 @@ export class PanelHallwayInfoComponent {
       x: tile.x,
       y: tile.y,
       hallwayId: gridTile.hallwayId,
-      startRoomName: startDef?.name ?? 'Unknown',
-      endRoomName: endDef?.name ?? 'Unknown',
+      startRoomName: startDef?.name,
+      endRoomName: endDef?.name,
     };
   });
 

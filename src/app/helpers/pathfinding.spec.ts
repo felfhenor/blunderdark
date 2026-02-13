@@ -95,14 +95,17 @@ describe('pathfindingBuildDungeonGraph', () => {
     expect(r2Edges[0].toRoomId).toBe('r1');
   });
 
-  it('creates edges from hallways', () => {
+  it('creates edges from hallway connections', () => {
     const floor = makeFloor({
       rooms: [
         { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
         { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 10, anchorY: 0 },
       ],
       hallways: [
-        { id: 'h1', startRoomId: 'r1', endRoomId: 'r2', tiles: [], upgrades: [] },
+        { id: 'h1', tiles: [], upgrades: [] },
+      ],
+      connections: [
+        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
       ],
     });
 
@@ -119,9 +122,10 @@ describe('pathfindingBuildDungeonGraph', () => {
       ],
       connections: [
         { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c2', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
       ],
       hallways: [
-        { id: 'h1', startRoomId: 'r1', endRoomId: 'r2', tiles: [], upgrades: [] },
+        { id: 'h1', tiles: [], upgrades: [] },
       ],
     });
 

@@ -1,4 +1,6 @@
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { gridGetTile, gridIsInBounds, gridSetTile } from '@helpers/grid';
+import type { Floor } from '@interfaces/floor';
 import type { GridState, GridTile } from '@interfaces/grid';
 import type { Hallway, HallwayUpgrade } from '@interfaces/hallway';
 import type { TileOffset } from '@interfaces/room-shape';
@@ -64,8 +66,9 @@ export function hallwayGetBetween(
 ): Hallway[] {
   return hallways.filter(
     (h) =>
-      (h.startRoomId === roomAId && h.endRoomId === roomBId) ||
-      (h.startRoomId === roomBId && h.endRoomId === roomAId),
+      (h.startRoomId !== undefined && h.endRoomId !== undefined) &&
+      ((h.startRoomId === roomAId && h.endRoomId === roomBId) ||
+       (h.startRoomId === roomBId && h.endRoomId === roomAId)),
   );
 }
 
@@ -100,6 +103,106 @@ export function hallwayRemoveUpgrade(
   };
 }
 
+/**
+ * Find all existing hallways on a floor that are adjacent to the given hallway.
+ */
+export function hallwayFindAdjacentHallways(
+  floor: Floor,
+  hallwayId: string,
+): Hallway[] {
+  const hallway = floor.hallways.find((h) => h.id === hallwayId);
+  if (!hallway) return [];
+
+  return floor.hallways.filter((other) => {
+    if (other.id === hallwayId) return false;
+    return adjacencyAreRoomsAdjacent(hallway.tiles, other.tiles);
+  });
+}
+
+/**
+ * Merge an absorbed hallway into a target hallway on a floor.
+ * Combines tiles and upgrades, updates grid tile references,
+ * transfers connections, and removes the absorbed hallway.
+ */
+export function hallwayMergeOnFloor(
+  floor: Floor,
+  targetId: string,
+  absorbedId: string,
+): Floor {
+  const target = floor.hallways.find((h) => h.id === targetId);
+  const absorbed = floor.hallways.find((h) => h.id === absorbedId);
+  if (!target || !absorbed) return floor;
+
+  // Combine tiles (deduplicate by coordinate)
+  const tileSet = new Set(target.tiles.map((t) => `${t.x},${t.y}`));
+  const mergedTiles = [...target.tiles];
+  for (const tile of absorbed.tiles) {
+    const key = `${tile.x},${tile.y}`;
+    if (!tileSet.has(key)) {
+      tileSet.add(key);
+      mergedTiles.push(tile);
+    }
+  }
+
+  // Combine upgrades (deduplicate by id)
+  const upgradeIds = new Set(target.upgrades.map((u) => u.id));
+  const mergedUpgrades = [...target.upgrades];
+  for (const upgrade of absorbed.upgrades) {
+    if (!upgradeIds.has(upgrade.id)) {
+      upgradeIds.add(upgrade.id);
+      mergedUpgrades.push(upgrade);
+    }
+  }
+
+  const mergedHallway: Hallway = {
+    ...target,
+    tiles: mergedTiles,
+    upgrades: mergedUpgrades,
+  };
+
+  // Update grid: re-point absorbed tiles to target id
+  let updatedGrid = floor.grid;
+  for (const tile of absorbed.tiles) {
+    if (!gridIsInBounds(tile.x, tile.y)) continue;
+    const existing = gridGetTile(updatedGrid, tile.x, tile.y);
+    if (existing?.hallwayId === absorbedId) {
+      updatedGrid = gridSetTile(updatedGrid, tile.x, tile.y, {
+        ...existing,
+        hallwayId: targetId,
+      });
+    }
+  }
+
+  // Transfer connections: replace absorbedId with targetId, drop self-connections and duplicates
+  const updatedConnections = floor.connections
+    .map((conn) => {
+      let { roomAId, roomBId } = conn;
+      if (roomAId === absorbedId) roomAId = targetId;
+      if (roomBId === absorbedId) roomBId = targetId;
+      return { ...conn, roomAId, roomBId };
+    })
+    .filter((conn) => conn.roomAId !== conn.roomBId)
+    .filter((conn, idx, arr) =>
+      arr.findIndex(
+        (c) =>
+          (c.roomAId === conn.roomAId && c.roomBId === conn.roomBId) ||
+          (c.roomAId === conn.roomBId && c.roomBId === conn.roomAId),
+      ) === idx,
+    );
+
+  // Replace target, remove absorbed from hallways list
+  const updatedHallways = floor.hallways
+    .map((h) => (h.id === targetId ? mergedHallway : h))
+    .filter((h) => h.id !== absorbedId);
+
+  return {
+    ...floor,
+    grid: updatedGrid,
+    hallways: updatedHallways,
+    connections: updatedConnections,
+  };
+}
+
 export function hallwaySerialize(hallways: Hallway[]): Hallway[] {
   return hallways.map((h) => ({
     ...h,
@@ -115,8 +218,8 @@ export function hallwayDeserialize(data: unknown[]): Hallway[] {
     const h = item as Record<string, unknown>;
     return {
       id: (h['id'] as string) ?? '',
-      startRoomId: (h['startRoomId'] as string) ?? '',
-      endRoomId: (h['endRoomId'] as string) ?? '',
+      startRoomId: (h['startRoomId'] as string) || undefined,
+      endRoomId: (h['endRoomId'] as string) || undefined,
       tiles: (h['tiles'] as TileOffset[]) ?? [],
       upgrades: (h['upgrades'] as HallwayUpgrade[]) ?? [],
     };

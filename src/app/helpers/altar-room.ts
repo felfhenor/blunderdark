@@ -5,7 +5,7 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { rngUuid } from '@helpers/rng';
-import { hallwayPlacementFindPath } from '@helpers/hallway-placement';
+import { hallwayPlacementFindPointPath } from '@helpers/hallway-placement';
 import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 import {
@@ -102,17 +102,19 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
   // Connect all auto-placed rooms with hallways
   for (let i = 0; i < placedRoomIds.length; i++) {
     for (let j = i + 1; j < placedRoomIds.length; j++) {
-      const path = hallwayPlacementFindPath(
+      const roomA = floorCurrent.rooms.find((r) => r.id === placedRoomIds[i]);
+      const roomB = floorCurrent.rooms.find((r) => r.id === placedRoomIds[j]);
+      if (!roomA || !roomB) continue;
+
+      const path = hallwayPlacementFindPointPath(
         floorCurrent.grid,
-        placedRoomIds[i],
-        placedRoomIds[j],
+        { x: roomA.anchorX, y: roomA.anchorY },
+        { x: roomB.anchorX, y: roomB.anchorY },
       );
       if (!path) continue;
 
       const hallway: Hallway = {
         id: rngUuid(),
-        startRoomId: placedRoomIds[i],
-        endRoomId: placedRoomIds[j],
         tiles: path,
         upgrades: [],
       };
