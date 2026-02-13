@@ -8,6 +8,7 @@ import type {
   IsContentItem,
   PassiveBonusUnlock,
   ReputationAction,
+  ReputationEffectContent,
   ResearchNode,
   RoomDefinition,
   RoomShape,
@@ -27,6 +28,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   invader: ensureInvader,
   invasion: ensureInvasion,
   reputationaction: ensureReputationAction,
+  reputationeffect: ensureReputationEffect,
   research: ensureResearch,
   room: ensureRoom,
   roomshape: ensureRoomShape,
@@ -50,6 +52,22 @@ function ensureReputationAction(
     __type: 'reputationaction',
     description: action.description ?? '',
     reputationRewards: action.reputationRewards ?? {},
+  };
+}
+
+function ensureReputationEffect(
+  effect: Partial<ReputationEffectContent & IsContentItem>,
+): ReputationEffectContent & IsContentItem {
+  return {
+    id: (effect.id ?? 'UNKNOWN') as ReputationEffectContent['id'],
+    name: effect.name ?? 'UNKNOWN',
+    __type: 'reputationeffect',
+    description: effect.description ?? '',
+    reputationType: effect.reputationType ?? 'terror',
+    minimumLevel: effect.minimumLevel ?? 'high',
+    effectType: effect.effectType ?? 'modify_production',
+    effectValue: effect.effectValue ?? 0,
+    targetId: effect.targetId ?? undefined,
   };
 }
 

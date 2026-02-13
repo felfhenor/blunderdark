@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added 'reputationeffect' to ContentType, created content-reputationeffect.ts interface, gamedata/reputationeffect/base.yml with 17 effects, and ensureReputationEffect initializer."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created reputation-effects.ts helper with pure functions (reputationEffectGetActive, reputationEffectHas, reputationEffectGetByType, etc.) and computed signals (reputationEffectActive, reputationEffectActiveNames). 21 unit tests."
     },
     {
       "id": "US-003",
@@ -50,8 +50,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Terror effects defined in YAML and tested in reputation-effects.spec.ts. 5 tests verify Terror thresholds at High (350) and Legendary (700)."
     },
     {
       "id": "US-004",
@@ -67,8 +67,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Wealth effects defined in YAML and tested. 4 tests verify Wealth thresholds including gold production multiplier at Legendary."
     },
     {
       "id": "US-005",
@@ -83,8 +83,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Knowledge effects defined in YAML and tested. 4 tests verify Knowledge thresholds including research speed multiplier (0.85 = 15% faster)."
     },
     {
       "id": "US-006",
@@ -100,8 +100,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Harmony effects defined in YAML and tested. 5 tests verify Harmony thresholds including invasion rate reduction and creature attraction."
     },
     {
       "id": "US-007",
@@ -117,8 +117,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Chaos effects defined in YAML and tested. 4 tests verify Chaos thresholds including random event frequency and double or nothing."
     },
     {
       "id": "US-008",
@@ -133,8 +133,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added Active Effects section to PanelReputationComponent with dynamic effect display, color-coded badges per reputation type, and descriptions."
     }
   ]
 }

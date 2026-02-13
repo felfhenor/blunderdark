@@ -19,3 +19,12 @@
     opacity: 0.7;
   }
 }
+
+.active-effect {
+  padding: 2px 0;
+  border-bottom: 1px solid oklch(var(--b3) / 0.3);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}

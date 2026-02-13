@@ -2,10 +2,16 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   gamestate,
+  reputationEffectActive,
   reputationGetLevel,
   reputationGetLevelLabel,
 } from '@helpers';
-import type { ReputationLevel, ReputationType } from '@interfaces';
+import type {
+  IsContentItem,
+  ReputationEffectContent,
+  ReputationLevel,
+  ReputationType,
+} from '@interfaces';
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
 
 type ReputationCategory = {
@@ -66,6 +72,36 @@ export class PanelReputationComponent {
 
   public isLegendary(type: ReputationType): boolean {
     return this.getLevel(type) === 'legendary';
+  }
+
+  public activeEffects = computed(() => reputationEffectActive());
+
+  public hasActiveEffects = computed(() => this.activeEffects().length > 0);
+
+  public getEffectIcon(
+    effect: ReputationEffectContent & IsContentItem,
+  ): string {
+    const icons: Record<ReputationType, string> = {
+      terror: '💀',
+      wealth: '💰',
+      knowledge: '📚',
+      harmony: '🌿',
+      chaos: '🌀',
+    };
+    return icons[effect.reputationType];
+  }
+
+  public getEffectBadgeClass(
+    effect: ReputationEffectContent & IsContentItem,
+  ): string {
+    const classes: Record<ReputationType, string> = {
+      terror: 'badge-error',
+      wealth: 'badge-warning',
+      knowledge: 'badge-info',
+      harmony: 'badge-success',
+      chaos: 'badge-secondary',
+    };
+    return classes[effect.reputationType];
   }
 
   private getNextThreshold(level: ReputationLevel): number {

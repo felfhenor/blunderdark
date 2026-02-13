@@ -47,6 +47,7 @@ export * from './production';
 export * from './production-modifiers';
 export * from './recruitment';
 export * from './reputation';
+export * from './reputation-effects';
 export * from './research-progress';
 export * from './research-unlocks';
 export * from './resources';

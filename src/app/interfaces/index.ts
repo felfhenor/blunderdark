@@ -8,6 +8,7 @@ export * from './content-inhabitant';
 export * from './content-invader';
 export * from './content-invasion';
 export * from './content-reputationaction';
+export * from './content-reputationeffect';
 export * from './content-research';
 export * from './content-room';
 export * from './content-roomshape';
