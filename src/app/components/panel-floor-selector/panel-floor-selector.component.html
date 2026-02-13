@@ -59,9 +59,8 @@
       <div class="floor-detail">
         <div class="flex items-center gap-2 mb-2">
           <span
-            class="biome-badge badge badge-lg"
-            [style.background-color]="selectedFloorBiome().color"
-            [style.color]="'white'"
+            class="biome-badge badge badge-lg text-white"
+            [style.--badge-bg]="selectedFloorBiome().color"
           >
             {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome().name }}
           </span>

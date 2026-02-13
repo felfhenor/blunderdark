@@ -54,7 +54,7 @@ import type { MoraleEvent } from '@helpers/morale';
           <div class="morale-log">
             <div class="text-xs font-semibold mb-1">Morale Log</div>
             @for (evt of eventLog(); track $index) {
-              <div class="flex justify-between text-[10px] gap-2">
+              <div class="flex justify-between text-xs gap-2">
                 <span class="opacity-60">Turn {{ evt.turn }}</span>
                 <span class="flex-1 truncate">{{ evt.description }}</span>
                 <span

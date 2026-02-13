@@ -250,6 +250,7 @@ BFS pathfinding for hallways between rooms:
 
 ## UI Patterns
 
+- **NEVER use inline styles** — do not use `[style.property]="value"` or `[style]="string"` in templates. Use Tailwind classes for static values (e.g., `text-white` instead of `[style.color]="'white'"`). For dynamic values, use CSS custom properties: set via `[style.--my-var]="dynamicValue"` in the template, consume via `var(--my-var)` in SCSS. This applies to all style properties including `width`, `height`, `background-color`, `border-color`, `grid-column`, etc.
 - DaisyUI progress bars use classes like `progress-error`, `progress-warning`, etc.
 - Theme variables: `var(--b3)`, `var(--p)`, `var(--s)`, `var(--pf)`
 - OKLCH color format works in Angular SCSS — the compiler converts them to browser-compatible formats
@@ -277,7 +278,7 @@ BFS pathfinding for hallways between rooms:
 
 ### Dynamic Styling with CSS Variables
 
-Pass colors from templates to SCSS using CSS custom properties:
+Always use CSS custom properties for dynamic values — never set CSS properties directly via `[style.property]`. Set the variable in the template and consume it in SCSS:
 
 ```html
 <div [style.--my-color]="getColor()"></div>
@@ -296,7 +297,7 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
 ```html
 <div class="shape-preview" [style.--grid-size]="getShapeGridSize(room)">
   @for (tile of getShapeTiles(room); track tile.key) {
-  <div class="shape-tile" [style.grid-column]="tile.x + 1" [style.grid-row]="tile.y + 1"></div>
+  <div class="shape-tile" [style.--tile-col]="tile.x + 1" [style.--tile-row]="tile.y + 1"></div>
   }
 </div>
 ```
@@ -307,6 +308,11 @@ For small shape preview icons in UI panels, use CSS grid with dynamic size:
   grid-template-columns: repeat(var(--grid-size), 8px);
   grid-template-rows: repeat(var(--grid-size), 8px);
   gap: 1px;
+}
+
+.shape-tile {
+  grid-column: var(--tile-col);
+  grid-row: var(--tile-row);
 }
 ```
 

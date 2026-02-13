@@ -232,7 +232,7 @@ export class GridComponent {
 
   private roomBorderMap = computed(() => {
     const grid = this.grid();
-    const map = new Map<string, string>();
+    const map = new Map<string, { color: string; classes: string }>();
 
     for (let y = 0; y < grid.length; y++) {
       for (let x = 0; x < grid[y].length; x++) {
@@ -245,22 +245,26 @@ export class GridComponent {
         const bottom = grid[y + 1]?.[x]?.roomId !== roomId;
         const left = grid[y]?.[x - 1]?.roomId !== roomId;
 
-        const parts: string[] = [];
-        if (top) parts.push(`border-top:2px solid ${color}`);
-        if (right) parts.push(`border-right:2px solid ${color}`);
-        if (bottom) parts.push(`border-bottom:2px solid ${color}`);
-        if (left) parts.push(`border-left:2px solid ${color}`);
+        const classes: string[] = [];
+        if (top) classes.push('border-edge-top');
+        if (right) classes.push('border-edge-right');
+        if (bottom) classes.push('border-edge-bottom');
+        if (left) classes.push('border-edge-left');
 
-        if (parts.length > 0) {
-          map.set(`${x},${y}`, parts.join(';'));
+        if (classes.length > 0) {
+          map.set(`${x},${y}`, { color, classes: classes.join(' ') });
         }
       }
     }
     return map;
   });
 
-  public getRoomBorderStyle(x: number, y: number): string | undefined {
-    return this.roomBorderMap().get(`${x},${y}`);
+  public getRoomBorderColor(x: number, y: number): string | undefined {
+    return this.roomBorderMap().get(`${x},${y}`)?.color;
+  }
+
+  public getRoomBorderClasses(x: number, y: number): string {
+    return this.roomBorderMap().get(`${x},${y}`)?.classes ?? '';
   }
 
   private selectedRoomId = computed(() => {

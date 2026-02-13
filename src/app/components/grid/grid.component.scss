@@ -148,6 +148,22 @@
     background-color: oklch(var(--in));
     opacity: 0.8;
   }
+
+  &.border-edge-top {
+    border-top: 2px solid var(--room-border-color);
+  }
+
+  &.border-edge-right {
+    border-right: 2px solid var(--room-border-color);
+  }
+
+  &.border-edge-bottom {
+    border-bottom: 2px solid var(--room-border-color);
+  }
+
+  &.border-edge-left {
+    border-left: 2px solid var(--room-border-color);
+  }
 }
 
 .doorway {

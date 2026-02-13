@@ -29,13 +29,13 @@ import { TippyDirective } from '@ngneat/helipopper';
 
       <ng-template #fearTip>
         @if (breakdown(); as b) {
-          <div style="font-weight:600;font-size:12px;margin-bottom:4px">
+          <div class="text-xs font-semibold mb-1">
             Fear: {{ fearLabel() }} ({{ b.effectiveFear }})
           </div>
-          <div style="font-size:10px;opacity:0.7">Base: {{ b.baseFear }}</div>
+          <div class="text-xs opacity-70">Base: {{ b.baseFear }}</div>
           @if (b.inhabitantModifier !== 0) {
             <div
-              style="font-size:10px"
+              class="text-xs"
               [class]="b.inhabitantModifier > 0 ? 'text-error' : 'text-success'"
             >
               Inhabitants: {{ b.inhabitantModifier > 0 ? '+' : '' }}{{ b.inhabitantModifier }}
@@ -43,29 +43,29 @@ import { TippyDirective } from '@ngneat/helipopper';
           }
           @if (b.upgradeAdjustment !== 0) {
             <div
-              style="font-size:10px"
+              class="text-xs"
               [class]="b.upgradeAdjustment > 0 ? 'text-error' : 'text-success'"
             >
               Upgrades: {{ b.upgradeAdjustment > 0 ? '+' : '' }}{{ b.upgradeAdjustment }}
             </div>
           }
           @if (b.altarAuraReduction !== 0) {
-            <div class="text-success" style="font-size:10px">
+            <div class="text-xs text-success">
               Altar Aura: -{{ b.altarAuraReduction }}
             </div>
           }
           @if (b.propagatedFear !== 0) {
-            <div class="text-error" style="font-size:10px">
+            <div class="text-xs text-error">
               Adjacent: +{{ b.propagatedFear }}
             </div>
             @for (source of b.propagationSources; track source.sourceRoomName) {
-              <div style="font-size:10px;opacity:0.5;margin-left:8px">
+              <div class="text-xs opacity-50 ml-2">
                 +{{ source.amount }} from {{ source.sourceRoomName }}
               </div>
             }
           }
           <hr class="fear-divider">
-          <div style="font-size:10px;opacity:0.6">{{ fearEffect() }}</div>
+          <div class="text-xs opacity-60">{{ fearEffect() }}</div>
         }
       </ng-template>
     }

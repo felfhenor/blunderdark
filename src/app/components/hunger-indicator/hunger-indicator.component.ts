@@ -34,11 +34,11 @@ import { TippyDirective } from '@ngneat/helipopper';
           <div class="text-xs opacity-70">Does not eat.</div>
         } @else {
           <div class="font-semibold text-xs mb-1">{{ hungerLabel() }}</div>
-          <div class="text-[10px] opacity-70">
+          <div class="text-xs opacity-70">
             Consumes {{ consumptionRatePerHour().toFixed(1) }} Food/hr
           </div>
           <div class="divider my-0.5 h-0"></div>
-          <div class="text-[10px] opacity-60">{{ hungerEffect() }}</div>
+          <div class="text-xs opacity-60">{{ hungerEffect() }}</div>
         }
       </ng-template>
     }

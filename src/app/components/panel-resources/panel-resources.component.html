@@ -50,10 +50,10 @@
       ></progress>
 
       <div class="flex items-center justify-between mt-0.5">
-        <span class="text-[10px] opacity-70">
+        <span class="text-xs opacity-70">
           {{ getCurrent(res.type) | number: '1.0-0' }}/{{ getMax(res.type) | number: '1.0-0' }}
         </span>
-        <span class="text-[10px]" [class]="getRateClass(res.type)">
+        <span class="text-xs" [class]="getRateClass(res.type)">
           {{ formatRate(res.type) }}
         </span>
       </div>
@@ -134,15 +134,15 @@
       <div
         class="corruption-level-fill h-full rounded-full transition-all"
         [class]="'corruption-fill-' + corruptionInfo().level"
-        [style.width.%]="corruptionInfo().value === 0 ? 0 : Math.min(100, (corruptionInfo().value / 200) * 100)"
+        [style.--fill-width]="(corruptionInfo().value === 0 ? 0 : Math.min(100, (corruptionInfo().value / 200) * 100)) + '%'"
       ></div>
     </div>
 
     <div class="flex items-center justify-between mt-0.5">
-      <span class="text-[10px] opacity-70">
+      <span class="text-xs opacity-70">
         {{ getCurrent('corruption') | number: '1.0-0' }}
       </span>
-      <span class="text-[10px]" [class]="getRateClass('corruption')">
+      <span class="text-xs" [class]="getRateClass('corruption')">
         {{ formatRate('corruption') }}
       </span>
     </div>
@@ -214,7 +214,7 @@
 
 @if (activeTimeModifiers().resourceModifiers.length > 0 || activeTimeModifiers().creatureModifiers.length > 0) {
   <div class="time-modifiers flex flex-wrap items-center gap-1 mt-1">
-    <span class="text-[10px] opacity-60 font-semibold">{{ getPhaseLabel() }}:</span>
+    <span class="text-xs opacity-60 font-semibold">{{ getPhaseLabel() }}:</span>
     @for (mod of activeTimeModifiers().resourceModifiers; track mod.resourceType + mod.phase) {
       <span
         class="badge badge-xs"

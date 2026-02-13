@@ -12,8 +12,8 @@
                 <span class="synergy-dot bg-success"></span>
                 <span class="text-xs font-semibold">{{ synergy.name }}</span>
               </div>
-              <div class="text-[10px] opacity-70 ml-4">{{ synergy.description }}</div>
-              <div class="text-[10px] text-success ml-4 font-medium">
+              <div class="text-xs opacity-70 ml-4">{{ synergy.description }}</div>
+              <div class="text-xs text-success ml-4 font-medium">
                 {{ formatEffect(synergy) }}
               </div>
             </div>
@@ -33,8 +33,8 @@
                 <span class="synergy-dot bg-warning"></span>
                 <span class="text-xs font-semibold">{{ ps.synergy.name }}</span>
               </div>
-              <div class="text-[10px] opacity-70 ml-4">{{ getPotentialEffect(ps) }}</div>
-              <div class="text-[10px] text-warning ml-4">
+              <div class="text-xs opacity-70 ml-4">{{ getPotentialEffect(ps) }}</div>
+              <div class="text-xs text-warning ml-4">
                 @for (cond of ps.missingConditions; track cond; let last = $last) {
                   <span>{{ cond }}</span>
                   @if (!last) {

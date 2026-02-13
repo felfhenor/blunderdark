@@ -11,7 +11,8 @@
         [class.hallway-source]="isHallwaySourceRoom(tile.roomId)"
         [class.hallway-path]="isHallwayPathTile(colIdx, rowIdx)"
         [style.--room-color]="getRoomColor(tile.roomId)"
-        [style]="getRoomBorderStyle(colIdx, rowIdx)"
+        [style.--room-border-color]="getRoomBorderColor(colIdx, rowIdx)"
+        [class]="getRoomBorderClasses(colIdx, rowIdx)"
         (click)="onTileClick(colIdx, rowIdx)"
         (mouseenter)="onTileHover(colIdx, rowIdx)"
       >

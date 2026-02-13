@@ -3,9 +3,9 @@
 <img
   [src]="assetUrl()"
   [alt]="assetName()"
-  [style.width.px]="asset.width"
-  [style.height.px]="asset.height"
-  [style.object-position]="`-${asset.x}px -${asset.y}px`"
+  [style.--sprite-width]="asset.width + 'px'"
+  [style.--sprite-height]="asset.height + 'px'"
+  [style.--sprite-position]="'-' + asset.x + 'px -' + asset.y + 'px'"
   [ngClass]="[cssClass()]"
   draggable="false"
 />

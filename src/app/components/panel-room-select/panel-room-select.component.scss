@@ -25,6 +25,8 @@
   height: 8px;
   background-color: oklch(var(--p));
   border-radius: 1px;
+  grid-column: var(--tile-col);
+  grid-row: var(--tile-row);
 }
 
 .cost-row {

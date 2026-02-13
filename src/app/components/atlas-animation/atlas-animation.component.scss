@@ -1,6 +1,7 @@
 .animated-sprite {
   width: 64px;
   height: 64px;
+  background-image: var(--sprite-bg);
 
   contain: layout paint;
   will-change: background-position;

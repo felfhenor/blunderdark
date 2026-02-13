@@ -1,3 +1,15 @@
 :host {
   @apply block;
 }
+
+.biome-btn {
+  border-color: var(--btn-color);
+}
+
+.biome-dot {
+  background-color: var(--btn-color);
+}
+
+.biome-description {
+  border-left: 3px solid var(--btn-color);
+}

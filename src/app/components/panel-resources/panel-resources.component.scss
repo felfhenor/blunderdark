@@ -52,6 +52,10 @@
   background: oklch(var(--bc) / 0.1);
 }
 
+.corruption-level-fill {
+  width: var(--fill-width, 0%);
+}
+
 .corruption-fill-low {
   background: oklch(var(--su));
 }

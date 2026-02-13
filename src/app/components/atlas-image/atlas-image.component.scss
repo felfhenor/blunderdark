@@ -1,4 +1,7 @@
 img {
   object-fit: none;
   user-select: none;
+  width: var(--sprite-width);
+  height: var(--sprite-height);
+  object-position: var(--sprite-position);
 }
