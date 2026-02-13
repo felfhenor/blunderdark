@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in researchCanStart() and researchStart() in research-progress.ts. 8 tests cover prerequisites, resource checks, active research blocking, and state updates."
     },
     {
       "id": "US-002",
@@ -34,8 +34,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "researchProcess(state) integrated into gameloop.ts. requiredTicks added to ResearchNode type and all YAML files. 5 tests verify tick advancement, accumulation, and raw tick storage."
     },
     {
       "id": "US-003",
@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "researchSpeedModifier computed signal and researchCalculateSpeedModifier() function. Library rooms producing research add +10% each. Ruler researchSpeed bonus from throne room. Scholar traits deferred (no existing research_speed trait effectType yet). 6 tests verify modifier stacking."
     },
     {
       "id": "US-004",
@@ -67,8 +67,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completion logic in researchProcess(). researchCompleted$ observable emits on completion. 5 tests verify completion at exact threshold, overshoot, append to completedNodes, and state reset."
     },
     {
       "id": "US-005",
@@ -83,8 +83,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "researchCancel() clears all active research state. 4 tests verify state reset, no-op when no active research, completed nodes preserved, and re-startability."
     },
     {
       "id": "US-006",
@@ -99,8 +99,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ResearchState is part of GameStateWorld, persisted via indexedDbSignal. defaultResearchState() provides migration baseline. 4 tests verify state structure, persistence, resume from saved progress, and completed nodes reflection."
     }
   ]
 }

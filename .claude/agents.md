@@ -994,3 +994,15 @@ export type {Type}Content = IsContentItem &
 4. Add `ensure{Type}()` initializer to `content-initializers.ts`
 5. Create `gamedata/{type}/` folder with YAML
 6. Update this table
+
+## Research Progress System
+
+- `research-progress.ts` helper: `researchProcess(state)` runs each tick inside `updateGamestate` — advances active research progress by `RESEARCH_BASE_PROGRESS_PER_TICK * speedModifier`
+- `ResearchNode` has `requiredTicks: number` — configurable per node in YAML (T1=50, T2=150, T3=300, T4=500, T5=750, T6=1000)
+- `ResearchState` in `GameStateWorld`: `{ completedNodes, activeResearch, activeResearchProgress, activeResearchStartTick }`
+- `researchStart(nodeId)` validates prerequisites, deducts resources via `resourcePayCost()`, sets `activeResearch`
+- `researchCancel()` clears `activeResearch` and progress — resources NOT refunded, progress lost entirely
+- `researchCanStart(nodeId, researchState)` returns `{ canStart, error? }` — checks: no active research, node exists, not already completed, prerequisites met, can afford
+- Speed modifier: `researchCalculateSpeedModifier(floors)` = `1 + (libraryBonus + rulerBonus)` — Library rooms (any room producing `research` resource) add `RESEARCH_LIBRARY_BONUS_PER_ROOM` (0.1) each; ruler `researchSpeed` bonus from throne room
+- `researchCompleted$` observable emits `{ nodeId, nodeName }` on completion — subscribe in services for notifications
+- Prerequisites reference resolved UUIDs at runtime (build script resolves names from YAML via `rewriteDataIds`)
