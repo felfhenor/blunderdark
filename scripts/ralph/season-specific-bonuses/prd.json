@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SeasonBonusDefinition and SeasonBonusModifier types added to season.ts. YAML at gamedata/seasonbonus/base.yml (follows content pipeline folder convention). ContentType 'seasonbonus' added with ensureSeasonBonus initializer."
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Season modifiers are multiplicative in the production pipeline (same pattern as day-night and floor-depth). Pure function lookup by current season means no residual bonuses. Cross-season isolation tests verify no carryover. Computed signals pass state.world.season.currentSeason."
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Growth food 1.50x, recruitment 0.75x. recruitmentGetAdjustedCost pure function applies season multiplier with Math.ceil rounding."
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Harvest 1.20x for all 7 resource types. seasonBonusIsMerchantVisitEnabled('harvest') returns true."
     },
     {
       "id": "US-005",
@@ -79,8 +79,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Darkness corruption 2.0x, dark creature spawn 1.5x via seasonBonusGetSpawnRateModifier."
     },
     {
       "id": "US-006",
@@ -94,8 +94,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Storms flux 1.80x. seasonBonusAreRandomEventsEnabled('storms') returns true."
     },
     {
       "id": "US-007",
@@ -111,7 +111,7 @@
       ],
       "priority": 7,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred - requires UI component creation and browser verification. Helper functions (seasonBonusGetAllActive, seasonBonusFormatMultiplier, seasonBonusGetSeasonLabel) are ready for UI consumption."
     }
   ]
 }

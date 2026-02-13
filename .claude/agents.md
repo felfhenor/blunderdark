@@ -621,6 +621,21 @@ When multiple build modes exist (room placement, hallway build):
 - `InhabitantDefinition.type` field identifies creature types: 'creature', 'undead', 'fungal', 'ooze', 'dragon', 'demon' — used for creature-type modifiers
 - Active modifiers displayed as badges in `PanelResourcesComponent` below the resource bar
 
+## Season-Specific Bonuses
+
+- `season-bonuses.ts` helper: season-based global production modifiers, recruitment cost multipliers, spawn rate modifiers, and flag queries
+- Follows the same hardcoded config array pattern as `day-night-modifiers.ts` and `floor-modifiers.ts`
+- `seasonBonusGetResourceModifier(season, resourceType)` returns per-resource multiplier: Growth food 1.5x, Harvest all 1.2x, Darkness corruption 2.0x, Storms flux 1.8x
+- `seasonBonusGetRecruitmentCostMultiplier(season)` returns cost multiplier: Growth 0.75x (only season with discount)
+- `seasonBonusGetSpawnRateModifier(season, creatureType)` returns spawn rate multiplier: Darkness dark 1.5x
+- `seasonBonusIsMerchantVisitEnabled(season)` → true only during Harvest
+- `seasonBonusAreRandomEventsEnabled(season)` → true only during Storms
+- Season modifiers applied in production pipeline as additional multiplicative factor alongside dayNightResourceMod and depthModifier
+- `recruitmentGetAdjustedCost(cost, season)` pure function in `recruitment.ts` applies season recruitment discount with `Math.ceil` rounding
+- Gamedata content type `'seasonbonus'` with YAML at `gamedata/seasonbonus/base.yml` — 4 entries (one per season)
+- When mocking `gamestate()` in tests that call `recruitmentRecruit()`, the mock must include `world.season.currentSeason` — use a season with 1.0 recruitment multiplier (e.g., 'harvest') to avoid affecting existing cost assertions
+- File-to-prefix: `season-bonuses.ts` → `seasonBonus` / `SEASON_BONUS`
+
 ## Research Tree YAML Conventions
 
 - Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=gold
@@ -741,6 +756,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `room-upgrades.ts` | `roomUpgrade` | `ROOM_UPGRADE` |
 | `scheduler.ts` | `scheduler` | `SCHEDULER` |
 | `season.ts` | `season` | `SEASON` |
+| `season-bonuses.ts` | `seasonBonus` | `SEASON_BONUS` |
 | `setup.ts` | `setup` | `SETUP` |
 | `sfx.ts` | `sfx` | `SFX` |
 | `signal.ts` | `signal` | `SIGNAL` |

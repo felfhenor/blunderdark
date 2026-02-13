@@ -4,9 +4,9 @@ A prioritized list of features based on dependencies and logical progression.
 
 ## Status Summary
 
-- **Complete:** 55 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions, invasion-rewards-system, turn-based-invasion-mode, conditional-state-modifiers, conditional-production-modifiers, biome-bonuses, biome-restrictions, floor-depth-modifiers, day-night-production-modifiers)
+- **Complete:** 56 features (grid-system, resource-manager, adjacency-detection, biome-system, inhabitant-data-model, tetromino-room-shapes, hallway-data-structure, reputation-tracking, seasonal-cycle-system, floor-creation-system, research-tree-data-structure, room-placement-validation, time-system, production-calculation-system, room-placement-ui, direct-adjacency-connection, hallway-placement-tool, throne-room, crystal-mine-room, mushroom-grove-room, altar-room, room-removal, inhabitant-recruitment-system, inhabitant-assignment-system, inhabitant-roster-ui, efficiency-calculation, resource-ui-display, adjacency-bonus-system, synergy-detection-logic, synergy-tooltip-system, shadow-library-room, soul-well-room, treasure-vault-room, underground-lake-room, ley-line-nexus-room, basic-combat-resolution, special-combat-abilities, barracks-room, training-grounds-room, trap-system, trap-workshop-room, multiple-invader-types, invader-pathfinding, invasion-trigger-system, invasion-composition-logic, invasion-objectives-system, invasion-win-loss-conditions, invasion-rewards-system, turn-based-invasion-mode, conditional-state-modifiers, conditional-production-modifiers, biome-bonuses, biome-restrictions, floor-depth-modifiers, day-night-production-modifiers, season-specific-bonuses)
 - **In Progress:** None
-- **Remaining:** ~71 features
+- **Remaining:** ~70 features
 
 ---
 
@@ -143,7 +143,7 @@ Production modifiers add strategic depth.
 | ~~10.4~~ | ~~`biome-restrictions`~~ | ~~COMPLETE (5/5)~~ | ~~biome-system, room-placement-ui~~ |
 | ~~10.5~~ | ~~`floor-depth-modifiers`~~ | ~~COMPLETE (4/4)~~ | ~~floor-creation-system~~ |
 | ~~10.6~~ | ~~`day-night-production-modifiers`~~ | ~~COMPLETE (3/3)~~ | ~~time-system, production-calculation-system~~ |
-| 10.7 | `season-specific-bonuses` | 5 | seasonal-cycle-system, production-calculation-system |
+| ~~10.7~~ | ~~`season-specific-bonuses`~~ | ~~COMPLETE (6/7, 1 deferred)~~ | ~~seasonal-cycle-system, production-calculation-system~~ |
 
 ---
 
