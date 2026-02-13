@@ -100,7 +100,7 @@
 
 .room-label {
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 11px;
@@ -118,9 +118,9 @@
 
 .fear-grid-badge {
   position: absolute;
-  top: 2px;
+  top: -4px;
   right: 2px;
-  z-index: 2;
+  z-index: 3;
   pointer-events: auto;
 }
 
