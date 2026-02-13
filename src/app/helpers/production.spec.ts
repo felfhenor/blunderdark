@@ -517,7 +517,7 @@ describe('productionCalculateConditionalModifiers', () => {
       },
     ];
     const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
-    expect(result).toBe(0.75);
+    expect(result).toBe(0.5);
   });
 
   it('should multiply modifiers when both scared and hungry inhabitants present', () => {
@@ -538,8 +538,8 @@ describe('productionCalculateConditionalModifiers', () => {
       },
     ];
     const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
-    // Per-creature averaging: scared (0.5) + hungry (0.75) / 2 = 0.625
-    expect(result).toBeCloseTo(0.625);
+    // Per-creature averaging: scared (0.5) + hungry (0.5) / 2 = 0.5
+    expect(result).toBeCloseTo(0.5);
   });
 
   it('should average same state from multiple inhabitants', () => {

@@ -3,6 +3,7 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { gameEventProcess } from '@helpers/game-events';
 import { gameTimeAdvanceClock } from '@helpers/game-time';
+import { hungerProcess, hungerProcessWarnings } from '@helpers/hunger';
 import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
 import { trainingProcess } from '@helpers/training';
@@ -54,10 +55,12 @@ export async function gameloop(totalTicks: number): Promise<void> {
   updateGamestate((state) => {
     state.clock.numTicks += numTicks;
     state.clock = gameTimeAdvanceClock(state.clock, numTicks);
+    hungerProcess(state);
     productionProcess(state);
     trainingProcess(state);
     trapWorkshopProcess(state);
     invasionTriggerProcessSchedule(state);
+    hungerProcessWarnings(state);
     return state;
   });
 

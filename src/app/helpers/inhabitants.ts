@@ -64,6 +64,7 @@ export function inhabitantDeserialize(
     trained: i.trained ?? false,
     trainingProgress: i.trainingProgress ?? 0,
     trainingBonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
+    hungerTicksWithoutFood: i.hungerTicksWithoutFood ?? 0,
   }));
 }
 

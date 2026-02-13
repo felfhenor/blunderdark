@@ -23,6 +23,7 @@ export * from './gameloop';
 export * from './grid';
 export * from './hallway-placement';
 export * from './hallways';
+export * from './hunger';
 export * from './icons';
 export * from './inhabitants';
 export * from './invaders';

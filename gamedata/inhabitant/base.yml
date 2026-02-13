@@ -20,6 +20,7 @@
       effectValue: 0.2
       targetResourceType: crystals
   fearTolerance: 1
+  foodConsumptionRate: 2
   stateModifiers:
     scared:
       productionMultiplier: 0.5
@@ -31,6 +32,11 @@
       foodConsumptionMultiplier: 1.0
       attackMultiplier: 0.8
       defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
@@ -56,6 +62,7 @@
       effectType: trap_bonus
       effectValue: 0.25
   fearTolerance: 2
+  foodConsumptionRate: 1.5
   stateModifiers:
     scared:
       productionMultiplier: 1.1
@@ -67,6 +74,11 @@
       foodConsumptionMultiplier: 1.0
       attackMultiplier: 0.9
       defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
@@ -92,6 +104,7 @@
       effectType: defense_bonus
       effectValue: 0.3
   fearTolerance: 4
+  foodConsumptionRate: 0
   stateModifiers:
     scared:
       productionMultiplier: 0.9
@@ -99,6 +112,9 @@
       attackMultiplier: 0.9
       defenseMultiplier: 0.95
     hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
     normal:
@@ -127,6 +143,7 @@
       effectValue: 0.15
       targetResourceType: food
   fearTolerance: 1
+  foodConsumptionRate: 1
   stateModifiers:
     scared:
       productionMultiplier: 0.3
@@ -138,6 +155,11 @@
       foodConsumptionMultiplier: 1.0
       attackMultiplier: 0.7
       defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
@@ -162,6 +184,7 @@
       effectType: versatility
       effectValue: 1.0
   fearTolerance: 0
+  foodConsumptionRate: 0.5
   stateModifiers:
     scared:
       productionMultiplier: 0.4
@@ -171,6 +194,11 @@
     hungry:
       productionMultiplier: 0.8
       foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.2
+      defenseMultiplier: 0.2
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
@@ -198,6 +226,7 @@
     fear: 0.05
   rulerFearLevel: 4
   fearTolerance: 4
+  foodConsumptionRate: 5
   stateModifiers:
     scared:
       productionMultiplier: 0.9
@@ -209,6 +238,11 @@
       foodConsumptionMultiplier: 1.0
       attackMultiplier: 0.9
       defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
@@ -236,6 +270,7 @@
     fluxProduction: 0.15
   rulerFearLevel: 3
   fearTolerance: 4
+  foodConsumptionRate: 0
   stateModifiers:
     scared:
       productionMultiplier: 0.95
@@ -243,6 +278,9 @@
       attackMultiplier: 0.9
       defenseMultiplier: 0.9
     hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
     normal:
@@ -273,6 +311,7 @@
     invaderMorale: -0.10
   rulerFearLevel: 5
   fearTolerance: 4
+  foodConsumptionRate: 3
   stateModifiers:
     scared:
       productionMultiplier: 0.95
@@ -284,6 +323,11 @@
       foodConsumptionMultiplier: 1.0
       attackMultiplier: 0.95
       defenseMultiplier: 0.95
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0

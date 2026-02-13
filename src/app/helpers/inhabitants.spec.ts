@@ -59,6 +59,7 @@ function createTestInhabitant(
     trained: false,
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
+    hungerTicksWithoutFood: 0,
     ...overrides,
   };
 }
@@ -121,6 +122,7 @@ describe('inhabitant serialization', () => {
       trained: true,
       trainingProgress: 25,
       trainingBonuses: { defense: 1, attack: 0 },
+      hungerTicksWithoutFood: 0,
     };
 
     const serialized = inhabitantSerialize([original]);

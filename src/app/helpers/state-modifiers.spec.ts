@@ -162,7 +162,7 @@ describe('stateModifierGet', () => {
       },
     });
     const result = stateModifierGet('goblin', 'hungry');
-    expect(result.productionMultiplier).toBe(0.75);
+    expect(result.productionMultiplier).toBe(0.5);
   });
 
   it('should return default modifier when definition not found', () => {
@@ -332,8 +332,8 @@ describe('stateModifierCalculatePerCreatureProduction', () => {
   it('should use default multipliers when creature has no stateModifiers', () => {
     registerDef('goblin', {});
     const inhabitants = [makeInhabitant({ definitionId: 'goblin', state: 'hungry' })];
-    // Default hungry = 0.75
-    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(0.75);
+    // Default hungry = 0.5
+    expect(stateModifierCalculatePerCreatureProduction(inhabitants)).toBe(0.5);
   });
 
   it('should handle all normal inhabitants returning 1.0', () => {
