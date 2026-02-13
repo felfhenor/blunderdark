@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "GameResearchComponent created at src/app/pages/game-research/ with route at /game/research. Header has Back button and Research title. Standalone with OnPush."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "DaisyUI tabs-bordered with signal<ResearchBranch> for state. tab-active class highlights selected. Default is 'dark'."
     },
     {
       "id": "US-003",
@@ -50,8 +50,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nodes rendered as cards grouped by tier with connector lines between tiers. Tree panel is overflow-auto for scrollability."
     },
     {
       "id": "US-004",
@@ -67,8 +67,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Four node states with distinct styles: completed (green border + checkmark), active (pulsing blue border animation), available (yellow glow), locked (dimmed 40% opacity). All derived via computed()."
     },
     {
       "id": "US-005",
@@ -83,8 +83,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Right-side detail panel (w-72) shows on node click. Displays name, description, tier/branch badges, cost, prerequisites (with missing names for locked nodes), and state-appropriate actions."
     },
     {
       "id": "US-006",
@@ -100,8 +100,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Start Research button calls researchStart(). Disabled with tooltip when canStart is false. Insufficient resources shown as error text. Uses existing research-progress.ts helper."
     },
     {
       "id": "US-007",
@@ -116,8 +116,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Progress bar on active node card (mini 4px), in detail panel, and in summary bar at top of page. Shows percentage and estimated time remaining. Also a PanelResearchSummaryComponent sidebar panel in game-play for at-a-glance progress."
     }
   ]
 }

@@ -1006,3 +1006,14 @@ export type {Type}Content = IsContentItem &
 - Speed modifier: `researchCalculateSpeedModifier(floors)` = `1 + (libraryBonus + rulerBonus)` — Library rooms (any room producing `research` resource) add `RESEARCH_LIBRARY_BONUS_PER_ROOM` (0.1) each; ruler `researchSpeed` bonus from throne room
 - `researchCompleted$` observable emits `{ nodeId, nodeName }` on completion — subscribe in services for notifications
 - Prerequisites reference resolved UUIDs at runtime (build script resolves names from YAML via `rewriteDataIds`)
+
+## Research UI
+
+- `GameResearchComponent` at `/game/research` — full-page research tree view, added as a child route under `/game` in `game.routes.ts`
+- Adding new game pages: add route to `game.routes.ts`, the `GameComponent` parent provides navbar via `<router-outlet>`
+- `PanelResearchSummaryComponent` — sidebar panel in game-play showing active research name, progress bar, and "Open" button to navigate to `/game/research`
+- Node states derived from `ResearchState`: completed (green), active (pulsing blue), available (glowing yellow), locked (dimmed)
+- Branch tab navigation uses `signal<ResearchBranch>` — no routing needed for tabs, just signal state
+- Nodes arranged by tier (computed from `branchNodes`) with tier labels and connector lines between tiers
+- Detail panel shows on node click: description, cost, prerequisites (with missing prereq names), and action buttons
+- `DecimalPipe` from `@angular/common` must be imported in standalone components that use the `| number` pipe
