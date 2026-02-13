@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added requiresDarkUpgrade field to RoomUpgradePath, 4 dark upgrade YAML definitions, roomUpgradeGetVisible() for UI, NotifyService wiring"
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing implementation in corruption-effects.ts with full test coverage. Notification wiring added via NotifyService."
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pre-existing implementation in corruption-effects.ts with full test coverage. Uses invasionTriggerAddSpecial('crusade'). Warning notification wired via NotifyService."
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CSS-only visual effects using data-corruption attribute on grid container. Inset box-shadows, radial gradients, and keyframe animation for pulsing at critical level."
     },
     {
       "id": "US-005",
@@ -80,8 +80,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NotifyService subscribes to corruptionEffectEvent$ and shows toastr notifications for all three event types. Crusade uses warning style, others use info. All are tap-to-dismiss."
     }
   ]
 }

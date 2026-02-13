@@ -762,6 +762,22 @@ When adding build-time validation for a content type:
 - `corruptionGenerationCalculateTotalPerMinute(inhabitantRatePerTick, roomRatePerTick)` combines both pipelines for UI display
 - When using `await import()` inside `vi.mock()` test files, the `it()` callback must be `async` — esbuild will reject `await` in non-async functions at transform time
 
+## Corruption Effects System
+
+- `corruption-effects.ts` helper: tick-based threshold processing for dark upgrade unlock (50), mutations (100), and crusade (200)
+- File-to-prefix: `corruption-effects.ts` → `corruptionEffect` / `CORRUPTION_EFFECT`
+- `corruptionEffectProcess(state, rng?)` runs each tick inside `updateGamestate` — checks corruption thresholds and triggers effects
+- `corruptionEffectEvent$` Subject emits `CorruptionEffectEvent` with types: `dark_upgrade_unlocked`, `mutation_applied`, `crusade_triggered`
+- `CorruptionEffectState` stored in `GameStateWorld.corruptionEffects` — tracks `darkUpgradeUnlocked` (one-way boolean), `lastMutationCorruption`, `lastCrusadeCorruption`
+- Dark upgrade unlock is one-way — once `darkUpgradeUnlocked` is true, it stays true even if corruption drops below 50
+- Mutations and crusades track "last corruption" to detect threshold crossings — dropping below threshold resets tracking, allowing re-trigger on re-crossing
+- `RoomUpgradePath.requiresDarkUpgrade?: boolean` — upgrade paths with this flag are gated behind corruption 50 unlock
+- `roomUpgradeGetAvailable(placedRoom, darkUpgradeUnlocked?)` filters dark upgrades; `roomUpgradeGetVisible(placedRoom, darkUpgradeUnlocked?)` returns all with lock status for UI
+- `roomUpgradeCanApply(placedRoom, upgradePathId, darkUpgradeUnlocked?)` rejects dark upgrades when not unlocked
+- NotifyService subscribes to `corruptionEffectEvent$` to show toastr notifications (info for unlock/mutation, warning for crusade)
+- Grid component uses `[attr.data-corruption]="corruptionLevel()"` for CSS-only visual corruption effects — no new DOM elements needed
+- Corruption visual effects use inset `box-shadow` for edge tinting, `::after` pseudo-elements with `radial-gradient` for vein effects, and `@keyframes` for critical-level pulsing
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
