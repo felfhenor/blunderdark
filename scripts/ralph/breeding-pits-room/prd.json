@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Room defined in gamedata/room/base.yml with 3x3 shape, fearLevel 4, maxInhabitants 4, role breedingPits, 2 upgrade paths."
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "5 recipes in gamedata/breedingrecipe/base.yml. New breedingrecipe content type with auto-ID-resolution for parentInhabitantAId/parentInhabitantBId."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "breedingCreateHybrid() averages parent stats + recipe bonuses. breedingPitsProcess() removes parents on completion. BREEDING_BASE_TICKS = 25 (5 game-minutes)."
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "breedingApplyMutation() with weighted outcomes. MUTATION_BASE_TICKS = 15 (3 game-minutes). mutated flag prevents re-mutation."
     },
     {
       "id": "US-005",
@@ -79,8 +79,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Mutation result modal using app-modal component. mutationCompleted$ RxJS Subject triggers popup. mutationBonuses stored on InhabitantInstance. Browser verification deferred."
     },
     {
       "id": "US-006",
@@ -94,8 +94,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "breedingAdjacencyEffects on RoomDefinition. Spawning Pool hybridTimeReduction: 0.25, Soul Well mutationOddsBonus: 0.10, Shadow Library researchBonus: 5. Calculated dynamically each tick."
     },
     {
       "id": "US-007",
@@ -111,8 +111,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelBreedingPitsComponent with computed signals for assigned inhabitants, available recipes, mutatable inhabitants, progress bars. OnPush change detection. Browser verification deferred."
     },
     {
       "id": "US-008",
@@ -130,8 +130,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "45 tests in src/app/helpers/breeding-pits.spec.ts covering recipe matching, hybrid stats, mutation odds, tick processing, adjacency effects. All 2002 tests pass."
     }
   ]
 }

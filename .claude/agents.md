@@ -828,6 +828,27 @@ When adding build-time validation for a content type:
 - Branded ID cast pattern: `(effect.id ?? 'UNKNOWN') as ReputationEffectContent['id']` to satisfy TypeScript branded types in ensure functions
 - Active effects UI lives in `panel-reputation` component — shows below reputation bars when effects are active
 
+## Breeding Pits System
+
+- `breeding-pits.ts` helper: `breedingPitsProcess(state)` runs each tick inside `updateGamestate` — processes breeding jobs (hybrid creation) and mutation jobs
+- File-to-prefix: `breeding-pits.ts` → `breeding` / `BREEDING`
+- Breeding Pits room is found via `roomRoleFindById('breedingPits')` — no hardcoded ID
+- `BREEDING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes), `MUTATION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3` (15 ticks = 3 game-minutes)
+- New content type `breedingrecipe` in `gamedata/breedingrecipe/base.yml` — 5 recipes with `parentInhabitantAId`/`parentInhabitantBId` auto-ID-resolved by build script
+- `BreedingJob` and `MutationJob` types stored on `PlacedRoom` — per-room instance state (same pattern as `spawnTicksRemaining` on Spawning Pool)
+- `breedingFindRecipe(parentADefId, parentBDefId)` is order-independent — checks both A→B and B→A combinations
+- `breedingCreateHybrid(parentA, parentB, recipe, statBonusMultiplier)` averages parent stats + applies recipe `statBonuses` — creates full `InhabitantInstance` with `isHybrid: true` and `hybridParentIds`
+- Mutation outcomes: positive (60%, +20% to random stat), neutral (25%, no change), negative (15%, -15% to random stat) — weighted roll via cumulative threshold
+- `mutated: boolean` flag on `InhabitantInstance` prevents re-mutation; `mutationBonuses` stores stat changes
+- Adjacency effects are data-driven via `breedingAdjacencyEffects` field on `RoomDefinition` — `hybridTimeReduction`, `mutationOddsBonus`, `researchBonus`
+- `breedingGetAdjacentRoomTypeIds(room, floor)` reuses `roomShapeResolve`/`roomShapeGetAbsoluteTiles`/`adjacencyAreRoomsAdjacent` — same adjacency pattern as training/production
+- `breedingCompleted$` / `mutationCompleted$` RxJS Subjects for cross-cutting event notifications — same pattern as `trainingCompleted$`, `spawningPoolSpawn$`
+- Upgrade effect types: `breedingTimeReduction` (reduces hybrid creation time), `mutationOddsBonus` (improves positive mutation chance), `breedingCapacityBonus` (increases max inhabitants)
+- When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/room-upgrades`, `@helpers/rng`; register room def and inhabitant defs in mockContent Map
+- On breeding completion, both parent inhabitants are removed from `state.world.inhabitants` and the hybrid is added — `floor.inhabitants` must be synced (same dual-location pattern as hunger/spawning)
+- `InhabitantInstance` fields added: `mutated?: boolean`, `isHybrid?: boolean`, `hybridParentIds?: string[]`, `mutationBonuses?: Partial<InhabitantStats>` — all optional to avoid breaking existing test mocks
+- `inhabitantDeserialize()` provides defaults for new fields via `??` — backwards-compatible with saved data
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -871,6 +892,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `analytics.ts`             | `analytics`           | `ANALYTICS`              |
 | `assignment.ts`            | `assignment`          | `ASSIGNMENT`             |
 | `biome-restrictions.ts`    | `biomeRestriction`    | `BIOME_RESTRICTION`      |
+| `breeding-pits.ts`         | `breeding`            | `BREEDING`               |
 | `clipboard.ts`             | `clipboard`           | `CLIPBOARD`              |
 | `combat.ts`                | `combat`              | `COMBAT`                 |
 | `combat-abilities.ts`      | `combatAbility`       | `COMBAT_ABILITY`         |
@@ -1016,6 +1038,7 @@ export type {Type}Content = IsContentItem &
 | `seasonbonus`      | `content-seasonbonus.ts`      | `SeasonBonusId`      | `SeasonBonusContent`      | `IsContentItem & HasDescription`                |
 | `stage`            | `content-stage.ts`            | `StageId`            | `StageContent`            | `IsContentItem & HasDescription`                |
 | `synergy`          | `content-synergy.ts`          | `SynergyId`          | `SynergyContent`          | `IsContentItem & HasDescription`                |
+| `breedingrecipe`   | `content-breedingrecipe.ts`   | `BreedingRecipeId`   | `BreedingRecipeContent`   | `IsContentItem & HasDescription`                |
 | `trap`             | `content-trap.ts`             | `TrapId`             | `TrapContent`             | `IsContentItem & HasDescription & HasSprite`    |
 | `trinket`          | `content-trinket.ts`          | `TrinketId`          | `TrinketContent`          | `IsContentItem & HasDescription & HasSprite`    |
 | `weapon`           | `content-weapon.ts`           | `WeaponId`           | `WeaponContent`           | `IsContentItem & HasDescription & HasSprite`    |
