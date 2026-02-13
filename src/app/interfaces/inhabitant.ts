@@ -64,4 +64,7 @@ export type InhabitantInstance = {
   trainingBonuses?: TrainingBonuses;
   hungerTicksWithoutFood?: number;
   mutationBonuses?: Partial<InhabitantStats>;
+  mutated?: boolean;
+  isHybrid?: boolean;
+  hybridParentIds?: string[];
 };

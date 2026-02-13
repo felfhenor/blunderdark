@@ -1,5 +1,6 @@
 import type {
   AbilityEffectDefinition,
+  BreedingRecipeContent,
   CombatAbility,
   CompositionWeightConfig,
   ContentType,
@@ -23,6 +24,7 @@ import type {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
   abilityeffect: ensureAbilityEffect,
+  breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
@@ -41,6 +43,22 @@ export function ensureContent<T extends IsContentItem>(content: T): T {
   const init = initializers[content.__type];
   if (!init) return content;
   return init(content) satisfies T;
+}
+
+function ensureBreedingRecipe(
+  recipe: Partial<BreedingRecipeContent & IsContentItem>,
+): BreedingRecipeContent & IsContentItem {
+  return {
+    id: (recipe.id ?? 'UNKNOWN') as BreedingRecipeContent['id'],
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'breedingrecipe',
+    description: recipe.description ?? '',
+    parentInhabitantAId: recipe.parentInhabitantAId ?? '',
+    parentInhabitantBId: recipe.parentInhabitantBId ?? '',
+    resultName: recipe.resultName ?? '',
+    statBonuses: recipe.statBonuses ?? {},
+    timeMultiplier: recipe.timeMultiplier ?? 1.0,
+  };
 }
 
 function ensureReputationAction(
@@ -141,6 +159,7 @@ function ensureRoom(
     spawnRate: room.spawnRate ?? undefined,
     spawnType: room.spawnType ?? undefined,
     spawnCapacity: room.spawnCapacity ?? undefined,
+    breedingAdjacencyEffects: room.breedingAdjacencyEffects ?? undefined,
   };
 }
 

@@ -60,6 +60,10 @@ function createTestInhabitant(
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
+    mutationBonuses: undefined,
+    mutated: false,
+    isHybrid: false,
+    hybridParentIds: undefined,
     ...overrides,
   };
 }
@@ -123,6 +127,10 @@ describe('inhabitant serialization', () => {
       trainingProgress: 25,
       trainingBonuses: { defense: 1, attack: 0 },
       hungerTicksWithoutFood: 0,
+      mutationBonuses: undefined,
+      mutated: false,
+      isHybrid: false,
+      hybridParentIds: undefined,
     };
 
     const serialized = inhabitantSerialize([original]);

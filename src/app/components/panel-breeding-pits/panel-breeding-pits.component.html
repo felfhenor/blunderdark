@@ -1,0 +1,127 @@
+@if (breedingRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Breeding Pits</h3>
+
+      <!-- Active Breeding Job -->
+      @if (breedingProgress(); as bp) {
+        <div class="mt-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs">Breeding: {{ bp.recipeName }}</span>
+            <span class="badge badge-xs badge-accent">In Progress</span>
+          </div>
+          <progress
+            class="progress progress-accent w-full mt-1"
+            [value]="bp.percent"
+            max="100"
+          ></progress>
+          <span class="text-xs opacity-40">{{ bp.percent }}%</span>
+        </div>
+      }
+
+      <!-- Active Mutation Job -->
+      @if (mutationProgress(); as mp) {
+        <div class="mt-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs">Mutating: {{ mp.targetName }}</span>
+            <span class="badge badge-xs badge-secondary">In Progress</span>
+          </div>
+          <progress
+            class="progress progress-secondary w-full mt-1"
+            [value]="mp.percent"
+            max="100"
+          ></progress>
+          <span class="text-xs opacity-40">{{ mp.percent }}%</span>
+        </div>
+      }
+
+      <!-- Assigned Inhabitants -->
+      @if (assignedInhabitants().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Assigned:</h4>
+          <div class="flex flex-wrap gap-1">
+            @for (inh of assignedInhabitants(); track inh.instanceId) {
+              <span class="badge badge-xs badge-outline">
+                {{ inh.defName }}
+                @if (inh.isHybrid) { (H) }
+                @if (inh.mutated) { (M) }
+              </span>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="text-xs opacity-50 mt-2">No inhabitants assigned.</p>
+      }
+
+      <!-- Available Recipes -->
+      @if (availableRecipes().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Hybrid Recipes:</h4>
+          <div class="flex flex-col gap-2">
+            @for (entry of availableRecipes(); track entry.recipe.id) {
+              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold">{{ entry.recipe.resultName }}</span>
+                  <span class="text-xs opacity-50">{{ entry.timeMinutes }} min</span>
+                </div>
+                <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
+                <button
+                  class="btn btn-xs btn-accent mt-1"
+                  (click)="startBreeding(entry.parentA.instanceId, entry.parentB.instanceId, entry.recipe.id, entry.ticks)"
+                >
+                  Start Breeding
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Mutatable Inhabitants -->
+      @if (mutatableInhabitants().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Mutation Candidates:</h4>
+          <div class="flex flex-col gap-1">
+            @for (inh of mutatableInhabitants(); track inh.instanceId) {
+              <div class="flex items-center justify-between">
+                <span class="text-xs">{{ inh.name }}</span>
+                <button
+                  class="btn btn-xs btn-secondary"
+                  (click)="startMutation(inh.instanceId)"
+                >
+                  Mutate
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Mutation Result Modal -->
+<app-modal [(visible)]="showMutationResult">
+  <span title>Mutation Result</span>
+  <div body>
+    @if (lastMutationResult(); as result) {
+      <div class="text-center">
+        <p class="text-lg font-semibold">{{ result.name }}</p>
+        @switch (result.outcome) {
+          @case ('positive') {
+            <p class="text-success mt-2">Positive mutation! Stats improved.</p>
+          }
+          @case ('neutral') {
+            <p class="text-warning mt-2">Neutral mutation. No significant change.</p>
+          }
+          @case ('negative') {
+            <p class="text-error mt-2">Negative mutation. Stats decreased.</p>
+          }
+        }
+      </div>
+    }
+  </div>
+  <div actions>
+    <button class="btn btn-sm" (click)="showMutationResult.set(false)">Close</button>
+  </div>
+</app-modal>

@@ -1,0 +1,54 @@
+- id: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+  name: Goblin Trapper
+  description: A cunning hybrid combining goblin tenacity with kobold agility. Excels at swift ambushes and trap-setting.
+  parentInhabitantAId: Goblin
+  parentInhabitantBId: Kobold
+  resultName: Goblin Trapper
+  statBonuses:
+    speed: 3
+    attack: 2
+  timeMultiplier: 1.0
+
+- id: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+  name: Skeletal Goblin
+  description: An undead goblin reanimated with reinforced bones. Tougher than either parent, but sluggish.
+  parentInhabitantAId: Goblin
+  parentInhabitantBId: Skeleton
+  resultName: Skeletal Goblin
+  statBonuses:
+    hp: 5
+    defense: 3
+  timeMultiplier: 1.2
+
+- id: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+  name: Fungal Revenant
+  description: A mushroom-infused skeleton sustained by symbiotic spores. Regenerates slowly and works with eerie efficiency.
+  parentInhabitantAId: Skeleton
+  parentInhabitantBId: Myconid
+  resultName: Fungal Revenant
+  statBonuses:
+    hp: 4
+    workerEfficiency: 0.3
+  timeMultiplier: 1.5
+
+- id: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80
+  name: Spore Stalker
+  description: A kobold mutated by myconid spores, gaining fungal camouflage and enhanced work capacity.
+  parentInhabitantAId: Kobold
+  parentInhabitantBId: Myconid
+  resultName: Spore Stalker
+  statBonuses:
+    speed: 2
+    workerEfficiency: 0.2
+  timeMultiplier: 1.0
+
+- id: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8091
+  name: Acidic Runt
+  description: A slime-goblin hybrid that oozes corrosive mucus. Small but surprisingly aggressive.
+  parentInhabitantAId: Slime
+  parentInhabitantBId: Goblin
+  resultName: Acidic Runt
+  statBonuses:
+    attack: 3
+    speed: 2
+  timeMultiplier: 0.8

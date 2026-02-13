@@ -9,7 +9,7 @@ export type GameOption =
   | 'bgmPlay'
   | 'gameloopPaused';
 
-export type NotificationCategory = 'Error' | 'Success' | 'Invasion' | 'Corruption';
+export type NotificationCategory = 'Error' | 'Success' | 'Invasion' | 'Corruption' | 'Breeding';
 
 export type OptionsTab = 'UI' | 'Savefile' | 'Debug';
 

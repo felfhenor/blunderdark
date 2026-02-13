@@ -13,6 +13,20 @@ export type RoomShape = {
   height: number;
 };
 
+export type BreedingJob = {
+  parentAInstanceId: string;
+  parentBInstanceId: string;
+  recipeId: string;
+  ticksRemaining: number;
+  targetTicks: number;
+};
+
+export type MutationJob = {
+  targetInstanceId: string;
+  ticksRemaining: number;
+  targetTicks: number;
+};
+
 export type PlacedRoom = {
   id: string;
   roomTypeId: string;
@@ -22,4 +36,6 @@ export type PlacedRoom = {
   rotation?: Rotation;
   appliedUpgradePathId?: string;
   spawnTicksRemaining?: number;
+  breedingJob?: BreedingJob;
+  mutationJob?: MutationJob;
 };

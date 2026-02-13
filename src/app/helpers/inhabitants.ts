@@ -83,6 +83,9 @@ export function inhabitantDeserialize(
     trainingBonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
     hungerTicksWithoutFood: i.hungerTicksWithoutFood ?? 0,
     mutationBonuses: i.mutationBonuses ?? undefined,
+    mutated: i.mutated ?? false,
+    isHybrid: i.isHybrid ?? false,
+    hybridParentIds: i.hybridParentIds ?? undefined,
   }));
 }
 

@@ -11,6 +11,7 @@ import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
 import { researchProcess } from '@helpers/research-progress';
 import { trainingProcess } from '@helpers/training';
+import { breedingPitsProcess } from '@helpers/breeding-pits';
 import { spawningPoolProcess } from '@helpers/spawning-pool';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { debug } from '@helpers/logging';
@@ -69,6 +70,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     trainingProcess(state);
     trapWorkshopProcess(state);
     spawningPoolProcess(state);
+    breedingPitsProcess(state);
     invasionTriggerProcessSchedule(state);
     hungerProcessWarnings(state);
     return state;

@@ -3,6 +3,7 @@ export * from './altar-room';
 export * from './analytics';
 export * from './assignment';
 export * from './biome-restrictions';
+export * from './breeding-pits';
 export * from './clipboard';
 export * from './combat';
 export * from './combat-abilities';

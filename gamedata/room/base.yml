@@ -236,6 +236,8 @@
     weight: 15
   objectiveTypes:
     - DefileLibrary
+  breedingAdjacencyEffects:
+    researchBonus: 5
   adjacencyBonuses:
     - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.15
@@ -324,6 +326,8 @@
     weight: 15
   objectiveTypes:
     - SealPortal
+  breedingAdjacencyEffects:
+    mutationOddsBonus: 0.10
   adjacencyBonuses:
     - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.2
@@ -797,6 +801,8 @@
   spawnRate: 25
   spawnType: Goblin
   spawnCapacity: 10
+  breedingAdjacencyEffects:
+    hybridTimeReduction: 0.25
   adjacencyBonuses:
     - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.15
@@ -831,3 +837,53 @@
           value: 1
         - type: fearIncrease
           value: 2
+
+- id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
+  name: Breeding Pits
+  description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign two compatible inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
+  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 4
+  inhabitantRestriction: null
+  fearLevel: 4
+  role: breedingPits
+  adjacencyBonuses:
+    - adjacentRoomType: bf618a8c-5b95-4a63-9168-98da24e061c4
+      bonus: 0.15
+      description: Primordial ooze from the Spawning Pool accelerates hybrid gestation.
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+      bonus: 0.1
+      description: Soul essence stabilizes mutagenic processes.
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+      bonus: 0.1
+      description: Library knowledge improves breeding recipe accuracy.
+  upgradePaths:
+    - id: 1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+      name: Enhanced Incubators
+      description: Improved incubation chambers reduce hybrid breeding time by 30% and increase room capacity by 2.
+      cost:
+        gold: 150
+        crystals: 80
+        essence: 40
+      effects:
+        - type: breedingTimeMultiplier
+          value: 0.7
+        - type: maxInhabitantBonus
+          value: 2
+    - id: 2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
+      name: Mutation Amplifier
+      description: Amplified mutagenic fields increase the chance of positive mutations by 15% and boost stat bonuses.
+      cost:
+        gold: 130
+        crystals: 70
+        essence: 50
+      effects:
+        - type: mutationOddsBonus
+          value: 0.15
+        - type: mutationStatBonus
+          value: 0.25

@@ -51,4 +51,9 @@ export type RoomDefinition = {
   spawnRate?: number;
   spawnType?: string;
   spawnCapacity?: number;
+  breedingAdjacencyEffects?: {
+    hybridTimeReduction?: number;
+    mutationOddsBonus?: number;
+    researchBonus?: number;
+  };
 };

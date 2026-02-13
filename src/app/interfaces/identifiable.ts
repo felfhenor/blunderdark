@@ -1,5 +1,6 @@
 export type ContentType =
   | 'abilityeffect'
+  | 'breedingrecipe'
   | 'combatability'
   | 'inhabitant'
   | 'invader'

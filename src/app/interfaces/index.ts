@@ -3,6 +3,7 @@ export * from './biome';
 export * from './combat';
 export * from './connection';
 export * from './content-abilityeffect';
+export * from './content-breedingrecipe';
 export * from './content-combatability';
 export * from './content-inhabitant';
 export * from './content-invader';
