@@ -30,7 +30,6 @@
   &.resource-empty {
     border-left-color: oklch(var(--er));
     background: oklch(var(--er) / 0.05);
-    opacity: 0.6;
   }
 }
 
@@ -44,7 +43,7 @@
   max-width: 260px;
   padding: 0.75rem;
   margin-top: 0.25rem;
-  background: oklch(var(--b3));
+  background: #000;
   border: 1px solid oklch(var(--bc) / 0.15);
   border-radius: 0.5rem;
   box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);

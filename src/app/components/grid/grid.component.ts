@@ -168,6 +168,7 @@ export class GridComponent {
     return this.roomLabelTileMap().get(roomId) === `${x},${y}`;
   }
 
+
   private previewTileSet = computed(() => {
     const preview = this.roomPlacementPreview();
     if (!preview) return undefined;
@@ -262,9 +263,22 @@ export class GridComponent {
     return this.roomBorderMap().get(`${x},${y}`);
   }
 
+  private selectedRoomId = computed(() => {
+    const sel = this.gridSelectedTile();
+    if (!sel) return undefined;
+    return this.grid()[sel.y]?.[sel.x]?.roomId;
+  });
+
   public isSelected(x: number, y: number): boolean {
     const sel = this.gridSelectedTile();
-    return sel?.x === x && sel?.y === y;
+    if (!sel) return false;
+
+    const selectedRoom = this.selectedRoomId();
+    if (selectedRoom) {
+      return this.grid()[y]?.[x]?.roomId === selectedRoom;
+    }
+
+    return sel.x === x && sel.y === y;
   }
 
   public isPreviewValid(x: number, y: number): boolean {
@@ -287,6 +301,11 @@ export class GridComponent {
       if (!result.success && result.error) {
         notifyError(result.error);
       }
+      return;
+    }
+    const tile = this.grid()[y]?.[x];
+    if (!tile?.occupied) {
+      gridDeselectTile();
       return;
     }
     gridSelectTile(x, y);
