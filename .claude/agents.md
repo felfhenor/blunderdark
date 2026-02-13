@@ -797,6 +797,21 @@ When adding build-time validation for a content type:
 - Warning tracking persisted in `CorruptionEffectState.warnedThresholds: number[]` — auto-cleared on threshold crossing or corruption drop
 - **Testing RxJS Subjects in Vitest**: Use `vi.spyOn(subject$, 'next')` pattern instead of `.subscribe()` — subscription-based testing fails when the module is loaded via `await import()` with `vi.mock()` dependencies. The spy approach works because it hooks directly into the module-scoped Subject instance.
 
+## Reputation Effects System
+
+- `reputation-effects.ts` helper: data-driven reputation effects engine evaluating active effects based on reputation levels
+- File-to-prefix: `reputation-effects.ts` → `reputationEffect` / `REPUTATION_EFFECT`
+- Content type `'reputationeffect'` in `gamedata/reputationeffect/base.yml` — 17 effects across 5 reputation types
+- `ReputationEffectContent` type: `id`, `name`, `description`, `reputationType`, `minimumLevel`, `effectType`, `effectValue`, `targetId?`
+- `ReputationEffectType` union: `'unlock_room' | 'modify_event_rate' | 'attract_creature' | 'modify_production' | 'modify_invasion_rate'`
+- All pure functions accept optional `allEffects` param to avoid content system mocking in tests — pass test fixtures directly
+- `reputationEffectGetActive(reputation, allEffects?)` returns active effects by comparing current level against minimumLevel
+- `reputationEffectGetInvasionRateMultiplier(reputation, allEffects?)` groups by reputation type, takes strongest per type, multiplies across types
+- `reputationEffectGetProductionMultiplier(resourceType, reputation, allEffects?)` returns combined multiplier for a specific resource
+- `reputationEffectActive` computed signal re-evaluates when `gamestate().world.reputation` changes
+- Branded ID cast pattern: `(effect.id ?? 'UNKNOWN') as ReputationEffectContent['id']` to satisfy TypeScript branded types in ensure functions
+- Active effects UI lives in `panel-reputation` component — shows below reputation bars when effects are active
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -880,6 +895,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `production-modifiers.ts`  | `productionModifier`  | `PRODUCTION_MODIFIER`    |
 | `recruitment.ts`           | `recruitment`         | `RECRUITMENT`            |
 | `reputation.ts`            | `reputation`          | `REPUTATION`             |
+| `reputation-effects.ts`   | `reputationEffect`    | `REPUTATION_EFFECT`      |
 | `resources.ts`             | `resource`            | `RESOURCE`               |
 | `rng.ts`                   | `rng`                 | `RNG`                    |
 | `room-placement.ts`        | `roomPlacement`       | `ROOM_PLACEMENT`         |
@@ -977,6 +993,7 @@ export type {Type}Content = IsContentItem &
 | `monster`          | `content-monster.ts`          | `MonsterId`          | `MonsterContent`          | `IsContentItem & HasDescription & HasAnimation` |
 | `pet`              | `content-pet.ts`              | `PetId`              | `PetContent`              | `IsContentItem & HasDescription & HasAnimation` |
 | `reputationaction` | `content-reputationaction.ts` | `ReputationActionId` | `ReputationActionContent` | `IsContentItem & HasDescription`                |
+| `reputationeffect` | `content-reputationeffect.ts` | `ReputationEffectId` | `ReputationEffectContent` | `IsContentItem & HasDescription`                |
 | `research`         | `content-research.ts`         | `ResearchId`         | `ResearchContent`         | `IsContentItem & HasDescription`                |
 | `room`             | `content-room.ts`             | `RoomId`             | `RoomContent`             | `IsContentItem & HasDescription`                |
 | `roomshape`        | `content-roomshape.ts`        | `RoomShapeId`        | `RoomShapeContent`        | `IsContentItem`                                 |
