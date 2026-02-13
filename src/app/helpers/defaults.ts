@@ -1,6 +1,7 @@
 import { gridCreateEmpty } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import type {
+  CorruptionEffectState,
   Floor,
   GameId,
   GameState,
@@ -41,6 +42,7 @@ export function defaultGameState(): GameState {
       trapInventory: [],
       trapCraftingQueues: [],
       invasionSchedule: defaultInvasionSchedule(),
+      corruptionEffects: defaultCorruptionEffectState(),
     },
   };
 }
@@ -102,6 +104,14 @@ export function defaultInvasionSchedule(): InvasionSchedule {
     pendingSpecialInvasions: [],
     warningActive: false,
     warningDismissed: false,
+  };
+}
+
+export function defaultCorruptionEffectState(): CorruptionEffectState {
+  return {
+    darkUpgradeUnlocked: false,
+    lastMutationCorruption: undefined,
+    lastCrusadeCorruption: undefined,
   };
 }
 

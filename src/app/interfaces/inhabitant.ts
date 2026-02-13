@@ -63,4 +63,5 @@ export type InhabitantInstance = {
   trainingProgress?: number;
   trainingBonuses?: TrainingBonuses;
   hungerTicksWithoutFood?: number;
+  mutationBonuses?: Partial<InhabitantStats>;
 };

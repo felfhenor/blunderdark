@@ -11,6 +11,7 @@ import type { ReputationState } from '@interfaces/reputation';
 import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
 import type { TrapCraftingQueue, TrapInventoryEntry } from '@interfaces/trap';
+import type { CorruptionEffectState } from '@interfaces/corruption-effect';
 import type { InvasionSchedule } from '@interfaces/invasion';
 
 export interface GameStateWorld {
@@ -26,6 +27,7 @@ export interface GameStateWorld {
   trapInventory: TrapInventoryEntry[];
   trapCraftingQueues: TrapCraftingQueue[];
   invasionSchedule: InvasionSchedule;
+  corruptionEffects: CorruptionEffectState;
 }
 
 export interface GameStateClock {

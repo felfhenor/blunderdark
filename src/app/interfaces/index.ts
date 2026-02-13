@@ -14,6 +14,7 @@ export * from './content-roomshape';
 export * from './content-seasonbonus';
 export * from './content-synergy';
 export * from './content-trap';
+export * from './corruption-effect';
 export * from './discord';
 export * from './droppable';
 export * from './floor';
