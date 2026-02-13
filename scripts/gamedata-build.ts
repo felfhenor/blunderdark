@@ -227,6 +227,31 @@ const validateResearchTree = () => {
     }
   }
 
+  // 4. Validate unlock effects reference valid content IDs
+  const allContentIds = new Set(Object.keys(trackedIds));
+  researchNodes.forEach((node: any) => {
+    if (!isArray(node.unlocks)) return;
+    node.unlocks.forEach((unlock: any, idx: number) => {
+      if (!unlock.type) {
+        errors.push(`Node "${node.name}" unlock[${idx}] is missing "type" field`);
+        return;
+      }
+      if (unlock.type === 'passive_bonus') {
+        if (!unlock.bonusType) {
+          errors.push(`Node "${node.name}" unlock[${idx}] passive_bonus is missing "bonusType"`);
+        }
+        return;
+      }
+      if (!unlock.targetId) {
+        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) is missing "targetId"`);
+        return;
+      }
+      if (!allContentIds.has(unlock.targetId)) {
+        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) references invalid ID "${unlock.targetId}"`);
+      }
+    });
+  });
+
   if (errors.length > 0) {
     console.error(`\nResearch tree validation failed with ${errors.length} error(s):`);
     errors.forEach((err) => console.error(`  - ${err}`));

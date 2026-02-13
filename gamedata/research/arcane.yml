@@ -27,7 +27,9 @@
     flux: 5
   prerequisiteResearchIds:
     - Arcane Basics
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: a7ef7e24-f250-45e7-986d-ad06b3610b52
   tier: 2
   requiredTicks: 150
 
@@ -40,7 +42,11 @@
     flux: 5
   prerequisiteResearchIds:
     - Arcane Basics
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: fluxProduction
+      value: 0.10
+      description: +10% flux production from all sources
   tier: 2
   requiredTicks: 150
 
@@ -53,7 +59,11 @@
     flux: 5
   prerequisiteResearchIds:
     - Arcane Basics
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: researchSpeed
+      value: 0.05
+      description: +5% research speed
   tier: 2
   requiredTicks: 150
 
@@ -68,7 +78,11 @@
     flux: 15
   prerequisiteResearchIds:
     - Flux Manipulation
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: fluxProduction
+      value: 0.15
+      description: +15% flux production from all sources
   tier: 3
   requiredTicks: 300
 
@@ -81,7 +95,11 @@
     flux: 15
   prerequisiteResearchIds:
     - Ley Line Tapping
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: allProduction
+      value: 0.05
+      description: +5% to all resource production
   tier: 3
   requiredTicks: 300
 
@@ -94,7 +112,11 @@
     flux: 15
   prerequisiteResearchIds:
     - Enchantment
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: invaderMoralePenalty
+      value: 5
+      description: Invaders suffer -5 morale on entering warded dungeon
   tier: 3
   requiredTicks: 300
 
@@ -111,7 +133,11 @@
   prerequisiteResearchIds:
     - Arcane Amplification
     - Enchantment
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: fluxProduction
+      value: 0.20
+      description: +20% flux production from all sources
   tier: 4
   requiredTicks: 500
 
@@ -126,7 +152,11 @@
   prerequisiteResearchIds:
     - Elemental Binding
     - Ley Line Tapping
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: allProduction
+      value: 0.10
+      description: +10% to all resource production
   tier: 4
   requiredTicks: 500
 
@@ -141,7 +171,11 @@
   prerequisiteResearchIds:
     - Warding
     - Arcane Amplification
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: researchSpeed
+      value: 0.10
+      description: +10% research speed
   tier: 4
   requiredTicks: 500
 
@@ -158,7 +192,11 @@
   prerequisiteResearchIds:
     - Dimensional Studies
     - Ley Line Mastery
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: fluxProduction
+      value: 0.25
+      description: +25% flux production from all sources
   tier: 5
   requiredTicks: 750
 
@@ -173,7 +211,11 @@
   prerequisiteResearchIds:
     - Spellweave Lattice
     - Dimensional Studies
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: allProduction
+      value: 0.15
+      description: +15% to all resource production
   tier: 5
   requiredTicks: 750
 
@@ -190,6 +232,10 @@
   prerequisiteResearchIds:
     - Arcane Convergence
     - Planar Nexus
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: arcaneMastery
+      value: 0.50
+      description: +50% to all arcane branch bonuses
   tier: 6
   requiredTicks: 1000

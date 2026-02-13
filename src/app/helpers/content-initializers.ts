@@ -6,6 +6,7 @@ import type {
   InhabitantDefinition,
   InvaderDefinition,
   IsContentItem,
+  PassiveBonusUnlock,
   ReputationAction,
   ResearchNode,
   RoomDefinition,
@@ -14,6 +15,7 @@ import type {
   SeasonBonusDefinition,
   SynergyDefinition,
   TrapDefinition,
+  UnlockEffect,
 } from '@interfaces';
 
 // eat my ass, typescript
@@ -62,10 +64,28 @@ function ensureResearch(
     branch: node.branch ?? 'dark',
     cost: node.cost ?? {},
     prerequisiteResearchIds: node.prerequisiteResearchIds ?? [],
-    unlocks: node.unlocks ?? [],
+    unlocks: (node.unlocks ?? []).map(ensureUnlockEffect),
     tier: node.tier ?? 1,
     requiredTicks: node.requiredTicks ?? 50,
   };
+}
+
+function ensureUnlockEffect(
+  effect: Partial<UnlockEffect>,
+): UnlockEffect {
+  const type = effect.type ?? 'room';
+  if (type === 'passive_bonus') {
+    return {
+      type: 'passive_bonus',
+      bonusType: (effect as Partial<PassiveBonusUnlock>).bonusType ?? '',
+      value: (effect as Partial<PassiveBonusUnlock>).value ?? 0,
+      description: (effect as Partial<PassiveBonusUnlock>).description ?? '',
+    };
+  }
+  return {
+    type,
+    targetId: (effect as { targetId?: string }).targetId ?? '',
+  } as UnlockEffect;
 }
 
 function ensureRoom(

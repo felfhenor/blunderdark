@@ -11,6 +11,7 @@ import type {
   ResourceMap,
   SeasonState,
   StatBlock,
+  UnlockedContent,
 } from '@interfaces';
 
 export function defaultGameState(): GameState {
@@ -71,6 +72,17 @@ export function defaultResearchState(): ResearchState {
     activeResearch: undefined,
     activeResearchProgress: 0,
     activeResearchStartTick: 0,
+    unlockedContent: defaultUnlockedContent(),
+  };
+}
+
+export function defaultUnlockedContent(): UnlockedContent {
+  return {
+    rooms: [],
+    inhabitants: [],
+    abilities: [],
+    upgrades: [],
+    passiveBonuses: [],
   };
 }
 

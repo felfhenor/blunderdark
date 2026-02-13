@@ -60,6 +60,13 @@ vi.mock('@helpers/throne-room', () => ({
   ),
 }));
 
+const mockResearchUnlockProcessCompletion = vi.fn();
+
+vi.mock('@helpers/research-unlocks', () => ({
+  researchUnlockProcessCompletion: (...args: unknown[]) =>
+    mockResearchUnlockProcessCompletion(...args),
+}));
+
 // --- Imports after mocks ---
 
 import {
@@ -163,6 +170,7 @@ function makeResearchState(
     activeResearch: undefined,
     activeResearchProgress: 0,
     activeResearchStartTick: 0,
+    unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
     ...overrides,
   };
 }
@@ -238,6 +246,7 @@ beforeEach(() => {
   });
   mockResourceCanAfford.mockReturnValue(true);
   mockResourcePayCost.mockResolvedValue(true);
+  mockResearchUnlockProcessCompletion.mockReset();
 
   vi.mocked(throneRoomGetRulerBonusValue).mockReturnValue(0);
 });
@@ -593,6 +602,35 @@ describe('US-004: Research Completion', () => {
     expect(state.world.research.activeResearch).toBeUndefined();
     expect(state.world.research.activeResearchProgress).toBe(0);
     expect(state.world.research.activeResearchStartTick).toBe(0);
+  });
+
+  it('should call researchUnlockProcessCompletion on completion', () => {
+    const state = makeGameState({
+      research: makeResearchState({
+        activeResearch: NODE_DARK_FUNDAMENTALS_ID,
+        activeResearchProgress: 49,
+      }),
+    });
+
+    researchProcess(state);
+
+    expect(mockResearchUnlockProcessCompletion).toHaveBeenCalledWith(
+      NODE_DARK_FUNDAMENTALS_ID,
+      state,
+    );
+  });
+
+  it('should not call researchUnlockProcessCompletion when not completing', () => {
+    const state = makeGameState({
+      research: makeResearchState({
+        activeResearch: NODE_DARK_FUNDAMENTALS_ID,
+        activeResearchProgress: 20,
+      }),
+    });
+
+    researchProcess(state);
+
+    expect(mockResearchUnlockProcessCompletion).not.toHaveBeenCalled();
   });
 
   it('should not complete when progress is below requiredTicks', () => {

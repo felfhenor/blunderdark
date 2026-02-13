@@ -115,6 +115,8 @@
                   >
                     Recruit
                   </button>
+                } @else if (entry.researchLocked) {
+                  <div class="text-xs text-warning opacity-70">Requires: {{ entry.researchRequirement }}</div>
                 } @else {
                   <div class="text-xs text-warning opacity-70">Requires Tier {{ entry.def.tier }}</div>
                 }

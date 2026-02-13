@@ -53,8 +53,9 @@
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
           [class.room-biome-restricted]="isBiomeRestricted(room)"
-          [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || isBiomeRestricted(room) || !hasAltar()"
-          [tp]="isBiomeRestricted(room) ? getBiomeRestrictionTooltip(room) : isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
+          [class.room-research-locked]="isResearchLocked(room)"
+          [disabled]="isHallwayMode() || isUniqueAndPlaced(room) || isBiomeRestricted(room) || isResearchLocked(room) || !hasAltar()"
+          [tp]="isResearchLocked(room) ? getResearchRequirement(room) : isBiomeRestricted(room) ? getBiomeRestrictionTooltip(room) : isUniqueAndPlaced(room) ? 'Already built (unique room)' : !hasAltar() ? 'Requires Altar' : ''"
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">
@@ -76,16 +77,20 @@
             }
           </div>
 
-          <div class="cost-row flex gap-2 w-full">
-            @for (cost of getCostEntries(room); track cost.type) {
-              <span class="text-xs opacity-70">
-                {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
-              </span>
-            }
-            @if (getCostEntries(room).length === 0) {
-              <span class="text-xs opacity-70">Free</span>
-            }
-          </div>
+          @if (isResearchLocked(room)) {
+            <div class="text-xs text-warning opacity-70 w-full text-left">{{ getResearchRequirement(room) }}</div>
+          } @else {
+            <div class="cost-row flex gap-2 w-full">
+              @for (cost of getCostEntries(room); track cost.type) {
+                <span class="text-xs opacity-70">
+                  {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
+                </span>
+              }
+              @if (getCostEntries(room).length === 0) {
+                <span class="text-xs opacity-70">Free</span>
+              }
+            </div>
+          }
         </button>
       }
     </div>

@@ -1,6 +1,7 @@
 # Research nodes define the tech tree for dungeon advancement.
 # Three branches: dark, arcane, engineering
 # Each node has: id, name, description, branch, cost, prerequisiteResearchIds, unlocks, tier, requiredTicks
+# Unlock effect types: room, inhabitant, ability, upgrade, passive_bonus
 
 # --- DARK BRANCH: root node ---
 - id: 965efdaa-6c12-48e3-8337-3ad70b5d309d
@@ -10,7 +11,9 @@
   cost:
     research: 10
   prerequisiteResearchIds: []
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   tier: 1
   requiredTicks: 50
 
@@ -22,7 +25,9 @@
   cost:
     research: 10
   prerequisiteResearchIds: []
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
   tier: 1
   requiredTicks: 50
 
@@ -34,6 +39,10 @@
   cost:
     research: 10
   prerequisiteResearchIds: []
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: ae673803-b514-4da9-a0d4-df448aa412a4
+    - type: room
+      targetId: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
   tier: 1
   requiredTicks: 50

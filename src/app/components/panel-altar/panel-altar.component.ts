@@ -19,6 +19,9 @@ import {
   recruitmentRecruit,
   gridSelectedTile,
   recruitmentUnlockedTier,
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+  researchUnlockGetRequiredResearchName,
 } from '@helpers';
 import type {
   InhabitantDefinition,
@@ -32,6 +35,8 @@ type RecruitableEntry = {
   def: InhabitantDefinition & IsContentItem;
   affordable: boolean;
   locked: boolean;
+  researchLocked: boolean;
+  researchRequirement: string;
   shortfall: { type: ResourceType; needed: number }[];
   costEntries: { type: string; amount: number }[];
 };
@@ -82,7 +87,12 @@ export class PanelAltarComponent {
     const tier = this.tierUnlocked();
 
     return defs.map((def) => {
-      const locked = def.tier > tier;
+      const researchGated = researchUnlockIsResearchGated('inhabitant', def.id);
+      const researchLocked = researchGated && !researchUnlockIsUnlocked('inhabitant', def.id);
+      const researchRequirement = researchLocked
+        ? researchUnlockGetRequiredResearchName('inhabitant', def.id) ?? ''
+        : '';
+      const locked = researchLocked || def.tier > tier;
       const affordable = !locked && resourceCanAfford(def.cost);
       const shortfall =
         !locked && !affordable
@@ -92,7 +102,7 @@ export class PanelAltarComponent {
         .filter(([, amount]) => amount && amount > 0)
         .map(([type, amount]) => ({ type, amount: amount as number }));
 
-      return { def, affordable, locked, shortfall, costEntries };
+      return { def, affordable, locked, researchLocked, researchRequirement, shortfall, costEntries };
     });
   });
 
@@ -114,6 +124,7 @@ export class PanelAltarComponent {
 
   public getDisabledReason(entry: RecruitableEntry): string {
     if (this.rosterFull()) return 'Roster full';
+    if (entry.researchLocked) return `Requires: ${entry.researchRequirement}`;
     if (entry.locked) return `Requires Tier ${entry.def.tier}`;
     if (!entry.affordable) {
       const parts = entry.shortfall.map(

@@ -74,7 +74,7 @@ function makeGameState(overrides: {
       inhabitants,
       hallways: [],
       season: { currentSeason: 'growth', dayInSeason: 1, totalSeasonCycles: 0 },
-      research: { completedNodes: [], activeResearch: undefined, activeResearchProgress: 0, activeResearchStartTick: 0 },
+      research: { completedNodes: [], activeResearch: undefined, activeResearchProgress: 0, activeResearchStartTick: 0, unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] } },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: [{
         id: 'floor-1',

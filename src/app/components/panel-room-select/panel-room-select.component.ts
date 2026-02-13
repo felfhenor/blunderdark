@@ -22,6 +22,9 @@ import {
   roomPlacementRotation,
   roomPlacementRotate,
   roomPlacementSelectedTypeId,
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+  researchUnlockGetRequiredResearchName,
 } from '@helpers';
 import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -63,6 +66,16 @@ export class PanelRoomSelectComponent {
   public isUniqueAndPlaced(room: RoomDefinition): boolean {
     if (!room.isUnique) return false;
     return this.roomPlacementPlacedTypeIds().has(room.id);
+  }
+
+  public isResearchLocked(room: RoomDefinition): boolean {
+    if (!researchUnlockIsResearchGated('room', room.id)) return false;
+    return !researchUnlockIsUnlocked('room', room.id);
+  }
+
+  public getResearchRequirement(room: RoomDefinition): string {
+    const name = researchUnlockGetRequiredResearchName('room', room.id);
+    return name ? `Requires: ${name}` : '';
   }
 
   public isBiomeRestricted(room: RoomDefinition): boolean {

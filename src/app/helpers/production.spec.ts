@@ -630,6 +630,7 @@ function makeGameState(
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
+        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
       },
       reputation: {
         terror: 0,

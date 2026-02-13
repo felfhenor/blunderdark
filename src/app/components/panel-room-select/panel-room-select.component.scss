@@ -7,6 +7,10 @@
     opacity: 0.35;
   }
 
+  &.room-research-locked {
+    opacity: 0.4;
+  }
+
   &.btn-active {
     border-color: oklch(var(--p));
   }

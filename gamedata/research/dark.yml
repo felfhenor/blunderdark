@@ -27,7 +27,11 @@
     essence: 5
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: essenceProduction
+      value: 0.10
+      description: +10% essence production from all sources
   tier: 2
   requiredTicks: 150
 
@@ -40,7 +44,11 @@
     essence: 5
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: corruptionGeneration
+      value: 0.10
+      description: +10% corruption generation
   tier: 2
   requiredTicks: 150
 
@@ -53,7 +61,9 @@
     essence: 5
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
-  unlocks: []
+  unlocks:
+    - type: inhabitant
+      targetId: c970d8c0-e920-4844-95ff-362f971abf06
   tier: 2
   requiredTicks: 150
 
@@ -68,7 +78,11 @@
     essence: 15
   prerequisiteResearchIds:
     - Necromancy
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: undeadEfficiency
+      value: 0.20
+      description: +20% undead worker efficiency
   tier: 3
   requiredTicks: 300
 
@@ -81,7 +95,11 @@
     essence: 15
   prerequisiteResearchIds:
     - Soul Manipulation
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: essenceProduction
+      value: 0.15
+      description: +15% essence production from all sources
   tier: 3
   requiredTicks: 300
 
@@ -95,7 +113,11 @@
     corruption: 5
   prerequisiteResearchIds:
     - Shadow Magic
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: corruptionResistance
+      value: 0.10
+      description: Corruption thresholds increased by 10%
   tier: 3
   requiredTicks: 300
 
@@ -112,7 +134,11 @@
   prerequisiteResearchIds:
     - Undead Mastery
     - Soul Well
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: essenceProduction
+      value: 0.20
+      description: +20% essence production from all sources
   tier: 4
   requiredTicks: 500
 
@@ -127,7 +153,11 @@
   prerequisiteResearchIds:
     - Shadow Magic
     - Corruption Control
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: fearReduction
+      value: 1
+      description: All rooms gain +1 fear reduction
   tier: 4
   requiredTicks: 500
 
@@ -144,7 +174,11 @@
   prerequisiteResearchIds:
     - Dark Rituals
     - Shadow Weaving
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: essenceProduction
+      value: 0.25
+      description: +25% essence production from all sources
   tier: 5
   requiredTicks: 750
 
@@ -158,7 +192,11 @@
     corruption: 30
   prerequisiteResearchIds:
     - Dark Rituals
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: inhabitantStats
+      value: 0.10
+      description: +10% to all inhabitant combat stats
   tier: 5
   requiredTicks: 750
 
@@ -175,6 +213,10 @@
   prerequisiteResearchIds:
     - Abyssal Gateway
     - Soul Forge
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: darkMastery
+      value: 0.50
+      description: +50% to all dark branch bonuses
   tier: 6
   requiredTicks: 1000

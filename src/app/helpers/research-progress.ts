@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { researchUnlockProcessCompletion } from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
@@ -206,6 +207,8 @@ export function researchProcess(state: GameState): void {
     research.activeResearch = undefined;
     research.activeResearchProgress = 0;
     research.activeResearchStartTick = 0;
+
+    researchUnlockProcessCompletion(completedNodeId, state);
 
     researchCompletedSubject.next({
       nodeId: completedNodeId,

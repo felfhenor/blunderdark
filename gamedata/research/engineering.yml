@@ -27,7 +27,11 @@
     gold: 5
   prerequisiteResearchIds:
     - Basic Engineering
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
+    - type: room
+      targetId: 827472bd-6bbb-482f-86c8-ad30d5613237
   tier: 2
   requiredTicks: 150
 
@@ -40,7 +44,11 @@
     gold: 5
   prerequisiteResearchIds:
     - Basic Engineering
-  unlocks: []
+  unlocks:
+    - type: room
+      targetId: 6d638daa-6e43-4569-a931-eb4710009da9
+    - type: room
+      targetId: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   tier: 2
   requiredTicks: 150
 
@@ -53,7 +61,11 @@
     gold: 5
   prerequisiteResearchIds:
     - Basic Engineering
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: goldProduction
+      value: 0.10
+      description: +10% gold production from all sources
   tier: 2
   requiredTicks: 150
 
@@ -68,7 +80,11 @@
     gold: 15
   prerequisiteResearchIds:
     - Advanced Construction
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: roomCapacity
+      value: 1
+      description: +1 max inhabitant capacity for all rooms
   tier: 3
   requiredTicks: 300
 
@@ -81,7 +97,11 @@
     gold: 15
   prerequisiteResearchIds:
     - Trap Design
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: trapDamage
+      value: 0.15
+      description: +15% trap damage
   tier: 3
   requiredTicks: 300
 
@@ -94,7 +114,11 @@
     gold: 15
   prerequisiteResearchIds:
     - Advanced Manufacturing
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: goldProduction
+      value: 0.15
+      description: +15% gold production from all sources
   tier: 3
   requiredTicks: 300
 
@@ -111,7 +135,11 @@
   prerequisiteResearchIds:
     - Master Architecture
     - Trap Design
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: defenseBonus
+      value: 0.15
+      description: +15% defense for all inhabitants
   tier: 4
   requiredTicks: 500
 
@@ -126,7 +154,11 @@
   prerequisiteResearchIds:
     - Automated Defenses
     - Trap Design
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: trapDamage
+      value: 0.20
+      description: +20% trap damage
   tier: 4
   requiredTicks: 500
 
@@ -141,7 +173,11 @@
   prerequisiteResearchIds:
     - Dark Forge
     - Master Architecture
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: goldProduction
+      value: 0.20
+      description: +20% gold production from all sources
   tier: 4
   requiredTicks: 500
 
@@ -158,7 +194,11 @@
   prerequisiteResearchIds:
     - Siege Works
     - Mechanical Sentinels
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: defenseBonus
+      value: 0.25
+      description: +25% defense for all inhabitants
   tier: 5
   requiredTicks: 750
 
@@ -173,7 +213,11 @@
   prerequisiteResearchIds:
     - Golem Assembly
     - Siege Works
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: craftingSpeed
+      value: 0.25
+      description: +25% crafting speed in all workshops
   tier: 5
   requiredTicks: 750
 
@@ -190,6 +234,10 @@
   prerequisiteResearchIds:
     - War Machines
     - Industrial Mastery
-  unlocks: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: engineeringMastery
+      value: 0.50
+      description: +50% to all engineering branch bonuses
   tier: 6
   requiredTicks: 1000

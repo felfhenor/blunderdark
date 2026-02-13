@@ -6,10 +6,12 @@ import {
   notifyNotification$,
   reputationLevelUp$,
   corruptionEffectEvent$,
+  researchUnlock$,
+  contentGetEntry,
 } from '@helpers';
 import type { CorruptionEffectEvent } from '@helpers/corruption-effects';
 import type { ReputationLevelUpEvent } from '@helpers/reputation';
-import type { ReputationType } from '@interfaces';
+import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 
 const REPUTATION_FLAVOR_TEXT: Record<ReputationType, string> = {
@@ -50,6 +52,10 @@ export class NotifyService {
     corruptionEffectEvent$.subscribe((event: CorruptionEffectEvent) => {
       this.showCorruptionEffect(event);
     });
+
+    researchUnlock$.subscribe((event) => {
+      this.showResearchUnlock(event);
+    });
   }
 
   private showCorruptionEffect(event: CorruptionEffectEvent): void {
@@ -78,6 +84,32 @@ export class NotifyService {
         progressBar: true,
       });
     }
+  }
+
+  private getUnlockDescription(unlock: UnlockEffect): string {
+    if (unlock.type === 'passive_bonus') {
+      return unlock.description;
+    }
+    const entry = contentGetEntry<IsContentItem>(unlock.targetId);
+    const label = unlock.type === 'room' ? 'Room' : unlock.type === 'inhabitant' ? 'Creature' : unlock.type === 'ability' ? 'Ability' : 'Upgrade';
+    return `${label}: ${entry?.name ?? unlock.targetId}`;
+  }
+
+  private showResearchUnlock(event: { nodeName: string; unlocks: UnlockEffect[] }): void {
+    const title = `Research Complete: ${event.nodeName}`;
+    const unlockLines = event.unlocks.map((u) => this.getUnlockDescription(u));
+    const message = unlockLines.length > 0
+      ? `Unlocked: ${unlockLines.join(', ')}`
+      : 'No new content unlocked';
+
+    this.logger.debug('Notify:ResearchUnlock', `${title} - ${message}`);
+
+    this.toast.success(message, title, {
+      timeOut: 6000,
+      extendedTimeOut: 2000,
+      tapToDismiss: true,
+      progressBar: true,
+    });
   }
 
   private showReputationLevelUp(event: ReputationLevelUpEvent): void {
