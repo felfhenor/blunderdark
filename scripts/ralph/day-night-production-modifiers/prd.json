@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Types defined in day-night-modifiers.ts: DayNightResourceModifier, DayNightCreatureModifier, DayNightPhase. All tagged with source 'time-of-day'. Config arrays define modifiers."
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Integrated into productionCalculateTotal, productionCalculateSingleRoom, and productionCalculateBreakdowns. Creature modifiers use weighted averaging based on undead/non-undead ratio. 48 tests passing."
     },
     {
       "id": "US-003",
@@ -49,8 +49,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added activeTimeModifiers computed signal to PanelResourcesComponent. Displays phase label and modifier badges below the resource bar using DaisyUI badge-success/badge-error styling. Uses @if/@for native control flow."
     }
   ]
 }

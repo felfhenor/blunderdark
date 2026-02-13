@@ -607,6 +607,20 @@ When multiple build modes exist (room placement, hallway build):
 - Tests that don't test depth modifiers should use `depth: 0` (no tier match → 1.0 multiplier for all resources)
 - The old flat `PRODUCTION_MODIFIER_DEPTH_BONUS_PER_LEVEL` (5% per depth) was removed and replaced by this per-resource system
 
+## Day/Night Production Modifiers
+
+- `day-night-modifiers.ts` helper: phase-based global production modifiers (resource-type and creature-type)
+- `DayNightPhase` type: `'day' | 'night' | 'dawn' | 'dusk'` — day=7-17, night=0-5 & 19-23, dawn=6, dusk=18
+- `dayNightGetPhase(hour)` returns the current phase
+- `dayNightGetResourceModifier(hour, resourceType)` returns per-resource multiplier: food +25% day, corruption +50% night, flux +100% dawn/dusk
+- `dayNightGetCreatureModifier(hour, creatureType)` returns per-creature-type multiplier: undead -10% day, +30% night
+- `dayNightCalculateCreatureProductionModifier(hour, inhabitants, roomId)` calculates weighted modifier based on undead/non-undead worker ratio in a room — uses content lookup
+- `dayNightCalculateCreatureProductionModifierPure(hour, creatureTypes)` pure version for testing without content dependency
+- Both resource and creature modifiers are applied in the production pipeline alongside envModifier and depthModifier — all multiplicative
+- Day/night modifiers only apply when `hour` is provided to production functions (same pattern as envModifier)
+- `InhabitantDefinition.type` field identifies creature types: 'creature', 'undead', 'fungal', 'ooze', 'dragon', 'demon' — used for creature-type modifiers
+- Active modifiers displayed as badges in `PanelResourcesComponent` below the resource bar
+
 ## Research Tree YAML Conventions
 
 - Each branch uses a thematic secondary resource: Dark=essence, Arcane=flux, Engineering=gold
@@ -688,6 +702,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `combat-abilities.ts` | `combatAbility` | `COMBAT_ABILITY` |
 | `connections.ts` | `connection` | `CONNECTION` |
 | `content.ts` | `content` | `CONTENT` |
+| `day-night-modifiers.ts` | `dayNight` | `DAY_NIGHT` |
 | `debug.ts` | `debug` | `DEBUG` |
 | `defaults.ts` | `default` | `DEFAULT` |
 | `discord.ts` | `discord` | `DISCORD` |
