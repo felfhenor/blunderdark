@@ -45,6 +45,19 @@
   color: unset;
 }
 
+.game-tooltip .tippy-box {
+  background: oklch(0.15 0.01 260);
+  border: 1px solid oklch(0.35 0.02 260);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.5);
+  color: white;
+  padding: 0.5rem;
+}
+
+.game-tooltip .tippy-arrow {
+  color: oklch(0.15 0.01 260);
+}
+
 .text-shadow-black {
   text-shadow:
     -1px -1px 0 #000,

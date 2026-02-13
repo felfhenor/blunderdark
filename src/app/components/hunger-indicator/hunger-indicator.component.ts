@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   input,
-  signal,
 } from '@angular/core';
 import {
   gamestate,
@@ -12,36 +11,36 @@ import {
   hungerGetConsumptionRate,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
-
-const TOOLTIP_DELAY_MS = 250;
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-hunger-indicator',
+  imports: [TippyDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (shouldShow()) {
       <span
         class="hunger-badge"
         [class]="hungerClass()"
-        (mouseenter)="onMouseEnter()"
-        (mouseleave)="onMouseLeave()"
+        [tp]="hungerTip"
+        [tpDelay]="250"
+        [tpClassName]="'game-tooltip'"
       >
         {{ hungerLabel() }}
       </span>
-      @if (showTooltip()) {
-        <div class="hunger-tooltip">
-          @if (isInappetent()) {
-            <div class="text-xs opacity-70">Does not eat.</div>
-          } @else {
-            <div class="font-semibold text-xs mb-1">{{ hungerLabel() }}</div>
-            <div class="text-[10px] opacity-70">
-              Consumes {{ consumptionRatePerHour().toFixed(1) }} Food/hr
-            </div>
-            <div class="divider my-0.5 h-0"></div>
-            <div class="text-[10px] opacity-60">{{ hungerEffect() }}</div>
-          }
-        </div>
-      }
+
+      <ng-template #hungerTip>
+        @if (isInappetent()) {
+          <div class="text-xs opacity-70">Does not eat.</div>
+        } @else {
+          <div class="font-semibold text-xs mb-1">{{ hungerLabel() }}</div>
+          <div class="text-[10px] opacity-70">
+            Consumes {{ consumptionRatePerHour().toFixed(1) }} Food/hr
+          </div>
+          <div class="divider my-0.5 h-0"></div>
+          <div class="text-[10px] opacity-60">{{ hungerEffect() }}</div>
+        }
+      </ng-template>
     }
   `,
   styles: [
@@ -80,20 +79,6 @@ const TOOLTIP_DELAY_MS = 250;
       .hunger-inappetent {
         background-color: oklch(0.35 0.02 260);
         color: oklch(0.7 0.02 260);
-      }
-
-      .hunger-tooltip {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        z-index: 50;
-        background: oklch(0.2 0.01 260);
-        border: 1px solid oklch(0.35 0.02 260);
-        border-radius: 6px;
-        padding: 8px;
-        min-width: 140px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        pointer-events: none;
       }
     `,
   ],
@@ -171,26 +156,4 @@ export class HungerIndicatorComponent {
     if (!inh) return 0;
     return hungerGetConsumptionRate(inh.definitionId);
   });
-
-  public showTooltip = signal(false);
-  private tooltipTimer: ReturnType<typeof setTimeout> | undefined;
-
-  public onMouseEnter(): void {
-    this.clearTimer();
-    this.tooltipTimer = setTimeout(() => {
-      this.showTooltip.set(true);
-    }, TOOLTIP_DELAY_MS);
-  }
-
-  public onMouseLeave(): void {
-    this.clearTimer();
-    this.showTooltip.set(false);
-  }
-
-  private clearTimer(): void {
-    if (this.tooltipTimer) {
-      clearTimeout(this.tooltipTimer);
-      this.tooltipTimer = undefined;
-    }
-  }
 }

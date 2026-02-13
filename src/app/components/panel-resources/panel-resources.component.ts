@@ -23,6 +23,7 @@ import type { CorruptionLevel } from '@helpers/corruption';
 import type { DayNightCreatureModifier, DayNightResourceModifier } from '@helpers/day-night-modifiers';
 import type { ResourceType } from '@interfaces';
 import type { ResourceProductionBreakdown } from '@helpers/production';
+import { TippyDirective } from '@ngneat/helipopper';
 
 type ResourceDisplay = {
   type: ResourceType;
@@ -33,7 +34,6 @@ type ResourceDisplay = {
 
 const LOW_THRESHOLD = 0.2;
 const CRITICAL_THRESHOLD = 0.1;
-const TOOLTIP_DELAY_MS = 250;
 
 const RESOURCE_DISPLAY: ResourceDisplay[] = [
   {
@@ -82,7 +82,7 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-panel-resources',
-  imports: [DecimalPipe, UpperCasePipe],
+  imports: [DecimalPipe, UpperCasePipe, TippyDirective],
   templateUrl: './panel-resources.component.html',
   styleUrl: './panel-resources.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -126,9 +126,6 @@ export class PanelResourcesComponent {
     // Reset after 60 seconds so it can reappear if condition persists
     setTimeout(() => this.foodWarningDismissed.set(false), 60_000);
   }
-
-  public activeTooltip = signal<ResourceType | undefined>(undefined);
-  private tooltipTimer: ReturnType<typeof setTimeout> | undefined = undefined;
 
   public getCurrent(type: ResourceType): number {
     return this.resourceAll()[type].current;
@@ -190,18 +187,6 @@ export class PanelResourcesComponent {
     return '0';
   }
 
-  public onMouseEnter(type: ResourceType): void {
-    this.clearTimer();
-    this.tooltipTimer = setTimeout(() => {
-      this.activeTooltip.set(type);
-    }, TOOLTIP_DELAY_MS);
-  }
-
-  public onMouseLeave(): void {
-    this.clearTimer();
-    this.activeTooltip.set(undefined);
-  }
-
   public getPhaseLabel(): string {
     return dayNightGetPhaseLabel(this.activeTimeModifiers().phase);
   }
@@ -257,13 +242,6 @@ export class PanelResourcesComponent {
         return 'badge-ghost bg-orange-400/20 text-orange-400';
       case 'critical':
         return 'badge-error';
-    }
-  }
-
-  private clearTimer(): void {
-    if (this.tooltipTimer) {
-      clearTimeout(this.tooltipTimer);
-      this.tooltipTimer = undefined;
     }
   }
 }

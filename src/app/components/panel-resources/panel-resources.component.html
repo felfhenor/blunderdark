@@ -29,8 +29,9 @@
     <div
       class="resource-item flex-1 min-w-[120px]"
       [class]="getWarningClass(res.type)"
-      (mouseenter)="onMouseEnter(res.type)"
-      (mouseleave)="onMouseLeave()"
+      [tp]="resourceTip"
+      [tpDelay]="250"
+      [tpClassName]="'game-tooltip'"
     >
       <div class="flex items-center justify-between mb-0.5">
         <span class="text-xs font-semibold truncate">{{ res.label }}</span>
@@ -56,67 +57,66 @@
           {{ formatRate(res.type) }}
         </span>
       </div>
+    </div>
 
-      @if (activeTooltip() === res.type) {
-        <div class="resource-tooltip">
-          <div class="font-semibold text-sm mb-1">{{ res.label }}</div>
-          <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
+    <ng-template #resourceTip>
+      <div class="font-semibold text-sm mb-1">{{ res.label }}</div>
+      <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
 
-          <div class="text-xs mb-1">
-            <span class="opacity-70">Amount:</span>
-            {{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}
+      <div class="text-xs mb-1">
+        <span class="opacity-70">Amount:</span>
+        {{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}
+      </div>
+
+      <div class="text-xs mb-2">
+        <span class="opacity-70">Rate:</span>
+        <span [class]="getRateClass(res.type)">{{ formatRate(res.type) }}</span>
+      </div>
+
+      @if (getBreakdown(res.type); as bd) {
+        <div class="divider my-1 h-0"></div>
+        <div class="text-xs font-semibold mb-1">Production Breakdown</div>
+        <div class="flex flex-col gap-0.5 text-xs">
+          <div class="flex justify-between">
+            <span class="opacity-70">Base:</span>
+            <span>{{ formatBreakdownRate(bd.base) }}/min</span>
           </div>
-
-          <div class="text-xs mb-2">
-            <span class="opacity-70">Rate:</span>
-            <span [class]="getRateClass(res.type)">{{ formatRate(res.type) }}</span>
-          </div>
-
-          @if (getBreakdown(res.type); as bd) {
-            <div class="divider my-1 h-0"></div>
-            <div class="text-xs font-semibold mb-1">Production Breakdown</div>
-            <div class="flex flex-col gap-0.5 text-xs">
-              <div class="flex justify-between">
-                <span class="opacity-70">Base:</span>
-                <span>{{ formatBreakdownRate(bd.base) }}/min</span>
-              </div>
-              @if (bd.inhabitantBonus !== 0) {
-                <div class="flex justify-between">
-                  <span class="opacity-70">Inhabitants:</span>
-                  <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
-                </div>
-              }
-              @if (bd.adjacencyBonus !== 0) {
-                <div class="flex justify-between">
-                  <span class="opacity-70">Adjacency:</span>
-                  <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
-                </div>
-              }
-              @if (bd.modifierEffect !== 0) {
-                <div class="flex justify-between">
-                  <span class="opacity-70">Modifiers:</span>
-                  <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
-                    {{ formatBreakdownRate(bd.modifierEffect) }}/min
-                  </span>
-                </div>
-              }
-              <div class="divider my-0.5 h-0"></div>
-              <div class="flex justify-between font-semibold">
-                <span>Total:</span>
-                <span>{{ formatBreakdownRate(bd.final) }}/min</span>
-              </div>
+          @if (bd.inhabitantBonus !== 0) {
+            <div class="flex justify-between">
+              <span class="opacity-70">Inhabitants:</span>
+              <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
             </div>
           }
+          @if (bd.adjacencyBonus !== 0) {
+            <div class="flex justify-between">
+              <span class="opacity-70">Adjacency:</span>
+              <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
+            </div>
+          }
+          @if (bd.modifierEffect !== 0) {
+            <div class="flex justify-between">
+              <span class="opacity-70">Modifiers:</span>
+              <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+                {{ formatBreakdownRate(bd.modifierEffect) }}/min
+              </span>
+            </div>
+          }
+          <div class="divider my-0.5 h-0"></div>
+          <div class="flex justify-between font-semibold">
+            <span>Total:</span>
+            <span>{{ formatBreakdownRate(bd.final) }}/min</span>
+          </div>
         </div>
       }
-    </div>
+    </ng-template>
   }
 
   <!-- Corruption: special display with level-based coloring -->
   <div
     class="resource-item corruption-item flex-1 min-w-[120px]"
-    (mouseenter)="onMouseEnter('corruption')"
-    (mouseleave)="onMouseLeave()"
+    [tp]="corruptionTip"
+    [tpDelay]="250"
+    [tpClassName]="'game-tooltip'"
   >
     <div class="flex items-center justify-between mb-0.5">
       <span class="text-xs font-semibold truncate" [class]="getCorruptionColorClass(corruptionInfo().level)">
@@ -146,72 +146,70 @@
         {{ formatRate('corruption') }}
       </span>
     </div>
+  </div>
 
-    @if (activeTooltip() === 'corruption') {
-      <div class="resource-tooltip">
-        <div class="font-semibold text-sm mb-1" [class]="getCorruptionColorClass(corruptionInfo().level)">
-          Corruption
+  <ng-template #corruptionTip>
+    <div class="font-semibold text-sm mb-1" [class]="getCorruptionColorClass(corruptionInfo().level)">
+      Corruption
+    </div>
+    <div class="text-xs opacity-70 mb-2">{{ corruptionDisplay.description }}</div>
+
+    <div class="text-xs mb-1">
+      <span class="opacity-70">Amount:</span>
+      {{ getCurrent('corruption') | number: '1.0-0' }}
+    </div>
+
+    <div class="text-xs mb-1">
+      <span class="opacity-70">Level:</span>
+      <span class="font-semibold" [class]="getCorruptionColorClass(corruptionInfo().level)">
+        {{ corruptionInfo().level | uppercase }}
+      </span>
+    </div>
+
+    <div class="text-xs mb-2">
+      <span class="opacity-70">Rate:</span>
+      <span [class]="getRateClass('corruption')">{{ formatRate('corruption') }}</span>
+    </div>
+
+    <div class="divider my-1 h-0"></div>
+    <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
+
+    @if (getBreakdown('corruption'); as bd) {
+      <div class="divider my-1 h-0"></div>
+      <div class="text-xs font-semibold mb-1">Production Breakdown</div>
+      <div class="flex flex-col gap-0.5 text-xs">
+        <div class="flex justify-between">
+          <span class="opacity-70">Base:</span>
+          <span>{{ formatBreakdownRate(bd.base) }}/min</span>
         </div>
-        <div class="text-xs opacity-70 mb-2">{{ corruptionDisplay.description }}</div>
-
-        <div class="text-xs mb-1">
-          <span class="opacity-70">Amount:</span>
-          {{ getCurrent('corruption') | number: '1.0-0' }}
-        </div>
-
-        <div class="text-xs mb-1">
-          <span class="opacity-70">Level:</span>
-          <span class="font-semibold" [class]="getCorruptionColorClass(corruptionInfo().level)">
-            {{ corruptionInfo().level | uppercase }}
-          </span>
-        </div>
-
-        <div class="text-xs mb-2">
-          <span class="opacity-70">Rate:</span>
-          <span [class]="getRateClass('corruption')">{{ formatRate('corruption') }}</span>
-        </div>
-
-        <div class="divider my-1 h-0"></div>
-        <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
-
-        @if (getBreakdown('corruption'); as bd) {
-          <div class="divider my-1 h-0"></div>
-          <div class="text-xs font-semibold mb-1">Production Breakdown</div>
-          <div class="flex flex-col gap-0.5 text-xs">
-            <div class="flex justify-between">
-              <span class="opacity-70">Base:</span>
-              <span>{{ formatBreakdownRate(bd.base) }}/min</span>
-            </div>
-            @if (bd.inhabitantBonus !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Inhabitants:</span>
-                <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
-              </div>
-            }
-            @if (bd.adjacencyBonus !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Adjacency:</span>
-                <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
-              </div>
-            }
-            @if (bd.modifierEffect !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Modifiers:</span>
-                <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
-                  {{ formatBreakdownRate(bd.modifierEffect) }}/min
-                </span>
-              </div>
-            }
-            <div class="divider my-0.5 h-0"></div>
-            <div class="flex justify-between font-semibold">
-              <span>Total:</span>
-              <span>{{ formatBreakdownRate(bd.final) }}/min</span>
-            </div>
+        @if (bd.inhabitantBonus !== 0) {
+          <div class="flex justify-between">
+            <span class="opacity-70">Inhabitants:</span>
+            <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
           </div>
         }
+        @if (bd.adjacencyBonus !== 0) {
+          <div class="flex justify-between">
+            <span class="opacity-70">Adjacency:</span>
+            <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
+          </div>
+        }
+        @if (bd.modifierEffect !== 0) {
+          <div class="flex justify-between">
+            <span class="opacity-70">Modifiers:</span>
+            <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+              {{ formatBreakdownRate(bd.modifierEffect) }}/min
+            </span>
+          </div>
+        }
+        <div class="divider my-0.5 h-0"></div>
+        <div class="flex justify-between font-semibold">
+          <span>Total:</span>
+          <span>{{ formatBreakdownRate(bd.final) }}/min</span>
+        </div>
       </div>
     }
-  </div>
+  </ng-template>
 </div>
 
 @if (activeTimeModifiers().resourceModifiers.length > 0 || activeTimeModifiers().creatureModifiers.length > 0) {

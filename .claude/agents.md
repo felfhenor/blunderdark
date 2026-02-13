@@ -256,6 +256,7 @@ BFS pathfinding for hallways between rooms:
 - SweetAlert2 pattern: `[swal]="templateRef"` on button + `<swal>` element with `(confirm)` event handler
 - Angular view encapsulation adds attribute selectors — manual class additions in browser console won't match scoped styles
 - `@ngneat/hotkeys` provides global keyboard shortcuts: `[hotkeys]="'SPACE'"` with `isGlobal` directive attr, `(hotkey)` event handler
+- **Tooltips**: Use `@ngneat/helipopper` (`TippyDirective`) for all tooltips — never hand-roll tooltip logic with `setTimeout`, DOM manipulation, or manual positioning. Pattern: `[tp]="templateRef"` on the trigger element + `<ng-template #templateRef>` for rich content, or `[tp]="'string'"` for plain text. Use `[tpDelay]="250"` for hover delay and `[tpClassName]="'game-tooltip'"` for the dark theme. See `icon-skill.component` for the canonical example.
 - `appRequireSetup` / `appRequireNotSetup` directives show/hide elements based on setup state
 - Navbar component already has pause button, pause menu (ESC), Space bar toggle — check before re-implementing
 - Panel components follow card pattern: `card bg-base-100 shadow-xl` → `card-body p-4` → `card-title text-sm` for headers
