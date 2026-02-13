@@ -10,9 +10,15 @@ import {
   defaultResources,
   defaultSeasonState,
 } from '@helpers/defaults';
+import { contentGetEntry } from '@helpers/content';
 import { gridCreateEmpty } from '@helpers/grid';
+import { rngUuid } from '@helpers/rng';
 import { worldResolveStartingBiome } from '@helpers/world';
-import type { GameStateWorld } from '@interfaces';
+import type {
+  GameStateWorld,
+  InhabitantContent,
+  InhabitantInstance,
+} from '@interfaces';
 import { Subject } from 'rxjs';
 
 const _currentWorldGenStatus = signal<string>('');
@@ -34,10 +40,21 @@ export async function worldgenGenerateWorld(): Promise<
   // Create the starting floor and auto-place initial rooms (e.g., Altar)
   const startingFloor = altarRoomAutoPlace(defaultFloor(1, startingBiome));
 
+  const slimeDef = contentGetEntry<InhabitantContent>('Slime');
+  const startingSlimes: InhabitantInstance[] = slimeDef
+    ? Array.from({ length: 3 }, () => ({
+        instanceId: rngUuid(),
+        definitionId: slimeDef.id,
+        name: slimeDef.name,
+        state: 'normal' as const,
+        assignedRoomId: undefined,
+      }))
+    : [];
+
   return {
     grid: gridCreateEmpty(),
     resources: defaultResources(),
-    inhabitants: [],
+    inhabitants: startingSlimes,
     hallways: [],
     season: defaultSeasonState(),
     research: defaultResearchState(),

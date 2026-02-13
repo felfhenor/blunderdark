@@ -5,6 +5,8 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { rngUuid } from '@helpers/rng';
+import { hallwayPlacementFindPath } from '@helpers/hallway-placement';
+import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 import {
   roomUpgradeApply,
@@ -14,6 +16,7 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
+  Hallway,
   IsContentItem,
   PlacedRoom,
   RoomDefinition,
@@ -57,6 +60,7 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
   const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
 
   let floorCurrent = floor;
+  const placedRoomIds: string[] = [];
 
   for (const roomDef of autoPlaceRooms) {
     const shape = contentGetEntry<RoomShape & IsContentItem>(roomDef.shapeId);
@@ -89,8 +93,35 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       const updated = roomPlacementPlaceOnFloor(floorCurrent, placedRoom, shape);
       if (updated) {
         floorCurrent = updated;
+        placedRoomIds.push(placedRoom.id);
         break;
       }
+    }
+  }
+
+  // Connect all auto-placed rooms with hallways
+  for (let i = 0; i < placedRoomIds.length; i++) {
+    for (let j = i + 1; j < placedRoomIds.length; j++) {
+      const path = hallwayPlacementFindPath(
+        floorCurrent.grid,
+        placedRoomIds[i],
+        placedRoomIds[j],
+      );
+      if (!path) continue;
+
+      const hallway: Hallway = {
+        id: rngUuid(),
+        startRoomId: placedRoomIds[i],
+        endRoomId: placedRoomIds[j],
+        tiles: path,
+        upgrades: [],
+      };
+
+      floorCurrent = {
+        ...floorCurrent,
+        grid: hallwayAddToGrid(floorCurrent.grid, hallway),
+        hallways: hallwayAdd(floorCurrent.hallways, hallway),
+      };
     }
   }
 

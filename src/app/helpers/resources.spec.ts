@@ -36,6 +36,7 @@ describe('resourceAdd', () => {
   });
 
   it('should add a normal amount and return the amount added', async () => {
+    mockResources.gold.current = 0;
     const added = await resourceAdd('gold', 100);
     expect(added).toBe(100);
     expect(mockResources.gold.current).toBe(100);
@@ -49,6 +50,7 @@ describe('resourceAdd', () => {
   });
 
   it('should return 0 and not change state when adding zero', async () => {
+    mockResources.gold.current = 0;
     const added = await resourceAdd('gold', 0);
     expect(added).toBe(0);
     expect(mockResources.gold.current).toBe(0);
@@ -182,6 +184,7 @@ describe('resourceIsLow', () => {
   });
 
   it('should return true when resource is at zero', () => {
+    mockResources.gold.current = 0;
     const low = resourceIsLow('gold', 0.1);
     expect(low()).toBe(true);
   });
