@@ -113,7 +113,7 @@ export function defaultResources(): ResourceMap {
     flux: { current: 0, max: 200 },
     research: { current: 0, max: 300 },
     essence: { current: 0, max: 200 },
-    corruption: { current: 0, max: 100 },
+    corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
   };
 }
 

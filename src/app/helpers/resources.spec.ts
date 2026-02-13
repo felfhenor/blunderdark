@@ -241,7 +241,7 @@ describe('resourceMigrate', () => {
     expect(migrated.crystals.current).toBe(300);
     expect(migrated.crystals.max).toBe(500);
     expect(migrated.corruption.current).toBe(42);
-    expect(migrated.corruption.max).toBe(100);
+    expect(migrated.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
   });
 
   it('should initialize missing resource types to defaults', () => {

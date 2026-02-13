@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, UpperCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,6 +6,8 @@ import {
   signal,
 } from '@angular/core';
 import {
+  corruptionGetLevel,
+  corruptionGetLevelDescription,
   dayNightFormatMultiplier,
   dayNightGetAllActiveModifiers,
   dayNightGetPhaseLabel,
@@ -17,6 +19,7 @@ import {
   productionRates,
   GAME_TIME_TICKS_PER_MINUTE,
 } from '@helpers';
+import type { CorruptionLevel } from '@helpers/corruption';
 import type { DayNightCreatureModifier, DayNightResourceModifier } from '@helpers/day-night-modifiers';
 import type { ResourceType } from '@interfaces';
 import type { ResourceProductionBreakdown } from '@helpers/production';
@@ -79,13 +82,15 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-panel-resources',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, UpperCasePipe],
   templateUrl: './panel-resources.component.html',
   styleUrl: './panel-resources.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelResourcesComponent {
-  public readonly resources = RESOURCE_DISPLAY;
+  public readonly Math = Math;
+  public readonly resources = RESOURCE_DISPLAY.filter(r => r.type !== 'corruption');
+  public readonly corruptionDisplay = RESOURCE_DISPLAY.find(r => r.type === 'corruption')!;
 
   public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
@@ -220,6 +225,39 @@ export class PanelResourcesComponent {
       research: 'Research',
     };
     return labels[resourceType] ?? resourceType;
+  }
+
+  public corruptionInfo = computed(() => {
+    const value = this.getCurrent('corruption');
+    const level = corruptionGetLevel(value);
+    const description = corruptionGetLevelDescription(level);
+    return { value, level, description };
+  });
+
+  public getCorruptionColorClass(level: CorruptionLevel): string {
+    switch (level) {
+      case 'low':
+        return 'text-success';
+      case 'medium':
+        return 'text-warning';
+      case 'high':
+        return 'text-orange-400';
+      case 'critical':
+        return 'text-error';
+    }
+  }
+
+  public getCorruptionBadgeClass(level: CorruptionLevel): string {
+    switch (level) {
+      case 'low':
+        return 'badge-success';
+      case 'medium':
+        return 'badge-warning';
+      case 'high':
+        return 'badge-ghost bg-orange-400/20 text-orange-400';
+      case 'critical':
+        return 'badge-error';
+    }
   }
 
   private clearTimer(): void {

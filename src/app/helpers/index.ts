@@ -9,6 +9,7 @@ export * from './combat-abilities';
 export * from './connections';
 export * from './content';
 export * from './content-initializers';
+export * from './corruption';
 export * from './day-night-modifiers';
 export * from './debug';
 export * from './defaults';

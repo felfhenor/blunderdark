@@ -66,6 +66,31 @@
   }
 }
 
+.corruption-level-bar {
+  background: oklch(var(--bc) / 0.1);
+}
+
+.corruption-fill-low {
+  background: oklch(var(--su));
+}
+
+.corruption-fill-medium {
+  background: oklch(var(--wa));
+}
+
+.corruption-fill-high {
+  background: oklch(0.7 0.15 50);
+}
+
+.corruption-fill-critical {
+  background: oklch(var(--er));
+  animation: pulse-warning 1.5s ease-in-out infinite;
+}
+
+.corruption-warning-icon {
+  margin-right: 2px;
+}
+
 @keyframes pulse-warning {
   0%,
   100% {
