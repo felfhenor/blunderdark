@@ -55,7 +55,7 @@
             [value]="fear.effectiveFear"
             [max]="fearMax"
           ></progress>
-          @if (fear.inhabitantModifier !== 0 || fear.upgradeAdjustment !== 0 || fear.altarAuraReduction !== 0) {
+          @if (fear.inhabitantModifier !== 0 || fear.upgradeAdjustment !== 0 || fear.altarAuraReduction !== 0 || fear.propagatedFear !== 0) {
             <div class="text-xs opacity-40 ml-2">Base: {{ fear.baseFear }}</div>
             @if (fear.inhabitantModifier !== 0) {
               <div class="text-xs ml-2" [class.text-error]="fear.inhabitantModifier > 0" [class.text-success]="fear.inhabitantModifier < 0">
@@ -71,6 +71,16 @@
               <div class="text-xs ml-2 text-success">
                 Altar Aura: -{{ fear.altarAuraReduction }}
               </div>
+            }
+            @if (fear.propagatedFear !== 0) {
+              <div class="text-xs ml-2 text-error">
+                Adjacent: +{{ fear.propagatedFear }}
+              </div>
+              @for (source of fear.propagationSources; track source.sourceRoomId) {
+                <div class="text-xs ml-4 opacity-50">
+                  +{{ source.amount }} from {{ source.sourceRoomName }}
+                </div>
+              }
             }
           }
         </div>

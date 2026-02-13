@@ -232,6 +232,7 @@
   rulerFearLevel: 4
   fearTolerance: 4
   fearModifier: 2
+  fearPropagationDistance: 2
   foodConsumptionRate: 5
   stateModifiers:
     scared:
@@ -319,6 +320,7 @@
   rulerFearLevel: 5
   fearTolerance: 4
   fearModifier: 2
+  fearPropagationDistance: 2
   foodConsumptionRate: 3
   stateModifiers:
     scared:

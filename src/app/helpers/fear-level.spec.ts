@@ -6,7 +6,9 @@ import type {
   PlacedRoom,
   RoomDefinition,
   RoomUpgradeEffect,
+  TileOffset,
 } from '@interfaces';
+import type { AdjacencyMap } from '@helpers/adjacency';
 
 // --- Mocks ---
 
@@ -37,6 +39,19 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/room-shapes', () => ({
+  roomShapeResolve: vi.fn(() => ({
+    tiles: [{ x: 0, y: 0 }],
+    width: 1,
+    height: 1,
+  })),
+  roomShapeGetAbsoluteTiles: vi.fn(
+    (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+      { x: anchorX, y: anchorY },
+    ],
+  ),
+}));
+
 // --- Import after mocks ---
 
 import {
@@ -47,16 +62,23 @@ import {
   FEAR_LEVEL_MEDIUM,
   FEAR_LEVEL_MIN,
   FEAR_LEVEL_NONE,
+  FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE,
   FEAR_LEVEL_VERY_HIGH,
+  fearLevelBuildAdjacencyMap,
   fearLevelCalculateAllForFloor,
+  fearLevelCalculateAllPropagation,
   fearLevelCalculateEffective,
   fearLevelCalculateInhabitantModifier,
+  fearLevelCalculatePropagationAmount,
+  fearLevelCalculateSourceFear,
   fearLevelCalculateUpgradeAdjustment,
   fearLevelGetForRoom,
   fearLevelGetLabel,
+  fearLevelGetMaxPropagationDistance,
 } from '@helpers/fear-level';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { altarRoomIsAdjacent, altarRoomGetFearReductionAura } from '@helpers/altar-room';
+import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 
 // --- Test helpers ---
 
@@ -96,19 +118,24 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
   };
 }
 
-function registerInhabitantDef(id: string, fearModifier: number): void {
+function registerInhabitantDef(
+  id: string,
+  fearModifier: number,
+  fearPropagationDistance?: number,
+): void {
   mockContent.set(id, {
     id,
     name: id,
     __type: 'inhabitant',
     fearModifier,
+    fearPropagationDistance: fearPropagationDistance ?? 1,
   });
 }
 
-function registerRoomDef(id: string, fearLevel: number | 'variable'): void {
+function registerRoomDef(id: string, fearLevel: number | 'variable', name?: string): void {
   mockContent.set(id, {
     id,
-    name: id,
+    name: name ?? id,
     __type: 'room',
     fearLevel,
     production: {},
@@ -126,7 +153,7 @@ beforeEach(() => {
   registerInhabitantDef('def-goblin', 0);
   registerInhabitantDef('def-skeleton', 1);
   registerInhabitantDef('def-myconid', -1);
-  registerInhabitantDef('def-dragon', 2);
+  registerInhabitantDef('def-dragon', 2, 2);
   registerInhabitantDef('def-slime', 0);
 });
 
@@ -144,6 +171,10 @@ describe('Constants', () => {
   it('should have correct min/max', () => {
     expect(FEAR_LEVEL_MIN).toBe(0);
     expect(FEAR_LEVEL_MAX).toBe(4);
+  });
+
+  it('should have correct default propagation distance', () => {
+    expect(FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE).toBe(1);
   });
 
   it('should have labels for all levels', () => {
@@ -301,9 +332,13 @@ describe('fearLevelCalculateEffective', () => {
     expect(fearLevelCalculateEffective(3, 0, 0, 2)).toBe(1);
   });
 
+  it('should add propagated fear', () => {
+    expect(fearLevelCalculateEffective(1, 0, 0, 0, 2)).toBe(3);
+  });
+
   it('should combine all modifiers', () => {
-    // 2 + 1 + (-1) - 1 = 1
-    expect(fearLevelCalculateEffective(2, 1, -1, 1)).toBe(1);
+    // 2 + 1 + (-1) - 1 + 1 = 2
+    expect(fearLevelCalculateEffective(2, 1, -1, 1, 1)).toBe(2);
   });
 
   it('should clamp to 0 (FEAR_LEVEL_MIN)', () => {
@@ -314,9 +349,268 @@ describe('fearLevelCalculateEffective', () => {
     expect(fearLevelCalculateEffective(3, 2, 1, 0)).toBe(4);
   });
 
+  it('should clamp with propagated fear at max', () => {
+    expect(fearLevelCalculateEffective(2, 0, 0, 0, 5)).toBe(4);
+  });
+
   it('should clamp exactly at boundaries', () => {
     expect(fearLevelCalculateEffective(0, 0, 0, 0)).toBe(0);
     expect(fearLevelCalculateEffective(4, 0, 0, 0)).toBe(4);
+  });
+
+  it('should default propagatedFear to 0 when omitted', () => {
+    expect(fearLevelCalculateEffective(2, 0, 0, 0)).toBe(2);
+  });
+});
+
+// --- fearLevelCalculateSourceFear ---
+
+describe('fearLevelCalculateSourceFear', () => {
+  it('should return sum of baseFear and inhabitantModifier', () => {
+    expect(fearLevelCalculateSourceFear(2, 1)).toBe(3);
+  });
+
+  it('should handle negative inhabitant modifier', () => {
+    expect(fearLevelCalculateSourceFear(2, -1)).toBe(1);
+  });
+
+  it('should not clamp (can exceed bounds)', () => {
+    expect(fearLevelCalculateSourceFear(4, 3)).toBe(7);
+    expect(fearLevelCalculateSourceFear(0, -2)).toBe(-2);
+  });
+});
+
+// --- fearLevelCalculatePropagationAmount ---
+
+describe('fearLevelCalculatePropagationAmount', () => {
+  it('should return 0 for fear below High', () => {
+    expect(fearLevelCalculatePropagationAmount(0)).toBe(0);
+    expect(fearLevelCalculatePropagationAmount(1)).toBe(0);
+    expect(fearLevelCalculatePropagationAmount(2)).toBe(0);
+  });
+
+  it('should return 1 for High fear', () => {
+    expect(fearLevelCalculatePropagationAmount(3)).toBe(1);
+  });
+
+  it('should return 2 for Very High fear', () => {
+    expect(fearLevelCalculatePropagationAmount(4)).toBe(2);
+  });
+
+  it('should return 2 for fear above Very High', () => {
+    expect(fearLevelCalculatePropagationAmount(5)).toBe(2);
+    expect(fearLevelCalculatePropagationAmount(10)).toBe(2);
+  });
+});
+
+// --- fearLevelGetMaxPropagationDistance ---
+
+describe('fearLevelGetMaxPropagationDistance', () => {
+  it('should return default distance when no inhabitants', () => {
+    expect(fearLevelGetMaxPropagationDistance('room-1', [])).toBe(1);
+  });
+
+  it('should return default when inhabitants have no extended distance', () => {
+    const inhabitants = [
+      makeInhabitant({ assignedRoomId: 'room-1', definitionId: 'def-goblin' }),
+    ];
+    // goblin has fearPropagationDistance: 1 (default)
+    expect(fearLevelGetMaxPropagationDistance('room-1', inhabitants)).toBe(1);
+  });
+
+  it('should return max distance from inhabitants', () => {
+    const inhabitants = [
+      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1', definitionId: 'def-goblin' }),
+      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-1', definitionId: 'def-dragon' }),
+    ];
+    // dragon has fearPropagationDistance: 2
+    expect(fearLevelGetMaxPropagationDistance('room-1', inhabitants)).toBe(2);
+  });
+
+  it('should ignore inhabitants in other rooms', () => {
+    const inhabitants = [
+      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-2', definitionId: 'def-dragon' }),
+    ];
+    expect(fearLevelGetMaxPropagationDistance('room-1', inhabitants)).toBe(1);
+  });
+
+  it('should handle unknown definitions gracefully', () => {
+    const inhabitants = [
+      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1', definitionId: 'def-unknown' }),
+    ];
+    expect(fearLevelGetMaxPropagationDistance('room-1', inhabitants)).toBe(1);
+  });
+});
+
+// --- fearLevelCalculateAllPropagation ---
+
+describe('fearLevelCalculateAllPropagation', () => {
+  it('should return empty map when no rooms have high fear', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a'],
+    };
+    const sourceFears = new Map([['room-a', 2], ['room-b', 1]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1]]);
+    const names = new Map([['room-a', 'Room A'], ['room-b', 'Room B']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    expect(result.size).toBe(0);
+  });
+
+  it('should propagate +1 from High (3) source to adjacent room', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a'],
+    };
+    const sourceFears = new Map([['room-a', 3], ['room-b', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1]]);
+    const names = new Map([['room-a', 'Soul Well'], ['room-b', 'Mine']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    expect(result.get('room-b')?.total).toBe(1);
+    expect(result.get('room-b')?.sources).toHaveLength(1);
+    expect(result.get('room-b')?.sources[0]).toEqual({
+      sourceRoomId: 'room-a',
+      sourceRoomName: 'Soul Well',
+      amount: 1,
+    });
+    // Source room should not propagate to itself
+    expect(result.has('room-a')).toBe(false);
+  });
+
+  it('should propagate +2 from Very High (4) source to adjacent room', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a'],
+    };
+    const sourceFears = new Map([['room-a', 4], ['room-b', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1]]);
+    const names = new Map([['room-a', 'Dark Room'], ['room-b', 'Mine']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    expect(result.get('room-b')?.total).toBe(2);
+    expect(result.get('room-b')?.sources[0].amount).toBe(2);
+  });
+
+  it('should stack propagated fear from multiple sources', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-c'],
+      'room-b': ['room-c'],
+      'room-c': ['room-a', 'room-b'],
+    };
+    const sourceFears = new Map([['room-a', 3], ['room-b', 4], ['room-c', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1], ['room-c', 1]]);
+    const names = new Map([['room-a', 'Source A'], ['room-b', 'Source B'], ['room-c', 'Target']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    // room-c gets +1 from A (High) and +2 from B (Very High) = 3
+    expect(result.get('room-c')?.total).toBe(3);
+    expect(result.get('room-c')?.sources).toHaveLength(2);
+  });
+
+  it('should not propagate to rooms beyond max distance', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a', 'room-c'],
+      'room-c': ['room-b'],
+    };
+    const sourceFears = new Map([['room-a', 3], ['room-b', 0], ['room-c', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1], ['room-c', 1]]);
+    const names = new Map([['room-a', 'Source'], ['room-b', 'B'], ['room-c', 'C']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    // room-b gets +1 (adjacent to source), room-c gets nothing (distance 2, but max is 1)
+    expect(result.get('room-b')?.total).toBe(1);
+    expect(result.has('room-c')).toBe(false);
+  });
+
+  it('should propagate at distance 2 with attenuation', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a', 'room-c'],
+      'room-c': ['room-b'],
+    };
+    // Very High (4) source with distance 2
+    const sourceFears = new Map([['room-a', 4], ['room-b', 0], ['room-c', 0]]);
+    const distances = new Map([['room-a', 2], ['room-b', 1], ['room-c', 1]]);
+    const names = new Map([['room-a', 'Source'], ['room-b', 'B'], ['room-c', 'C']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    // room-b: distance 1, base 2, attenuation 0 => +2
+    expect(result.get('room-b')?.total).toBe(2);
+    // room-c: distance 2, base 2, attenuation 1 => +1
+    expect(result.get('room-c')?.total).toBe(1);
+  });
+
+  it('should not propagate at distance 2 when attenuation removes all fear', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a', 'room-c'],
+      'room-c': ['room-b'],
+    };
+    // High (3) source with distance 2: base propagation 1, distance 2 attenuation 1 => 0
+    const sourceFears = new Map([['room-a', 3], ['room-b', 0], ['room-c', 0]]);
+    const distances = new Map([['room-a', 2], ['room-b', 1], ['room-c', 1]]);
+    const names = new Map([['room-a', 'Source'], ['room-b', 'B'], ['room-c', 'C']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    // room-b: distance 1, base 1, attenuation 0 => +1
+    expect(result.get('room-b')?.total).toBe(1);
+    // room-c: distance 2, base 1, attenuation 1 => 0, so no propagation
+    expect(result.has('room-c')).toBe(false);
+  });
+
+  it('should not propagate back to the source room', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-b'],
+      'room-b': ['room-a'],
+    };
+    const sourceFears = new Map([['room-a', 4], ['room-b', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1]]);
+    const names = new Map([['room-a', 'Source'], ['room-b', 'B']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    expect(result.has('room-a')).toBe(false);
+  });
+
+  it('should handle no adjacency', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': [],
+      'room-b': [],
+    };
+    const sourceFears = new Map([['room-a', 4], ['room-b', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1]]);
+    const names = new Map([['room-a', 'A'], ['room-b', 'B']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    expect(result.size).toBe(0);
+  });
+
+  it('should handle multiple sources propagating to same target with different amounts', () => {
+    const adjacencyMap: AdjacencyMap = {
+      'room-a': ['room-target'],
+      'room-b': ['room-target'],
+      'room-target': ['room-a', 'room-b'],
+    };
+    const sourceFears = new Map([['room-a', 3], ['room-b', 3], ['room-target', 0]]);
+    const distances = new Map([['room-a', 1], ['room-b', 1], ['room-target', 1]]);
+    const names = new Map([['room-a', 'A'], ['room-b', 'B'], ['room-target', 'Target']]);
+
+    const result = fearLevelCalculateAllPropagation(adjacencyMap, sourceFears, distances, names);
+
+    // Each High source propagates +1, total = 2
+    expect(result.get('room-target')?.total).toBe(2);
+    expect(result.get('room-target')?.sources).toHaveLength(2);
   });
 });
 
@@ -334,6 +628,8 @@ describe('fearLevelGetForRoom', () => {
     expect(result.inhabitantModifier).toBe(0);
     expect(result.upgradeAdjustment).toBe(0);
     expect(result.altarAuraReduction).toBe(0);
+    expect(result.propagatedFear).toBe(0);
+    expect(result.propagationSources).toEqual([]);
     expect(result.effectiveFear).toBe(2);
   });
 
@@ -491,5 +787,210 @@ describe('fearLevelCalculateAllForFloor', () => {
 
     expect(result.get('room-throne')?.baseFear).toBe(3);
     expect(result.get('room-throne')?.effectiveFear).toBe(3);
+  });
+
+  it('should include propagated fear from adjacent high-fear rooms', () => {
+    registerRoomDef('room-type-high', 3, 'Soul Well');
+    registerRoomDef('room-type-low', 0, 'Mine');
+
+    // Place rooms adjacent to each other (anchors at (0,0) and (1,0))
+    const roomHigh = makePlacedRoom({ id: 'room-high', roomTypeId: 'room-type-high', anchorX: 0, anchorY: 0 });
+    const roomLow = makePlacedRoom({ id: 'room-low', roomTypeId: 'room-type-low', anchorX: 1, anchorY: 0 });
+
+    // Mock roomShapeGetAbsoluteTiles to return tiles that make rooms adjacent
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    const floor = makeFloor({ rooms: [roomHigh, roomLow] });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    // room-low should have propagated fear from room-high
+    const lowBreakdown = result.get('room-low')!;
+    expect(lowBreakdown.propagatedFear).toBe(1);
+    expect(lowBreakdown.propagationSources).toHaveLength(1);
+    expect(lowBreakdown.propagationSources[0].sourceRoomName).toBe('Soul Well');
+    expect(lowBreakdown.propagationSources[0].amount).toBe(1);
+    expect(lowBreakdown.effectiveFear).toBe(1); // 0 base + 1 propagated
+  });
+
+  it('should include propagated fear from Very High rooms', () => {
+    registerRoomDef('room-type-vh', 4, 'Dark Sanctum');
+    registerRoomDef('room-type-low', 0, 'Mine');
+
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    const roomVH = makePlacedRoom({ id: 'room-vh', roomTypeId: 'room-type-vh', anchorX: 0, anchorY: 0 });
+    const roomLow = makePlacedRoom({ id: 'room-low', roomTypeId: 'room-type-low', anchorX: 1, anchorY: 0 });
+
+    const floor = makeFloor({ rooms: [roomVH, roomLow] });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    expect(result.get('room-low')!.propagatedFear).toBe(2);
+    expect(result.get('room-low')!.effectiveFear).toBe(2);
+  });
+
+  it('should stack propagation from multiple adjacent high-fear rooms', () => {
+    registerRoomDef('room-type-high-a', 3, 'Source A');
+    registerRoomDef('room-type-high-b', 3, 'Source B');
+    registerRoomDef('room-type-target', 0, 'Target');
+
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    // rooms at (0,0), (2,0), and (1,0) in the middle
+    const roomA = makePlacedRoom({ id: 'room-a', roomTypeId: 'room-type-high-a', anchorX: 0, anchorY: 0 });
+    const roomB = makePlacedRoom({ id: 'room-b', roomTypeId: 'room-type-high-b', anchorX: 2, anchorY: 0 });
+    const roomTarget = makePlacedRoom({ id: 'room-target', roomTypeId: 'room-type-target', anchorX: 1, anchorY: 0 });
+
+    const floor = makeFloor({ rooms: [roomA, roomB, roomTarget] });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    // Target gets +1 from Source A and +1 from Source B = +2
+    expect(result.get('room-target')!.propagatedFear).toBe(2);
+    expect(result.get('room-target')!.propagationSources).toHaveLength(2);
+  });
+
+  it('should clamp effective fear to max when propagation exceeds bounds', () => {
+    registerRoomDef('room-type-high', 4, 'Source');
+    registerRoomDef('room-type-target', 3, 'Target');
+
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    const roomSource = makePlacedRoom({ id: 'room-source', roomTypeId: 'room-type-high', anchorX: 0, anchorY: 0 });
+    const roomTarget = makePlacedRoom({ id: 'room-target', roomTypeId: 'room-type-target', anchorX: 1, anchorY: 0 });
+
+    const floor = makeFloor({ rooms: [roomSource, roomTarget] });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    // Target: base 3 + propagated 2 = 5, clamped to 4
+    expect(result.get('room-target')!.effectiveFear).toBe(4);
+  });
+
+  it('should propagate with distance 2 and attenuation when inhabitant extends range', () => {
+    registerRoomDef('room-type-source', 2, 'Source');
+    registerRoomDef('room-type-mid', 0, 'Middle');
+    registerRoomDef('room-type-far', 0, 'Far');
+
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    // Dragon (fearModifier: 2, fearPropagationDistance: 2) in source room
+    // Source room base fear 2 + dragon modifier 2 = 4 (Very High)
+    const dragonInhabitant = makeInhabitant({
+      instanceId: 'inst-dragon',
+      assignedRoomId: 'room-source',
+      definitionId: 'def-dragon',
+    });
+
+    const roomSource = makePlacedRoom({ id: 'room-source', roomTypeId: 'room-type-source', anchorX: 0, anchorY: 0 });
+    const roomMid = makePlacedRoom({ id: 'room-mid', roomTypeId: 'room-type-mid', anchorX: 1, anchorY: 0 });
+    const roomFar = makePlacedRoom({ id: 'room-far', roomTypeId: 'room-type-far', anchorX: 2, anchorY: 0 });
+
+    const floor = makeFloor({
+      rooms: [roomSource, roomMid, roomFar],
+      inhabitants: [dragonInhabitant],
+    });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    // Source: base 2 + dragon 2 = effective 4 (clamped), source fear = 4
+    expect(result.get('room-source')!.effectiveFear).toBe(4);
+
+    // Middle (distance 1): propagation 2 (base from VH), no attenuation
+    expect(result.get('room-mid')!.propagatedFear).toBe(2);
+    expect(result.get('room-mid')!.effectiveFear).toBe(2);
+
+    // Far (distance 2): propagation 2 - 1 attenuation = 1
+    expect(result.get('room-far')!.propagatedFear).toBe(1);
+    expect(result.get('room-far')!.effectiveFear).toBe(1);
+  });
+
+  it('should not propagate from non-adjacent rooms', () => {
+    registerRoomDef('room-type-high', 4, 'Source');
+    registerRoomDef('room-type-low', 0, 'Target');
+
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    // Rooms far apart (not adjacent)
+    const roomSource = makePlacedRoom({ id: 'room-source', roomTypeId: 'room-type-high', anchorX: 0, anchorY: 0 });
+    const roomTarget = makePlacedRoom({ id: 'room-target', roomTypeId: 'room-type-low', anchorX: 5, anchorY: 5 });
+
+    const floor = makeFloor({ rooms: [roomSource, roomTarget] });
+
+    const result = fearLevelCalculateAllForFloor(floor);
+
+    expect(result.get('room-target')!.propagatedFear).toBe(0);
+    expect(result.get('room-target')!.propagationSources).toEqual([]);
+  });
+});
+
+// --- fearLevelBuildAdjacencyMap ---
+
+describe('fearLevelBuildAdjacencyMap', () => {
+  it('should return empty map for no rooms', () => {
+    const floor = makeFloor({ rooms: [] });
+    const result = fearLevelBuildAdjacencyMap(floor);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it('should detect adjacent rooms', () => {
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    const roomA = makePlacedRoom({ id: 'room-a', anchorX: 0, anchorY: 0 });
+    const roomB = makePlacedRoom({ id: 'room-b', anchorX: 1, anchorY: 0 });
+
+    const floor = makeFloor({ rooms: [roomA, roomB] });
+
+    const result = fearLevelBuildAdjacencyMap(floor);
+
+    expect(result['room-a']).toContain('room-b');
+    expect(result['room-b']).toContain('room-a');
+  });
+
+  it('should not detect non-adjacent rooms', () => {
+    vi.mocked(roomShapeGetAbsoluteTiles).mockImplementation(
+      (_shape: unknown, anchorX: number, anchorY: number): TileOffset[] => [
+        { x: anchorX, y: anchorY },
+      ],
+    );
+
+    const roomA = makePlacedRoom({ id: 'room-a', anchorX: 0, anchorY: 0 });
+    const roomB = makePlacedRoom({ id: 'room-b', anchorX: 5, anchorY: 5 });
+
+    const floor = makeFloor({ rooms: [roomA, roomB] });
+
+    const result = fearLevelBuildAdjacencyMap(floor);
+
+    expect(result['room-a']).toHaveLength(0);
+    expect(result['room-b']).toHaveLength(0);
   });
 });
