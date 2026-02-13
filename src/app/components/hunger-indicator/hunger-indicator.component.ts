@@ -67,18 +67,18 @@ import { TippyDirective } from '@ngneat/helipopper';
       }
 
       .hunger-hungry {
-        background-color: oklch(0.45 0.15 80);
-        color: oklch(0.9 0.05 80);
+        background-color: oklch(var(--wa));
+        color: oklch(var(--wac, 0.9 0.05 80));
       }
 
       .hunger-starving {
-        background-color: oklch(0.4 0.15 25);
-        color: oklch(0.9 0.05 25);
+        background-color: oklch(var(--er));
+        color: oklch(var(--erc, 0.9 0.05 25));
       }
 
       .hunger-inappetent {
-        background-color: oklch(0.35 0.02 260);
-        color: oklch(0.7 0.02 260);
+        background-color: oklch(var(--n));
+        color: oklch(var(--nc));
       }
     `,
   ],

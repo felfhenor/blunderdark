@@ -253,6 +253,7 @@ BFS pathfinding for hallways between rooms:
 - DaisyUI progress bars use classes like `progress-error`, `progress-warning`, etc.
 - Theme variables: `var(--b3)`, `var(--p)`, `var(--s)`, `var(--pf)`
 - OKLCH color format works in Angular SCSS — the compiler converts them to browser-compatible formats
+- **Prefer CSS variables over raw oklch values** — use DaisyUI vars (`--su`, `--wa`, `--er`, `--in`, `--p`, `--b2`, `--bc`, `--n`, `--nc`, etc.) via `oklch(var(--su))` for status colors, backgrounds, and borders. Only use raw oklch for deliberate visual effects (corruption purple overlays, room color palettes) or specific shades with no DaisyUI equivalent (e.g., orange between warning and error). Use fallbacks for content color vars: `oklch(var(--suc, 0.9 0.05 145))`
 - SweetAlert2 pattern: `[swal]="templateRef"` on button + `<swal>` element with `(confirm)` event handler
 - Angular view encapsulation adds attribute selectors — manual class additions in browser console won't match scoped styles
 - `@ngneat/hotkeys` provides global keyboard shortcuts: `[hotkeys]="'SPACE'"` with `isGlobal` directive attr, `(hotkey)` event handler

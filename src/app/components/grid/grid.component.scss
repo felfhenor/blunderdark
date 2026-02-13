@@ -88,11 +88,11 @@
 @keyframes selection-pulse {
   0%, 100% {
     outline-color: var(--pf, #6a6a9a);
-    box-shadow: inset 0 0 8px 2px oklch(0.7 0.15 260 / 0.3);
+    box-shadow: inset 0 0 8px 2px oklch(var(--p) / 0.3);
   }
   50% {
-    outline-color: oklch(0.8 0.18 260);
-    box-shadow: inset 0 0 12px 4px oklch(0.7 0.15 260 / 0.5);
+    outline-color: oklch(var(--p));
+    box-shadow: inset 0 0 12px 4px oklch(var(--p) / 0.5);
   }
 }
 
@@ -130,29 +130,29 @@
   }
 
   &.preview-valid {
-    background-color: oklch(0.65 0.2 145);
+    background-color: oklch(var(--su));
     opacity: 0.7;
   }
 
   &.preview-invalid {
-    background-color: oklch(0.55 0.25 25);
+    background-color: oklch(var(--er));
     opacity: 0.7;
   }
 
   &.hallway-source {
-    outline: 2px solid oklch(0.75 0.18 200);
+    outline: 2px solid oklch(var(--in));
     outline-offset: -2px;
   }
 
   &.hallway-path {
-    background-color: oklch(0.6 0.15 200);
+    background-color: oklch(var(--in));
     opacity: 0.8;
   }
 }
 
 .doorway {
   position: absolute;
-  background-color: oklch(0.85 0.15 80);
+  background-color: oklch(var(--wa));
   z-index: 2;
   pointer-events: none;
   border-radius: 1px;
@@ -227,17 +227,17 @@
   white-space: nowrap;
 
   &.status-full {
-    background-color: oklch(0.45 0.15 145);
-    color: oklch(0.9 0.05 145);
+    background-color: oklch(var(--su));
+    color: oklch(var(--suc, 0.9 0.05 145));
   }
 
   &.status-partial {
-    background-color: oklch(0.45 0.15 80);
-    color: oklch(0.9 0.05 80);
+    background-color: oklch(var(--wa));
+    color: oklch(var(--wac, 0.9 0.05 80));
   }
 
   &.status-empty {
-    background-color: oklch(0.4 0.15 25);
-    color: oklch(0.9 0.05 25);
+    background-color: oklch(var(--er));
+    color: oklch(var(--erc, 0.9 0.05 25));
   }
 }

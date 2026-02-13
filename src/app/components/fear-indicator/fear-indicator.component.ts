@@ -36,7 +36,7 @@ import { TippyDirective } from '@ngneat/helipopper';
           @if (b.inhabitantModifier !== 0) {
             <div
               style="font-size:10px"
-              [style.color]="b.inhabitantModifier > 0 ? 'oklch(0.7 0.2 25)' : 'oklch(0.7 0.2 145)'"
+              [class]="b.inhabitantModifier > 0 ? 'text-error' : 'text-success'"
             >
               Inhabitants: {{ b.inhabitantModifier > 0 ? '+' : '' }}{{ b.inhabitantModifier }}
             </div>
@@ -44,18 +44,18 @@ import { TippyDirective } from '@ngneat/helipopper';
           @if (b.upgradeAdjustment !== 0) {
             <div
               style="font-size:10px"
-              [style.color]="b.upgradeAdjustment > 0 ? 'oklch(0.7 0.2 25)' : 'oklch(0.7 0.2 145)'"
+              [class]="b.upgradeAdjustment > 0 ? 'text-error' : 'text-success'"
             >
               Upgrades: {{ b.upgradeAdjustment > 0 ? '+' : '' }}{{ b.upgradeAdjustment }}
             </div>
           }
           @if (b.altarAuraReduction !== 0) {
-            <div style="font-size:10px;color:oklch(0.7 0.2 145)">
+            <div class="text-success" style="font-size:10px">
               Altar Aura: -{{ b.altarAuraReduction }}
             </div>
           }
           @if (b.propagatedFear !== 0) {
-            <div style="font-size:10px;color:oklch(0.7 0.2 25)">
+            <div class="text-error" style="font-size:10px">
               Adjacent: +{{ b.propagatedFear }}
             </div>
             @for (source of b.propagationSources; track source.sourceRoomName) {
@@ -64,7 +64,7 @@ import { TippyDirective } from '@ngneat/helipopper';
               </div>
             }
           }
-          <hr style="border-color:oklch(0.35 0.02 260);margin:4px 0">
+          <hr class="fear-divider">
           <div style="font-size:10px;opacity:0.6">{{ fearEffect() }}</div>
         }
       </ng-template>
@@ -90,13 +90,13 @@ import { TippyDirective } from '@ngneat/helipopper';
       }
 
       .fear-low {
-        background-color: oklch(0.45 0.15 145);
-        color: oklch(0.9 0.05 145);
+        background-color: oklch(var(--su));
+        color: oklch(var(--suc, 0.9 0.05 145));
       }
 
       .fear-medium {
-        background-color: oklch(0.45 0.15 80);
-        color: oklch(0.9 0.05 80);
+        background-color: oklch(var(--wa));
+        color: oklch(var(--wac, 0.9 0.05 80));
       }
 
       .fear-high {
@@ -105,10 +105,14 @@ import { TippyDirective } from '@ngneat/helipopper';
       }
 
       .fear-very-high {
-        background-color: oklch(0.4 0.15 25);
-        color: oklch(0.9 0.05 25);
+        background-color: oklch(var(--er));
+        color: oklch(var(--erc, 0.9 0.05 25));
       }
 
+      .fear-divider {
+        border-color: oklch(var(--bc) / 0.2);
+        margin: 4px 0;
+      }
     `,
   ],
 })
