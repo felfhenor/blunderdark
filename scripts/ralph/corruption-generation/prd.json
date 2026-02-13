@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Soul Well generates corruption: 0.4 per tick (2/min) and Shadow Library generates corruption: 0.2 per tick (1/min) via the existing production pipeline (YAML data). Torture Chamber does not exist yet (Phase 15.6) - will add corruption generation when that room is created."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added corruptionGeneration field to InhabitantDefinition interface. Skeleton has corruptionGeneration: 1, Demon Lord has corruptionGeneration: 10 in YAML. corruptionGenerationCalculateInhabitantRate() skips unstationed inhabitants. ensureInhabitant() defaults to 0."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "corruptionGenerationProcess(state) runs each tick in gameloop.ts after productionProcess. Applies day/night modifier via dayNightGetResourceModifier(). Biome modifiers for room-based corruption are applied via the existing production pipeline (floor-modifiers.ts depth tiers already include corruption bonuses). Room corruption flows through productionProcess; inhabitant corruption flows through corruptionGenerationProcess."
     },
     {
       "id": "US-004",
@@ -62,7 +62,7 @@
       ],
       "priority": 4,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred - requires UI work and browser verification. corruptionGenerationCalculateTotalPerMinute() utility function is available for UI consumption."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "31 tests in corruption.spec.ts covering: inhabitant rate calculation (no inhabitants, unstationed, Skeleton 1/min, Demon Lord 10/min, multiple, no generation, undefined generation), process function (no inhabitants, stationed skeleton, night modifier +50%, unstationed), total per-minute calculation. Soul Well corruption tested via production pipeline. Torture Chamber deferred (room doesn't exist yet)."
     }
   ]
 }

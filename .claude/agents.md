@@ -754,6 +754,13 @@ When adding build-time validation for a content type:
 - Corruption is displayed separately from other resources in `panel-resources` — no progress bar (uncapped), uses level-based color coding and badge instead
 - Panel-resources splits `RESOURCE_DISPLAY` into `resources` (non-corruption) and `corruptionDisplay` (corruption only) for differentiated rendering
 - Corruption already existed as a `ResourceType` — the corruption-resource feature added dedicated helper functions, level tracking, and enhanced UI
+- **Corruption generation has two separate pipelines:**
+  - **Room-based**: corruption production values in room YAML (e.g., `corruption: 0.4` on Soul Well) flow through the standard `productionProcess` pipeline — no special code needed, just YAML data
+  - **Inhabitant-based**: `corruptionGeneration` field on `InhabitantDefinition` (per-minute rate) is processed by `corruptionGenerationProcess(state)` — a separate function called in gameloop.ts after productionProcess
+- `corruptionGenerationCalculateInhabitantRate(inhabitants, lookupDef?)` accepts optional lookup function for testability — defaults to `contentGetEntry` in production, injectable in tests
+- `corruptionGenerationProcess(state)` mutates state in-place (same pattern as productionProcess, hungerProcess) — applies day/night modifier via `dayNightGetResourceModifier()`
+- `corruptionGenerationCalculateTotalPerMinute(inhabitantRatePerTick, roomRatePerTick)` combines both pipelines for UI display
+- When using `await import()` inside `vi.mock()` test files, the `it()` callback must be `async` — esbuild will reject `await` in non-async functions at transform time
 
 ## Miscellaneous
 
