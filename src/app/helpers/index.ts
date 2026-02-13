@@ -14,6 +14,7 @@ export * from './debug';
 export * from './defaults';
 export * from './discord';
 export * from './efficiency';
+export * from './fear-level';
 export * from './floor';
 export * from './floor-modifiers';
 export * from './game-events';

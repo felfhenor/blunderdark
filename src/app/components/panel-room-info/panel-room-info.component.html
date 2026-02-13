@@ -43,6 +43,39 @@
         </div>
       }
 
+      @if (fearBreakdown(); as fear) {
+        <div class="mt-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs opacity-50">Fear:</span>
+            <span class="text-xs font-semibold" [class]="fearLabelClass()">{{ fearLabel() }}</span>
+          </div>
+          <progress
+            class="progress w-full"
+            [class]="fearProgressClass()"
+            [value]="fear.effectiveFear"
+            [max]="fearMax"
+          ></progress>
+          @if (fear.inhabitantModifier !== 0 || fear.upgradeAdjustment !== 0 || fear.altarAuraReduction !== 0) {
+            <div class="text-xs opacity-40 ml-2">Base: {{ fear.baseFear }}</div>
+            @if (fear.inhabitantModifier !== 0) {
+              <div class="text-xs ml-2" [class.text-error]="fear.inhabitantModifier > 0" [class.text-success]="fear.inhabitantModifier < 0">
+                Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : '' }}{{ fear.inhabitantModifier }}
+              </div>
+            }
+            @if (fear.upgradeAdjustment !== 0) {
+              <div class="text-xs ml-2" [class.text-error]="fear.upgradeAdjustment > 0" [class.text-success]="fear.upgradeAdjustment < 0">
+                Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : '' }}{{ fear.upgradeAdjustment }}
+              </div>
+            }
+            @if (fear.altarAuraReduction !== 0) {
+              <div class="text-xs ml-2 text-success">
+                Altar Aura: -{{ fear.altarAuraReduction }}
+              </div>
+            }
+          }
+        </div>
+      }
+
       @if (room.maxInhabitants !== 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">

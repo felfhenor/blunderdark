@@ -20,6 +20,7 @@
       effectValue: 0.2
       targetResourceType: crystals
   fearTolerance: 1
+  fearModifier: 0
   foodConsumptionRate: 2
   stateModifiers:
     scared:
@@ -62,6 +63,7 @@
       effectType: trap_bonus
       effectValue: 0.25
   fearTolerance: 2
+  fearModifier: 0
   foodConsumptionRate: 1.5
   stateModifiers:
     scared:
@@ -104,6 +106,7 @@
       effectType: defense_bonus
       effectValue: 0.3
   fearTolerance: 4
+  fearModifier: 1
   foodConsumptionRate: 0
   stateModifiers:
     scared:
@@ -143,6 +146,7 @@
       effectValue: 0.15
       targetResourceType: food
   fearTolerance: 1
+  fearModifier: -1
   foodConsumptionRate: 1
   stateModifiers:
     scared:
@@ -184,6 +188,7 @@
       effectType: versatility
       effectValue: 1.0
   fearTolerance: 0
+  fearModifier: 0
   foodConsumptionRate: 0.5
   stateModifiers:
     scared:
@@ -226,6 +231,7 @@
     fear: 0.05
   rulerFearLevel: 4
   fearTolerance: 4
+  fearModifier: 2
   foodConsumptionRate: 5
   stateModifiers:
     scared:
@@ -270,6 +276,7 @@
     fluxProduction: 0.15
   rulerFearLevel: 3
   fearTolerance: 4
+  fearModifier: 1
   foodConsumptionRate: 0
   stateModifiers:
     scared:
@@ -311,6 +318,7 @@
     invaderMorale: -0.10
   rulerFearLevel: 5
   fearTolerance: 4
+  fearModifier: 2
   foodConsumptionRate: 3
   stateModifiers:
     scared:

@@ -254,6 +254,7 @@ function ensureInhabitant(
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},
     rulerFearLevel: inhabitant.rulerFearLevel ?? 0,
+    fearModifier: inhabitant.fearModifier ?? 0,
     foodConsumptionRate: inhabitant.foodConsumptionRate ?? 0,
   };
 }

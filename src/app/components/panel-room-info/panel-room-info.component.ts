@@ -20,6 +20,9 @@ import {
   connectionRemove,
   gridSelectedTile,
   inhabitantUnassignFromRoom,
+  fearLevelBreakdownMap,
+  fearLevelGetLabel,
+  FEAR_LEVEL_MAX,
 } from '@helpers';
 import type { InhabitantDefinition, IsContentItem } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -95,6 +98,41 @@ export class PanelRoomInfoComponent {
     if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return undefined;
 
     return efficiencyCalculateRoom(room.placedRoom, floor.inhabitants);
+  });
+
+  public fearBreakdown = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+    return fearLevelBreakdownMap().get(room.id);
+  });
+
+  public fearLabel = computed(() => {
+    const breakdown = this.fearBreakdown();
+    if (!breakdown) return undefined;
+    return fearLevelGetLabel(breakdown.effectiveFear);
+  });
+
+  public fearMax = FEAR_LEVEL_MAX;
+
+  public fearLabelClass = computed(() => {
+    const breakdown = this.fearBreakdown();
+    if (!breakdown) return '';
+    switch (breakdown.effectiveFear) {
+      case 0: return 'opacity-50';
+      case 1: return 'text-success';
+      case 2: return 'text-warning';
+      case 3: return 'text-orange-400';
+      case 4: return 'text-error';
+      default: return '';
+    }
+  });
+
+  public fearProgressClass = computed(() => {
+    const breakdown = this.fearBreakdown();
+    if (!breakdown) return 'progress-success';
+    if (breakdown.effectiveFear >= 4) return 'progress-error';
+    if (breakdown.effectiveFear >= 2) return 'progress-warning';
+    return 'progress-success';
   });
 
   public eligibleUnassigned = computed(() => {

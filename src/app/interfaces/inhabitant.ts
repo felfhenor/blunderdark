@@ -32,6 +32,7 @@ export type InhabitantDefinition = {
   rulerBonuses: RulerBonuses;
   rulerFearLevel: number;
   fearTolerance?: number;
+  fearModifier?: number;
   foodConsumptionRate?: number;
   stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
 };
