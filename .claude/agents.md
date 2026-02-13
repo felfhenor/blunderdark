@@ -720,6 +720,26 @@ When adding build-time validation for a content type:
 - Fear is derived state (computed from existing gamestate), NOT stored as a new field — no migration needed
 - Dependencies: `@helpers/content`, `@helpers/room-upgrades`, `@helpers/altar-room`, `@helpers/throne-room`, `@helpers/state-game`, `@helpers/production`, `@helpers/room-shapes`, `@helpers/adjacency` — no circular deps
 
+## Morale System
+
+- `morale.ts` helper: party-level invader morale (0-100) tracked via Angular signals during invasions
+- File-to-prefix: `morale.ts` → `morale` / `MORALE`
+- Morale is party-level (single value for whole invader party), NOT per-invader
+- `moraleCurrent` signal (WritableSignal<number>), `moraleEventLog` signal (WritableSignal<MoraleEvent[]>), `moraleIsRetreating` signal (WritableSignal<boolean>)
+- `moraleInit()` resets to 100 and clears log/retreating — call at start of each invasion
+- `moraleApply(eventType, delta, turn, description)` updates signal, logs event, triggers retreat if ≤ 0
+- Convenience functions: `moraleApplyAllyDeath(invader, turn)`, `moraleApplyTrapTrigger(isFearGlyph, turn)`, `moraleApplyFearRoomEntry(fearLevel, invaders, turn)`, `moraleApplyRoomCapture(isHighValue, turn)`
+- Penalties: ally death -10, cleric/paladin death -15, trap -5, Fear Glyph -10, high-fear room (≥3) -15
+- Bonuses: room capture +10, high-value room +15
+- Paladin Aura of Courage negates high-fear room penalty — checked via `moralePartyHasPaladinAura()` looking for 'courage' status effect on alive invaders
+- `MoraleEventType`: `'ally_death' | 'trap_trigger' | 'high_fear_room' | 'room_capture'`
+- `'morale_broken'` added to `InvasionEndReason` union in `invasion.ts`
+- `invasionWinLossIsMoraleBroken(state, retreating?)` in invasion-win-loss.ts — reads `moraleIsRetreating()` signal, with optional parameter override for pure testing
+- Morale broken check priority: after all_invaders_eliminated, before turn_limit_reached
+- Traps already have `moralePenalty` field on `TrapTriggerResult` — `def.effectType === 'fear'` gives 10, others 0. Morale system consumes this via `moraleApplyTrapTrigger()`
+- `MoraleBarComponent` in `src/app/components/morale-bar/` — inline template, color-coded progress (green >60, yellow 30-60, red <30), floating text on changes, hover event log
+- Component auto-hides when morale is full and no events have occurred — shows during active invasions
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -793,6 +813,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `invasion-triggers.ts` | `invasionTrigger` | `INVASION_TRIGGER` |
 | `invasion-win-loss.ts` | `invasionWinLoss` | `INVASION_WIN_LOSS` |
 | `migrate.ts` | `migrate` | `MIGRATE` |
+| `morale.ts` | `morale` | `MORALE` |
 | `notify.ts` | `notify` | `NOTIFY` |
 | `pathfinding.ts` | `pathfinding` | `PATHFINDING` |
 | `production.ts` | `production` | `PRODUCTION` |
