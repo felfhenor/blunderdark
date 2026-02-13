@@ -16,6 +16,7 @@
       >
         @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
           <span class="room-label">{{ getRoomName(tile.roomId) }}</span>
+          <app-fear-indicator class="fear-grid-badge" [roomId]="tile.roomId!" />
           @if (getAssignmentInfo(tile.roomId); as info) {
             <span
               class="assignment-badge"

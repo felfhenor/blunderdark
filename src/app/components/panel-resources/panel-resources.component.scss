@@ -51,6 +51,21 @@
   pointer-events: none;
 }
 
+.food-warning {
+  &-low {
+    background: oklch(var(--wa) / 0.15);
+    border: 1px solid oklch(var(--wa) / 0.4);
+    color: oklch(var(--wac, var(--wa)));
+  }
+
+  &-critical {
+    background: oklch(var(--er) / 0.15);
+    border: 1px solid oklch(var(--er) / 0.4);
+    color: oklch(var(--erc, var(--er)));
+    animation: pulse-warning 1.5s ease-in-out infinite;
+  }
+}
+
 @keyframes pulse-warning {
   0%,
   100% {

@@ -1,0 +1,196 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  signal,
+} from '@angular/core';
+import {
+  gamestate,
+  contentGetEntry,
+  hungerIsInappetent,
+  hungerGetConsumptionRate,
+} from '@helpers';
+import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+
+const TOOLTIP_DELAY_MS = 250;
+
+@Component({
+  selector: 'app-hunger-indicator',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @if (shouldShow()) {
+      <span
+        class="hunger-badge"
+        [class]="hungerClass()"
+        (mouseenter)="onMouseEnter()"
+        (mouseleave)="onMouseLeave()"
+      >
+        {{ hungerLabel() }}
+      </span>
+      @if (showTooltip()) {
+        <div class="hunger-tooltip">
+          @if (isInappetent()) {
+            <div class="text-xs opacity-70">Does not eat.</div>
+          } @else {
+            <div class="font-semibold text-xs mb-1">{{ hungerLabel() }}</div>
+            <div class="text-[10px] opacity-70">
+              Consumes {{ consumptionRatePerHour().toFixed(1) }} Food/hr
+            </div>
+            <div class="divider my-0.5 h-0"></div>
+            <div class="text-[10px] opacity-60">{{ hungerEffect() }}</div>
+          }
+        </div>
+      }
+    }
+  `,
+  styles: [
+    `
+      :host {
+        display: inline-block;
+        position: relative;
+      }
+
+      .hunger-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 0 3px;
+        border-radius: 3px;
+        line-height: 14px;
+        white-space: nowrap;
+        cursor: default;
+      }
+
+      .hunger-normal {
+        display: none;
+      }
+
+      .hunger-hungry {
+        background-color: oklch(0.45 0.15 80);
+        color: oklch(0.9 0.05 80);
+      }
+
+      .hunger-starving {
+        background-color: oklch(0.4 0.15 25);
+        color: oklch(0.9 0.05 25);
+      }
+
+      .hunger-inappetent {
+        background-color: oklch(0.35 0.02 260);
+        color: oklch(0.7 0.02 260);
+      }
+
+      .hunger-tooltip {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 50;
+        background: oklch(0.2 0.01 260);
+        border: 1px solid oklch(0.35 0.02 260);
+        border-radius: 6px;
+        padding: 8px;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+      }
+    `,
+  ],
+})
+export class HungerIndicatorComponent {
+  public inhabitantId = input.required<string>();
+
+  private inhabitant = computed(() => {
+    return gamestate().world.inhabitants.find(
+      (i) => i.instanceId === this.inhabitantId(),
+    );
+  });
+
+  private definition = computed(() => {
+    const inh = this.inhabitant();
+    if (!inh) return undefined;
+    return contentGetEntry<InhabitantDefinition & IsContentItem>(
+      inh.definitionId,
+    );
+  });
+
+  public isInappetent = computed(() => {
+    const def = this.definition();
+    return def ? hungerIsInappetent(def.foodConsumptionRate ?? 0) : false;
+  });
+
+  public hungerState = computed(
+    () => this.inhabitant()?.state ?? 'normal',
+  );
+
+  public shouldShow = computed(() => {
+    const state = this.hungerState();
+    return (
+      state === 'hungry' || state === 'starving' || this.isInappetent()
+    );
+  });
+
+  public hungerLabel = computed(() => {
+    if (this.isInappetent()) return 'N/A';
+    switch (this.hungerState()) {
+      case 'hungry':
+        return 'Hungry';
+      case 'starving':
+        return 'Starving';
+      default:
+        return 'Fed';
+    }
+  });
+
+  public hungerClass = computed(() => {
+    if (this.isInappetent()) return 'hunger-inappetent';
+    switch (this.hungerState()) {
+      case 'hungry':
+        return 'hunger-hungry';
+      case 'starving':
+        return 'hunger-starving';
+      default:
+        return 'hunger-normal';
+    }
+  });
+
+  public hungerEffect = computed(() => {
+    switch (this.hungerState()) {
+      case 'hungry':
+        return 'Hungry: -50% production';
+      case 'starving':
+        return 'Starving: -90% production, -50% food consumption';
+      default:
+        return '';
+    }
+  });
+
+  public consumptionRatePerHour = computed(() => {
+    const inh = this.inhabitant();
+    if (!inh) return 0;
+    return hungerGetConsumptionRate(inh.definitionId);
+  });
+
+  public showTooltip = signal(false);
+  private tooltipTimer: ReturnType<typeof setTimeout> | undefined;
+
+  public onMouseEnter(): void {
+    this.clearTimer();
+    this.tooltipTimer = setTimeout(() => {
+      this.showTooltip.set(true);
+    }, TOOLTIP_DELAY_MS);
+  }
+
+  public onMouseLeave(): void {
+    this.clearTimer();
+    this.showTooltip.set(false);
+  }
+
+  private clearTimer(): void {
+    if (this.tooltipTimer) {
+      clearTimeout(this.tooltipTimer);
+      this.tooltipTimer = undefined;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
 import {
   roomPlacementClearPreviewPosition,
   floorCurrent,
@@ -44,6 +45,7 @@ function getRoomColor(roomTypeId: string): string {
 
 @Component({
   selector: 'app-grid',
+  imports: [FearIndicatorComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

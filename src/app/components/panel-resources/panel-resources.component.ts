@@ -10,9 +10,12 @@ import {
   dayNightGetAllActiveModifiers,
   dayNightGetPhaseLabel,
   gamestate,
+  hungerCalculateTotalConsumption,
+  hungerGetWarningLevel,
   productionBreakdowns,
   productionPerMinute,
   productionRates,
+  GAME_TIME_TICKS_PER_MINUTE,
 } from '@helpers';
 import type { DayNightCreatureModifier, DayNightResourceModifier } from '@helpers/day-night-modifiers';
 import type { ResourceType } from '@interfaces';
@@ -92,6 +95,32 @@ export class PanelResourcesComponent {
     const hour = gamestate().clock.hour;
     return dayNightGetAllActiveModifiers(hour);
   });
+
+  public foodWarning = computed(() => {
+    const state = gamestate();
+    const food = state.world.resources.food.current;
+    const totalConsumption = hungerCalculateTotalConsumption(
+      state.world.inhabitants,
+    );
+    const level = hungerGetWarningLevel(food, totalConsumption);
+    if (!level) return undefined;
+
+    let minutesRemaining: number | undefined;
+    if (totalConsumption > 0 && food > 0) {
+      const ticksRemaining = food / totalConsumption;
+      minutesRemaining = Math.floor(ticksRemaining / GAME_TIME_TICKS_PER_MINUTE);
+    }
+
+    return { level, minutesRemaining };
+  });
+
+  public foodWarningDismissed = signal(false);
+
+  public dismissFoodWarning(): void {
+    this.foodWarningDismissed.set(true);
+    // Reset after 60 seconds so it can reappear if condition persists
+    setTimeout(() => this.foodWarningDismissed.set(false), 60_000);
+  }
 
   public activeTooltip = signal<ResourceType | undefined>(undefined);
   private tooltipTimer: ReturnType<typeof setTimeout> | undefined = undefined;

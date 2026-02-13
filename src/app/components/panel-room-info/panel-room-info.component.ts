@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import {
   inhabitantAssignToRoom,
   efficiencyCalculateRoom,
@@ -29,7 +30,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [SweetAlert2Module],
+  imports: [SweetAlert2Module, HungerIndicatorComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

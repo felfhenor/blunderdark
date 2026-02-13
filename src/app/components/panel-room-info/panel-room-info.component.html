@@ -99,7 +99,10 @@
             <div class="flex flex-col gap-1 mb-2">
               @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
                 <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs">{{ inh.name }}</span>
+                  <span class="text-xs flex items-center gap-1">
+                    {{ inh.name }}
+                    <app-hunger-indicator [inhabitantId]="inh.instance.instanceId" />
+                  </span>
                   <button
                     class="btn btn-xs btn-outline btn-error"
                     (click)="onUnassignInhabitant(inh.instance.instanceId)"
