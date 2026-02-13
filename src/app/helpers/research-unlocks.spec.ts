@@ -38,7 +38,6 @@ vi.mock('@helpers/state-game', () => ({
 // --- Imports after mocks ---
 
 import {
-  researchUnlock$,
   researchUnlockApplyEffects,
   researchUnlockGetPassiveBonuses,
   researchUnlockGetRequiredResearchName,
@@ -129,10 +128,12 @@ beforeEach(() => {
   mockContent.clear();
   mockUpdateGamestate.mockReset();
   mockGameState = makeGameState();
-  mockUpdateGamestate.mockImplementation(async (fn: (s: GameState) => GameState) => {
-    mockGameState = fn(mockGameState);
-    return mockGameState;
-  });
+  mockUpdateGamestate.mockImplementation(
+    async (fn: (s: GameState) => GameState) => {
+      mockGameState = fn(mockGameState);
+      return mockGameState;
+    },
+  );
 });
 
 describe('researchUnlockIsUnlocked', () => {
@@ -148,24 +149,36 @@ describe('researchUnlockIsUnlocked', () => {
 
   it('should return true for unlocked inhabitant', () => {
     const content = makeUnlockedContent({ inhabitants: [INHABITANT_ID] });
-    expect(researchUnlockIsUnlocked('inhabitant', INHABITANT_ID, content)).toBe(true);
+    expect(researchUnlockIsUnlocked('inhabitant', INHABITANT_ID, content)).toBe(
+      true,
+    );
   });
 
   it('should return false for locked inhabitant', () => {
     const content = makeUnlockedContent();
-    expect(researchUnlockIsUnlocked('inhabitant', INHABITANT_ID, content)).toBe(false);
+    expect(researchUnlockIsUnlocked('inhabitant', INHABITANT_ID, content)).toBe(
+      false,
+    );
   });
 
   it('should check ability unlock status', () => {
     const content = makeUnlockedContent({ abilities: ['ability-1'] });
-    expect(researchUnlockIsUnlocked('ability', 'ability-1', content)).toBe(true);
-    expect(researchUnlockIsUnlocked('ability', 'ability-2', content)).toBe(false);
+    expect(researchUnlockIsUnlocked('ability', 'ability-1', content)).toBe(
+      true,
+    );
+    expect(researchUnlockIsUnlocked('ability', 'ability-2', content)).toBe(
+      false,
+    );
   });
 
   it('should check upgrade unlock status', () => {
     const content = makeUnlockedContent({ upgrades: ['upgrade-1'] });
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-1', content)).toBe(true);
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-2', content)).toBe(false);
+    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-1', content)).toBe(
+      true,
+    );
+    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-2', content)).toBe(
+      false,
+    );
   });
 
   it('should read from gamestate when no content provided', () => {
@@ -188,7 +201,9 @@ describe('researchUnlockGetPassiveBonuses', () => {
         { bonusType: 'fluxProduction', value: 0.2, description: '+20%' },
       ],
     });
-    expect(researchUnlockGetPassiveBonuses('goldProduction', content)).toBeCloseTo(0.25);
+    expect(
+      researchUnlockGetPassiveBonuses('goldProduction', content),
+    ).toBeCloseTo(0.25);
   });
 
   it('should ignore non-matching bonus types', () => {
@@ -216,14 +231,21 @@ describe('researchUnlockApplyEffects', () => {
   });
 
   it('should add inhabitant unlock', () => {
-    const effects: UnlockEffect[] = [{ type: 'inhabitant', targetId: INHABITANT_ID }];
+    const effects: UnlockEffect[] = [
+      { type: 'inhabitant', targetId: INHABITANT_ID },
+    ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.inhabitants).toEqual([INHABITANT_ID]);
   });
 
   it('should add passive bonus', () => {
     const effects: UnlockEffect[] = [
-      { type: 'passive_bonus', bonusType: 'goldProduction', value: 0.1, description: '+10%' },
+      {
+        type: 'passive_bonus',
+        bonusType: 'goldProduction',
+        value: 0.1,
+        description: '+10%',
+      },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.passiveBonuses).toEqual([
@@ -236,7 +258,12 @@ describe('researchUnlockApplyEffects', () => {
       { type: 'room', targetId: ROOM_ID_A },
       { type: 'room', targetId: ROOM_ID_B },
       { type: 'inhabitant', targetId: INHABITANT_ID },
-      { type: 'passive_bonus', bonusType: 'test', value: 0.5, description: 'test' },
+      {
+        type: 'passive_bonus',
+        bonusType: 'test',
+        value: 0.5,
+        description: 'test',
+      },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.rooms).toEqual([ROOM_ID_A, ROOM_ID_B]);
@@ -252,13 +279,17 @@ describe('researchUnlockApplyEffects', () => {
   });
 
   it('should add ability unlock', () => {
-    const effects: UnlockEffect[] = [{ type: 'ability', targetId: 'ability-1' }];
+    const effects: UnlockEffect[] = [
+      { type: 'ability', targetId: 'ability-1' },
+    ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.abilities).toEqual(['ability-1']);
   });
 
   it('should add upgrade unlock', () => {
-    const effects: UnlockEffect[] = [{ type: 'upgrade', targetId: 'upgrade-1' }];
+    const effects: UnlockEffect[] = [
+      { type: 'upgrade', targetId: 'upgrade-1' },
+    ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.upgrades).toEqual(['upgrade-1']);
   });
@@ -285,7 +316,9 @@ describe('researchUnlockIsResearchGated', () => {
     });
     mockContent.set(node.id, node);
     expect(researchUnlockIsResearchGated('room', INHABITANT_ID)).toBe(false);
-    expect(researchUnlockIsResearchGated('inhabitant', INHABITANT_ID)).toBe(true);
+    expect(researchUnlockIsResearchGated('inhabitant', INHABITANT_ID)).toBe(
+      true,
+    );
   });
 });
 
@@ -296,13 +329,17 @@ describe('researchUnlockGetRequiredResearchName', () => {
       unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
     });
     mockContent.set(node.id, node);
-    expect(researchUnlockGetRequiredResearchName('room', ROOM_ID_A)).toBe('Dark Arts');
+    expect(researchUnlockGetRequiredResearchName('room', ROOM_ID_A)).toBe(
+      'Dark Arts',
+    );
   });
 
   it('should return undefined for non-gated content', () => {
     const node = makeResearchNode({ unlocks: [] });
     mockContent.set(node.id, node);
-    expect(researchUnlockGetRequiredResearchName('room', ROOM_ID_A)).toBeUndefined();
+    expect(
+      researchUnlockGetRequiredResearchName('room', ROOM_ID_A),
+    ).toBeUndefined();
   });
 });
 
@@ -318,7 +355,9 @@ describe('researchUnlockOnComplete', () => {
     await researchUnlockOnComplete(NODE_ID);
 
     expect(mockUpdateGamestate).toHaveBeenCalled();
-    expect(mockGameState.world.research.unlockedContent.rooms).toContain(ROOM_ID_A);
+    expect(mockGameState.world.research.unlockedContent.rooms).toContain(
+      ROOM_ID_A,
+    );
   });
 
   it('should not update state if node has no unlocks', async () => {
@@ -341,16 +380,21 @@ describe('researchUnlockOnComplete', () => {
       id: NODE_ID,
       name: 'Soul Manipulation',
       unlocks: [
-        { type: 'passive_bonus', bonusType: 'essenceProduction', value: 0.10, description: '+10%' },
+        {
+          type: 'passive_bonus',
+          bonusType: 'essenceProduction',
+          value: 0.1,
+          description: '+10%',
+        },
       ],
     });
     mockContent.set(NODE_ID, node);
 
     await researchUnlockOnComplete(NODE_ID);
 
-    expect(mockGameState.world.research.unlockedContent.passiveBonuses).toEqual([
-      { bonusType: 'essenceProduction', value: 0.10, description: '+10%' },
-    ]);
+    expect(mockGameState.world.research.unlockedContent.passiveBonuses).toEqual(
+      [{ bonusType: 'essenceProduction', value: 0.1, description: '+10%' }],
+    );
   });
 });
 
@@ -364,7 +408,9 @@ describe('researchUnlockProcessCompletion', () => {
 
     researchUnlockProcessCompletion(NODE_ID, mockGameState);
 
-    expect(mockGameState.world.research.unlockedContent.rooms).toContain(ROOM_ID_A);
+    expect(mockGameState.world.research.unlockedContent.rooms).toContain(
+      ROOM_ID_A,
+    );
   });
 
   it('should not mutate state when node has no unlocks', () => {
@@ -390,16 +436,27 @@ describe('researchUnlockProcessCompletion', () => {
       unlocks: [
         { type: 'room', targetId: ROOM_ID_A },
         { type: 'inhabitant', targetId: INHABITANT_ID },
-        { type: 'passive_bonus', bonusType: 'test', value: 0.1, description: 'test' },
+        {
+          type: 'passive_bonus',
+          bonusType: 'test',
+          value: 0.1,
+          description: 'test',
+        },
       ],
     });
     mockContent.set(NODE_ID, node);
 
     researchUnlockProcessCompletion(NODE_ID, mockGameState);
 
-    expect(mockGameState.world.research.unlockedContent.rooms).toContain(ROOM_ID_A);
-    expect(mockGameState.world.research.unlockedContent.inhabitants).toContain(INHABITANT_ID);
-    expect(mockGameState.world.research.unlockedContent.passiveBonuses).toHaveLength(1);
+    expect(mockGameState.world.research.unlockedContent.rooms).toContain(
+      ROOM_ID_A,
+    );
+    expect(mockGameState.world.research.unlockedContent.inhabitants).toContain(
+      INHABITANT_ID,
+    );
+    expect(
+      mockGameState.world.research.unlockedContent.passiveBonuses,
+    ).toHaveLength(1);
   });
 
   it('should not call updateGamestate (synchronous in-place mutation)', () => {

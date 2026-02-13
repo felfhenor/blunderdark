@@ -18,7 +18,7 @@
       >
         @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
           <span class="room-label" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)">{{ getRoomName(tile.roomId) }}@if (getAssignmentInfo(tile.roomId); as info) {<span class="assignment-inline" [class.status-full]="info.status === 'full'" [class.status-partial]="info.status === 'partial'" [class.status-empty]="info.status === 'empty'"> ({{ info.current }}/{{ info.max === -1 ? '\u221E' : info.max }})</span>}</span>
-          <app-fear-indicator class="fear-grid-badge" [roomId]="tile.roomId!" />
+          <app-fear-indicator class="fear-grid-badge" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)" [roomId]="tile.roomId!" />
         }
         @if (getDoorways(colIdx, rowIdx); as dirs) {
           @if (dirs.has('top')) {

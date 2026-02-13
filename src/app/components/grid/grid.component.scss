@@ -85,6 +85,15 @@
   }
 }
 
+@keyframes hallway-glow {
+  from {
+    box-shadow: 0 0 8px 2px oklch(0.5 0.12 240 / 0.5);
+  }
+  to {
+    box-shadow: 0 0 12px 4px oklch(0.55 0.15 240 / 0.7);
+  }
+}
+
 @keyframes selection-pulse {
   0%, 100% {
     outline-color: var(--pf, #6a6a9a);
@@ -108,11 +117,6 @@
   position: relative;
   overflow: visible;
 
-  &:hover {
-    background-color: var(--p, #4a4a6a);
-    opacity: 0.7;
-  }
-
   &.occupied {
     background-color: var(--s, #5a5a8a);
   }
@@ -130,23 +134,19 @@
   }
 
   &.preview-valid {
-    background-color: oklch(var(--su));
+    background-color: var(--color-success);
     opacity: 0.7;
   }
 
   &.preview-invalid {
-    background-color: oklch(var(--er));
+    background-color: var(--color-error);
     opacity: 0.7;
   }
 
-  &.hallway-source {
-    outline: 2px solid oklch(var(--in));
-    outline-offset: -2px;
-  }
-
   &.hallway-path {
-    background-color: oklch(var(--in));
-    opacity: 0.8;
+    background-color: oklch(0.45 0.08 240) !important;
+    box-shadow: 0 0 8px 2px oklch(0.5 0.12 240 / 0.5);
+    animation: hallway-glow 1s ease-in-out infinite alternate;
   }
 
   &.border-edge-top {
@@ -168,7 +168,7 @@
 
 .doorway {
   position: absolute;
-  background-color: oklch(var(--wa));
+  background-color: var(--color-warning);
   z-index: 2;
   pointer-events: none;
   border-radius: 1px;
@@ -204,7 +204,7 @@
 
 .room-label {
   position: absolute;
-  bottom: calc(100% + 2px);
+  bottom: 100%;
   left: calc(50% + var(--room-center-offset, 0px));
   transform: translateX(-50%);
   font-size: 11px;
@@ -223,8 +223,9 @@
 
 .fear-grid-badge {
   position: absolute;
-  top: -4px;
-  right: 2px;
+  top: 2px;
+  left: calc(50% + var(--room-center-offset, 0px));
+  transform: translateX(-50%);
   z-index: 3;
   pointer-events: auto;
 }
@@ -233,14 +234,14 @@
   font-weight: 400;
 
   &.status-full {
-    color: oklch(var(--su));
+    color: var(--color-success);
   }
 
   &.status-partial {
-    color: oklch(var(--wa));
+    color: var(--color-warning);
   }
 
   &.status-empty {
-    color: oklch(var(--er));
+    color: var(--color-error);
   }
 }

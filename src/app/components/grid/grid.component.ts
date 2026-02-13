@@ -150,25 +150,35 @@ export class GridComponent {
 
   private roomLabelTileMap = computed(() => {
     const grid = this.grid();
-    const anchorMap = new Map<string, string>();
-    const tilesMap = new Map<string, { minX: number; maxX: number; anchorX: number }>();
+    const bounds = new Map<string, { minX: number; maxX: number; minY: number; anchorX: number }>();
 
-    for (let x = 0; x < grid[0]?.length; x++) {
-      for (let y = 0; y < grid.length; y++) {
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[y]?.length; x++) {
         const roomId = grid[y][x].roomId;
         if (!roomId) continue;
 
-        if (!anchorMap.has(roomId)) {
-          anchorMap.set(roomId, `${x},${y}`);
-          tilesMap.set(roomId, { minX: x, maxX: x, anchorX: x });
+        const entry = bounds.get(roomId);
+        if (!entry) {
+          bounds.set(roomId, { minX: x, maxX: x, minY: y, anchorX: x });
         } else {
-          const entry = tilesMap.get(roomId)!;
           if (x < entry.minX) entry.minX = x;
           if (x > entry.maxX) entry.maxX = x;
+          if (y < entry.minY) {
+            entry.minY = y;
+            entry.anchorX = x;
+          } else if (y === entry.minY && x < entry.anchorX) {
+            entry.anchorX = x;
+          }
         }
       }
     }
-    return { anchorMap, tilesMap };
+
+    const anchorMap = new Map<string, string>();
+    for (const [roomId, entry] of bounds) {
+      anchorMap.set(roomId, `${entry.anchorX},${entry.minY}`);
+    }
+
+    return { anchorMap, tilesMap: bounds };
   });
 
   public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {

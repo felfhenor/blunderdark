@@ -1,25 +1,22 @@
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from '@angular/core';
-import {
-  fearLevelBreakdownMap,
-  fearLevelGetLabel,
-} from '@helpers';
+import { fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
 import type { FearLevelBreakdown } from '@helpers/fear-level';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-fear-indicator',
-  imports: [TippyDirective],
+  imports: [TippyDirective, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (fearLevel() > 0) {
       <span
-        class="fear-badge"
-        [class]="fearClass()"
+        [ngClass]="['fear-badge', fearClass()]"
         [tp]="fearTip"
         [tpDelay]="250"
         [tpClassName]="'game-tooltip'"
@@ -38,7 +35,8 @@ import { TippyDirective } from '@ngneat/helipopper';
               class="text-xs"
               [class]="b.inhabitantModifier > 0 ? 'text-error' : 'text-success'"
             >
-              Inhabitants: {{ b.inhabitantModifier > 0 ? '+' : '' }}{{ b.inhabitantModifier }}
+              Inhabitants: {{ b.inhabitantModifier > 0 ? '+' : ''
+              }}{{ b.inhabitantModifier }}
             </div>
           }
           @if (b.upgradeAdjustment !== 0) {
@@ -46,7 +44,8 @@ import { TippyDirective } from '@ngneat/helipopper';
               class="text-xs"
               [class]="b.upgradeAdjustment > 0 ? 'text-error' : 'text-success'"
             >
-              Upgrades: {{ b.upgradeAdjustment > 0 ? '+' : '' }}{{ b.upgradeAdjustment }}
+              Upgrades: {{ b.upgradeAdjustment > 0 ? '+' : ''
+              }}{{ b.upgradeAdjustment }}
             </div>
           }
           @if (b.altarAuraReduction !== 0) {
@@ -64,7 +63,7 @@ import { TippyDirective } from '@ngneat/helipopper';
               </div>
             }
           }
-          <hr class="fear-divider">
+          <hr class="fear-divider" />
           <div class="text-xs opacity-60">{{ fearEffect() }}</div>
         }
       </ng-template>
@@ -90,13 +89,13 @@ import { TippyDirective } from '@ngneat/helipopper';
       }
 
       .fear-low {
-        background-color: oklch(var(--su));
-        color: oklch(var(--suc, 0.9 0.05 145));
+        background-color: var(--color-success);
+        color: var(--color-success-content);
       }
 
       .fear-medium {
-        background-color: oklch(var(--wa));
-        color: oklch(var(--wac, 0.9 0.05 80));
+        background-color: var(--color-warning);
+        color: var(--color-warning-content);
       }
 
       .fear-high {
@@ -105,12 +104,12 @@ import { TippyDirective } from '@ngneat/helipopper';
       }
 
       .fear-very-high {
-        background-color: oklch(var(--er));
-        color: oklch(var(--erc, 0.9 0.05 25));
+        background-color: var(--color-error);
+        color: var(--color-error-content);
       }
 
       .fear-divider {
-        border-color: oklch(var(--bc) / 0.2);
+        border-color: var(--color-base-content / 0.2);
         margin: 4px 0;
       }
     `,
