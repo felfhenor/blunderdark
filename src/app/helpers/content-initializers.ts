@@ -270,7 +270,7 @@ function ensureInvader(
     description: invader.description ?? '',
     invaderClass: invader.invaderClass ?? 'warrior',
     baseStats: invader.baseStats ?? { hp: 0, attack: 0, defense: 0, speed: 0 },
-    abilityIds: invader.abilityIds ?? [],
+    combatAbilityIds: invader.combatAbilityIds ?? [],
     sprite: invader.sprite ?? 'UNKNOWN',
   };
 }

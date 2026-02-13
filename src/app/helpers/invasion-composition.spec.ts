@@ -100,7 +100,7 @@ function makeDef(
     description: '',
     invaderClass: cls,
     baseStats: { hp: 20, attack: 5, defense: 5, speed: 5 },
-    abilityIds: [],
+    combatAbilityIds: [],
     sprite: 'test',
   };
 }

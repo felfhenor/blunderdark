@@ -10,7 +10,7 @@ export type ResearchContent = IsContentItem &
     id: ResearchId;
     branch: ResearchBranch;
     cost: ResourceCost;
-    prerequisiteResearchIds: string[];
+    prerequisiteResearchIds: ResearchId[];
     unlocks: string[];
     tier: number;
   };

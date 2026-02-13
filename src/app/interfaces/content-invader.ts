@@ -1,4 +1,5 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { InvaderClassType, InvaderStats } from '@interfaces/invader';
 import type { HasDescription } from '@interfaces/traits';
@@ -11,5 +12,5 @@ export type InvaderContent = IsContentItem &
     id: InvaderId;
     invaderClass: InvaderClassType;
     baseStats: InvaderStats;
-    abilityIds: string[];
+    combatAbilityIds: CombatAbilityId[];
   };

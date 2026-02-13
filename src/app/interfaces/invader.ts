@@ -21,7 +21,7 @@ export type InvaderDefinition = {
   description: string;
   invaderClass: InvaderClassType;
   baseStats: InvaderStats;
-  abilityIds: string[];
+  combatAbilityIds: string[];
   sprite: string;
 };
 

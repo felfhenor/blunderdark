@@ -8,7 +8,7 @@
     attack: 8
     defense: 7
     speed: 3
-  abilityIds:
+  combatAbilityIds:
     - Shield Wall
   sprite: invader-warrior
 
@@ -22,7 +22,7 @@
     attack: 6
     defense: 3
     speed: 10
-  abilityIds:
+  combatAbilityIds:
     - Disarm Trap
     - Backstab
   sprite: invader-rogue
@@ -37,7 +37,7 @@
     attack: 10
     defense: 2
     speed: 5
-  abilityIds:
+  combatAbilityIds:
     - Arcane Bolt
     - Dispel
   sprite: invader-mage
@@ -52,7 +52,7 @@
     attack: 4
     defense: 8
     speed: 4
-  abilityIds:
+  combatAbilityIds:
     - Heal
     - Turn Undead
   sprite: invader-cleric
@@ -67,7 +67,7 @@
     attack: 7
     defense: 9
     speed: 2
-  abilityIds:
+  combatAbilityIds:
     - Smite Evil
     - Aura of Courage
   sprite: invader-paladin
@@ -82,7 +82,7 @@
     attack: 7
     defense: 4
     speed: 9
-  abilityIds:
+  combatAbilityIds:
     - Scout
     - Mark Target
   sprite: invader-ranger

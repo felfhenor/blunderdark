@@ -254,7 +254,7 @@ function makeInvaderDef(
     description: 'test warrior',
     invaderClass: 'warrior',
     baseStats: { hp: 30, attack: 8, defense: 7, speed: 3 },
-    abilityIds: [SHIELD_WALL_ID],
+    combatAbilityIds: [SHIELD_WALL_ID],
     sprite: 'invader-warrior',
     ...overrides,
   };
@@ -267,7 +267,7 @@ const rogueDef = makeInvaderDef({
   name: 'Rogue',
   invaderClass: 'rogue',
   baseStats: { hp: 15, attack: 6, defense: 3, speed: 10 },
-  abilityIds: [DISARM_TRAP_ID, BACKSTAB_ID],
+  combatAbilityIds: [DISARM_TRAP_ID, BACKSTAB_ID],
   sprite: 'invader-rogue',
 });
 
@@ -276,7 +276,7 @@ const mageDef = makeInvaderDef({
   name: 'Mage',
   invaderClass: 'mage',
   baseStats: { hp: 12, attack: 10, defense: 2, speed: 5 },
-  abilityIds: [ARCANE_BOLT_ID, DISPEL_ID],
+  combatAbilityIds: [ARCANE_BOLT_ID, DISPEL_ID],
   sprite: 'invader-mage',
 });
 
@@ -285,7 +285,7 @@ const clericDef = makeInvaderDef({
   name: 'Cleric',
   invaderClass: 'cleric',
   baseStats: { hp: 20, attack: 4, defense: 8, speed: 4 },
-  abilityIds: [HEAL_ID, TURN_UNDEAD_ID],
+  combatAbilityIds: [HEAL_ID, TURN_UNDEAD_ID],
   sprite: 'invader-cleric',
 });
 
@@ -294,7 +294,7 @@ const paladinDef = makeInvaderDef({
   name: 'Paladin',
   invaderClass: 'paladin',
   baseStats: { hp: 28, attack: 7, defense: 9, speed: 2 },
-  abilityIds: [SMITE_EVIL_ID, AURA_OF_COURAGE_ID],
+  combatAbilityIds: [SMITE_EVIL_ID, AURA_OF_COURAGE_ID],
   sprite: 'invader-paladin',
 });
 
@@ -303,7 +303,7 @@ const rangerDef = makeInvaderDef({
   name: 'Ranger',
   invaderClass: 'ranger',
   baseStats: { hp: 18, attack: 7, defense: 4, speed: 9 },
-  abilityIds: [SCOUT_ID, MARK_TARGET_ID],
+  combatAbilityIds: [SCOUT_ID, MARK_TARGET_ID],
   sprite: 'invader-ranger',
 });
 
@@ -401,31 +401,31 @@ describe('Invader definitions', () => {
     expect(warrior.invaderClass).toBe('warrior');
     expect(warrior.baseStats.hp).toBe(30);
     expect(warrior.baseStats.attack).toBe(8);
-    expect(warrior.abilityIds).toContain(SHIELD_WALL_ID);
+    expect(warrior.combatAbilityIds).toContain(SHIELD_WALL_ID);
   });
 
   it('Rogue has high speed and two abilities', () => {
     const rogue = invaderGetDefinitionById(ROGUE_ID)!;
     expect(rogue.invaderClass).toBe('rogue');
     expect(rogue.baseStats.speed).toBe(10);
-    expect(rogue.abilityIds).toContain(DISARM_TRAP_ID);
-    expect(rogue.abilityIds).toContain(BACKSTAB_ID);
+    expect(rogue.combatAbilityIds).toContain(DISARM_TRAP_ID);
+    expect(rogue.combatAbilityIds).toContain(BACKSTAB_ID);
   });
 
   it('Mage has high attack and magic abilities', () => {
     const mage = invaderGetDefinitionById(MAGE_ID)!;
     expect(mage.invaderClass).toBe('mage');
     expect(mage.baseStats.attack).toBe(10);
-    expect(mage.abilityIds).toContain(ARCANE_BOLT_ID);
-    expect(mage.abilityIds).toContain(DISPEL_ID);
+    expect(mage.combatAbilityIds).toContain(ARCANE_BOLT_ID);
+    expect(mage.combatAbilityIds).toContain(DISPEL_ID);
   });
 
   it('Cleric has high defense and healing/anti-undead abilities', () => {
     const cleric = invaderGetDefinitionById(CLERIC_ID)!;
     expect(cleric.invaderClass).toBe('cleric');
     expect(cleric.baseStats.defense).toBe(8);
-    expect(cleric.abilityIds).toContain(HEAL_ID);
-    expect(cleric.abilityIds).toContain(TURN_UNDEAD_ID);
+    expect(cleric.combatAbilityIds).toContain(HEAL_ID);
+    expect(cleric.combatAbilityIds).toContain(TURN_UNDEAD_ID);
   });
 
   it('Paladin has high HP/defense and anti-corruption abilities', () => {
@@ -433,16 +433,16 @@ describe('Invader definitions', () => {
     expect(paladin.invaderClass).toBe('paladin');
     expect(paladin.baseStats.hp).toBe(28);
     expect(paladin.baseStats.defense).toBe(9);
-    expect(paladin.abilityIds).toContain(SMITE_EVIL_ID);
-    expect(paladin.abilityIds).toContain(AURA_OF_COURAGE_ID);
+    expect(paladin.combatAbilityIds).toContain(SMITE_EVIL_ID);
+    expect(paladin.combatAbilityIds).toContain(AURA_OF_COURAGE_ID);
   });
 
   it('Ranger has high speed and scouting abilities', () => {
     const ranger = invaderGetDefinitionById(RANGER_ID)!;
     expect(ranger.invaderClass).toBe('ranger');
     expect(ranger.baseStats.speed).toBe(9);
-    expect(ranger.abilityIds).toContain(SCOUT_ID);
-    expect(ranger.abilityIds).toContain(MARK_TARGET_ID);
+    expect(ranger.combatAbilityIds).toContain(SCOUT_ID);
+    expect(ranger.combatAbilityIds).toContain(MARK_TARGET_ID);
   });
 });
 

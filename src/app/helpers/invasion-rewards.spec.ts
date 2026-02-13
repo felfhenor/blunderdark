@@ -292,7 +292,7 @@ describe('invasion-rewards', () => {
         name: 'Warrior',
         invaderClass: 'warrior',
         baseStats: { hp: 20, attack: 8, defense: 5, speed: 3 },
-        abilityIds: [],
+        combatAbilityIds: [],
         sprite: 'warrior.png',
       });
       mockContent.set('def-rogue', {
@@ -300,7 +300,7 @@ describe('invasion-rewards', () => {
         name: 'Rogue',
         invaderClass: 'rogue',
         baseStats: { hp: 15, attack: 10, defense: 3, speed: 6 },
-        abilityIds: [],
+        combatAbilityIds: [],
         sprite: 'rogue.png',
       });
     });
