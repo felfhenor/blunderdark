@@ -29,6 +29,7 @@
     - Basic Engineering
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: eb8b543e-0b7d-47f8-9192-7fba92e9ea34
   name: Trap Design
@@ -41,6 +42,7 @@
     - Basic Engineering
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: 7c76338a-a73a-4b12-a726-beec4e93974d
   name: Advanced Manufacturing
@@ -53,6 +55,7 @@
     - Basic Engineering
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 # --- TIER 3: Specializations ---
 
@@ -67,6 +70,7 @@
     - Advanced Construction
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: 687957be-a605-4d0d-811e-591a71f21300
   name: Automated Defenses
@@ -79,6 +83,7 @@
     - Trap Design
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: e1af3b41-800b-4190-82de-7e8a2e626986
   name: Dark Forge
@@ -91,6 +96,7 @@
     - Advanced Manufacturing
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 # --- TIER 4: Advanced combinations ---
 
@@ -107,6 +113,7 @@
     - Trap Design
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 - id: c1509327-9bf8-41ad-b674-9c79137fe3b9
   name: Mechanical Sentinels
@@ -121,6 +128,7 @@
     - Trap Design
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 - id: 0493134f-837b-4636-909a-ca334d605466
   name: Golem Assembly
@@ -135,6 +143,7 @@
     - Master Architecture
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -151,6 +160,7 @@
     - Mechanical Sentinels
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 - id: 4caa2af0-5ecd-48f5-b012-0223c2d3bb79
   name: Industrial Mastery
@@ -165,6 +175,7 @@
     - Siege Works
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -181,3 +192,4 @@
     - Industrial Mastery
   unlocks: []
   tier: 6
+  requiredTicks: 1000

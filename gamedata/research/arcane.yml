@@ -29,6 +29,7 @@
     - Arcane Basics
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: 7a2ebad7-c9ab-4718-a456-0562b7a8da6d
   name: Ley Line Tapping
@@ -41,6 +42,7 @@
     - Arcane Basics
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: 85974131-d05e-4b8e-81f5-4ae3247e781a
   name: Enchantment
@@ -53,6 +55,7 @@
     - Arcane Basics
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 # --- TIER 3: Specializations ---
 
@@ -67,6 +70,7 @@
     - Flux Manipulation
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: e318e918-eb4f-4d0b-823e-360ddf1dfe80
   name: Elemental Binding
@@ -79,6 +83,7 @@
     - Ley Line Tapping
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: 21df8436-d4be-4f55-b2eb-217dfec171a0
   name: Warding
@@ -91,6 +96,7 @@
     - Enchantment
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 # --- TIER 4: Advanced combinations ---
 
@@ -107,6 +113,7 @@
     - Enchantment
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 - id: 3bae2f3c-511a-4afd-9f52-8f4839dc847f
   name: Ley Line Mastery
@@ -121,6 +128,7 @@
     - Ley Line Tapping
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 - id: 575be533-699f-492f-81f9-3cd003a0e822
   name: Spellweave Lattice
@@ -135,6 +143,7 @@
     - Arcane Amplification
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -151,6 +160,7 @@
     - Ley Line Mastery
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 - id: a0d84b13-668d-4cfc-9ed9-79355f70d484
   name: Planar Nexus
@@ -165,6 +175,7 @@
     - Dimensional Studies
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -181,3 +192,4 @@
     - Planar Nexus
   unlocks: []
   tier: 6
+  requiredTicks: 1000

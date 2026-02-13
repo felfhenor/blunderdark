@@ -46,6 +46,7 @@ export * from './production';
 export * from './production-modifiers';
 export * from './recruitment';
 export * from './reputation';
+export * from './research-progress';
 export * from './resources';
 export * from './rng';
 export * from './room-placement';

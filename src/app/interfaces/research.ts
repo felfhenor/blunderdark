@@ -11,6 +11,7 @@ export type ResearchNode = {
   prerequisiteResearchIds: string[];
   unlocks: string[];
   tier: number;
+  requiredTicks: number;
 };
 
 export type ResearchTree = {

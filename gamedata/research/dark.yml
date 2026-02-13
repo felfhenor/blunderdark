@@ -29,6 +29,7 @@
     - Dark Arts Fundamentals
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: 1b956dec-e63e-467d-bd4d-20541f157d40
   name: Shadow Magic
@@ -41,6 +42,7 @@
     - Dark Arts Fundamentals
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 - id: 303c1628-2834-4abf-a1e2-617fb554d151
   name: Necromancy
@@ -53,6 +55,7 @@
     - Dark Arts Fundamentals
   unlocks: []
   tier: 2
+  requiredTicks: 150
 
 # --- TIER 3: Specializations ---
 
@@ -67,6 +70,7 @@
     - Necromancy
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: 8a4edb8b-65bb-4d08-a30c-45097e1e8483
   name: Soul Well
@@ -79,6 +83,7 @@
     - Soul Manipulation
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 - id: b4b92c13-7086-471f-8855-5c01301e73ea
   name: Corruption Control
@@ -92,6 +97,7 @@
     - Shadow Magic
   unlocks: []
   tier: 3
+  requiredTicks: 300
 
 # --- TIER 4: Advanced combinations ---
 
@@ -108,6 +114,7 @@
     - Soul Well
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 - id: 7758e38b-773b-426a-863e-c154566a49fa
   name: Shadow Weaving
@@ -122,6 +129,7 @@
     - Corruption Control
   unlocks: []
   tier: 4
+  requiredTicks: 500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -138,6 +146,7 @@
     - Shadow Weaving
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge
@@ -151,6 +160,7 @@
     - Dark Rituals
   unlocks: []
   tier: 5
+  requiredTicks: 750
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -167,3 +177,4 @@
     - Soul Forge
   unlocks: []
   tier: 6
+  requiredTicks: 1000

@@ -9,6 +9,7 @@ import { gameTimeAdvanceClock } from '@helpers/game-time';
 import { hungerProcess, hungerProcessWarnings } from '@helpers/hunger';
 import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
+import { researchProcess } from '@helpers/research-progress';
 import { trainingProcess } from '@helpers/training';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { debug } from '@helpers/logging';
@@ -63,6 +64,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     corruptionGenerationProcess(state);
     corruptionEffectProcess(state);
     corruptionThresholdProcess(state);
+    researchProcess(state);
     trainingProcess(state);
     trapWorkshopProcess(state);
     invasionTriggerProcessSchedule(state);

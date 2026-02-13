@@ -64,6 +64,7 @@ function ensureResearch(
     prerequisiteResearchIds: node.prerequisiteResearchIds ?? [],
     unlocks: node.unlocks ?? [],
     tier: node.tier ?? 1,
+    requiredTicks: node.requiredTicks ?? 50,
   };
 }
 
