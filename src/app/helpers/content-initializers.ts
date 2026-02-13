@@ -1,4 +1,3 @@
-import { defaultStats } from '@helpers/defaults';
 import type {
   AbilityEffectDefinition,
   CombatAbility,
@@ -13,7 +12,6 @@ import type {
   RoomShape,
   Season,
   SeasonBonusDefinition,
-  StatBlock,
   SynergyDefinition,
   TrapDefinition,
 } from '@interfaces';
@@ -34,10 +32,6 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   synergy: ensureSynergy,
   trap: ensureTrap,
 };
-
-function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
-  return Object.assign({}, defaultStats(), statblock);
-}
 
 export function ensureContent<T extends IsContentItem>(content: T): T {
   const init = initializers[content.__type];
