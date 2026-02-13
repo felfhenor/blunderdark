@@ -5,6 +5,7 @@ export type ContentType =
   | 'invader'
   | 'invasion'
   | 'reputationaction'
+  | 'reputationeffect'
   | 'research'
   | 'room'
   | 'roomshape'

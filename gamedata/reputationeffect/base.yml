@@ -1,0 +1,148 @@
+# Reputation effects define gameplay consequences at reputation level thresholds.
+# effectType: unlock_room, modify_event_rate, attract_creature, modify_production, modify_invasion_rate
+# effectValue: multiplier (1.25 = +25%), flat bonus, or boolean (1 = enabled)
+
+# --- TERROR effects ---
+- id: 2df1db1c-3e1a-471d-945c-e52355b9266b
+  name: Terror - Increased Invasions
+  description: Your fearsome reputation draws more frequent invasions from would-be heroes.
+  reputationType: terror
+  minimumLevel: high
+  effectType: modify_invasion_rate
+  effectValue: 1.25
+
+- id: cfd7f3e2-7bbb-43d6-ae28-d0cc52c04eab
+  name: Terror - Dark Invasions
+  description: Dark invasion variant events become possible as your terror grows.
+  reputationType: terror
+  minimumLevel: high
+  effectType: modify_event_rate
+  effectValue: 1
+
+- id: 81e6b8e8-f8a7-455c-9dbb-5b31ad4a1ed1
+  name: Terror - Unlock Torture Chamber
+  description: Your reputation for cruelty unlocks the ability to build a Torture Chamber.
+  reputationType: terror
+  minimumLevel: high
+  effectType: unlock_room
+  effectValue: 1
+  targetId: Torture Chamber
+
+- id: 8094567d-5d41-47d9-9c7b-0c6908605838
+  name: Terror - Legendary Dark Invasions
+  description: Legendary terror doubles the frequency of dark invasion events.
+  reputationType: terror
+  minimumLevel: legendary
+  effectType: modify_invasion_rate
+  effectValue: 2.0
+
+# --- WEALTH effects ---
+- id: c89d06fa-fbe7-469a-8517-e83153a37a0c
+  name: Wealth - Thief Raids
+  description: Word of your riches attracts thief raid events that steal gold if undefended.
+  reputationType: wealth
+  minimumLevel: high
+  effectType: modify_event_rate
+  effectValue: 1
+
+- id: 740900c5-fbfe-4125-8475-3e74ca71e193
+  name: Wealth - Treasure Vault Upgrades
+  description: Your wealth reputation unlocks advanced Treasure Vault room upgrades.
+  reputationType: wealth
+  minimumLevel: high
+  effectType: unlock_room
+  effectValue: 1
+  targetId: Treasure Vault
+
+- id: 8f4ed3df-48f4-437c-8ef0-5934a506f48f
+  name: Wealth - Gold Production Bonus
+  description: Legendary wealth grants a 10% gold production bonus across all rooms.
+  reputationType: wealth
+  minimumLevel: legendary
+  effectType: modify_production
+  effectValue: 1.10
+  targetId: gold
+
+# --- KNOWLEDGE effects ---
+- id: b08a1bf5-c832-4711-ae64-3c09c3f5a864
+  name: Knowledge - Advanced Research
+  description: High knowledge reputation unlocks advanced research tiers.
+  reputationType: knowledge
+  minimumLevel: high
+  effectType: modify_event_rate
+  effectValue: 1
+
+- id: 38c3d27f-82e6-402d-8054-4a286173dcbf
+  name: Knowledge - Research Speed Bonus
+  description: Your scholarly reputation increases research speed by 15%.
+  reputationType: knowledge
+  minimumLevel: high
+  effectType: modify_production
+  effectValue: 0.85
+  targetId: research_speed
+
+- id: 90b087ec-d4ef-47a2-890c-fcc39cbcf28a
+  name: Knowledge - Forbidden Knowledge
+  description: Legendary knowledge unlocks a unique forbidden knowledge research branch.
+  reputationType: knowledge
+  minimumLevel: legendary
+  effectType: modify_event_rate
+  effectValue: 1
+
+# --- HARMONY effects ---
+- id: c26a86cc-1d3b-4f02-b85a-d83e3f84bba4
+  name: Harmony - Reduced Invasions
+  description: Your benevolent reputation discourages invaders, reducing invasion frequency by 30%.
+  reputationType: harmony
+  minimumLevel: high
+  effectType: modify_invasion_rate
+  effectValue: 0.70
+
+- id: 0f9ac25c-12b6-4a14-bf22-05d988d44e51
+  name: Harmony - Peaceful Creatures
+  description: Peaceful creatures are attracted by your harmonious dungeon.
+  reputationType: harmony
+  minimumLevel: high
+  effectType: attract_creature
+  effectValue: 1
+
+- id: b47aaa6a-9b09-4b45-b0a9-d4910193b06d
+  name: Harmony - Legendary Invasion Reduction
+  description: Legendary harmony reduces invasion frequency by 50%.
+  reputationType: harmony
+  minimumLevel: legendary
+  effectType: modify_invasion_rate
+  effectValue: 0.50
+
+- id: 8ad608fa-1448-44b6-b05c-4f21b3fa2206
+  name: Harmony - Unique Peaceful Creatures
+  description: Legendary harmony attracts unique peaceful creature types.
+  reputationType: harmony
+  minimumLevel: legendary
+  effectType: attract_creature
+  effectValue: 2
+
+# --- CHAOS effects ---
+- id: 84685394-41fd-4898-9a1a-c12b50564404
+  name: Chaos - Increased Random Events
+  description: Embracing chaos increases random event frequency by 50%.
+  reputationType: chaos
+  minimumLevel: high
+  effectType: modify_event_rate
+  effectValue: 1.50
+
+- id: fbade86a-ff21-48b0-aa25-4e618cf972cb
+  name: Chaos - Double or Nothing
+  description: Random events have a 20% chance to give double rewards or double penalties.
+  reputationType: chaos
+  minimumLevel: high
+  effectType: modify_event_rate
+  effectValue: 0.20
+
+- id: ca14c428-2841-47b0-bc73-0ac0bfc5ae8e
+  name: Chaos - Chaos Surges
+  description: Legendary chaos triggers chaos surge events that dramatically alter dungeon state.
+  reputationType: chaos
+  minimumLevel: legendary
+  effectType: modify_event_rate
+  effectValue: 1
