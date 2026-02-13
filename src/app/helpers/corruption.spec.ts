@@ -1,5 +1,11 @@
 import { defaultResources } from '@helpers/defaults';
-import type { GameState, ResourceMap } from '@interfaces';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import type {
+  GameState,
+  InhabitantDefinition,
+  InhabitantInstance,
+  ResourceMap,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
@@ -19,16 +25,31 @@ vi.mock('@helpers/state-game', () => {
   };
 });
 
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: vi.fn(),
+}));
+
+vi.mock('@helpers/day-night-modifiers', () => ({
+  dayNightGetResourceModifier: vi.fn(() => 1.0),
+}));
+
 const {
   corruptionAdd,
   corruptionSpend,
   corruptionCanAfford,
   corruptionGetLevel,
   corruptionGetLevelDescription,
+  corruptionGenerationCalculateInhabitantRate,
+  corruptionGenerationProcess,
+  corruptionGenerationCalculateTotalPerMinute,
   CORRUPTION_THRESHOLD_MEDIUM,
   CORRUPTION_THRESHOLD_HIGH,
   CORRUPTION_THRESHOLD_CRITICAL,
 } = await import('@helpers/corruption');
+
+const { dayNightGetResourceModifier } = await import(
+  '@helpers/day-night-modifiers'
+);
 
 describe('corruptionAdd', () => {
   beforeEach(() => {
@@ -156,5 +177,205 @@ describe('corruptionGetLevelDescription', () => {
     const high = corruptionGetLevelDescription('high');
     const critical = corruptionGetLevelDescription('critical');
     expect(new Set([low, medium, high, critical]).size).toBe(4);
+  });
+});
+
+describe('corruptionGenerationCalculateInhabitantRate', () => {
+  function makeDef(overrides: Partial<InhabitantDefinition> = {}): InhabitantDefinition {
+    return {
+      id: 'def-1',
+      name: 'Test',
+      type: 'creature',
+      tier: 1,
+      description: '',
+      cost: {},
+      stats: { hp: 10, attack: 5, defense: 5, speed: 5, workerEfficiency: 1.0 },
+      traits: [],
+      restrictionTags: [],
+      rulerBonuses: {},
+      rulerFearLevel: 0,
+      ...overrides,
+    };
+  }
+
+  function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
+    return {
+      instanceId: 'inst-1',
+      definitionId: 'def-1',
+      name: 'Test',
+      state: 'normal',
+      assignedRoomId: undefined,
+      ...overrides,
+    };
+  }
+
+  it('should return 0 for no inhabitants', () => {
+    const rate = corruptionGenerationCalculateInhabitantRate([], () => undefined);
+    expect(rate).toBe(0);
+  });
+
+  it('should return 0 for unstationed inhabitants', () => {
+    const inst = makeInst({ assignedRoomId: undefined });
+    const def = makeDef({ corruptionGeneration: 5 });
+    const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
+    expect(rate).toBe(0);
+  });
+
+  it('should calculate rate for stationed Skeleton (1/min)', () => {
+    const inst = makeInst({ assignedRoomId: 'room-1', definitionId: 'skeleton' });
+    const def = makeDef({ corruptionGeneration: 1 });
+    const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
+    // 1 per minute / 5 ticks per minute = 0.2 per tick
+    expect(rate).toBeCloseTo(1 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should calculate rate for stationed Demon Lord (10/min)', () => {
+    const inst = makeInst({ assignedRoomId: 'room-1', definitionId: 'demon-lord' });
+    const def = makeDef({ corruptionGeneration: 10 });
+    const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
+    // 10 per minute / 5 ticks per minute = 2.0 per tick
+    expect(rate).toBeCloseTo(10 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should sum multiple stationed inhabitants', () => {
+    const inhabitants = [
+      makeInst({ instanceId: 'i1', assignedRoomId: 'room-1', definitionId: 'skeleton' }),
+      makeInst({ instanceId: 'i2', assignedRoomId: 'room-2', definitionId: 'skeleton' }),
+    ];
+    const def = makeDef({ corruptionGeneration: 1 });
+    const rate = corruptionGenerationCalculateInhabitantRate(inhabitants, () => def);
+    // 2 per minute total / 5 = 0.4 per tick
+    expect(rate).toBeCloseTo(2 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should ignore inhabitants with no corruption generation', () => {
+    const inst = makeInst({ assignedRoomId: 'room-1' });
+    const def = makeDef({ corruptionGeneration: 0 });
+    const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
+    expect(rate).toBe(0);
+  });
+
+  it('should ignore inhabitants with undefined corruption generation', () => {
+    const inst = makeInst({ assignedRoomId: 'room-1' });
+    const def = makeDef();
+    const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
+    expect(rate).toBe(0);
+  });
+});
+
+describe('corruptionGenerationProcess', () => {
+  function makeState(
+    inhabitants: InhabitantInstance[],
+    hour = 12,
+    corruptionCurrent = 0,
+  ): GameState {
+    return {
+      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour, minute: 0 },
+      world: {
+        resources: {
+          ...defaultResources(),
+          corruption: { current: corruptionCurrent, max: Number.MAX_SAFE_INTEGER },
+        },
+        inhabitants,
+      },
+    } as unknown as GameState;
+  }
+
+  function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
+    return {
+      instanceId: 'inst-1',
+      definitionId: 'skeleton-def',
+      name: 'Skeleton',
+      state: 'normal',
+      assignedRoomId: 'room-1',
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.0);
+  });
+
+  it('should do nothing with no inhabitants', () => {
+    const state = makeState([]);
+    corruptionGenerationProcess(state);
+    expect(state.world.resources.corruption.current).toBe(0);
+  });
+
+  it('should add corruption from stationed Skeleton (1/min)', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'skeleton-def',
+      name: 'Skeleton',
+      __type: 'inhabitant',
+      type: 'undead',
+      tier: 1,
+      description: '',
+      cost: {},
+      stats: { hp: 40, attack: 12, defense: 15, speed: 6, workerEfficiency: 0.7 },
+      traits: [],
+      restrictionTags: [],
+      rulerBonuses: {},
+      rulerFearLevel: 0,
+      corruptionGeneration: 1,
+    } as unknown as ReturnType<typeof contentGetEntry>);
+
+    const state = makeState([makeInst()]);
+    corruptionGenerationProcess(state);
+    // 1/min / 5 ticks/min = 0.2 per tick
+    expect(state.world.resources.corruption.current).toBeCloseTo(0.2);
+  });
+
+  it('should apply night modifier (+50%)', async () => {
+    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.5);
+
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'skeleton-def',
+      name: 'Skeleton',
+      __type: 'inhabitant',
+      type: 'undead',
+      tier: 1,
+      description: '',
+      cost: {},
+      stats: { hp: 40, attack: 12, defense: 15, speed: 6, workerEfficiency: 0.7 },
+      traits: [],
+      restrictionTags: [],
+      rulerBonuses: {},
+      rulerFearLevel: 0,
+      corruptionGeneration: 1,
+    } as unknown as ReturnType<typeof contentGetEntry>);
+
+    const state = makeState([makeInst()], 22);
+    corruptionGenerationProcess(state);
+    // 0.2 per tick * 1.5 night = 0.3
+    expect(state.world.resources.corruption.current).toBeCloseTo(0.3);
+  });
+
+  it('should not add corruption from unstationed inhabitants', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'skeleton-def',
+      name: 'Skeleton',
+      __type: 'inhabitant',
+      corruptionGeneration: 1,
+    } as unknown as ReturnType<typeof contentGetEntry>);
+
+    const state = makeState([makeInst({ assignedRoomId: undefined })]);
+    corruptionGenerationProcess(state);
+    expect(state.world.resources.corruption.current).toBe(0);
+  });
+});
+
+describe('corruptionGenerationCalculateTotalPerMinute', () => {
+  it('should combine inhabitant and room rates into per-minute', () => {
+    // 0.2 per tick (inhabitant) + 0.4 per tick (room) = 0.6 per tick
+    // 0.6 * 5 = 3.0 per minute
+    const total = corruptionGenerationCalculateTotalPerMinute(0.2, 0.4);
+    expect(total).toBeCloseTo(3.0);
+  });
+
+  it('should return 0 when both rates are 0', () => {
+    expect(corruptionGenerationCalculateTotalPerMinute(0, 0)).toBe(0);
   });
 });

@@ -1,5 +1,9 @@
 import { computed } from '@angular/core';
+import { contentGetEntry } from '@helpers/content';
+import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import type { GameState, InhabitantDefinition, InhabitantInstance, IsContentItem } from '@interfaces';
 
 export type CorruptionLevel = 'low' | 'medium' | 'high' | 'critical';
 
@@ -93,4 +97,62 @@ export async function corruptionSpend(amount: number): Promise<boolean> {
 
 export function corruptionCanAfford(amount: number): boolean {
   return gamestate().world.resources.corruption.current >= amount;
+}
+
+/**
+ * Calculate per-tick corruption generation from stationed inhabitants.
+ * corruptionGeneration on InhabitantDefinition is in per-game-minute units.
+ * Only stationed (assigned to a room) inhabitants generate corruption.
+ */
+export function corruptionGenerationCalculateInhabitantRate(
+  inhabitants: InhabitantInstance[],
+  lookupDef?: (id: string) => InhabitantDefinition | undefined,
+): number {
+  const lookup = lookupDef ?? ((id: string) =>
+    contentGetEntry<InhabitantDefinition & IsContentItem>(id));
+
+  let totalPerMinute = 0;
+  for (const inst of inhabitants) {
+    if (!inst.assignedRoomId) continue;
+    const def = lookup(inst.definitionId);
+    if (!def) continue;
+    const rate = def.corruptionGeneration ?? 0;
+    if (rate > 0) {
+      totalPerMinute += rate;
+    }
+  }
+
+  return totalPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+}
+
+/**
+ * Process inhabitant-based corruption generation each tick.
+ * Applies day/night modifier (night +50%) to inhabitant-generated corruption.
+ * Room-based corruption production is handled by the standard production pipeline.
+ * Mutates state in-place (same pattern as productionProcess/hungerProcess).
+ */
+export function corruptionGenerationProcess(state: GameState): void {
+  const basePerTick = corruptionGenerationCalculateInhabitantRate(
+    state.world.inhabitants,
+  );
+
+  if (basePerTick <= 0) return;
+
+  const dayNightMod = dayNightGetResourceModifier(state.clock.hour, 'corruption');
+  const finalPerTick = basePerTick * dayNightMod;
+
+  const resource = state.world.resources.corruption;
+  const available = resource.max - resource.current;
+  resource.current += Math.min(finalPerTick, available);
+}
+
+/**
+ * Calculate total corruption generation per minute from all sources (for UI display).
+ * Combines room-based production (from productionRates) and inhabitant-based generation.
+ */
+export function corruptionGenerationCalculateTotalPerMinute(
+  inhabitantRatePerTick: number,
+  roomRatePerTick: number,
+): number {
+  return (inhabitantRatePerTick + roomRatePerTick) * GAME_TIME_TICKS_PER_MINUTE;
 }

@@ -190,6 +190,7 @@
     crystals: 30
   production:
     research: 0.6
+    corruption: 0.2
   requiresWorkers: true
   maxInhabitants: 1
   fearLevel: 2
@@ -257,6 +258,7 @@
     crystals: 50
   production:
     essence: 0.3
+    corruption: 0.4
   requiresWorkers: false
   maxInhabitants: 2
   fearLevel: 3

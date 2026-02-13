@@ -35,6 +35,7 @@ export type InhabitantDefinition = {
   fearModifier?: number;
   fearPropagationDistance?: number;
   foodConsumptionRate?: number;
+  corruptionGeneration?: number;
   stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
 };
 
