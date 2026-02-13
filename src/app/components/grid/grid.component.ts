@@ -13,6 +13,7 @@ import {
   hallwayPlacementSourceRoomId,
   hallwayPlacementHandleTileClick,
   hallwayPlacementIsBuildMode,
+  inhabitantAll,
   notifyError,
   roomPlacementPreview,
   roomPlacementPreviewShape,
@@ -41,6 +42,19 @@ function getRoomColor(roomTypeId: string): string {
     colorIndex++;
   }
   return ROOM_COLORS[roomTypeId];
+}
+
+const BORDER_HUES = [40, 180, 310, 90, 220, 350, 130, 270, 10, 160];
+let borderColorIndex = 0;
+const ROOM_BORDER_COLORS: Record<string, string> = {};
+
+function getRoomBorderColor(roomId: string): string {
+  if (!ROOM_BORDER_COLORS[roomId]) {
+    const hue = BORDER_HUES[borderColorIndex % BORDER_HUES.length];
+    ROOM_BORDER_COLORS[roomId] = `oklch(0.8 0.15 ${hue})`;
+    borderColorIndex++;
+  }
+  return ROOM_BORDER_COLORS[roomId];
 }
 
 @Component({
@@ -74,6 +88,8 @@ export class GridComponent {
     return map;
   });
 
+  private inhabitants = inhabitantAll();
+
   public roomAssignmentMap = computed(() => {
     const floor = floorCurrent();
     if (!floor)
@@ -82,6 +98,7 @@ export class GridComponent {
         { current: number; max: number; status: 'full' | 'partial' | 'empty' }
       >();
 
+    const inhabitants = this.inhabitants();
     const map = new Map<
       string,
       { current: number; max: number; status: 'full' | 'partial' | 'empty' }
@@ -94,7 +111,7 @@ export class GridComponent {
       const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(room, def);
       if (maxCapacity === 0) continue;
 
-      const currentCount = floor.inhabitants.filter(
+      const currentCount = inhabitants.filter(
         (i) => i.assignedRoomId === room.id,
       ).length;
 
@@ -129,12 +146,24 @@ export class GridComponent {
     return this.roomInfoMap().get(roomId)?.name ?? undefined;
   }
 
+  private roomLabelTileMap = computed(() => {
+    const grid = this.grid();
+    const map = new Map<string, string>();
+
+    for (let x = 0; x < grid[0]?.length; x++) {
+      for (let y = 0; y < grid.length; y++) {
+        const roomId = grid[y][x].roomId;
+        if (roomId && !map.has(roomId)) {
+          map.set(roomId, `${x},${y}`);
+        }
+      }
+    }
+    return map;
+  });
+
   public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {
     if (!roomId) return false;
-    const floor = floorCurrent();
-    if (!floor) return false;
-    const room = floor.rooms.find((r) => r.id === roomId);
-    return room?.anchorX === x && room?.anchorY === y;
+    return this.roomLabelTileMap().get(roomId) === `${x},${y}`;
   }
 
   private previewTileSet = computed(() => {
@@ -198,6 +227,39 @@ export class GridComponent {
     return this.doorwayMap().get(`${x},${y}`);
   }
 
+  private roomBorderMap = computed(() => {
+    const grid = this.grid();
+    const map = new Map<string, string>();
+
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[y].length; x++) {
+        const roomId = grid[y][x].roomId;
+        if (!roomId) continue;
+
+        const color = getRoomBorderColor(roomId);
+        const top = grid[y - 1]?.[x]?.roomId !== roomId;
+        const right = grid[y]?.[x + 1]?.roomId !== roomId;
+        const bottom = grid[y + 1]?.[x]?.roomId !== roomId;
+        const left = grid[y]?.[x - 1]?.roomId !== roomId;
+
+        const parts: string[] = [];
+        if (top) parts.push(`border-top:2px solid ${color}`);
+        if (right) parts.push(`border-right:2px solid ${color}`);
+        if (bottom) parts.push(`border-bottom:2px solid ${color}`);
+        if (left) parts.push(`border-left:2px solid ${color}`);
+
+        if (parts.length > 0) {
+          map.set(`${x},${y}`, parts.join(';'));
+        }
+      }
+    }
+    return map;
+  });
+
+  public getRoomBorderStyle(x: number, y: number): string | undefined {
+    return this.roomBorderMap().get(`${x},${y}`);
+  }
+
   public isSelected(x: number, y: number): boolean {
     const sel = this.gridSelectedTile();
     return sel?.x === x && sel?.y === y;
@@ -259,7 +321,7 @@ export class GridComponent {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {
       event.preventDefault();
-      roomPlacementRotate();
+      roomPlacementExitMode();
     }
   }
 

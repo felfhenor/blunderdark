@@ -51,6 +51,8 @@ export async function worldgenGenerateWorld(): Promise<
       }))
     : [];
 
+  startingFloor.inhabitants = startingSlimes;
+
   return {
     grid: gridCreateEmpty(),
     resources: defaultResources(),

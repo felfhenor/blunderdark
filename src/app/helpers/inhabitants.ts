@@ -3,12 +3,29 @@ import { contentGetEntry } from '@helpers/content';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  GameStateWorld,
   InhabitantDefinition,
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
+
+/**
+ * Sync world.inhabitants into each floor's inhabitants array.
+ * Many systems (production, efficiency, fear, etc.) read from floor.inhabitants,
+ * so this must be called whenever world.inhabitants changes.
+ */
+function syncFloorInhabitants(world: GameStateWorld): GameStateWorld {
+  if (!world.floors) return world;
+  return {
+    ...world,
+    floors: world.floors.map((floor) => ({
+      ...floor,
+      inhabitants: world.inhabitants,
+    })),
+  };
+}
 
 export function inhabitantAll(): Signal<InhabitantInstance[]> {
   return computed(() => gamestate().world.inhabitants);
@@ -25,25 +42,25 @@ export function inhabitantGet(
 export async function inhabitantAdd(
   inhabitant: InhabitantInstance,
 ): Promise<void> {
-  await updateGamestate((state) => ({
-    ...state,
-    world: {
+  await updateGamestate((state) => {
+    const world = {
       ...state.world,
       inhabitants: [...state.world.inhabitants, inhabitant],
-    },
-  }));
+    };
+    return { ...state, world: syncFloorInhabitants(world) };
+  });
 }
 
 export async function inhabitantRemove(instanceId: string): Promise<void> {
-  await updateGamestate((state) => ({
-    ...state,
-    world: {
+  await updateGamestate((state) => {
+    const world = {
       ...state.world,
       inhabitants: state.world.inhabitants.filter(
         (i) => i.instanceId !== instanceId,
       ),
-    },
-  }));
+    };
+    return { ...state, world: syncFloorInhabitants(world) };
+  });
 }
 
 export function inhabitantSerialize(
@@ -176,15 +193,15 @@ export async function inhabitantAssignToRoom(
     return { success: false, error: check.reason };
   }
 
-  await updateGamestate((s) => ({
-    ...s,
-    world: {
+  await updateGamestate((s) => {
+    const world = {
       ...s.world,
       inhabitants: s.world.inhabitants.map((i) =>
         i.instanceId === instanceId ? { ...i, assignedRoomId: roomId } : i,
       ),
-    },
-  }));
+    };
+    return { ...s, world: syncFloorInhabitants(world) };
+  });
 
   return { success: true };
 }
@@ -201,15 +218,15 @@ export async function inhabitantUnassignFromRoom(
   );
   if (!instance || instance.assignedRoomId === undefined) return false;
 
-  await updateGamestate((s) => ({
-    ...s,
-    world: {
+  await updateGamestate((s) => {
+    const world = {
       ...s.world,
       inhabitants: s.world.inhabitants.map((i) =>
         i.instanceId === instanceId ? { ...i, assignedRoomId: undefined } : i,
       ),
-    },
-  }));
+    };
+    return { ...s, world: syncFloorInhabitants(world) };
+  });
 
   return true;
 }

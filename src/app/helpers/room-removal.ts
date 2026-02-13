@@ -133,6 +133,11 @@ export async function roomRemovalExecute(
       i.assignedRoomId === roomId ? { ...i, assignedRoomId: undefined } : i,
     );
 
+    // Sync floor inhabitants with updated world inhabitants
+    for (const floor of newFloors) {
+      floor.inhabitants = newInhabitants;
+    }
+
     return {
       ...s,
       world: {

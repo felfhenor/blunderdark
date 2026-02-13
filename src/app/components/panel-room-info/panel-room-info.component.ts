@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import {
   inhabitantAssignToRoom,
+  inhabitantAll,
   efficiencyCalculateRoom,
   connectionCreate,
   floorCurrent,
@@ -36,6 +37,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelRoomInfoComponent {
+  private inhabitants = inhabitantAll();
+
   public selectedRoom = computed(() => {
     const tile = gridSelectedTile();
     const floor = floorCurrent();
@@ -63,10 +66,9 @@ export class PanelRoomInfoComponent {
 
   public assignedInhabitants = computed(() => {
     const room = this.selectedRoom();
-    const floor = floorCurrent();
-    if (!room || !floor) return [];
+    if (!room) return [];
 
-    return floor.inhabitants
+    return this.inhabitants()
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
@@ -92,13 +94,12 @@ export class PanelRoomInfoComponent {
 
   public efficiencyBreakdown = computed(() => {
     const room = this.selectedRoom();
-    const floor = floorCurrent();
-    if (!room || !floor) return undefined;
+    if (!room) return undefined;
 
     const roomDef = productionGetRoomDefinition(room.roomTypeId);
     if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return undefined;
 
-    return efficiencyCalculateRoom(room.placedRoom, floor.inhabitants);
+    return efficiencyCalculateRoom(room.placedRoom, this.inhabitants());
   });
 
   public fearBreakdown = computed(() => {
@@ -138,13 +139,12 @@ export class PanelRoomInfoComponent {
 
   public eligibleUnassigned = computed(() => {
     const room = this.selectedRoom();
-    const floor = floorCurrent();
-    if (!room || !floor || room.maxInhabitants === 0) return [];
+    if (!room || room.maxInhabitants === 0) return [];
 
     const roomDef = productionGetRoomDefinition(room.roomTypeId);
     if (!roomDef) return [];
 
-    return floor.inhabitants
+    return this.inhabitants()
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
         const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
