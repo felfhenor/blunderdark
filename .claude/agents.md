@@ -849,6 +849,25 @@ When adding build-time validation for a content type:
 - `InhabitantInstance` fields added: `mutated?: boolean`, `isHybrid?: boolean`, `hybridParentIds?: string[]`, `mutationBonuses?: Partial<InhabitantStats>` — all optional to avoid breaking existing test mocks
 - `inhabitantDeserialize()` provides defaults for new fields via `??` — backwards-compatible with saved data
 
+## Summoning Circle System
+
+- `summoning-circle.ts` helper: `summoningCircleProcess(state)` runs each tick inside `updateGamestate` — processes summon jobs and temporary inhabitant expiry
+- File-to-prefix: `summoning-circle.ts` → `summoning` / `SUMMONING`
+- Summoning Circle room is found via `roomRoleFindById('summoningCircle')` — no hardcoded ID
+- `SUMMONING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4` (20 ticks = 4 game-minutes)
+- New content type `summonrecipe` in `gamedata/summonrecipe/base.yml` — 5 recipes with `resultInhabitantId` auto-ID-resolved by build script
+- `SummonJob` type stored on `PlacedRoom.summonJob` — per-room instance state (same pattern as `breedingJob` on Breeding Pits)
+- `InhabitantInstance` fields: `isSummoned?: boolean`, `isTemporary?: boolean`, `temporaryTicksRemaining?: number` — all optional
+- Summoned inhabitants use `restrictionTags: [summoned]` to prevent normal altar recruitment
+- Recipe tier gating: base rooms only see `tier: 'rare'`; Greater Summoning upgrade unlocks `tier: 'advanced'` via `summonTierUnlock` effect
+- Temporary inhabitants auto-despawn when `temporaryTicksRemaining <= 0` — Binding Mastery upgrade applies `summonDurationMultiplier: 1.5`
+- **Critical**: newly created temporary inhabitants must NOT have their timer decremented on the same tick they spawn — track `newTemporaryIds` Set and skip in expiry loop
+- Adjacency effects are data-driven via `summoningAdjacencyEffects` field on `RoomDefinition` — `summonTimeReduction` (Library, -25%) and `summonStatBonus` (Soul Well, +2)
+- `summoningCompleted$` / `summoningExpired$` RxJS Subjects for cross-cutting event notifications — same pattern as breeding/training/spawning
+- Upgrade effect types: `summonTierUnlock` (unlocks advanced recipes), `summonDurationMultiplier` (longer temp helpers), `summonStatBonus` (flat stat bonus)
+- When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/room-upgrades`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
+- After summoning completion, `floor.inhabitants` must be synced with `state.world.inhabitants` — same dual-location pattern as hunger/spawning/breeding
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
@@ -947,7 +966,9 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `setup.ts`                 | `setup`               | `SETUP`                  |
 | `sfx.ts`                   | `sfx`                 | `SFX`                    |
 | `signal.ts`                | `signal`              | `SIGNAL`                 |
+| `spawning-pool.ts`         | `spawningPool`        | `SPAWNING_POOL`          |
 | `state-game.ts`            | `gamestate`           | `GAMESTATE`              |
+| `summoning-circle.ts`      | `summoning`           | `SUMMONING`              |
 | `state-modifiers.ts`       | `stateModifier`       | `STATE_MODIFIER`         |
 | `state-options.ts`         | `options`             | `OPTIONS`                |
 | `synergy.ts`               | `synergy`             | `SYNERGY`                |
@@ -1039,6 +1060,7 @@ export type {Type}Content = IsContentItem &
 | `stage`            | `content-stage.ts`            | `StageId`            | `StageContent`            | `IsContentItem & HasDescription`                |
 | `synergy`          | `content-synergy.ts`          | `SynergyId`          | `SynergyContent`          | `IsContentItem & HasDescription`                |
 | `breedingrecipe`   | `content-breedingrecipe.ts`   | `BreedingRecipeId`   | `BreedingRecipeContent`   | `IsContentItem & HasDescription`                |
+| `summonrecipe`     | `content-summonrecipe.ts`     | `SummonRecipeId`     | `SummonRecipeContent`     | `IsContentItem & HasDescription`                |
 | `trap`             | `content-trap.ts`             | `TrapId`             | `TrapContent`             | `IsContentItem & HasDescription & HasSprite`    |
 | `trinket`          | `content-trinket.ts`          | `TrinketId`          | `TrinketContent`          | `IsContentItem & HasDescription & HasSprite`    |
 | `weapon`           | `content-weapon.ts`           | `WeaponId`           | `WeaponContent`           | `IsContentItem & HasDescription & HasSprite`    |

@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Summoning Circle added to gamedata/room/base.yml with L-shape, fearLevel 3, maxInhabitants 1, role summoningCircle, 3 upgrade paths. New summonrecipe content type in gamedata/summonrecipe/base.yml."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing L-shape 82f509dd-9ff8-4c99-986d-0b57198a4749 (3x3, 5 tiles). Room placement and rotation handled by existing room-placement system."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 permanent summon recipes (Fire Elemental, Shadow Beast, Frost Wraith) with restrictionTags:[summoned] preventing normal recruitment. Tick-based summoning via summoningCircleProcess()."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2 temporary recipes (Spectral Servant, Arcane Familiar) with duration 50 ticks. Auto-despawn via temporaryTicksRemaining countdown in summoningCircleProcess(). UI shows ticks remaining."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelSummoningCircleComponent shows recipe list with costs, stat bonuses, time estimate, progress bar for active job, and disabled state for unaffordable recipes."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "fearLevel: 3 and maxInhabitants: 1 set in gamedata/room/base.yml. Integrates with existing fear-level.ts system."
     },
     {
       "id": "US-007",
@@ -108,8 +108,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrades: Greater Summoning (summonTierUnlock), Dual Circle (maxInhabitantBonus: 1), Binding Mastery (summonDurationMultiplier: 1.5 + summonStatBonus: 1). All in same tier for mutual exclusion."
     },
     {
       "id": "US-008",
@@ -122,8 +122,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "summoningAdjacencyEffects added to Shadow Library (summonTimeReduction: 0.25) and Soul Well (summonStatBonus: 2) in gamedata/room/base.yml. Data-driven adjacency pattern."
     }
   ]
 }
