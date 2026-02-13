@@ -420,6 +420,18 @@ When multiple build modes exist (room placement, hallway build):
 - Rich tooltips use custom CSS absolute positioning with a delay timer (250ms) — DaisyUI's `data-tip` tooltips only support plain text, so custom implementation is needed for HTML content
 - Warning thresholds: `LOW_THRESHOLD = 0.2`, `CRITICAL_THRESHOLD = 0.1` — configurable constants, not hardcoded inline
 - Production breakdown math: `inhabitantContrib = base * inhabitantBonus`, `adjacencyContrib = base * adjacencyBonus`, `modifierEffect = withBonuses * (modifier - 1)`
+- Food warning banner uses `hungerGetWarningLevel()` and `hungerCalculateTotalConsumption()` from hunger.ts — computes estimated minutes remaining from `food / consumptionPerTick / GAME_TIME_TICKS_PER_MINUTE`
+- Dismissible warnings use a signal + setTimeout pattern: `dismissFoodWarning()` sets signal to true, then resets after 60s
+
+## Fear/Hunger UI Indicators
+
+- `FearIndicatorComponent` in `src/app/components/fear-indicator/` — accepts `roomId` input, renders color-coded badge (Low=green, Medium=yellow, High=orange, VeryHigh=red), hides at fear 0
+- `HungerIndicatorComponent` in `src/app/components/hunger-indicator/` — accepts `inhabitantId` input, renders state badge (Hungry=yellow, Starving=red, Inappetent=gray), hides when fed/normal
+- Both use signal-based tooltip mechanism with 250ms delay (matching `panel-resources` pattern)
+- Fear indicators are placed on grid anchor tiles at `top: 2px; right: 2px` via `.fear-grid-badge` CSS class in `grid.component.scss`
+- Hunger indicators are placed inline next to inhabitant names in `panel-room-info.component.html`
+- Both components read from existing computed signals (`fearLevelBreakdownMap`, `gamestate().world.inhabitants`) — no new state management needed
+- Grid imports `FearIndicatorComponent`; `panel-room-info` imports `HungerIndicatorComponent` — no changes to `game-play.component.ts` needed since they're child components of already-imported parents
 
 ## Synergy Detection System
 

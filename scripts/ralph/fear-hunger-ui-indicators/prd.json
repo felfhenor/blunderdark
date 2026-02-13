@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created FearIndicatorComponent and HungerIndicatorComponent with input() signals, computed() derived state, OnPush, and signal-based tooltip mechanism with 250ms delay."
     },
     {
       "id": "US-002",
@@ -34,8 +34,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added FearIndicatorComponent to grid anchor tiles at top-right position. Hides when fear=0, shows color-coded badge for levels 1-4. Reactively updates via fearLevelBreakdownMap computed signal."
     },
     {
       "id": "US-003",
@@ -50,8 +50,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added HungerIndicatorComponent to inhabitant list in panel-room-info. Shows hunger state badges (yellow=hungry, red=starving, gray=inappetent). Fed inhabitants show no badge."
     },
     {
       "id": "US-004",
@@ -67,8 +67,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Both components have signal-based tooltips with 250ms delay (matching panel-resources pattern). Fear tooltip shows full breakdown (base, inhabitants, upgrades, altar aura, propagation sources, effect description). Hunger tooltip shows state, consumption rate, and production effect."
     },
     {
       "id": "US-005",
@@ -84,8 +84,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added food warning banner to PanelResourcesComponent (OnPush). Uses hungerGetWarningLevel for threshold detection. Yellow for low, red+pulse for critical. Shows estimated game-minutes remaining. Dismissible with 60s auto-reset."
     }
   ]
 }
