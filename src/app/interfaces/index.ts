@@ -14,6 +14,7 @@ export * from './content-research';
 export * from './content-room';
 export * from './content-roomshape';
 export * from './content-seasonbonus';
+export * from './content-summonrecipe';
 export * from './content-synergy';
 export * from './content-trap';
 export * from './corruption-effect';

@@ -15,6 +15,7 @@ import type {
   RoomShape,
   Season,
   SeasonBonusDefinition,
+  SummonRecipeContent,
   SynergyDefinition,
   TrapDefinition,
   UnlockEffect,
@@ -35,6 +36,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   room: ensureRoom,
   roomshape: ensureRoomShape,
   seasonbonus: ensureSeasonBonus,
+  summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
   trap: ensureTrap,
 };
@@ -160,6 +162,25 @@ function ensureRoom(
     spawnType: room.spawnType ?? undefined,
     spawnCapacity: room.spawnCapacity ?? undefined,
     breedingAdjacencyEffects: room.breedingAdjacencyEffects ?? undefined,
+    summoningAdjacencyEffects: room.summoningAdjacencyEffects ?? undefined,
+  };
+}
+
+function ensureSummonRecipe(
+  recipe: Partial<SummonRecipeContent & IsContentItem>,
+): SummonRecipeContent & IsContentItem {
+  return {
+    id: (recipe.id ?? 'UNKNOWN') as SummonRecipeContent['id'],
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'summonrecipe',
+    description: recipe.description ?? '',
+    resultInhabitantId: recipe.resultInhabitantId ?? '',
+    summonType: recipe.summonType ?? 'permanent',
+    duration: recipe.duration ?? undefined,
+    cost: recipe.cost ?? {},
+    timeMultiplier: recipe.timeMultiplier ?? 1.0,
+    statBonuses: recipe.statBonuses ?? {},
+    tier: recipe.tier ?? 'rare',
   };
 }
 

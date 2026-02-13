@@ -68,6 +68,7 @@ export * from './spawning-pool';
 export * from './state-game';
 export * from './state-modifiers';
 export * from './state-options';
+export * from './summoning-circle';
 export * from './synergy';
 export * from './throne-room';
 export * from './timer';

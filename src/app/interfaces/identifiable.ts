@@ -11,6 +11,7 @@ export type ContentType =
   | 'room'
   | 'roomshape'
   | 'seasonbonus'
+  | 'summonrecipe'
   | 'synergy'
   | 'trap';
 

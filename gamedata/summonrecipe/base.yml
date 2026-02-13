@@ -1,0 +1,62 @@
+- id: 3a1b2c3d-e4f5-4a6b-7c8d-9e0f1a2b3c4d
+  name: Summon Fire Elemental
+  description: Call forth a Fire Elemental from the infernal planes. A powerful permanent addition to your forces.
+  resultInhabitantId: Fire Elemental
+  summonType: permanent
+  cost:
+    essence: 100
+    crystals: 50
+  timeMultiplier: 1.0
+  statBonuses:
+    attack: 5
+  tier: rare
+
+- id: 4b2c3d4e-f5a6-4b7c-8d9e-0f1a2b3c4d5e
+  name: Summon Shadow Beast
+  description: Summon a Shadow Beast from the darkest corners of the void. Fast and elusive.
+  resultInhabitantId: Shadow Beast
+  summonType: permanent
+  cost:
+    essence: 80
+    gold: 40
+  timeMultiplier: 0.8
+  statBonuses:
+    speed: 5
+  tier: rare
+
+- id: 5c3d4e5f-a6b7-4c8d-9e0f-1a2b3c4d5e6f
+  name: Summon Frost Wraith
+  description: Bind a Frost Wraith from the frozen beyond. Durable and difficult to destroy.
+  resultInhabitantId: Frost Wraith
+  summonType: permanent
+  cost:
+    essence: 120
+    flux: 30
+  timeMultiplier: 1.2
+  statBonuses:
+    defense: 5
+  tier: rare
+
+- id: 6d4e5f6a-b7c8-4d9e-0f1a-2b3c4d5e6f7a
+  name: Summon Spectral Servant
+  description: Conjure a temporary Spectral Servant to assist with menial tasks. Fades after a time.
+  resultInhabitantId: Spectral Servant
+  summonType: temporary
+  duration: 50
+  cost:
+    essence: 30
+  timeMultiplier: 0.5
+  statBonuses: {}
+  tier: rare
+
+- id: 7e5f6a7b-c8d9-4e0f-1a2b-3c4d5e6f7a8b
+  name: Summon Arcane Familiar
+  description: Summon a temporary Arcane Familiar skilled in magical research. Vanishes when its power wanes.
+  resultInhabitantId: Arcane Familiar
+  summonType: temporary
+  duration: 50
+  cost:
+    flux: 40
+  timeMultiplier: 0.5
+  statBonuses: {}
+  tier: rare

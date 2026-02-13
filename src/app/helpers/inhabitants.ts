@@ -86,6 +86,9 @@ export function inhabitantDeserialize(
     mutated: i.mutated ?? false,
     isHybrid: i.isHybrid ?? false,
     hybridParentIds: i.hybridParentIds ?? undefined,
+    isSummoned: i.isSummoned ?? undefined,
+    isTemporary: i.isTemporary ?? undefined,
+    temporaryTicksRemaining: i.temporaryTicksRemaining ?? undefined,
   }));
 }
 

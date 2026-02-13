@@ -343,3 +343,174 @@
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
+
+- id: a1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
+  name: Fire Elemental
+  type: demon
+  tier: 2
+  description: A blazing entity of living flame, summoned from the infernal planes to serve.
+  cost: {}
+  stats:
+    hp: 80
+    attack: 30
+    defense: 15
+    speed: 14
+    workerEfficiency: 0.8
+  traits: []
+  restrictionTags:
+    - summoned
+  fearModifier: 1
+  foodConsumptionRate: 0
+  corruptionGeneration: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.8
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.9
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: b2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b
+  name: Shadow Beast
+  type: creature
+  tier: 2
+  description: A swift predator born of living shadow, nearly invisible in the dark.
+  cost: {}
+  stats:
+    hp: 60
+    attack: 20
+    defense: 12
+    speed: 22
+    workerEfficiency: 1.1
+  traits: []
+  restrictionTags:
+    - summoned
+  fearModifier: 0
+  foodConsumptionRate: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c
+  name: Frost Wraith
+  type: undead
+  tier: 2
+  description: An icy spirit bound to your service. Its frozen touch slows all who approach.
+  cost: {}
+  stats:
+    hp: 70
+    attack: 15
+    defense: 25
+    speed: 10
+    workerEfficiency: 0.9
+  traits: []
+  restrictionTags:
+    - summoned
+  fearModifier: 1
+  foodConsumptionRate: 0
+  corruptionGeneration: 1
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.95
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: d4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d
+  name: Spectral Servant
+  type: undead
+  tier: 1
+  description: A ghostly helper that performs tasks with tireless efficiency, though it is fragile.
+  cost: {}
+  stats:
+    hp: 10
+    attack: 2
+    defense: 2
+    speed: 15
+    workerEfficiency: 1.5
+  traits: []
+  restrictionTags:
+    - summoned
+  fearModifier: 0
+  foodConsumptionRate: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: e5c6d7e8-f9a0-4b1c-2d3e-4f5a6b7c8d9e
+  name: Arcane Familiar
+  type: creature
+  tier: 1
+  description: A small magical construct animated by arcane energy. Excellent at research tasks.
+  cost: {}
+  stats:
+    hp: 15
+    attack: 5
+    defense: 5
+    speed: 20
+    workerEfficiency: 1.3
+  traits: []
+  restrictionTags:
+    - summoned
+  fearModifier: 0
+  foodConsumptionRate: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

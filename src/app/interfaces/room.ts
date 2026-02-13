@@ -56,4 +56,8 @@ export type RoomDefinition = {
     mutationOddsBonus?: number;
     researchBonus?: number;
   };
+  summoningAdjacencyEffects?: {
+    summonTimeReduction?: number;
+    summonStatBonus?: number;
+  };
 };

@@ -67,4 +67,7 @@ export type InhabitantInstance = {
   mutated?: boolean;
   isHybrid?: boolean;
   hybridParentIds?: string[];
+  isSummoned?: boolean;
+  isTemporary?: boolean;
+  temporaryTicksRemaining?: number;
 };

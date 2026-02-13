@@ -238,6 +238,8 @@
     - DefileLibrary
   breedingAdjacencyEffects:
     researchBonus: 5
+  summoningAdjacencyEffects:
+    summonTimeReduction: 0.25
   adjacencyBonuses:
     - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.15
@@ -328,6 +330,8 @@
     - SealPortal
   breedingAdjacencyEffects:
     mutationOddsBonus: 0.10
+  summoningAdjacencyEffects:
+    summonStatBonus: 2
   adjacencyBonuses:
     - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.2
@@ -887,3 +891,57 @@
           value: 0.15
         - type: mutationStatBonus
           value: 0.25
+
+- id: 8f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c
+  name: Summoning Circle
+  description: An L-shaped ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
+  shapeId: 82f509dd-9ff8-4c99-986d-0b57198a4749
+  cost:
+    gold: 150
+    essence: 80
+    flux: 40
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 1
+  inhabitantRestriction: null
+  fearLevel: 3
+  role: summoningCircle
+  adjacencyBonuses:
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+      bonus: 0.15
+      description: Arcane knowledge from the Shadow Library enhances summoning rituals.
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+      bonus: 0.1
+      description: Soul essence from the Well stabilizes planar connections.
+  upgradePaths:
+    - id: 9a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+      name: Greater Summoning
+      description: Unlock advanced summoning recipes, allowing access to more powerful creatures.
+      cost:
+        gold: 200
+        essence: 100
+        flux: 50
+      effects:
+        - type: summonTierUnlock
+          value: 1
+    - id: ab3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
+      name: Dual Circle
+      description: Inscribe a second summoning circle, allowing an additional summoner to work in parallel.
+      cost:
+        gold: 150
+        crystals: 80
+      effects:
+        - type: maxInhabitantBonus
+          value: 1
+    - id: bc4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
+      name: Binding Mastery
+      description: Master the art of planar binding. Temporary summons last 50% longer and permanent summons gain +1 to all stats.
+      cost:
+        gold: 180
+        essence: 60
+        flux: 40
+      effects:
+        - type: summonDurationMultiplier
+          value: 1.5
+        - type: summonStatBonus
+          value: 1

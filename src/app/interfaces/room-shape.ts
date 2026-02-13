@@ -27,6 +27,12 @@ export type MutationJob = {
   targetTicks: number;
 };
 
+export type SummonJob = {
+  recipeId: string;
+  ticksRemaining: number;
+  targetTicks: number;
+};
+
 export type PlacedRoom = {
   id: string;
   roomTypeId: string;
@@ -38,4 +44,5 @@ export type PlacedRoom = {
   spawnTicksRemaining?: number;
   breedingJob?: BreedingJob;
   mutationJob?: MutationJob;
+  summonJob?: SummonJob;
 };
