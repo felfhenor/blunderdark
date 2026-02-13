@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added to gamedata/room/base.yml with role: spawningPool, spawnRate: 25, spawnType: Goblin, spawnCapacity: 10"
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing Square 2x2 shape (cedc340b-2f75-4811-89e5-b971659950fc). Placement and rendering handled by existing room systems."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "spawningPoolProcess() in spawning-pool.ts runs each tick inside gameloop. Timer stored as spawnTicksRemaining on PlacedRoom. 25 ticks = 5 game-minutes."
     },
     {
       "id": "US-004",
@@ -60,8 +60,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "spawningPoolCreateInhabitant() creates full InhabitantInstance with unique id, random name suffix, normal state, unassigned. RxJS Subject emits spawn events for notifications."
     },
     {
       "id": "US-005",
@@ -75,8 +75,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "spawningPoolCountUnassigned() checks unassigned count against effective capacity. Timer resets but no spawn when capacity reached."
     },
     {
       "id": "US-006",
@@ -90,8 +90,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Rapid Spawning upgrade: spawnRateReduction -10 (25→15 ticks), spawnCapacityBonus +5 (10→15), maxInhabitantBonus +2. Cost: 100 gold, 50 crystals, 15 essence."
     },
     {
       "id": "US-007",
@@ -105,8 +105,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Dark Spawning upgrade: spawnTypeChange to Skeleton, fearIncrease +2. Cost: 120 gold, 60 crystals, 20 essence. Requires dark upgrade unlock."
     }
   ]
 }

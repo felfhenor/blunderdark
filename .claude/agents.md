@@ -500,6 +500,22 @@ When multiple build modes exist (room placement, hallway build):
 - `trapWorkshopCanQueue(roomId, floors)` validates: room is Trap Workshop, has at least 1 assigned inhabitant
 - When mocking `@helpers/content` in trap-workshop tests, provide both `contentGetEntriesByType` and `contentGetEntry` mocks
 
+### Spawning Pool System
+
+- `spawning-pool.ts` helper: `spawningPoolProcess(state)` runs each tick inside `updateGamestate` — creates inhabitants automatically on a timer
+- File-to-prefix: `spawning-pool.ts` → `spawningPool` / `SPAWNING_POOL`
+- Spawning Pool room is found via `roomRoleFindById('spawningPool')` — no hardcoded ID
+- `SPAWNING_POOL_DEFAULT_RATE = GAME_TIME_TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes between spawns)
+- Timer state stored on `PlacedRoom.spawnTicksRemaining?: number` — per-room instance state, not global
+- Room config stored on `RoomDefinition`: `spawnRate?: number`, `spawnType?: string`, `spawnCapacity?: number` — data-driven from YAML
+- Capacity checks unassigned inhabitants globally (not per-pool) — `spawningPoolCountUnassigned()` filters `assignedRoomId === undefined`
+- `spawningPoolCreateInhabitant(def)` creates full `InhabitantInstance` with random name suffix via `rngChoice()`
+- After spawning, `floor.inhabitants` must be synced with `state.world.inhabitants` — same dual-location pattern as hunger system
+- `spawningPoolSpawn$` observable emits `SpawningPoolEvent` for notifications — same RxJS Subject pattern as training/corruption
+- Upgrade effect types: `spawnRateReduction` (reduces timer), `spawnCapacityBonus` (increases max unassigned), `spawnTypeChange` (switches to Skeleton)
+- Content lookup uses spawn type name (e.g., 'Goblin', 'Skeleton') via `contentGetEntry()` — names must match inhabitant definition names in YAML
+- When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`; register room def, inhabitant defs by name in mockContent Map
+
 ## Invader System
 
 - Invader definitions in `gamedata/invader/base.yml` — 6 classes: Warrior, Rogue, Mage, Cleric, Paladin, Ranger
