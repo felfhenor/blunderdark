@@ -1017,3 +1017,17 @@ export type {Type}Content = IsContentItem &
 - Nodes arranged by tier (computed from `branchNodes`) with tier labels and connector lines between tiers
 - Detail panel shows on node click: description, cost, prerequisites (with missing prereq names), and action buttons
 - `DecimalPipe` from `@angular/common` must be imported in standalone components that use the `| number` pipe
+
+## Research Unlock System
+
+- `research-unlocks.ts` helper: `researchUnlockProcessCompletion(nodeId, state)` is the synchronous in-place mutation called from `researchProcess()` during the game tick — applies unlock effects atomically in the same state update
+- `researchUnlockOnComplete(nodeId)` is the async version using `updateGamestate()` — available for external callers but NOT used during tick processing
+- `UnlockEffect` is a union type with 5 variants: `RoomUnlock`, `InhabitantUnlock`, `AbilityUnlock`, `UpgradeUnlock`, `PassiveBonusUnlock` — defined in `interfaces/research.ts`
+- `UnlockedContent` tracked in `ResearchState.unlockedContent`: `{ rooms: string[], inhabitants: string[], abilities: string[], upgrades: string[], passiveBonuses: [] }`
+- Query functions: `researchUnlockIsUnlocked(type, id)`, `researchUnlockIsResearchGated(type, id)`, `researchUnlockGetRequiredResearchName(type, id)`, `researchUnlockGetPassiveBonuses(bonusType)`
+- `researchUnlock$` observable emits `{ nodeId, nodeName, unlocks }` — subscribed in `NotifyService` for toast notifications
+- Research nodes reference content by UUID in YAML `unlocks[].targetId` — NOT auto-resolved by `rewriteDataIds()` because `targetId` doesn't match any content type name pattern
+- Build-time validation in `gamedata-build.ts` checks all `targetId` references point to valid content IDs
+- Room gating: `panel-room-select` uses `isResearchLocked(room)` to grey out and disable research-gated rooms with "Requires: [Research Name]" tooltip
+- Inhabitant gating: `panel-altar` adds `researchLocked` and `researchRequirement` fields to `RecruitableEntry` — shows "Requires: [Research Name]" for locked creatures
+- When adding new fields to `ResearchState`, all spec files with inline `ResearchState` objects must be updated (check with `grep researchState` or look for `research:` in `makeGameState` helpers)

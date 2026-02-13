@@ -14,8 +14,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "UnlockEffect union type in interfaces/research.ts. 5 variants: RoomUnlock, InhabitantUnlock, AbilityUnlock, UpgradeUnlock, PassiveBonusUnlock. UnlockedContent type also added. ResearchState updated with unlockedContent field."
     },
     {
       "id": "US-002",
@@ -29,8 +29,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "All 38 research nodes across 4 YAML files (base, dark, arcane, engineering) have unlock effects. T1 nodes unlock rooms. Necromancy unlocks Skeleton inhabitant. Higher tiers use passive_bonus unlocks. Build-time validation added to gamedata-build.ts."
     },
     {
       "id": "US-003",
@@ -44,8 +44,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "research-unlocks.ts helper with query functions, apply effects, and completion handler. 32 tests in research-unlocks.spec.ts covering all unlock types and edge cases."
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "researchUnlockProcessCompletion() called synchronously from researchProcess() during game tick. Applies unlock effects in-place atomically. 2 integration tests in research-progress.spec.ts verify the wiring."
     },
     {
       "id": "US-005",
@@ -76,8 +76,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Room panel: isResearchLocked() disables and greys out gated rooms, shows 'Requires: X' label instead of cost. Altar panel: researchLocked/researchRequirement fields added to RecruitableEntry, shows 'Requires: X' for locked inhabitants."
     },
     {
       "id": "US-006",
@@ -93,8 +93,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Toast notification via NotifyService subscribing to researchUnlock$. Shows 'Research Complete: [Name]' title with list of unlocked content (rooms, creatures, passive bonuses). Uses existing ngx-toastr pattern."
     }
   ]
 }
