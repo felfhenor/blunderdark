@@ -10,10 +10,4 @@ export type HasAnimation = HasSprite & {
   frames: number;
 };
 
-export type AtlasedImage =
-  | 'hero'
-  | 'item'
-  | 'monster'
-  | 'pet'
-  | 'trinket'
-  | 'weapon';
+export type AtlasedImage = 'inhabitant';
