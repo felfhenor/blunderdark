@@ -26,5 +26,23 @@
         </div>
       }
     </div>
+
+    @if (hasActiveEffects()) {
+      <div class="divider my-1"></div>
+      <h4 class="text-xs font-semibold opacity-70 mb-1">Active Effects</h4>
+      <div class="flex flex-col gap-1">
+        @for (effect of activeEffects(); track effect.id) {
+          <div class="active-effect">
+            <div class="flex items-center gap-1">
+              <span class="badge badge-xs" [class]="getEffectBadgeClass(effect)">
+                {{ getEffectIcon(effect) }}
+              </span>
+              <span class="text-xs font-medium">{{ effect.name }}</span>
+            </div>
+            <div class="text-xs opacity-60 ml-5">{{ effect.description }}</div>
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>
