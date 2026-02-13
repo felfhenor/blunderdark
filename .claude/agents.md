@@ -834,3 +834,71 @@ export const ALL_ICONS = {...};
   The type `SeasonState` keeps `currentSeason`, `dayInSeason`, etc. as field names.
 - Observable subjects with `$` suffix keep the prefix: `notifyNotification$`, `reputationAward$`.
 - When a name already starts with the prefix, it's kept as-is: `gameloop()`, `gamestate()`, `options()`.
+
+## Content Interface Convention
+
+Every gamedata content type has a corresponding `content-{type}.ts` file in `src/app/interfaces/` with a branded ID and a `{Type}Content` type.
+
+### Pattern
+
+```typescript
+// src/app/interfaces/content-{type}.ts
+import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { HasDescription } from '@interfaces/traits';
+
+export type {Type}Id = Branded<string, '{Type}Id'>;
+
+export type {Type}Content = IsContentItem &
+  HasDescription & {  // only if the content has a description field
+    id: {Type}Id;
+    // ... type-specific fields from the YAML data
+  };
+```
+
+### Naming Rules
+
+| Convention | Example |
+|---|---|
+| File name | `content-abilityeffect.ts`, `content-room.ts` |
+| Branded ID type | `AbilityEffectId`, `RoomId` |
+| Content type name | `AbilityEffectContent`, `RoomContent` |
+
+### Trait Extensions
+
+- **All** content types extend `IsContentItem` (provides `id`, `name`, `__type`)
+- Extend `HasDescription` if the YAML data includes a `description` field
+- Extend `HasSprite` if the YAML data includes a `sprite` field (e.g., invader, trap)
+- Extend `HasAnimation` if the content has `sprite` + `frames` fields (e.g., hero, monster, pet)
+
+### Complete Content Type Mapping
+
+| ContentType | File | Branded ID | Content Type | Extends |
+|---|---|---|---|---|
+| `abilityeffect` | `content-abilityeffect.ts` | `AbilityEffectId` | `AbilityEffectContent` | `IsContentItem` |
+| `combatability` | `content-combatability.ts` | `CombatAbilityId` | `CombatAbilityContent` | `IsContentItem & HasDescription` |
+| `hero` | `content-hero.ts` | `HeroId` | `HeroContent` | `IsContentItem & HasDescription & HasAnimation` |
+| `inhabitant` | `content-inhabitant.ts` | `InhabitantId` | `InhabitantContent` | `IsContentItem & HasDescription` |
+| `invader` | `content-invader.ts` | `InvaderId` | `InvaderContent` | `IsContentItem & HasDescription & HasSprite` |
+| `invasion` | `content-invasion.ts` | `InvasionId` | `InvasionContent` | `IsContentItem` |
+| `item` | `content-item.ts` | `ItemId` | `ItemContent` | `IsContentItem & HasDescription & HasSprite` |
+| `monster` | `content-monster.ts` | `MonsterId` | `MonsterContent` | `IsContentItem & HasDescription & HasAnimation` |
+| `pet` | `content-pet.ts` | `PetId` | `PetContent` | `IsContentItem & HasDescription & HasAnimation` |
+| `reputationaction` | `content-reputationaction.ts` | `ReputationActionId` | `ReputationActionContent` | `IsContentItem & HasDescription` |
+| `research` | `content-research.ts` | `ResearchId` | `ResearchContent` | `IsContentItem & HasDescription` |
+| `room` | `content-room.ts` | `RoomId` | `RoomContent` | `IsContentItem & HasDescription` |
+| `roomshape` | `content-roomshape.ts` | `RoomShapeId` | `RoomShapeContent` | `IsContentItem` |
+| `seasonbonus` | `content-seasonbonus.ts` | `SeasonBonusId` | `SeasonBonusContent` | `IsContentItem & HasDescription` |
+| `stage` | `content-stage.ts` | `StageId` | `StageContent` | `IsContentItem & HasDescription` |
+| `synergy` | `content-synergy.ts` | `SynergyId` | `SynergyContent` | `IsContentItem & HasDescription` |
+| `trap` | `content-trap.ts` | `TrapId` | `TrapContent` | `IsContentItem & HasDescription & HasSprite` |
+| `trinket` | `content-trinket.ts` | `TrinketId` | `TrinketContent` | `IsContentItem & HasDescription & HasSprite` |
+| `weapon` | `content-weapon.ts` | `WeaponId` | `WeaponContent` | `IsContentItem & HasDescription & HasSprite` |
+
+### Adding a New Content Type
+
+1. Add the type string to `ContentType` union in `identifiable.ts`
+2. Create `content-{type}.ts` with branded ID and content type following the pattern above
+3. Export from `src/app/interfaces/index.ts`
+4. Add `ensure{Type}()` initializer to `content-initializers.ts`
+5. Create `gamedata/{type}/` folder with YAML
+6. Update this table
