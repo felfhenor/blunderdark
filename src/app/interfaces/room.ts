@@ -65,4 +65,8 @@ export type RoomDefinition = {
     forgingStatBonus?: number;
     forgingEffectivenessBonus?: number;
   };
+  alchemyAdjacencyEffects?: {
+    alchemySpeedBonus?: number;
+    alchemyCostReduction?: number;
+  };
 };

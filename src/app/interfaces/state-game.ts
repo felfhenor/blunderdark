@@ -12,6 +12,7 @@ import type { ResourceMap } from '@interfaces/resource';
 import type { SeasonState } from '@interfaces/season';
 import type { TrapCraftingQueue, TrapInventoryEntry } from '@interfaces/trap';
 import type { ForgeCraftingQueue, ForgeInventoryEntry } from '@interfaces/forge';
+import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
 import type { InvasionSchedule } from '@interfaces/invasion';
 
@@ -29,6 +30,7 @@ export interface GameStateWorld {
   trapCraftingQueues: TrapCraftingQueue[];
   forgeInventory: ForgeInventoryEntry[];
   forgeCraftingQueues: ForgeCraftingQueue[];
+  alchemyConversions: AlchemyConversion[];
   invasionSchedule: InvasionSchedule;
   corruptionEffects: CorruptionEffectState;
 }

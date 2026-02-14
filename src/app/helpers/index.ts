@@ -1,4 +1,5 @@
 export * from './adjacency';
+export * from './alchemy-lab';
 export * from './altar-room';
 export * from './analytics';
 export * from './assignment';

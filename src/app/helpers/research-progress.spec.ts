@@ -213,6 +213,7 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
       trapCraftingQueues: [],
       forgeInventory: [],
       forgeCraftingQueues: [],
+      alchemyConversions: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

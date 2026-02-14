@@ -1,5 +1,6 @@
 import type {
   AbilityEffectDefinition,
+  AlchemyRecipeContent,
   BreedingRecipeContent,
   CombatAbility,
   CompositionWeightConfig,
@@ -26,6 +27,7 @@ import type {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
   abilityeffect: ensureAbilityEffect,
+  alchemyrecipe: ensureAlchemyRecipe,
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
   forgerecipe: ensureForgeRecipe,
@@ -47,6 +49,22 @@ export function ensureContent<T extends IsContentItem>(content: T): T {
   const init = initializers[content.__type];
   if (!init) return content;
   return init(content) satisfies T;
+}
+
+function ensureAlchemyRecipe(
+  recipe: Partial<AlchemyRecipeContent & IsContentItem>,
+): AlchemyRecipeContent & IsContentItem {
+  return {
+    id: (recipe.id ?? 'UNKNOWN') as AlchemyRecipeContent['id'],
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'alchemyrecipe',
+    description: recipe.description ?? '',
+    inputCost: recipe.inputCost ?? {},
+    outputResource: recipe.outputResource ?? 'flux',
+    outputAmount: recipe.outputAmount ?? 1,
+    baseTicks: recipe.baseTicks ?? 15,
+    tier: recipe.tier ?? 'basic',
+  };
 }
 
 function ensureBreedingRecipe(
@@ -182,6 +200,7 @@ function ensureRoom(
     breedingAdjacencyEffects: room.breedingAdjacencyEffects ?? undefined,
     summoningAdjacencyEffects: room.summoningAdjacencyEffects ?? undefined,
     forgingAdjacencyEffects: room.forgingAdjacencyEffects ?? undefined,
+    alchemyAdjacencyEffects: room.alchemyAdjacencyEffects ?? undefined,
   };
 }
 

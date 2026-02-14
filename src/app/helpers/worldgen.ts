@@ -67,6 +67,7 @@ export async function worldgenGenerateWorld(): Promise<
     trapCraftingQueues: [],
     forgeInventory: [],
     forgeCraftingQueues: [],
+    alchemyConversions: [],
     invasionSchedule: defaultInvasionSchedule(),
     corruptionEffects: defaultCorruptionEffectState(),
     didFinish: true,

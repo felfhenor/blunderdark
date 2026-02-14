@@ -90,6 +90,8 @@
     weight: 10
   forgingAdjacencyEffects:
     forgingSpeedBonus: 0.30
+  alchemyAdjacencyEffects:
+    alchemySpeedBonus: 0.20
   adjacencyBonuses:
     - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.1
@@ -162,6 +164,8 @@
     bonus: 0.15
   biomeBonuses:
     fungal: 0.60
+  alchemyAdjacencyEffects:
+    alchemyCostReduction: 0.15
   adjacencyBonuses:
     - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
       bonus: 0.4
@@ -978,3 +982,55 @@
           value: 1.5
         - type: summonStatBonus
           value: 1
+
+- id: c3b02001-0001-4001-8001-000000000001
+  name: Alchemy Lab
+  description: An L-shaped laboratory for transmuting raw resources into refined magical materials. Assign an alchemist to begin converting crystals and food into flux, or unlock advanced recipes to produce essence and other exotic substances.
+  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: true
+  maxInhabitants: 1
+  inhabitantRestriction: null
+  fearLevel: 2
+  role: alchemyLab
+  biomeBonuses:
+    crystal: 0.20
+  adjacencyBonuses:
+    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+      bonus: 0.15
+      description: Crystal Mine provides a steady supply of raw materials.
+    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+      bonus: 0.10
+      description: Fresh mushroom substrate aids in reagent preparation.
+  upgradePaths:
+    - id: c3b02001-0002-4001-8001-000000000001
+      name: Efficient Distillation
+      description: Refine the conversion process to use fewer raw materials per cycle. Reduces input costs to 3 Crystals + 3 Food per Flux.
+      cost:
+        gold: 100
+        crystals: 50
+      effects:
+        - type: alchemyCostMultiplier
+          value: 0.6
+    - id: c3b02001-0002-4001-8001-000000000002
+      name: Advanced Alchemy
+      description: Unlock advanced transmutation recipes for producing Essence and concentrated Flux from exotic inputs.
+      cost:
+        gold: 120
+        essence: 40
+        flux: 20
+      effects:
+        - type: alchemyTierUnlock
+          value: 1
+    - id: c3b02001-0002-4001-8001-000000000003
+      name: Expanded Capacity
+      description: Add additional workstations, increasing the lab's inhabitant capacity from 1 to 3.
+      cost:
+        gold: 80
+        crystals: 40
+      effects:
+        - type: maxInhabitantBonus
+          value: 2

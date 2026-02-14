@@ -1,0 +1,32 @@
+- id: b2a01001-0001-4001-8001-000000000001
+  name: Flux Conversion
+  description: Transmute crystals and food into magical flux.
+  inputCost:
+    crystals: 5
+    food: 5
+  outputResource: flux
+  outputAmount: 1
+  baseTicks: 15
+  tier: basic
+
+- id: b2a01001-0001-4001-8001-000000000002
+  name: Essence Synthesis
+  description: Distill gold and crystals into pure essence.
+  inputCost:
+    gold: 10
+    crystals: 5
+  outputResource: essence
+  outputAmount: 1
+  baseTicks: 25
+  tier: advanced
+
+- id: b2a01001-0001-4001-8001-000000000003
+  name: Dark Transmutation
+  description: Channel corruption through food to produce concentrated flux.
+  inputCost:
+    food: 5
+    corruption: 10
+  outputResource: flux
+  outputAmount: 2
+  baseTicks: 20
+  tier: advanced
