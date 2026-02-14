@@ -868,6 +868,23 @@ When adding build-time validation for a content type:
 - When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/room-upgrades`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
 - After summoning completion, `floor.inhabitants` must be synced with `state.world.inhabitants` — same dual-location pattern as hunger/spawning/breeding
 
+## Dark Forge System
+
+- `dark-forge.ts` helper: `darkForgeProcess(state)` runs each tick inside `updateGamestate` — processes crafting queues and completes items to forge inventory
+- File-to-prefix: `dark-forge.ts` → `darkForge` / `DARK_FORGE`
+- Dark Forge room is found via `roomRoleFindById('darkForge')` — no hardcoded ID
+- `DARK_FORGE_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4` (20 ticks = 4 game-minutes)
+- New content type `forgerecipe` in `gamedata/forgerecipe/base.yml` — 7 recipes across basic and advanced tiers
+- `ForgeCraftingQueue` stored globally in `GameStateWorld.forgeCraftingQueues` (not per-floor) — same pattern as `trapCraftingQueues`
+- `ForgeInventoryEntry[]` stored in `GameStateWorld.forgeInventory` — completed crafted items
+- Recipe tier gating: base rooms see `tier: 'basic'`; Infernal Forge upgrade unlocks `tier: 'advanced'` via `forgingTierUnlock` effect
+- Worker speed bonus: same as trap workshop — each additional worker beyond first reduces time by 20%, capped at 0.4 multiplier
+- Adjacency effects are data-driven via `forgingAdjacencyEffects` field on `RoomDefinition` — `forgingSpeedBonus` (Crystal Mine, 0.30), `forgingStatBonus` (Training Grounds, +1), `forgingEffectivenessBonus` (Trap Workshop, 0.20)
+- Upgrade effect types: `forgingSpeedMultiplier` (Master Forge, -25% time), `forgingTierUnlock` (Infernal Forge, unlocks advanced), `forgingStatBonus` (Infernal Forge, +2 all stats), `maxInhabitantBonus` (Master Forge, +2 capacity)
+- `darkForgeCompleted$` RxJS Subject for cross-cutting event notifications — same pattern as training/spawning/breeding/summoning
+- When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
+- `InhabitantState` valid values are `'normal' | 'scared' | 'hungry' | 'starving'` — do NOT use `'idle'` in test fixtures
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
