@@ -234,6 +234,16 @@ BFS pathfinding for hallways between rooms:
 6. Click handler (`hallwayPlacementHandleTileClick`) uses step-based state machine: `selectSource → selectDestination → preview`
 7. In preview step, clicking a different room updates destination (re-pathfinds)
 
+## Floor Navigation
+
+- `PanelFloorSelectorComponent` in `panel-floor-selector/` — sidebar panel for floor selection, creation, and detail viewing
+- `PanelFloorMinimapComponent` in `panel-floor-minimap/` — minimap overview of all floors with simplified CSS grid (3px tiles)
+- Floor indicator ("Floor X / Y") in `game-play.component.html` resource bar area
+- PageUp/PageDown keyboard shortcuts on `GamePlayComponent` via `host` bindings — navigate floors by index
+- Grid only renders `floorCurrent()` — non-active floors are never in the DOM (signal-driven, no explicit `@if` needed)
+- Floor entries in selector show depth number, biome icon, floor name, and room count
+- No global "invasion is active" signal exists yet — keyboard shortcut invasion-mode disable deferred
+
 ## Connection System
 
 - Connections stored per-floor in `Floor.connections: Connection[]` — bidirectional links between adjacent rooms

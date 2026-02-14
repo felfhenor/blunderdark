@@ -18,8 +18,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "FloorSelector already existed. Added depth number and room count to each floor entry."
     },
     {
       "id": "US-002",
@@ -36,8 +36,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Floor indicator added to resource bar area. PageUp/PageDown via host bindings on GamePlayComponent. Invasion mode disable deferred (no global invasion active signal exists yet)."
     },
     {
       "id": "US-003",
@@ -53,8 +53,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created PanelFloorMinimapComponent with 3px CSS grid tiles, biome-colored room indicators, and click-to-switch."
     },
     {
       "id": "US-004",
@@ -68,8 +68,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Already optimized: grid reads from floorCurrent() computed signal, only current floor data is ever in the DOM."
     }
   ]
 }
