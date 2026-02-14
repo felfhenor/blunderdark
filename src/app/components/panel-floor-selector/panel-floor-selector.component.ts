@@ -13,6 +13,16 @@ import {
   stairPlacementEnter,
   stairPlacementExit,
   STAIR_PLACEMENT_COST,
+  elevatorPlacementActive,
+  elevatorPlacementEnter,
+  elevatorPlacementExit,
+  ELEVATOR_PLACEMENT_COST_CRYSTALS,
+  ELEVATOR_PLACEMENT_COST_FLUX,
+  portalPlacementActive,
+  portalPlacementEnter,
+  portalPlacementExit,
+  PORTAL_PLACEMENT_COST_FLUX,
+  PORTAL_PLACEMENT_COST_ESSENCE,
 } from '@helpers';
 import type { FloorDepthResourceModifier } from '@helpers/floor-modifiers';
 import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
@@ -116,6 +126,14 @@ export class PanelFloorSelectorComponent {
   public isStairModeActive = stairPlacementActive;
   public stairCost = STAIR_PLACEMENT_COST;
 
+  public isElevatorModeActive = elevatorPlacementActive;
+  public elevatorCostCrystals = ELEVATOR_PLACEMENT_COST_CRYSTALS;
+  public elevatorCostFlux = ELEVATOR_PLACEMENT_COST_FLUX;
+
+  public isPortalModeActive = portalPlacementActive;
+  public portalCostFlux = PORTAL_PLACEMENT_COST_FLUX;
+  public portalCostEssence = PORTAL_PLACEMENT_COST_ESSENCE;
+
   public canBuildStairs = computed(() => {
     return this.floors().length >= 2;
   });
@@ -124,7 +142,29 @@ export class PanelFloorSelectorComponent {
     if (stairPlacementActive()) {
       stairPlacementExit();
     } else {
+      elevatorPlacementExit();
+      portalPlacementExit();
       stairPlacementEnter(direction);
+    }
+  }
+
+  public toggleElevatorMode(): void {
+    if (elevatorPlacementActive()) {
+      elevatorPlacementExit();
+    } else {
+      stairPlacementExit();
+      portalPlacementExit();
+      elevatorPlacementEnter();
+    }
+  }
+
+  public togglePortalMode(): void {
+    if (portalPlacementActive()) {
+      portalPlacementExit();
+    } else {
+      stairPlacementExit();
+      elevatorPlacementExit();
+      portalPlacementEnter();
     }
   }
 }

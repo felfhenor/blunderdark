@@ -10,6 +10,8 @@ function roomTile(roomId: string): GridTile {
     roomId,
     hallwayId: undefined,
     stairId: undefined,
+    elevatorId: undefined,
+    portalId: undefined,
     connectionType: undefined,
   };
 }

@@ -281,6 +281,8 @@ function makeGameState(overrides: {
         warnedThresholds: [],
       },
       stairs: [],
+      elevators: [],
+      portals: [],
     },
   };
 }

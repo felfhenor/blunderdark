@@ -55,18 +55,43 @@
     ></swal>
 
     @if (canBuildStairs()) {
-      <div class="mt-2 flex gap-1">
+      <div class="divider my-1 text-xs opacity-60">Vertical Transport</div>
+      <div class="flex gap-1 flex-wrap">
         <button
-          class="btn btn-sm flex-1"
+          class="btn btn-xs flex-1"
           [class.btn-warning]="isStairModeActive()"
           [class.btn-outline]="!isStairModeActive()"
           (click)="toggleStairMode('down')"
         >
-          {{ isStairModeActive() ? 'Cancel' : 'Build Stairs' }}
+          {{ isStairModeActive() ? 'Cancel' : 'Stairs' }}
+        </button>
+        <button
+          class="btn btn-xs flex-1"
+          [class.btn-info]="isElevatorModeActive()"
+          [class.btn-outline]="!isElevatorModeActive()"
+          (click)="toggleElevatorMode()"
+        >
+          {{ isElevatorModeActive() ? 'Cancel' : 'Elevator' }}
+        </button>
+        <button
+          class="btn btn-xs flex-1"
+          [class.btn-secondary]="isPortalModeActive()"
+          [class.btn-outline]="!isPortalModeActive()"
+          (click)="togglePortalMode()"
+        >
+          {{ isPortalModeActive() ? 'Cancel' : 'Portal' }}
         </button>
       </div>
       <div class="text-xs opacity-60 mt-1 text-center">
-        Cost: {{ stairCost }} Crystals
+        @if (isStairModeActive()) {
+          Cost: {{ stairCost }} Crystals
+        } @else if (isElevatorModeActive()) {
+          Cost: {{ elevatorCostCrystals }} Crystals + {{ elevatorCostFlux }} Flux
+        } @else if (isPortalModeActive()) {
+          Cost: {{ portalCostFlux }} Flux + {{ portalCostEssence }} Essence
+        } @else {
+          Stairs: {{ stairCost }}C | Elevator: {{ elevatorCostCrystals }}C+{{ elevatorCostFlux }}F | Portal: {{ portalCostFlux }}F+{{ portalCostEssence }}E
+        }
       </div>
     }
 

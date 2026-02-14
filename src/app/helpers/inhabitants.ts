@@ -1,8 +1,10 @@
 import { computed, type Signal } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
-import { stairCountFloorsTraversed } from '@helpers/stairs';
+import {
+  verticalTransportCalculateTravelTicks,
+  verticalTransportFloorsAreConnected,
+} from '@helpers/vertical-transport';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameStateWorld,
@@ -208,16 +210,25 @@ export async function inhabitantAssignToRoom(
     f.rooms.some((r) => r.id === roomId),
   );
   if (roomFloor && roomFloor.depth > 1) {
-    const floorsTraversed = stairCountFloorsTraversed(
+    const connected = verticalTransportFloorsAreConnected(
       state.world.stairs,
+      state.world.elevators,
+      state.world.portals,
       1,
       roomFloor.depth,
     );
-    if (floorsTraversed === undefined) {
-      return { success: false, error: 'No stair connection to that floor' };
+    if (!connected) {
+      return { success: false, error: 'No vertical connection to that floor' };
     }
-    if (floorsTraversed > 0) {
-      travelTicks = floorsTraversed * GAME_TIME_TICKS_PER_MINUTE;
+    const calculatedTicks = verticalTransportCalculateTravelTicks(
+      state.world.stairs,
+      state.world.elevators,
+      state.world.portals,
+      1,
+      roomFloor.depth,
+    );
+    if (calculatedTicks !== undefined && calculatedTicks > 0) {
+      travelTicks = calculatedTicks;
     }
   }
 

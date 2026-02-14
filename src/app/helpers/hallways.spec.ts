@@ -97,6 +97,8 @@ describe('hallwayIsTileBlocked', () => {
       roomId: 'room-1',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     });
     expect(hallwayIsTileBlocked(grid, 5, 5)).toBe(true);

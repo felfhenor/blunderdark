@@ -106,7 +106,9 @@
 }
 
 .grid-container.hallway-mode .grid-tile,
-.grid-container.stair-mode .grid-tile {
+.grid-container.stair-mode .grid-tile,
+.grid-container.elevator-mode .grid-tile,
+.grid-container.portal-mode .grid-tile {
   cursor: crosshair;
 }
 
@@ -172,6 +174,16 @@
 
   &.stair-down {
     background: linear-gradient(to bottom, oklch(0.35 0.08 75), oklch(0.5 0.12 60)) !important;
+  }
+
+  &.elevator-tile {
+    border-color: oklch(0.6 0.15 220);
+    background: linear-gradient(to bottom, oklch(0.3 0.1 220), oklch(0.45 0.15 240)) !important;
+  }
+
+  &.portal-tile {
+    border-color: oklch(0.6 0.2 300);
+    background: radial-gradient(circle, oklch(0.4 0.2 300), oklch(0.25 0.15 280)) !important;
   }
 
   &.border-edge-top {
@@ -293,6 +305,58 @@
   font-size: 10px;
   font-weight: 700;
   color: oklch(0.85 0.06 60);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  line-height: 1;
+}
+
+.elevator-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.elevator-icon {
+  font-size: 20px;
+  color: oklch(0.85 0.12 220);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+.elevator-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: oklch(0.8 0.1 220);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  line-height: 1;
+}
+
+.portal-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.portal-icon {
+  font-size: 22px;
+  color: oklch(0.85 0.2 300);
+  text-shadow: 0 0 6px oklch(0.7 0.3 300 / 0.6);
+  line-height: 1;
+}
+
+.portal-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: oklch(0.8 0.15 300);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
   line-height: 1;
 }

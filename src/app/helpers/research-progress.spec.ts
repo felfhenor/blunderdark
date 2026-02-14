@@ -231,6 +231,8 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
         warnedThresholds: [],
       },
       stairs: [],
+      elevators: [],
+      portals: [],
       ...overrides,
     },
   };

@@ -17,6 +17,8 @@ export function hallwayAddToGrid(grid: GridState, hallway: Hallway): GridState {
       roomId: undefined,
       hallwayId: hallway.id,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: 'hallway',
     };
     result = gridSetTile(result, tile.x, tile.y, newTile);
@@ -43,6 +45,8 @@ export function hallwayRemoveFromGrid(
       roomId: undefined,
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
     result = gridSetTile(result, tile.x, tile.y, emptyTile);

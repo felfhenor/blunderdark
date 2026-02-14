@@ -125,6 +125,8 @@ function makeGameState(
         warnedThresholds: [],
       },
       stairs: [],
+      elevators: [],
+      portals: [],
     },
   };
 }

@@ -66,6 +66,8 @@ describe('stairValidatePlacement', () => {
       roomId: 'room-1',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
     const floors = [floor1, makeFloor(2)];
@@ -82,6 +84,8 @@ describe('stairValidatePlacement', () => {
       roomId: 'room-1',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
     const floors = [makeFloor(1), floor2];

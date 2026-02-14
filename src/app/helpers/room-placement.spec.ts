@@ -121,6 +121,8 @@ describe('roomPlacementValidateNoOverlap', () => {
       roomId: 'existing-room',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     });
 
@@ -138,6 +140,8 @@ describe('roomPlacementValidateNoOverlap', () => {
       roomId: 'existing-room',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
     grid = gridSetTile(grid, 5, 5, occupiedTile);
@@ -158,6 +162,8 @@ describe('roomPlacementValidateNoOverlap', () => {
       roomId: 'existing-room',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     });
 
@@ -189,6 +195,8 @@ describe('roomPlacementValidate', () => {
       roomId: 'existing-room',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     });
 
@@ -206,6 +214,8 @@ describe('roomPlacementValidate', () => {
       roomId: 'existing-room',
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     });
 

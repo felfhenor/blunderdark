@@ -18,6 +18,8 @@ export const stairPlacementDirection = signal<StairDirection>('down');
 export function stairPlacementEnter(direction: StairDirection = 'down'): void {
   roomPlacementExitMode();
   hallwayPlacementExit();
+  // Note: elevator/portal exit is handled by the UI layer (grid component, panel-floor-selector)
+  // to avoid circular dependencies between stairs ↔ elevators ↔ portals
   stairPlacementActive.set(true);
   stairPlacementDirection.set(direction);
 }
@@ -96,6 +98,8 @@ export function stairPlaceOnFloors(
       roomId: undefined,
       hallwayId: undefined,
       stairId: stair.id,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
 
@@ -126,6 +130,8 @@ export function stairRemoveFromFloors(
       roomId: undefined,
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     };
 

@@ -49,6 +49,8 @@ export function defaultGameState(): GameState {
       invasionSchedule: defaultInvasionSchedule(),
       corruptionEffects: defaultCorruptionEffectState(),
       stairs: [],
+      elevators: [],
+      portals: [],
     },
   };
 }

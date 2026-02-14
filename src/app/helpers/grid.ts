@@ -10,6 +10,8 @@ export function gridCreateEmpty(): GridState {
       roomId: undefined,
       hallwayId: undefined,
       stairId: undefined,
+      elevatorId: undefined,
+      portalId: undefined,
       connectionType: undefined,
     })),
   );

@@ -1,4 +1,4 @@
-export type TileOccupant = 'empty' | 'room' | 'hallway' | 'stair';
+export type TileOccupant = 'empty' | 'room' | 'hallway' | 'stair' | 'elevator' | 'portal';
 
 export type GridTile = {
   occupied: boolean;
@@ -6,6 +6,8 @@ export type GridTile = {
   roomId: string | undefined;
   hallwayId: string | undefined;
   stairId: string | undefined;
+  elevatorId: string | undefined;
+  portalId: string | undefined;
   connectionType: string | undefined;
 };
 
