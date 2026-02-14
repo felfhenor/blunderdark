@@ -15,6 +15,7 @@ import type { ForgeCraftingQueue, ForgeInventoryEntry } from '@interfaces/forge'
 import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
 import type { CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
+import type { StairInstance } from '@interfaces/stair';
 
 export interface GameStateWorld {
   grid: GridState;
@@ -34,6 +35,7 @@ export interface GameStateWorld {
   prisoners: CapturedPrisoner[];
   invasionSchedule: InvasionSchedule;
   corruptionEffects: CorruptionEffectState;
+  stairs: StairInstance[];
 }
 
 export interface GameStateClock {

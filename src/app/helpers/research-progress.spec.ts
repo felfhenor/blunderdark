@@ -230,6 +230,7 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
         lastCrusadeCorruption: undefined,
         warnedThresholds: [],
       },
+      stairs: [],
       ...overrides,
     },
   };

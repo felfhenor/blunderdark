@@ -51,7 +51,8 @@ export function productionCalculateInhabitantBonus(
   inhabitants: InhabitantInstance[],
 ): InhabitantBonusResult {
   const assignedInhabitants = inhabitants.filter(
-    (i) => i.assignedRoomId === placedRoom.id,
+    (i) => i.assignedRoomId === placedRoom.id &&
+      !(i.travelTicksRemaining !== undefined && i.travelTicksRemaining > 0),
   );
 
   if (assignedInhabitants.length === 0) {

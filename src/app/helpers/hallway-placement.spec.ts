@@ -9,6 +9,7 @@ function roomTile(roomId: string): GridTile {
     occupiedBy: 'room',
     roomId,
     hallwayId: undefined,
+    stairId: undefined,
     connectionType: undefined,
   };
 }

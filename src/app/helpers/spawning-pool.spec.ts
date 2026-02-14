@@ -241,6 +241,7 @@ function makeGameState(overrides: {
         lastCrusadeCorruption: undefined,
         warnedThresholds: [],
       },
+      stairs: [],
     },
   };
 }

@@ -48,6 +48,7 @@ export function defaultGameState(): GameState {
       prisoners: [],
       invasionSchedule: defaultInvasionSchedule(),
       corruptionEffects: defaultCorruptionEffectState(),
+      stairs: [],
     },
   };
 }

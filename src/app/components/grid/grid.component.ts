@@ -24,7 +24,12 @@ import {
   roomPlacementUpdatePreviewPosition,
   corruptionLevel,
   uiIsAnyModalOpen,
+  stairPlacementActive,
+  stairPlacementExecute,
+  stairPlacementExit,
+  stairGetOnFloor,
 } from '@helpers';
+import { gamestate } from '@helpers/state-game';
 import { gridCreateEmpty } from '@helpers/grid';
 
 const ROOM_COLORS: Record<string, string> = {};
@@ -398,6 +403,13 @@ export class GridComponent {
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
+    if (stairPlacementActive()) {
+      const result = await stairPlacementExecute(x, y);
+      if (!result.success && result.error) {
+        notifyError(result.error);
+      }
+      return;
+    }
     if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementHandleTileClick(x, y);
       return;
@@ -430,7 +442,28 @@ export class GridComponent {
   }
 
   public isHallwayMode = hallwayPlacementIsBuildMode;
+  public isStairMode = stairPlacementActive;
   private hallwayPathSet = hallwayPlacementPreviewTileSet;
+
+  public stairTileMap = computed(() => {
+    const floor = floorCurrent();
+    if (!floor) return new Map<string, { direction: 'up' | 'down'; connectsToDepth: number }>();
+
+    const stairs = stairGetOnFloor(gamestate().world.stairs, floor.depth);
+    const map = new Map<string, { direction: 'up' | 'down'; connectsToDepth: number }>();
+
+    for (const stair of stairs) {
+      const direction = stair.floorDepthA === floor.depth ? 'down' : 'up';
+      const connectsToDepth = stair.floorDepthA === floor.depth ? stair.floorDepthB : stair.floorDepthA;
+      map.set(`${stair.gridX},${stair.gridY}`, { direction, connectsToDepth });
+    }
+
+    return map;
+  });
+
+  public getStairInfo(x: number, y: number): { direction: 'up' | 'down'; connectsToDepth: number } | undefined {
+    return this.stairTileMap().get(`${x},${y}`);
+  }
 
   public isHallwayPathTile(x: number, y: number): boolean {
     return this.hallwayPathSet().has(`${x},${y}`);
@@ -447,7 +480,10 @@ export class GridComponent {
   }
 
   public onRightClick(event: MouseEvent): void {
-    if (hallwayPlacementIsBuildMode()) {
+    if (stairPlacementActive()) {
+      event.preventDefault();
+      stairPlacementExit();
+    } else if (hallwayPlacementIsBuildMode()) {
       event.preventDefault();
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {
@@ -464,7 +500,9 @@ export class GridComponent {
 
   public onEscapeKey(): void {
     if (uiIsAnyModalOpen()) return;
-    if (hallwayPlacementIsBuildMode()) {
+    if (stairPlacementActive()) {
+      stairPlacementExit();
+    } else if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {
       roomPlacementExitMode();

@@ -281,6 +281,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: 'hallway-1',
+      stairId: undefined,
       connectionType: undefined,
     });
     grid = gridSetTile(grid, 6, 5, {
@@ -288,6 +289,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
+      stairId: undefined,
       connectionType: undefined,
     });
     grid = gridSetTile(grid, 5, 6, {
@@ -295,6 +297,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
+      stairId: undefined,
       connectionType: undefined,
     });
     grid = gridSetTile(grid, 6, 6, {
@@ -302,6 +305,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupiedBy: 'room',
       roomId: 'room-1',
       hallwayId: undefined,
+      stairId: undefined,
       connectionType: undefined,
     });
 

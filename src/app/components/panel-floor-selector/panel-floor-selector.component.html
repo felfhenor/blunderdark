@@ -54,6 +54,22 @@
       (confirm)="onConfirmCreateFloor()"
     ></swal>
 
+    @if (canBuildStairs()) {
+      <div class="mt-2 flex gap-1">
+        <button
+          class="btn btn-sm flex-1"
+          [class.btn-warning]="isStairModeActive()"
+          [class.btn-outline]="!isStairModeActive()"
+          (click)="toggleStairMode('down')"
+        >
+          {{ isStairModeActive() ? 'Cancel' : 'Build Stairs' }}
+        </button>
+      </div>
+      <div class="text-xs opacity-60 mt-1 text-center">
+        Cost: {{ stairCost }} Crystals
+      </div>
+    }
+
     @if (selectedFloor(); as floor) {
       <div class="divider my-2"></div>
 

@@ -16,6 +16,7 @@ export function hallwayAddToGrid(grid: GridState, hallway: Hallway): GridState {
       occupiedBy: 'hallway',
       roomId: undefined,
       hallwayId: hallway.id,
+      stairId: undefined,
       connectionType: 'hallway',
     };
     result = gridSetTile(result, tile.x, tile.y, newTile);
@@ -41,6 +42,7 @@ export function hallwayRemoveFromGrid(
       occupiedBy: 'empty',
       roomId: undefined,
       hallwayId: undefined,
+      stairId: undefined,
       connectionType: undefined,
     };
     result = gridSetTile(result, tile.x, tile.y, emptyTile);

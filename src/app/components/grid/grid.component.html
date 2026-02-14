@@ -1,10 +1,13 @@
-<div class="grid-container" [class.hallway-mode]="isHallwayMode()" [class]="'corruption-' + corruptionLevel()" (mouseleave)="onGridLeave()" (contextmenu)="onRightClick($event)">
+<div class="grid-container" [class.hallway-mode]="isHallwayMode()" [class.stair-mode]="isStairMode()" [class]="'corruption-' + corruptionLevel()" (mouseleave)="onGridLeave()" (contextmenu)="onRightClick($event)">
   @for (row of grid(); track rowIdx; let rowIdx = $index) {
     @for (tile of row; track colIdx; let colIdx = $index) {
       <div
         class="grid-tile"
         [class.occupied]="tile.occupied"
         [class.room-tile]="tile.roomId"
+        [class.stair-tile]="tile.stairId"
+        [class.stair-up]="getStairInfo(colIdx, rowIdx)?.direction === 'up'"
+        [class.stair-down]="getStairInfo(colIdx, rowIdx)?.direction === 'down'"
         [class.selected]="isSelected(colIdx, rowIdx)"
         [class.preview-valid]="isPreviewValid(colIdx, rowIdx)"
         [class.preview-invalid]="isPreviewInvalid(colIdx, rowIdx)"
@@ -48,6 +51,12 @@
           @if (hdirs.has('left')) {
             <div class="doorway doorway-left"></div>
           }
+        }
+        @if (getStairInfo(colIdx, rowIdx); as stairInfo) {
+          <div class="stair-indicator">
+            <span class="stair-arrow">{{ stairInfo.direction === 'up' ? '&#9650;' : '&#9660;' }}</span>
+            <span class="stair-label">F{{ stairInfo.connectsToDepth }}</span>
+          </div>
         }
       </div>
     }

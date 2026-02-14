@@ -40,6 +40,7 @@ export * from './room';
 export * from './room-shape';
 export * from './season';
 export * from './sfx';
+export * from './stair';
 export * from './stat';
 export * from './state-game';
 export * from './state-options';

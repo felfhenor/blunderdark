@@ -13,6 +13,7 @@ import { PanelReputationComponent } from '@components/panel-reputation/panel-rep
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
+import { PanelStairInfoComponent } from '@components/panel-stair-info/panel-stair-info.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
@@ -47,6 +48,7 @@ import {
     PanelFloorMinimapComponent,
     PanelFloorSelectorComponent,
     PanelHallwayInfoComponent,
+    PanelStairInfoComponent,
     PanelReputationComponent,
     PanelResourcesComponent,
     PanelRoomInfoComponent,

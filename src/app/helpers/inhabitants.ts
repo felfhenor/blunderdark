@@ -1,6 +1,8 @@
 import { computed, type Signal } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
+import { stairCountFloorsTraversed } from '@helpers/stairs';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameStateWorld,
@@ -89,6 +91,7 @@ export function inhabitantDeserialize(
     isSummoned: i.isSummoned ?? undefined,
     isTemporary: i.isTemporary ?? undefined,
     temporaryTicksRemaining: i.temporaryTicksRemaining ?? undefined,
+    travelTicksRemaining: i.travelTicksRemaining ?? undefined,
   }));
 }
 
@@ -199,11 +202,32 @@ export async function inhabitantAssignToRoom(
     return { success: false, error: check.reason };
   }
 
+  // Calculate travel time for cross-floor assignments
+  let travelTicks: number | undefined;
+  const roomFloor = state.world.floors.find((f) =>
+    f.rooms.some((r) => r.id === roomId),
+  );
+  if (roomFloor && roomFloor.depth > 1) {
+    const floorsTraversed = stairCountFloorsTraversed(
+      state.world.stairs,
+      1,
+      roomFloor.depth,
+    );
+    if (floorsTraversed === undefined) {
+      return { success: false, error: 'No stair connection to that floor' };
+    }
+    if (floorsTraversed > 0) {
+      travelTicks = floorsTraversed * GAME_TIME_TICKS_PER_MINUTE;
+    }
+  }
+
   await updateGamestate((s) => {
     const world = {
       ...s.world,
       inhabitants: s.world.inhabitants.map((i) =>
-        i.instanceId === instanceId ? { ...i, assignedRoomId: roomId } : i,
+        i.instanceId === instanceId
+          ? { ...i, assignedRoomId: roomId, travelTicksRemaining: travelTicks }
+          : i,
       ),
     };
     return { ...s, world: syncFloorInhabitants(world) };

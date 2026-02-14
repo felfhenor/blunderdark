@@ -70,4 +70,5 @@ export type InhabitantInstance = {
   isSummoned?: boolean;
   isTemporary?: boolean;
   temporaryTicksRemaining?: number;
+  travelTicksRemaining?: number;
 };

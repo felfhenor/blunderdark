@@ -71,6 +71,7 @@ export async function worldgenGenerateWorld(): Promise<
     prisoners: [],
     invasionSchedule: defaultInvasionSchedule(),
     corruptionEffects: defaultCorruptionEffectState(),
+    stairs: [],
     didFinish: true,
   };
 }

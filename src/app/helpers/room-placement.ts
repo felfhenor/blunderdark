@@ -347,6 +347,7 @@ export function roomPlacementPlaceOnFloor(
       occupiedBy: 'room',
       roomId: room.id,
       hallwayId: undefined,
+      stairId: undefined,
       connectionType: undefined,
     };
   }
@@ -383,6 +384,7 @@ export function roomPlacementRemoveFromFloor(
           occupiedBy: 'empty',
           roomId: undefined,
           hallwayId: gridTile.hallwayId,
+          stairId: gridTile.stairId,
           connectionType: gridTile.connectionType,
         };
       }

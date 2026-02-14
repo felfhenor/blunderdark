@@ -9,6 +9,10 @@ import {
   floorModifierFormatPercentage,
   floorModifierGet,
   floorSetCurrentByIndex,
+  stairPlacementActive,
+  stairPlacementEnter,
+  stairPlacementExit,
+  STAIR_PLACEMENT_COST,
 } from '@helpers';
 import type { FloorDepthResourceModifier } from '@helpers/floor-modifiers';
 import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
@@ -107,5 +111,20 @@ export class PanelFloorSelectorComponent {
 
   public trackByFloorId(_index: number, floor: Floor): string {
     return floor.id;
+  }
+
+  public isStairModeActive = stairPlacementActive;
+  public stairCost = STAIR_PLACEMENT_COST;
+
+  public canBuildStairs = computed(() => {
+    return this.floors().length >= 2;
+  });
+
+  public toggleStairMode(direction: 'up' | 'down'): void {
+    if (stairPlacementActive()) {
+      stairPlacementExit();
+    } else {
+      stairPlacementEnter(direction);
+    }
   }
 }
