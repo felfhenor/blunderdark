@@ -8,6 +8,7 @@ import type {
   ReputationType,
 } from '@interfaces';
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
+import type { ReputationAwardEvent, ReputationLevelUpEvent } from '@interfaces/reputation';
 import { Subject } from 'rxjs';
 
 

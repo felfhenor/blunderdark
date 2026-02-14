@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Season, SeasonState } from '@interfaces';
 import { DAYS_PER_SEASON, SEASON_ORDER } from '@interfaces/season';
+import type { SeasonTransitionEvent } from '@interfaces/season';
 import { Subject } from 'rxjs';
 
 const seasonTransition = new Subject<SeasonTransitionEvent>();
