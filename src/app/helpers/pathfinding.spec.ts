@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DungeonGraph, PathEdge, PathNode } from '@helpers/pathfinding';
-import type { Floor } from '@interfaces';
+import type { Floor, GridState, GridTile } from '@interfaces';
 
 const {
   pathfindingBuildDungeonGraph,
@@ -8,7 +8,11 @@ const {
   pathfindingGetCost,
   pathfindingFindWithObjectives,
   pathfindingRecalculate,
+  tilePathfindingFindPath,
+  tilePathfindingFindRoomToRoomPath,
 } = await import('@helpers/pathfinding');
+
+const { gridCreateEmpty, gridSetTile } = await import('@helpers/grid');
 
 // --- Test helpers ---
 
@@ -844,5 +848,319 @@ describe('Complex graph scenarios', () => {
     );
 
     expect(pathfindingFindPath(graph, 'A', 'B')).toEqual([]);
+  });
+});
+
+// ============================================================
+// Tile-level A* pathfinding (tilePathfindingFindPath)
+// ============================================================
+
+function roomTile(roomId: string): GridTile {
+  return {
+    occupied: true,
+    occupiedBy: 'room',
+    roomId,
+    hallwayId: undefined,
+    stairId: undefined,
+    elevatorId: undefined,
+    portalId: undefined,
+    connectionType: undefined,
+  };
+}
+
+function hallwayTile(hallwayId: string): GridTile {
+  return {
+    occupied: true,
+    occupiedBy: 'hallway',
+    roomId: undefined,
+    hallwayId,
+    stairId: undefined,
+    elevatorId: undefined,
+    portalId: undefined,
+    connectionType: undefined,
+  };
+}
+
+function makeGridWithObstacles(
+  obstacles: Array<{ x: number; y: number; tile: GridTile }>,
+): GridState {
+  let grid = gridCreateEmpty();
+  for (const obs of obstacles) {
+    grid = gridSetTile(grid, obs.x, obs.y, obs.tile);
+  }
+  return grid;
+}
+
+describe('tilePathfindingFindPath', () => {
+  it('should find a straight-line path with no obstacles', () => {
+    const grid = gridCreateEmpty();
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 8, y: 5 });
+    expect(path).not.toBeNull();
+    expect(path!.length).toBe(4);
+    expect(path![0]).toEqual({ x: 5, y: 5 });
+    expect(path![3]).toEqual({ x: 8, y: 5 });
+  });
+
+  it('should find an L-shaped path around a single obstacle', () => {
+    // Wall at (6,5) between start(5,5) and end(7,5)
+    const grid = makeGridWithObstacles([
+      { x: 6, y: 5, tile: roomTile('wall') },
+    ]);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 7, y: 5 });
+    expect(path).not.toBeNull();
+    // Must go around: e.g., (5,5)→(5,4)→(6,4)→(7,4)→(7,5) = 5 tiles
+    // or (5,5)→(5,6)→(6,6)→(7,6)→(7,5) = 5 tiles
+    expect(path!.length).toBe(5);
+    expect(path![0]).toEqual({ x: 5, y: 5 });
+    expect(path![path!.length - 1]).toEqual({ x: 7, y: 5 });
+    // Path should not include the obstacle
+    expect(path!.some((t) => t.x === 6 && t.y === 5)).toBe(false);
+  });
+
+  it('should find a multi-turn path around complex obstacles', () => {
+    // Build a wall from y=0 to y=18 at x=6, with a gap at y=3
+    const obstacles = Array.from({ length: 19 }, (_, i) => ({
+      x: 6,
+      y: i,
+      tile: roomTile('wall'),
+    })).filter((obs) => obs.y !== 3);
+
+    const grid = makeGridWithObstacles(obstacles);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 10 }, { x: 7, y: 10 });
+    expect(path).not.toBeNull();
+    // Must navigate up to gap at y=3, through x=6, then back down
+    expect(path!.length).toBeGreaterThan(2);
+    expect(path![0]).toEqual({ x: 5, y: 10 });
+    expect(path![path!.length - 1]).toEqual({ x: 7, y: 10 });
+    // Should pass through the gap
+    expect(path!.some((t) => t.x === 6 && t.y === 3)).toBe(true);
+  });
+
+  it('should return null when no valid path exists', () => {
+    // Complete wall from y=0 to y=19 at x=6
+    const obstacles = Array.from({ length: 20 }, (_, i) => ({
+      x: 6,
+      y: i,
+      tile: roomTile('wall'),
+    }));
+    const grid = makeGridWithObstacles(obstacles);
+    const path = tilePathfindingFindPath(grid, { x: 3, y: 5 }, { x: 9, y: 5 });
+    expect(path).toBeNull();
+  });
+
+  it('should return single tile for same start and end', () => {
+    const grid = gridCreateEmpty();
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: 5 });
+    expect(path).toEqual([{ x: 5, y: 5 }]);
+  });
+
+  it('should return null when start is occupied', () => {
+    const grid = makeGridWithObstacles([
+      { x: 5, y: 5, tile: roomTile('room-a') },
+    ]);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 8, y: 5 });
+    expect(path).toBeNull();
+  });
+
+  it('should return null when end is occupied', () => {
+    const grid = makeGridWithObstacles([
+      { x: 8, y: 5, tile: roomTile('room-a') },
+    ]);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 8, y: 5 });
+    expect(path).toBeNull();
+  });
+
+  it('should return null for out-of-bounds start', () => {
+    const grid = gridCreateEmpty();
+    expect(tilePathfindingFindPath(grid, { x: -1, y: 5 }, { x: 5, y: 5 })).toBeNull();
+    expect(tilePathfindingFindPath(grid, { x: 20, y: 5 }, { x: 5, y: 5 })).toBeNull();
+  });
+
+  it('should return null for out-of-bounds end', () => {
+    const grid = gridCreateEmpty();
+    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: -1 })).toBeNull();
+    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: 20 })).toBeNull();
+  });
+
+  it('should avoid room-occupied tiles', () => {
+    const grid = makeGridWithObstacles([
+      { x: 6, y: 5, tile: roomTile('room-a') },
+    ]);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 7, y: 5 });
+    expect(path).not.toBeNull();
+    expect(path!.every((t) => !(t.x === 6 && t.y === 5))).toBe(true);
+  });
+
+  it('should avoid hallway-occupied tiles', () => {
+    const grid = makeGridWithObstacles([
+      { x: 6, y: 5, tile: hallwayTile('hw-1') },
+    ]);
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 7, y: 5 });
+    expect(path).not.toBeNull();
+    expect(path!.every((t) => !(t.x === 6 && t.y === 5))).toBe(true);
+  });
+
+  it('should find shortest path (Manhattan optimal for open grid)', () => {
+    const grid = gridCreateEmpty();
+    const path = tilePathfindingFindPath(grid, { x: 0, y: 0 }, { x: 3, y: 2 });
+    expect(path).not.toBeNull();
+    // Manhattan distance = 3 + 2 = 5, path length = distance + 1
+    expect(path!.length).toBe(6);
+  });
+
+  it('should find adjacent tile path (length 2)', () => {
+    const grid = gridCreateEmpty();
+    const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 6, y: 5 });
+    expect(path).not.toBeNull();
+    expect(path!.length).toBe(2);
+    expect(path![0]).toEqual({ x: 5, y: 5 });
+    expect(path![1]).toEqual({ x: 6, y: 5 });
+  });
+
+  it('should complete pathfinding on a full 20x20 grid within acceptable time', () => {
+    const grid = gridCreateEmpty();
+    const start = performance.now();
+    const path = tilePathfindingFindPath(grid, { x: 0, y: 0 }, { x: 19, y: 19 });
+    const elapsed = performance.now() - start;
+    expect(path).not.toBeNull();
+    expect(path!.length).toBe(39); // Manhattan distance 19+19 = 38, +1 = 39
+    expect(elapsed).toBeLessThan(100); // Should complete well under 100ms
+  });
+});
+
+// ============================================================
+// Room-to-room tile pathfinding (tilePathfindingFindRoomToRoomPath)
+// ============================================================
+
+function makeFloorWithRooms(
+  rooms: Array<{ id: string; tiles: Array<{ x: number; y: number }> }>,
+): Floor {
+  let grid = gridCreateEmpty();
+  for (const room of rooms) {
+    for (const t of room.tiles) {
+      grid = gridSetTile(grid, t.x, t.y, roomTile(room.id));
+    }
+  }
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 1,
+    biome: 'neutral',
+    grid,
+    rooms: rooms.map((r) => ({
+      id: r.id,
+      roomTypeId: 'type-a',
+      shapeId: 'shape-1',
+      anchorX: r.tiles[0].x,
+      anchorY: r.tiles[0].y,
+    })),
+    hallways: [],
+    inhabitants: [],
+    connections: [],
+    traps: [],
+  };
+}
+
+describe('tilePathfindingFindRoomToRoomPath', () => {
+  it('should find a straight path between adjacent rooms with a gap', () => {
+    // Room A at (2,5)(3,5), Room B at (6,5)(7,5), gap at (4,5)(5,5)
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 2, y: 5 }, { x: 3, y: 5 }] },
+      { id: 'room-b', tiles: [{ x: 6, y: 5 }, { x: 7, y: 5 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    expect(path).not.toBeNull();
+    expect(path![0]).toEqual({ x: 4, y: 5 });
+    expect(path![path!.length - 1]).toEqual({ x: 5, y: 5 });
+    // Path should not include room tiles
+    expect(path!.every((t) => t.x !== 2 && t.x !== 3 && t.x !== 6 && t.x !== 7 || t.y !== 5)).toBe(true);
+  });
+
+  it('should find path with turns between offset rooms (0 direct alignment)', () => {
+    // Room A at (2,2)(3,2), Room B at (8,6)(9,6)
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 2, y: 2 }, { x: 3, y: 2 }] },
+      { id: 'room-b', tiles: [{ x: 8, y: 6 }, { x: 9, y: 6 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    expect(path).not.toBeNull();
+    expect(path!.length).toBeGreaterThan(0);
+  });
+
+  it('should return null for same room', () => {
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 2, y: 5 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-a');
+    expect(path).toBeNull();
+  });
+
+  it('should return null for non-existent room', () => {
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 2, y: 5 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-z');
+    expect(path).toBeNull();
+  });
+
+  it('should return null when no path exists between rooms', () => {
+    // Room A at left side, Room B at right side, full wall in between
+    const wall = Array.from({ length: 20 }, (_, i) => ({
+      x: 10,
+      y: i,
+      tile: roomTile('wall'),
+    }));
+    let grid = gridCreateEmpty();
+    for (const w of wall) {
+      grid = gridSetTile(grid, w.x, w.y, w.tile);
+    }
+    // Place rooms on either side of wall
+    grid = gridSetTile(grid, 5, 5, roomTile('room-a'));
+    grid = gridSetTile(grid, 15, 5, roomTile('room-b'));
+
+    const floor: Floor = {
+      id: 'floor-1',
+      name: 'Floor 1',
+      depth: 1,
+      biome: 'neutral',
+      grid,
+      rooms: [
+        { id: 'room-a', roomTypeId: 'type-a', shapeId: 's1', anchorX: 5, anchorY: 5 },
+        { id: 'room-b', roomTypeId: 'type-a', shapeId: 's1', anchorX: 15, anchorY: 5 },
+      ],
+      hallways: [],
+      inhabitants: [],
+      connections: [],
+      traps: [],
+    };
+
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    expect(path).toBeNull();
+  });
+
+  it('should prefer paths with fewer turns when length is equal', () => {
+    // Room A at (3,5), Room B at (7,5) — straight horizontal path has 0 turns
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 3, y: 5 }] },
+      { id: 'room-b', tiles: [{ x: 7, y: 5 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    expect(path).not.toBeNull();
+    // All tiles should be on y=5 (straight line, 0 turns)
+    expect(path!.every((t) => t.y === 5)).toBe(true);
+  });
+
+  it('should not include room tiles in the returned path', () => {
+    const floor = makeFloorWithRooms([
+      { id: 'room-a', tiles: [{ x: 3, y: 5 }, { x: 4, y: 5 }] },
+      { id: 'room-b', tiles: [{ x: 8, y: 5 }, { x: 9, y: 5 }] },
+    ]);
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    expect(path).not.toBeNull();
+    // No tile in path should be a room tile
+    const roomTileKeys = new Set(['3,5', '4,5', '8,5', '9,5']);
+    for (const t of path!) {
+      expect(roomTileKeys.has(`${t.x},${t.y}`)).toBe(false);
+    }
   });
 });

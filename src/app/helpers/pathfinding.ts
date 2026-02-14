@@ -1,4 +1,5 @@
-import type { Floor } from '@interfaces';
+import type { Floor, GridState, TileOffset } from '@interfaces';
+import { GRID_SIZE } from '@interfaces/grid';
 
 // --- Graph types ---
 
@@ -253,4 +254,255 @@ export function pathfindingRecalculate(
     ...options,
     blockedNodes: blocked,
   });
+}
+
+// ============================================================
+// Tile-level A* pathfinding
+// ============================================================
+
+/**
+ * Binary min-heap for A* open set.
+ * Entries are [fScore, tieBreaker, x, y] — tieBreaker favours later inserts (lower g).
+ */
+type HeapEntry = [number, number, number, number];
+
+function heapPush(heap: HeapEntry[], entry: HeapEntry): void {
+  heap.push(entry);
+  let i = heap.length - 1;
+  while (i > 0) {
+    const parent = (i - 1) >> 1;
+    if (heap[parent][0] < entry[0] || (heap[parent][0] === entry[0] && heap[parent][1] <= entry[1])) break;
+    heap[i] = heap[parent];
+    heap[parent] = entry;
+    i = parent;
+  }
+}
+
+function heapPop(heap: HeapEntry[]): HeapEntry | undefined {
+  if (heap.length === 0) return undefined;
+  const top = heap[0];
+  const last = heap.pop()!;
+  if (heap.length > 0) {
+    heap[0] = last;
+    let i = 0;
+    const len = heap.length;
+    let needsSift = true;
+    while (needsSift) {
+      let smallest = i;
+      const left = 2 * i + 1;
+      const right = 2 * i + 2;
+      if (left < len && (heap[left][0] < heap[smallest][0] || (heap[left][0] === heap[smallest][0] && heap[left][1] < heap[smallest][1]))) {
+        smallest = left;
+      }
+      if (right < len && (heap[right][0] < heap[smallest][0] || (heap[right][0] === heap[smallest][0] && heap[right][1] < heap[smallest][1]))) {
+        smallest = right;
+      }
+      if (smallest === i) {
+        needsSift = false;
+      } else {
+        [heap[i], heap[smallest]] = [heap[smallest], heap[i]];
+        i = smallest;
+      }
+    }
+  }
+  return top;
+}
+
+const TILE_DIRS: ReadonlyArray<[number, number]> = [
+  [0, -1],
+  [1, 0],
+  [0, 1],
+  [-1, 0],
+];
+
+function manhattanDistance(ax: number, ay: number, bx: number, by: number): number {
+  return Math.abs(ax - bx) + Math.abs(ay - by);
+}
+
+/**
+ * A* pathfinding on the tile grid.
+ * Uses Manhattan distance heuristic and a min-heap priority queue.
+ * Returns the shortest path as an ordered array of tiles, or null if no valid path.
+ * Occupied tiles (rooms, hallways, stairs, etc.) are treated as impassable.
+ */
+export function tilePathfindingFindPath(
+  grid: GridState,
+  start: TileOffset,
+  end: TileOffset,
+): TileOffset[] | null {
+  if (start.x === end.x && start.y === end.y) return [{ x: start.x, y: start.y }];
+
+  if (start.x < 0 || start.x >= GRID_SIZE || start.y < 0 || start.y >= GRID_SIZE) return null;
+  if (end.x < 0 || end.x >= GRID_SIZE || end.y < 0 || end.y >= GRID_SIZE) return null;
+
+  if (grid[start.y][start.x].occupied) return null;
+  if (grid[end.y][end.x].occupied) return null;
+
+  const gScore = new Float64Array(GRID_SIZE * GRID_SIZE).fill(Infinity);
+  const cameFromX = new Int8Array(GRID_SIZE * GRID_SIZE).fill(-1);
+  const cameFromY = new Int8Array(GRID_SIZE * GRID_SIZE).fill(-1);
+  const closed = new Uint8Array(GRID_SIZE * GRID_SIZE);
+
+  const startIdx = start.y * GRID_SIZE + start.x;
+  gScore[startIdx] = 0;
+
+  const heap: HeapEntry[] = [];
+  let tieBreaker = 0;
+  heapPush(heap, [manhattanDistance(start.x, start.y, end.x, end.y), tieBreaker++, start.x, start.y]);
+
+  while (heap.length > 0) {
+    const entry = heapPop(heap)!;
+    const cx = entry[2];
+    const cy = entry[3];
+    const cIdx = cy * GRID_SIZE + cx;
+
+    if (cx === end.x && cy === end.y) {
+      // Reconstruct path
+      const path: TileOffset[] = [];
+      let px = cx;
+      let py = cy;
+      while (px !== -1 && py !== -1) {
+        path.push({ x: px, y: py });
+        const pIdx = py * GRID_SIZE + px;
+        const nx = cameFromX[pIdx];
+        const ny = cameFromY[pIdx];
+        px = nx;
+        py = ny;
+      }
+      path.reverse();
+      return path;
+    }
+
+    if (closed[cIdx]) continue;
+    closed[cIdx] = 1;
+
+    const currentG = gScore[cIdx];
+
+    for (const [dx, dy] of TILE_DIRS) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) continue;
+
+      const nIdx = ny * GRID_SIZE + nx;
+      if (closed[nIdx]) continue;
+      if (grid[ny][nx].occupied && !(nx === end.x && ny === end.y)) continue;
+
+      const tentativeG = currentG + 1;
+      if (tentativeG < gScore[nIdx]) {
+        gScore[nIdx] = tentativeG;
+        cameFromX[nIdx] = cx;
+        cameFromY[nIdx] = cy;
+        const f = tentativeG + manhattanDistance(nx, ny, end.x, end.y);
+        heapPush(heap, [f, tieBreaker++, nx, ny]);
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Count the number of direction changes (turns) in a path.
+ */
+function countTurns(path: TileOffset[]): number {
+  if (path.length < 3) return 0;
+  let turns = 0;
+  for (let i = 2; i < path.length; i++) {
+    const dx1 = path[i - 1].x - path[i - 2].x;
+    const dy1 = path[i - 1].y - path[i - 2].y;
+    const dx2 = path[i].x - path[i - 1].x;
+    const dy2 = path[i].y - path[i - 1].y;
+    if (dx1 !== dx2 || dy1 !== dy2) turns++;
+  }
+  return turns;
+}
+
+/**
+ * Find all tiles on the grid that belong to a given room.
+ * Reads directly from grid state to avoid content service dependency.
+ */
+function getRoomTilesFromGrid(grid: GridState, roomId: string): TileOffset[] {
+  const tiles: TileOffset[] = [];
+  for (let y = 0; y < GRID_SIZE; y++) {
+    for (let x = 0; x < GRID_SIZE; x++) {
+      if (grid[y][x].roomId === roomId) {
+        tiles.push({ x, y });
+      }
+    }
+  }
+  return tiles;
+}
+
+/**
+ * Get tiles adjacent to a room that are empty on the grid.
+ * These are candidate start/end points for room-to-room pathfinding.
+ */
+function getRoomEdgeEmptyTiles(grid: GridState, roomId: string): TileOffset[] {
+  const roomTiles = getRoomTilesFromGrid(grid, roomId);
+  const roomTileSet = new Set(roomTiles.map((t) => `${t.x},${t.y}`));
+
+  const result: TileOffset[] = [];
+  const seen = new Set<string>();
+
+  for (const tile of roomTiles) {
+    for (const [dx, dy] of TILE_DIRS) {
+      const nx = tile.x + dx;
+      const ny = tile.y + dy;
+      const key = `${nx},${ny}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) continue;
+      if (roomTileSet.has(key)) continue;
+      if (!grid[ny][nx].occupied) {
+        result.push({ x: nx, y: ny });
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Find a path from one room's edge to another room's edge.
+ * Evaluates multiple start/end candidates from each room's border.
+ * Returns the shortest path (preferring fewer turns when lengths are equal),
+ * or null if no valid path exists.
+ * The returned path does NOT include tiles inside either room.
+ */
+export function tilePathfindingFindRoomToRoomPath(
+  floor: Floor,
+  roomAId: string,
+  roomBId: string,
+): TileOffset[] | null {
+  if (roomAId === roomBId) return null;
+
+  const roomATiles = getRoomTilesFromGrid(floor.grid, roomAId);
+  const roomBTiles = getRoomTilesFromGrid(floor.grid, roomBId);
+  if (roomATiles.length === 0 || roomBTiles.length === 0) return null;
+
+  const startsA = getRoomEdgeEmptyTiles(floor.grid, roomAId);
+  const endsB = getRoomEdgeEmptyTiles(floor.grid, roomBId);
+
+  if (startsA.length === 0 || endsB.length === 0) return null;
+
+  let bestPath: TileOffset[] | null = null;
+  let bestLen = Infinity;
+  let bestTurns = Infinity;
+
+  for (const start of startsA) {
+    for (const end of endsB) {
+      const path = tilePathfindingFindPath(floor.grid, start, end);
+      if (!path) continue;
+
+      const turns = countTurns(path);
+      if (path.length < bestLen || (path.length === bestLen && turns < bestTurns)) {
+        bestPath = path;
+        bestLen = path.length;
+        bestTurns = turns;
+      }
+    }
+  }
+
+  return bestPath;
 }
