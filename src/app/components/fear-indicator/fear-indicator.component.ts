@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
+import type { PlacedRoomId } from '@interfaces';
 import type { FearLevelBreakdown } from '@interfaces/fear';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -116,7 +117,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   ],
 })
 export class FearIndicatorComponent {
-  public roomId = input.required<string>();
+  public roomId = input.required<PlacedRoomId>();
 
   public breakdown = computed<FearLevelBreakdown | undefined>(() =>
     fearLevelBreakdownMap().get(this.roomId()),

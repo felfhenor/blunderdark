@@ -1,5 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
-import type { InhabitantDefinition, InhabitantInstance, IsContentItem } from '@interfaces';
+import type { InhabitantDefinition, InhabitantInstance, IsContentItem, PlacedRoomId } from '@interfaces';
 import type { DayNightPhase, DayNightResourceModifier, DayNightCreatureModifier } from '@interfaces/day-night';
 
 // --- Constants ---
@@ -131,7 +131,7 @@ export function dayNightGetActiveCreatureModifiers(hour: number): DayNightCreatu
 export function dayNightCalculateCreatureProductionModifier(
   hour: number,
   inhabitants: InhabitantInstance[],
-  roomId: string,
+  roomId: PlacedRoomId,
 ): number {
   const assigned = inhabitants.filter((i) => i.assignedRoomId === roomId);
   if (assigned.length === 0) return 1.0;

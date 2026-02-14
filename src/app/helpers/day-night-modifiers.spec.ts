@@ -27,12 +27,12 @@ import {
   dayNightGetPhaseLabel,
   dayNightGetResourceModifier,
 } from '@helpers/day-night-modifiers';
-import type { InhabitantInstance } from '@interfaces';
+import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
 
 function makeInhabitant(
   instanceId: string,
   definitionId: string,
-  assignedRoomId: string | undefined = undefined,
+  assignedRoomId: PlacedRoomId | undefined = undefined,
 ): InhabitantInstance {
   return {
     instanceId,
@@ -236,11 +236,11 @@ describe('dayNightCalculateCreatureProductionModifierPure', () => {
 // --- Creature production modifier with content lookup ---
 
 describe('dayNightCalculateCreatureProductionModifier', () => {
-  const ROOM_ID = 'room-001';
+  const ROOM_ID = 'room-001' as PlacedRoomId;
 
   it('should return 1.0 for room with no assigned inhabitants', () => {
     const inhabitants = [
-      makeInhabitant('i1', SKELETON_DEF_ID, 'other-room'),
+      makeInhabitant('i1', SKELETON_DEF_ID, 'other-room' as PlacedRoomId),
     ];
     expect(dayNightCalculateCreatureProductionModifier(12, inhabitants, ROOM_ID)).toBe(1.0);
   });
@@ -271,7 +271,7 @@ describe('dayNightCalculateCreatureProductionModifier', () => {
   it('should only consider inhabitants assigned to the room', () => {
     const inhabitants = [
       makeInhabitant('i1', SKELETON_DEF_ID, ROOM_ID),
-      makeInhabitant('i2', SKELETON_DEF_ID, 'other-room'),
+      makeInhabitant('i2', SKELETON_DEF_ID, 'other-room' as PlacedRoomId),
       makeInhabitant('i3', GOBLIN_DEF_ID, ROOM_ID),
     ];
     // Only i1 (undead) and i3 (creature) in this room: (0.90 + 1.0) / 2 = 0.95

@@ -1,7 +1,7 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
 import { roomPlacementPlaceOnFloor, roomPlacementRemoveFromFloor } from '@helpers/room-placement';
 import { roomRemovalCalculateRefund } from '@helpers/room-removal';
-import type { Floor, InhabitantInstance, PlacedRoom, RoomShape } from '@interfaces';
+import type { Floor, InhabitantInstance, PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // --- Mock contentGetEntry to control removable/cost for roomPlacementIsRemovable ---
@@ -154,22 +154,22 @@ beforeEach(() => {
 describe('US-001: Altar Cannot Be Removed', () => {
   it('should flag altar as non-removable via roomPlacementIsRemovable', async () => {
     const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
-    expect(roomPlacementIsRemovable(ALTAR_ROOM_TYPE_ID)).toBe(false);
+    expect(roomPlacementIsRemovable(ALTAR_ROOM_TYPE_ID as RoomId)).toBe(false);
   });
 
   it('should allow removal of regular rooms via roomPlacementIsRemovable', async () => {
     const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
-    expect(roomPlacementIsRemovable(CRYSTAL_MINE_TYPE_ID)).toBe(true);
+    expect(roomPlacementIsRemovable(CRYSTAL_MINE_TYPE_ID as RoomId)).toBe(true);
   });
 
   it('should allow removal of unique non-altar rooms', async () => {
     const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
-    expect(roomPlacementIsRemovable(THRONE_ROOM_TYPE_ID)).toBe(true);
+    expect(roomPlacementIsRemovable(THRONE_ROOM_TYPE_ID as RoomId)).toBe(true);
   });
 
   it('should return true for unknown room types (safe default)', async () => {
     const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
-    expect(roomPlacementIsRemovable('nonexistent-room-type')).toBe(true);
+    expect(roomPlacementIsRemovable('nonexistent-room-type' as RoomId)).toBe(true);
   });
 });
 
@@ -218,8 +218,8 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
   it('should clear all tiles occupied by the removed room', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -227,7 +227,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
     expect(placed).toBeDefined();
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
 
@@ -245,15 +245,15 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
   it('should not affect tiles of other rooms', () => {
     const floor = makeFloor();
     const room1: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
-      id: 'room-2',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -261,7 +261,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     let placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
     placed = roomPlacementPlaceOnFloor(placed, room2, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
@@ -279,7 +279,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: 'hallway-1',
       stairId: undefined,
       elevatorId: undefined,
@@ -289,7 +289,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     grid = gridSetTile(grid, 6, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -299,7 +299,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     grid = gridSetTile(grid, 5, 6, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -309,7 +309,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     grid = gridSetTile(grid, 6, 6, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -318,15 +318,15 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     });
 
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
     };
     const floor = makeFloor([room], grid);
 
-    const result = roomPlacementRemoveFromFloor(floor, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(floor, 'room-1' as PlacedRoomId, square2x2);
     expect(result).toBeDefined();
     // Hallway data should be preserved
     expect(result!.grid[5][5].hallwayId).toBe('hallway-1');
@@ -336,26 +336,26 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
 
   it('should return undefined when trying to remove non-existent room', () => {
     const floor = makeFloor();
-    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent', square2x2);
+    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent' as PlacedRoomId, square2x2);
     expect(result).toBeUndefined();
   });
 
   it('should allow re-placing a room on cleared tiles', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
     };
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
-    const removed = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2)!;
+    const removed = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2)!;
 
     // Place a new room in the same spot
     const newRoom: PlacedRoom = {
-      id: 'room-new',
-      roomTypeId: CRYSTAL_MINE_TYPE_ID,
+      id: 'room-new' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,

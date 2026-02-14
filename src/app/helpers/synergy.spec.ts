@@ -163,6 +163,8 @@ import type {
   Floor,
   InhabitantInstance,
   PlacedRoom,
+  PlacedRoomId,
+  RoomId,
   SynergyDefinition,
 } from '@interfaces';
 import {
@@ -194,16 +196,16 @@ function makeFloor(
 
 describe('synergyEvaluateCondition', () => {
   const mine: PlacedRoom = {
-    id: 'placed-mine',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const forge: PlacedRoom = {
-    id: 'placed-forge',
-    roomTypeId: 'room-dark-forge',
+    id: 'placed-forge' as PlacedRoomId,
+    roomTypeId: 'room-dark-forge' as RoomId,
     shapeId: 'shape-1',
     anchorX: 2,
     anchorY: 0,
@@ -214,7 +216,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine]);
       expect(
         synergyEvaluateCondition(
-          { type: 'roomType', roomTypeId: 'room-crystal-mine' },
+          { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
           mine,
           floor,
           [],
@@ -226,7 +228,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine]);
       expect(
         synergyEvaluateCondition(
-          { type: 'roomType', roomTypeId: 'room-dark-forge' },
+          { type: 'roomType', roomTypeId: 'room-dark-forge' as RoomId },
           mine,
           floor,
           [],
@@ -240,7 +242,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine, forge]);
       expect(
         synergyEvaluateCondition(
-          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
           mine,
           floor,
           ['placed-forge'],
@@ -252,7 +254,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine, forge]);
       expect(
         synergyEvaluateCondition(
-          { type: 'adjacentRoomType', roomTypeId: 'room-soul-well' },
+          { type: 'adjacentRoomType', roomTypeId: 'room-soul-well' as RoomId },
           mine,
           floor,
           ['placed-forge'],
@@ -264,7 +266,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine, forge]);
       expect(
         synergyEvaluateCondition(
-          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+          { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
           mine,
           floor,
           [],
@@ -277,14 +279,14 @@ describe('synergyEvaluateCondition', () => {
     it('should return true when connected to matching room type', () => {
       const conn: Connection = {
         id: 'conn-1',
-        roomAId: 'placed-mine',
-        roomBId: 'placed-forge',
+        roomAId: 'placed-mine' as PlacedRoomId,
+        roomBId: 'placed-forge' as PlacedRoomId,
         edgeTiles: [],
       };
       const floor = makeFloor([mine, forge], [], [conn]);
       expect(
         synergyEvaluateCondition(
-          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' as RoomId },
           mine,
           floor,
           [],
@@ -295,14 +297,14 @@ describe('synergyEvaluateCondition', () => {
     it('should return true for the reverse direction of connection', () => {
       const conn: Connection = {
         id: 'conn-1',
-        roomAId: 'placed-mine',
-        roomBId: 'placed-forge',
+        roomAId: 'placed-mine' as PlacedRoomId,
+        roomBId: 'placed-forge' as PlacedRoomId,
         edgeTiles: [],
       };
       const floor = makeFloor([mine, forge], [], [conn]);
       expect(
         synergyEvaluateCondition(
-          { type: 'connectedRoomType', roomTypeId: 'room-crystal-mine' },
+          { type: 'connectedRoomType', roomTypeId: 'room-crystal-mine' as RoomId },
           forge,
           floor,
           [],
@@ -314,7 +316,7 @@ describe('synergyEvaluateCondition', () => {
       const floor = makeFloor([mine, forge]);
       expect(
         synergyEvaluateCondition(
-          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+          { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' as RoomId },
           mine,
           floor,
           [],
@@ -331,7 +333,7 @@ describe('synergyEvaluateCondition', () => {
           definitionId: 'def-goblin',
           name: 'Goblin',
           state: 'normal',
-          assignedRoomId: 'placed-mine',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
       ];
       const floor = makeFloor([mine], inhabitants);
@@ -352,7 +354,7 @@ describe('synergyEvaluateCondition', () => {
           definitionId: 'def-skeleton',
           name: 'Skeleton',
           state: 'normal',
-          assignedRoomId: 'placed-mine',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
       ];
       const floor = makeFloor([mine], inhabitants);
@@ -385,7 +387,7 @@ describe('synergyEvaluateCondition', () => {
           definitionId: 'def-goblin',
           name: 'Goblin',
           state: 'normal',
-          assignedRoomId: 'placed-forge',
+          assignedRoomId: 'placed-forge' as PlacedRoomId,
         },
       ];
       const floor = makeFloor([mine, forge], inhabitants);
@@ -408,14 +410,14 @@ describe('synergyEvaluateCondition', () => {
           definitionId: 'def-goblin',
           name: 'Goblin 1',
           state: 'normal',
-          assignedRoomId: 'placed-mine',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
         {
           instanceId: 'inst-2',
           definitionId: 'def-goblin',
           name: 'Goblin 2',
           state: 'normal',
-          assignedRoomId: 'placed-mine',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
       ];
       const floor = makeFloor([mine], inhabitants);
@@ -436,7 +438,7 @@ describe('synergyEvaluateCondition', () => {
           definitionId: 'def-goblin',
           name: 'Goblin',
           state: 'normal',
-          assignedRoomId: 'placed-mine',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
       ];
       const floor = makeFloor([mine], inhabitants);
@@ -471,8 +473,8 @@ describe('synergyEvaluateForRoom', () => {
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'inhabitantType', inhabitantType: 'creature' },
       ],
       effects: [{ type: 'productionBonus', value: 0.15 }],
@@ -482,7 +484,7 @@ describe('synergyEvaluateForRoom', () => {
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'minInhabitants', count: 2 },
       ],
       effects: [{ type: 'productionBonus', value: 0.1 }],
@@ -490,16 +492,16 @@ describe('synergyEvaluateForRoom', () => {
   ];
 
   const mine: PlacedRoom = {
-    id: 'placed-mine',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const forge: PlacedRoom = {
-    id: 'placed-forge',
-    roomTypeId: 'room-dark-forge',
+    id: 'placed-forge' as PlacedRoomId,
+    roomTypeId: 'room-dark-forge' as RoomId,
     shapeId: 'shape-1',
     anchorX: 2,
     anchorY: 0,
@@ -512,7 +514,7 @@ describe('synergyEvaluateForRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
@@ -545,7 +547,7 @@ describe('synergyEvaluateForRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-forge',
+        assignedRoomId: 'placed-forge' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
@@ -566,8 +568,8 @@ describe('synergyEvaluateForRoom', () => {
       name: 'Test Mine Adjacent',
       description: 'Mine near forge',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
       ],
       effects: [{ type: 'productionBonus', value: 0.05 }],
     };
@@ -578,7 +580,7 @@ describe('synergyEvaluateForRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
@@ -599,8 +601,8 @@ describe('synergyEvaluateAll', () => {
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'inhabitantType', inhabitantType: 'creature' },
       ],
       effects: [{ type: 'productionBonus', value: 0.15 }],
@@ -608,16 +610,16 @@ describe('synergyEvaluateAll', () => {
   ];
 
   const mine: PlacedRoom = {
-    id: 'placed-mine',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const forge: PlacedRoom = {
-    id: 'placed-forge',
-    roomTypeId: 'room-dark-forge',
+    id: 'placed-forge' as PlacedRoomId,
+    roomTypeId: 'room-dark-forge' as RoomId,
     shapeId: 'shape-1',
     anchorX: 2,
     anchorY: 0,
@@ -630,7 +632,7 @@ describe('synergyEvaluateAll', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
@@ -653,7 +655,7 @@ describe('synergyEvaluateAll', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     // Mine on floor 1, forge on floor 2 — adjacency not met
@@ -671,8 +673,8 @@ describe('synergy re-evaluation scenarios', () => {
       name: 'Test',
       description: 'Test',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'inhabitantType', inhabitantType: 'creature' },
       ],
       effects: [{ type: 'productionBonus', value: 0.15 }],
@@ -682,24 +684,24 @@ describe('synergy re-evaluation scenarios', () => {
       name: 'Test Connected',
       description: 'Test',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'connectedRoomType', roomTypeId: 'room-dark-forge' as RoomId },
       ],
       effects: [{ type: 'productionBonus', value: 0.1 }],
     },
   ];
 
   const mine: PlacedRoom = {
-    id: 'placed-mine',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const forge: PlacedRoom = {
-    id: 'placed-forge',
-    roomTypeId: 'room-dark-forge',
+    id: 'placed-forge' as PlacedRoomId,
+    roomTypeId: 'room-dark-forge' as RoomId,
     shapeId: 'shape-1',
     anchorX: 2,
     anchorY: 0,
@@ -712,7 +714,7 @@ describe('synergy re-evaluation scenarios', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     // Before forge placed: no adjacency synergy
@@ -745,7 +747,7 @@ describe('synergy re-evaluation scenarios', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const after = synergyEvaluateAll(
@@ -762,7 +764,7 @@ describe('synergy re-evaluation scenarios', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const active = synergyEvaluateAll(
@@ -797,8 +799,8 @@ describe('synergy re-evaluation scenarios', () => {
 
     const conn: Connection = {
       id: 'conn-1',
-      roomAId: 'placed-mine',
-      roomBId: 'placed-forge',
+      roomAId: 'placed-mine' as PlacedRoomId,
+      roomBId: 'placed-forge' as PlacedRoomId,
       edgeTiles: [],
     };
     const after = synergyEvaluateAll(
@@ -812,8 +814,8 @@ describe('synergy re-evaluation scenarios', () => {
   it('should deactivate connection-based synergy when disconnected', () => {
     const conn: Connection = {
       id: 'conn-1',
-      roomAId: 'placed-mine',
-      roomBId: 'placed-forge',
+      roomAId: 'placed-mine' as PlacedRoomId,
+      roomBId: 'placed-forge' as PlacedRoomId,
       edgeTiles: [],
     };
     const connected = synergyEvaluateAll(
@@ -837,7 +839,7 @@ describe('synergy re-evaluation scenarios', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const withForge = synergyEvaluateAll(
@@ -898,8 +900,8 @@ describe('synergyGetPotentialForRoom', () => {
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-crystal-mine' },
-        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-crystal-mine' as RoomId },
+        { type: 'adjacentRoomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'inhabitantType', inhabitantType: 'creature' },
       ],
       effects: [{ type: 'productionBonus', value: 0.15 }],
@@ -909,7 +911,7 @@ describe('synergyGetPotentialForRoom', () => {
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-dark-forge' },
+        { type: 'roomType', roomTypeId: 'room-dark-forge' as RoomId },
         { type: 'minInhabitants', count: 2 },
       ],
       effects: [{ type: 'productionBonus', value: 0.1 }],
@@ -919,24 +921,24 @@ describe('synergyGetPotentialForRoom', () => {
       name: 'Test Library Well',
       description: 'Library connected to well',
       conditions: [
-        { type: 'roomType', roomTypeId: 'room-shadow-library' },
-        { type: 'connectedRoomType', roomTypeId: 'room-soul-well' },
+        { type: 'roomType', roomTypeId: 'room-shadow-library' as RoomId },
+        { type: 'connectedRoomType', roomTypeId: 'room-soul-well' as RoomId },
       ],
       effects: [{ type: 'productionBonus', value: 0.15, resource: 'research' }],
     },
   ];
 
   const mine: PlacedRoom = {
-    id: 'placed-mine',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const forge: PlacedRoom = {
-    id: 'placed-forge',
-    roomTypeId: 'room-dark-forge',
+    id: 'placed-forge' as PlacedRoomId,
+    roomTypeId: 'room-dark-forge' as RoomId,
     shapeId: 'shape-1',
     anchorX: 2,
     anchorY: 0,
@@ -983,7 +985,7 @@ describe('synergyGetPotentialForRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([mine, forge], inhabitants);
@@ -1016,8 +1018,8 @@ describe('synergyGetPotentialForRoom', () => {
 
   it('should describe connected room type conditions', () => {
     const library: PlacedRoom = {
-      id: 'placed-library',
-      roomTypeId: 'room-shadow-library',
+      id: 'placed-library' as PlacedRoomId,
+      roomTypeId: 'room-shadow-library' as RoomId,
       shapeId: 'shape-1',
       anchorX: 0,
       anchorY: 0,

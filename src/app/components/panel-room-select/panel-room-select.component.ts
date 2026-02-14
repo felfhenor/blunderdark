@@ -26,7 +26,7 @@ import {
   researchUnlockIsUnlocked,
   researchUnlockGetRequiredResearchName,
 } from '@helpers';
-import type { IsContentItem, RoomDefinition, RoomShape } from '@interfaces';
+import type { IsContentItem, RoomDefinition, RoomId, RoomShape } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -65,7 +65,7 @@ export class PanelRoomSelectComponent {
 
   public isUniqueAndPlaced(room: RoomDefinition): boolean {
     if (!room.isUnique) return false;
-    return this.roomPlacementPlacedTypeIds().has(room.id);
+    return this.roomPlacementPlacedTypeIds().has(room.id as RoomId);
   }
 
   public isResearchLocked(room: RoomDefinition): boolean {
@@ -81,21 +81,21 @@ export class PanelRoomSelectComponent {
   public isBiomeRestricted(room: RoomDefinition): boolean {
     const floor = floorCurrent();
     if (!floor) return false;
-    const result = biomeRestrictionCanBuild(room.id, floor.biome, floor);
+    const result = biomeRestrictionCanBuild(room.id as RoomId, floor.biome, floor);
     return !result.allowed;
   }
 
   public getBiomeRestrictionTooltip(room: RoomDefinition): string {
     const floor = floorCurrent();
     if (!floor) return '';
-    const info = biomeRestrictionGetRoomInfo(room.id, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
     return info.reason ?? '';
   }
 
   public getBiomeLimitLabel(room: RoomDefinition): string | undefined {
     const floor = floorCurrent();
     if (!floor) return undefined;
-    const info = biomeRestrictionGetRoomInfo(room.id, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
     if (info.maxCount !== undefined && info.currentCount !== undefined) {
       return `${info.currentCount}/${info.maxCount}`;
     }
@@ -154,7 +154,7 @@ export class PanelRoomSelectComponent {
     const shape = roomShapeGet(room.shapeId);
     if (!shape) return;
 
-    roomPlacementEnterMode(room.id, shape);
+    roomPlacementEnterMode(room.id as RoomId, shape);
   }
 
   public toggleHallwayMode(): void {

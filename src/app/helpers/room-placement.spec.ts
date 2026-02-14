@@ -1,5 +1,5 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
-import type { Floor, PlacedRoom, RoomShape } from '@interfaces';
+import type { Floor, PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 import {
   roomPlacementFormatErrors,
@@ -118,7 +118,7 @@ describe('roomPlacementValidateNoOverlap', () => {
     grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'existing-room',
+      roomId: 'existing-room' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -137,7 +137,7 @@ describe('roomPlacementValidateNoOverlap', () => {
     const occupiedTile = {
       occupied: true,
       occupiedBy: 'room' as const,
-      roomId: 'existing-room',
+      roomId: 'existing-room' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -159,7 +159,7 @@ describe('roomPlacementValidateNoOverlap', () => {
     grid = gridSetTile(grid, 4, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'existing-room',
+      roomId: 'existing-room' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -192,7 +192,7 @@ describe('roomPlacementValidate', () => {
     grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'existing-room',
+      roomId: 'existing-room' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -211,7 +211,7 @@ describe('roomPlacementValidate', () => {
     grid = gridSetTile(grid, 19, 0, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'existing-room',
+      roomId: 'existing-room' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -282,8 +282,8 @@ describe('roomPlacementPlaceOnFloor', () => {
   it('should place a room and mark grid tiles', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -306,8 +306,8 @@ describe('roomPlacementPlaceOnFloor', () => {
   it('should return undefined for invalid placement (out of bounds)', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 19,
       anchorY: 19,
@@ -319,8 +319,8 @@ describe('roomPlacementPlaceOnFloor', () => {
   it('should return undefined for overlapping placement', () => {
     const floor = makeFloor();
     const room1: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -328,8 +328,8 @@ describe('roomPlacementPlaceOnFloor', () => {
     const placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
 
     const room2: PlacedRoom = {
-      id: 'room-2',
-      roomTypeId: 'room-throne',
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 6,
       anchorY: 6,
@@ -341,8 +341,8 @@ describe('roomPlacementPlaceOnFloor', () => {
   it('should allow placing non-overlapping rooms', () => {
     const floor = makeFloor();
     const room1: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
@@ -350,8 +350,8 @@ describe('roomPlacementPlaceOnFloor', () => {
     const placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
 
     const room2: PlacedRoom = {
-      id: 'room-2',
-      roomTypeId: 'room-throne',
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 3,
       anchorY: 0,
@@ -364,8 +364,8 @@ describe('roomPlacementPlaceOnFloor', () => {
   it('should not mutate the original floor', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -381,15 +381,15 @@ describe('roomPlacementRemoveFromFloor', () => {
   it('should remove a room and clear grid tiles', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
     };
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
     expect(result!.grid[5][5].occupied).toBe(false);
@@ -401,22 +401,22 @@ describe('roomPlacementRemoveFromFloor', () => {
 
   it('should return undefined for non-existent room', () => {
     const floor = makeFloor();
-    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent', square2x2);
+    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent' as PlacedRoomId, square2x2);
     expect(result).toBeUndefined();
   });
 
   it('should only remove the specified room', () => {
     const floor = makeFloor();
     const room1: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
-      id: 'room-2',
-      roomTypeId: 'room-throne',
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
@@ -424,7 +424,7 @@ describe('roomPlacementRemoveFromFloor', () => {
     let placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
     placed = roomPlacementPlaceOnFloor(placed, room2, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
+    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
@@ -438,15 +438,15 @@ describe('roomPlacementRemoveFromFloor', () => {
   it('should not mutate the original floor', () => {
     const floor = makeFloor();
     const room: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
     };
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
 
-    roomPlacementRemoveFromFloor(placed, 'room-1', square2x2);
+    roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
 
     expect(placed.rooms).toHaveLength(1);
     expect(placed.grid[5][5].occupied).toBe(true);
@@ -456,63 +456,63 @@ describe('roomPlacementRemoveFromFloor', () => {
 describe('roomPlacementIsUniqueTypePlaced', () => {
   it('should return false when no rooms are placed', () => {
     const floors = [makeFloor()];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne')).toBe(false);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(false);
   });
 
   it('should return true when the room type is placed on the current floor', () => {
     const existingRoom: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-throne',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const floors = [makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne')).toBe(true);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
   });
 
   it('should return true when the room type is placed on a different floor', () => {
     const existingRoom: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-throne',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const floors = [makeFloor(), makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne')).toBe(true);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
   });
 
   it('should return false for a different room type', () => {
     const existingRoom: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const floors = [makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne')).toBe(false);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(false);
   });
 
   it('should check across multiple floors', () => {
     const room1: PlacedRoom = {
-      id: 'room-1',
-      roomTypeId: 'room-crystal-mine',
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
-      id: 'room-2',
-      roomTypeId: 'room-throne',
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
       shapeId: 'square-2x2',
       anchorX: 5,
       anchorY: 5,
     };
     const floors = [makeFloor([room1]), makeFloor([room2])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne')).toBe(true);
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-crystal-mine')).toBe(true);
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-barracks')).toBe(false);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-crystal-mine' as RoomId)).toBe(true);
+    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-barracks' as RoomId)).toBe(false);
   });
 });

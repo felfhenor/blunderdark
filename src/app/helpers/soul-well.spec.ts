@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -190,8 +192,8 @@ function makeFloor(
 
 function createPlacedWell(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-well-1',
-    roomTypeId: SOUL_WELL_ID,
+    id: 'placed-well-1' as PlacedRoomId,
+    roomTypeId: SOUL_WELL_ID as RoomId,
     shapeId: 'shape-3x3',
     anchorX: 0,
     anchorY: 0,
@@ -235,7 +237,7 @@ describe('Soul Well: definition', () => {
 
 describe('Soul Well: base production', () => {
   it('should have base production of 0.3 essence/tick (1.5 essence/min)', () => {
-    const production = productionGetBase(SOUL_WELL_ID);
+    const production = productionGetBase(SOUL_WELL_ID as RoomId);
     expect(production).toEqual({ essence: 0.3 });
     expect(productionPerMinute(production['essence']!)).toBeCloseTo(1.5);
   });
@@ -252,8 +254,8 @@ describe('Soul Well: adjacency bonuses', () => {
   it('should apply +20% when adjacent to Mushroom Grove', () => {
     const well = createPlacedWell({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -270,8 +272,8 @@ describe('Soul Well: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Shadow Library', () => {
     const well = createPlacedWell({ anchorX: 0, anchorY: 0 });
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -288,8 +290,8 @@ describe('Soul Well: adjacency bonuses', () => {
   it('should apply +25% when adjacent to another Soul Well', () => {
     const well1 = createPlacedWell({ anchorX: 0, anchorY: 0 });
     const well2: PlacedRoom = {
-      id: 'placed-well-2',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-2' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -306,15 +308,15 @@ describe('Soul Well: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const well = createPlacedWell({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
     };
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 0,
       anchorY: 3,
@@ -332,7 +334,7 @@ describe('Soul Well: adjacency bonuses', () => {
 
 describe('Soul Well: Necrotic Enhancement upgrade', () => {
   it('should have productionMultiplier 1.5 and maxInhabitantBonus 1', () => {
-    const paths = roomUpgradeGetPaths(SOUL_WELL_ID);
+    const paths = roomUpgradeGetPaths(SOUL_WELL_ID as RoomId);
     const necrotic = paths.find((p) => p.name === 'Necrotic Enhancement');
     expect(necrotic).toBeDefined();
     expect(necrotic!.effects).toHaveLength(2);
@@ -362,7 +364,7 @@ describe('Soul Well: Necrotic Enhancement upgrade', () => {
 
 describe('Soul Well: Essence Mastery upgrade', () => {
   it('should have productionMultiplier 1.75 and fearReduction 1', () => {
-    const paths = roomUpgradeGetPaths(SOUL_WELL_ID);
+    const paths = roomUpgradeGetPaths(SOUL_WELL_ID as RoomId);
     const mastery = paths.find((p) => p.name === 'Essence Mastery');
     expect(mastery).toBeDefined();
     expect(mastery!.effects).toHaveLength(2);
@@ -410,8 +412,8 @@ describe('Soul Well: full production with adjacency', () => {
   it('should apply adjacency bonus to passive essence production', () => {
     const well = createPlacedWell({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -430,7 +432,7 @@ describe('Soul Well: full production with adjacency', () => {
         definitionId: 'def-skeleton',
         name: 'Skeleton 1',
         state: 'normal',
-        assignedRoomId: 'placed-well-1',
+        assignedRoomId: 'placed-well-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([well], inhabitants);

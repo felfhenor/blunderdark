@@ -8,6 +8,7 @@ import type {
   InhabitantTrait,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomProduction,
 } from '@interfaces';
 import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown } from '@interfaces/efficiency';
@@ -162,7 +163,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 /**
  * Get the efficiency breakdown for a specific room by ID.
  */
-export function efficiencyGetRoom(roomId: string): RoomEfficiencyBreakdown | undefined {
+export function efficiencyGetRoom(roomId: PlacedRoomId): RoomEfficiencyBreakdown | undefined {
   const floors = gamestate().world.floors;
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);

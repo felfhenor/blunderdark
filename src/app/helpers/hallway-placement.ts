@@ -11,7 +11,7 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { updateGamestate } from '@helpers/state-game';
-import type { Floor, GridState, Hallway, TileOffset } from '@interfaces';
+import type { Floor, GridState, Hallway, PlacedRoomId, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 import type { HallwayBuildStep } from '@interfaces/hallway';
 
@@ -266,9 +266,9 @@ export async function hallwayPlacementConfirm(): Promise<boolean> {
 
     // Auto-connect to adjacent rooms (not hallways — those were merged)
     for (const room of floor.rooms) {
-      const validation = connectionValidate(updatedFloor, hallway.id, room.id);
+      const validation = connectionValidate(updatedFloor, hallway.id as PlacedRoomId, room.id);
       if (validation.valid && validation.edgeTiles) {
-        const result = connectionAddToFloor(updatedFloor, hallway.id, room.id, validation.edgeTiles);
+        const result = connectionAddToFloor(updatedFloor, hallway.id as PlacedRoomId, room.id, validation.edgeTiles);
         if (result) {
           updatedFloor = result.floor;
         }

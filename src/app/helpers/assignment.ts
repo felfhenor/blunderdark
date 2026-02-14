@@ -4,6 +4,7 @@ import { gamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
 } from '@interfaces';
 import type { AssignmentValidation } from '@interfaces/assignment';
@@ -12,7 +13,7 @@ import type { AssignmentValidation } from '@interfaces/assignment';
  * Check whether a given room (by roomId) can accept another inhabitant.
  * Returns capacity info plus allowed/reason for UI feedback.
  */
-export function assignmentCanAssignToRoom(roomId: string): AssignmentValidation {
+export function assignmentCanAssignToRoom(roomId: PlacedRoomId): AssignmentValidation {
   const state = gamestate();
 
   let placedRoom: PlacedRoom | undefined;
@@ -50,7 +51,7 @@ export function assignmentCanAssignToRoom(roomId: string): AssignmentValidation 
 /**
  * Get the current assignment count for a room.
  */
-export function assignmentGetCount(roomId: string): number {
+export function assignmentGetCount(roomId: PlacedRoomId): number {
   return gamestate().world.inhabitants.filter(
     (i) => i.assignedRoomId === roomId,
   ).length;
@@ -71,7 +72,7 @@ export function assignmentIsInhabitantAssigned(instanceId: string): boolean {
  * Returns undefined if room is not found or does not accept inhabitants.
  */
 export function assignmentGetRoomInfo(
-  roomId: string,
+  roomId: PlacedRoomId,
 ): { currentCount: number; maxCapacity: number } | undefined {
   const state = gamestate();
 

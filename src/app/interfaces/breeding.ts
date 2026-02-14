@@ -1,12 +1,14 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type MutationOutcome = 'positive' | 'neutral' | 'negative';
 
 export type BreedingCompletedEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   hybridName: string;
 };
 
 export type MutationCompletedEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   inhabitantName: string;
   outcome: MutationOutcome;
 };

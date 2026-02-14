@@ -4,7 +4,7 @@ import { productionGetRoomDefinition } from '@helpers/production';
 import { rngUuid } from '@helpers/rng';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Connection, Floor, PlacedRoom, TileOffset } from '@interfaces';
+import type { Connection, Floor, PlacedRoom, PlacedRoomId, TileOffset } from '@interfaces';
 import type { ConnectionValidationResult } from '@interfaces/connection';
 
 /**
@@ -18,11 +18,11 @@ function getRoomTiles(room: PlacedRoom): TileOffset[] {
 /**
  * Get the tiles for an entity (room or hallway) by ID.
  */
-function getEntityTiles(floor: Floor, entityId: string): TileOffset[] | undefined {
+function getEntityTiles(floor: Floor, entityId: PlacedRoomId): TileOffset[] | undefined {
   const room = floor.rooms.find((r) => r.id === entityId);
   if (room) return getRoomTiles(room);
 
-  const hallway = floor.hallways.find((h) => h.id === entityId);
+  const hallway = floor.hallways.find((h) => h.id === (entityId as string));
   if (hallway) return hallway.tiles;
 
   return undefined;
@@ -47,8 +47,8 @@ export function getEntityName(floor: Floor, entityId: string): string {
  */
 export function connectionValidate(
   floor: Floor,
-  roomAId: string,
-  roomBId: string,
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
 ): ConnectionValidationResult {
   if (roomAId === roomBId) {
     return { valid: false, error: 'Cannot connect an entity to itself' };
@@ -86,9 +86,9 @@ export function connectionGetFloorConnections(): Connection[] {
 /**
  * Get all room IDs connected to the given room on the current floor.
  */
-export function connectionGetConnectedRooms(roomId: string): string[] {
+export function connectionGetConnectedRooms(roomId: PlacedRoomId): PlacedRoomId[] {
   const connections = connectionGetFloorConnections();
-  const connected: string[] = [];
+  const connected: PlacedRoomId[] = [];
 
   for (const conn of connections) {
     if (conn.roomAId === roomId) {
@@ -104,7 +104,7 @@ export function connectionGetConnectedRooms(roomId: string): string[] {
 /**
  * Check whether two rooms are connected on the current floor.
  */
-export function connectionAreConnected(roomAId: string, roomBId: string): boolean {
+export function connectionAreConnected(roomAId: PlacedRoomId, roomBId: PlacedRoomId): boolean {
   const connections = connectionGetFloorConnections();
   return connections.some(
     (c) =>
@@ -118,8 +118,8 @@ export function connectionAreConnected(roomAId: string, roomBId: string): boolea
  */
 export function connectionFind(
   floor: Floor,
-  roomAId: string,
-  roomBId: string,
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
 ): Connection | undefined {
   return floor.connections.find(
     (c) =>
@@ -134,8 +134,8 @@ export function connectionFind(
  */
 export function connectionAddToFloor(
   floor: Floor,
-  roomAId: string,
-  roomBId: string,
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
   edgeTiles: TileOffset[],
 ): { floor: Floor; connection: Connection } | undefined {
   const existing = connectionFind(floor, roomAId, roomBId);
@@ -180,7 +180,7 @@ export function connectionRemoveFromFloor(
  */
 export function connectionRemoveRoomFromFloor(
   floor: Floor,
-  roomId: string,
+  roomId: PlacedRoomId,
 ): Floor {
   return {
     ...floor,
@@ -196,12 +196,12 @@ export function connectionRemoveRoomFromFloor(
  */
 export function connectionGetAdjacentUnconnected(
   floor: Floor,
-  entityId: string,
-): string[] {
+  entityId: PlacedRoomId,
+): PlacedRoomId[] {
   const sourceTiles = getEntityTiles(floor, entityId);
   if (!sourceTiles) return [];
 
-  const adjacent: string[] = [];
+  const adjacent: PlacedRoomId[] = [];
 
   for (const other of floor.rooms) {
     if (other.id === entityId) continue;
@@ -214,10 +214,10 @@ export function connectionGetAdjacentUnconnected(
   }
 
   for (const hallway of floor.hallways) {
-    if (hallway.id === entityId) continue;
+    if (hallway.id === entityId as string) continue;
     if (adjacencyAreRoomsAdjacent(sourceTiles, hallway.tiles)) {
-      if (!connectionFind(floor, entityId, hallway.id)) {
-        adjacent.push(hallway.id);
+      if (!connectionFind(floor, entityId, hallway.id as PlacedRoomId)) {
+        adjacent.push(hallway.id as PlacedRoomId);
       }
     }
   }
@@ -231,7 +231,7 @@ export function connectionGetAdjacentUnconnected(
  */
 export function connectionGetRoomConnections(
   floor: Floor,
-  roomId: string,
+  roomId: PlacedRoomId,
 ): Connection[] {
   return floor.connections.filter(
     (c) => c.roomAId === roomId || c.roomBId === roomId,
@@ -245,8 +245,8 @@ export function connectionGetRoomConnections(
  * Returns `{ connection }` on success, or `{ error }` on failure.
  */
 export async function connectionCreate(
-  roomAId: string,
-  roomBId: string,
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
 ): Promise<{ connection: Connection; error?: undefined } | { connection?: undefined; error: string }> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;

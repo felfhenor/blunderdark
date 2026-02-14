@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -207,8 +209,8 @@ function makeFloor(
 
 function createPlacedNexus(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-nexus-1',
-    roomTypeId: LEY_LINE_NEXUS_ID,
+    id: 'placed-nexus-1' as PlacedRoomId,
+    roomTypeId: LEY_LINE_NEXUS_ID as RoomId,
     shapeId: 'shape-t',
     anchorX: 0,
     anchorY: 0,
@@ -256,7 +258,7 @@ describe('Ley Line Nexus: definition', () => {
 
 describe('Ley Line Nexus: base production', () => {
   it('should have base production of 2.0 flux/tick (10 flux/min)', () => {
-    const production = productionGetBase(LEY_LINE_NEXUS_ID);
+    const production = productionGetBase(LEY_LINE_NEXUS_ID as RoomId);
     expect(production).toEqual({ flux: 2.0 });
     expect(productionPerMinute(production['flux']!)).toBeCloseTo(10.0);
   });
@@ -276,7 +278,7 @@ describe('Ley Line Nexus: base production', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-nexus-1',
+        assignedRoomId: 'placed-nexus-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([nexus], inhabitants);
@@ -289,8 +291,8 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
   it('should apply +20% when adjacent to Shadow Library', () => {
     const nexus = createPlacedNexus({ anchorX: 0, anchorY: 0 });
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -307,8 +309,8 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Soul Well', () => {
     const nexus = createPlacedNexus({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -325,8 +327,8 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
   it('should apply +25% when adjacent to another Ley Line Nexus', () => {
     const nexus1 = createPlacedNexus({ anchorX: 0, anchorY: 0 });
     const nexus2: PlacedRoom = {
-      id: 'placed-nexus-2',
-      roomTypeId: LEY_LINE_NEXUS_ID,
+      id: 'placed-nexus-2' as PlacedRoomId,
+      roomTypeId: LEY_LINE_NEXUS_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -343,15 +345,15 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const nexus = createPlacedNexus({ anchorX: 0, anchorY: 0 });
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
     };
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 0,
       anchorY: 2,
@@ -369,7 +371,7 @@ describe('Ley Line Nexus: adjacency bonuses', () => {
 
 describe('Ley Line Nexus: Flux Amplifier upgrade', () => {
   it('should have productionMultiplier 1.5 for flux', () => {
-    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID);
+    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID as RoomId);
     const amplifier = paths.find((p) => p.name === 'Flux Amplifier');
     expect(amplifier).toBeDefined();
     expect(amplifier!.effects).toHaveLength(1);
@@ -397,7 +399,7 @@ describe('Ley Line Nexus: Expanded Nexus upgrade', () => {
 
 describe('Ley Line Nexus: Arcane Overcharge upgrade', () => {
   it('should have productionMultiplier, fearIncrease, and secondaryProduction', () => {
-    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID);
+    const paths = roomUpgradeGetPaths(LEY_LINE_NEXUS_ID as RoomId);
     const overcharge = paths.find((p) => p.name === 'Arcane Overcharge');
     expect(overcharge).toBeDefined();
     expect(overcharge!.effects).toHaveLength(3);
@@ -439,8 +441,8 @@ describe('Ley Line Nexus: full production with adjacency', () => {
   it('should apply adjacency bonus to flux production with worker', () => {
     const nexus = createPlacedNexus({ anchorX: 0, anchorY: 0 });
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -451,7 +453,7 @@ describe('Ley Line Nexus: full production with adjacency', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-nexus-1',
+        assignedRoomId: 'placed-nexus-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([nexus, library], inhabitants);

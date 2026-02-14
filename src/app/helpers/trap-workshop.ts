@@ -7,6 +7,7 @@ import type {
   GameState,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   TrapCraftingJob,
   TrapCraftingQueue,
   TrapDefinition,
@@ -70,14 +71,14 @@ export function trapWorkshopGetCraftingTicks(
 
 export function trapWorkshopGetQueue(
   queues: TrapCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
 ): TrapCraftingQueue | undefined {
   return queues.find((q) => q.roomId === roomId);
 }
 
 export function trapWorkshopAddJob(
   queues: TrapCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
   trapTypeId: string,
   targetTicks: number,
 ): TrapCraftingQueue[] {
@@ -99,7 +100,7 @@ export function trapWorkshopAddJob(
 
 export function trapWorkshopRemoveJob(
   queues: TrapCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
   jobIndex: number,
 ): TrapCraftingQueue[] {
   return queues
@@ -114,7 +115,7 @@ export function trapWorkshopRemoveJob(
 // --- Validation ---
 
 export function trapWorkshopCanQueue(
-  roomId: string,
+  roomId: PlacedRoomId,
   floors: GameState['world']['floors'],
 ): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {
@@ -183,7 +184,7 @@ export function trapWorkshopProcess(state: GameState): void {
 }
 
 export function trapWorkshopGetInfo(
-  roomId: string,
+  roomId: PlacedRoomId,
   state: GameState,
 ): TrapWorkshopInfo | undefined {
   for (const floor of state.world.floors) {

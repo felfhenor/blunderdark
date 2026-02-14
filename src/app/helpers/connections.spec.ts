@@ -8,7 +8,7 @@ import {
   connectionRemoveRoomFromFloor,
   connectionValidate,
 } from '@helpers/connections';
-import type { Connection, Floor, PlacedRoom } from '@interfaces';
+import type { Connection, Floor, PlacedRoom, PlacedRoomId, RoomId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGamestate = vi.fn();
@@ -55,8 +55,8 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
 function makeConnection(overrides: Partial<Connection> = {}): Connection {
   return {
     id: 'conn-1',
-    roomAId: 'room-a',
-    roomBId: 'room-b',
+    roomAId: 'room-a' as PlacedRoomId,
+    roomBId: 'room-b' as PlacedRoomId,
     edgeTiles: [{ x: 2, y: 0 }],
     ...overrides,
   };
@@ -64,8 +64,8 @@ function makeConnection(overrides: Partial<Connection> = {}): Connection {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'room-a',
-    roomTypeId: 'room-type-1',
+    id: 'room-a' as PlacedRoomId,
+    roomTypeId: 'room-type-1' as RoomId,
     shapeId: 'shape-2x1',
     anchorX: 0,
     anchorY: 0,
@@ -78,8 +78,8 @@ const defaultState = () => ({
     floors: [
       makeFloor({
         connections: [
-          makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' }),
-          makeConnection({ id: 'conn-2', roomAId: 'room-b', roomBId: 'room-c' }),
+          makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
+          makeConnection({ id: 'conn-2', roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
         ],
       }),
     ],
@@ -109,68 +109,68 @@ describe('connectionGetFloorConnections', () => {
 
 describe('connectionGetConnectedRooms', () => {
   it('should return rooms connected to a room via roomAId', () => {
-    const connected = connectionGetConnectedRooms('room-a');
+    const connected = connectionGetConnectedRooms('room-a' as PlacedRoomId);
     expect(connected).toEqual(['room-b']);
   });
 
   it('should return rooms connected to a room via roomBId', () => {
-    const connected = connectionGetConnectedRooms('room-c');
+    const connected = connectionGetConnectedRooms('room-c' as PlacedRoomId);
     expect(connected).toEqual(['room-b']);
   });
 
   it('should return multiple connected rooms', () => {
-    const connected = connectionGetConnectedRooms('room-b');
+    const connected = connectionGetConnectedRooms('room-b' as PlacedRoomId);
     expect(connected).toHaveLength(2);
     expect(connected).toContain('room-a');
     expect(connected).toContain('room-c');
   });
 
   it('should return empty array for unconnected room', () => {
-    const connected = connectionGetConnectedRooms('room-z');
+    const connected = connectionGetConnectedRooms('room-z' as PlacedRoomId);
     expect(connected).toEqual([]);
   });
 });
 
 describe('connectionAreConnected', () => {
   it('should return true for connected rooms (A→B order)', () => {
-    expect(connectionAreConnected('room-a', 'room-b')).toBe(true);
+    expect(connectionAreConnected('room-a' as PlacedRoomId, 'room-b' as PlacedRoomId)).toBe(true);
   });
 
   it('should return true for connected rooms (B→A order)', () => {
-    expect(connectionAreConnected('room-b', 'room-a')).toBe(true);
+    expect(connectionAreConnected('room-b' as PlacedRoomId, 'room-a' as PlacedRoomId)).toBe(true);
   });
 
   it('should return false for unconnected rooms', () => {
-    expect(connectionAreConnected('room-a', 'room-c')).toBe(false);
+    expect(connectionAreConnected('room-a' as PlacedRoomId, 'room-c' as PlacedRoomId)).toBe(false);
   });
 
   it('should return false for nonexistent rooms', () => {
-    expect(connectionAreConnected('room-x', 'room-y')).toBe(false);
+    expect(connectionAreConnected('room-x' as PlacedRoomId, 'room-y' as PlacedRoomId)).toBe(false);
   });
 });
 
 describe('connectionFind', () => {
   it('should find connection in A→B order', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionFind(floor, 'room-a', 'room-b');
+    const result = connectionFind(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result).toBeDefined();
     expect(result?.id).toBe('conn-1');
   });
 
   it('should find connection in B→A order', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionFind(floor, 'room-b', 'room-a');
+    const result = connectionFind(floor, 'room-b' as PlacedRoomId, 'room-a' as PlacedRoomId);
     expect(result).toBeDefined();
     expect(result?.id).toBe('conn-1');
   });
 
   it('should return undefined for nonexistent connection', () => {
     const floor = makeFloor({ connections: [] });
-    const result = connectionFind(floor, 'room-a', 'room-b');
+    const result = connectionFind(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result).toBeUndefined();
   });
 });
@@ -178,7 +178,7 @@ describe('connectionFind', () => {
 describe('connectionAddToFloor', () => {
   it('should add a new connection', () => {
     const floor = makeFloor({ connections: [] });
-    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId, [{ x: 2, y: 0 }]);
     expect(result).toBeDefined();
     expect(result!.floor.connections).toHaveLength(1);
     expect(result!.connection.roomAId).toBe('room-a');
@@ -188,23 +188,23 @@ describe('connectionAddToFloor', () => {
 
   it('should return undefined for duplicate connection', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId, [{ x: 2, y: 0 }]);
     expect(result).toBeUndefined();
   });
 
   it('should return undefined for duplicate connection in reverse order', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionAddToFloor(floor, 'room-b', 'room-a', [{ x: 2, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-b' as PlacedRoomId, 'room-a' as PlacedRoomId, [{ x: 2, y: 0 }]);
     expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {
     const floor = makeFloor({ connections: [] });
-    connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 2, y: 0 }]);
+    connectionAddToFloor(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId, [{ x: 2, y: 0 }]);
     expect(floor.connections).toHaveLength(0);
   });
 });
@@ -214,7 +214,7 @@ describe('connectionRemoveFromFloor', () => {
     const floor = makeFloor({
       connections: [
         makeConnection({ id: 'conn-1' }),
-        makeConnection({ id: 'conn-2', roomAId: 'room-c', roomBId: 'room-d' }),
+        makeConnection({ id: 'conn-2', roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
       ],
     });
     const result = connectionRemoveFromFloor(floor, 'conn-1');
@@ -240,29 +240,29 @@ describe('connectionRemoveRoomFromFloor', () => {
   it('should remove all connections involving a room', () => {
     const floor = makeFloor({
       connections: [
-        makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' }),
-        makeConnection({ id: 'conn-2', roomAId: 'room-b', roomBId: 'room-c' }),
-        makeConnection({ id: 'conn-3', roomAId: 'room-c', roomBId: 'room-d' }),
+        makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
+        makeConnection({ id: 'conn-2', roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
+        makeConnection({ id: 'conn-3', roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
       ],
     });
-    const result = connectionRemoveRoomFromFloor(floor, 'room-b');
+    const result = connectionRemoveRoomFromFloor(floor, 'room-b' as PlacedRoomId);
     expect(result.connections).toHaveLength(1);
     expect(result.connections[0].id).toBe('conn-3');
   });
 
   it('should return unchanged floor if room has no connections', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionRemoveRoomFromFloor(floor, 'room-z');
+    const result = connectionRemoveRoomFromFloor(floor, 'room-z' as PlacedRoomId);
     expect(result.connections).toHaveLength(1);
   });
 
   it('should not mutate the original floor', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    connectionRemoveRoomFromFloor(floor, 'room-a');
+    connectionRemoveRoomFromFloor(floor, 'room-a' as PlacedRoomId);
     expect(floor.connections).toHaveLength(1);
   });
 });
@@ -271,11 +271,11 @@ describe('connectionAddToFloor - no resource cost', () => {
   it('should create a connection without any resource deduction', () => {
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 }),
       ],
     });
-    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 1, y: 0 }]);
+    const result = connectionAddToFloor(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId, [{ x: 1, y: 0 }]);
     expect(result).toBeDefined();
     expect(result!.floor.connections).toHaveLength(1);
     // connectionAddToFloor is a pure function that only modifies connections —
@@ -285,7 +285,7 @@ describe('connectionAddToFloor - no resource cost', () => {
   it('should not validate or check resource availability', () => {
     // connectionAddToFloor accepts any valid parameters without resource checks
     const floor = makeFloor({ connections: [] });
-    const result = connectionAddToFloor(floor, 'room-x', 'room-y', [{ x: 5, y: 5 }]);
+    const result = connectionAddToFloor(floor, 'room-x' as PlacedRoomId, 'room-y' as PlacedRoomId, [{ x: 5, y: 5 }]);
     expect(result).toBeDefined();
     expect(result!.connection.roomAId).toBe('room-x');
     // No resourceCanAfford or resourcePayCost is called — connections are free
@@ -295,27 +295,27 @@ describe('connectionAddToFloor - no resource cost', () => {
 describe('connectionValidate', () => {
   it('should reject self-connection', () => {
     const floor = makeFloor({
-      rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
+      rooms: [makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 })],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-a');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-a' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Cannot connect an entity to itself');
   });
 
   it('should reject when room A not found', () => {
     const floor = makeFloor({
-      rooms: [makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 })],
+      rooms: [makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 })],
     });
-    const result = connectionValidate(floor, 'room-x', 'room-b');
+    const result = connectionValidate(floor, 'room-x' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('One or both entities not found on this floor');
   });
 
   it('should reject when room B not found', () => {
     const floor = makeFloor({
-      rooms: [makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 })],
+      rooms: [makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 })],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-y');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-y' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('One or both entities not found on this floor');
   });
@@ -324,11 +324,11 @@ describe('connectionValidate', () => {
     // Room A at (0,0)-(1,0), Room B at (5,0)-(6,0) — not adjacent
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 5, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 5, anchorY: 0 }),
       ],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Entities are not adjacent');
   });
@@ -337,12 +337,12 @@ describe('connectionValidate', () => {
     // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — adjacent
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 }),
       ],
-      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Entities are already connected');
   });
@@ -350,12 +350,12 @@ describe('connectionValidate', () => {
   it('should reject already connected rooms in reverse order', () => {
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 }),
       ],
-      connections: [makeConnection({ roomAId: 'room-a', roomBId: 'room-b' })],
+      connections: [makeConnection({ roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
-    const result = connectionValidate(floor, 'room-b', 'room-a');
+    const result = connectionValidate(floor, 'room-b' as PlacedRoomId, 'room-a' as PlacedRoomId);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('Entities are already connected');
   });
@@ -364,11 +364,11 @@ describe('connectionValidate', () => {
     // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — adjacent at x=1/x=2
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 }),
       ],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result.valid).toBe(true);
     expect(result.edgeTiles).toBeDefined();
     expect(result.edgeTiles!.length).toBeGreaterThan(0);
@@ -378,11 +378,11 @@ describe('connectionValidate', () => {
     // Room A at (0,0)-(1,0), Room B at (2,0)-(3,0) — shared edge at (1,0)↔(2,0)
     const floor = makeFloor({
       rooms: [
-        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
-        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+        makeRoom({ id: 'room-a' as PlacedRoomId, anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b' as PlacedRoomId, anchorX: 2, anchorY: 0 }),
       ],
     });
-    const result = connectionValidate(floor, 'room-a', 'room-b');
+    const result = connectionValidate(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result.valid).toBe(true);
     expect(result.edgeTiles).toEqual([{ x: 1, y: 0 }]);
   });

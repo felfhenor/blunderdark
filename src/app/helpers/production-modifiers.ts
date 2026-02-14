@@ -1,5 +1,5 @@
 import { contentGetEntriesByType } from '@helpers/content';
-import type { BiomeType, IsContentItem, RoomDefinition } from '@interfaces';
+import type { BiomeType, IsContentItem, RoomDefinition, RoomId } from '@interfaces';
 import type { ProductionModifierContext, ProductionModifierResult, ProductionModifierDefinition } from '@interfaces/production-modifier';
 
 // --- Constants ---
@@ -91,7 +91,7 @@ function evaluateTimeOfDay(context: ProductionModifierContext): number {
  * Get the biome bonus multiplier for a specific room type on a specific biome.
  * Returns 1.0 for rooms not affected by the biome or for neutral biome.
  */
-export function productionModifierGetBiomeBonus(biome: BiomeType, roomTypeId: string): number {
+export function productionModifierGetBiomeBonus(biome: BiomeType, roomTypeId: RoomId): number {
   const map = getBiomeMap();
   const biomeRooms = map.get(biome);
   if (!biomeRooms) return 1.0;

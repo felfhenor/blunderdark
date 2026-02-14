@@ -1,3 +1,5 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type ForgeInventoryEntry = {
   recipeId: string;
   count: number;
@@ -10,12 +12,12 @@ export type ForgeCraftingJob = {
 };
 
 export type ForgeCraftingQueue = {
-  roomId: string;
+  roomId: PlacedRoomId;
   jobs: ForgeCraftingJob[];
 };
 
 export type DarkForgeCompletedEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   recipeName: string;
   category: 'equipment' | 'upgrade';
 };

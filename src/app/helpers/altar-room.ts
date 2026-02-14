@@ -19,7 +19,9 @@ import type {
   Hallway,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomShape,
   RoomUpgradePath,
 } from '@interfaces';
@@ -83,8 +85,8 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       const anchorY = centerY + offset.y;
 
       const placedRoom: PlacedRoom = {
-        id: rngUuid(),
-        roomTypeId: roomDef.id,
+        id: rngUuid() as PlacedRoomId,
+        roomTypeId: roomDef.id as RoomId,
         shapeId: roomDef.shapeId,
         anchorX,
         anchorY,

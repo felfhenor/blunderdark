@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -188,8 +190,8 @@ function makeFloor(
 
 function createPlacedLake(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-lake-1',
-    roomTypeId: UNDERGROUND_LAKE_ID,
+    id: 'placed-lake-1' as PlacedRoomId,
+    roomTypeId: UNDERGROUND_LAKE_ID as RoomId,
     shapeId: 'shape-t',
     anchorX: 0,
     anchorY: 0,
@@ -233,7 +235,7 @@ describe('Underground Lake: definition', () => {
 
 describe('Underground Lake: base production', () => {
   it('should have base production of 1.0 food/tick (5 food/min)', () => {
-    const production = productionGetBase(UNDERGROUND_LAKE_ID);
+    const production = productionGetBase(UNDERGROUND_LAKE_ID as RoomId);
     expect(production).toEqual({ food: 1.0 });
     expect(productionPerMinute(production['food']!)).toBeCloseTo(5.0);
   });
@@ -253,7 +255,7 @@ describe('Underground Lake: base production', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-lake-1',
+        assignedRoomId: 'placed-lake-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([lake], inhabitants);
@@ -267,8 +269,8 @@ describe('Underground Lake: adjacency bonuses', () => {
   it('should apply +30% when adjacent to Mushroom Grove', () => {
     const lake = createPlacedLake({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -285,8 +287,8 @@ describe('Underground Lake: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Soul Well', () => {
     const lake = createPlacedLake({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -303,8 +305,8 @@ describe('Underground Lake: adjacency bonuses', () => {
   it('should apply +20% when adjacent to another Underground Lake', () => {
     const lake1 = createPlacedLake({ anchorX: 0, anchorY: 0 });
     const lake2: PlacedRoom = {
-      id: 'placed-lake-2',
-      roomTypeId: UNDERGROUND_LAKE_ID,
+      id: 'placed-lake-2' as PlacedRoomId,
+      roomTypeId: UNDERGROUND_LAKE_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -321,15 +323,15 @@ describe('Underground Lake: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const lake = createPlacedLake({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
     };
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 0,
       anchorY: 2,
@@ -347,7 +349,7 @@ describe('Underground Lake: adjacency bonuses', () => {
 
 describe('Underground Lake: Deep Fishing upgrade', () => {
   it('should have productionMultiplier 1.6 for food', () => {
-    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID);
+    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID as RoomId);
     const deep = paths.find((p) => p.name === 'Deep Fishing');
     expect(deep).toBeDefined();
     expect(deep!.effects).toHaveLength(1);
@@ -375,7 +377,7 @@ describe('Underground Lake: Expanded Lake upgrade', () => {
 
 describe('Underground Lake: Dark Waters upgrade', () => {
   it('should have productionMultiplier, fearIncrease, and secondaryProduction', () => {
-    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID);
+    const paths = roomUpgradeGetPaths(UNDERGROUND_LAKE_ID as RoomId);
     const dark = paths.find((p) => p.name === 'Dark Waters');
     expect(dark).toBeDefined();
     expect(dark!.effects).toHaveLength(3);
@@ -417,8 +419,8 @@ describe('Underground Lake: full production with adjacency', () => {
   it('should apply adjacency bonus to food production with worker', () => {
     const lake = createPlacedLake({ anchorX: 0, anchorY: 0 });
     const grove: PlacedRoom = {
-      id: 'placed-grove-1',
-      roomTypeId: MUSHROOM_GROVE_ID,
+      id: 'placed-grove-1' as PlacedRoomId,
+      roomTypeId: MUSHROOM_GROVE_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -429,7 +431,7 @@ describe('Underground Lake: full production with adjacency', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-lake-1',
+        assignedRoomId: 'placed-lake-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([lake, grove], inhabitants);

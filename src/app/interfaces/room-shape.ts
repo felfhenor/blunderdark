@@ -1,3 +1,8 @@
+import type { Branded } from '@interfaces/identifiable';
+import type { RoomId } from '@interfaces/content-room';
+
+export type PlacedRoomId = Branded<string, 'PlacedRoomId'>;
+
 export type TileOffset = {
   x: number;
   y: number;
@@ -41,8 +46,8 @@ export type TortureJob = {
 };
 
 export type PlacedRoom = {
-  id: string;
-  roomTypeId: string;
+  id: PlacedRoomId;
+  roomTypeId: RoomId;
   shapeId: string;
   anchorX: number;
   anchorY: number;

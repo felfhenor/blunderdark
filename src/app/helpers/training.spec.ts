@@ -4,7 +4,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -220,8 +222,8 @@ function createPlacedTrainingGrounds(
   overrides: Partial<PlacedRoom> = {},
 ): PlacedRoom {
   return {
-    id: 'placed-tg-1',
-    roomTypeId: TRAINING_GROUNDS_ID,
+    id: 'placed-tg-1' as PlacedRoomId,
+    roomTypeId: TRAINING_GROUNDS_ID as RoomId,
     shapeId: 'shape-t',
     anchorX: 0,
     anchorY: 0,
@@ -342,17 +344,17 @@ describe('Training Grounds: definition', () => {
 
 describe('Training Grounds: trainingIsGroundsRoom', () => {
   it('should return true for Training Grounds type ID', () => {
-    expect(trainingIsGroundsRoom(TRAINING_GROUNDS_ID)).toBe(true);
+    expect(trainingIsGroundsRoom(TRAINING_GROUNDS_ID as RoomId)).toBe(true);
   });
 
   it('should return false for other room types', () => {
-    expect(trainingIsGroundsRoom(BARRACKS_ID)).toBe(false);
+    expect(trainingIsGroundsRoom(BARRACKS_ID as RoomId)).toBe(false);
   });
 });
 
 describe('Training Grounds: no production', () => {
   it('should have no base production', () => {
-    const production = productionGetBase(TRAINING_GROUNDS_ID);
+    const production = productionGetBase(TRAINING_GROUNDS_ID as RoomId);
     expect(production).toEqual({});
   });
 });
@@ -467,7 +469,7 @@ describe('Training Grounds: trainingProcess', () => {
   it('should increment training progress for untrained inhabitants', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
     });
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
@@ -481,7 +483,7 @@ describe('Training Grounds: trainingProcess', () => {
   it('should not increment progress for trained inhabitants', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trained: true,
       trainingProgress: 25,
       trainingBonuses: { defense: 1, attack: 0 },
@@ -497,7 +499,7 @@ describe('Training Grounds: trainingProcess', () => {
   it('should not affect inhabitants in other rooms', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
-      assignedRoomId: 'other-room',
+      assignedRoomId: 'other-room' as PlacedRoomId,
     });
     const floor = makeFloor([tg], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
@@ -510,7 +512,7 @@ describe('Training Grounds: trainingProcess', () => {
   it('should mark inhabitant as trained when progress reaches target', () => {
     const tg = createPlacedTrainingGrounds();
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg], [inhabitant]);
@@ -531,7 +533,7 @@ describe('Training Grounds: trainingProcess', () => {
     });
     const targetTicks = Math.round(TRAINING_BASE_TICKS * 1.2);
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: targetTicks - 1,
     });
     const floor = makeFloor([tg], [inhabitant]);
@@ -549,14 +551,14 @@ describe('Training Grounds: trainingProcess', () => {
   it('should apply Altar adjacency bonus to training bonuses', () => {
     const tg = createPlacedTrainingGrounds({ anchorX: 0, anchorY: 0 });
     const altar: PlacedRoom = {
-      id: 'placed-altar',
-      roomTypeId: ALTAR_ID,
+      id: 'placed-altar' as PlacedRoomId,
+      roomTypeId: ALTAR_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3, // Adjacent: T-shape at (0,0) has tile at (2,0); altar at (3,0)
       anchorY: 0,
     };
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg, altar], [inhabitant]);
@@ -574,15 +576,15 @@ describe('Training Grounds: trainingProcess', () => {
   it('should apply Barracks adjacency to reduce training time', () => {
     const tg = createPlacedTrainingGrounds({ anchorX: 0, anchorY: 0 });
     const barracks: PlacedRoom = {
-      id: 'placed-barracks',
-      roomTypeId: BARRACKS_ID,
+      id: 'placed-barracks' as PlacedRoomId,
+      roomTypeId: BARRACKS_ID as RoomId,
       shapeId: 'shape-i',
       anchorX: 3, // Adjacent: T-shape at (0,0) has tile at (2,0); barracks at (3,0)
       anchorY: 0,
     };
     const reducedTicks = Math.round(TRAINING_BASE_TICKS * 0.8);
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: reducedTicks - 1,
     });
     const floor = makeFloor([tg, barracks], [inhabitant]);
@@ -597,13 +599,13 @@ describe('Training Grounds: trainingProcess', () => {
     const tg = createPlacedTrainingGrounds();
     const inh1 = createInhabitant({
       instanceId: 'inst-1',
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: 10,
     });
     const inh2 = createInhabitant({
       instanceId: 'inst-2',
       name: 'Goblin 2',
-      assignedRoomId: 'placed-tg-1',
+      assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: TRAINING_BASE_TICKS - 1,
     });
     const floor = makeFloor([tg], [inh1, inh2]);
@@ -621,14 +623,14 @@ describe('Training Grounds: trainingProcess', () => {
 
   it('should skip floors with no Training Grounds', () => {
     const barracks: PlacedRoom = {
-      id: 'placed-barracks',
-      roomTypeId: BARRACKS_ID,
+      id: 'placed-barracks' as PlacedRoomId,
+      roomTypeId: BARRACKS_ID as RoomId,
       shapeId: 'shape-i',
       anchorX: 0,
       anchorY: 0,
     };
     const inhabitant = createInhabitant({
-      assignedRoomId: 'placed-barracks',
+      assignedRoomId: 'placed-barracks' as PlacedRoomId,
     });
     const floor = makeFloor([barracks], [inhabitant]);
     const state = makeGameState([floor], [inhabitant]);
@@ -643,8 +645,8 @@ describe('Training Grounds: adjacency bonuses', () => {
   it('should apply +20% bonus when adjacent to Barracks', () => {
     const tg = createPlacedTrainingGrounds({ anchorX: 0, anchorY: 0 });
     const barracks: PlacedRoom = {
-      id: 'placed-barracks',
-      roomTypeId: BARRACKS_ID,
+      id: 'placed-barracks' as PlacedRoomId,
+      roomTypeId: BARRACKS_ID as RoomId,
       shapeId: 'shape-i',
       anchorX: 3,
       anchorY: 0,
@@ -661,8 +663,8 @@ describe('Training Grounds: adjacency bonuses', () => {
   it('should apply +15% bonus when adjacent to Altar', () => {
     const tg = createPlacedTrainingGrounds({ anchorX: 0, anchorY: 0 });
     const altar: PlacedRoom = {
-      id: 'placed-altar',
-      roomTypeId: ALTAR_ID,
+      id: 'placed-altar' as PlacedRoomId,
+      roomTypeId: ALTAR_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -679,14 +681,14 @@ describe('Training Grounds: adjacency bonuses', () => {
 
 describe('Training Grounds: upgrade paths', () => {
   it('should have Elite Training upgrade', () => {
-    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID as RoomId);
     const elite = paths.find((p) => p.name === 'Elite Training');
     expect(elite).toBeDefined();
     expect(elite!.effects).toHaveLength(2);
   });
 
   it('should have Mass Training upgrade with maxInhabitantBonus', () => {
-    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID as RoomId);
     const mass = paths.find((p) => p.name === 'Mass Training');
     expect(mass).toBeDefined();
     const capacityEffect = mass!.effects.find(
@@ -711,7 +713,7 @@ describe('Training Grounds: upgrade paths', () => {
   });
 
   it('should have Specialized Drills with trainingDefenseBonus', () => {
-    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID);
+    const paths = roomUpgradeGetPaths(TRAINING_GROUNDS_ID as RoomId);
     const drills = paths.find((p) => p.name === 'Specialized Drills');
     expect(drills).toBeDefined();
     expect(drills!.effects[0].type).toBe('trainingDefenseBonus');

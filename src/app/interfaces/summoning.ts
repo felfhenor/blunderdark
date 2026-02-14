@@ -1,5 +1,7 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type SummoningCompletedEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   inhabitantName: string;
   summonType: 'permanent' | 'temporary';
 };

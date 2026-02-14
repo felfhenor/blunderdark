@@ -2,7 +2,9 @@ import type {
   GameState,
   InhabitantInstance,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -58,8 +60,8 @@ function createTestPlacedRoom(
   overrides: Partial<PlacedRoom> = {},
 ): PlacedRoom {
   return {
-    id: 'room-001',
-    roomTypeId: 'room-type-crystal-mine',
+    id: 'room-001' as PlacedRoomId,
+    roomTypeId: 'room-type-crystal-mine' as RoomId,
     shapeId: 'shape-l',
     anchorX: 5,
     anchorY: 5,
@@ -114,7 +116,7 @@ describe('assignmentCanAssignToRoom', () => {
 
   it('should return not allowed when room is not found', () => {
     mockFloors = [{ rooms: [], inhabitants: [] }];
-    const result = assignmentCanAssignToRoom('nonexistent');
+    const result = assignmentCanAssignToRoom('nonexistent' as PlacedRoomId);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('not found');
   });
@@ -123,7 +125,7 @@ describe('assignmentCanAssignToRoom', () => {
     const room = createTestPlacedRoom();
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     // No content registered
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('Unknown room type');
   });
@@ -134,7 +136,7 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('does not accept inhabitants');
   });
@@ -146,7 +148,7 @@ describe('assignmentCanAssignToRoom', () => {
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [];
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(true);
     expect(result.currentCount).toBe(0);
     expect(result.maxCapacity).toBe(2);
@@ -158,10 +160,10 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(true);
     expect(result.currentCount).toBe(1);
     expect(result.maxCapacity).toBe(3);
@@ -173,11 +175,11 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('maximum capacity');
     expect(result.currentCount).toBe(2);
@@ -192,11 +194,11 @@ describe('assignmentCanAssignToRoom', () => {
     mockInhabitants = Array.from({ length: 50 }, (_, i) =>
       createTestInhabitant({
         instanceId: `inst-${i}`,
-        assignedRoomId: 'room-001',
+        assignedRoomId: 'room-001' as PlacedRoomId,
       }),
     );
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(true);
     expect(result.currentCount).toBe(50);
     expect(result.maxCapacity).toBe(-1);
@@ -209,11 +211,11 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
-    const result = assignmentCanAssignToRoom('room-001');
+    const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
     expect(result.allowed).toBe(true);
     expect(result.currentCount).toBe(2);
     expect(result.maxCapacity).toBe(4);
@@ -230,17 +232,17 @@ describe('assignmentGetCount', () => {
 
   it('should return 0 for empty room', () => {
     mockInhabitants = [];
-    expect(assignmentGetCount('room-001')).toBe(0);
+    expect(assignmentGetCount('room-001' as PlacedRoomId)).toBe(0);
   });
 
   it('should count only inhabitants assigned to the specified room', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-002' }),
-      createTestInhabitant({ instanceId: 'inst-003', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-002' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-003', assignedRoomId: 'room-001' as PlacedRoomId }),
       createTestInhabitant({ instanceId: 'inst-004', assignedRoomId: undefined }),
     ];
-    expect(assignmentGetCount('room-001')).toBe(2);
+    expect(assignmentGetCount('room-001' as PlacedRoomId)).toBe(2);
   });
 });
 
@@ -266,7 +268,7 @@ describe('assignmentIsInhabitantAssigned', () => {
 
   it('should return true for assigned inhabitant', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
     expect(assignmentIsInhabitantAssigned('inst-001')).toBe(true);
   });
@@ -282,7 +284,7 @@ describe('assignmentGetRoomInfo', () => {
 
   it('should return null for non-existent room', () => {
     mockFloors = [{ rooms: [], inhabitants: [] }];
-    expect(assignmentGetRoomInfo('nonexistent')).toBeUndefined();
+    expect(assignmentGetRoomInfo('nonexistent' as PlacedRoomId)).toBeUndefined();
   });
 
   it('should return null for room that does not accept inhabitants', () => {
@@ -290,7 +292,7 @@ describe('assignmentGetRoomInfo', () => {
     const def = createTestRoomDef({ maxInhabitants: 0 });
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
-    expect(assignmentGetRoomInfo('room-001')).toBeUndefined();
+    expect(assignmentGetRoomInfo('room-001' as PlacedRoomId)).toBeUndefined();
   });
 
   it('should return count and max for a valid room', () => {
@@ -299,10 +301,10 @@ describe('assignmentGetRoomInfo', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' }),
+      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
-    const info = assignmentGetRoomInfo('room-001');
+    const info = assignmentGetRoomInfo('room-001' as PlacedRoomId);
     expect(info).toBeDefined();
     expect(info!.currentCount).toBe(1);
     expect(info!.maxCapacity).toBe(3);
@@ -316,7 +318,7 @@ describe('assignmentGetRoomInfo', () => {
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [];
 
-    const info = assignmentGetRoomInfo('room-001');
+    const info = assignmentGetRoomInfo('room-001' as PlacedRoomId);
     expect(info).toBeDefined();
     expect(info!.currentCount).toBe(0);
     expect(info!.maxCapacity).toBe(5);

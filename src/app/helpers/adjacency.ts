@@ -1,4 +1,4 @@
-import type { TileOffset } from '@interfaces';
+import type { PlacedRoomId, TileOffset } from '@interfaces';
 import type { AdjacencyMap } from '@interfaces/adjacency';
 
 /**
@@ -70,9 +70,9 @@ export function adjacencyCreateMap(): AdjacencyMap {
 
 export function adjacencyAddRoom(
   map: AdjacencyMap,
-  roomId: string,
+  roomId: PlacedRoomId,
   roomTiles: TileOffset[],
-  allRooms: Array<{ id: string; tiles: TileOffset[] }>,
+  allRooms: Array<{ id: PlacedRoomId; tiles: TileOffset[] }>,
 ): AdjacencyMap {
   const result = { ...map };
   result[roomId] = [];
@@ -95,12 +95,12 @@ export function adjacencyAddRoom(
 
 export function adjacencyRemoveRoom(
   map: AdjacencyMap,
-  roomId: string,
+  roomId: PlacedRoomId,
 ): AdjacencyMap {
   const result = { ...map };
 
   // Remove this room from all other rooms' lists
-  for (const key of Object.keys(result)) {
+  for (const key of Object.keys(result) as PlacedRoomId[]) {
     if (key === roomId) continue;
     result[key] = result[key].filter((id) => id !== roomId);
   }
@@ -113,7 +113,7 @@ export function adjacencyRemoveRoom(
 
 export function adjacencyGetAdjacentRooms(
   map: AdjacencyMap,
-  roomId: string,
-): string[] {
+  roomId: PlacedRoomId,
+): PlacedRoomId[] {
   return map[roomId] ?? [];
 }

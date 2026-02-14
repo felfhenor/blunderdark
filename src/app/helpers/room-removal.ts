@@ -8,6 +8,7 @@ import { roomShapeGetRotated, roomShapeGet } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
+  PlacedRoomId,
   ResourceCost,
   ResourceType,
   RoomDefinition,
@@ -33,7 +34,7 @@ export function roomRemovalCalculateRefund(cost: ResourceCost): RemovalRefund {
  * Get information about what would happen if a room were removed.
  * Used by the confirmation dialog to show refund and displaced inhabitants.
  */
-export function roomRemovalGetInfo(roomId: string): RemovalInfo | undefined {
+export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefined {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
@@ -77,7 +78,7 @@ export function roomRemovalGetInfo(roomId: string): RemovalInfo | undefined {
  * Returns a result with displaced inhabitant names for notification.
  */
 export async function roomRemovalExecute(
-  roomId: string,
+  roomId: PlacedRoomId,
 ): Promise<{ success: boolean; error?: string; displacedNames?: string[] }> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;

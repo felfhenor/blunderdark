@@ -4,8 +4,8 @@ import {
   GAME_TIME_HOURS_PER_DAY,
   GAME_TIME_MINUTES_PER_HOUR,
   GAME_TIME_TICKS_PER_MINUTE,
-  type GameTime,
 } from '@helpers/game-time';
+import type { GameTime } from '@interfaces';
 
 function defaultTime(): GameTime {
   return { day: 1, hour: 0, minute: 0 };

@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -194,8 +196,8 @@ function createPlacedLibrary(
   overrides: Partial<PlacedRoom> = {},
 ): PlacedRoom {
   return {
-    id: 'placed-library-1',
-    roomTypeId: SHADOW_LIBRARY_ID,
+    id: 'placed-library-1' as PlacedRoomId,
+    roomTypeId: SHADOW_LIBRARY_ID as RoomId,
     shapeId: 'shape-small-l',
     anchorX: 0,
     anchorY: 0,
@@ -239,7 +241,7 @@ describe('Shadow Library: definition', () => {
 
 describe('Shadow Library: base production', () => {
   it('should have base production of 0.6 research/tick (3 research/min)', () => {
-    const production = productionGetBase(SHADOW_LIBRARY_ID);
+    const production = productionGetBase(SHADOW_LIBRARY_ID as RoomId);
     expect(production).toEqual({ research: 0.6 });
     expect(productionPerMinute(production['research']!)).toBeCloseTo(3.0);
   });
@@ -259,7 +261,7 @@ describe('Shadow Library: base production', () => {
         definitionId: 'def-skeleton',
         name: 'Skeleton 1',
         state: 'normal',
-        assignedRoomId: 'placed-library-1',
+        assignedRoomId: 'placed-library-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([library], inhabitants);
@@ -273,8 +275,8 @@ describe('Shadow Library: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Soul Well', () => {
     const library = createPlacedLibrary({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 2,
       anchorY: 0,
@@ -291,8 +293,8 @@ describe('Shadow Library: adjacency bonuses', () => {
   it('should apply +10% when adjacent to Crystal Mine', () => {
     const library = createPlacedLibrary({ anchorX: 0, anchorY: 0 });
     const mine: PlacedRoom = {
-      id: 'placed-mine-1',
-      roomTypeId: CRYSTAL_MINE_ID,
+      id: 'placed-mine-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 2,
       anchorY: 0,
@@ -309,8 +311,8 @@ describe('Shadow Library: adjacency bonuses', () => {
   it('should apply +20% when adjacent to another Shadow Library', () => {
     const library1 = createPlacedLibrary({ anchorX: 0, anchorY: 0 });
     const library2: PlacedRoom = {
-      id: 'placed-library-2',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-2' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 2,
       anchorY: 0,
@@ -327,15 +329,15 @@ describe('Shadow Library: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const library = createPlacedLibrary({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 2,
       anchorY: 0,
     };
     const mine: PlacedRoom = {
-      id: 'placed-mine-1',
-      roomTypeId: CRYSTAL_MINE_ID,
+      id: 'placed-mine-1' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 0,
       anchorY: 3,
@@ -353,7 +355,7 @@ describe('Shadow Library: adjacency bonuses', () => {
 
 describe('Shadow Library: Arcane Focus upgrade', () => {
   it('should have productionMultiplier effect of 1.75 for research', () => {
-    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID);
+    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID as RoomId);
     const arcane = paths.find((p) => p.name === 'Arcane Focus');
     expect(arcane).toBeDefined();
     expect(arcane!.effects).toHaveLength(1);
@@ -391,7 +393,7 @@ describe('Shadow Library: Expanded Archives upgrade', () => {
 
 describe('Shadow Library: Forbidden Knowledge upgrade', () => {
   it('should have productionMultiplier of 2.0 and fearIncrease of 2', () => {
-    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID);
+    const paths = roomUpgradeGetPaths(SHADOW_LIBRARY_ID as RoomId);
     const forbidden = paths.find((p) => p.name === 'Forbidden Knowledge');
     expect(forbidden).toBeDefined();
     expect(forbidden!.effects).toHaveLength(2);
@@ -439,8 +441,8 @@ describe('Shadow Library: full production with adjacency', () => {
   it('should apply adjacency bonus to research production with worker', () => {
     const library = createPlacedLibrary({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-small-l',
       anchorX: 2,
       anchorY: 0,
@@ -451,7 +453,7 @@ describe('Shadow Library: full production with adjacency', () => {
         definitionId: 'def-skeleton',
         name: 'Skeleton 1',
         state: 'normal',
-        assignedRoomId: 'placed-library-1',
+        assignedRoomId: 'placed-library-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([library, well], inhabitants);

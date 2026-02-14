@@ -4,14 +4,14 @@ import {
   HALLWAY_PLACEMENT_COST_PER_TILE,
   hallwayPlacementFindPointPath,
 } from '@helpers/hallway-placement';
-import type { GridState, GridTile, TileOffset } from '@interfaces';
+import type { GridState, GridTile, PlacedRoomId, TileOffset } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function roomTile(roomId: string): GridTile {
   return {
     occupied: true,
     occupiedBy: 'room',
-    roomId,
+    roomId: roomId as PlacedRoomId,
     hallwayId: undefined,
     stairId: undefined,
     elevatorId: undefined,

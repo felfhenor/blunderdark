@@ -16,22 +16,24 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   ResourceType,
   RoomDefinition,
+  RoomId,
   RoomProduction,
   Season,
   TileOffset,
 } from '@interfaces';
 import type { InhabitantBonusResult, ActiveAdjacencyBonus, ResourceProductionBreakdown } from '@interfaces/production';
 
-export function productionGetBase(roomTypeId: string): RoomProduction {
+export function productionGetBase(roomTypeId: RoomId): RoomProduction {
   const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!room) return {};
   return room.production ?? {};
 }
 
 export function productionGetRoomDefinition(
-  roomTypeId: string,
+  roomTypeId: RoomId,
 ): (RoomDefinition & IsContentItem) | undefined {
   return contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
 }
@@ -324,7 +326,7 @@ export function productionPerMinute(perTickRate: number): number {
   return perTickRate * GAME_TIME_TICKS_PER_MINUTE;
 }
 
-export function productionGetRoomRates(roomId: string): RoomProduction {
+export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
   const state = gamestate();
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);

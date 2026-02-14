@@ -4,6 +4,7 @@ import type {
   GameState,
   InhabitantDefinition,
   InhabitantInstance,
+  PlacedRoomId,
   ResourceMap,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -222,7 +223,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
   });
 
   it('should calculate rate for stationed Skeleton (1/min)', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1', definitionId: 'skeleton' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' });
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     // 1 per minute / 5 ticks per minute = 0.2 per tick
@@ -230,7 +231,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
   });
 
   it('should calculate rate for stationed Demon Lord (10/min)', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1', definitionId: 'demon-lord' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'demon-lord' });
     const def = makeDef({ corruptionGeneration: 10 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     // 10 per minute / 5 ticks per minute = 2.0 per tick
@@ -239,8 +240,8 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
 
   it('should sum multiple stationed inhabitants', () => {
     const inhabitants = [
-      makeInst({ instanceId: 'i1', assignedRoomId: 'room-1', definitionId: 'skeleton' }),
-      makeInst({ instanceId: 'i2', assignedRoomId: 'room-2', definitionId: 'skeleton' }),
+      makeInst({ instanceId: 'i1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' }),
+      makeInst({ instanceId: 'i2', assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'skeleton' }),
     ];
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate(inhabitants, () => def);
@@ -249,14 +250,14 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
   });
 
   it('should ignore inhabitants with no corruption generation', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId });
     const def = makeDef({ corruptionGeneration: 0 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     expect(rate).toBe(0);
   });
 
   it('should ignore inhabitants with undefined corruption generation', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId });
     const def = makeDef();
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     expect(rate).toBe(0);
@@ -287,7 +288,7 @@ describe('corruptionGenerationProcess', () => {
       definitionId: 'skeleton-def',
       name: 'Skeleton',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
       ...overrides,
     };
   }

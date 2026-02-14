@@ -13,6 +13,7 @@ import type {
   InhabitantStats,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
@@ -130,14 +131,14 @@ export function darkForgeGetStatBonuses(
 
 export function darkForgeGetQueue(
   queues: ForgeCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
 ): ForgeCraftingQueue | undefined {
   return queues.find((q) => q.roomId === roomId);
 }
 
 export function darkForgeAddJob(
   queues: ForgeCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
   recipeId: string,
   targetTicks: number,
 ): ForgeCraftingQueue[] {
@@ -159,7 +160,7 @@ export function darkForgeAddJob(
 
 export function darkForgeRemoveJob(
   queues: ForgeCraftingQueue[],
-  roomId: string,
+  roomId: PlacedRoomId,
   jobIndex: number,
 ): ForgeCraftingQueue[] {
   return queues
@@ -191,7 +192,7 @@ export function darkForgeAddToInventory(
 // --- Validation ---
 
 export function darkForgeCanQueue(
-  roomId: string,
+  roomId: PlacedRoomId,
   floors: GameState['world']['floors'],
   queues: ForgeCraftingQueue[],
 ): { canQueue: boolean; reason?: string; room?: PlacedRoom } {

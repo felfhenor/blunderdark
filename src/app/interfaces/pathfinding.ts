@@ -1,28 +1,31 @@
+import type { RoomId } from '@interfaces/content-room';
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type PathNode = {
-  roomId: string;
-  roomTypeId: string;
+  roomId: PlacedRoomId;
+  roomTypeId: RoomId;
   x: number;
   y: number;
   fearLevel: number;
 };
 
 export type PathEdge = {
-  toRoomId: string;
+  toRoomId: PlacedRoomId;
   baseCost: number;
 };
 
 export type DungeonGraph = {
-  nodes: Map<string, PathNode>;
-  adjacency: Map<string, PathEdge[]>;
+  nodes: Map<PlacedRoomId, PathNode>;
+  adjacency: Map<PlacedRoomId, PathEdge[]>;
 };
 
 export type PathfindingOptions = {
   morale?: number;
   fearCostMultiplier?: number;
-  blockedNodes?: Set<string>;
+  blockedNodes?: Set<PlacedRoomId>;
 };
 
 export type SecondaryObjective = {
-  roomId: string;
+  roomId: PlacedRoomId;
   priority: number;
 };

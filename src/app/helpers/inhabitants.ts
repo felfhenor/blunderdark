@@ -12,7 +12,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
 } from '@interfaces';
 
 /**
@@ -160,8 +162,8 @@ export function inhabitantGetEligible(
  */
 export async function inhabitantAssignToRoom(
   instanceId: string,
-  roomId: string,
-  roomTypeId: string,
+  roomId: PlacedRoomId,
+  roomTypeId: RoomId,
 ): Promise<{ success: boolean; error?: string }> {
   const state = gamestate();
   const instance = state.world.inhabitants.find(

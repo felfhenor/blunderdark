@@ -1,20 +1,20 @@
 import { contentGetEntriesByType } from '@helpers/content';
-import type { IsContentItem, RoomDefinition } from '@interfaces';
+import type { IsContentItem, RoomDefinition, RoomId } from '@interfaces';
 
-let roleCache: Map<string, string> | undefined = undefined;
+let roleCache: Map<string, RoomId> | undefined = undefined;
 
-function buildRoleCache(): Map<string, string> {
+function buildRoleCache(): Map<string, RoomId> {
   const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
-  const map = new Map<string, string>();
+  const map = new Map<string, RoomId>();
   for (const room of rooms) {
     if (room.role) {
-      map.set(room.role, room.id);
+      map.set(room.role, room.id as RoomId);
     }
   }
   return map;
 }
 
-export function roomRoleFindById(role: string): string | undefined {
+export function roomRoleFindById(role: string): RoomId | undefined {
   if (!roleCache) {
     roleCache = buildRoleCache();
   }

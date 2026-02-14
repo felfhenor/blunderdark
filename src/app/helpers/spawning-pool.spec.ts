@@ -5,7 +5,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -133,8 +135,8 @@ const spawningPoolDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'pool-1',
-    roomTypeId: SPAWNING_POOL_ID,
+    id: 'pool-1' as PlacedRoomId,
+    roomTypeId: SPAWNING_POOL_ID as RoomId,
     shapeId: 'shape-2x2',
     anchorX: 0,
     anchorY: 0,
@@ -341,7 +343,7 @@ describe('spawningPoolCountUnassigned', () => {
   it('should count only unassigned inhabitants', () => {
     const inhabitants = [
       makeInhabitant({ instanceId: 'a', assignedRoomId: undefined }),
-      makeInhabitant({ instanceId: 'b', assignedRoomId: 'room-1' }),
+      makeInhabitant({ instanceId: 'b', assignedRoomId: 'room-1' as PlacedRoomId }),
       makeInhabitant({ instanceId: 'c', assignedRoomId: undefined }),
     ];
     expect(spawningPoolCountUnassigned(inhabitants)).toBe(2);
@@ -349,8 +351,8 @@ describe('spawningPoolCountUnassigned', () => {
 
   it('should return 0 when all assigned', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'a', assignedRoomId: 'room-1' }),
-      makeInhabitant({ instanceId: 'b', assignedRoomId: 'room-2' }),
+      makeInhabitant({ instanceId: 'a', assignedRoomId: 'room-1' as PlacedRoomId }),
+      makeInhabitant({ instanceId: 'b', assignedRoomId: 'room-2' as PlacedRoomId }),
     ];
     expect(spawningPoolCountUnassigned(inhabitants)).toBe(0);
   });
@@ -461,7 +463,7 @@ describe('spawningPoolProcess', () => {
         makeInhabitant({ instanceId: `un-${i}`, assignedRoomId: undefined }),
       ),
       ...Array.from({ length: 5 }, (_, i) =>
-        makeInhabitant({ instanceId: `as-${i}`, assignedRoomId: 'some-room' }),
+        makeInhabitant({ instanceId: `as-${i}`, assignedRoomId: 'some-room' as PlacedRoomId }),
       ),
     ];
     const state = makeGameState({ floors: [floor], inhabitants });
@@ -486,8 +488,8 @@ describe('spawningPoolProcess', () => {
 
   it('should not process rooms that are not spawning pools', () => {
     const otherRoom: PlacedRoom = {
-      id: 'other-room',
-      roomTypeId: 'other-type',
+      id: 'other-room' as PlacedRoomId,
+      roomTypeId: 'other-type' as RoomId,
       shapeId: 'shape-2x2',
       anchorX: 0,
       anchorY: 0,
@@ -502,8 +504,8 @@ describe('spawningPoolProcess', () => {
   });
 
   it('should process multiple spawning pools across floors', () => {
-    const pool1 = makeRoom({ id: 'pool-1', spawnTicksRemaining: 1 });
-    const pool2 = makeRoom({ id: 'pool-2', spawnTicksRemaining: 1 });
+    const pool1 = makeRoom({ id: 'pool-1' as PlacedRoomId, spawnTicksRemaining: 1 });
+    const pool2 = makeRoom({ id: 'pool-2' as PlacedRoomId, spawnTicksRemaining: 1 });
     const floor1 = makeFloor([pool1]);
     const floor2 = makeFloor([pool2]);
     floor2.id = 'floor-2';

@@ -4,7 +4,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
   TrapCraftingQueue,
   TrapDefinition,
@@ -134,8 +136,8 @@ const workshopDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'workshop-1',
-    roomTypeId: TRAP_WORKSHOP_ID,
+    id: 'workshop-1' as PlacedRoomId,
+    roomTypeId: TRAP_WORKSHOP_ID as RoomId,
     shapeId: 'shape-2x2',
     anchorX: 0,
     anchorY: 0,
@@ -151,7 +153,7 @@ function makeInhabitant(
     definitionId: 'def-1',
     name: 'Worker',
     state: 'normal',
-    assignedRoomId: 'workshop-1',
+    assignedRoomId: 'workshop-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -372,20 +374,20 @@ describe('Queue Management', () => {
   describe('trapWorkshopGetQueue', () => {
     it('should find queue for existing room', () => {
       const queues: TrapCraftingQueue[] = [
-        { roomId: 'room-1', jobs: [] },
-        { roomId: 'room-2', jobs: [] },
+        { roomId: 'room-1' as PlacedRoomId, jobs: [] },
+        { roomId: 'room-2' as PlacedRoomId, jobs: [] },
       ];
-      expect(trapWorkshopGetQueue(queues, 'room-1')?.roomId).toBe('room-1');
+      expect(trapWorkshopGetQueue(queues, 'room-1' as PlacedRoomId)?.roomId).toBe('room-1');
     });
 
     it('should return undefined for missing room', () => {
-      expect(trapWorkshopGetQueue([], 'nonexistent')).toBeUndefined();
+      expect(trapWorkshopGetQueue([], 'nonexistent' as PlacedRoomId)).toBeUndefined();
     });
   });
 
   describe('trapWorkshopAddJob', () => {
     it('should create new queue entry for room without existing queue', () => {
-      const result = trapWorkshopAddJob([], 'room-1', PIT_TRAP_ID, 15);
+      const result = trapWorkshopAddJob([], 'room-1' as PlacedRoomId, PIT_TRAP_ID, 15);
       expect(result).toHaveLength(1);
       expect(result[0].roomId).toBe('room-1');
       expect(result[0].jobs).toHaveLength(1);
@@ -397,11 +399,11 @@ describe('Queue Management', () => {
     it('should append job to existing queue', () => {
       const queues: TrapCraftingQueue[] = [
         {
-          roomId: 'room-1',
+          roomId: 'room-1' as PlacedRoomId,
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 5, targetTicks: 15 }],
         },
       ];
-      const result = trapWorkshopAddJob(queues, 'room-1', ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(queues, 'room-1' as PlacedRoomId, ARROW_TRAP_ID, 20);
       expect(result[0].jobs).toHaveLength(2);
       expect(result[0].jobs[1].trapTypeId).toBe(ARROW_TRAP_ID);
     });
@@ -409,11 +411,11 @@ describe('Queue Management', () => {
     it('should not modify other room queues', () => {
       const queues: TrapCraftingQueue[] = [
         {
-          roomId: 'room-other',
+          roomId: 'room-other' as PlacedRoomId,
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
         },
       ];
-      const result = trapWorkshopAddJob(queues, 'room-1', ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(queues, 'room-1' as PlacedRoomId, ARROW_TRAP_ID, 20);
       expect(result).toHaveLength(2);
       expect(result[0].roomId).toBe('room-other');
       expect(result[0].jobs).toHaveLength(1);
@@ -424,14 +426,14 @@ describe('Queue Management', () => {
     it('should remove job at specified index', () => {
       const queues: TrapCraftingQueue[] = [
         {
-          roomId: 'room-1',
+          roomId: 'room-1' as PlacedRoomId,
           jobs: [
             { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 },
             { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 20 },
           ],
         },
       ];
-      const result = trapWorkshopRemoveJob(queues, 'room-1', 0);
+      const result = trapWorkshopRemoveJob(queues, 'room-1' as PlacedRoomId, 0);
       expect(result[0].jobs).toHaveLength(1);
       expect(result[0].jobs[0].trapTypeId).toBe(ARROW_TRAP_ID);
     });
@@ -439,11 +441,11 @@ describe('Queue Management', () => {
     it('should remove queue entry when last job removed', () => {
       const queues: TrapCraftingQueue[] = [
         {
-          roomId: 'room-1',
+          roomId: 'room-1' as PlacedRoomId,
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
         },
       ];
-      const result = trapWorkshopRemoveJob(queues, 'room-1', 0);
+      const result = trapWorkshopRemoveJob(queues, 'room-1' as PlacedRoomId, 0);
       expect(result).toHaveLength(0);
     });
   });
@@ -470,7 +472,7 @@ describe('trapWorkshopCanQueue', () => {
   });
 
   it('should reject for non-workshop room', () => {
-    const room = makeRoom({ roomTypeId: 'other-type' });
+    const room = makeRoom({ roomTypeId: 'other-type' as RoomId });
     const worker = makeInhabitant({ assignedRoomId: room.id });
     const floor = makeFloor([room], [worker]);
 
@@ -481,7 +483,7 @@ describe('trapWorkshopCanQueue', () => {
 
   it('should return not found for missing room', () => {
     const floor = makeFloor();
-    const result = trapWorkshopCanQueue('nonexistent', [floor]);
+    const result = trapWorkshopCanQueue('nonexistent' as PlacedRoomId, [floor]);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not found');
   });
@@ -574,10 +576,10 @@ describe('trapWorkshopProcess', () => {
   });
 
   it('should process multiple workshops across floors', () => {
-    const ws1 = makeRoom({ id: 'ws-1' });
-    const ws2 = makeRoom({ id: 'ws-2' });
-    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'ws-1' });
-    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'ws-2' });
+    const ws1 = makeRoom({ id: 'ws-1' as PlacedRoomId });
+    const ws2 = makeRoom({ id: 'ws-2' as PlacedRoomId });
+    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'ws-1' as PlacedRoomId });
+    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'ws-2' as PlacedRoomId });
     const floor1 = makeFloor([ws1], [w1]);
     const floor2 = makeFloor([ws2], [w2]);
     floor2.id = 'floor-2';
@@ -586,11 +588,11 @@ describe('trapWorkshopProcess', () => {
       floors: [floor1, floor2],
       trapCraftingQueues: [
         {
-          roomId: 'ws-1',
+          roomId: 'ws-1' as PlacedRoomId,
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
         },
         {
-          roomId: 'ws-2',
+          roomId: 'ws-2' as PlacedRoomId,
           jobs: [{ trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 }],
         },
       ],

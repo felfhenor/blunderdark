@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -214,8 +216,8 @@ function makeFloor(
 
 function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-grove-1',
-    roomTypeId: MUSHROOM_GROVE_ID,
+    id: 'placed-grove-1' as PlacedRoomId,
+    roomTypeId: MUSHROOM_GROVE_ID as RoomId,
     shapeId: 'shape-t',
     anchorX: 0,
     anchorY: 0,
@@ -234,7 +236,7 @@ beforeEach(() => {
 
 describe('Mushroom Grove: base production', () => {
   it('should have base production of 1.6 food/tick (8 food/min)', () => {
-    const production = productionGetBase(MUSHROOM_GROVE_ID);
+    const production = productionGetBase(MUSHROOM_GROVE_ID as RoomId);
     expect(production).toEqual({ food: 1.6 });
     expect(productionPerMinute(production['food']!)).toBeCloseTo(8.0);
   });
@@ -254,7 +256,7 @@ describe('Mushroom Grove: base production', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-grove-1',
+        assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([grove], inhabitants);
@@ -268,8 +270,8 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
   it('should apply +40% food production when adjacent to Soul Well', () => {
     const grove = createPlacedRoom({ anchorX: 0, anchorY: 0 });
     const soulWell: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -286,15 +288,15 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
   it('should stack Water adjacency bonus for multiple Soul Wells', () => {
     const grove = createPlacedRoom();
     const well1: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
     };
     const well2: PlacedRoom = {
-      id: 'placed-well-2',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-2' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 0,
       anchorY: 2,
@@ -313,8 +315,8 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
   it('should apply +15% food production when adjacent to Shadow Library', () => {
     const grove = createPlacedRoom();
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -331,8 +333,8 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
   it('should apply +15% food production when adjacent to Dark Forge', () => {
     const grove = createPlacedRoom();
     const forge: PlacedRoom = {
-      id: 'placed-forge-1',
-      roomTypeId: DARK_FORGE_ID,
+      id: 'placed-forge-1' as PlacedRoomId,
+      roomTypeId: DARK_FORGE_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -349,15 +351,15 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
   it('should combine Water and Dark adjacency bonuses', () => {
     const grove = createPlacedRoom();
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
     };
     const library: PlacedRoom = {
-      id: 'placed-library-1',
-      roomTypeId: SHADOW_LIBRARY_ID,
+      id: 'placed-library-1' as PlacedRoomId,
+      roomTypeId: SHADOW_LIBRARY_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 0,
       anchorY: 2,
@@ -375,7 +377,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
 
 describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
   it('should have productionMultiplier effect of 1.5 for food', () => {
-    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID);
+    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID as RoomId);
     const bountiful = paths.find((p) => p.name === 'Bountiful Harvest');
     expect(bountiful).toBeDefined();
     expect(bountiful!.effects).toHaveLength(1);
@@ -413,7 +415,7 @@ describe('Mushroom Grove: Expanded Growth upgrade', () => {
 
 describe('Mushroom Grove: Tranquil Garden upgrade', () => {
   it('should have fearReduction effect of 1', () => {
-    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID);
+    const paths = roomUpgradeGetPaths(MUSHROOM_GROVE_ID as RoomId);
     const tranquil = paths.find((p) => p.name === 'Tranquil Garden');
     expect(tranquil).toBeDefined();
     expect(tranquil!.effects).toHaveLength(1);
@@ -461,8 +463,8 @@ describe('Mushroom Grove: full production with adjacency', () => {
     // Grove at (0,0), Soul Well at (3,0) — tiles touch at x=2/x=3
     const grove = createPlacedRoom({ anchorX: 0, anchorY: 0 });
     const well: PlacedRoom = {
-      id: 'placed-well-1',
-      roomTypeId: SOUL_WELL_ID,
+      id: 'placed-well-1' as PlacedRoomId,
+      roomTypeId: SOUL_WELL_ID as RoomId,
       shapeId: 'shape-t',
       anchorX: 3,
       anchorY: 0,
@@ -473,7 +475,7 @@ describe('Mushroom Grove: full production with adjacency', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-grove-1',
+        assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([grove, well], inhabitants);

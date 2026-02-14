@@ -3,7 +3,9 @@ import type {
   InhabitantDefinition,
   InhabitantInstance,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -122,7 +124,7 @@ describe('inhabitant serialization', () => {
       definitionId: '7f716f6e-3742-496b-8277-875c180b0d94',
       name: 'Goblin Miner',
       state: 'scared',
-      assignedRoomId: 'room-abc',
+      assignedRoomId: 'room-abc' as PlacedRoomId,
       trained: true,
       trainingProgress: 25,
       trainingBonuses: { defense: 1, attack: 0 },
@@ -149,7 +151,7 @@ describe('inhabitant serialization', () => {
         instanceId: 'inst-002',
         name: 'Skeleton Guard',
         state: 'hungry',
-        assignedRoomId: 'room-xyz',
+        assignedRoomId: 'room-xyz' as PlacedRoomId,
       }),
     ];
 
@@ -372,8 +374,8 @@ function createTestPlacedRoom(
   overrides: Partial<PlacedRoom> = {},
 ): PlacedRoom {
   return {
-    id: 'placed-room-001',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-room-001' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-l',
     anchorX: 5,
     anchorY: 5,

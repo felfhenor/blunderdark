@@ -6,7 +6,7 @@ import {
   adjacencyGetSharedEdges,
   adjacencyRemoveRoom,
 } from '@helpers/adjacency';
-import type { TileOffset } from '@interfaces';
+import type { PlacedRoomId, TileOffset } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 describe('adjacencyAreRoomsAdjacent', () => {
@@ -121,8 +121,8 @@ describe('AdjacencyMap operations', () => {
 
   it('should add a room with no neighbors', () => {
     let map = adjacencyCreateMap();
-    map = adjacencyAddRoom(map, 'room-a', [{ x: 0, y: 0 }], []);
-    expect(adjacencyGetAdjacentRooms(map, 'room-a')).toEqual([]);
+    map = adjacencyAddRoom(map, 'room-a' as PlacedRoomId, [{ x: 0, y: 0 }], []);
+    expect(adjacencyGetAdjacentRooms(map, 'room-a' as PlacedRoomId)).toEqual([]);
   });
 
   it('should detect adjacency when adding a room near existing rooms', () => {
@@ -130,13 +130,13 @@ describe('AdjacencyMap operations', () => {
     const roomATiles = [{ x: 0, y: 0 }];
     const roomBTiles = [{ x: 1, y: 0 }];
 
-    map = adjacencyAddRoom(map, 'room-a', roomATiles, []);
-    map = adjacencyAddRoom(map, 'room-b', roomBTiles, [
-      { id: 'room-a', tiles: roomATiles },
+    map = adjacencyAddRoom(map, 'room-a' as PlacedRoomId, roomATiles, []);
+    map = adjacencyAddRoom(map, 'room-b' as PlacedRoomId, roomBTiles, [
+      { id: 'room-a' as PlacedRoomId, tiles: roomATiles },
     ]);
 
-    expect(adjacencyGetAdjacentRooms(map, 'room-a')).toContain('room-b');
-    expect(adjacencyGetAdjacentRooms(map, 'room-b')).toContain('room-a');
+    expect(adjacencyGetAdjacentRooms(map, 'room-a' as PlacedRoomId)).toContain('room-b');
+    expect(adjacencyGetAdjacentRooms(map, 'room-b' as PlacedRoomId)).toContain('room-a');
   });
 
   it('should remove a room and clean up all references', () => {
@@ -144,20 +144,20 @@ describe('AdjacencyMap operations', () => {
     const roomATiles = [{ x: 0, y: 0 }];
     const roomBTiles = [{ x: 1, y: 0 }];
 
-    map = adjacencyAddRoom(map, 'room-a', roomATiles, []);
-    map = adjacencyAddRoom(map, 'room-b', roomBTiles, [
-      { id: 'room-a', tiles: roomATiles },
+    map = adjacencyAddRoom(map, 'room-a' as PlacedRoomId, roomATiles, []);
+    map = adjacencyAddRoom(map, 'room-b' as PlacedRoomId, roomBTiles, [
+      { id: 'room-a' as PlacedRoomId, tiles: roomATiles },
     ]);
 
-    map = adjacencyRemoveRoom(map, 'room-b');
+    map = adjacencyRemoveRoom(map, 'room-b' as PlacedRoomId);
 
-    expect(adjacencyGetAdjacentRooms(map, 'room-a')).toEqual([]);
-    expect(adjacencyGetAdjacentRooms(map, 'room-b')).toEqual([]);
+    expect(adjacencyGetAdjacentRooms(map, 'room-a' as PlacedRoomId)).toEqual([]);
+    expect(adjacencyGetAdjacentRooms(map, 'room-b' as PlacedRoomId)).toEqual([]);
   });
 
   it('should return empty array for unknown room ID', () => {
     const map = adjacencyCreateMap();
-    expect(adjacencyGetAdjacentRooms(map, 'nonexistent')).toEqual([]);
+    expect(adjacencyGetAdjacentRooms(map, 'nonexistent' as PlacedRoomId)).toEqual([]);
   });
 
   it('should handle multiple adjacent rooms', () => {
@@ -169,16 +169,16 @@ describe('AdjacencyMap operations', () => {
     const roomBTiles = [{ x: 0, y: 0 }];
     const roomCTiles = [{ x: 2, y: 0 }];
 
-    map = adjacencyAddRoom(map, 'room-a', roomATiles, []);
-    map = adjacencyAddRoom(map, 'room-b', roomBTiles, [
-      { id: 'room-a', tiles: roomATiles },
+    map = adjacencyAddRoom(map, 'room-a' as PlacedRoomId, roomATiles, []);
+    map = adjacencyAddRoom(map, 'room-b' as PlacedRoomId, roomBTiles, [
+      { id: 'room-a' as PlacedRoomId, tiles: roomATiles },
     ]);
-    map = adjacencyAddRoom(map, 'room-c', roomCTiles, [
-      { id: 'room-a', tiles: roomATiles },
-      { id: 'room-b', tiles: roomBTiles },
+    map = adjacencyAddRoom(map, 'room-c' as PlacedRoomId, roomCTiles, [
+      { id: 'room-a' as PlacedRoomId, tiles: roomATiles },
+      { id: 'room-b' as PlacedRoomId, tiles: roomBTiles },
     ]);
 
-    const adjacentToA = adjacencyGetAdjacentRooms(map, 'room-a');
+    const adjacentToA = adjacencyGetAdjacentRooms(map, 'room-a' as PlacedRoomId);
     expect(adjacentToA).toContain('room-b');
     expect(adjacentToA).toContain('room-c');
     expect(adjacentToA).toHaveLength(2);

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { BiomeType, Floor } from '@interfaces';
+import type { BiomeType, Floor, PlacedRoomId, RoomId } from '@interfaces';
 
 // Test-local room type IDs
 const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
@@ -38,8 +38,8 @@ function makeFloor(
     biome,
     grid: [],
     rooms: rooms.map((r) => ({
-      id: r.id,
-      roomTypeId: r.roomTypeId,
+      id: r.id as PlacedRoomId,
+      roomTypeId: r.roomTypeId as RoomId,
       shapeId: 'shape-1',
       anchorX: 0,
       anchorY: 0,
@@ -100,7 +100,7 @@ describe('BIOME_RESTRICTION_MAP', () => {
 describe('biomeRestrictionCountRoomType', () => {
   it('should return 0 when no rooms match', () => {
     const floor = makeFloor('neutral');
-    expect(biomeRestrictionCountRoomType(floor, CRYSTAL_MINE_ID)).toBe(0);
+    expect(biomeRestrictionCountRoomType(floor, CRYSTAL_MINE_ID as RoomId)).toBe(0);
   });
 
   it('should count matching room types on a floor', () => {
@@ -109,7 +109,7 @@ describe('biomeRestrictionCountRoomType', () => {
       { id: 'r2', roomTypeId: CRYSTAL_MINE_ID },
       { id: 'r3', roomTypeId: BARRACKS_ID },
     ]);
-    expect(biomeRestrictionCountRoomType(floor, CRYSTAL_MINE_ID)).toBe(2);
+    expect(biomeRestrictionCountRoomType(floor, CRYSTAL_MINE_ID as RoomId)).toBe(2);
   });
 });
 
@@ -118,7 +118,7 @@ describe('biomeRestrictionCountRoomType', () => {
 describe('biomeRestrictionCanBuild', () => {
   it('should block Underground Lake on volcanic floor', () => {
     const floor = makeFloor('volcanic');
-    const result = biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID, 'volcanic', floor);
+    const result = biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID as RoomId, 'volcanic', floor);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('Underground Lake');
     expect(result.reason).toContain('volcanic');
@@ -126,14 +126,14 @@ describe('biomeRestrictionCanBuild', () => {
 
   it('should block Mushroom Grove on volcanic floor', () => {
     const floor = makeFloor('volcanic');
-    const result = biomeRestrictionCanBuild(MUSHROOM_GROVE_ID, 'volcanic', floor);
+    const result = biomeRestrictionCanBuild(MUSHROOM_GROVE_ID as RoomId, 'volcanic', floor);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('Mushroom Grove');
   });
 
   it('should block Soul Well on flooded floor', () => {
     const floor = makeFloor('flooded');
-    const result = biomeRestrictionCanBuild(SOUL_WELL_ID, 'flooded', floor);
+    const result = biomeRestrictionCanBuild(SOUL_WELL_ID as RoomId, 'flooded', floor);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('Soul Well');
   });
@@ -143,7 +143,7 @@ describe('biomeRestrictionCanBuild', () => {
       { id: 'r1', roomTypeId: CRYSTAL_MINE_ID },
       { id: 'r2', roomTypeId: CRYSTAL_MINE_ID },
     ]);
-    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID, 'crystal', floor);
+    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(result.allowed).toBe(true);
   });
 
@@ -153,7 +153,7 @@ describe('biomeRestrictionCanBuild', () => {
       roomTypeId: CRYSTAL_MINE_ID,
     }));
     const floor = makeFloor('crystal', rooms);
-    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID, 'crystal', floor);
+    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(result.allowed).toBe(true);
   });
 
@@ -163,7 +163,7 @@ describe('biomeRestrictionCanBuild', () => {
       roomTypeId: CRYSTAL_MINE_ID,
     }));
     const floor = makeFloor('crystal', rooms);
-    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID, 'crystal', floor);
+    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('5');
   });
@@ -174,35 +174,35 @@ describe('biomeRestrictionCanBuild', () => {
       roomTypeId: CRYSTAL_MINE_ID,
     }));
     const floor = makeFloor('crystal', rooms);
-    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID, 'crystal', floor);
+    const result = biomeRestrictionCanBuild(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(result.allowed).toBe(false);
   });
 
   it('should allow all rooms on neutral floor', () => {
     const floor = makeFloor('neutral');
-    expect(biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID, 'neutral', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(MUSHROOM_GROVE_ID, 'neutral', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(SOUL_WELL_ID, 'neutral', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(CRYSTAL_MINE_ID, 'neutral', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(THRONE_ROOM_ID, 'neutral', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID as RoomId, 'neutral', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(MUSHROOM_GROVE_ID as RoomId, 'neutral', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(SOUL_WELL_ID as RoomId, 'neutral', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(CRYSTAL_MINE_ID as RoomId, 'neutral', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(THRONE_ROOM_ID as RoomId, 'neutral', floor).allowed).toBe(true);
   });
 
   it('should allow all rooms on fungal floor', () => {
     const floor = makeFloor('fungal');
-    expect(biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID, 'fungal', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(MUSHROOM_GROVE_ID, 'fungal', floor).allowed).toBe(true);
-    expect(biomeRestrictionCanBuild(SOUL_WELL_ID, 'fungal', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID as RoomId, 'fungal', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(MUSHROOM_GROVE_ID as RoomId, 'fungal', floor).allowed).toBe(true);
+    expect(biomeRestrictionCanBuild(SOUL_WELL_ID as RoomId, 'fungal', floor).allowed).toBe(true);
   });
 
   it('should block Mushroom Grove on corrupted floor', () => {
     const floor = makeFloor('corrupted');
-    const result = biomeRestrictionCanBuild(MUSHROOM_GROVE_ID, 'corrupted', floor);
+    const result = biomeRestrictionCanBuild(MUSHROOM_GROVE_ID as RoomId, 'corrupted', floor);
     expect(result.allowed).toBe(false);
   });
 
   it('should block Underground Lake on corrupted floor', () => {
     const floor = makeFloor('corrupted');
-    const result = biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID, 'corrupted', floor);
+    const result = biomeRestrictionCanBuild(UNDERGROUND_LAKE_ID as RoomId, 'corrupted', floor);
     expect(result.allowed).toBe(false);
   });
 
@@ -210,14 +210,14 @@ describe('biomeRestrictionCanBuild', () => {
     const biomes: BiomeType[] = ['volcanic', 'flooded', 'crystal', 'corrupted', 'fungal', 'neutral'];
     for (const biome of biomes) {
       const floor = makeFloor(biome);
-      expect(biomeRestrictionCanBuild(THRONE_ROOM_ID, biome, floor).allowed).toBe(true);
-      expect(biomeRestrictionCanBuild(BARRACKS_ID, biome, floor).allowed).toBe(true);
+      expect(biomeRestrictionCanBuild(THRONE_ROOM_ID as RoomId, biome, floor).allowed).toBe(true);
+      expect(biomeRestrictionCanBuild(BARRACKS_ID as RoomId, biome, floor).allowed).toBe(true);
     }
   });
 
   it('should allow room when roomTypeId is unknown', () => {
     const floor = makeFloor('volcanic');
-    const result = biomeRestrictionCanBuild('nonexistent-id', 'volcanic', floor);
+    const result = biomeRestrictionCanBuild('nonexistent-id' as RoomId, 'volcanic', floor);
     expect(result.allowed).toBe(true);
   });
 });
@@ -227,7 +227,7 @@ describe('biomeRestrictionCanBuild', () => {
 describe('biomeRestrictionGetRoomInfo', () => {
   it('should return restricted with reason for blocked rooms', () => {
     const floor = makeFloor('volcanic');
-    const info = biomeRestrictionGetRoomInfo(UNDERGROUND_LAKE_ID, 'volcanic', floor);
+    const info = biomeRestrictionGetRoomInfo(UNDERGROUND_LAKE_ID as RoomId, 'volcanic', floor);
     expect(info.restricted).toBe(true);
     expect(info.reason).toBeDefined();
   });
@@ -238,7 +238,7 @@ describe('biomeRestrictionGetRoomInfo', () => {
       roomTypeId: CRYSTAL_MINE_ID,
     }));
     const floor = makeFloor('crystal', rooms);
-    const info = biomeRestrictionGetRoomInfo(CRYSTAL_MINE_ID, 'crystal', floor);
+    const info = biomeRestrictionGetRoomInfo(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(info.restricted).toBe(false);
     expect(info.currentCount).toBe(3);
     expect(info.maxCount).toBe(5);
@@ -250,14 +250,14 @@ describe('biomeRestrictionGetRoomInfo', () => {
       roomTypeId: CRYSTAL_MINE_ID,
     }));
     const floor = makeFloor('crystal', rooms);
-    const info = biomeRestrictionGetRoomInfo(CRYSTAL_MINE_ID, 'crystal', floor);
+    const info = biomeRestrictionGetRoomInfo(CRYSTAL_MINE_ID as RoomId, 'crystal', floor);
     expect(info.restricted).toBe(true);
     expect(info.reason).toContain('5/5');
   });
 
   it('should return not restricted for unrestricted rooms', () => {
     const floor = makeFloor('volcanic');
-    const info = biomeRestrictionGetRoomInfo(THRONE_ROOM_ID, 'volcanic', floor);
+    const info = biomeRestrictionGetRoomInfo(THRONE_ROOM_ID as RoomId, 'volcanic', floor);
     expect(info.restricted).toBe(false);
     expect(info.reason).toBeUndefined();
   });

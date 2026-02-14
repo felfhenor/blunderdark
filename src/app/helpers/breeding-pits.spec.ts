@@ -6,7 +6,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -226,8 +228,8 @@ const soulWellDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'breeding-1',
-    roomTypeId: BREEDING_PITS_ID,
+    id: 'breeding-1' as PlacedRoomId,
+    roomTypeId: BREEDING_PITS_ID as RoomId,
     shapeId: 'shape-3x3',
     anchorX: 0,
     anchorY: 0,
@@ -243,7 +245,7 @@ function makeInhabitant(
     definitionId: GOBLIN_ID,
     name: 'Goblin the Bold',
     state: 'normal',
-    assignedRoomId: 'breeding-1',
+    assignedRoomId: 'breeding-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -743,7 +745,7 @@ describe('breedingPitsProcess', () => {
   });
 
   it('should not process rooms that are not breeding pits', () => {
-    const room = makeRoom({ roomTypeId: 'other-room-type' });
+    const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.breedingJob = {
       parentAInstanceId: 'g1',
       parentBInstanceId: 'k1',
@@ -763,7 +765,7 @@ describe('breedingPitsProcess', () => {
   });
 
   it('should process multiple breeding pits across floors', () => {
-    const room1 = makeRoom({ id: 'bp-1' });
+    const room1 = makeRoom({ id: 'bp-1' as PlacedRoomId });
     room1.breedingJob = {
       parentAInstanceId: 'g1',
       parentBInstanceId: 'k1',
@@ -772,16 +774,16 @@ describe('breedingPitsProcess', () => {
       targetTicks: 25,
     };
 
-    const room2 = makeRoom({ id: 'bp-2' });
+    const room2 = makeRoom({ id: 'bp-2' as PlacedRoomId });
     room2.mutationJob = {
       targetInstanceId: 'g2',
       ticksRemaining: 3,
       targetTicks: 15,
     };
 
-    const g1 = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, assignedRoomId: 'bp-1' });
-    const k1 = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID, assignedRoomId: 'bp-1' });
-    const g2 = makeInhabitant({ instanceId: 'g2', definitionId: GOBLIN_ID, assignedRoomId: 'bp-2' });
+    const g1 = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, assignedRoomId: 'bp-1' as PlacedRoomId });
+    const k1 = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID, assignedRoomId: 'bp-1' as PlacedRoomId });
+    const g2 = makeInhabitant({ instanceId: 'g2', definitionId: GOBLIN_ID, assignedRoomId: 'bp-2' as PlacedRoomId });
 
     const floor1 = makeFloor([room1], [g1, k1]);
     const floor2 = makeFloor([room2], [g2]);

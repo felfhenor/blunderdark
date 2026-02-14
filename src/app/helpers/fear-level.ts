@@ -14,6 +14,7 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
   TileOffset,
 } from '@interfaces';
@@ -47,7 +48,7 @@ export function fearLevelGetLabel(level: number): string {
 }
 
 export function fearLevelCalculateInhabitantModifier(
-  roomId: string,
+  roomId: PlacedRoomId,
   inhabitants: InhabitantInstance[],
 ): number {
   let modifier = 0;
@@ -121,7 +122,7 @@ export function fearLevelCalculatePropagationAmount(sourceFear: number): number 
  * Uses the highest fearPropagationDistance value among inhabitants.
  */
 export function fearLevelGetMaxPropagationDistance(
-  roomId: string,
+  roomId: PlacedRoomId,
   inhabitants: InhabitantInstance[],
 ): number {
   let maxDistance = FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE;
@@ -147,7 +148,7 @@ export function fearLevelGetMaxPropagationDistance(
  * Builds an adjacency map for all rooms on a floor using tile-based edge sharing.
  */
 export function fearLevelBuildAdjacencyMap(floor: Floor): AdjacencyMap {
-  const roomTiles = new Map<string, TileOffset[]>();
+  const roomTiles = new Map<PlacedRoomId, TileOffset[]>();
   for (const room of floor.rooms) {
     const shape = roomShapeResolve(room);
     roomTiles.set(
@@ -186,11 +187,11 @@ export function fearLevelBuildAdjacencyMap(floor: Floor): AdjacencyMap {
  */
 export function fearLevelCalculateAllPropagation(
   adjacencyMap: AdjacencyMap,
-  roomSourceFears: Map<string, number>,
-  roomPropagationDistances: Map<string, number>,
-  roomNames: Map<string, string>,
-): Map<string, { total: number; sources: FearPropagationSource[] }> {
-  const result = new Map<string, { total: number; sources: FearPropagationSource[] }>();
+  roomSourceFears: Map<PlacedRoomId, number>,
+  roomPropagationDistances: Map<PlacedRoomId, number>,
+  roomNames: Map<PlacedRoomId, string>,
+): Map<PlacedRoomId, { total: number; sources: FearPropagationSource[] }> {
+  const result = new Map<PlacedRoomId, { total: number; sources: FearPropagationSource[] }>();
 
   for (const [sourceRoomId, sourceFear] of roomSourceFears) {
     const basePropagation = fearLevelCalculatePropagationAmount(sourceFear);
@@ -199,12 +200,12 @@ export function fearLevelCalculateAllPropagation(
     const maxDistance = roomPropagationDistances.get(sourceRoomId) ?? FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE;
 
     // BFS from source room
-    const visited = new Set<string>();
+    const visited = new Set<PlacedRoomId>();
     visited.add(sourceRoomId);
-    let currentLevel: string[] = [sourceRoomId];
+    let currentLevel: PlacedRoomId[] = [sourceRoomId];
 
     for (let distance = 1; distance <= maxDistance; distance++) {
-      const nextLevel: string[] = [];
+      const nextLevel: PlacedRoomId[] = [];
 
       for (const roomId of currentLevel) {
         const neighbors = adjacencyMap[roomId] ?? [];
@@ -280,11 +281,11 @@ export function fearLevelGetForRoom(
 export function fearLevelCalculateAllForFloor(
   floor: Floor,
   throneRoomFear?: number,
-): Map<string, FearLevelBreakdown> {
-  const result = new Map<string, FearLevelBreakdown>();
-  const roomSourceFears = new Map<string, number>();
-  const roomPropagationDistances = new Map<string, number>();
-  const roomNames = new Map<string, string>();
+): Map<PlacedRoomId, FearLevelBreakdown> {
+  const result = new Map<PlacedRoomId, FearLevelBreakdown>();
+  const roomSourceFears = new Map<PlacedRoomId, number>();
+  const roomPropagationDistances = new Map<PlacedRoomId, number>();
+  const roomNames = new Map<PlacedRoomId, string>();
 
   // First pass: compute individual breakdowns without propagation
   for (const placedRoom of floor.rooms) {
@@ -347,12 +348,12 @@ export function fearLevelCalculateAllForFloor(
 
 // --- Computed signals ---
 
-export const fearLevelBreakdownMap = computed<Map<string, FearLevelBreakdown>>(
+export const fearLevelBreakdownMap = computed<Map<PlacedRoomId, FearLevelBreakdown>>(
   () => {
     const state = gamestate();
     const floors = state.world.floors;
     const throneRoomFear = throneRoomGetFearLevel(floors) ?? undefined;
-    const combined = new Map<string, FearLevelBreakdown>();
+    const combined = new Map<PlacedRoomId, FearLevelBreakdown>();
 
     for (const floor of floors) {
       const floorMap = fearLevelCalculateAllForFloor(floor, throneRoomFear);
@@ -365,9 +366,9 @@ export const fearLevelBreakdownMap = computed<Map<string, FearLevelBreakdown>>(
   },
 );
 
-export const fearLevelRoomMap = computed<Map<string, number>>(() => {
+export const fearLevelRoomMap = computed<Map<PlacedRoomId, number>>(() => {
   const breakdowns = fearLevelBreakdownMap();
-  const result = new Map<string, number>();
+  const result = new Map<PlacedRoomId, number>();
 
   for (const [roomId, breakdown] of breakdowns) {
     result.set(roomId, breakdown.effectiveFear);

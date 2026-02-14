@@ -19,7 +19,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
 } from '@interfaces';
 
 type RosterFilter = 'all' | 'assigned' | 'unassigned';
@@ -164,7 +166,7 @@ export class PanelRosterComponent {
       await inhabitantUnassignFromRoom(instanceId);
     }
 
-    const result = await inhabitantAssignToRoom(instanceId, roomId, roomTypeId);
+    const result = await inhabitantAssignToRoom(instanceId, roomId as PlacedRoomId, roomTypeId as RoomId);
     if (!result.success && result.error) {
       notifyError(result.error);
     } else if (result.success) {

@@ -1,4 +1,4 @@
-import type { TileOffset } from '@interfaces/room-shape';
+import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
 
 export type HallwayUpgrade = {
   id: string;
@@ -7,8 +7,8 @@ export type HallwayUpgrade = {
 
 export type Hallway = {
   id: string;
-  startRoomId?: string;
-  endRoomId?: string;
+  startRoomId?: PlacedRoomId;
+  endRoomId?: PlacedRoomId;
   tiles: TileOffset[];
   upgrades: HallwayUpgrade[];
 };

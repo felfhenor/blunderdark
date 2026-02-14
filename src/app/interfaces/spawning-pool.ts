@@ -1,4 +1,6 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type SpawningPoolEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   inhabitantName: string;
 };

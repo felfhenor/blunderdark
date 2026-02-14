@@ -3,6 +3,7 @@ import { floorCurrent } from '@helpers/floor';
 import { gridGetTile } from '@helpers/grid';
 import { hallwayRemove, hallwayRemoveFromGrid } from '@helpers/hallways';
 import { updateGamestate } from '@helpers/state-game';
+import type { PlacedRoomId } from '@interfaces';
 
 /**
  * Remove an entire hallway starting from a tile at (x, y).
@@ -35,7 +36,7 @@ export async function hallwayTileRemove(
     const updatedGrid = hallwayRemoveFromGrid(currentFloor.grid, hallway);
     const updatedHallways = hallwayRemove(currentFloor.hallways, hallwayId);
 
-    const floorWithoutConnections = connectionRemoveRoomFromFloor(currentFloor, hallwayId);
+    const floorWithoutConnections = connectionRemoveRoomFromFloor(currentFloor, hallwayId as PlacedRoomId);
 
     const updatedFloors = [...state.world.floors];
     updatedFloors[floorIndex] = {

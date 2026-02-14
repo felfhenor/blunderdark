@@ -16,8 +16,10 @@ import type {
   GridState,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   Rotation,
   RoomDefinition,
+  RoomId,
   RoomShape,
   TileOffset,
 } from '@interfaces';
@@ -101,7 +103,7 @@ export function roomPlacementValidate(
  */
 export function roomPlacementIsUniqueTypePlaced(
   floors: Floor[],
-  roomTypeId: string,
+  roomTypeId: RoomId,
 ): boolean {
   return floors.some((floor) =>
     floor.rooms.some((room) => room.roomTypeId === roomTypeId),
@@ -114,7 +116,7 @@ export function roomPlacementIsUniqueTypePlaced(
  */
 export const roomPlacementPlacedTypeIds = computed(() => {
   const state = gamestate();
-  const placed = new Set<string>();
+  const placed = new Set<RoomId>();
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
       placed.add(room.roomTypeId);
@@ -125,13 +127,13 @@ export const roomPlacementPlacedTypeIds = computed(() => {
 
 // --- Placement mode state ---
 
-export const roomPlacementSelectedTypeId = signal<string | undefined>(undefined);
+export const roomPlacementSelectedTypeId = signal<RoomId | undefined>(undefined);
 export const roomPlacementRotation = signal<Rotation>(0);
 
 /** The base (unrotated) shape for the current placement. */
 const placementBaseShape = signal<RoomShape | undefined>(undefined);
 
-export function roomPlacementEnterMode(roomTypeId: string, shape: RoomShape): void {
+export function roomPlacementEnterMode(roomTypeId: RoomId, shape: RoomShape): void {
   roomPlacementSelectedTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
   roomPlacementRotation.set(0);
@@ -344,7 +346,7 @@ export function roomPlacementPlaceOnFloor(
 
 export function roomPlacementRemoveFromFloor(
   floor: Floor,
-  roomId: string,
+  roomId: PlacedRoomId,
   shape: RoomShape,
 ): Floor | undefined {
   const room = floor.rooms.find((r) => r.id === roomId);
@@ -384,7 +386,7 @@ export function roomPlacementRemoveFromFloor(
 }
 
 export async function roomPlacementPlace(
-  roomTypeId: string,
+  roomTypeId: RoomId,
   shapeId: string,
   anchorX: number,
   anchorY: number,
@@ -401,7 +403,7 @@ export async function roomPlacementPlace(
   if (!floor) return undefined;
 
   const room: PlacedRoom = {
-    id: rngUuid(),
+    id: rngUuid() as PlacedRoomId,
     roomTypeId,
     shapeId,
     anchorX,
@@ -431,13 +433,13 @@ export async function roomPlacementPlace(
  * Check if a placed room can be removed based on its definition.
  * Returns false for rooms with removable: false (e.g., Altar Room).
  */
-export function roomPlacementIsRemovable(roomTypeId: string): boolean {
+export function roomPlacementIsRemovable(roomTypeId: RoomId): boolean {
   const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!roomDef) return true;
   return roomDef.removable;
 }
 
-export async function roomPlacementRemove(roomId: string): Promise<boolean> {
+export async function roomPlacementRemove(roomId: PlacedRoomId): Promise<boolean> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];

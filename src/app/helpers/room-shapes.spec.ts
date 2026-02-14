@@ -1,4 +1,4 @@
-import type { PlacedRoom, RoomShape } from '@interfaces';
+import type { PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -151,8 +151,8 @@ describe('roomShapeFitsInGrid', () => {
 describe('PlacedRoom serialization', () => {
   it('should be JSON-serializable and round-trip correctly', () => {
     const placed: PlacedRoom = {
-      id: 'room-001',
-      roomTypeId: 'room-type-001',
+      id: 'room-001' as PlacedRoomId,
+      roomTypeId: 'room-type-001' as RoomId,
       shapeId: 'test-2x2',
       anchorX: 5,
       anchorY: 3,
@@ -169,8 +169,8 @@ describe('PlacedRoom serialization', () => {
 
   it('should store shapeId not full shape data', () => {
     const placed: PlacedRoom = {
-      id: 'room-001',
-      roomTypeId: 'room-type-001',
+      id: 'room-001' as PlacedRoomId,
+      roomTypeId: 'room-type-001' as RoomId,
       shapeId: 'test-2x2',
       anchorX: 0,
       anchorY: 0,
@@ -185,8 +185,8 @@ describe('PlacedRoom serialization', () => {
 describe('roomShapeResolve', () => {
   it('should return fallback shape when shape ID is not found in content', () => {
     const placed: PlacedRoom = {
-      id: 'room-001',
-      roomTypeId: 'room-type-001',
+      id: 'room-001' as PlacedRoomId,
+      roomTypeId: 'room-type-001' as RoomId,
       shapeId: 'nonexistent-shape-id',
       anchorX: 0,
       anchorY: 0,

@@ -6,7 +6,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -128,8 +130,8 @@ function makeDarkTransmuteRecipe(): AlchemyRecipeContent & IsContentItem {
 
 function makePlacedRoom(overrides?: Partial<PlacedRoom>): PlacedRoom {
   return {
-    id: 'room-1',
-    roomTypeId: ALCHEMY_LAB_ID,
+    id: 'room-1' as PlacedRoomId,
+    roomTypeId: ALCHEMY_LAB_ID as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
@@ -143,7 +145,7 @@ function makeInhabitant(overrides?: Partial<InhabitantInstance>): InhabitantInst
     definitionId: 'def-goblin',
     name: 'Goblin Worker',
     state: 'normal',
-    assignedRoomId: 'room-1',
+    assignedRoomId: 'room-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -371,11 +373,11 @@ describe('alchemy-lab', () => {
   describe('Conversion Management', () => {
     it('should start a new conversion', async () => {
       const { alchemyLabStartConversion } = await import('@helpers/alchemy-lab');
-      const result = alchemyLabStartConversion([], 'room-1', FLUX_RECIPE_ID, 15);
+      const result = alchemyLabStartConversion([], 'room-1' as PlacedRoomId, FLUX_RECIPE_ID, 15);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 0,
         targetTicks: 15,
@@ -386,14 +388,14 @@ describe('alchemy-lab', () => {
     it('should replace existing conversion when switching recipe', async () => {
       const { alchemyLabStartConversion } = await import('@helpers/alchemy-lab');
       const existing: AlchemyConversion[] = [{
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
         inputConsumed: true,
       }];
 
-      const result = alchemyLabStartConversion(existing, 'room-1', ESSENCE_RECIPE_ID, 25);
+      const result = alchemyLabStartConversion(existing, 'room-1' as PlacedRoomId, ESSENCE_RECIPE_ID, 25);
       expect(result).toHaveLength(1);
       expect(result[0].recipeId).toBe(ESSENCE_RECIPE_ID);
       expect(result[0].progress).toBe(0);
@@ -403,35 +405,35 @@ describe('alchemy-lab', () => {
     it('should stop a conversion', async () => {
       const { alchemyLabStopConversion } = await import('@helpers/alchemy-lab');
       const conversions: AlchemyConversion[] = [{
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
         inputConsumed: true,
       }];
 
-      const result = alchemyLabStopConversion(conversions, 'room-1');
+      const result = alchemyLabStopConversion(conversions, 'room-1' as PlacedRoomId);
       expect(result).toHaveLength(0);
     });
 
     it('should get conversion for a room', async () => {
       const { alchemyLabGetConversion } = await import('@helpers/alchemy-lab');
       const conversions: AlchemyConversion[] = [{
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
         inputConsumed: true,
       }];
 
-      const result = alchemyLabGetConversion(conversions, 'room-1');
+      const result = alchemyLabGetConversion(conversions, 'room-1' as PlacedRoomId);
       expect(result).toBeDefined();
       expect(result?.recipeId).toBe(FLUX_RECIPE_ID);
     });
 
     it('should return undefined for room without conversion', async () => {
       const { alchemyLabGetConversion } = await import('@helpers/alchemy-lab');
-      const result = alchemyLabGetConversion([], 'room-1');
+      const result = alchemyLabGetConversion([], 'room-1' as PlacedRoomId);
       expect(result).toBeUndefined();
     });
   });
@@ -440,14 +442,14 @@ describe('alchemy-lab', () => {
     it('should allow conversion with assigned worker in alchemy lab', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
       const floors = [makeFloor()];
-      const { canConvert } = alchemyLabCanConvert('room-1', floors);
+      const { canConvert } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
       expect(canConvert).toBe(true);
     });
 
     it('should reject conversion without workers', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
       const floors = [makeFloor({ inhabitants: [] })];
-      const { canConvert, reason } = alchemyLabCanConvert('room-1', floors);
+      const { canConvert, reason } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
       expect(canConvert).toBe(false);
       expect(reason).toContain('1 inhabitant');
     });
@@ -455,16 +457,16 @@ describe('alchemy-lab', () => {
     it('should reject conversion for non-alchemy-lab room', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
       const floors = [makeFloor({
-        rooms: [makePlacedRoom({ roomTypeId: 'other-room' })],
+        rooms: [makePlacedRoom({ roomTypeId: 'other-room' as RoomId })],
       })];
-      const { canConvert, reason } = alchemyLabCanConvert('room-1', floors);
+      const { canConvert, reason } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
       expect(canConvert).toBe(false);
       expect(reason).toContain('not an Alchemy Lab');
     });
 
     it('should reject for non-existent room', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
-      const { canConvert, reason } = alchemyLabCanConvert('nonexistent', [makeFloor()]);
+      const { canConvert, reason } = alchemyLabCanConvert('nonexistent' as PlacedRoomId, [makeFloor()]);
       expect(canConvert).toBe(false);
       expect(reason).toContain('not found');
     });
@@ -474,7 +476,7 @@ describe('alchemy-lab', () => {
     it('should consume input and start progress on first tick', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 0,
         targetTicks: 15,
@@ -493,7 +495,7 @@ describe('alchemy-lab', () => {
     it('should not consume input if already consumed', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
@@ -511,7 +513,7 @@ describe('alchemy-lab', () => {
     it('should not start if resources are insufficient', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 0,
         targetTicks: 15,
@@ -534,7 +536,7 @@ describe('alchemy-lab', () => {
     it('should complete conversion and add output resource', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 14,
         targetTicks: 15,
@@ -552,7 +554,7 @@ describe('alchemy-lab', () => {
     it('should cap output at resource max', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 14,
         targetTicks: 15,
@@ -571,7 +573,7 @@ describe('alchemy-lab', () => {
     it('should not process without assigned worker', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
@@ -590,7 +592,7 @@ describe('alchemy-lab', () => {
     it('should skip rooms that are not alchemy labs', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 5,
         targetTicks: 15,
@@ -600,7 +602,7 @@ describe('alchemy-lab', () => {
       const state = makeGameState({
         alchemyConversions: [conversion],
         floors: [makeFloor({
-          rooms: [makePlacedRoom({ roomTypeId: 'other-type' })],
+          rooms: [makePlacedRoom({ roomTypeId: 'other-type' as RoomId })],
         })],
       });
       alchemyLabProcess(state);
@@ -611,7 +613,7 @@ describe('alchemy-lab', () => {
     it('should reset cycle on completion for continuous conversion', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: FLUX_RECIPE_ID,
         progress: 14,
         targetTicks: 15,
@@ -632,7 +634,7 @@ describe('alchemy-lab', () => {
     it('should handle advanced recipe output (multiple units)', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         recipeId: DARK_TRANSMUTE_ID,
         progress: 19,
         targetTicks: 20,

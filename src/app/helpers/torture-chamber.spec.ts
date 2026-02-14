@@ -5,7 +5,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -153,8 +155,8 @@ const barracksDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'torture-1',
-    roomTypeId: TORTURE_CHAMBER_ID,
+    id: 'torture-1' as PlacedRoomId,
+    roomTypeId: TORTURE_CHAMBER_ID as RoomId,
     shapeId: 'shape-l',
     anchorX: 0,
     anchorY: 0,
@@ -170,7 +172,7 @@ function makeInhabitant(
     definitionId: GOBLIN_ID,
     name: 'Goblin Torturer',
     state: 'normal',
-    assignedRoomId: 'torture-1',
+    assignedRoomId: 'torture-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -703,7 +705,7 @@ describe('tortureChamberProcess', () => {
   });
 
   it('should not process rooms that are not torture chambers', () => {
-    const room = makeRoom({ roomTypeId: 'other-room-type' });
+    const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.tortureJob = {
       prisonerId: 'prisoner-1',
       action: 'extract',
@@ -730,7 +732,7 @@ describe('tortureChamberProcess', () => {
       targetTicks: 20,
     };
 
-    const unassigned = makeInhabitant({ assignedRoomId: 'other-room' });
+    const unassigned = makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId });
     const prisoner = makePrisoner();
     const floor = makeFloor([room], [unassigned]);
     const state = makeGameState({

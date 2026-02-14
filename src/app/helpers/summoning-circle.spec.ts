@@ -5,7 +5,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
   SummonRecipeContent,
 } from '@interfaces';
@@ -259,8 +261,8 @@ const soulWellDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'summoning-1',
-    roomTypeId: SUMMONING_CIRCLE_ID,
+    id: 'summoning-1' as PlacedRoomId,
+    roomTypeId: SUMMONING_CIRCLE_ID as RoomId,
     shapeId: 'shape-l',
     anchorX: 0,
     anchorY: 0,
@@ -276,7 +278,7 @@ function makeInhabitant(
     definitionId: GOBLIN_ID,
     name: 'Goblin the Bold',
     state: 'normal',
-    assignedRoomId: 'summoning-1',
+    assignedRoomId: 'summoning-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -515,7 +517,7 @@ describe('Summoning Can Start', () => {
 
   it('should return false when no inhabitants are assigned', () => {
     const room = makeRoom();
-    const inhabitants = [makeInhabitant({ assignedRoomId: 'other-room' })];
+    const inhabitants = [makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId })];
     expect(summoningCanStart(room, inhabitants)).toBe(false);
   });
 
@@ -683,7 +685,7 @@ describe('summoningCircleProcess', () => {
   });
 
   it('should not process rooms that are not summoning circles', () => {
-    const room = makeRoom({ roomTypeId: 'other-room-type' });
+    const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.summonJob = {
       recipeId: RECIPE_FIRE_ID,
       ticksRemaining: 1,

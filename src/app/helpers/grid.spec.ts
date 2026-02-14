@@ -1,4 +1,5 @@
 import type { GridState, GridTile } from '@interfaces/grid';
+import type { PlacedRoomId } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 import { describe, expect, it } from 'vitest';
 
@@ -83,7 +84,7 @@ describe('Grid Helpers', () => {
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
         stairId: undefined,
         elevatorId: undefined,
@@ -102,7 +103,7 @@ describe('Grid Helpers', () => {
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
         stairId: undefined,
         elevatorId: undefined,
@@ -120,7 +121,7 @@ describe('Grid Helpers', () => {
       const newTile: GridTile = {
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
         stairId: undefined,
         elevatorId: undefined,
@@ -173,7 +174,7 @@ describe('Grid Helpers', () => {
       const modified = gridSetTile(grid, 2, 3, {
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'test-room',
+        roomId: 'test-room' as PlacedRoomId,
         hallwayId: undefined,
         stairId: undefined,
         elevatorId: undefined,
@@ -188,7 +189,7 @@ describe('Grid Helpers', () => {
       expect(deserialized[3][2]).toEqual({
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'test-room',
+        roomId: 'test-room' as PlacedRoomId,
         hallwayId: undefined,
         stairId: undefined,
         elevatorId: undefined,

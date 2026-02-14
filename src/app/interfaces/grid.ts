@@ -1,9 +1,11 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type TileOccupant = 'empty' | 'room' | 'hallway' | 'stair' | 'elevator' | 'portal';
 
 export type GridTile = {
   occupied: boolean;
   occupiedBy: TileOccupant;
-  roomId: string | undefined;
+  roomId: PlacedRoomId | undefined;
   hallwayId: string | undefined;
   stairId: string | undefined;
   elevatorId: string | undefined;

@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -220,8 +222,8 @@ function makeFloor(
 
 function createPlacedVault(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-vault-1',
-    roomTypeId: TREASURE_VAULT_ID,
+    id: 'placed-vault-1' as PlacedRoomId,
+    roomTypeId: TREASURE_VAULT_ID as RoomId,
     shapeId: 'shape-3x3',
     anchorX: 0,
     anchorY: 0,
@@ -266,7 +268,7 @@ describe('Treasure Vault: definition', () => {
 
 describe('Treasure Vault: base production', () => {
   it('should have base production of 0.8 gold/tick (4 gold/min)', () => {
-    const production = productionGetBase(TREASURE_VAULT_ID);
+    const production = productionGetBase(TREASURE_VAULT_ID as RoomId);
     expect(production).toEqual({ gold: 0.8 });
     expect(productionPerMinute(production['gold']!)).toBeCloseTo(4.0);
   });
@@ -283,8 +285,8 @@ describe('Treasure Vault: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Dark Forge', () => {
     const vault = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const forge: PlacedRoom = {
-      id: 'placed-forge-1',
-      roomTypeId: DARK_FORGE_ID,
+      id: 'placed-forge-1' as PlacedRoomId,
+      roomTypeId: DARK_FORGE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -301,8 +303,8 @@ describe('Treasure Vault: adjacency bonuses', () => {
   it('should apply +25% when adjacent to Altar Room', () => {
     const vault = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const altar: PlacedRoom = {
-      id: 'placed-altar-1',
-      roomTypeId: ALTAR_ROOM_ID,
+      id: 'placed-altar-1' as PlacedRoomId,
+      roomTypeId: ALTAR_ROOM_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -319,8 +321,8 @@ describe('Treasure Vault: adjacency bonuses', () => {
   it('should apply +20% when adjacent to Throne Room', () => {
     const vault = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const throne: PlacedRoom = {
-      id: 'placed-throne-1',
-      roomTypeId: THRONE_ROOM_ID,
+      id: 'placed-throne-1' as PlacedRoomId,
+      roomTypeId: THRONE_ROOM_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -337,8 +339,8 @@ describe('Treasure Vault: adjacency bonuses', () => {
   it('should apply +10% when adjacent to another Treasure Vault', () => {
     const vault1 = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const vault2: PlacedRoom = {
-      id: 'placed-vault-2',
-      roomTypeId: TREASURE_VAULT_ID,
+      id: 'placed-vault-2' as PlacedRoomId,
+      roomTypeId: TREASURE_VAULT_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
@@ -355,15 +357,15 @@ describe('Treasure Vault: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const vault = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const forge: PlacedRoom = {
-      id: 'placed-forge-1',
-      roomTypeId: DARK_FORGE_ID,
+      id: 'placed-forge-1' as PlacedRoomId,
+      roomTypeId: DARK_FORGE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,
     };
     const altar: PlacedRoom = {
-      id: 'placed-altar-1',
-      roomTypeId: ALTAR_ROOM_ID,
+      id: 'placed-altar-1' as PlacedRoomId,
+      roomTypeId: ALTAR_ROOM_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 0,
       anchorY: 3,
@@ -381,7 +383,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
 
 describe('Treasure Vault: Reinforced Vault upgrade', () => {
   it('should have productionMultiplier 1.5 and fearReduction 1', () => {
-    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID as RoomId);
     const reinforced = paths.find((p) => p.name === 'Reinforced Vault');
     expect(reinforced).toBeDefined();
     expect(reinforced!.effects).toHaveLength(2);
@@ -401,7 +403,7 @@ describe('Treasure Vault: Reinforced Vault upgrade', () => {
 
 describe('Treasure Vault: Investment Vault upgrade', () => {
   it('should have productionMultiplier 2.0 and maxInhabitantBonus 1', () => {
-    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID as RoomId);
     const investment = paths.find((p) => p.name === 'Investment Vault');
     expect(investment).toBeDefined();
     expect(investment!.effects).toHaveLength(2);
@@ -428,7 +430,7 @@ describe('Treasure Vault: Investment Vault upgrade', () => {
 
 describe("Treasure Vault: Dragon's Hoard upgrade", () => {
   it('should have productionMultiplier 2.5 and fearIncrease 2', () => {
-    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID);
+    const paths = roomUpgradeGetPaths(TREASURE_VAULT_ID as RoomId);
     const hoard = paths.find((p) => p.name === "Dragon's Hoard");
     expect(hoard).toBeDefined();
     expect(hoard!.effects).toHaveLength(2);
@@ -473,8 +475,8 @@ describe('Treasure Vault: full production with adjacency', () => {
   it('should apply adjacency bonus to passive gold production', () => {
     const vault = createPlacedVault({ anchorX: 0, anchorY: 0 });
     const altar: PlacedRoom = {
-      id: 'placed-altar-1',
-      roomTypeId: ALTAR_ROOM_ID,
+      id: 'placed-altar-1' as PlacedRoomId,
+      roomTypeId: ALTAR_ROOM_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 3,
       anchorY: 0,

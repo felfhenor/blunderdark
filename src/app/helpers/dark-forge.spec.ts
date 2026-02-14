@@ -7,7 +7,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -186,8 +188,8 @@ const trainingGroundsDef: RoomDefinition & IsContentItem = {
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'forge-1',
-    roomTypeId: DARK_FORGE_ID,
+    id: 'forge-1' as PlacedRoomId,
+    roomTypeId: DARK_FORGE_ID as RoomId,
     shapeId: 'shape-2x2',
     anchorX: 0,
     anchorY: 0,
@@ -203,7 +205,7 @@ function makeInhabitant(
     definitionId: 'def-1',
     name: 'Worker',
     state: 'normal',
-    assignedRoomId: 'forge-1',
+    assignedRoomId: 'forge-1' as PlacedRoomId,
     ...overrides,
   };
 }
@@ -426,7 +428,7 @@ describe('Stat Bonus Calculation', () => {
 describe('Queue Management', () => {
   describe('darkForgeAddJob', () => {
     it('should create new queue entry for room without existing queue', () => {
-      const result = darkForgeAddJob([], 'forge-1', IRON_SWORD_ID, 20);
+      const result = darkForgeAddJob([], 'forge-1' as PlacedRoomId, IRON_SWORD_ID, 20);
       expect(result).toHaveLength(1);
       expect(result[0].roomId).toBe('forge-1');
       expect(result[0].jobs).toHaveLength(1);
@@ -438,11 +440,11 @@ describe('Queue Management', () => {
     it('should append job to existing queue', () => {
       const queues: ForgeCraftingQueue[] = [
         {
-          roomId: 'forge-1',
+          roomId: 'forge-1' as PlacedRoomId,
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 5, targetTicks: 20 }],
         },
       ];
-      const result = darkForgeAddJob(queues, 'forge-1', DARK_SHIELD_ID, 25);
+      const result = darkForgeAddJob(queues, 'forge-1' as PlacedRoomId, DARK_SHIELD_ID, 25);
       expect(result[0].jobs).toHaveLength(2);
       expect(result[0].jobs[1].recipeId).toBe(DARK_SHIELD_ID);
     });
@@ -450,11 +452,11 @@ describe('Queue Management', () => {
     it('should not modify other room queues', () => {
       const queues: ForgeCraftingQueue[] = [
         {
-          roomId: 'forge-other',
+          roomId: 'forge-other' as PlacedRoomId,
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 0, targetTicks: 20 }],
         },
       ];
-      const result = darkForgeAddJob(queues, 'forge-1', DARK_SHIELD_ID, 25);
+      const result = darkForgeAddJob(queues, 'forge-1' as PlacedRoomId, DARK_SHIELD_ID, 25);
       expect(result).toHaveLength(2);
       expect(result[0].roomId).toBe('forge-other');
       expect(result[0].jobs).toHaveLength(1);
@@ -465,14 +467,14 @@ describe('Queue Management', () => {
     it('should remove job at specified index', () => {
       const queues: ForgeCraftingQueue[] = [
         {
-          roomId: 'forge-1',
+          roomId: 'forge-1' as PlacedRoomId,
           jobs: [
             { recipeId: IRON_SWORD_ID, progress: 0, targetTicks: 20 },
             { recipeId: DARK_SHIELD_ID, progress: 0, targetTicks: 25 },
           ],
         },
       ];
-      const result = darkForgeRemoveJob(queues, 'forge-1', 0);
+      const result = darkForgeRemoveJob(queues, 'forge-1' as PlacedRoomId, 0);
       expect(result[0].jobs).toHaveLength(1);
       expect(result[0].jobs[0].recipeId).toBe(DARK_SHIELD_ID);
     });
@@ -480,11 +482,11 @@ describe('Queue Management', () => {
     it('should remove queue entry when last job removed', () => {
       const queues: ForgeCraftingQueue[] = [
         {
-          roomId: 'forge-1',
+          roomId: 'forge-1' as PlacedRoomId,
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 0, targetTicks: 20 }],
         },
       ];
-      const result = darkForgeRemoveJob(queues, 'forge-1', 0);
+      const result = darkForgeRemoveJob(queues, 'forge-1' as PlacedRoomId, 0);
       expect(result).toHaveLength(0);
     });
   });
@@ -511,7 +513,7 @@ describe('darkForgeCanQueue', () => {
   });
 
   it('should reject for non-forge room', () => {
-    const room = makeRoom({ roomTypeId: 'other-type' });
+    const room = makeRoom({ roomTypeId: 'other-type' as RoomId });
     const worker = makeInhabitant({ assignedRoomId: room.id });
     const floor = makeFloor([room], [worker]);
 
@@ -543,7 +545,7 @@ describe('darkForgeCanQueue', () => {
 
   it('should return not found for missing room', () => {
     const floor = makeFloor();
-    const result = darkForgeCanQueue('nonexistent', [floor], []);
+    const result = darkForgeCanQueue('nonexistent' as PlacedRoomId, [floor], []);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not found');
   });
@@ -661,10 +663,10 @@ describe('darkForgeProcess', () => {
   });
 
   it('should process multiple forges across floors', () => {
-    const forge1 = makeRoom({ id: 'forge-1' });
-    const forge2 = makeRoom({ id: 'forge-2' });
-    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'forge-1' });
-    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'forge-2' });
+    const forge1 = makeRoom({ id: 'forge-1' as PlacedRoomId });
+    const forge2 = makeRoom({ id: 'forge-2' as PlacedRoomId });
+    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'forge-1' as PlacedRoomId });
+    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'forge-2' as PlacedRoomId });
     const floor1 = makeFloor([forge1], [w1]);
     const floor2 = makeFloor([forge2], [w2]);
     floor2.id = 'floor-2';
@@ -673,11 +675,11 @@ describe('darkForgeProcess', () => {
       floors: [floor1, floor2],
       forgeCraftingQueues: [
         {
-          roomId: 'forge-1',
+          roomId: 'forge-1' as PlacedRoomId,
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 0, targetTicks: 5 }],
         },
         {
-          roomId: 'forge-2',
+          roomId: 'forge-2' as PlacedRoomId,
           jobs: [{ recipeId: DARK_SHIELD_ID, progress: 0, targetTicks: 10 }],
         },
       ],

@@ -1,13 +1,19 @@
-import type { Floor, GridState, TileOffset } from '@interfaces';
+import type { Floor, GridState, PlacedRoomId, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-import type { PathNode, PathEdge, DungeonGraph, PathfindingOptions, SecondaryObjective } from '@interfaces/pathfinding';
+import type {
+  DungeonGraph,
+  PathEdge,
+  PathfindingOptions,
+  PathNode,
+  SecondaryObjective,
+} from '@interfaces/pathfinding';
 
 // --- Graph building ---
 
 function addBidirectionalEdge(
-  adjacency: Map<string, PathEdge[]>,
-  roomAId: string,
-  roomBId: string,
+  adjacency: Map<PlacedRoomId, PathEdge[]>,
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
   baseCost: number = 1,
 ): void {
   const edgesA = adjacency.get(roomAId);
@@ -28,10 +34,10 @@ function addBidirectionalEdge(
  */
 export function pathfindingBuildDungeonGraph(
   floor: Floor,
-  roomFearLevels?: Map<string, number>,
+  roomFearLevels?: Map<PlacedRoomId, number>,
 ): DungeonGraph {
-  const nodes = new Map<string, PathNode>();
-  const adjacency = new Map<string, PathEdge[]>();
+  const nodes = new Map<PlacedRoomId, PathNode>();
+  const adjacency = new Map<PlacedRoomId, PathEdge[]>();
 
   for (const room of floor.rooms) {
     nodes.set(room.id, {
@@ -77,24 +83,24 @@ function getTraversalCost(
  */
 export function pathfindingFindPath(
   graph: DungeonGraph,
-  startRoomId: string,
-  goalRoomId: string,
+  startRoomId: PlacedRoomId,
+  goalRoomId: PlacedRoomId,
   options: PathfindingOptions = {},
-): string[] {
+): PlacedRoomId[] {
   if (!graph.nodes.has(startRoomId) || !graph.nodes.has(goalRoomId)) return [];
   if (startRoomId === goalRoomId) return [startRoomId];
 
-  const blocked = options.blockedNodes ?? new Set<string>();
+  const blocked = options.blockedNodes ?? new Set<PlacedRoomId>();
 
-  const openSet = new Set<string>([startRoomId]);
-  const cameFrom = new Map<string, string>();
-  const gScore = new Map<string, number>();
+  const openSet = new Set<PlacedRoomId>([startRoomId]);
+  const cameFrom = new Map<PlacedRoomId, PlacedRoomId>();
+  const gScore = new Map<PlacedRoomId, number>();
 
   gScore.set(startRoomId, 0);
 
   while (openSet.size > 0) {
     // Find node with lowest gScore in open set
-    let current = '';
+    let current = '' as PlacedRoomId;
     let lowestG = Infinity;
     for (const nodeId of openSet) {
       const g = gScore.get(nodeId) ?? Infinity;
@@ -105,7 +111,7 @@ export function pathfindingFindPath(
     }
 
     if (current === goalRoomId) {
-      const path: string[] = [current];
+      const path: PlacedRoomId[] = [current];
       while (cameFrom.has(current)) {
         current = cameFrom.get(current)!;
         path.unshift(current);
@@ -138,7 +144,7 @@ export function pathfindingFindPath(
  */
 export function pathfindingGetCost(
   graph: DungeonGraph,
-  path: string[],
+  path: PlacedRoomId[],
   options: PathfindingOptions = {},
 ): number {
   if (path.length < 2) return 0;
@@ -161,22 +167,32 @@ export function pathfindingGetCost(
  */
 export function pathfindingFindWithObjectives(
   graph: DungeonGraph,
-  startRoomId: string,
-  primaryGoalId: string,
+  startRoomId: PlacedRoomId,
+  primaryGoalId: PlacedRoomId,
   secondaryObjectives: SecondaryObjective[],
   options: PathfindingOptions = {},
-): string[] {
-  const directPath = pathfindingFindPath(graph, startRoomId, primaryGoalId, options);
+): PlacedRoomId[] {
+  const directPath = pathfindingFindPath(
+    graph,
+    startRoomId,
+    primaryGoalId,
+    options,
+  );
   if (directPath.length === 0) return [];
 
   const directCost = pathfindingGetCost(graph, directPath, options);
   const detourThreshold = directCost * 2;
 
-  let bestDetourPath: string[] = [];
+  let bestDetourPath: PlacedRoomId[] = [];
   let bestDetourPriority = -1;
 
   for (const objective of secondaryObjectives) {
-    const pathToObj = pathfindingFindPath(graph, startRoomId, objective.roomId, options);
+    const pathToObj = pathfindingFindPath(
+      graph,
+      startRoomId,
+      objective.roomId,
+      options,
+    );
     if (pathToObj.length === 0) continue;
 
     const pathFromObj = pathfindingFindPath(
@@ -191,7 +207,10 @@ export function pathfindingFindWithObjectives(
       pathfindingGetCost(graph, pathToObj, options) +
       pathfindingGetCost(graph, pathFromObj, options);
 
-    if (detourCost < detourThreshold && objective.priority > bestDetourPriority) {
+    if (
+      detourCost < detourThreshold &&
+      objective.priority > bestDetourPriority
+    ) {
       bestDetourPath = [...pathToObj, ...pathFromObj.slice(1)];
       bestDetourPriority = objective.priority;
     }
@@ -208,11 +227,11 @@ export function pathfindingFindWithObjectives(
  */
 export function pathfindingRecalculate(
   graph: DungeonGraph,
-  currentRoomId: string,
-  goalRoomId: string,
-  newBlockedNodeId: string,
+  currentRoomId: PlacedRoomId,
+  goalRoomId: PlacedRoomId,
+  newBlockedNodeId: PlacedRoomId,
   options: PathfindingOptions = {},
-): string[] {
+): PlacedRoomId[] {
   const blocked = new Set(options.blockedNodes ?? []);
   blocked.add(newBlockedNodeId);
 
@@ -237,7 +256,11 @@ function heapPush(heap: HeapEntry[], entry: HeapEntry): void {
   let i = heap.length - 1;
   while (i > 0) {
     const parent = (i - 1) >> 1;
-    if (heap[parent][0] < entry[0] || (heap[parent][0] === entry[0] && heap[parent][1] <= entry[1])) break;
+    if (
+      heap[parent][0] < entry[0] ||
+      (heap[parent][0] === entry[0] && heap[parent][1] <= entry[1])
+    )
+      break;
     heap[i] = heap[parent];
     heap[parent] = entry;
     i = parent;
@@ -257,10 +280,20 @@ function heapPop(heap: HeapEntry[]): HeapEntry | undefined {
       let smallest = i;
       const left = 2 * i + 1;
       const right = 2 * i + 2;
-      if (left < len && (heap[left][0] < heap[smallest][0] || (heap[left][0] === heap[smallest][0] && heap[left][1] < heap[smallest][1]))) {
+      if (
+        left < len &&
+        (heap[left][0] < heap[smallest][0] ||
+          (heap[left][0] === heap[smallest][0] &&
+            heap[left][1] < heap[smallest][1]))
+      ) {
         smallest = left;
       }
-      if (right < len && (heap[right][0] < heap[smallest][0] || (heap[right][0] === heap[smallest][0] && heap[right][1] < heap[smallest][1]))) {
+      if (
+        right < len &&
+        (heap[right][0] < heap[smallest][0] ||
+          (heap[right][0] === heap[smallest][0] &&
+            heap[right][1] < heap[smallest][1]))
+      ) {
         smallest = right;
       }
       if (smallest === i) {
@@ -281,7 +314,12 @@ const TILE_DIRS: ReadonlyArray<[number, number]> = [
   [-1, 0],
 ];
 
-function manhattanDistance(ax: number, ay: number, bx: number, by: number): number {
+function manhattanDistance(
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+): number {
   return Math.abs(ax - bx) + Math.abs(ay - by);
 }
 
@@ -295,14 +333,22 @@ export function tilePathfindingFindPath(
   grid: GridState,
   start: TileOffset,
   end: TileOffset,
-): TileOffset[] | null {
-  if (start.x === end.x && start.y === end.y) return [{ x: start.x, y: start.y }];
+): TileOffset[] | undefined {
+  if (start.x === end.x && start.y === end.y)
+    return [{ x: start.x, y: start.y }];
 
-  if (start.x < 0 || start.x >= GRID_SIZE || start.y < 0 || start.y >= GRID_SIZE) return null;
-  if (end.x < 0 || end.x >= GRID_SIZE || end.y < 0 || end.y >= GRID_SIZE) return null;
+  if (
+    start.x < 0 ||
+    start.x >= GRID_SIZE ||
+    start.y < 0 ||
+    start.y >= GRID_SIZE
+  )
+    return undefined;
+  if (end.x < 0 || end.x >= GRID_SIZE || end.y < 0 || end.y >= GRID_SIZE)
+    return undefined;
 
-  if (grid[start.y][start.x].occupied) return null;
-  if (grid[end.y][end.x].occupied) return null;
+  if (grid[start.y][start.x].occupied) return undefined;
+  if (grid[end.y][end.x].occupied) return undefined;
 
   const gScore = new Float64Array(GRID_SIZE * GRID_SIZE).fill(Infinity);
   const cameFromX = new Int8Array(GRID_SIZE * GRID_SIZE).fill(-1);
@@ -314,7 +360,12 @@ export function tilePathfindingFindPath(
 
   const heap: HeapEntry[] = [];
   let tieBreaker = 0;
-  heapPush(heap, [manhattanDistance(start.x, start.y, end.x, end.y), tieBreaker++, start.x, start.y]);
+  heapPush(heap, [
+    manhattanDistance(start.x, start.y, end.x, end.y),
+    tieBreaker++,
+    start.x,
+    start.y,
+  ]);
 
   while (heap.length > 0) {
     const entry = heapPop(heap)!;
@@ -364,7 +415,7 @@ export function tilePathfindingFindPath(
     }
   }
 
-  return null;
+  return undefined;
 }
 
 /**
@@ -387,7 +438,7 @@ function countTurns(path: TileOffset[]): number {
  * Find all tiles on the grid that belong to a given room.
  * Reads directly from grid state to avoid content service dependency.
  */
-function getRoomTilesFromGrid(grid: GridState, roomId: string): TileOffset[] {
+function getRoomTilesFromGrid(grid: GridState, roomId: PlacedRoomId): TileOffset[] {
   const tiles: TileOffset[] = [];
   for (let y = 0; y < GRID_SIZE; y++) {
     for (let x = 0; x < GRID_SIZE; x++) {
@@ -403,7 +454,7 @@ function getRoomTilesFromGrid(grid: GridState, roomId: string): TileOffset[] {
  * Get tiles adjacent to a room that are empty on the grid.
  * These are candidate start/end points for room-to-room pathfinding.
  */
-function getRoomEdgeEmptyTiles(grid: GridState, roomId: string): TileOffset[] {
+function getRoomEdgeEmptyTiles(grid: GridState, roomId: PlacedRoomId): TileOffset[] {
   const roomTiles = getRoomTilesFromGrid(grid, roomId);
   const roomTileSet = new Set(roomTiles.map((t) => `${t.x},${t.y}`));
 
@@ -438,21 +489,21 @@ function getRoomEdgeEmptyTiles(grid: GridState, roomId: string): TileOffset[] {
  */
 export function tilePathfindingFindRoomToRoomPath(
   floor: Floor,
-  roomAId: string,
-  roomBId: string,
-): TileOffset[] | null {
-  if (roomAId === roomBId) return null;
+  roomAId: PlacedRoomId,
+  roomBId: PlacedRoomId,
+): TileOffset[] | undefined {
+  if (roomAId === roomBId) return undefined;
 
   const roomATiles = getRoomTilesFromGrid(floor.grid, roomAId);
   const roomBTiles = getRoomTilesFromGrid(floor.grid, roomBId);
-  if (roomATiles.length === 0 || roomBTiles.length === 0) return null;
+  if (roomATiles.length === 0 || roomBTiles.length === 0) return undefined;
 
   const startsA = getRoomEdgeEmptyTiles(floor.grid, roomAId);
   const endsB = getRoomEdgeEmptyTiles(floor.grid, roomBId);
 
-  if (startsA.length === 0 || endsB.length === 0) return null;
+  if (startsA.length === 0 || endsB.length === 0) return undefined;
 
-  let bestPath: TileOffset[] | null = null;
+  let bestPath: TileOffset[] | undefined = undefined;
   let bestLen = Infinity;
   let bestTurns = Infinity;
 
@@ -462,7 +513,10 @@ export function tilePathfindingFindRoomToRoomPath(
       if (!path) continue;
 
       const turns = countTurns(path);
-      if (path.length < bestLen || (path.length === bestLen && turns < bestTurns)) {
+      if (
+        path.length < bestLen ||
+        (path.length === bestLen && turns < bestTurns)
+      ) {
         bestPath = path;
         bestLen = path.length;
         bestTurns = turns;

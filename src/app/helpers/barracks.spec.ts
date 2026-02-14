@@ -3,7 +3,9 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -209,8 +211,8 @@ function makeFloor(
 
 function createPlacedBarracks(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-barracks-1',
-    roomTypeId: BARRACKS_ID,
+    id: 'placed-barracks-1' as PlacedRoomId,
+    roomTypeId: BARRACKS_ID as RoomId,
     shapeId: 'shape-i',
     anchorX: 0,
     anchorY: 0,
@@ -258,7 +260,7 @@ describe('Barracks: definition', () => {
 
 describe('Barracks: no production', () => {
   it('should have no base production', () => {
-    const production = productionGetBase(BARRACKS_ID);
+    const production = productionGetBase(BARRACKS_ID as RoomId);
     expect(production).toEqual({});
   });
 
@@ -270,7 +272,7 @@ describe('Barracks: no production', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-barracks-1',
+        assignedRoomId: 'placed-barracks-1' as PlacedRoomId,
       },
     ];
     const floor = makeFloor([barracks], inhabitants);
@@ -283,8 +285,8 @@ describe('Barracks: adjacency bonuses', () => {
   it('should apply +15% when adjacent to Dark Forge', () => {
     const barracks = createPlacedBarracks({ anchorX: 0, anchorY: 0 });
     const forge: PlacedRoom = {
-      id: 'placed-forge-1',
-      roomTypeId: DARK_FORGE_ID,
+      id: 'placed-forge-1' as PlacedRoomId,
+      roomTypeId: DARK_FORGE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 1,
       anchorY: 0,
@@ -292,7 +294,7 @@ describe('Barracks: adjacency bonuses', () => {
     const allRooms = [barracks, forge];
     const bonus = productionCalculateAdjacencyBonus(
       barracks,
-      ['placed-forge-1'],
+      ['placed-forge-1' as PlacedRoomId],
       allRooms,
     );
     expect(bonus).toBeCloseTo(0.15);
@@ -301,8 +303,8 @@ describe('Barracks: adjacency bonuses', () => {
   it('should apply +20% when adjacent to Throne Room', () => {
     const barracks = createPlacedBarracks({ anchorX: 0, anchorY: 0 });
     const throne: PlacedRoom = {
-      id: 'placed-throne-1',
-      roomTypeId: THRONE_ROOM_ID,
+      id: 'placed-throne-1' as PlacedRoomId,
+      roomTypeId: THRONE_ROOM_ID as RoomId,
       shapeId: 'shape-4x4',
       anchorX: 1,
       anchorY: 0,
@@ -310,7 +312,7 @@ describe('Barracks: adjacency bonuses', () => {
     const allRooms = [barracks, throne];
     const bonus = productionCalculateAdjacencyBonus(
       barracks,
-      ['placed-throne-1'],
+      ['placed-throne-1' as PlacedRoomId],
       allRooms,
     );
     expect(bonus).toBeCloseTo(0.2);
@@ -319,8 +321,8 @@ describe('Barracks: adjacency bonuses', () => {
   it('should apply +10% when adjacent to another Barracks', () => {
     const barracks1 = createPlacedBarracks({ anchorX: 0, anchorY: 0 });
     const barracks2: PlacedRoom = {
-      id: 'placed-barracks-2',
-      roomTypeId: BARRACKS_ID,
+      id: 'placed-barracks-2' as PlacedRoomId,
+      roomTypeId: BARRACKS_ID as RoomId,
       shapeId: 'shape-i',
       anchorX: 1,
       anchorY: 0,
@@ -328,7 +330,7 @@ describe('Barracks: adjacency bonuses', () => {
     const allRooms = [barracks1, barracks2];
     const bonus = productionCalculateAdjacencyBonus(
       barracks1,
-      ['placed-barracks-2'],
+      ['placed-barracks-2' as PlacedRoomId],
       allRooms,
     );
     expect(bonus).toBeCloseTo(0.1);
@@ -337,15 +339,15 @@ describe('Barracks: adjacency bonuses', () => {
   it('should combine multiple adjacency bonuses', () => {
     const barracks = createPlacedBarracks({ anchorX: 0, anchorY: 0 });
     const forge: PlacedRoom = {
-      id: 'placed-forge-1',
-      roomTypeId: DARK_FORGE_ID,
+      id: 'placed-forge-1' as PlacedRoomId,
+      roomTypeId: DARK_FORGE_ID as RoomId,
       shapeId: 'shape-3x3',
       anchorX: 1,
       anchorY: 0,
     };
     const throne: PlacedRoom = {
-      id: 'placed-throne-1',
-      roomTypeId: THRONE_ROOM_ID,
+      id: 'placed-throne-1' as PlacedRoomId,
+      roomTypeId: THRONE_ROOM_ID as RoomId,
       shapeId: 'shape-4x4',
       anchorX: 1,
       anchorY: 3,
@@ -353,7 +355,7 @@ describe('Barracks: adjacency bonuses', () => {
     const allRooms = [barracks, forge, throne];
     const bonus = productionCalculateAdjacencyBonus(
       barracks,
-      ['placed-forge-1', 'placed-throne-1'],
+      ['placed-forge-1' as PlacedRoomId, 'placed-throne-1' as PlacedRoomId],
       allRooms,
     );
     // 0.15 (Dark Forge) + 0.2 (Throne Room) = 0.35
@@ -363,7 +365,7 @@ describe('Barracks: adjacency bonuses', () => {
 
 describe('Barracks: Fortified Barracks upgrade', () => {
   it('should have maxInhabitantBonus of 4', () => {
-    const paths = roomUpgradeGetPaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID as RoomId);
     const fortified = paths.find((p) => p.name === 'Fortified Barracks');
     expect(fortified).toBeDefined();
     expect(fortified!.effects).toHaveLength(1);
@@ -388,7 +390,7 @@ describe('Barracks: Fortified Barracks upgrade', () => {
 
 describe('Barracks: Comfortable Quarters upgrade', () => {
   it('should have fearReduction of 1', () => {
-    const paths = roomUpgradeGetPaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID as RoomId);
     const comfortable = paths.find((p) => p.name === 'Comfortable Quarters');
     expect(comfortable).toBeDefined();
     expect(comfortable!.effects).toHaveLength(1);
@@ -399,7 +401,7 @@ describe('Barracks: Comfortable Quarters upgrade', () => {
 
 describe('Barracks: War Room upgrade', () => {
   it('should have fearIncrease of 1', () => {
-    const paths = roomUpgradeGetPaths(BARRACKS_ID);
+    const paths = roomUpgradeGetPaths(BARRACKS_ID as RoomId);
     const warRoom = paths.find((p) => p.name === 'War Room');
     expect(warRoom).toBeDefined();
     expect(warRoom!.effects).toHaveLength(1);

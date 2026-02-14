@@ -1,3 +1,6 @@
+import type { RoomId } from '@interfaces/content-room';
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type SynergyConditionType =
   | 'roomType'
   | 'adjacentRoomType'
@@ -7,7 +10,7 @@ export type SynergyConditionType =
 
 export type SynergyCondition = {
   type: SynergyConditionType;
-  roomTypeId?: string;
+  roomTypeId?: RoomId;
   inhabitantType?: string;
   count?: number;
 };
@@ -30,7 +33,7 @@ export type SynergyDefinition = {
 
 export type ActiveSynergy = {
   synergyId: string;
-  roomId: string;
+  roomId: PlacedRoomId;
 };
 
 export type PotentialSynergy = {

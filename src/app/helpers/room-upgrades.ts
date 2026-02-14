@@ -3,12 +3,13 @@ import type {
   IsContentItem,
   PlacedRoom,
   RoomDefinition,
+  RoomId,
   RoomUpgradeEffect,
   RoomUpgradePath,
 } from '@interfaces';
 import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
 
-export function roomUpgradeGetPaths(roomTypeId: string): RoomUpgradePath[] {
+export function roomUpgradeGetPaths(roomTypeId: RoomId): RoomUpgradePath[] {
   const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
   if (!room) return [];
   return room.upgradePaths ?? [];

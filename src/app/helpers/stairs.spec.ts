@@ -7,7 +7,7 @@ import {
   stairRemoveFromFloors,
   stairValidatePlacement,
 } from '@helpers/stairs';
-import type { Floor, StairInstance } from '@interfaces';
+import type { Floor, PlacedRoomId, StairInstance } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function makeFloor(depth: number, overrides: Partial<Floor> = {}): Floor {
@@ -63,7 +63,7 @@ describe('stairValidatePlacement', () => {
     floor1.grid[5][5] = {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -81,7 +81,7 @@ describe('stairValidatePlacement', () => {
     floor2.grid[5][5] = {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,

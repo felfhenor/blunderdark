@@ -10,6 +10,8 @@ import type {
   InhabitantDefinition,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
+  RoomId,
   SynergyCondition,
   SynergyDefinition,
   TileOffset,
@@ -54,8 +56,8 @@ function buildAdjacencyMap(
 
 function isConnectedTo(
   connections: Connection[],
-  roomId: string,
-  targetRoomTypeId: string,
+  roomId: PlacedRoomId,
+  targetRoomTypeId: RoomId,
   allRooms: PlacedRoom[],
 ): boolean {
   for (const conn of connections) {
@@ -159,7 +161,7 @@ export function synergyEvaluateAll(
 }
 
 export function synergyGetActive(
-  roomId: string,
+  roomId: PlacedRoomId,
 ): SynergyDefinition[] {
   return synergyActiveMap().get(roomId) ?? [];
 }

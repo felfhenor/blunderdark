@@ -4,9 +4,11 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   ResearchNode,
   ResearchState,
   RoomDefinition,
+  RoomId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -459,8 +461,8 @@ describe('US-003: Research Speed Modifiers', () => {
       const floors = [
         makeFloor([
           {
-            id: 'lib-1',
-            roomTypeId: SHADOW_LIBRARY_ID,
+            id: 'lib-1' as PlacedRoomId,
+            roomTypeId: SHADOW_LIBRARY_ID as RoomId,
             shapeId: 'shape-l',
             anchorX: 0,
             anchorY: 0,
@@ -476,15 +478,15 @@ describe('US-003: Research Speed Modifiers', () => {
       const floors = [
         makeFloor([
           {
-            id: 'lib-1',
-            roomTypeId: SHADOW_LIBRARY_ID,
+            id: 'lib-1' as PlacedRoomId,
+            roomTypeId: SHADOW_LIBRARY_ID as RoomId,
             shapeId: 'shape-l',
             anchorX: 0,
             anchorY: 0,
           },
           {
-            id: 'lib-2',
-            roomTypeId: SHADOW_LIBRARY_ID,
+            id: 'lib-2' as PlacedRoomId,
+            roomTypeId: SHADOW_LIBRARY_ID as RoomId,
             shapeId: 'shape-l',
             anchorX: 5,
             anchorY: 0,
@@ -509,8 +511,8 @@ describe('US-003: Research Speed Modifiers', () => {
       const floors = [
         makeFloor([
           {
-            id: 'lib-1',
-            roomTypeId: SHADOW_LIBRARY_ID,
+            id: 'lib-1' as PlacedRoomId,
+            roomTypeId: SHADOW_LIBRARY_ID as RoomId,
             shapeId: 'shape-l',
             anchorX: 0,
             anchorY: 0,

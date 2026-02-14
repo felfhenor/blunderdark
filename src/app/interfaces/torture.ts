@@ -1,11 +1,13 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type TortureExtractionCompleteEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   prisonerName: string;
   researchGained: number;
 };
 
 export type TortureConversionCompleteEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   prisonerName: string;
   success: boolean;
   inhabitantName?: string;

@@ -13,6 +13,7 @@ import {
   notifySuccess,
   productionGetRoomDefinition,
 } from '@helpers';
+import type { PlacedRoomId } from '@interfaces';
 
 @Component({
   selector: 'app-panel-hallway-info',
@@ -125,7 +126,7 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const ids = connectionGetAdjacentUnconnected(floor, info.hallwayId);
+    const ids = connectionGetAdjacentUnconnected(floor, info.hallwayId as PlacedRoomId);
     return ids.map((id) => ({ id, name: getEntityName(floor, id) }));
   });
 
@@ -134,7 +135,7 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const connections = connectionGetRoomConnections(floor, info.hallwayId);
+    const connections = connectionGetRoomConnections(floor, info.hallwayId as PlacedRoomId);
     return connections.map((conn) => {
       const otherId =
         conn.roomAId === info.hallwayId ? conn.roomBId : conn.roomAId;
@@ -150,7 +151,7 @@ export class PanelHallwayInfoComponent {
     const info = this.selectedHallwayTile();
     if (!info) return;
 
-    const result = await connectionCreate(info.hallwayId, entityId);
+    const result = await connectionCreate(info.hallwayId as PlacedRoomId, entityId as PlacedRoomId);
     if (result.error) {
       notifyError(result.error);
     } else {

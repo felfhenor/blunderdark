@@ -11,7 +11,9 @@ import type {
   GameState,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   TileOffset,
   TrainingBonuses,
 } from '@interfaces';
@@ -35,7 +37,7 @@ export const trainingCompleted$ = trainingCompletedSubject.asObservable();
 /**
  * Check if a room type is a Training Grounds.
  */
-export function trainingIsGroundsRoom(roomTypeId: string): boolean {
+export function trainingIsGroundsRoom(roomTypeId: RoomId): boolean {
   return roomTypeId === roomRoleFindById('trainingGrounds');
 }
 
@@ -193,7 +195,7 @@ export function trainingProcess(state: GameState): void {
 
 
 export function trainingGetRoomInfo(
-  roomId: string,
+  roomId: PlacedRoomId,
 ): TrainingRoomInfo | undefined {
   const trainingGroundsId = roomRoleFindById('trainingGrounds');
   const state = gamestate();

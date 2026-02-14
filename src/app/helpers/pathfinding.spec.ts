@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DungeonGraph, PathEdge, PathNode } from '@interfaces/pathfinding';
-import type { Floor, GridState, GridTile } from '@interfaces';
+import type { Floor, GridState, GridTile, PlacedRoomId, RoomId } from '@interfaces';
 
 const {
   pathfindingBuildDungeonGraph,
@@ -25,20 +25,21 @@ function makeGraph(
   nodeDefs: [string, string, number, number, number][],
   edgeDefs: [string, string, number?][],
 ): DungeonGraph {
-  const nodes = new Map<string, PathNode>();
-  const adjacency = new Map<string, PathEdge[]>();
+  const nodes = new Map<PlacedRoomId, PathNode>();
+  const adjacency = new Map<PlacedRoomId, PathEdge[]>();
 
   for (const [id, roomTypeId, x, y, fearLevel] of nodeDefs) {
-    nodes.set(id, { roomId: id, roomTypeId, x, y, fearLevel });
-    adjacency.set(id, []);
+    const pId = id as PlacedRoomId;
+    nodes.set(pId, { roomId: pId, roomTypeId: roomTypeId as RoomId, x, y, fearLevel });
+    adjacency.set(pId, []);
   }
 
   for (const [from, to, cost] of edgeDefs) {
     const baseCost = cost ?? 1;
-    const edgesFrom = adjacency.get(from);
-    if (edgesFrom) edgesFrom.push({ toRoomId: to, baseCost });
-    const edgesTo = adjacency.get(to);
-    if (edgesTo) edgesTo.push({ toRoomId: from, baseCost });
+    const edgesFrom = adjacency.get(from as PlacedRoomId);
+    if (edgesFrom) edgesFrom.push({ toRoomId: to as PlacedRoomId, baseCost });
+    const edgesTo = adjacency.get(to as PlacedRoomId);
+    if (edgesTo) edgesTo.push({ toRoomId: from as PlacedRoomId, baseCost });
   }
 
   return { nodes, adjacency };
@@ -68,31 +69,31 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('creates nodes from floor rooms', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 5, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 5, anchorY: 0 },
       ],
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
     expect(graph.nodes.size).toBe(2);
-    expect(graph.nodes.get('r1')!.roomTypeId).toBe('type-a');
-    expect(graph.nodes.get('r2')!.x).toBe(5);
+    expect(graph.nodes.get('r1' as PlacedRoomId)!.roomTypeId).toBe('type-a');
+    expect(graph.nodes.get('r2' as PlacedRoomId)!.x).toBe(5);
   });
 
   it('creates edges from connections', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
-    const r1Edges = graph.adjacency.get('r1')!;
-    const r2Edges = graph.adjacency.get('r2')!;
+    const r1Edges = graph.adjacency.get('r1' as PlacedRoomId)!;
+    const r2Edges = graph.adjacency.get('r2' as PlacedRoomId)!;
     expect(r1Edges).toHaveLength(1);
     expect(r1Edges[0].toRoomId).toBe('r2');
     expect(r2Edges).toHaveLength(1);
@@ -102,31 +103,31 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('creates edges from hallway connections', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 10, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 10, anchorY: 0 },
       ],
       hallways: [
         { id: 'h1', tiles: [], upgrades: [] },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
-    expect(graph.adjacency.get('r1')!).toHaveLength(1);
-    expect(graph.adjacency.get('r2')!).toHaveLength(1);
+    expect(graph.adjacency.get('r1' as PlacedRoomId)!).toHaveLength(1);
+    expect(graph.adjacency.get('r2' as PlacedRoomId)!).toHaveLength(1);
   });
 
   it('does not create duplicate edges for same room pair', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
-        { id: 'c2', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c2', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
       hallways: [
         { id: 'h1', tiles: [], upgrades: [] },
@@ -134,68 +135,68 @@ describe('pathfindingBuildDungeonGraph', () => {
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
-    expect(graph.adjacency.get('r1')!).toHaveLength(1);
+    expect(graph.adjacency.get('r1' as PlacedRoomId)!).toHaveLength(1);
   });
 
   it('applies fear levels from roomFearLevels map', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
       ],
     });
 
-    const fearMap = new Map([['r1', 5]]);
+    const fearMap = new Map<PlacedRoomId, number>([['r1' as PlacedRoomId, 5]]);
     const graph = pathfindingBuildDungeonGraph(floor, fearMap);
-    expect(graph.nodes.get('r1')!.fearLevel).toBe(5);
+    expect(graph.nodes.get('r1' as PlacedRoomId)!.fearLevel).toBe(5);
   });
 
   it('defaults fear level to 0 when not in map', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
       ],
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
-    expect(graph.nodes.get('r1')!.fearLevel).toBe(0);
+    expect(graph.nodes.get('r1' as PlacedRoomId)!.fearLevel).toBe(0);
   });
 
   it('edges have default base cost of 1', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
     const graph = pathfindingBuildDungeonGraph(floor);
-    expect(graph.adjacency.get('r1')![0].baseCost).toBe(1);
+    expect(graph.adjacency.get('r1' as PlacedRoomId)![0].baseCost).toBe(1);
   });
 
   it('graph updates when rooms/connections change (rebuild)', () => {
     const floor1 = makeFloor({
       rooms: [
-        { id: 'r1', roomTypeId: 'type-a', shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2', roomTypeId: 'type-b', shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
       ],
       connections: [],
     });
 
     const graph1 = pathfindingBuildDungeonGraph(floor1);
-    expect(graph1.adjacency.get('r1')!).toHaveLength(0);
+    expect(graph1.adjacency.get('r1' as PlacedRoomId)!).toHaveLength(0);
 
     const floor2 = makeFloor({
       rooms: floor1.rooms,
       connections: [
-        { id: 'c1', roomAId: 'r1', roomBId: 'r2', edgeTiles: [] },
+        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
     const graph2 = pathfindingBuildDungeonGraph(floor2);
-    expect(graph2.adjacency.get('r1')!).toHaveLength(1);
+    expect(graph2.adjacency.get('r1' as PlacedRoomId)!).toHaveLength(1);
   });
 });
 
@@ -220,7 +221,7 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar');
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId);
     expect(path).toEqual(['spawn', 'room1', 'room2', 'altar']);
   });
 
@@ -244,7 +245,7 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar');
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId);
     expect(path).toEqual(['spawn', 'A', 'altar']);
   });
 
@@ -261,7 +262,7 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'island');
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'island' as PlacedRoomId);
     expect(path).toEqual([]);
   });
 
@@ -271,7 +272,7 @@ describe('pathfindingFindPath', () => {
       [],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'spawn');
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'spawn' as PlacedRoomId);
     expect(path).toEqual(['spawn']);
   });
 
@@ -281,7 +282,7 @@ describe('pathfindingFindPath', () => {
       [],
     );
 
-    expect(pathfindingFindPath(graph, 'missing', 'altar')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'missing' as PlacedRoomId, 'altar' as PlacedRoomId)).toEqual([]);
   });
 
   it('returns empty array for non-existent goal node', () => {
@@ -290,7 +291,7 @@ describe('pathfindingFindPath', () => {
       [],
     );
 
-    expect(pathfindingFindPath(graph, 'spawn', 'missing')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'missing' as PlacedRoomId)).toEqual([]);
   });
 
   it('respects blocked nodes', () => {
@@ -311,8 +312,8 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
-      blockedNodes: new Set(['A']),
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, {
+      blockedNodes: new Set(['A' as PlacedRoomId]),
     });
     expect(path).toEqual(['spawn', 'B', 'altar']);
   });
@@ -335,8 +336,8 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
-      blockedNodes: new Set(['blocked']),
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, {
+      blockedNodes: new Set(['blocked' as PlacedRoomId]),
     });
     expect(path).toEqual(['spawn', 'detour', 'altar']);
   });
@@ -355,8 +356,8 @@ describe('pathfindingFindPath', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
-      blockedNodes: new Set(['A']),
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, {
+      blockedNodes: new Set(['A' as PlacedRoomId]),
     });
     expect(path).toEqual([]);
   });
@@ -386,7 +387,7 @@ describe('Fear-based cost modification', () => {
     );
 
     // With low morale: avoids scary room (cost 3) and goes through safe (cost 1)
-    const pathWithFear = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 2 });
+    const pathWithFear = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, { morale: 2 });
     expect(pathWithFear).toEqual(['spawn', 'safe', 'altar']);
   });
 
@@ -404,7 +405,7 @@ describe('Fear-based cost modification', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 1 });
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, { morale: 1 });
     expect(path).toEqual(['spawn', 'scary', 'altar']);
   });
 
@@ -429,7 +430,7 @@ describe('Fear-based cost modification', () => {
     );
 
     // High morale (10 > fear 3): goes through scary (shorter)
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', { morale: 10 });
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, { morale: 10 });
     expect(path).toEqual(['spawn', 'scary', 'altar']);
   });
 
@@ -459,7 +460,7 @@ describe('Fear-based cost modification', () => {
 
     // With 5x fear multiplier, scary costs 5; alternate costs 5 (same)
     // With 6x, scary costs 6; alternate costs 5 (prefer alternate)
-    const path = pathfindingFindPath(graph, 'spawn', 'altar', {
+    const path = pathfindingFindPath(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, {
       morale: 1,
       fearCostMultiplier: 6,
     });
@@ -470,7 +471,7 @@ describe('Fear-based cost modification', () => {
 describe('pathfindingGetCost', () => {
   it('returns 0 for single-node path', () => {
     const graph = makeGraph([['A', 'generic', 0, 0, 0]], []);
-    expect(pathfindingGetCost(graph, ['A'])).toBe(0);
+    expect(pathfindingGetCost(graph, ['A' as PlacedRoomId])).toBe(0);
   });
 
   it('returns 0 for empty path', () => {
@@ -491,7 +492,7 @@ describe('pathfindingGetCost', () => {
       ],
     );
 
-    expect(pathfindingGetCost(graph, ['A', 'B', 'C'])).toBe(2);
+    expect(pathfindingGetCost(graph, ['A' as PlacedRoomId, 'B' as PlacedRoomId, 'C' as PlacedRoomId])).toBe(2);
   });
 
   it('applies fear cost in path cost calculation', () => {
@@ -508,9 +509,9 @@ describe('pathfindingGetCost', () => {
     );
 
     // Without fear: cost = 2
-    expect(pathfindingGetCost(graph, ['A', 'B', 'C'])).toBe(2);
+    expect(pathfindingGetCost(graph, ['A' as PlacedRoomId, 'B' as PlacedRoomId, 'C' as PlacedRoomId])).toBe(2);
     // With low morale: entering B costs 3, then B→C costs 1 = 4
-    expect(pathfindingGetCost(graph, ['A', 'B', 'C'], { morale: 1 })).toBe(4);
+    expect(pathfindingGetCost(graph, ['A' as PlacedRoomId, 'B' as PlacedRoomId, 'C' as PlacedRoomId], { morale: 1 })).toBe(4);
   });
 });
 
@@ -528,7 +529,7 @@ describe('pathfindingFindWithObjectives', () => {
       [['spawn', 'altar']],
     );
 
-    const path = pathfindingFindWithObjectives(graph, 'spawn', 'altar', []);
+    const path = pathfindingFindWithObjectives(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, []);
     expect(path).toEqual(['spawn', 'altar']);
   });
 
@@ -555,8 +556,8 @@ describe('pathfindingFindWithObjectives', () => {
     );
 
     const path = pathfindingFindWithObjectives(
-      graph, 'spawn', 'altar',
-      [{ roomId: 'vault', priority: 5 }],
+      graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId,
+      [{ roomId: 'vault' as PlacedRoomId, priority: 5 }],
     );
     // Both paths have cost 2; detour cost (2) < threshold (4), so vault detour is preferred
     expect(path).toEqual(['spawn', 'vault', 'altar']);
@@ -588,8 +589,8 @@ describe('pathfindingFindWithObjectives', () => {
     );
 
     const path = pathfindingFindWithObjectives(
-      graph, 'spawn', 'altar',
-      [{ roomId: 'vault', priority: 5 }],
+      graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId,
+      [{ roomId: 'vault' as PlacedRoomId, priority: 5 }],
     );
     expect(path).toEqual(['spawn', 'altar']);
   });
@@ -617,10 +618,10 @@ describe('pathfindingFindWithObjectives', () => {
     );
 
     const path = pathfindingFindWithObjectives(
-      graph, 'spawn', 'altar',
+      graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId,
       [
-        { roomId: 'throne', priority: 3 },
-        { roomId: 'vault', priority: 8 },
+        { roomId: 'throne' as PlacedRoomId, priority: 3 },
+        { roomId: 'vault' as PlacedRoomId, priority: 8 },
       ],
     );
     // Vault has higher priority and same cost
@@ -636,7 +637,7 @@ describe('pathfindingFindWithObjectives', () => {
       [], // no edges
     );
 
-    const path = pathfindingFindWithObjectives(graph, 'spawn', 'altar', []);
+    const path = pathfindingFindWithObjectives(graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId, []);
     expect(path).toEqual([]);
   });
 
@@ -651,8 +652,8 @@ describe('pathfindingFindWithObjectives', () => {
     );
 
     const path = pathfindingFindWithObjectives(
-      graph, 'spawn', 'altar',
-      [{ roomId: 'island', priority: 10 }],
+      graph, 'spawn' as PlacedRoomId, 'altar' as PlacedRoomId,
+      [{ roomId: 'island' as PlacedRoomId, priority: 10 }],
     );
     expect(path).toEqual(['spawn', 'altar']);
   });
@@ -677,7 +678,7 @@ describe('pathfindingRecalculate', () => {
       ],
     );
 
-    const path = pathfindingRecalculate(graph, 'current', 'altar', 'A');
+    const path = pathfindingRecalculate(graph, 'current' as PlacedRoomId, 'altar' as PlacedRoomId, 'A' as PlacedRoomId);
     expect(path).toEqual(['current', 'B', 'altar']);
   });
 
@@ -695,7 +696,7 @@ describe('pathfindingRecalculate', () => {
       ],
     );
 
-    const path = pathfindingRecalculate(graph, 'current', 'altar', 'A');
+    const path = pathfindingRecalculate(graph, 'current' as PlacedRoomId, 'altar' as PlacedRoomId, 'A' as PlacedRoomId);
     expect(path).toEqual([]);
   });
 
@@ -722,8 +723,8 @@ describe('pathfindingRecalculate', () => {
     );
 
     // A already blocked, now also block B → only C remains
-    const path = pathfindingRecalculate(graph, 'current', 'altar', 'B', {
-      blockedNodes: new Set(['A']),
+    const path = pathfindingRecalculate(graph, 'current' as PlacedRoomId, 'altar' as PlacedRoomId, 'B' as PlacedRoomId, {
+      blockedNodes: new Set(['A' as PlacedRoomId]),
     });
     expect(path).toEqual(['current', 'C', 'altar']);
   });
@@ -747,7 +748,7 @@ describe('pathfindingRecalculate', () => {
     );
 
     // Block nothing new, but low morale should still prefer safe path
-    const path = pathfindingRecalculate(graph, 'current', 'altar', 'nonexistent', {
+    const path = pathfindingRecalculate(graph, 'current' as PlacedRoomId, 'altar' as PlacedRoomId, 'nonexistent' as PlacedRoomId, {
       morale: 1,
     });
     expect(path).toEqual(['current', 'safe', 'altar']);
@@ -784,7 +785,7 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    const path = pathfindingFindPath(graph, 'S', 'goal');
+    const path = pathfindingFindPath(graph, 'S' as PlacedRoomId, 'goal' as PlacedRoomId);
     expect(path).toHaveLength(5); // S → A → B/C → D → goal
     expect(path[0]).toBe('S');
     expect(path[path.length - 1]).toBe('goal');
@@ -813,10 +814,10 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    const pathFearful = pathfindingFindPath(graph, 'S', 'goal', { morale: 1 });
+    const pathFearful = pathfindingFindPath(graph, 'S' as PlacedRoomId, 'goal' as PlacedRoomId, { morale: 1 });
     expect(pathFearful).toEqual(['S', 'A', 'B', 'goal']);
 
-    const pathBrave = pathfindingFindPath(graph, 'S', 'goal', { morale: 10 });
+    const pathBrave = pathfindingFindPath(graph, 'S' as PlacedRoomId, 'goal' as PlacedRoomId, { morale: 10 });
     expect(pathBrave).toEqual(['S', 'scary', 'goal']);
   });
 
@@ -834,8 +835,8 @@ describe('Complex graph scenarios', () => {
       ],
     );
 
-    expect(pathfindingFindPath(graph, 'A', 'D')).toEqual([]);
-    expect(pathfindingFindPath(graph, 'C', 'D')).toEqual(['C', 'D']);
+    expect(pathfindingFindPath(graph, 'A' as PlacedRoomId, 'D' as PlacedRoomId)).toEqual([]);
+    expect(pathfindingFindPath(graph, 'C' as PlacedRoomId, 'D' as PlacedRoomId)).toEqual(['C', 'D']);
   });
 
   it('handles graph with no edges', () => {
@@ -847,7 +848,7 @@ describe('Complex graph scenarios', () => {
       [],
     );
 
-    expect(pathfindingFindPath(graph, 'A', 'B')).toEqual([]);
+    expect(pathfindingFindPath(graph, 'A' as PlacedRoomId, 'B' as PlacedRoomId)).toEqual([]);
   });
 });
 
@@ -859,7 +860,7 @@ function roomTile(roomId: string): GridTile {
   return {
     occupied: true,
     occupiedBy: 'room',
-    roomId,
+    roomId: roomId as PlacedRoomId,
     hallwayId: undefined,
     stairId: undefined,
     elevatorId: undefined,
@@ -945,7 +946,7 @@ describe('tilePathfindingFindPath', () => {
     }));
     const grid = makeGridWithObstacles(obstacles);
     const path = tilePathfindingFindPath(grid, { x: 3, y: 5 }, { x: 9, y: 5 });
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should return single tile for same start and end', () => {
@@ -959,7 +960,7 @@ describe('tilePathfindingFindPath', () => {
       { x: 5, y: 5, tile: roomTile('room-a') },
     ]);
     const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 8, y: 5 });
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should return null when end is occupied', () => {
@@ -967,19 +968,19 @@ describe('tilePathfindingFindPath', () => {
       { x: 8, y: 5, tile: roomTile('room-a') },
     ]);
     const path = tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 8, y: 5 });
-    expect(path).toBeNull();
+    expect(path).toBeUndefined();
   });
 
   it('should return null for out-of-bounds start', () => {
     const grid = gridCreateEmpty();
-    expect(tilePathfindingFindPath(grid, { x: -1, y: 5 }, { x: 5, y: 5 })).toBeNull();
-    expect(tilePathfindingFindPath(grid, { x: 20, y: 5 }, { x: 5, y: 5 })).toBeNull();
+    expect(tilePathfindingFindPath(grid, { x: -1, y: 5 }, { x: 5, y: 5 })).toBeUndefined();
+    expect(tilePathfindingFindPath(grid, { x: 20, y: 5 }, { x: 5, y: 5 })).toBeUndefined();
   });
 
   it('should return null for out-of-bounds end', () => {
     const grid = gridCreateEmpty();
-    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: -1 })).toBeNull();
-    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: 20 })).toBeNull();
+    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: -1 })).toBeUndefined();
+    expect(tilePathfindingFindPath(grid, { x: 5, y: 5 }, { x: 5, y: 20 })).toBeUndefined();
   });
 
   it('should avoid room-occupied tiles', () => {
@@ -1048,8 +1049,8 @@ function makeFloorWithRooms(
     biome: 'neutral',
     grid,
     rooms: rooms.map((r) => ({
-      id: r.id,
-      roomTypeId: 'type-a',
+      id: r.id as PlacedRoomId,
+      roomTypeId: 'type-a' as RoomId,
       shapeId: 'shape-1',
       anchorX: r.tiles[0].x,
       anchorY: r.tiles[0].y,
@@ -1068,7 +1069,7 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       { id: 'room-a', tiles: [{ x: 2, y: 5 }, { x: 3, y: 5 }] },
       { id: 'room-b', tiles: [{ x: 6, y: 5 }, { x: 7, y: 5 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(path).not.toBeNull();
     expect(path![0]).toEqual({ x: 4, y: 5 });
     expect(path![path!.length - 1]).toEqual({ x: 5, y: 5 });
@@ -1082,7 +1083,7 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       { id: 'room-a', tiles: [{ x: 2, y: 2 }, { x: 3, y: 2 }] },
       { id: 'room-b', tiles: [{ x: 8, y: 6 }, { x: 9, y: 6 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(path).not.toBeNull();
     expect(path!.length).toBeGreaterThan(0);
   });
@@ -1091,16 +1092,16 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
     const floor = makeFloorWithRooms([
       { id: 'room-a', tiles: [{ x: 2, y: 5 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-a');
-    expect(path).toBeNull();
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-a' as PlacedRoomId);
+    expect(path).toBeUndefined();
   });
 
   it('should return null for non-existent room', () => {
     const floor = makeFloorWithRooms([
       { id: 'room-a', tiles: [{ x: 2, y: 5 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-z');
-    expect(path).toBeNull();
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-z' as PlacedRoomId);
+    expect(path).toBeUndefined();
   });
 
   it('should return null when no path exists between rooms', () => {
@@ -1125,8 +1126,8 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       biome: 'neutral',
       grid,
       rooms: [
-        { id: 'room-a', roomTypeId: 'type-a', shapeId: 's1', anchorX: 5, anchorY: 5 },
-        { id: 'room-b', roomTypeId: 'type-a', shapeId: 's1', anchorX: 15, anchorY: 5 },
+        { id: 'room-a' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 5, anchorY: 5 },
+        { id: 'room-b' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 15, anchorY: 5 },
       ],
       hallways: [],
       inhabitants: [],
@@ -1134,8 +1135,8 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       traps: [],
     };
 
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
-    expect(path).toBeNull();
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
+    expect(path).toBeUndefined();
   });
 
   it('should prefer paths with fewer turns when length is equal', () => {
@@ -1144,7 +1145,7 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       { id: 'room-a', tiles: [{ x: 3, y: 5 }] },
       { id: 'room-b', tiles: [{ x: 7, y: 5 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(path).not.toBeNull();
     // All tiles should be on y=5 (straight line, 0 turns)
     expect(path!.every((t) => t.y === 5)).toBe(true);
@@ -1155,7 +1156,7 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
       { id: 'room-a', tiles: [{ x: 3, y: 5 }, { x: 4, y: 5 }] },
       { id: 'room-b', tiles: [{ x: 8, y: 5 }, { x: 9, y: 5 }] },
     ]);
-    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a', 'room-b');
+    const path = tilePathfindingFindRoomToRoomPath(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(path).not.toBeNull();
     // No tile in path should be a room tile
     const roomTileKeys = new Set(['3,5', '4,5', '8,5', '9,5']);

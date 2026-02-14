@@ -4,6 +4,8 @@ import type {
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
+  RoomId,
   RoomShape,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -52,8 +54,8 @@ const {
 
 function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'room-001',
-    roomTypeId: THRONE_ROOM_TYPE_ID,
+    id: 'room-001' as PlacedRoomId,
+    roomTypeId: THRONE_ROOM_TYPE_ID as RoomId,
     shapeId: 'shape-4x4',
     anchorX: 5,
     anchorY: 5,
@@ -126,8 +128,8 @@ describe('throneRoomFind', () => {
     const floor = floorCreate({
       rooms: [
         createPlacedRoom({
-          id: 'room-other',
-          roomTypeId: 'some-other-room-type',
+          id: 'room-other' as PlacedRoomId,
+          roomTypeId: 'some-other-room-type' as RoomId,
         }),
       ],
     });
@@ -160,22 +162,22 @@ describe('throneRoomFind', () => {
 describe('throneRoomGetSeatedRulerInstance', () => {
   it('should return undefined when no inhabitants are assigned', () => {
     const floor = floorCreate({ inhabitants: [] });
-    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
+    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId)).toBeUndefined();
   });
 
   it('should return undefined when no inhabitant is assigned to the throne room', () => {
     const floor = floorCreate({
       inhabitants: [
-        createInhabitantInstance({ assignedRoomId: 'other-room' }),
+        createInhabitantInstance({ assignedRoomId: 'other-room' as PlacedRoomId }),
       ],
     });
-    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001')).toBeUndefined();
+    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId)).toBeUndefined();
   });
 
   it('should return the seated ruler', () => {
-    const ruler = createInhabitantInstance({ assignedRoomId: 'room-001' });
+    const ruler = createInhabitantInstance({ assignedRoomId: 'room-001' as PlacedRoomId });
     const floor = floorCreate({ inhabitants: [ruler] });
-    const result = throneRoomGetSeatedRulerInstance(floor, 'room-001');
+    const result = throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId);
     expect(result).toBeDefined();
     expect(result!.instanceId).toBe('ruler-001');
   });
@@ -212,7 +214,7 @@ describe('throneRoomGetActiveRulerBonuses', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'def-dragon',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -237,7 +239,7 @@ describe('throneRoomGetActiveRulerBonuses', () => {
           instanceId: 'ruler-lich',
           definitionId: 'def-lich',
           name: 'Lich',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -262,7 +264,7 @@ describe('throneRoomGetActiveRulerBonuses', () => {
           instanceId: 'ruler-demon',
           definitionId: 'def-demon',
           name: 'Demon Lord',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -294,7 +296,7 @@ describe('throneRoomGetActiveRulerBonuses', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'nonexistent-def',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -324,7 +326,7 @@ describe('throneRoomGetRulerBonusValue', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'def-dragon',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -365,7 +367,7 @@ describe('throneRoomGetFearLevel', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'def-dragon',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -387,7 +389,7 @@ describe('throneRoomGetFearLevel', () => {
         createInhabitantInstance({
           instanceId: 'ruler-lich',
           definitionId: 'def-lich',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -409,7 +411,7 @@ describe('throneRoomGetFearLevel', () => {
         createInhabitantInstance({
           instanceId: 'ruler-demon',
           definitionId: 'def-demon',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -423,7 +425,7 @@ describe('throneRoomGetFearLevel', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'nonexistent-def',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -443,7 +445,7 @@ describe('throneRoomGetFearLevel', () => {
       inhabitants: [
         createInhabitantInstance({
           definitionId: 'def-weak',
-          assignedRoomId: 'room-001',
+          assignedRoomId: 'room-001' as PlacedRoomId,
         }),
       ],
     });
@@ -489,8 +491,8 @@ function createVaultShape(): RoomShape & IsContentItem {
 
 function createVaultRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'vault-001',
-    roomTypeId: TREASURE_VAULT_TYPE_ID,
+    id: 'vault-001' as PlacedRoomId,
+    roomTypeId: TREASURE_VAULT_TYPE_ID as RoomId,
     shapeId: 'shape-3x3',
     anchorX: 9,
     anchorY: 5,
@@ -670,8 +672,8 @@ describe('throneRoomGetPositionalBonuses', () => {
       rooms: [
         createPlacedRoom({ anchorX: 5, anchorY: 5 }),
         {
-          id: 'other-room',
-          roomTypeId: 'some-other-type',
+          id: 'other-room' as PlacedRoomId,
+          roomTypeId: 'some-other-type' as RoomId,
           shapeId: 'shape-3x3',
           anchorX: 9,
           anchorY: 5,

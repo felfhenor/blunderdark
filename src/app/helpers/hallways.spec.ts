@@ -11,13 +11,13 @@ import {
   hallwayRemoveUpgrade,
   hallwaySerialize,
 } from '@helpers/hallways';
-import type { Hallway } from '@interfaces';
+import type { Hallway, PlacedRoomId } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 const testHallway: Hallway = {
   id: 'hallway-1',
-  startRoomId: 'room-a',
-  endRoomId: 'room-b',
+  startRoomId: 'room-a' as PlacedRoomId,
+  endRoomId: 'room-b' as PlacedRoomId,
   tiles: [
     { x: 5, y: 5 },
     { x: 6, y: 5 },
@@ -94,7 +94,7 @@ describe('hallwayIsTileBlocked', () => {
     grid = gridSetTile(grid, 5, 5, {
       occupied: true,
       occupiedBy: 'room',
-      roomId: 'room-1',
+      roomId: 'room-1' as PlacedRoomId,
       hallwayId: undefined,
       stairId: undefined,
       elevatorId: undefined,
@@ -113,9 +113,9 @@ describe('hallwayIsTileBlocked', () => {
 
 describe('hallwayGetBetween', () => {
   const hallways: Hallway[] = [
-    { ...testHallway, id: 'h1', startRoomId: 'a', endRoomId: 'b' },
-    { ...testHallway, id: 'h2', startRoomId: 'b', endRoomId: 'a' },
-    { ...testHallway, id: 'h3', startRoomId: 'a', endRoomId: 'c' },
+    { ...testHallway, id: 'h1', startRoomId: 'a' as PlacedRoomId, endRoomId: 'b' as PlacedRoomId },
+    { ...testHallway, id: 'h2', startRoomId: 'b' as PlacedRoomId, endRoomId: 'a' as PlacedRoomId },
+    { ...testHallway, id: 'h3', startRoomId: 'a' as PlacedRoomId, endRoomId: 'c' as PlacedRoomId },
   ];
 
   it('should find hallways in both directions', () => {

@@ -1,7 +1,9 @@
 import type {
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -87,8 +89,8 @@ const crystalMineRoom: RoomDefinition & IsContentItem = {
 
 function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'room-001',
-    roomTypeId: CRYSTAL_MINE_ID,
+    id: 'room-001' as PlacedRoomId,
+    roomTypeId: CRYSTAL_MINE_ID as RoomId,
     shapeId: 'shape-l',
     anchorX: 5,
     anchorY: 5,
@@ -105,7 +107,7 @@ beforeEach(() => {
 
 describe('roomUpgradeGetPaths', () => {
   it('should return upgrade paths for a valid room type', () => {
-    const paths = roomUpgradeGetPaths(CRYSTAL_MINE_ID);
+    const paths = roomUpgradeGetPaths(CRYSTAL_MINE_ID as RoomId);
     expect(paths).toHaveLength(4);
     expect(paths[0].name).toBe('Deep Vein Extraction');
     expect(paths[1].name).toBe('Expanded Tunnels');
@@ -114,7 +116,7 @@ describe('roomUpgradeGetPaths', () => {
   });
 
   it('should return empty array for unknown room type', () => {
-    const paths = roomUpgradeGetPaths('nonexistent');
+    const paths = roomUpgradeGetPaths('nonexistent' as RoomId);
     expect(paths).toEqual([]);
   });
 
@@ -126,7 +128,7 @@ describe('roomUpgradeGetPaths', () => {
     };
     mockContent.set('no-upgrades', noUpgradeRoom);
 
-    const paths = roomUpgradeGetPaths('no-upgrades');
+    const paths = roomUpgradeGetPaths('no-upgrades' as RoomId);
     expect(paths).toEqual([]);
   });
 });
@@ -269,7 +271,7 @@ describe('roomUpgradeGetAvailable', () => {
   });
 
   it('should return empty array for unknown room type', () => {
-    const room = createPlacedRoom({ roomTypeId: 'nonexistent' });
+    const room = createPlacedRoom({ roomTypeId: 'nonexistent' as RoomId });
     const available = roomUpgradeGetAvailable(room);
     expect(available).toEqual([]);
   });
@@ -397,7 +399,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
     };
     mockContent.set('unlimited-room', unlimitedRoom);
 
-    const room = createPlacedRoom({ roomTypeId: 'unlimited-room' });
+    const room = createPlacedRoom({ roomTypeId: 'unlimited-room' as RoomId });
     const result = roomUpgradeGetEffectiveMaxInhabitants(room, unlimitedRoom);
     expect(result).toBe(-1);
   });

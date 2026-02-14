@@ -2,7 +2,9 @@ import type {
   Floor,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
+  RoomId,
   RoomUpgradePath,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -173,8 +175,8 @@ function makeFloor(rooms: PlacedRoom[]): Floor {
 
 function createAltarRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-altar-1',
-    roomTypeId: ALTAR_ROOM_ID,
+    id: 'placed-altar-1' as PlacedRoomId,
+    roomTypeId: ALTAR_ROOM_ID as RoomId,
     shapeId: ALTAR_SHAPE_ID,
     anchorX: 8,
     anchorY: 8,
@@ -184,8 +186,8 @@ function createAltarRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 
 function createMineRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
-    id: 'placed-mine-1',
-    roomTypeId: CRYSTAL_MINE_ID,
+    id: 'placed-mine-1' as PlacedRoomId,
+    roomTypeId: CRYSTAL_MINE_ID as RoomId,
     shapeId: 'shape-l',
     anchorX: 11,
     anchorY: 8,
@@ -228,11 +230,11 @@ describe('Altar Room: non-removable', () => {
   });
 
   it('should not be removable via roomPlacementIsRemovable', () => {
-    expect(roomPlacementIsRemovable(ALTAR_ROOM_ID)).toBe(false);
+    expect(roomPlacementIsRemovable(ALTAR_ROOM_ID as RoomId)).toBe(false);
   });
 
   it('should allow removal of regular rooms', () => {
-    expect(roomPlacementIsRemovable(CRYSTAL_MINE_ID)).toBe(true);
+    expect(roomPlacementIsRemovable(CRYSTAL_MINE_ID as RoomId)).toBe(true);
   });
 });
 
@@ -277,7 +279,7 @@ describe('Altar Room: level system', () => {
 
 describe('Altar Room: upgrade paths', () => {
   it('should have 2 upgrade paths', () => {
-    const paths = roomUpgradeGetPaths(ALTAR_ROOM_ID);
+    const paths = roomUpgradeGetPaths(ALTAR_ROOM_ID as RoomId);
     expect(paths).toHaveLength(2);
   });
 

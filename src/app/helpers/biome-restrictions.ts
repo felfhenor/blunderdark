@@ -1,5 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
-import type { BiomeType, Floor, IsContentItem, RoomDefinition } from '@interfaces';
+import type { BiomeType, Floor, IsContentItem, RoomDefinition, RoomId } from '@interfaces';
 import type { BiomeRestrictionRule, BiomeRestrictionResult } from '@interfaces/biome-restriction';
 
 
@@ -41,7 +41,7 @@ export const BIOME_RESTRICTION_MAP: Record<
  */
 export function biomeRestrictionCountRoomType(
   floor: Floor,
-  roomTypeId: string,
+  roomTypeId: RoomId,
 ): number {
   return floor.rooms.filter((r) => r.roomTypeId === roomTypeId).length;
 }
@@ -56,7 +56,7 @@ export function biomeRestrictionCountRoomType(
  * @param floor - The floor to check room counts against (for maxPerFloor rules)
  */
 export function biomeRestrictionCanBuild(
-  roomTypeId: string,
+  roomTypeId: RoomId,
   biome: BiomeType,
   floor: Floor,
 ): BiomeRestrictionResult {
@@ -94,7 +94,7 @@ export function biomeRestrictionCanBuild(
  * Returns the rule and current count info for count-limited rooms.
  */
 export function biomeRestrictionGetRoomInfo(
-  roomTypeId: string,
+  roomTypeId: RoomId,
   biome: BiomeType,
   floor: Floor,
 ): {

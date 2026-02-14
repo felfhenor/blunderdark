@@ -1,4 +1,5 @@
 import type { ResourceCost } from '@interfaces/resource';
+import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type TrapEffectType =
   | 'physical'
@@ -42,7 +43,7 @@ export type TrapCraftingJob = {
 };
 
 export type TrapCraftingQueue = {
-  roomId: string;
+  roomId: PlacedRoomId;
   jobs: TrapCraftingJob[];
 };
 

@@ -1,4 +1,5 @@
 import type { ResourceType } from '@interfaces/resource';
+import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type InhabitantTrait = {
   id: string;
@@ -58,7 +59,7 @@ export type InhabitantInstance = {
   definitionId: string;
   name: string;
   state: InhabitantState;
-  assignedRoomId: string | undefined;
+  assignedRoomId: PlacedRoomId | undefined;
   trained?: boolean;
   trainingProgress?: number;
   trainingBonuses?: TrainingBonuses;

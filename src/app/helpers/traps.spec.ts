@@ -2,6 +2,7 @@ import type {
   Floor,
   GridTile,
   IsContentItem,
+  PlacedRoomId,
   TrapDefinition,
   TrapInstance,
   TrapInventoryEntry,
@@ -289,7 +290,7 @@ describe('Trap Placement', () => {
       grid[2][2] = makeTile({
         occupied: true,
         occupiedBy: 'room',
-        roomId: 'room-1',
+        roomId: 'room-1' as PlacedRoomId,
       });
       const floor = makeFloor({ grid });
 

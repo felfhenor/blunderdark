@@ -1,9 +1,9 @@
-import type { TileOffset } from '@interfaces/room-shape';
+import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
 
 export type Connection = {
   id: string;
-  roomAId: string;
-  roomBId: string;
+  roomAId: PlacedRoomId;
+  roomBId: PlacedRoomId;
   edgeTiles: TileOffset[];
 };
 

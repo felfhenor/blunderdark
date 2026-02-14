@@ -27,7 +27,7 @@ import {
   fearLevelGetLabel,
   FEAR_LEVEL_MAX,
 } from '@helpers';
-import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+import type { InhabitantDefinition, IsContentItem, PlacedRoomId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -194,7 +194,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const result = await connectionCreate(room.id, otherRoomId);
+    const result = await connectionCreate(room.id, otherRoomId as PlacedRoomId);
     if (result.error) {
       notifyError(result.error);
     } else {

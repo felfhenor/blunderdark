@@ -185,6 +185,8 @@ import type {
   InhabitantTrait,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
+  RoomId,
   RoomProduction,
 } from '@interfaces';
 import {
@@ -311,7 +313,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-goblin',
       name: 'Goblin',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
     expect(result).toBeDefined();
@@ -330,7 +332,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-goblin',
       name: 'Goblin',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     // Goblin Miner targets crystals, food room doesn't produce crystals
     const result = efficiencyCalculateInhabitantContribution(instance, foodProduction);
@@ -346,7 +348,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-myconid',
       name: 'Myconid',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     // Myconid in crystal mine: workerEfficiency 1.3 → 0.3, but Farmer targets food → no match
     const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
@@ -362,7 +364,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-nonexistent',
       name: 'Unknown',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
     expect(result).toBeUndefined();
@@ -374,7 +376,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-skeleton',
       name: 'Skeleton',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
     expect(result).toBeDefined();
@@ -390,7 +392,7 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       definitionId: 'def-allbonus',
       name: 'AllBonus Worker',
       state: 'normal',
-      assignedRoomId: 'room-1',
+      assignedRoomId: 'room-1' as PlacedRoomId,
     };
     const resultCrystal = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
     expect(resultCrystal!.traitBonuses[0].applies).toBe(true);
@@ -404,24 +406,24 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
 describe('efficiencyCalculateRoom', () => {
   const crystalMine: PlacedRoom = {
-    id: 'placed-mine-1',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine-1' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const mushroomGrove: PlacedRoom = {
-    id: 'placed-grove-1',
-    roomTypeId: 'room-mushroom-grove',
+    id: 'placed-grove-1' as PlacedRoomId,
+    roomTypeId: 'room-mushroom-grove' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const barracks: PlacedRoom = {
-    id: 'placed-barracks-1',
-    roomTypeId: 'room-barracks',
+    id: 'placed-barracks-1' as PlacedRoomId,
+    roomTypeId: 'room-barracks' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
@@ -441,7 +443,7 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
@@ -459,7 +461,7 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-grove-1',
+        assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
     // Goblin Miner targets crystals, but Mushroom Grove produces food
@@ -475,14 +477,14 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin 1',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
       {
         instanceId: 'inst-2',
         definitionId: 'def-goblin',
         name: 'Goblin 2',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
@@ -499,14 +501,14 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
       {
         instanceId: 'inst-2',
         definitionId: 'def-myconid',
         name: 'Myconid',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
@@ -523,7 +525,7 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'other-room',
+        assignedRoomId: 'other-room' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
@@ -538,7 +540,7 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-barracks-1',
+        assignedRoomId: 'placed-barracks-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(barracks, inhabitants);
@@ -555,7 +557,7 @@ describe('efficiencyCalculateRoom', () => {
         definitionId: 'def-skeleton',
         name: 'Skeleton',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
@@ -567,16 +569,16 @@ describe('efficiencyCalculateRoom', () => {
 
 describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   const crystalMine: PlacedRoom = {
-    id: 'placed-mine-1',
-    roomTypeId: 'room-crystal-mine',
+    id: 'placed-mine-1' as PlacedRoomId,
+    roomTypeId: 'room-crystal-mine' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
   };
 
   const mushroomGrove: PlacedRoom = {
-    id: 'placed-grove-1',
-    roomTypeId: 'room-mushroom-grove',
+    id: 'placed-grove-1' as PlacedRoomId,
+    roomTypeId: 'room-mushroom-grove' as RoomId,
     shapeId: 'shape-1',
     anchorX: 0,
     anchorY: 0,
@@ -595,7 +597,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateMatchedInhabitantBonus(crystalMine, inhabitants);
@@ -611,7 +613,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         definitionId: 'def-goblin',
         name: 'Goblin',
         state: 'normal',
-        assignedRoomId: 'placed-grove-1',
+        assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
     // Goblin Miner targets crystals, grove produces food → no trait bonus
@@ -627,7 +629,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         definitionId: 'def-myconid',
         name: 'Myconid',
         state: 'normal',
-        assignedRoomId: 'placed-grove-1',
+        assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateMatchedInhabitantBonus(mushroomGrove, inhabitants);
@@ -643,7 +645,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         definitionId: 'def-allbonus',
         name: 'AllBonus',
         state: 'normal',
-        assignedRoomId: 'placed-mine-1',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
     const result = efficiencyCalculateMatchedInhabitantBonus(crystalMine, inhabitants);
@@ -681,7 +683,7 @@ describe('efficiencyTotalBonusForResource', () => {
                 definitionId: 'def-goblin',
                 name: 'Goblin',
                 state: 'normal',
-                assignedRoomId: 'placed-mine-1',
+                assignedRoomId: 'placed-mine-1' as PlacedRoomId,
               },
             ],
             connections: [],
@@ -762,7 +764,7 @@ describe('efficiencyTotalBonusForResource', () => {
                 definitionId: 'def-goblin',
                 name: 'Goblin 1',
                 state: 'normal',
-                assignedRoomId: 'placed-mine-1',
+                assignedRoomId: 'placed-mine-1' as PlacedRoomId,
               },
               {
                 instanceId: 'inst-2',

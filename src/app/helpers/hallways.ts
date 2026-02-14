@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { gridGetTile, gridIsInBounds, gridSetTile } from '@helpers/grid';
+import type { PlacedRoomId } from '@interfaces';
 import type { Floor } from '@interfaces/floor';
 import type { GridState, GridTile } from '@interfaces/grid';
 import type { Hallway, HallwayUpgrade } from '@interfaces/hallway';
@@ -183,8 +184,8 @@ export function hallwayMergeOnFloor(
   const updatedConnections = floor.connections
     .map((conn) => {
       let { roomAId, roomBId } = conn;
-      if (roomAId === absorbedId) roomAId = targetId;
-      if (roomBId === absorbedId) roomBId = targetId;
+      if ((roomAId as string) === absorbedId) roomAId = targetId as PlacedRoomId;
+      if ((roomBId as string) === absorbedId) roomBId = targetId as PlacedRoomId;
       return { ...conn, roomAId, roomBId };
     })
     .filter((conn) => conn.roomAId !== conn.roomBId)
@@ -224,8 +225,8 @@ export function hallwayDeserialize(data: unknown[]): Hallway[] {
     const h = item as Record<string, unknown>;
     return {
       id: (h['id'] as string) ?? '',
-      startRoomId: (h['startRoomId'] as string) || undefined,
-      endRoomId: (h['endRoomId'] as string) || undefined,
+      startRoomId: ((h['startRoomId'] as string) || undefined) as PlacedRoomId | undefined,
+      endRoomId: ((h['endRoomId'] as string) || undefined) as PlacedRoomId | undefined,
       tiles: (h['tiles'] as TileOffset[]) ?? [],
       upgrades: (h['upgrades'] as HallwayUpgrade[]) ?? [],
     };

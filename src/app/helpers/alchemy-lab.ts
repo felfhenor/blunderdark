@@ -10,6 +10,7 @@ import type {
   GameState,
   IsContentItem,
   PlacedRoom,
+  PlacedRoomId,
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
@@ -113,14 +114,14 @@ export function alchemyLabGetEffectiveCost(
 
 export function alchemyLabGetConversion(
   conversions: AlchemyConversion[],
-  roomId: string,
+  roomId: PlacedRoomId,
 ): AlchemyConversion | undefined {
   return conversions.find((c) => c.roomId === roomId);
 }
 
 export function alchemyLabStartConversion(
   conversions: AlchemyConversion[],
-  roomId: string,
+  roomId: PlacedRoomId,
   recipeId: string,
   targetTicks: number,
 ): AlchemyConversion[] {
@@ -140,7 +141,7 @@ export function alchemyLabStartConversion(
 
 export function alchemyLabStopConversion(
   conversions: AlchemyConversion[],
-  roomId: string,
+  roomId: PlacedRoomId,
 ): AlchemyConversion[] {
   return conversions.filter((c) => c.roomId !== roomId);
 }
@@ -148,7 +149,7 @@ export function alchemyLabStopConversion(
 // --- Validation ---
 
 export function alchemyLabCanConvert(
-  roomId: string,
+  roomId: PlacedRoomId,
   floors: GameState['world']['floors'],
 ): { canConvert: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {

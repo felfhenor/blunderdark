@@ -1,5 +1,7 @@
+import type { PlacedRoomId } from '@interfaces/room-shape';
+
 export type AlchemyConversion = {
-  roomId: string;
+  roomId: PlacedRoomId;
   recipeId: string;
   progress: number;
   targetTicks: number;
@@ -7,7 +9,7 @@ export type AlchemyConversion = {
 };
 
 export type AlchemyLabCompletedEvent = {
-  roomId: string;
+  roomId: PlacedRoomId;
   recipeName: string;
   outputResource: string;
   outputAmount: number;
