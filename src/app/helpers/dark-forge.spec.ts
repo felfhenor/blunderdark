@@ -264,6 +264,7 @@ function makeGameState(overrides: {
       forgeInventory: overrides.forgeInventory ?? [],
       forgeCraftingQueues: overrides.forgeCraftingQueues ?? [],
       alchemyConversions: [],
+      prisoners: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

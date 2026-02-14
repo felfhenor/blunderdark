@@ -201,6 +201,7 @@ function ensureRoom(
     summoningAdjacencyEffects: room.summoningAdjacencyEffects ?? undefined,
     forgingAdjacencyEffects: room.forgingAdjacencyEffects ?? undefined,
     alchemyAdjacencyEffects: room.alchemyAdjacencyEffects ?? undefined,
+    tortureAdjacencyEffects: room.tortureAdjacencyEffects ?? undefined,
   };
 }
 

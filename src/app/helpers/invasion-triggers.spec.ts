@@ -72,6 +72,10 @@ function makeGameState(overrides: {
       currentFloorIndex: 0,
       trapInventory: [],
       trapCraftingQueues: [],
+      forgeInventory: [],
+      forgeCraftingQueues: [],
+      alchemyConversions: [],
+      prisoners: [],
       invasionSchedule: makeSchedule(overrides.schedule),
     },
   } as unknown as GameState;

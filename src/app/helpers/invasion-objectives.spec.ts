@@ -155,6 +155,10 @@ function makeGameState(overrides: {
       currentFloorIndex: 0,
       trapInventory: [],
       trapCraftingQueues: [],
+      forgeInventory: [],
+      forgeCraftingQueues: [],
+      alchemyConversions: [],
+      prisoners: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

@@ -214,6 +214,7 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
       forgeInventory: [],
       forgeCraftingQueues: [],
       alchemyConversions: [],
+      prisoners: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

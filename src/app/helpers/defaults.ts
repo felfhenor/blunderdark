@@ -45,6 +45,7 @@ export function defaultGameState(): GameState {
       forgeInventory: [],
       forgeCraftingQueues: [],
       alchemyConversions: [],
+      prisoners: [],
       invasionSchedule: defaultInvasionSchedule(),
       corruptionEffects: defaultCorruptionEffectState(),
     },

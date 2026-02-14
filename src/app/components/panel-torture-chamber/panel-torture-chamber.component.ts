@@ -1,0 +1,211 @@
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ModalComponent } from '@components/modal/modal.component';
+import {
+  contentGetEntry,
+  floorCurrent,
+  gamestate,
+  gridSelectedTile,
+  notify,
+  roomRoleFindById,
+  tortureConversionComplete$,
+  tortureExtractionComplete$,
+  tortureGetAdjacentRoomTypeIds,
+  tortureGetConversionRate,
+  tortureGetConversionTicks,
+  tortureGetExtractionTicks,
+  updateGamestate,
+} from '@helpers';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import type {
+  InhabitantDefinition,
+  InvaderClassType,
+  IsContentItem,
+} from '@interfaces';
+
+@Component({
+  selector: 'app-panel-torture-chamber',
+  imports: [ModalComponent],
+  templateUrl: './panel-torture-chamber.component.html',
+  styleUrl: './panel-torture-chamber.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PanelTortureChamberComponent {
+  public showResult = signal(false);
+  public lastResult = signal<
+    | { type: 'extraction'; prisonerName: string; researchGained: number }
+    | { type: 'conversion'; prisonerName: string; success: boolean; inhabitantName?: string }
+    | undefined
+  >(undefined);
+
+  private subscriptions = [
+    tortureExtractionComplete$.subscribe((evt) => {
+      this.lastResult.set({
+        type: 'extraction',
+        prisonerName: evt.prisonerName,
+        researchGained: evt.researchGained,
+      });
+      this.showResult.set(true);
+      notify('Torture', `Extracted ${evt.researchGained} research from ${evt.prisonerName}`);
+    }),
+    tortureConversionComplete$.subscribe((evt) => {
+      this.lastResult.set({
+        type: 'conversion',
+        prisonerName: evt.prisonerName,
+        success: evt.success,
+        inhabitantName: evt.inhabitantName,
+      });
+      this.showResult.set(true);
+      if (evt.success) {
+        notify('Torture', `Converted ${evt.prisonerName} into ${evt.inhabitantName}`);
+      } else {
+        notify('Torture', `Failed to convert ${evt.prisonerName}`);
+      }
+    }),
+  ];
+
+  public tortureRoom = computed(() => {
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return undefined;
+
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    if (!gridTile?.roomId) return undefined;
+
+    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    if (!room || room.roomTypeId !== roomRoleFindById('tortureChamber'))
+      return undefined;
+
+    return room;
+  });
+
+  public assignedInhabitants = computed(() => {
+    const room = this.tortureRoom();
+    if (!room) return [];
+
+    const state = gamestate();
+    return state.world.inhabitants
+      .filter((i) => i.assignedRoomId === room.id)
+      .map((i) => {
+        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+          i.definitionId,
+        );
+        return { ...i, defName: def?.name ?? i.name };
+      });
+  });
+
+  public availablePrisoners = computed(() => {
+    const room = this.tortureRoom();
+    if (!room || room.tortureJob) return [];
+
+    return gamestate().world.prisoners;
+  });
+
+  public tortureProgress = computed(() => {
+    const room = this.tortureRoom();
+    if (!room?.tortureJob) return undefined;
+    const job = room.tortureJob;
+    const elapsed = job.targetTicks - job.ticksRemaining;
+    const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
+    const prisoner = gamestate().world.prisoners.find((p) => p.id === job.prisonerId);
+    return {
+      percent,
+      prisonerName: prisoner?.name ?? 'Unknown',
+      action: job.action,
+      ticksRemaining: job.ticksRemaining,
+    };
+  });
+
+  public canStartJob = computed(() => {
+    const room = this.tortureRoom();
+    if (!room || room.tortureJob) return false;
+    const hasWorker = this.assignedInhabitants().length > 0;
+    const hasPrisoners = gamestate().world.prisoners.length > 0;
+    return hasWorker && hasPrisoners;
+  });
+
+  public getConversionRate(invaderClass: InvaderClassType): number {
+    const room = this.tortureRoom();
+    if (!room) return 0;
+    const floor = floorCurrent();
+    const adjacentTypes = floor
+      ? tortureGetAdjacentRoomTypeIds(room, floor)
+      : new Set<string>();
+    return Math.round(tortureGetConversionRate(room, adjacentTypes, invaderClass) * 100);
+  }
+
+  public getExtractionTime(): number {
+    const room = this.tortureRoom();
+    if (!room) return 0;
+    const floor = floorCurrent();
+    const adjacentTypes = floor
+      ? tortureGetAdjacentRoomTypeIds(room, floor)
+      : new Set<string>();
+    const ticks = tortureGetExtractionTicks(room, adjacentTypes);
+    return ticks / GAME_TIME_TICKS_PER_MINUTE;
+  }
+
+  public getConversionTime(): number {
+    const room = this.tortureRoom();
+    if (!room) return 0;
+    const floor = floorCurrent();
+    const adjacentTypes = floor
+      ? tortureGetAdjacentRoomTypeIds(room, floor)
+      : new Set<string>();
+    const ticks = tortureGetConversionTicks(room, adjacentTypes);
+    return ticks / GAME_TIME_TICKS_PER_MINUTE;
+  }
+
+  public async startExtraction(prisonerId: string): Promise<void> {
+    const room = this.tortureRoom();
+    if (!room) return;
+
+    const floor = floorCurrent();
+    const adjacentTypes = floor
+      ? tortureGetAdjacentRoomTypeIds(room, floor)
+      : new Set<string>();
+    const targetTicks = tortureGetExtractionTicks(room, adjacentTypes);
+
+    await updateGamestate((state) => {
+      for (const flr of state.world.floors) {
+        const target = flr.rooms.find((r) => r.id === room.id);
+        if (target) {
+          target.tortureJob = {
+            prisonerId,
+            action: 'extract',
+            ticksRemaining: targetTicks,
+            targetTicks,
+          };
+          break;
+        }
+      }
+      return state;
+    });
+  }
+
+  public async startConversion(prisonerId: string): Promise<void> {
+    const room = this.tortureRoom();
+    if (!room) return;
+
+    const floor = floorCurrent();
+    const adjacentTypes = floor
+      ? tortureGetAdjacentRoomTypeIds(room, floor)
+      : new Set<string>();
+    const targetTicks = tortureGetConversionTicks(room, adjacentTypes);
+
+    await updateGamestate((state) => {
+      for (const flr of state.world.floors) {
+        const target = flr.rooms.find((r) => r.id === room.id);
+        if (target) {
+          target.tortureJob = {
+            prisonerId,
+            action: 'convert',
+            ticksRemaining: targetTicks,
+            targetTicks,
+          };
+          break;
+        }
+      }
+      return state;
+    });
+  }
+}

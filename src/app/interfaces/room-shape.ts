@@ -33,6 +33,13 @@ export type SummonJob = {
   targetTicks: number;
 };
 
+export type TortureJob = {
+  prisonerId: string;
+  action: 'extract' | 'convert';
+  ticksRemaining: number;
+  targetTicks: number;
+};
+
 export type PlacedRoom = {
   id: string;
   roomTypeId: string;
@@ -45,4 +52,5 @@ export type PlacedRoom = {
   breedingJob?: BreedingJob;
   mutationJob?: MutationJob;
   summonJob?: SummonJob;
+  tortureJob?: TortureJob;
 };

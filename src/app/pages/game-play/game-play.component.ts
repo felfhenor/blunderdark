@@ -18,6 +18,7 @@ import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-th
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelResearchSummaryComponent } from '@components/panel-research-summary/panel-research-summary.component';
 import { PanelSummoningCircleComponent } from '@components/panel-summoning-circle/panel-summoning-circle.component';
+import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -47,6 +48,7 @@ import { optionsGet } from '@helpers';
     PanelTrainingGroundsComponent,
     PanelResearchSummaryComponent,
     PanelSummoningCircleComponent,
+    PanelTortureChamberComponent,
     SynergyTooltipComponent,
   ],
   templateUrl: './game-play.component.html',

@@ -69,4 +69,8 @@ export type RoomDefinition = {
     alchemySpeedBonus?: number;
     alchemyCostReduction?: number;
   };
+  tortureAdjacencyEffects?: {
+    tortureSpeedBonus?: number;
+    tortureConversionBonus?: number;
+  };
 };

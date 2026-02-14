@@ -338,6 +338,8 @@
     mutationOddsBonus: 0.10
   summoningAdjacencyEffects:
     summonStatBonus: 2
+  tortureAdjacencyEffects:
+    tortureSpeedBonus: 0.15
   adjacencyBonuses:
     - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
       bonus: 0.2
@@ -511,6 +513,8 @@
   role: barracks
   trainingAdjacencyEffects:
     timeReduction: 0.20
+  tortureAdjacencyEffects:
+    tortureConversionBonus: 0.10
   adjacencyBonuses:
     - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.15
@@ -1034,3 +1038,68 @@
       effects:
         - type: maxInhabitantBonus
           value: 2
+
+- id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
+  name: Torture Chamber
+  description: An L-shaped chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
+  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
+  cost:
+    gold: 120
+    crystals: 40
+    essence: 20
+  production:
+    corruption: 0.4
+  requiresWorkers: true
+  maxInhabitants: 1
+  inhabitantRestriction: null
+  fearLevel: 4
+  role: tortureChamber
+  timeOfDayBonus:
+    period: night
+    bonus: 0.20
+  invasionProfile:
+    dimension: corruption
+    weight: 10
+  adjacencyBonuses:
+    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+      bonus: 0.20
+      description: Soul Well's spectral energy intensifies the chamber's dark methods.
+    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+      bonus: 0.15
+      description: Forbidden knowledge from the Shadow Library refines interrogation techniques.
+    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+      bonus: 0.10
+      description: Military discipline from the Barracks aids in prisoner control.
+  upgradePaths:
+    - id: 744ed99e-a98a-419e-9b8a-70ffca75c3f5
+      name: Grand Inquisitor
+      description: A master interrogator oversees the chamber, halving processing time and boosting conversion odds by 25%.
+      cost:
+        gold: 120
+        essence: 40
+      effects:
+        - type: tortureSpeedMultiplier
+          value: 0.5
+        - type: tortureConversionBonus
+          value: 0.25
+        - type: maxInhabitantBonus
+          value: 1
+    - id: 486e229e-c186-4d74-a71e-79010c9b6bdf
+      name: Corruption Engine
+      description: Dark machinery amplifies the chamber's corrupting influence, doubling corruption output.
+      cost:
+        gold: 100
+        flux: 30
+      effects:
+        - type: productionMultiplier
+          value: 2.0
+          resource: corruption
+    - id: f5a2a50a-4d0e-47fb-b860-3b41c1a86529
+      name: Fear Amplifier
+      description: Screaming echoes and dread enchantments push fear to nightmarish levels.
+      cost:
+        gold: 150
+        essence: 50
+      effects:
+        - type: fearIncrease
+          value: 1

@@ -74,6 +74,7 @@ export * from './summoning-circle';
 export * from './synergy';
 export * from './throne-room';
 export * from './timer';
+export * from './torture-chamber';
 export * from './training';
 export * from './trap-workshop';
 export * from './traps';

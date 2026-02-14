@@ -1,0 +1,108 @@
+@if (tortureRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Torture Chamber</h3>
+
+      <!-- Active Job -->
+      @if (tortureProgress(); as tp) {
+        <div class="mt-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs">
+              @if (tp.action === 'extract') { Extracting: } @else { Converting: }
+              {{ tp.prisonerName }}
+            </span>
+            <span class="badge badge-xs badge-error">In Progress</span>
+          </div>
+          <progress
+            class="progress progress-error w-full mt-1"
+            [value]="tp.percent"
+            max="100"
+          ></progress>
+          <span class="text-xs opacity-40">{{ tp.percent }}%</span>
+        </div>
+      }
+
+      <!-- Assigned Inhabitants -->
+      @if (assignedInhabitants().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Torturer:</h4>
+          <div class="flex flex-wrap gap-1">
+            @for (inh of assignedInhabitants(); track inh.instanceId) {
+              <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="text-xs opacity-50 mt-2">No torturer assigned.</p>
+      }
+
+      <!-- Prisoner List -->
+      @if (availablePrisoners().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Prisoners ({{ availablePrisoners().length }}):</h4>
+          <div class="flex flex-col gap-2">
+            @for (prisoner of availablePrisoners(); track prisoner.id) {
+              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold">{{ prisoner.name }}</span>
+                  <span class="badge badge-xs badge-ghost">{{ prisoner.invaderClass }}</span>
+                </div>
+                <span class="text-xs opacity-60">
+                  HP {{ prisoner.stats.hp }} / ATK {{ prisoner.stats.attack }} / DEF {{ prisoner.stats.defense }} / SPD {{ prisoner.stats.speed }}
+                </span>
+                @if (canStartJob()) {
+                  <div class="flex gap-1 mt-1">
+                    <button
+                      class="btn btn-xs btn-warning flex-1"
+                      (click)="startExtraction(prisoner.id)"
+                    >
+                      Extract ({{ getExtractionTime() }}m)
+                    </button>
+                    <button
+                      class="btn btn-xs btn-error flex-1"
+                      (click)="startConversion(prisoner.id)"
+                    >
+                      Convert ({{ getConversionRate(prisoner.invaderClass) }}%)
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @else if (!tortureProgress()) {
+        <p class="text-xs opacity-50 mt-2">No prisoners available.</p>
+      }
+    </div>
+  </div>
+}
+
+<!-- Result Modal -->
+<app-modal [(visible)]="showResult">
+  <span title>Torture Result</span>
+  <div body>
+    @if (lastResult(); as result) {
+      <div class="text-center">
+        <p class="text-lg font-semibold">{{ result.prisonerName }}</p>
+        @if (result.type === 'extraction') {
+          <p class="text-warning mt-2">
+            Extracted {{ result.researchGained }} research points.
+          </p>
+        } @else {
+          @if (result.success) {
+            <p class="text-success mt-2">
+              Conversion successful! {{ result.inhabitantName }} has joined your dungeon.
+            </p>
+          } @else {
+            <p class="text-error mt-2">
+              Conversion failed. The prisoner's will could not be broken.
+            </p>
+          }
+        }
+      </div>
+    }
+  </div>
+  <div actions>
+    <button class="btn btn-sm" (click)="showResult.set(false)">Close</button>
+  </div>
+</app-modal>

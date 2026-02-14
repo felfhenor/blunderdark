@@ -514,3 +514,41 @@
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
+
+- id: 1df0572f-4dc5-4ba8-9c4d-d1df84f58979
+  name: Converted Prisoner
+  type: creature
+  tier: 1
+  description: A former invader broken and reshaped by the torture chamber. Serves loyally but with diminished capability.
+  cost: {}
+  stats:
+    hp: 20
+    attack: 8
+    defense: 5
+    speed: 8
+    workerEfficiency: 0.80
+  traits: []
+  restrictionTags:
+    - converted
+  fearModifier: 0
+  foodConsumptionRate: 1
+  corruptionGeneration: 0.1
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.4
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
