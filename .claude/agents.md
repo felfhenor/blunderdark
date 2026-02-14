@@ -81,8 +81,32 @@ For cross-cutting events (level-ups, season transitions, notifications):
 
 ### Adding Fields to GridTile
 
-1. Update `gridCreateEmpty()` in `grid.ts`
-2. Fix any `toEqual` assertions in `grid.spec.ts` that check tile structure
+1. Update `GridTile` type in `src/app/interfaces/grid.ts`
+2. Update `gridCreateEmpty()` in `grid.ts` with the new field's default
+3. Fix `toEqual` assertions in `grid.spec.ts` that check tile structure
+4. Update ALL GridTile object literals across helpers: `room-placement.ts`, `hallways.ts`
+5. Update ALL GridTile object literals across spec files: `grid.spec.ts`, `hallway-placement.spec.ts`, `hallways.spec.ts`, `room-placement.spec.ts`, `room-removal.spec.ts`, `traps.spec.ts` — use `replace_all` on the `hallwayId: undefined, connectionType:` pattern for efficiency
+6. If adding a new `TileOccupant` value, update the union type in `grid.ts`
+
+### Adding Fields to GameStateWorld
+
+When adding a field to `GameStateWorld` (e.g., `stairs: StairInstance[]`):
+1. Add to `GameStateWorld` interface in `state-game.ts`
+2. Add default in `defaultGameState()` in `defaults.ts`
+3. Add to `worldgenGenerateWorld()` return in `worldgen.ts`
+4. Add to ALL `makeGameState()` / world object literals in spec files (~10 files): `breeding-pits.spec.ts`, `dark-forge.spec.ts`, `production.spec.ts`, `research-progress.spec.ts`, `research-unlocks.spec.ts`, `spawning-pool.spec.ts`, `summoning-circle.spec.ts`, `torture-chamber.spec.ts`, `training.spec.ts`, `trap-workshop.spec.ts`
+5. Migration handled automatically by `merge(defaultGameState(), state)` in `migrate.ts`
+
+### Cross-Floor Feature Pattern (Stairs/Elevators/Portals)
+
+For features spanning multiple floors:
+1. Store globally in `GameStateWorld` (not per-floor) since they span two floors
+2. Mark grid tiles on BOTH connected floors via the per-floor grid
+3. Use BFS for connectivity queries (e.g., `stairFloorsAreConnected()`)
+4. Gate cross-floor inhabitant assignment on connectivity
+5. Travel time = `floorsTraversed * GAME_TIME_TICKS_PER_MINUTE`
+6. Filter traveling inhabitants from production calculations
+7. Process travel ticks in gameloop alongside other tick-based processes
 
 ### Adding Fields to Floor Type
 
