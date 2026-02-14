@@ -150,7 +150,7 @@ function makeInhabitant(
     instanceId: 'inh-1',
     definitionId: 'def-1',
     name: 'Worker',
-    state: 'idle',
+    state: 'normal',
     assignedRoomId: 'workshop-1',
     ...overrides,
   };
@@ -209,6 +209,8 @@ function makeGameState(overrides: {
       currentFloorIndex: 0,
       trapInventory: overrides.trapInventory ?? [],
       trapCraftingQueues: overrides.trapCraftingQueues ?? [],
+      forgeInventory: [],
+      forgeCraftingQueues: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
@@ -217,6 +219,12 @@ function makeGameState(overrides: {
         pendingSpecialInvasions: [],
         warningActive: false,
         warningDismissed: false,
+      },
+      corruptionEffects: {
+        darkUpgradeUnlocked: false,
+        lastMutationCorruption: undefined,
+        lastCrusadeCorruption: undefined,
+        warnedThresholds: [],
       },
     },
   };

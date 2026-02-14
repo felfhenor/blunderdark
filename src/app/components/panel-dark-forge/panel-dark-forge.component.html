@@ -1,0 +1,110 @@
+@if (forgeRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">Dark Forge</h3>
+
+      <!-- Active Queue -->
+      @if (queueState(); as qs) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Crafting Queue ({{ qs.jobs.length }}/{{ qs.maxSize }}):</h4>
+          <div class="flex flex-col gap-1">
+            @for (job of qs.jobs; track job.index) {
+              <div class="flex flex-col gap-1 p-1 bg-base-200 rounded">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs">{{ job.recipeName }}</span>
+                  <div class="flex items-center gap-1">
+                    @if (job.isActive) {
+                      <span class="badge badge-xs badge-warning">Forging</span>
+                    } @else {
+                      <span class="badge badge-xs badge-ghost">Queued</span>
+                    }
+                    <button
+                      class="btn btn-xs btn-ghost btn-circle"
+                      (click)="cancelJob(job.index)"
+                    >x</button>
+                  </div>
+                </div>
+                @if (job.isActive) {
+                  <progress
+                    class="progress progress-warning w-full"
+                    [value]="job.percent"
+                    max="100"
+                  ></progress>
+                  <span class="text-xs opacity-40">{{ job.percent }}%</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Assigned Workers -->
+      @if (assignedWorkers().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Workers:</h4>
+          <div class="flex flex-wrap gap-1">
+            @for (w of assignedWorkers(); track w.instanceId) {
+              <span class="badge badge-xs badge-outline">{{ w.defName }}</span>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="text-xs opacity-50 mt-2">No workers assigned.</p>
+      }
+
+      <!-- Available Recipes -->
+      @if (availableRecipes().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Recipes:</h4>
+          <div class="flex flex-col gap-2">
+            @for (entry of availableRecipes(); track entry.recipe.id) {
+              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold">{{ entry.recipe.name }}</span>
+                  <span class="badge badge-xs" [class.badge-info]="entry.recipe.category === 'equipment'" [class.badge-secondary]="entry.recipe.category === 'upgrade'">{{ entry.recipe.category }}</span>
+                </div>
+                <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
+                <span class="text-xs opacity-50">Cost: {{ formatCost(entry.recipe.cost) }}</span>
+                <span class="text-xs opacity-50">Time: {{ entry.timeMinutes }} min</span>
+                @if (entry.recipe.tier === 'advanced') {
+                  <span class="badge badge-xs badge-accent">Advanced</span>
+                }
+                @if (formatStatBonuses(entry.statBonuses); as bonusStr) {
+                  @if (bonusStr) {
+                    <span class="text-xs text-success">Bonuses: {{ bonusStr }}</span>
+                  }
+                }
+                <button
+                  class="btn btn-xs btn-warning mt-1"
+                  [disabled]="!entry.canAfford"
+                  (click)="startCrafting(entry.recipe.id, entry.ticks, entry.recipe.cost)"
+                >
+                  @if (entry.canAfford) {
+                    Start Crafting
+                  } @else {
+                    Not enough resources
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Forge Inventory -->
+      @if (forgeInventory().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Forge Inventory:</h4>
+          <div class="flex flex-col gap-1">
+            @for (item of forgeInventory(); track item.recipeId) {
+              <div class="flex items-center justify-between">
+                <span class="text-xs">{{ item.name }}</span>
+                <span class="badge badge-xs badge-outline">x{{ item.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

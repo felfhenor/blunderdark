@@ -2,6 +2,7 @@ export type ContentType =
   | 'abilityeffect'
   | 'breedingrecipe'
   | 'combatability'
+  | 'forgerecipe'
   | 'inhabitant'
   | 'invader'
   | 'invasion'

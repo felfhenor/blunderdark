@@ -88,6 +88,8 @@
   invasionProfile:
     dimension: wealth
     weight: 10
+  forgingAdjacencyEffects:
+    forgingSpeedBonus: 0.30
   adjacencyBonuses:
     - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.1
@@ -389,20 +391,47 @@
 
 - id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge
-  description: Smelts ores and crafts equipment. Produces gold when worked.
-  shapeId: aab0b609-237e-4689-bb42-eca45d796746
+  description: A blazing 2x2 forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
+  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  role: darkForge
   cost:
     gold: 60
     crystals: 20
   production:
     gold: 1.2
   requiresWorkers: true
+  maxInhabitants: 2
+  fearLevel: 2
   biomeBonuses:
     volcanic: 0.50
   adjacencyBonuses:
     - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
       bonus: 0.15
       description: Raw crystal ore fuels the forge's smelting process.
+  upgradePaths:
+    - id: e1f02001-0001-4001-8001-000000000001
+      name: Master Forge
+      description: Expand the forge to house more workers and speed up crafting by 25%.
+      cost:
+        gold: 120
+        crystals: 60
+      effects:
+        - type: maxInhabitantBonus
+          value: 2
+        - type: forgingSpeedMultiplier
+          value: 0.75
+    - id: e1f02001-0001-4001-8001-000000000002
+      name: Infernal Forge
+      description: Unlock advanced recipes and add +2 to all stat bonuses on forged items.
+      cost:
+        gold: 150
+        essence: 40
+        flux: 30
+      effects:
+        - type: forgingTierUnlock
+          value: 1
+        - type: forgingStatBonus
+          value: 2
 
 - id: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
   name: Underground Lake
@@ -603,6 +632,8 @@
   maxInhabitants: 4
   inhabitantRestriction: null
   fearLevel: 1
+  forgingAdjacencyEffects:
+    forgingStatBonus: 1
   adjacencyBonuses:
     - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
       bonus: 0.2
@@ -745,6 +776,8 @@
   maxInhabitants: 2
   inhabitantRestriction: null
   fearLevel: 2
+  forgingAdjacencyEffects:
+    forgingEffectivenessBonus: 0.20
   adjacencyBonuses:
     - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
       bonus: 0.2

@@ -60,4 +60,9 @@ export type RoomDefinition = {
     summonTimeReduction?: number;
     summonStatBonus?: number;
   };
+  forgingAdjacencyEffects?: {
+    forgingSpeedBonus?: number;
+    forgingStatBonus?: number;
+    forgingEffectivenessBonus?: number;
+  };
 };

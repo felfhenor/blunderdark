@@ -4,6 +4,7 @@ import type {
   CombatAbility,
   CompositionWeightConfig,
   ContentType,
+  ForgeRecipeContent,
   InhabitantDefinition,
   InvaderDefinition,
   IsContentItem,
@@ -27,6 +28,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   abilityeffect: ensureAbilityEffect,
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
+  forgerecipe: ensureForgeRecipe,
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
   invasion: ensureInvasion,
@@ -60,6 +62,22 @@ function ensureBreedingRecipe(
     resultName: recipe.resultName ?? '',
     statBonuses: recipe.statBonuses ?? {},
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
+  };
+}
+
+function ensureForgeRecipe(
+  recipe: Partial<ForgeRecipeContent & IsContentItem>,
+): ForgeRecipeContent & IsContentItem {
+  return {
+    id: (recipe.id ?? 'UNKNOWN') as ForgeRecipeContent['id'],
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'forgerecipe',
+    description: recipe.description ?? '',
+    category: recipe.category ?? 'equipment',
+    cost: recipe.cost ?? {},
+    timeMultiplier: recipe.timeMultiplier ?? 1.0,
+    statBonuses: recipe.statBonuses ?? {},
+    tier: recipe.tier ?? 'basic',
   };
 }
 
@@ -163,6 +181,7 @@ function ensureRoom(
     spawnCapacity: room.spawnCapacity ?? undefined,
     breedingAdjacencyEffects: room.breedingAdjacencyEffects ?? undefined,
     summoningAdjacencyEffects: room.summoningAdjacencyEffects ?? undefined,
+    forgingAdjacencyEffects: room.forgingAdjacencyEffects ?? undefined,
   };
 }
 

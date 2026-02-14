@@ -5,6 +5,7 @@ import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
 import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
+import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
@@ -32,6 +33,7 @@ import { optionsGet } from '@helpers';
     MoraleBarComponent,
     PanelAltarComponent,
     PanelBreedingPitsComponent,
+    PanelDarkForgeComponent,
     PanelFloorSelectorComponent,
     PanelHallwayInfoComponent,
     PanelReputationComponent,

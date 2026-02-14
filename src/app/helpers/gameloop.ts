@@ -13,6 +13,7 @@ import { researchProcess } from '@helpers/research-progress';
 import { trainingProcess } from '@helpers/training';
 import { breedingPitsProcess } from '@helpers/breeding-pits';
 import { spawningPoolProcess } from '@helpers/spawning-pool';
+import { darkForgeProcess } from '@helpers/dark-forge';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { debug } from '@helpers/logging';
@@ -73,6 +74,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     spawningPoolProcess(state);
     breedingPitsProcess(state);
     summoningCircleProcess(state);
+    darkForgeProcess(state);
     invasionTriggerProcessSchedule(state);
     hungerProcessWarnings(state);
     return state;

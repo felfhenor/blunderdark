@@ -65,6 +65,8 @@ export async function worldgenGenerateWorld(): Promise<
     currentFloorIndex: 0,
     trapInventory: [],
     trapCraftingQueues: [],
+    forgeInventory: [],
+    forgeCraftingQueues: [],
     invasionSchedule: defaultInvasionSchedule(),
     corruptionEffects: defaultCorruptionEffectState(),
     didFinish: true,

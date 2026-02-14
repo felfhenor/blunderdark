@@ -1,0 +1,84 @@
+- id: a1f01001-0001-4001-8001-000000000001
+  name: Iron Sword
+  description: A sturdy iron blade forged in dark fire. Grants a solid attack bonus to equipped inhabitants.
+  category: equipment
+  cost:
+    gold: 40
+    crystals: 20
+  timeMultiplier: 1.0
+  statBonuses:
+    attack: 3
+  tier: basic
+
+- id: a1f01001-0001-4001-8001-000000000002
+  name: Dark Shield
+  description: A shield infused with shadow essence. Provides reliable defense against invader attacks.
+  category: equipment
+  cost:
+    gold: 50
+    crystals: 15
+  timeMultiplier: 1.2
+  statBonuses:
+    defense: 3
+  tier: basic
+
+- id: a1f01001-0001-4001-8001-000000000003
+  name: Shadow Armor
+  description: Lightweight armor woven from shadow threads. Offers defense and resilience to the wearer.
+  category: equipment
+  cost:
+    gold: 60
+    crystals: 25
+  timeMultiplier: 1.5
+  statBonuses:
+    defense: 2
+    hp: 5
+  tier: basic
+
+- id: a1f01001-0001-4001-8001-000000000004
+  name: Reinforced Walls
+  description: Forge-hardened wall reinforcements that can be installed in any room for increased durability.
+  category: upgrade
+  cost:
+    gold: 80
+    crystals: 30
+  timeMultiplier: 2.0
+  statBonuses: {}
+  tier: basic
+
+- id: a1f01001-0001-4001-8001-000000000005
+  name: Enhanced Production Module
+  description: A mechanical augment that boosts resource output when installed in a production room.
+  category: upgrade
+  cost:
+    gold: 100
+    flux: 20
+  timeMultiplier: 2.5
+  statBonuses: {}
+  tier: basic
+
+- id: a1f01001-0001-4001-8001-000000000006
+  name: Infernal Blade
+  description: A fearsome weapon forged with infernal essence. Grants devastating attack power and swiftness.
+  category: equipment
+  cost:
+    gold: 120
+    essence: 40
+  timeMultiplier: 2.0
+  statBonuses:
+    attack: 6
+    speed: 2
+  tier: advanced
+
+- id: a1f01001-0001-4001-8001-000000000007
+  name: Abyssal Plate
+  description: Armor forged from abyssal metals, granting immense defense and resilience to the wearer.
+  category: equipment
+  cost:
+    gold: 150
+    essence: 50
+  timeMultiplier: 2.5
+  statBonuses:
+    defense: 6
+    hp: 10
+  tier: advanced

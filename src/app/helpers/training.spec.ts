@@ -276,6 +276,8 @@ function makeGameState(
       currentFloorIndex: 0,
       trapInventory: [],
       trapCraftingQueues: [],
+      forgeInventory: [],
+      forgeCraftingQueues: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
@@ -284,6 +286,12 @@ function makeGameState(
         pendingSpecialInvasions: [],
         warningActive: false,
         warningDismissed: false,
+      },
+      corruptionEffects: {
+        darkUpgradeUnlocked: false,
+        lastMutationCorruption: undefined,
+        lastCrusadeCorruption: undefined,
+        warnedThresholds: [],
       },
     },
   };

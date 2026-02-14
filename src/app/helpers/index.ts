@@ -13,6 +13,7 @@ export * from './content-initializers';
 export * from './corruption';
 export * from './corruption-effects';
 export * from './corruption-thresholds';
+export * from './dark-forge';
 export * from './day-night-modifiers';
 export * from './debug';
 export * from './defaults';
