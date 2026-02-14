@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Alchemy Lab defined in gamedata/room/base.yml with L-shaped layout (shapeId 1c224b76), role alchemyLab, fearLevel 2, maxInhabitants 1, 3 upgrade paths. Recipes in gamedata/alchemyrecipe/base.yml."
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Uses existing Small L-Shape (shapeId 1c224b76) which supports 4 rotations via the room shape system."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in alchemy-lab.ts. Input consumed at cycle start (inputConsumed flag), output produced at cycle end. Unit tested."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AlchemyConversion type in state-game.ts tracks roomId, recipeId, progress, targetTicks, inputConsumed. Continuous conversion auto-repeats. Base ticks from recipe baseTicks field."
     },
     {
       "id": "US-005",
@@ -77,8 +77,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Base maxInhabitants: 1. Expanded Capacity upgrade adds maxInhabitantBonus: 2 (total 3). Panel shows assigned worker count."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Panel-alchemy-lab component shows progress bar, input/output resources, recipe selection buttons, and active conversion status."
     },
     {
       "id": "US-007",
@@ -109,8 +109,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 upgrades in same tier (mutual exclusion): Efficient Distillation (alchemyCostMultiplier: 0.6), Advanced Alchemy (alchemyTierUnlock: 1), Expanded Capacity (maxInhabitantBonus: 2). All compile correctly."
     },
     {
       "id": "US-008",
@@ -123,8 +123,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Worker scaling: 25% reduction per extra worker beyond first, capped at 0.5 multiplier. Implemented in alchemyLabGetConversionTicks(). Unit tested."
     }
   ]
 }

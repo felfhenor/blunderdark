@@ -885,6 +885,24 @@ When adding build-time validation for a content type:
 - When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
 - `InhabitantState` valid values are `'normal' | 'scared' | 'hungry' | 'starving'` — do NOT use `'idle'` in test fixtures
 
+## Alchemy Lab System
+
+- `alchemy-lab.ts` helper: `alchemyLabProcess(state)` runs each tick inside `updateGamestate` — continuous conversion room (not queue-based like Dark Forge)
+- File-to-prefix: `alchemy-lab.ts` → `alchemyLab` / `ALCHEMY_LAB`
+- Alchemy Lab room is found via `roomRoleFindById('alchemyLab')` — no hardcoded ID
+- `ALCHEMY_LAB_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3` (15 ticks = 3 game-minutes)
+- New content type `alchemyrecipe` in `gamedata/alchemyrecipe/base.yml` — 3 recipes (1 basic, 2 advanced)
+- `AlchemyConversion[]` stored globally in `GameStateWorld.alchemyConversions` — one conversion per room (continuous cycle, not queue)
+- Conversion flow: consume input at cycle start → increment progress each tick → produce output on completion → reset cycle automatically
+- `inputConsumed` boolean on `AlchemyConversion` tracks whether resources were consumed for the current cycle — prevents double consumption
+- Recipe tier gating: base rooms only see `tier: 'basic'`; Advanced Alchemy upgrade unlocks `tier: 'advanced'` via `alchemyTierUnlock` effect
+- Worker speed scaling: 25% reduction per extra worker beyond first, capped at 0.5 multiplier (different from Dark Forge/Trap Workshop which use 20%/0.4)
+- Adjacency effects are data-driven via `alchemyAdjacencyEffects` field on `RoomDefinition` — `alchemySpeedBonus` (Crystal Mine, 0.20), `alchemyCostReduction` (Mushroom Grove, 0.15)
+- Upgrade effect types: `alchemyCostMultiplier` (Efficient Distillation, 0.6×), `alchemyTierUnlock` (Advanced Alchemy, unlocks advanced recipes), `maxInhabitantBonus` (Expanded Capacity, +2)
+- `alchemyLabCompleted$` RxJS Subject for cross-cutting event notifications — subscription-based testing fails with `vi.mock` + `await import()`, use side-effect verification instead
+- When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`; use `vi.mocked(contentGetEntriesByType)` pattern (not `require()`)
+- `PlacedRoom` type requires `shapeId` field — include it in test `makePlacedRoom()` helpers
+
 ## Miscellaneous
 
 - Use `rngChoice(array)` from `@helpers/rng` for equal-probability random selection
