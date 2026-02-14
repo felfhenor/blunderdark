@@ -181,6 +181,15 @@ When multiple placement modes are mutually exclusive (stairs, elevators, portals
 - Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
 - Room YAML upgrade paths are defined in YAML data only, never referenced by code
 
+### Tile-Level A* Pathfinding
+
+- `tilePathfindingFindPath(grid, start, end)` — A* on GridState with Manhattan heuristic, binary min-heap; returns `TileOffset[] | null`
+- `tilePathfindingFindRoomToRoomPath(floor, roomAId, roomBId)` — finds shortest empty-tile path between room edges; evaluates all edge-adjacent empty tile pairs; prefers fewer turns on equal-length paths
+- Uses `getRoomTilesFromGrid(grid, roomId)` to read room tiles directly from GridState (avoids content service dependency, keeping functions pure and testable without mocks)
+- Separate from room-level graph pathfinding (`pathfindingFindPath`) which uses Dijkstra on `DungeonGraph` nodes
+- Both tile-level functions live in `pathfinding.ts` alongside the room-level functions
+- `heapPush`/`heapPop` are private min-heap helpers with f-score primary sort and tie-breaker secondary sort
+
 ### Hallway Cost System
 
 - `HALLWAY_PLACEMENT_COST_PER_TILE = 5` (Crystals) — defined in `hallway-placement.ts`
