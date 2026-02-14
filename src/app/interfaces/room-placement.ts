@@ -13,7 +13,3 @@ export type PlacementValidationResult = {
   valid: boolean;
   errors: string[];
 };
-
-export type PreviewTile = TileOffset & {
-  inBounds: boolean;
-};

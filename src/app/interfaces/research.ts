@@ -60,12 +60,6 @@ export type ResearchNode = {
   requiredTicks: number;
 };
 
-export type ResearchTree = {
-  dark: ResearchNode[];
-  arcane: ResearchNode[];
-  engineering: ResearchNode[];
-};
-
 export type UnlockedContent = {
   rooms: RoomId[];
   inhabitants: InhabitantId[];
