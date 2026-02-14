@@ -36,7 +36,7 @@ export async function hallwayTileRemove(
     const updatedGrid = hallwayRemoveFromGrid(currentFloor.grid, hallway);
     const updatedHallways = hallwayRemove(currentFloor.hallways, hallwayId);
 
-    const floorWithoutConnections = connectionRemoveRoomFromFloor(currentFloor, hallwayId as PlacedRoomId);
+    const floorWithoutConnections = connectionRemoveRoomFromFloor(currentFloor, hallwayId as unknown as PlacedRoomId);
 
     const updatedFloors = [...state.world.floors];
     updatedFloors[floorIndex] = {

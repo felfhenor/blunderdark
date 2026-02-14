@@ -15,6 +15,7 @@ import type {
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
+import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import { Subject } from 'rxjs';
 import type { PRNG } from 'seedrandom';
 import type { MutationOutcome, BreedingCompletedEvent, MutationCompletedEvent } from '@interfaces/breeding';
@@ -212,7 +213,7 @@ export function breedingCreateHybrid(
 
   // Use parentA's definitionId as the base definition for the hybrid
   return {
-    instanceId: rngUuid(),
+    instanceId: rngUuid() as InhabitantInstanceId,
     definitionId: parentA.definitionId,
     name: `${recipe.resultName} ${suffix}`,
     state: 'normal',
@@ -229,7 +230,7 @@ export function breedingCreateHybrid(
       workerEfficiency: Math.round((stats.workerEfficiency - parentADef.stats.workerEfficiency) * 100) / 100,
     },
     isHybrid: true,
-    hybridParentIds: [parentA.definitionId, parentB.definitionId],
+    hybridParentIds: [parentA.definitionId as unknown as InhabitantInstanceId, parentB.definitionId as unknown as InhabitantInstanceId],
   };
 }
 

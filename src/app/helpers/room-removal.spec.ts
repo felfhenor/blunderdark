@@ -1,7 +1,7 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
 import { roomPlacementPlaceOnFloor, roomPlacementRemoveFromFloor } from '@helpers/room-placement';
 import { roomRemovalCalculateRefund } from '@helpers/room-removal';
-import type { Floor, InhabitantInstance, PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
+import type { Floor, FloorId, HallwayId, InhabitantInstance, PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // --- Mock contentGetEntry to control removable/cost for roomPlacementIsRemovable ---
@@ -22,7 +22,7 @@ vi.mock('@helpers/room-upgrades', () => ({
 // --- Test shapes ---
 
 const square2x2: RoomShape = {
-  id: 'square-2x2',
+  id: 'square-2x2' as RoomShapeId,
   name: 'Square 2x2',
   tiles: [
     { x: 0, y: 0 },
@@ -35,7 +35,7 @@ const square2x2: RoomShape = {
 };
 
 const square3x3: RoomShape = {
-  id: 'square-3x3',
+  id: 'square-3x3' as RoomShapeId,
   name: 'Square 3x3',
   tiles: [
     { x: 0, y: 0 },
@@ -60,7 +60,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -220,7 +220,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -247,14 +247,14 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const room1: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
       id: 'room-2' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -280,7 +280,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       occupied: true,
       occupiedBy: 'room',
       roomId: 'room-1' as PlacedRoomId,
-      hallwayId: 'hallway-1',
+      hallwayId: 'hallway-1' as HallwayId,
       stairId: undefined,
       elevatorId: undefined,
       portalId: undefined,
@@ -320,7 +320,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -345,7 +345,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -356,7 +356,7 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const newRoom: PlacedRoom = {
       id: 'room-new' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };

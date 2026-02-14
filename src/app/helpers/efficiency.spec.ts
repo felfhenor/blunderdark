@@ -8,7 +8,7 @@ vi.mock('@helpers/content', () => {
     name: 'Crystal Mine',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { crystals: 1.0 },
     requiresWorkers: true,
@@ -19,7 +19,7 @@ vi.mock('@helpers/content', () => {
     name: 'Mushroom Grove',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { food: 0.8 },
     requiresWorkers: true,
@@ -30,7 +30,7 @@ vi.mock('@helpers/content', () => {
     name: 'Barracks',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: {},
     requiresWorkers: false,
@@ -180,15 +180,19 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import type {
+  FloorId,
   InhabitantDefinition,
   InhabitantInstance,
+  InhabitantInstanceId,
   InhabitantTrait,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
   RoomProduction,
+  RoomShapeId,
 } from '@interfaces';
+import type { InhabitantId } from '@interfaces/content-inhabitant';
 import {
   efficiencyCalculateInhabitantContribution,
   efficiencyCalculateMatchedInhabitantBonus,
@@ -309,8 +313,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should calculate contribution for matching trait', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-goblin',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-goblin' as InhabitantId,
       name: 'Goblin',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -328,8 +332,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should return 0 trait bonus for non-matching trait', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-goblin',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-goblin' as InhabitantId,
       name: 'Goblin',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -344,8 +348,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should include workerEfficiency bonus regardless of trait match', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-myconid',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-myconid' as InhabitantId,
       name: 'Myconid',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -360,8 +364,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should return null for unknown definition', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-nonexistent',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-nonexistent' as InhabitantId,
       name: 'Unknown',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -372,8 +376,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should handle inhabitant with no efficiency traits', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-skeleton',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-skeleton' as InhabitantId,
       name: 'Skeleton',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -388,8 +392,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
 
   it('should apply "all" trait to any room', () => {
     const instance: InhabitantInstance = {
-      instanceId: 'inst-1',
-      definitionId: 'def-allbonus',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-allbonus' as InhabitantId,
       name: 'AllBonus Worker',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
@@ -408,7 +412,7 @@ describe('efficiencyCalculateRoom', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -416,7 +420,7 @@ describe('efficiencyCalculateRoom', () => {
   const mushroomGrove: PlacedRoom = {
     id: 'placed-grove-1' as PlacedRoomId,
     roomTypeId: 'room-mushroom-grove' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -424,7 +428,7 @@ describe('efficiencyCalculateRoom', () => {
   const barracks: PlacedRoom = {
     id: 'placed-barracks-1' as PlacedRoomId,
     roomTypeId: 'room-barracks' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -439,8 +443,8 @@ describe('efficiencyCalculateRoom', () => {
   it('should return correct multiplier for one matching worker', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -457,8 +461,8 @@ describe('efficiencyCalculateRoom', () => {
   it('should not apply mismatched trait bonus', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,
@@ -473,15 +477,15 @@ describe('efficiencyCalculateRoom', () => {
   it('should stack bonuses additively for multiple workers', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -497,15 +501,15 @@ describe('efficiencyCalculateRoom', () => {
   it('should handle mixed workers with different trait matches', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-myconid',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-myconid' as InhabitantId,
         name: 'Myconid',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -521,8 +525,8 @@ describe('efficiencyCalculateRoom', () => {
   it('should ignore inhabitants assigned to other rooms', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'other-room' as PlacedRoomId,
@@ -536,8 +540,8 @@ describe('efficiencyCalculateRoom', () => {
   it('should handle room with no production (barracks)', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-barracks-1' as PlacedRoomId,
@@ -553,8 +557,8 @@ describe('efficiencyCalculateRoom', () => {
   it('should handle worker with below-1.0 efficiency and no matching traits', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -571,7 +575,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -579,7 +583,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   const mushroomGrove: PlacedRoom = {
     id: 'placed-grove-1' as PlacedRoomId,
     roomTypeId: 'room-mushroom-grove' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -593,8 +597,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   it('should apply matching trait bonus', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -609,8 +613,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   it('should not apply mismatched trait bonus', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,
@@ -625,8 +629,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   it('should apply matching Myconid trait in food room', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-myconid',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-myconid' as InhabitantId,
         name: 'Myconid',
         state: 'normal',
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,
@@ -641,8 +645,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
   it('should apply "all" trait to any room', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-allbonus',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-allbonus' as InhabitantId,
         name: 'AllBonus',
         state: 'normal',
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -670,8 +674,8 @@ describe('efficiencyTotalBonusForResource', () => {
             rooms: [
               {
                 id: 'placed-mine-1',
-                roomTypeId: 'room-crystal-mine',
-                shapeId: 'shape-1',
+                roomTypeId: 'room-crystal-mine' as RoomId,
+                shapeId: 'shape-1' as RoomShapeId,
                 anchorX: 0,
                 anchorY: 0,
               },
@@ -679,8 +683,8 @@ describe('efficiencyTotalBonusForResource', () => {
             hallways: [],
             inhabitants: [
               {
-                instanceId: 'inst-1',
-                definitionId: 'def-goblin',
+                instanceId: 'inst-1' as InhabitantInstanceId,
+                definitionId: 'def-goblin' as InhabitantId,
                 name: 'Goblin',
                 state: 'normal',
                 assignedRoomId: 'placed-mine-1' as PlacedRoomId,
@@ -711,8 +715,8 @@ describe('efficiencyTotalBonusForResource', () => {
             rooms: [
               {
                 id: 'placed-mine-1',
-                roomTypeId: 'room-crystal-mine',
-                shapeId: 'shape-1',
+                roomTypeId: 'room-crystal-mine' as RoomId,
+                shapeId: 'shape-1' as RoomShapeId,
                 anchorX: 0,
                 anchorY: 0,
               },
@@ -744,15 +748,15 @@ describe('efficiencyTotalBonusForResource', () => {
             rooms: [
               {
                 id: 'placed-mine-1',
-                roomTypeId: 'room-crystal-mine',
-                shapeId: 'shape-1',
+                roomTypeId: 'room-crystal-mine' as RoomId,
+                shapeId: 'shape-1' as RoomShapeId,
                 anchorX: 0,
                 anchorY: 0,
               },
               {
                 id: 'placed-mine-2',
-                roomTypeId: 'room-crystal-mine',
-                shapeId: 'shape-1',
+                roomTypeId: 'room-crystal-mine' as RoomId,
+                shapeId: 'shape-1' as RoomShapeId,
                 anchorX: 4,
                 anchorY: 0,
               },
@@ -760,15 +764,15 @@ describe('efficiencyTotalBonusForResource', () => {
             hallways: [],
             inhabitants: [
               {
-                instanceId: 'inst-1',
-                definitionId: 'def-goblin',
+                instanceId: 'inst-1' as InhabitantInstanceId,
+                definitionId: 'def-goblin' as InhabitantId,
                 name: 'Goblin 1',
                 state: 'normal',
                 assignedRoomId: 'placed-mine-1' as PlacedRoomId,
               },
               {
-                instanceId: 'inst-2',
-                definitionId: 'def-goblin',
+                instanceId: 'inst-2' as InhabitantInstanceId,
+                definitionId: 'def-goblin' as InhabitantId,
                 name: 'Goblin 2',
                 state: 'normal',
                 assignedRoomId: 'placed-mine-2',

@@ -1,12 +1,15 @@
 import type {
   Floor,
+  FloorId,
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,7 +23,7 @@ const THRONE_ROOM_ID = 'room-throne-room';
 // --- Upgrade paths ---
 
 const reinforcedVaultPath: RoomUpgradePath = {
-  id: 'upgrade-reinforced-vault',
+  id: 'upgrade-reinforced-vault' as UpgradePathId,
   name: 'Reinforced Vault',
   description: 'Reinforce walls with enchanted steel.',
   cost: { gold: 150, crystals: 80 },
@@ -31,7 +34,7 @@ const reinforcedVaultPath: RoomUpgradePath = {
 };
 
 const investmentVaultPath: RoomUpgradePath = {
-  id: 'upgrade-investment-vault',
+  id: 'upgrade-investment-vault' as UpgradePathId,
   name: 'Investment Vault',
   description: 'Transform the vault into a financial hub.',
   cost: { gold: 200, crystals: 60 },
@@ -42,7 +45,7 @@ const investmentVaultPath: RoomUpgradePath = {
 };
 
 const dragonsHoardPath: RoomUpgradePath = {
-  id: 'upgrade-dragons-hoard',
+  id: 'upgrade-dragons-hoard' as UpgradePathId,
   name: "Dragon's Hoard",
   description: 'Amass a legendary treasure hoard.',
   cost: { gold: 180, crystals: 100, essence: 20 },
@@ -64,11 +67,11 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const treasureVaultRoom: RoomDefinition & IsContentItem = {
-  id: TREASURE_VAULT_ID,
+  id: TREASURE_VAULT_ID as RoomId,
   name: 'Treasure Vault',
   __type: 'room',
   description: 'A fortified 3x3 chamber for storing and growing gold.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: { gold: 120, crystals: 40 },
   production: { gold: 0.8 },
   requiresWorkers: false,
@@ -89,11 +92,11 @@ const treasureVaultRoom: RoomDefinition & IsContentItem = {
 };
 
 const darkForgeRoom: RoomDefinition & IsContentItem = {
-  id: DARK_FORGE_ID,
+  id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: { gold: 1.2 },
   requiresWorkers: true,
@@ -109,11 +112,11 @@ const darkForgeRoom: RoomDefinition & IsContentItem = {
 };
 
 const altarRoom: RoomDefinition & IsContentItem = {
-  id: ALTAR_ROOM_ID,
+  id: ALTAR_ROOM_ID as RoomId,
   name: 'Altar Room',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: { essence: 0.2 },
   requiresWorkers: false,
@@ -129,11 +132,11 @@ const altarRoom: RoomDefinition & IsContentItem = {
 };
 
 const throneRoom: RoomDefinition & IsContentItem = {
-  id: THRONE_ROOM_ID,
+  id: THRONE_ROOM_ID as RoomId,
   name: 'Throne Room',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -207,7 +210,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -224,7 +227,7 @@ function createPlacedVault(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-vault-1' as PlacedRoomId,
     roomTypeId: TREASURE_VAULT_ID as RoomId,
-    shapeId: 'shape-3x3',
+    shapeId: 'shape-3x3' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -287,7 +290,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
     const forge: PlacedRoom = {
       id: 'placed-forge-1' as PlacedRoomId,
       roomTypeId: DARK_FORGE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -305,7 +308,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
     const altar: PlacedRoom = {
       id: 'placed-altar-1' as PlacedRoomId,
       roomTypeId: ALTAR_ROOM_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -323,7 +326,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne-1' as PlacedRoomId,
       roomTypeId: THRONE_ROOM_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -341,7 +344,7 @@ describe('Treasure Vault: adjacency bonuses', () => {
     const vault2: PlacedRoom = {
       id: 'placed-vault-2' as PlacedRoomId,
       roomTypeId: TREASURE_VAULT_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -359,14 +362,14 @@ describe('Treasure Vault: adjacency bonuses', () => {
     const forge: PlacedRoom = {
       id: 'placed-forge-1' as PlacedRoomId,
       roomTypeId: DARK_FORGE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const altar: PlacedRoom = {
       id: 'placed-altar-1' as PlacedRoomId,
       roomTypeId: ALTAR_ROOM_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 0,
       anchorY: 3,
     };
@@ -421,7 +424,7 @@ describe('Treasure Vault: Investment Vault upgrade', () => {
 
   it('should change capacity from 1 to 2', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-investment-vault',
+      appliedUpgradePathId: 'upgrade-investment-vault' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
     expect(effective).toBe(2);
@@ -448,7 +451,7 @@ describe("Treasure Vault: Dragon's Hoard upgrade", () => {
 
   it('should not change capacity', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-dragons-hoard',
+      appliedUpgradePathId: 'upgrade-dragons-hoard' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
     expect(effective).toBe(1);
@@ -458,7 +461,7 @@ describe("Treasure Vault: Dragon's Hoard upgrade", () => {
 describe('Treasure Vault: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-reinforced-vault',
+      appliedUpgradePathId: 'upgrade-reinforced-vault' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-investment-vault');
     expect(result.valid).toBe(false);
@@ -477,7 +480,7 @@ describe('Treasure Vault: full production with adjacency', () => {
     const altar: PlacedRoom = {
       id: 'placed-altar-1' as PlacedRoomId,
       roomTypeId: ALTAR_ROOM_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };

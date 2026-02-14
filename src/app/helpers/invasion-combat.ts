@@ -2,6 +2,7 @@ import { combatResolve } from '@helpers/combat';
 import type {
   ActionResult,
   Combatant,
+  CombatantId,
   CombatantSide,
   TilePosition,
   TurnAction,
@@ -14,7 +15,7 @@ import type {
  * Create a combatant for the turn queue.
  */
 export function invasionCombatCreateCombatant(
-  id: string,
+  id: CombatantId,
   side: CombatantSide,
   name: string,
   stats: { hp: number; maxHp: number; attack: number; defense: number; speed: number },
@@ -230,7 +231,7 @@ export function invasionCombatGetAvailableActions(
  */
 export function invasionCombatExecuteMove(
   queue: TurnQueue,
-  actorId: string,
+  actorId: CombatantId,
   target: TilePosition,
 ): { queue: TurnQueue; result: ActionResult } {
   const updatedCombatants = queue.combatants.map((c) =>
@@ -256,8 +257,8 @@ export function invasionCombatExecuteMove(
  */
 export function invasionCombatExecuteAttack(
   queue: TurnQueue,
-  actorId: string,
-  targetId: string,
+  actorId: CombatantId,
+  targetId: CombatantId,
   rng: () => number,
 ): { queue: TurnQueue; result: ActionResult } {
   const attacker = queue.combatants.find((c) => c.id === actorId);
@@ -303,7 +304,7 @@ export function invasionCombatExecuteAttack(
 /**
  * Execute a wait action. Returns action result.
  */
-export function invasionCombatExecuteWait(actorId: string): ActionResult {
+export function invasionCombatExecuteWait(actorId: CombatantId): ActionResult {
   return {
     action: 'wait',
     actorId,
@@ -322,7 +323,7 @@ export function invasionCombatExecuteWait(actorId: string): ActionResult {
 export function invasionCombatResolveAiAction(
   actor: Combatant,
   allCombatants: Combatant[],
-): { action: TurnAction; targetId: string | undefined; targetPosition: TilePosition | undefined } {
+): { action: TurnAction; targetId: CombatantId | undefined; targetPosition: TilePosition | undefined } {
   // 1. Attack adjacent defender if possible
   const attackTargets = invasionCombatGetValidAttackTargets(actor, allCombatants);
   if (attackTargets.length > 0) {
@@ -368,7 +369,7 @@ export function invasionCombatExecuteAiTurn(
   if (!actor) {
     return {
       queue,
-      result: invasionCombatExecuteWait('unknown'),
+      result: invasionCombatExecuteWait('unknown' as CombatantId),
     };
   }
 

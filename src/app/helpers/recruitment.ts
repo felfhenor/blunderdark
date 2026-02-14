@@ -9,6 +9,7 @@ import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantDefinition,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   ResourceCost,
   ResourceType,
@@ -142,7 +143,7 @@ export async function recruitmentRecruit(
   }
 
   const instance: InhabitantInstance = {
-    instanceId: rngUuid(),
+    instanceId: rngUuid() as InhabitantInstanceId,
     definitionId: def.id,
     name: def.name,
     state: 'normal',

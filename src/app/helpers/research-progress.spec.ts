@@ -1,5 +1,6 @@
 import type {
   Floor,
+  FloorId,
   GameState,
   InhabitantInstance,
   IsContentItem,
@@ -9,15 +10,17 @@ import type {
   ResearchState,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
 } from '@interfaces';
+import type { ResearchId } from '@interfaces/content-research';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
 
-const NODE_DARK_FUNDAMENTALS_ID = 'aa000001-0001-0001-0001-000000000001';
-const NODE_SOUL_MANIPULATION_ID = 'aa000001-0001-0001-0001-000000000002';
-const NODE_SHADOW_MAGIC_ID = 'aa000001-0001-0001-0001-000000000003';
-const SHADOW_LIBRARY_ID = 'aa000001-0001-0001-0001-000000000010';
+const NODE_DARK_FUNDAMENTALS_ID = 'aa000001-0001-0001-0001-000000000001' as ResearchId;
+const NODE_SOUL_MANIPULATION_ID = 'aa000001-0001-0001-0001-000000000002' as ResearchId;
+const NODE_SHADOW_MAGIC_ID = 'aa000001-0001-0001-0001-000000000003' as ResearchId;
+const SHADOW_LIBRARY_ID = 'aa000001-0001-0001-0001-000000000010' as RoomId;
 
 // --- Mock content ---
 
@@ -125,11 +128,11 @@ const shadowMagicNode: ResearchNode & IsContentItem = {
 };
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
-  id: SHADOW_LIBRARY_ID,
+  id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
   description: '',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 80, crystals: 30 },
   production: { research: 0.6, corruption: 0.2 },
   requiresWorkers: true,
@@ -151,7 +154,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -331,7 +334,7 @@ describe('US-001: Start Research', () => {
 
     it('should block for unknown node ID', () => {
       const result = researchCanStart(
-        'nonexistent-id',
+        'nonexistent-id' as ResearchId,
         makeResearchState(),
       );
       expect(result.canStart).toBe(false);
@@ -418,7 +421,7 @@ describe('US-002: Research Tick Advancement', () => {
   it('should not advance for unknown research node', () => {
     const state = makeGameState({
       research: makeResearchState({
-        activeResearch: 'nonexistent-id',
+        activeResearch: 'nonexistent-id' as ResearchId,
         activeResearchProgress: 5,
       }),
     });
@@ -463,7 +466,7 @@ describe('US-003: Research Speed Modifiers', () => {
           {
             id: 'lib-1' as PlacedRoomId,
             roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-            shapeId: 'shape-l',
+            shapeId: 'shape-l' as RoomShapeId,
             anchorX: 0,
             anchorY: 0,
           },
@@ -480,14 +483,14 @@ describe('US-003: Research Speed Modifiers', () => {
           {
             id: 'lib-1' as PlacedRoomId,
             roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-            shapeId: 'shape-l',
+            shapeId: 'shape-l' as RoomShapeId,
             anchorX: 0,
             anchorY: 0,
           },
           {
             id: 'lib-2' as PlacedRoomId,
             roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-            shapeId: 'shape-l',
+            shapeId: 'shape-l' as RoomShapeId,
             anchorX: 5,
             anchorY: 0,
           },
@@ -513,7 +516,7 @@ describe('US-003: Research Speed Modifiers', () => {
           {
             id: 'lib-1' as PlacedRoomId,
             roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-            shapeId: 'shape-l',
+            shapeId: 'shape-l' as RoomShapeId,
             anchorX: 0,
             anchorY: 0,
           },

@@ -249,7 +249,7 @@ export class GridComponent {
       { dx: -1, dy: 0, dir: 'left', opposite: 'right' },
     ];
 
-    const hallwayIds = new Set(floor.hallways.map((h) => h.id));
+    const hallwayIds: Set<string> = new Set(floor.hallways.map((h) => h.id as string));
 
     for (const conn of floor.connections) {
       // Skip hallway connections — handled by hallwayDoorwayMap
@@ -303,8 +303,8 @@ export class GridComponent {
       // Build set of entity IDs actually connected to this hallway
       const connectedIds = new Set<string>();
       for (const conn of floor.connections) {
-        if (conn.roomAId === hallway.id) connectedIds.add(conn.roomBId);
-        else if (conn.roomBId === hallway.id) connectedIds.add(conn.roomAId);
+        if ((conn.roomAId as string) === (hallway.id as string)) connectedIds.add(conn.roomBId);
+        else if ((conn.roomBId as string) === (hallway.id as string)) connectedIds.add(conn.roomAId);
       }
 
       for (const tile of hallway.tiles) {

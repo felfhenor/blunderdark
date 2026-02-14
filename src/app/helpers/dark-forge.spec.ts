@@ -1,16 +1,22 @@
 import type {
   Floor,
+  FloorId,
   ForgeCraftingQueue,
   ForgeInventoryEntry,
   ForgeRecipeContent,
+  ForgeRecipeId,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,14 +25,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const DARK_FORGE_ID = 'ae673803-b514-4da9-a0d4-df448aa412a4';
 const CRYSTAL_MINE_ID = '9d9bddd6-cb51-4a9f-866d-cc4773bdec37';
 const TRAINING_GROUNDS_ID = '46b5aa14-f6c5-48db-a9dd-d1d070dfde56';
-const IRON_SWORD_ID = 'a1f01001-0001-4001-8001-000000000001';
-const DARK_SHIELD_ID = 'a1f01001-0001-4001-8001-000000000002';
-const INFERNAL_BLADE_ID = 'a1f01001-0001-4001-8001-000000000006';
+const IRON_SWORD_ID = 'a1f01001-0001-4001-8001-000000000001' as ForgeRecipeId;
+const DARK_SHIELD_ID = 'a1f01001-0001-4001-8001-000000000002' as ForgeRecipeId;
+const INFERNAL_BLADE_ID = 'a1f01001-0001-4001-8001-000000000006' as ForgeRecipeId;
 
 // --- Upgrade paths ---
 
 const masterForgePath: RoomUpgradePath = {
-  id: 'e1f02001-0001-4001-8001-000000000001',
+  id: 'e1f02001-0001-4001-8001-000000000001' as UpgradePathId,
   name: 'Master Forge',
   description: 'Expand forge capacity and speed.',
   cost: { gold: 120, crystals: 60 },
@@ -37,7 +43,7 @@ const masterForgePath: RoomUpgradePath = {
 };
 
 const infernalForgePath: RoomUpgradePath = {
-  id: 'e1f02001-0001-4001-8001-000000000002',
+  id: 'e1f02001-0001-4001-8001-000000000002' as UpgradePathId,
   name: 'Infernal Forge',
   description: 'Unlock advanced recipes.',
   cost: { gold: 150, essence: 40, flux: 30 },
@@ -122,11 +128,11 @@ const infernalBladeRecipe: ForgeRecipeContent & IsContentItem = {
 // --- Room definitions ---
 
 const forgeDef: RoomDefinition & IsContentItem = {
-  id: DARK_FORGE_ID,
+  id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
   description: 'Forges items.',
-  shapeId: 'shape-2x2',
+  shapeId: 'shape-2x2' as RoomShapeId,
   cost: { gold: 60, crystals: 20 },
   production: { gold: 1.2 },
   requiresWorkers: true,
@@ -143,11 +149,11 @@ const forgeDef: RoomDefinition & IsContentItem = {
 };
 
 const crystalMineDef: RoomDefinition & IsContentItem = {
-  id: CRYSTAL_MINE_ID,
+  id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
   description: 'Mines crystals.',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 50 },
   production: { crystals: 1.0 },
   requiresWorkers: true,
@@ -164,11 +170,11 @@ const crystalMineDef: RoomDefinition & IsContentItem = {
 };
 
 const trainingGroundsDef: RoomDefinition & IsContentItem = {
-  id: TRAINING_GROUNDS_ID,
+  id: TRAINING_GROUNDS_ID as RoomId,
   name: 'Training Grounds',
   __type: 'room',
   description: 'Training.',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: { gold: 80, crystals: 30 },
   production: {},
   requiresWorkers: false,
@@ -190,7 +196,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'forge-1' as PlacedRoomId,
     roomTypeId: DARK_FORGE_ID as RoomId,
-    shapeId: 'shape-2x2',
+    shapeId: 'shape-2x2' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -201,8 +207,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inh-1',
-    definitionId: 'def-1',
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: 'def-1' as InhabitantId,
     name: 'Worker',
     state: 'normal',
     assignedRoomId: 'forge-1' as PlacedRoomId,
@@ -215,7 +221,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -665,11 +671,11 @@ describe('darkForgeProcess', () => {
   it('should process multiple forges across floors', () => {
     const forge1 = makeRoom({ id: 'forge-1' as PlacedRoomId });
     const forge2 = makeRoom({ id: 'forge-2' as PlacedRoomId });
-    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'forge-1' as PlacedRoomId });
-    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'forge-2' as PlacedRoomId });
+    const w1 = makeInhabitant({ instanceId: 'w1' as InhabitantInstanceId, assignedRoomId: 'forge-1' as PlacedRoomId });
+    const w2 = makeInhabitant({ instanceId: 'w2' as InhabitantInstanceId, assignedRoomId: 'forge-2' as PlacedRoomId });
     const floor1 = makeFloor([forge1], [w1]);
     const floor2 = makeFloor([forge2], [w2]);
-    floor2.id = 'floor-2';
+    floor2.id = 'floor-2' as FloorId;
 
     const state = makeGameState({
       floors: [floor1, floor2],

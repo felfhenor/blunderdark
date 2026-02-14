@@ -8,7 +8,9 @@ import { rngRandom, rngUuid } from '@helpers/rng';
 import type {
   CapturedPrisoner,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   InvaderClassType,
   IsContentItem,
   PlacedRoom,
@@ -161,8 +163,8 @@ export function tortureCreateConvertedInhabitant(
   prisoner: CapturedPrisoner,
 ): InhabitantInstance {
   return {
-    instanceId: rngUuid(),
-    definitionId: CONVERTED_PRISONER_DEF_ID,
+    instanceId: rngUuid() as InhabitantInstanceId,
+    definitionId: CONVERTED_PRISONER_DEF_ID as InhabitantId,
     name: `${prisoner.name} (Converted)`,
     state: 'normal',
     assignedRoomId: undefined,

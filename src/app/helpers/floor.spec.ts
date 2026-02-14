@@ -7,7 +7,7 @@ import {
   floorGetCreationCost,
   floorMigrate,
 } from '@helpers/floor';
-import type { Floor } from '@interfaces';
+import type { Floor, FloorId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGamestate = vi.fn();
@@ -45,7 +45,7 @@ vi.mock('@helpers/grid', () => ({
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -61,9 +61,9 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
 const threeFloorState = () => ({
   world: {
     floors: [
-      makeFloor({ id: 'floor-1', name: 'Floor 1', depth: 1, biome: 'neutral' }),
-      makeFloor({ id: 'floor-2', name: 'Floor 2', depth: 2, biome: 'volcanic' }),
-      makeFloor({ id: 'floor-3', name: 'Floor 3', depth: 3, biome: 'crystal' }),
+      makeFloor({ id: 'floor-1' as FloorId, name: 'Floor 1', depth: 1, biome: 'neutral' }),
+      makeFloor({ id: 'floor-2' as FloorId, name: 'Floor 2', depth: 2, biome: 'volcanic' }),
+      makeFloor({ id: 'floor-3' as FloorId, name: 'Floor 3', depth: 3, biome: 'crystal' }),
     ],
     currentFloorIndex: 0,
   },
@@ -168,7 +168,7 @@ describe('floorCanCreate', () => {
     mockGamestate.mockReturnValue({
       world: {
         floors: Array.from({ length: 10 }, (_, i) =>
-          makeFloor({ id: `floor-${i + 1}`, depth: i + 1 }),
+          makeFloor({ id: `floor-${i + 1}` as FloorId, depth: i + 1 }),
         ),
         currentFloorIndex: 0,
       },
@@ -215,7 +215,7 @@ describe('floorCreate', () => {
     mockGamestate.mockReturnValue({
       world: {
         floors: Array.from({ length: 10 }, (_, i) =>
-          makeFloor({ id: `floor-${i + 1}`, depth: i + 1 }),
+          makeFloor({ id: `floor-${i + 1}` as FloorId, depth: i + 1 }),
         ),
         currentFloorIndex: 0,
       },
@@ -289,8 +289,8 @@ describe('floorMigrate', () => {
 
   it('should preserve existing floors when present', () => {
     const floors = [
-      makeFloor({ id: 'f1', depth: 1, biome: 'volcanic' }),
-      makeFloor({ id: 'f2', depth: 2, biome: 'crystal' }),
+      makeFloor({ id: 'f1' as FloorId, depth: 1, biome: 'volcanic' }),
+      makeFloor({ id: 'f2' as FloorId, depth: 2, biome: 'crystal' }),
     ];
 
     const result = floorMigrate({ floors });
@@ -302,7 +302,7 @@ describe('floorMigrate', () => {
   });
 
   it('should fill missing fields on saved floors with defaults', () => {
-    const partialFloor = { id: 'f1', depth: 2 } as unknown as Floor;
+    const partialFloor = { id: 'f1' as FloorId, depth: 2 } as unknown as Floor;
     const result = floorMigrate({ floors: [partialFloor] });
     expect(result.floors[0].id).toBe('f1');
     expect(result.floors[0].depth).toBe(2);
@@ -312,22 +312,22 @@ describe('floorMigrate', () => {
   });
 
   it('should clamp floorCurrentIndex to valid range', () => {
-    const floors = [makeFloor({ id: 'f1', depth: 1 })];
+    const floors = [makeFloor({ id: 'f1' as FloorId, depth: 1 })];
     const result = floorMigrate({ floors, currentFloorIndex: 5 });
     expect(result.currentFloorIndex).toBe(0);
   });
 
   it('should clamp negative floorCurrentIndex to 0', () => {
-    const floors = [makeFloor({ id: 'f1', depth: 1 })];
+    const floors = [makeFloor({ id: 'f1' as FloorId, depth: 1 })];
     const result = floorMigrate({ floors, currentFloorIndex: -1 });
     expect(result.currentFloorIndex).toBe(0);
   });
 
   it('should preserve valid floorCurrentIndex', () => {
     const floors = [
-      makeFloor({ id: 'f1', depth: 1 }),
-      makeFloor({ id: 'f2', depth: 2 }),
-      makeFloor({ id: 'f3', depth: 3 }),
+      makeFloor({ id: 'f1' as FloorId, depth: 1 }),
+      makeFloor({ id: 'f2' as FloorId, depth: 2 }),
+      makeFloor({ id: 'f3' as FloorId, depth: 3 }),
     ];
     const result = floorMigrate({ floors, currentFloorIndex: 2 });
     expect(result.currentFloorIndex).toBe(2);
@@ -335,7 +335,7 @@ describe('floorMigrate', () => {
 
   it('should not mutate input data', () => {
     const original = {
-      floors: [makeFloor({ id: 'f1', depth: 1 })],
+      floors: [makeFloor({ id: 'f1' as FloorId, depth: 1 })],
       currentFloorIndex: 0,
     };
     const floorsCopy = JSON.parse(JSON.stringify(original));

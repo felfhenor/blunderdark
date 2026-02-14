@@ -3,6 +3,7 @@ import { rngUuid } from '@helpers/rng';
 import type {
   CorruptionEffectState,
   Floor,
+  FloorId,
   GameId,
   GameState,
   InvasionSchedule,
@@ -104,7 +105,7 @@ export function defaultFloor(
   biome: Floor['biome'] = 'neutral',
 ): Floor {
   return {
-    id: rngUuid(),
+    id: rngUuid() as FloorId,
     name: `Floor ${depth}`,
     depth,
     biome,

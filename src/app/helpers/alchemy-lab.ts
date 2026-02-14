@@ -7,6 +7,7 @@ import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   AlchemyConversion,
   AlchemyRecipeContent,
+  AlchemyRecipeId,
   GameState,
   IsContentItem,
   PlacedRoom,
@@ -122,7 +123,7 @@ export function alchemyLabGetConversion(
 export function alchemyLabStartConversion(
   conversions: AlchemyConversion[],
   roomId: PlacedRoomId,
-  recipeId: string,
+  recipeId: AlchemyRecipeId,
   targetTicks: number,
 ): AlchemyConversion[] {
   // Remove any existing conversion for this room

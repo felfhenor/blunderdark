@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { InvasionId, InvasionObjectiveId, InvaderInstanceId, InvaderId } from '@interfaces';
 import type { InvasionState } from '@interfaces/invasion';
 import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
@@ -57,8 +58,8 @@ vi.mock('@helpers/invasion-objectives', () => ({
 
 function makeInvader(id: string, hp = 10): InvaderInstance {
   return {
-    id,
-    definitionId: 'def-1',
+    id: id as InvaderInstanceId,
+    definitionId: 'def-1' as InvaderId,
     currentHp: hp,
     maxHp: hp,
     statusEffects: [],
@@ -68,7 +69,7 @@ function makeInvader(id: string, hp = 10): InvaderInstance {
 
 function makePrimaryObjective(completed = false): InvasionObjective {
   return {
-    id: 'obj-primary',
+    id: 'obj-primary' as InvasionObjectiveId,
     type: 'DestroyAltar',
     name: 'Destroy Altar',
     description: 'Destroy the altar.',
@@ -84,7 +85,7 @@ function makeSecondaryObjective(
   completed = false,
 ): InvasionObjective {
   return {
-    id: `obj-${type}`,
+    id: `obj-${type}` as InvasionObjectiveId,
     type,
     name: type,
     description: `${type} objective.`,
@@ -97,7 +98,7 @@ function makeSecondaryObjective(
 
 function makeInvasionState(overrides: Partial<InvasionState> = {}): InvasionState {
   return {
-    invasionId: 'inv-1',
+    invasionId: 'inv-1' as InvasionId,
     currentTurn: 0,
     maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
     altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
@@ -545,7 +546,7 @@ describe('invasion-win-loss', () => {
   describe('invasionWinLossCreateHistoryEntry', () => {
     it('should create history entry from detailed result', () => {
       const result: ReturnType<typeof invasionWinLossResolveDetailedResult> = {
-        invasionId: 'inv-1',
+        invasionId: 'inv-1' as InvasionId,
         day: 42,
         outcome: 'victory',
         endReason: 'all_invaders_eliminated',
@@ -574,7 +575,7 @@ describe('invasion-win-loss', () => {
 
     it('should create defeat history entry', () => {
       const result: ReturnType<typeof invasionWinLossResolveDetailedResult> = {
-        invasionId: 'inv-2',
+        invasionId: 'inv-2' as InvasionId,
         day: 50,
         outcome: 'defeat',
         endReason: 'altar_destroyed',

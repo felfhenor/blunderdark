@@ -20,6 +20,7 @@ import type {
   InhabitantDefinition,
   InvaderClassType,
   IsContentItem,
+  PrisonerId,
 } from '@interfaces';
 
 @Component({
@@ -155,7 +156,7 @@ export class PanelTortureChamberComponent {
     return ticks / GAME_TIME_TICKS_PER_MINUTE;
   }
 
-  public async startExtraction(prisonerId: string): Promise<void> {
+  public async startExtraction(prisonerId: PrisonerId): Promise<void> {
     const room = this.tortureRoom();
     if (!room) return;
 
@@ -182,7 +183,7 @@ export class PanelTortureChamberComponent {
     });
   }
 
-  public async startConversion(prisonerId: string): Promise<void> {
+  public async startConversion(prisonerId: PrisonerId): Promise<void> {
     const room = this.tortureRoom();
     if (!room) return;
 

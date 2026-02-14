@@ -7,6 +7,7 @@ import type {
   GameState,
   InhabitantDefinition,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   RoomDefinition,
@@ -95,7 +96,7 @@ export function spawningPoolCreateInhabitant(
   const suffixes = ['the Bold', 'the Meek', 'the Swift', 'the Cunning', 'the Lucky', 'the Brave'];
   const suffix = rngChoice(suffixes);
   return {
-    instanceId: rngUuid(),
+    instanceId: rngUuid() as InhabitantInstanceId,
     definitionId: def.id,
     name: `${def.name} ${suffix}`,
     state: 'normal',

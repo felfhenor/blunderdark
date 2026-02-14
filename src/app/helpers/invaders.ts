@@ -5,10 +5,13 @@ import type {
   CombatAbility,
   IsContentItem,
 } from '@interfaces';
+import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { CombatantId } from '@interfaces/invasion';
 import type {
   AbilityResult,
   InvaderDefinition,
   InvaderInstance,
+  InvaderInstanceId,
 } from '@interfaces/invader';
 
 // --- Content access ---
@@ -30,7 +33,7 @@ export function invaderCreateInstance(
   definition: InvaderDefinition,
 ): InvaderInstance {
   return {
-    id: rngUuid(),
+    id: rngUuid() as InvaderInstanceId,
     definitionId: definition.id,
     currentHp: definition.baseStats.hp,
     maxHp: definition.baseStats.hp,
@@ -38,7 +41,7 @@ export function invaderCreateInstance(
     abilityStates: definition.combatAbilityIds.map((abilityName) => {
       const ability = contentGetEntry<CombatAbility & IsContentItem>(abilityName);
       return {
-        abilityId: ability?.id ?? abilityName,
+        abilityId: (ability?.id ?? abilityName) as CombatAbilityId,
         currentCooldown: 0,
         isActive: false,
         remainingDuration: 0,
@@ -57,7 +60,7 @@ export function invaderCreateInstance(
 export function invaderResolveAbility(
   invader: InvaderInstance,
   ability: CombatAbility,
-  targetIds: string[],
+  targetIds: CombatantId[],
   rng: () => number = Math.random,
 ): AbilityResult | undefined {
   // Check cooldown
@@ -97,9 +100,9 @@ export function invaderResolveAbility(
   // courage, dispel: value stays 0
 
   // Determine affected targets
-  const affectedTargetIds: string[] = [];
+  const affectedTargetIds: CombatantId[] = [];
   if (ability.targetType === 'self') {
-    affectedTargetIds.push(invader.id);
+    affectedTargetIds.push(invader.id as unknown as CombatantId);
   } else if (ability.targetType === 'aoe') {
     affectedTargetIds.push(...targetIds);
   } else if (targetIds.length > 0) {

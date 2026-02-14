@@ -1,4 +1,7 @@
+import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
+
+export type HallwayId = Branded<string, 'HallwayId'>;
 
 export type HallwayUpgrade = {
   id: string;
@@ -6,7 +9,7 @@ export type HallwayUpgrade = {
 };
 
 export type Hallway = {
-  id: string;
+  id: HallwayId;
   startRoomId?: PlacedRoomId;
   endRoomId?: PlacedRoomId;
   tiles: TileOffset[];

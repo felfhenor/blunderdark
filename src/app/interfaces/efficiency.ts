@@ -1,3 +1,5 @@
+import type { InhabitantInstanceId } from '@interfaces/inhabitant';
+
 export type EfficiencyTrait = {
   traitName: string;
   effectValue: number;
@@ -5,7 +7,7 @@ export type EfficiencyTrait = {
 };
 
 export type InhabitantContribution = {
-  instanceId: string;
+  instanceId: InhabitantInstanceId;
   name: string;
   workerEfficiencyBonus: number;
   traitBonuses: Array<{

@@ -7,6 +7,7 @@ import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import type {
   GameState,
   IsContentItem,
+  ResearchId,
   ResearchNode,
   ResearchState,
   RoomDefinition,
@@ -47,7 +48,7 @@ export function researchArePrerequisitesMet(
  * Returns { canStart, error? } for UI feedback.
  */
 export function researchCanStart(
-  nodeId: string,
+  nodeId: ResearchId,
   research: ResearchState,
 ): { canStart: boolean; error?: string } {
   if (research.activeResearch) {
@@ -81,7 +82,7 @@ export function researchCanStart(
  * Start research on a node. Validates prerequisites and deducts resources.
  */
 export async function researchStart(
-  nodeId: string,
+  nodeId: ResearchId,
 ): Promise<{ success: boolean; error?: string }> {
   const state = gamestate();
   const validation = researchCanStart(nodeId, state.world.research);

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { CombatantId } from '@interfaces';
 import type { Combatant, TilePosition, TurnQueue } from '@interfaces/invasion';
 import {
   invasionCombatAdvanceTurn,
@@ -28,7 +29,7 @@ function makeDefender(
   position: TilePosition | undefined = undefined,
   hp = 20,
 ): Combatant {
-  return invasionCombatCreateCombatant(id, 'defender', `Defender ${id}`, {
+  return invasionCombatCreateCombatant(id as CombatantId, 'defender', `Defender ${id}`, {
     hp,
     maxHp: 20,
     attack: 8,
@@ -43,7 +44,7 @@ function makeInvader(
   position: TilePosition | undefined = undefined,
   hp = 15,
 ): Combatant {
-  return invasionCombatCreateCombatant(id, 'invader', `Invader ${id}`, {
+  return invasionCombatCreateCombatant(id as CombatantId, 'invader', `Invader ${id}`, {
     hp,
     maxHp: 15,
     attack: 6,
@@ -61,7 +62,7 @@ function fixedRng(value: number): () => number {
 describe('invasion-combat', () => {
   describe('invasionCombatCreateCombatant', () => {
     it('should create a combatant with correct fields', () => {
-      const c = invasionCombatCreateCombatant('c1', 'defender', 'Goblin', {
+      const c = invasionCombatCreateCombatant('c1' as CombatantId, 'defender', 'Goblin', {
         hp: 20, maxHp: 20, attack: 8, defense: 5, speed: 3,
       }, { x: 5, y: 3 });
 
@@ -78,7 +79,7 @@ describe('invasion-combat', () => {
     });
 
     it('should allow undefined position', () => {
-      const c = invasionCombatCreateCombatant('c1', 'invader', 'Warrior', {
+      const c = invasionCombatCreateCombatant('c1' as CombatantId, 'invader', 'Warrior', {
         hp: 15, maxHp: 15, attack: 6, defense: 4, speed: 2,
       }, undefined);
       expect(c.position).toBeUndefined();
@@ -402,7 +403,7 @@ describe('invasion-combat', () => {
   describe('invasionCombatExecuteMove', () => {
     it('should update combatant position', () => {
       const queue = invasionCombatBuildTurnQueue([makeDefender('d1', 5, { x: 5, y: 5 })]);
-      const { queue: updated, result } = invasionCombatExecuteMove(queue, 'd1', { x: 5, y: 4 });
+      const { queue: updated, result } = invasionCombatExecuteMove(queue, 'd1' as CombatantId, { x: 5, y: 4 });
 
       expect(updated.combatants[0].position).toEqual({ x: 5, y: 4 });
       expect(result.action).toBe('move');
@@ -413,7 +414,7 @@ describe('invasion-combat', () => {
 
     it('should not mutate original queue', () => {
       const queue = invasionCombatBuildTurnQueue([makeDefender('d1', 5, { x: 5, y: 5 })]);
-      invasionCombatExecuteMove(queue, 'd1', { x: 5, y: 4 });
+      invasionCombatExecuteMove(queue, 'd1' as CombatantId, { x: 5, y: 4 });
       expect(queue.combatants[0].position).toEqual({ x: 5, y: 5 });
     });
   });
@@ -425,7 +426,7 @@ describe('invasion-combat', () => {
         makeInvader('i1', 3, { x: 5, y: 4 }),
       ]);
       // Fixed rng = 0.95 => roll = 20 (natural 20, always hits)
-      const { queue: updated, result } = invasionCombatExecuteAttack(queue, 'd1', 'i1', fixedRng(0.95));
+      const { queue: updated, result } = invasionCombatExecuteAttack(queue, 'd1' as CombatantId, 'i1' as CombatantId, fixedRng(0.95));
 
       expect(result.action).toBe('attack');
       expect(result.actorId).toBe('d1');
@@ -443,7 +444,7 @@ describe('invasion-combat', () => {
         makeInvader('i1', 3, { x: 5, y: 4 }),
       ]);
       // Fixed rng = 0 => roll = 1 (natural 1, always misses)
-      const { result } = invasionCombatExecuteAttack(queue, 'd1', 'i1', fixedRng(0));
+      const { result } = invasionCombatExecuteAttack(queue, 'd1' as CombatantId, 'i1' as CombatantId, fixedRng(0));
 
       expect(result.combatResult!.hit).toBe(false);
       expect(result.combatResult!.damage).toBe(0);
@@ -454,20 +455,20 @@ describe('invasion-combat', () => {
         makeDefender('d1', 5, { x: 5, y: 5 }),
         makeInvader('i1', 3, { x: 5, y: 4 }),
       ]);
-      invasionCombatExecuteAttack(queue, 'd1', 'i1', fixedRng(0.95));
+      invasionCombatExecuteAttack(queue, 'd1' as CombatantId, 'i1' as CombatantId, fixedRng(0.95));
       expect(queue.combatants.find((c) => c.id === 'i1')!.hp).toBe(15);
     });
 
     it('should handle unknown attacker gracefully', () => {
       const queue = invasionCombatBuildTurnQueue([makeDefender('d1', 5)]);
-      const { result } = invasionCombatExecuteAttack(queue, 'nonexistent', 'd1', fixedRng(0.5));
+      const { result } = invasionCombatExecuteAttack(queue, 'nonexistent' as CombatantId, 'd1' as CombatantId, fixedRng(0.5));
       expect(result.combatResult).toBeUndefined();
     });
   });
 
   describe('invasionCombatExecuteWait', () => {
     it('should return a wait action result', () => {
-      const result = invasionCombatExecuteWait('d1');
+      const result = invasionCombatExecuteWait('d1' as CombatantId);
       expect(result.action).toBe('wait');
       expect(result.actorId).toBe('d1');
       expect(result.targetId).toBeUndefined();
@@ -582,7 +583,7 @@ describe('invasion-combat', () => {
       ]);
 
       // d1 attacks i1 with a guaranteed hit
-      const { queue: afterAttack } = invasionCombatExecuteAttack(queue, 'd1', 'i1', fixedRng(0.95));
+      const { queue: afterAttack } = invasionCombatExecuteAttack(queue, 'd1' as CombatantId, 'i1' as CombatantId, fixedRng(0.95));
       const i1 = afterAttack.combatants.find((c) => c.id === 'i1');
 
       // If i1 died from the attack

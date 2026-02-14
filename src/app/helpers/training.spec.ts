@@ -1,13 +1,18 @@
 import type {
   Floor,
+  FloorId,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,7 +26,7 @@ const ALTAR_ID = 'aa100001-0001-0001-0001-000000000009';
 // --- Upgrade paths ---
 
 const eliteTrainingPath: RoomUpgradePath = {
-  id: 'upgrade-elite-training',
+  id: 'upgrade-elite-training' as UpgradePathId,
   name: 'Elite Training',
   description: 'Grants +1 attack, training takes 20% longer.',
   cost: { gold: 100, crystals: 50, essence: 20 },
@@ -32,7 +37,7 @@ const eliteTrainingPath: RoomUpgradePath = {
 };
 
 const massTrainingPath: RoomUpgradePath = {
-  id: 'upgrade-mass-training',
+  id: 'upgrade-mass-training' as UpgradePathId,
   name: 'Mass Training',
   description: 'Increases capacity and reduces training time.',
   cost: { gold: 80, crystals: 30 },
@@ -43,7 +48,7 @@ const massTrainingPath: RoomUpgradePath = {
 };
 
 const specializedDrillsPath: RoomUpgradePath = {
-  id: 'upgrade-specialized-drills',
+  id: 'upgrade-specialized-drills' as UpgradePathId,
   name: 'Specialized Drills',
   description: 'Grants an extra +1 defense bonus.',
   cost: { gold: 120, crystals: 60, essence: 30 },
@@ -70,11 +75,11 @@ vi.mock('@helpers/room-roles', () => ({
 }));
 
 const trainingGroundsRoom: RoomDefinition & IsContentItem = {
-  id: TRAINING_GROUNDS_ID,
+  id: TRAINING_GROUNDS_ID as RoomId,
   name: 'Training Grounds',
   __type: 'room',
   description: 'A combat training facility.',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: { gold: 80, crystals: 30 },
   production: {},
   requiresWorkers: false,
@@ -94,11 +99,11 @@ const trainingGroundsRoom: RoomDefinition & IsContentItem = {
 };
 
 const barracksRoom: RoomDefinition & IsContentItem = {
-  id: BARRACKS_ID,
+  id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',
   description: '',
-  shapeId: 'shape-i',
+  shapeId: 'shape-i' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -115,11 +120,11 @@ const barracksRoom: RoomDefinition & IsContentItem = {
 };
 
 const altarRoom: RoomDefinition & IsContentItem = {
-  id: ALTAR_ID,
+  id: ALTAR_ID as RoomId,
   name: 'Altar Room',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -205,7 +210,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -224,7 +229,7 @@ function createPlacedTrainingGrounds(
   return {
     id: 'placed-tg-1' as PlacedRoomId,
     roomTypeId: TRAINING_GROUNDS_ID as RoomId,
-    shapeId: 'shape-t',
+    shapeId: 'shape-t' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -235,8 +240,8 @@ function createInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inst-1',
-    definitionId: 'def-goblin',
+    instanceId: 'inst-1' as InhabitantInstanceId,
+    definitionId: 'def-goblin' as InhabitantId,
     name: 'Goblin 1',
     state: 'normal',
     assignedRoomId: undefined,
@@ -375,7 +380,7 @@ describe('Training Grounds: training ticks', () => {
 
   it('should apply Mass Training time reduction (0.7x)', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-mass-training',
+      appliedUpgradePathId: 'upgrade-mass-training' as UpgradePathId,
     });
     const ticks = trainingGetTicksForRoom(room, new Set());
     expect(ticks).toBe(Math.round(TRAINING_BASE_TICKS * 0.7));
@@ -383,7 +388,7 @@ describe('Training Grounds: training ticks', () => {
 
   it('should apply Elite Training time increase (1.2x)', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-elite-training',
+      appliedUpgradePathId: 'upgrade-elite-training' as UpgradePathId,
     });
     const ticks = trainingGetTicksForRoom(room, new Set());
     expect(ticks).toBe(Math.round(TRAINING_BASE_TICKS * 1.2));
@@ -391,7 +396,7 @@ describe('Training Grounds: training ticks', () => {
 
   it('should combine upgrade and adjacency time modifiers', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-mass-training',
+      appliedUpgradePathId: 'upgrade-mass-training' as UpgradePathId,
     });
     const adjacentTypes = new Set([BARRACKS_ID]);
     const ticks = trainingGetTicksForRoom(room, adjacentTypes);
@@ -410,7 +415,7 @@ describe('Training Grounds: training bonuses', () => {
 
   it('should grant +1 attack with Elite Training upgrade', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-elite-training',
+      appliedUpgradePathId: 'upgrade-elite-training' as UpgradePathId,
     });
     const bonuses = trainingGetBonusesForRoom(room, new Set());
     expect(bonuses).toEqual({ defense: 1, attack: 1 });
@@ -418,7 +423,7 @@ describe('Training Grounds: training bonuses', () => {
 
   it('should grant +2 defense with Specialized Drills upgrade', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-specialized-drills',
+      appliedUpgradePathId: 'upgrade-specialized-drills' as UpgradePathId,
     });
     const bonuses = trainingGetBonusesForRoom(room, new Set());
     expect(bonuses).toEqual({ defense: 2, attack: 0 });
@@ -433,7 +438,7 @@ describe('Training Grounds: training bonuses', () => {
 
   it('should combine upgrade and Altar adjacency bonuses', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-elite-training',
+      appliedUpgradePathId: 'upgrade-elite-training' as UpgradePathId,
     });
     const adjacentTypes = new Set([ALTAR_ID]);
     const bonuses = trainingGetBonusesForRoom(room, adjacentTypes);
@@ -529,7 +534,7 @@ describe('Training Grounds: trainingProcess', () => {
 
   it('should apply Elite Training bonuses when upgrade is active', () => {
     const tg = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-elite-training',
+      appliedUpgradePathId: 'upgrade-elite-training' as UpgradePathId,
     });
     const targetTicks = Math.round(TRAINING_BASE_TICKS * 1.2);
     const inhabitant = createInhabitant({
@@ -553,7 +558,7 @@ describe('Training Grounds: trainingProcess', () => {
     const altar: PlacedRoom = {
       id: 'placed-altar' as PlacedRoomId,
       roomTypeId: ALTAR_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3, // Adjacent: T-shape at (0,0) has tile at (2,0); altar at (3,0)
       anchorY: 0,
     };
@@ -578,7 +583,7 @@ describe('Training Grounds: trainingProcess', () => {
     const barracks: PlacedRoom = {
       id: 'placed-barracks' as PlacedRoomId,
       roomTypeId: BARRACKS_ID as RoomId,
-      shapeId: 'shape-i',
+      shapeId: 'shape-i' as RoomShapeId,
       anchorX: 3, // Adjacent: T-shape at (0,0) has tile at (2,0); barracks at (3,0)
       anchorY: 0,
     };
@@ -598,12 +603,12 @@ describe('Training Grounds: trainingProcess', () => {
   it('should handle multiple inhabitants training simultaneously', () => {
     const tg = createPlacedTrainingGrounds();
     const inh1 = createInhabitant({
-      instanceId: 'inst-1',
+      instanceId: 'inst-1' as InhabitantInstanceId,
       assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: 10,
     });
     const inh2 = createInhabitant({
-      instanceId: 'inst-2',
+      instanceId: 'inst-2' as InhabitantInstanceId,
       name: 'Goblin 2',
       assignedRoomId: 'placed-tg-1' as PlacedRoomId,
       trainingProgress: TRAINING_BASE_TICKS - 1,
@@ -625,7 +630,7 @@ describe('Training Grounds: trainingProcess', () => {
     const barracks: PlacedRoom = {
       id: 'placed-barracks' as PlacedRoomId,
       roomTypeId: BARRACKS_ID as RoomId,
-      shapeId: 'shape-i',
+      shapeId: 'shape-i' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -647,7 +652,7 @@ describe('Training Grounds: adjacency bonuses', () => {
     const barracks: PlacedRoom = {
       id: 'placed-barracks' as PlacedRoomId,
       roomTypeId: BARRACKS_ID as RoomId,
-      shapeId: 'shape-i',
+      shapeId: 'shape-i' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -665,7 +670,7 @@ describe('Training Grounds: adjacency bonuses', () => {
     const altar: PlacedRoom = {
       id: 'placed-altar' as PlacedRoomId,
       roomTypeId: ALTAR_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -700,7 +705,7 @@ describe('Training Grounds: upgrade paths', () => {
 
   it('should increase capacity from 4 to 6 with Mass Training', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-mass-training',
+      appliedUpgradePathId: 'upgrade-mass-training' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, trainingGroundsRoom);
     expect(effective).toBe(6);
@@ -724,7 +729,7 @@ describe('Training Grounds: upgrade paths', () => {
 describe('Training Grounds: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedTrainingGrounds({
-      appliedUpgradePathId: 'upgrade-elite-training',
+      appliedUpgradePathId: 'upgrade-elite-training' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-mass-training');
     expect(result.valid).toBe(false);

@@ -1,3 +1,10 @@
+import type { InvasionId } from '@interfaces/content-invasion';
+import type { Branded } from '@interfaces/identifiable';
+import type { InhabitantInstanceId } from '@interfaces/inhabitant';
+
+export type PrisonerId = Branded<string, 'PrisonerId'>;
+export type CombatantId = Branded<string, 'CombatantId'>;
+
 export type SpecialInvasionType = 'crusade' | 'raid' | 'bounty_hunter';
 
 export type InvasionHistoryEntry = {
@@ -27,7 +34,7 @@ import type { InvaderClassType } from '@interfaces/invader';
 export type InvaderClassWeights = Record<InvaderClassType, number>;
 
 export type CompositionWeightConfig = {
-  id: string;
+  id: InvasionId;
   name: string;
   balanced: InvaderClassWeights;
   highCorruption: InvaderClassWeights;
@@ -56,7 +63,7 @@ export type InvasionEndReason =
   | 'morale_broken';
 
 export type InvasionState = {
-  invasionId: string;
+  invasionId: InvasionId;
   currentTurn: number;
   maxTurns: number;
   altarHp: number;
@@ -70,7 +77,7 @@ export type InvasionState = {
 };
 
 export type DetailedInvasionResult = {
-  invasionId: string;
+  invasionId: InvasionId;
   day: number;
   outcome: 'victory' | 'defeat';
   endReason: InvasionEndReason;
@@ -101,11 +108,11 @@ export type DefensePenalties = {
   reputationLoss: number;
   goldLost: number;
   resourceLosses: Partial<Record<ResourceType, number>>;
-  killedInhabitantIds: string[];
+  killedInhabitantIds: InhabitantInstanceId[];
 };
 
 export type CapturedPrisoner = {
-  id: string;
+  id: PrisonerId;
   invaderClass: InvaderClassType;
   name: string;
   stats: InvaderStats;
@@ -140,7 +147,7 @@ export type TilePosition = {
 };
 
 export type Combatant = {
-  id: string;
+  id: CombatantId;
   side: CombatantSide;
   name: string;
   speed: number;
@@ -156,8 +163,8 @@ export type TurnAction = 'move' | 'attack' | 'ability' | 'wait';
 
 export type ActionResult = {
   action: TurnAction;
-  actorId: string;
-  targetId: string | undefined;
+  actorId: CombatantId;
+  targetId: CombatantId | undefined;
   targetPosition: TilePosition | undefined;
   combatResult: CombatResult | undefined;
 };

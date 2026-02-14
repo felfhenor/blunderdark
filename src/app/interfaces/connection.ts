@@ -1,7 +1,10 @@
+import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
 
+export type ConnectionId = Branded<string, 'ConnectionId'>;
+
 export type Connection = {
-  id: string;
+  id: ConnectionId;
   roomAId: PlacedRoomId;
   roomBId: PlacedRoomId;
   edgeTiles: TileOffset[];

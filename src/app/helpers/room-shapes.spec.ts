@@ -1,4 +1,4 @@
-import type { PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
+import type { PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -12,7 +12,7 @@ import {
 } from '@helpers/room-shapes';
 
 const square2x2: RoomShape = {
-  id: 'test-2x2',
+  id: 'test-2x2' as RoomShapeId,
   name: 'Square 2x2',
   width: 2,
   height: 2,
@@ -25,7 +25,7 @@ const square2x2: RoomShape = {
 };
 
 const lShape: RoomShape = {
-  id: 'test-l',
+  id: 'test-l' as RoomShapeId,
   name: 'L-Shape',
   width: 3,
   height: 3,
@@ -39,7 +39,7 @@ const lShape: RoomShape = {
 };
 
 const iShape: RoomShape = {
-  id: 'test-i',
+  id: 'test-i' as RoomShapeId,
   name: 'I-Shape',
   width: 1,
   height: 4,
@@ -52,7 +52,7 @@ const iShape: RoomShape = {
 };
 
 const emptyShape: RoomShape = {
-  id: 'test-empty',
+  id: 'test-empty' as RoomShapeId,
   name: 'Empty',
   width: 0,
   height: 0,
@@ -153,7 +153,7 @@ describe('PlacedRoom serialization', () => {
     const placed: PlacedRoom = {
       id: 'room-001' as PlacedRoomId,
       roomTypeId: 'room-type-001' as RoomId,
-      shapeId: 'test-2x2',
+      shapeId: 'test-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 3,
     };
@@ -171,7 +171,7 @@ describe('PlacedRoom serialization', () => {
     const placed: PlacedRoom = {
       id: 'room-001' as PlacedRoomId,
       roomTypeId: 'room-type-001' as RoomId,
-      shapeId: 'test-2x2',
+      shapeId: 'test-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -187,7 +187,7 @@ describe('roomShapeResolve', () => {
     const placed: PlacedRoom = {
       id: 'room-001' as PlacedRoomId,
       roomTypeId: 'room-type-001' as RoomId,
-      shapeId: 'nonexistent-shape-id',
+      shapeId: 'nonexistent-shape-id' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };

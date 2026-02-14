@@ -1,3 +1,5 @@
+import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { Branded } from '@interfaces/identifiable';
 import type { ResourceType } from '@interfaces/resource';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
@@ -20,8 +22,10 @@ export type InhabitantStats = {
 
 export type RulerBonuses = Record<string, number>;
 
+export type InhabitantInstanceId = Branded<string, 'InhabitantInstanceId'>;
+
 export type InhabitantDefinition = {
-  id: string;
+  id: InhabitantId;
   name: string;
   type: string;
   tier: number;
@@ -55,8 +59,8 @@ export type TrainingBonuses = {
 };
 
 export type InhabitantInstance = {
-  instanceId: string;
-  definitionId: string;
+  instanceId: InhabitantInstanceId;
+  definitionId: InhabitantId;
   name: string;
   state: InhabitantState;
   assignedRoomId: PlacedRoomId | undefined;
@@ -67,7 +71,7 @@ export type InhabitantInstance = {
   mutationBonuses?: Partial<InhabitantStats>;
   mutated?: boolean;
   isHybrid?: boolean;
-  hybridParentIds?: string[];
+  hybridParentIds?: InhabitantInstanceId[];
   isSummoned?: boolean;
   isTemporary?: boolean;
   temporaryTicksRemaining?: number;

@@ -1,5 +1,5 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
-import type { Floor, PlacedRoom, PlacedRoomId, RoomId, RoomShape } from '@interfaces';
+import type { Floor, FloorId, PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 import {
   roomPlacementFormatErrors,
@@ -12,7 +12,7 @@ import {
 } from '@helpers/room-placement';
 
 const square2x2: RoomShape = {
-  id: 'square-2x2',
+  id: 'square-2x2' as RoomShapeId,
   name: 'Square 2x2',
   tiles: [
     { x: 0, y: 0 },
@@ -25,7 +25,7 @@ const square2x2: RoomShape = {
 };
 
 const lShape: RoomShape = {
-  id: 'l-shape',
+  id: 'l-shape' as RoomShapeId,
   name: 'L-Shape',
   tiles: [
     { x: 0, y: 0 },
@@ -38,7 +38,7 @@ const lShape: RoomShape = {
 };
 
 const iShape: RoomShape = {
-  id: 'i-shape',
+  id: 'i-shape' as RoomShapeId,
   name: 'I-Shape',
   tiles: [
     { x: 0, y: 0 },
@@ -265,7 +265,7 @@ function makeFloor(
   grid = gridCreateEmpty(),
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -284,7 +284,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -308,7 +308,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 19,
       anchorY: 19,
     };
@@ -321,7 +321,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room1: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -330,7 +330,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room2: PlacedRoom = {
       id: 'room-2' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 6,
       anchorY: 6,
     };
@@ -343,7 +343,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room1: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -352,7 +352,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room2: PlacedRoom = {
       id: 'room-2' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -366,7 +366,7 @@ describe('roomPlacementPlaceOnFloor', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -383,7 +383,7 @@ describe('roomPlacementRemoveFromFloor', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -410,14 +410,14 @@ describe('roomPlacementRemoveFromFloor', () => {
     const room1: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
       id: 'room-2' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -440,7 +440,7 @@ describe('roomPlacementRemoveFromFloor', () => {
     const room: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };
@@ -463,7 +463,7 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
     const existingRoom: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -475,7 +475,7 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
     const existingRoom: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -487,7 +487,7 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
     const existingRoom: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -499,14 +499,14 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
     const room1: PlacedRoom = {
       id: 'room-1' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const room2: PlacedRoom = {
       id: 'room-2' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'square-2x2',
+      shapeId: 'square-2x2' as RoomShapeId,
       anchorX: 5,
       anchorY: 5,
     };

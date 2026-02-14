@@ -1,12 +1,17 @@
 import type {
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +24,7 @@ const SOUL_WELL_ID = 'room-soul-well';
 // --- Upgrade paths ---
 
 const deepFishingPath: RoomUpgradePath = {
-  id: 'upgrade-deep-fishing',
+  id: 'upgrade-deep-fishing' as UpgradePathId,
   name: 'Deep Fishing',
   description: 'Deep-water techniques increase the food catch.',
   cost: { gold: 80, crystals: 30 },
@@ -27,7 +32,7 @@ const deepFishingPath: RoomUpgradePath = {
 };
 
 const expandedLakePath: RoomUpgradePath = {
-  id: 'upgrade-expanded-lake',
+  id: 'upgrade-expanded-lake' as UpgradePathId,
   name: 'Expanded Lake',
   description: 'Excavate additional chambers for more fishers.',
   cost: { gold: 70, crystals: 25 },
@@ -35,7 +40,7 @@ const expandedLakePath: RoomUpgradePath = {
 };
 
 const darkWatersPath: RoomUpgradePath = {
-  id: 'upgrade-dark-waters',
+  id: 'upgrade-dark-waters' as UpgradePathId,
   name: 'Dark Waters',
   description: 'Strange creatures provide food and an unsettling presence.',
   cost: { gold: 90, crystals: 40, essence: 15 },
@@ -58,11 +63,11 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const undergroundLakeRoom: RoomDefinition & IsContentItem = {
-  id: UNDERGROUND_LAKE_ID,
+  id: UNDERGROUND_LAKE_ID as RoomId,
   name: 'Underground Lake',
   __type: 'room',
   description: 'A vast subterranean lake fed by hidden aquifers.',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: { gold: 60, crystals: 20 },
   production: { food: 1.0 },
   requiresWorkers: true,
@@ -82,11 +87,11 @@ const undergroundLakeRoom: RoomDefinition & IsContentItem = {
 };
 
 const mushroomGroveRoom: RoomDefinition & IsContentItem = {
-  id: MUSHROOM_GROVE_ID,
+  id: MUSHROOM_GROVE_ID as RoomId,
   name: 'Mushroom Grove',
   __type: 'room',
   description: '',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: {},
   production: { food: 1.6 },
   requiresWorkers: true,
@@ -102,11 +107,11 @@ const mushroomGroveRoom: RoomDefinition & IsContentItem = {
 };
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: '',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: {},
   production: { essence: 0.3 },
   requiresWorkers: false,
@@ -175,7 +180,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 0,
     biome: 'neutral',
@@ -192,7 +197,7 @@ function createPlacedLake(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-lake-1' as PlacedRoomId,
     roomTypeId: UNDERGROUND_LAKE_ID as RoomId,
-    shapeId: 'shape-t',
+    shapeId: 'shape-t' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -251,8 +256,8 @@ describe('Underground Lake: base production', () => {
     const lake = createPlacedLake();
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-lake-1' as PlacedRoomId,
@@ -271,7 +276,7 @@ describe('Underground Lake: adjacency bonuses', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -289,7 +294,7 @@ describe('Underground Lake: adjacency bonuses', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -307,7 +312,7 @@ describe('Underground Lake: adjacency bonuses', () => {
     const lake2: PlacedRoom = {
       id: 'placed-lake-2' as PlacedRoomId,
       roomTypeId: UNDERGROUND_LAKE_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -325,14 +330,14 @@ describe('Underground Lake: adjacency bonuses', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 0,
       anchorY: 2,
     };
@@ -362,7 +367,7 @@ describe('Underground Lake: Deep Fishing upgrade', () => {
 describe('Underground Lake: Expanded Lake upgrade', () => {
   it('should change capacity from 3 to 5', () => {
     const room = createPlacedLake({
-      appliedUpgradePathId: 'upgrade-expanded-lake',
+      appliedUpgradePathId: 'upgrade-expanded-lake' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, undergroundLakeRoom);
     expect(effective).toBe(5);
@@ -402,7 +407,7 @@ describe('Underground Lake: Dark Waters upgrade', () => {
 describe('Underground Lake: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedLake({
-      appliedUpgradePathId: 'upgrade-deep-fishing',
+      appliedUpgradePathId: 'upgrade-deep-fishing' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-lake');
     expect(result.valid).toBe(false);
@@ -421,14 +426,14 @@ describe('Underground Lake: full production with adjacency', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-lake-1' as PlacedRoomId,

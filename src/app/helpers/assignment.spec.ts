@@ -1,10 +1,13 @@
 import type {
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -62,7 +65,7 @@ function createTestPlacedRoom(
   return {
     id: 'room-001' as PlacedRoomId,
     roomTypeId: 'room-type-crystal-mine' as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 5,
     anchorY: 5,
     ...overrides,
@@ -73,10 +76,10 @@ function createTestRoomDef(
   overrides: Partial<RoomDefinition> = {},
 ): RoomDefinition {
   return {
-    id: 'room-type-crystal-mine',
+    id: 'room-type-crystal-mine' as RoomId,
     name: 'Crystal Mine',
     description: 'A mine',
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     cost: {},
     production: { crystals: 1.0 },
     requiresWorkers: true,
@@ -97,8 +100,8 @@ function createTestInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inst-001',
-    definitionId: 'def-goblin',
+    instanceId: 'inst-001' as InhabitantInstanceId,
+    definitionId: 'def-goblin' as InhabitantId,
     name: 'Goblin Worker',
     state: 'normal',
     assignedRoomId: undefined,
@@ -160,7 +163,7 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
     const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
@@ -175,8 +178,8 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
     const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
@@ -193,7 +196,7 @@ describe('assignmentCanAssignToRoom', () => {
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = Array.from({ length: 50 }, (_, i) =>
       createTestInhabitant({
-        instanceId: `inst-${i}`,
+        instanceId: `inst-${i}` as InhabitantInstanceId,
         assignedRoomId: 'room-001' as PlacedRoomId,
       }),
     );
@@ -211,8 +214,8 @@ describe('assignmentCanAssignToRoom', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
     const result = assignmentCanAssignToRoom('room-001' as PlacedRoomId);
@@ -237,10 +240,10 @@ describe('assignmentGetCount', () => {
 
   it('should count only inhabitants assigned to the specified room', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
-      createTestInhabitant({ instanceId: 'inst-002', assignedRoomId: 'room-002' as PlacedRoomId }),
-      createTestInhabitant({ instanceId: 'inst-003', assignedRoomId: 'room-001' as PlacedRoomId }),
-      createTestInhabitant({ instanceId: 'inst-004', assignedRoomId: undefined }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-002' as InhabitantInstanceId, assignedRoomId: 'room-002' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-003' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-004' as InhabitantInstanceId, assignedRoomId: undefined }),
     ];
     expect(assignmentGetCount('room-001' as PlacedRoomId)).toBe(2);
   });
@@ -261,14 +264,14 @@ describe('assignmentIsInhabitantAssigned', () => {
 
   it('should return false for unassigned inhabitant', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: undefined }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: undefined }),
     ];
     expect(assignmentIsInhabitantAssigned('inst-001')).toBe(false);
   });
 
   it('should return true for assigned inhabitant', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
     expect(assignmentIsInhabitantAssigned('inst-001')).toBe(true);
   });
@@ -301,7 +304,7 @@ describe('assignmentGetRoomInfo', () => {
     mockFloors = [{ rooms: [room], inhabitants: [] }];
     mockContent.set('room-type-crystal-mine', def);
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', assignedRoomId: 'room-001' as PlacedRoomId }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, assignedRoomId: 'room-001' as PlacedRoomId }),
     ];
 
     const info = assignmentGetRoomInfo('room-001' as PlacedRoomId);

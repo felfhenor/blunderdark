@@ -9,6 +9,7 @@ import type {
   GameState,
   InhabitantDefinition,
   InhabitantInstance,
+  InhabitantInstanceId,
   InhabitantStats,
   IsContentItem,
   PlacedRoom,
@@ -162,7 +163,7 @@ export function summoningCreateInhabitant(
   }
 
   return {
-    instanceId: rngUuid(),
+    instanceId: rngUuid() as InhabitantInstanceId,
     definitionId: def.id,
     name: `${def.name} ${suffix}`,
     state: 'normal',

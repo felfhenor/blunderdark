@@ -21,6 +21,7 @@ import {
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   AlchemyRecipeContent,
+  AlchemyRecipeId,
   InhabitantDefinition,
   IsContentItem,
   ResourceType,
@@ -118,7 +119,7 @@ export class PanelAlchemyLabComponent {
       .join(', ');
   }
 
-  public async selectRecipe(recipeId: string, targetTicks: number): Promise<void> {
+  public async selectRecipe(recipeId: AlchemyRecipeId, targetTicks: number): Promise<void> {
     const room = this.labRoom();
     if (!room) return;
 

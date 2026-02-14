@@ -3,6 +3,7 @@ import type {
   GRID_SIZE,
   IsContentItem,
   PlacedRoom,
+  RoomShapeId,
   Rotation,
   RoomShape,
   TileOffset,
@@ -114,7 +115,7 @@ export function roomShapeGetRotated(
 }
 
 const FALLBACK_SHAPE: RoomShape = {
-  id: 'fallback',
+  id: 'fallback' as RoomShapeId,
   name: 'Fallback',
   tiles: [{ x: 0, y: 0 }],
   width: 1,

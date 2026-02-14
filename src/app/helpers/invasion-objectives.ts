@@ -9,6 +9,7 @@ import type {
 } from '@interfaces';
 import type {
   InvasionObjective,
+  InvasionObjectiveId,
   InvasionResult,
   ObjectiveType,
 } from '@interfaces/invasion-objective';
@@ -157,7 +158,7 @@ export function invasionObjectiveAssign(
   // Primary: Destroy Altar
   const altarId = invasionObjectiveFindAltarRoomId(state);
   objectives.push({
-    id: rngUuid(),
+    id: rngUuid() as InvasionObjectiveId,
     type: 'DestroyAltar',
     name: 'Destroy Altar',
     description:
@@ -183,7 +184,7 @@ export function invasionObjectiveAssign(
 
     selectedTypes.add(template.type);
     objectives.push({
-      id: rngUuid(),
+      id: rngUuid() as InvasionObjectiveId,
       type: template.type,
       name: template.name,
       description: template.description,

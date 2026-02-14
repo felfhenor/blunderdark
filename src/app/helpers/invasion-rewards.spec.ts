@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { InvasionId, InvaderInstanceId, InvaderId, PrisonerId } from '@interfaces';
 import type {
   CapturedPrisoner,
   DetailedInvasionResult,
@@ -43,7 +44,7 @@ vi.mock('@helpers/content', () => ({
 
 function makeResult(overrides: Partial<DetailedInvasionResult> = {}): DetailedInvasionResult {
   return {
-    invasionId: 'inv-1',
+    invasionId: 'inv-1' as InvasionId,
     day: 42,
     outcome: 'victory',
     endReason: 'all_invaders_eliminated',
@@ -64,7 +65,7 @@ function makePrisoner(
   overrides: Partial<CapturedPrisoner> = {},
 ): CapturedPrisoner {
   return {
-    id: 'prisoner-1',
+    id: 'prisoner-1' as PrisonerId,
     invaderClass,
     name: 'Captured Warrior',
     stats: { hp: 20, attack: 8, defense: 5, speed: 3 },
@@ -75,8 +76,8 @@ function makePrisoner(
 
 function makeInvader(id: string, defId: string): InvaderInstance {
   return {
-    id,
-    definitionId: defId,
+    id: id as InvaderInstanceId,
+    definitionId: defId as InvaderId,
     currentHp: 5,
     maxHp: 20,
     statusEffects: [],

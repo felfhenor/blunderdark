@@ -1,11 +1,14 @@
 import type {
   GameState,
   InhabitantDefinition,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -53,8 +56,8 @@ function createTestInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inst-001',
-    definitionId: '7f716f6e-3742-496b-8277-875c180b0d94',
+    instanceId: 'inst-001' as InhabitantInstanceId,
+    definitionId: '7f716f6e-3742-496b-8277-875c180b0d94' as InhabitantId,
     name: 'Goblin Worker',
     state: 'normal',
     assignedRoomId: undefined,
@@ -85,8 +88,8 @@ describe('inhabitant management', () => {
 
   it('should remove an inhabitant by instanceId', async () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001' }),
-      createTestInhabitant({ instanceId: 'inst-002', name: 'Kobold Scout' }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId }),
+      createTestInhabitant({ instanceId: 'inst-002' as InhabitantInstanceId, name: 'Kobold Scout' }),
     ];
     await inhabitantRemove('inst-001');
     expect(mockInhabitants).toHaveLength(1);
@@ -95,8 +98,8 @@ describe('inhabitant management', () => {
 
   it('should get all inhabitants', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001' }),
-      createTestInhabitant({ instanceId: 'inst-002' }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId }),
+      createTestInhabitant({ instanceId: 'inst-002' as InhabitantInstanceId }),
     ];
     const all = inhabitantAll();
     expect(all()).toHaveLength(2);
@@ -104,7 +107,7 @@ describe('inhabitant management', () => {
 
   it('should get a specific inhabitant by instanceId', () => {
     mockInhabitants = [
-      createTestInhabitant({ instanceId: 'inst-001', name: 'Goblin' }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, name: 'Goblin' }),
     ];
     const found = inhabitantGet('inst-001');
     expect(found()?.name).toBe('Goblin');
@@ -120,8 +123,8 @@ describe('inhabitant management', () => {
 describe('inhabitant serialization', () => {
   it('should round-trip an inhabitant with all fields populated', () => {
     const original: InhabitantInstance = {
-      instanceId: 'inst-001',
-      definitionId: '7f716f6e-3742-496b-8277-875c180b0d94',
+      instanceId: 'inst-001' as InhabitantInstanceId,
+      definitionId: '7f716f6e-3742-496b-8277-875c180b0d94' as InhabitantId,
       name: 'Goblin Miner',
       state: 'scared',
       assignedRoomId: 'room-abc' as PlacedRoomId,
@@ -146,9 +149,9 @@ describe('inhabitant serialization', () => {
 
   it('should round-trip multiple inhabitants', () => {
     const inhabitants: InhabitantInstance[] = [
-      createTestInhabitant({ instanceId: 'inst-001', state: 'normal' }),
+      createTestInhabitant({ instanceId: 'inst-001' as InhabitantInstanceId, state: 'normal' }),
       createTestInhabitant({
-        instanceId: 'inst-002',
+        instanceId: 'inst-002' as InhabitantInstanceId,
         name: 'Skeleton Guard',
         state: 'hungry',
         assignedRoomId: 'room-xyz' as PlacedRoomId,
@@ -192,7 +195,7 @@ function createTestInhabitantDef(
   overrides: Partial<InhabitantDefinition> = {},
 ): InhabitantDefinition {
   return {
-    id: 'def-goblin',
+    id: 'def-goblin' as InhabitantId,
     name: 'Goblin',
     type: 'creature',
     tier: 1,
@@ -217,10 +220,10 @@ function createTestRoomDef(
   overrides: Partial<RoomDefinition> = {},
 ): RoomDefinition {
   return {
-    id: 'room-barracks',
+    id: 'room-barracks' as RoomId,
     name: 'Barracks',
     description: 'A training room',
-    shapeId: 'shape-2x2',
+    shapeId: 'shape-2x2' as RoomShapeId,
     cost: {},
     production: {},
     requiresWorkers: false,
@@ -330,8 +333,8 @@ describe('inhabitantCanAssignToRoom', () => {
 describe('inhabitantGetEligible', () => {
   it('should return all inhabitants for unrestricted room', () => {
     const defs = [
-      createTestInhabitantDef({ id: 'goblin' }),
-      createTestInhabitantDef({ id: 'skeleton', restrictionTags: ['unique'] }),
+      createTestInhabitantDef({ id: 'goblin' as InhabitantId }),
+      createTestInhabitantDef({ id: 'skeleton' as InhabitantId, restrictionTags: ['unique'] }),
     ];
     const room = createTestRoomDef();
     expect(inhabitantGetEligible(defs, room)).toHaveLength(2);
@@ -339,13 +342,13 @@ describe('inhabitantGetEligible', () => {
 
   it('should filter to only unique inhabitants for Throne Room', () => {
     const defs = [
-      createTestInhabitantDef({ id: 'goblin', name: 'Goblin' }),
+      createTestInhabitantDef({ id: 'goblin' as InhabitantId, name: 'Goblin' }),
       createTestInhabitantDef({
-        id: 'dragon',
+        id: 'dragon' as InhabitantId,
         name: 'Dragon',
         restrictionTags: ['unique'],
       }),
-      createTestInhabitantDef({ id: 'kobold', name: 'Kobold' }),
+      createTestInhabitantDef({ id: 'kobold' as InhabitantId, name: 'Kobold' }),
     ];
     const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
     const eligible = inhabitantGetEligible(defs, room);
@@ -355,8 +358,8 @@ describe('inhabitantGetEligible', () => {
 
   it('should return empty array when no inhabitants meet restriction', () => {
     const defs = [
-      createTestInhabitantDef({ id: 'goblin' }),
-      createTestInhabitantDef({ id: 'kobold' }),
+      createTestInhabitantDef({ id: 'goblin' as InhabitantId }),
+      createTestInhabitantDef({ id: 'kobold' as InhabitantId }),
     ];
     const room = createTestRoomDef({ inhabitantRestriction: 'unique' });
     expect(inhabitantGetEligible(defs, room)).toHaveLength(0);
@@ -376,7 +379,7 @@ function createTestPlacedRoom(
   return {
     id: 'placed-room-001' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 5,
     anchorY: 5,
     ...overrides,

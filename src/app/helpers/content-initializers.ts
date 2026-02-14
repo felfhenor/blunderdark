@@ -22,6 +22,15 @@ import type {
   TrapDefinition,
   UnlockEffect,
 } from '@interfaces';
+import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { InvaderId } from '@interfaces/content-invader';
+import type { InvasionId } from '@interfaces/content-invasion';
+import type { ReputationActionId } from '@interfaces/content-reputationaction';
+import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { SynergyId } from '@interfaces/content-synergy';
+import type { TrapId } from '@interfaces/content-trap';
+import type { ResearchId } from '@interfaces/content-research';
+import type { RoomId } from '@interfaces/content-room';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,8 +84,8 @@ function ensureBreedingRecipe(
     name: recipe.name ?? 'UNKNOWN',
     __type: 'breedingrecipe',
     description: recipe.description ?? '',
-    parentInhabitantAId: recipe.parentInhabitantAId ?? '',
-    parentInhabitantBId: recipe.parentInhabitantBId ?? '',
+    parentInhabitantAId: recipe.parentInhabitantAId ?? ('' as InhabitantId),
+    parentInhabitantBId: recipe.parentInhabitantBId ?? ('' as InhabitantId),
     resultName: recipe.resultName ?? '',
     statBonuses: recipe.statBonuses ?? {},
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
@@ -103,7 +112,7 @@ function ensureReputationAction(
   action: Partial<ReputationAction & IsContentItem>,
 ): ReputationAction & IsContentItem {
   return {
-    id: action.id ?? 'UNKNOWN',
+    id: action.id ?? ('UNKNOWN' as ReputationActionId),
     name: action.name ?? 'UNKNOWN',
     __type: 'reputationaction',
     description: action.description ?? '',
@@ -131,7 +140,7 @@ function ensureResearch(
   node: Partial<ResearchNode & IsContentItem>,
 ): ResearchNode & IsContentItem {
   return {
-    id: node.id ?? 'UNKNOWN',
+    id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',
     __type: 'research',
     description: node.description ?? '',
@@ -166,11 +175,11 @@ function ensureRoom(
   room: Partial<RoomDefinition & IsContentItem>,
 ): RoomDefinition & IsContentItem {
   return {
-    id: room.id ?? 'UNKNOWN',
+    id: room.id ?? ('UNKNOWN' as RoomId),
     name: room.name ?? 'UNKNOWN',
     __type: 'room',
     description: room.description ?? '',
-    shapeId: room.shapeId ?? '',
+    shapeId: room.shapeId ?? ('' as RoomShapeId),
     cost: room.cost ?? {},
     production: room.production ?? {},
     requiresWorkers: room.requiresWorkers ?? false,
@@ -213,7 +222,7 @@ function ensureSummonRecipe(
     name: recipe.name ?? 'UNKNOWN',
     __type: 'summonrecipe',
     description: recipe.description ?? '',
-    resultInhabitantId: recipe.resultInhabitantId ?? '',
+    resultInhabitantId: recipe.resultInhabitantId ?? ('' as InhabitantId),
     summonType: recipe.summonType ?? 'permanent',
     duration: recipe.duration ?? undefined,
     cost: recipe.cost ?? {},
@@ -227,7 +236,7 @@ function ensureSynergy(
   synergy: Partial<SynergyDefinition & IsContentItem>,
 ): SynergyDefinition & IsContentItem {
   return {
-    id: synergy.id ?? 'UNKNOWN',
+    id: synergy.id ?? ('UNKNOWN' as SynergyId),
     name: synergy.name ?? 'UNKNOWN',
     __type: 'synergy',
     description: synergy.description ?? '',
@@ -240,7 +249,7 @@ function ensureInhabitant(
   inhabitant: Partial<InhabitantDefinition & IsContentItem>,
 ): InhabitantDefinition & IsContentItem {
   return {
-    id: inhabitant.id ?? 'UNKNOWN',
+    id: inhabitant.id ?? ('UNKNOWN' as InhabitantId),
     name: inhabitant.name ?? 'UNKNOWN',
     __type: 'inhabitant',
     type: inhabitant.type ?? '',
@@ -269,7 +278,7 @@ function ensureInvader(
   invader: Partial<InvaderDefinition & IsContentItem>,
 ): InvaderDefinition & IsContentItem {
   return {
-    id: invader.id ?? 'UNKNOWN',
+    id: invader.id ?? ('UNKNOWN' as InvaderId),
     name: invader.name ?? 'UNKNOWN',
     __type: 'invader',
     description: invader.description ?? '',
@@ -284,7 +293,7 @@ function ensureRoomShape(
   shape: Partial<RoomShape & IsContentItem>,
 ): RoomShape & IsContentItem {
   return {
-    id: shape.id ?? 'UNKNOWN',
+    id: shape.id ?? ('UNKNOWN' as RoomShapeId),
     name: shape.name ?? 'UNKNOWN',
     __type: 'roomshape',
     tiles: shape.tiles ?? [],
@@ -325,7 +334,7 @@ function ensureTrap(
   trap: Partial<TrapDefinition & IsContentItem>,
 ): TrapDefinition & IsContentItem {
   return {
-    id: trap.id ?? 'UNKNOWN',
+    id: trap.id ?? ('UNKNOWN' as TrapId),
     name: trap.name ?? 'UNKNOWN',
     __type: 'trap',
     description: trap.description ?? '',
@@ -353,7 +362,7 @@ function ensureInvasion(
   config: Partial<CompositionWeightConfig & IsContentItem>,
 ): CompositionWeightConfig & IsContentItem {
   return {
-    id: config.id ?? 'UNKNOWN',
+    id: config.id ?? ('UNKNOWN' as InvasionId),
     name: config.name ?? 'UNKNOWN',
     __type: 'invasion',
     balanced: config.balanced ?? { ...defaultWeights },

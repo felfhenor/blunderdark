@@ -1,3 +1,7 @@
+import type { Branded } from '@interfaces/identifiable';
+
+export type InvasionObjectiveId = Branded<string, 'InvasionObjectiveId'>;
+
 export type ObjectiveType =
   | 'DestroyAltar'
   | 'SlayMonster'
@@ -9,7 +13,7 @@ export type ObjectiveType =
   | 'ScoutDungeon';
 
 export type InvasionObjective = {
-  id: string;
+  id: InvasionObjectiveId;
   type: ObjectiveType;
   name: string;
   description: string;

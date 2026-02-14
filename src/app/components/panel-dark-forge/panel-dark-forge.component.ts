@@ -22,6 +22,7 @@ import {
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   ForgeRecipeContent,
+  ForgeRecipeId,
   InhabitantDefinition,
   InhabitantStats,
   IsContentItem,
@@ -146,7 +147,7 @@ export class PanelDarkForgeComponent {
       .join(', ');
   }
 
-  public async startCrafting(recipeId: string, targetTicks: number, cost: Partial<Record<ResourceType, number>>): Promise<void> {
+  public async startCrafting(recipeId: ForgeRecipeId, targetTicks: number, cost: Partial<Record<ResourceType, number>>): Promise<void> {
     const room = this.forgeRoom();
     if (!room) return;
 

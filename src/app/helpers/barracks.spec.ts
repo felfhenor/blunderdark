@@ -1,12 +1,17 @@
 import type {
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +24,7 @@ const THRONE_ROOM_ID = 'room-throne-room';
 // --- Upgrade paths ---
 
 const fortifiedBarracksPath: RoomUpgradePath = {
-  id: 'upgrade-fortified-barracks',
+  id: 'upgrade-fortified-barracks' as UpgradePathId,
   name: 'Fortified Barracks',
   description: 'Reinforce walls and expand sleeping quarters.',
   cost: { gold: 100, crystals: 40 },
@@ -27,7 +32,7 @@ const fortifiedBarracksPath: RoomUpgradePath = {
 };
 
 const comfortableQuartersPath: RoomUpgradePath = {
-  id: 'upgrade-comfortable-quarters',
+  id: 'upgrade-comfortable-quarters' as UpgradePathId,
   name: 'Comfortable Quarters',
   description: 'Replace crude bunks with proper beds.',
   cost: { gold: 80, crystals: 20 },
@@ -35,7 +40,7 @@ const comfortableQuartersPath: RoomUpgradePath = {
 };
 
 const warRoomPath: RoomUpgradePath = {
-  id: 'upgrade-war-room',
+  id: 'upgrade-war-room' as UpgradePathId,
   name: 'War Room',
   description: 'Add strategic planning tables.',
   cost: { gold: 120, crystals: 60, essence: 20 },
@@ -54,11 +59,11 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const barracksRoom: RoomDefinition & IsContentItem = {
-  id: BARRACKS_ID,
+  id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',
   description: 'Houses and trains your fighters.',
-  shapeId: 'shape-i',
+  shapeId: 'shape-i' as RoomShapeId,
   cost: { gold: 70 },
   production: {},
   requiresWorkers: false,
@@ -78,11 +83,11 @@ const barracksRoom: RoomDefinition & IsContentItem = {
 };
 
 const darkForgeRoom: RoomDefinition & IsContentItem = {
-  id: DARK_FORGE_ID,
+  id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: { gold: 1.2 },
   requiresWorkers: true,
@@ -98,11 +103,11 @@ const darkForgeRoom: RoomDefinition & IsContentItem = {
 };
 
 const throneRoom: RoomDefinition & IsContentItem = {
-  id: THRONE_ROOM_ID,
+  id: THRONE_ROOM_ID as RoomId,
   name: 'Throne Room',
   __type: 'room',
   description: '',
-  shapeId: 'shape-4x4',
+  shapeId: 'shape-4x4' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -196,7 +201,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -213,7 +218,7 @@ function createPlacedBarracks(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-barracks-1' as PlacedRoomId,
     roomTypeId: BARRACKS_ID as RoomId,
-    shapeId: 'shape-i',
+    shapeId: 'shape-i' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -268,8 +273,8 @@ describe('Barracks: no production', () => {
     const barracks = createPlacedBarracks();
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-barracks-1' as PlacedRoomId,
@@ -287,7 +292,7 @@ describe('Barracks: adjacency bonuses', () => {
     const forge: PlacedRoom = {
       id: 'placed-forge-1' as PlacedRoomId,
       roomTypeId: DARK_FORGE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 1,
       anchorY: 0,
     };
@@ -305,7 +310,7 @@ describe('Barracks: adjacency bonuses', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne-1' as PlacedRoomId,
       roomTypeId: THRONE_ROOM_ID as RoomId,
-      shapeId: 'shape-4x4',
+      shapeId: 'shape-4x4' as RoomShapeId,
       anchorX: 1,
       anchorY: 0,
     };
@@ -323,7 +328,7 @@ describe('Barracks: adjacency bonuses', () => {
     const barracks2: PlacedRoom = {
       id: 'placed-barracks-2' as PlacedRoomId,
       roomTypeId: BARRACKS_ID as RoomId,
-      shapeId: 'shape-i',
+      shapeId: 'shape-i' as RoomShapeId,
       anchorX: 1,
       anchorY: 0,
     };
@@ -341,14 +346,14 @@ describe('Barracks: adjacency bonuses', () => {
     const forge: PlacedRoom = {
       id: 'placed-forge-1' as PlacedRoomId,
       roomTypeId: DARK_FORGE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 1,
       anchorY: 0,
     };
     const throne: PlacedRoom = {
       id: 'placed-throne-1' as PlacedRoomId,
       roomTypeId: THRONE_ROOM_ID as RoomId,
-      shapeId: 'shape-4x4',
+      shapeId: 'shape-4x4' as RoomShapeId,
       anchorX: 1,
       anchorY: 3,
     };
@@ -375,7 +380,7 @@ describe('Barracks: Fortified Barracks upgrade', () => {
 
   it('should change capacity from 6 to 10', () => {
     const room = createPlacedBarracks({
-      appliedUpgradePathId: 'upgrade-fortified-barracks',
+      appliedUpgradePathId: 'upgrade-fortified-barracks' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, barracksRoom);
     expect(effective).toBe(10);
@@ -413,7 +418,7 @@ describe('Barracks: War Room upgrade', () => {
 describe('Barracks: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedBarracks({
-      appliedUpgradePathId: 'upgrade-fortified-barracks',
+      appliedUpgradePathId: 'upgrade-fortified-barracks' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-comfortable-quarters');
     expect(result.valid).toBe(false);

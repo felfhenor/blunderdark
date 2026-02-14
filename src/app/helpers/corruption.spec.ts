@@ -3,7 +3,9 @@ import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   GameState,
   InhabitantDefinition,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoomId,
   ResourceMap,
 } from '@interfaces';
@@ -184,7 +186,7 @@ describe('corruptionGetLevelDescription', () => {
 describe('corruptionGenerationCalculateInhabitantRate', () => {
   function makeDef(overrides: Partial<InhabitantDefinition> = {}): InhabitantDefinition {
     return {
-      id: 'def-1',
+      id: 'def-1' as InhabitantId,
       name: 'Test',
       type: 'creature',
       tier: 1,
@@ -201,8 +203,8 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
 
   function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
     return {
-      instanceId: 'inst-1',
-      definitionId: 'def-1',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-1' as InhabitantId,
       name: 'Test',
       state: 'normal',
       assignedRoomId: undefined,
@@ -223,7 +225,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
   });
 
   it('should calculate rate for stationed Skeleton (1/min)', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' as InhabitantId });
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     // 1 per minute / 5 ticks per minute = 0.2 per tick
@@ -231,7 +233,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
   });
 
   it('should calculate rate for stationed Demon Lord (10/min)', () => {
-    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'demon-lord' });
+    const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'demon-lord' as InhabitantId });
     const def = makeDef({ corruptionGeneration: 10 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     // 10 per minute / 5 ticks per minute = 2.0 per tick
@@ -240,8 +242,8 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
 
   it('should sum multiple stationed inhabitants', () => {
     const inhabitants = [
-      makeInst({ instanceId: 'i1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' }),
-      makeInst({ instanceId: 'i2', assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'skeleton' }),
+      makeInst({ instanceId: 'i1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' as InhabitantId }),
+      makeInst({ instanceId: 'i2' as InhabitantInstanceId, assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'skeleton' as InhabitantId }),
     ];
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate(inhabitants, () => def);
@@ -284,8 +286,8 @@ describe('corruptionGenerationProcess', () => {
 
   function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
     return {
-      instanceId: 'inst-1',
-      definitionId: 'skeleton-def',
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'skeleton-def' as InhabitantId,
       name: 'Skeleton',
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,

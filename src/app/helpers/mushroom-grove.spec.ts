@@ -1,12 +1,17 @@
 import type {
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,7 +25,7 @@ const DARK_FORGE_ID = 'room-dark-forge';
 // --- Upgrade paths ---
 
 const bountifulHarvestPath: RoomUpgradePath = {
-  id: 'upgrade-bountiful-harvest',
+  id: 'upgrade-bountiful-harvest' as UpgradePathId,
   name: 'Bountiful Harvest',
   description: 'Enhanced fungal cultivation techniques increase food yield by 50%.',
   cost: { gold: 60 },
@@ -28,7 +33,7 @@ const bountifulHarvestPath: RoomUpgradePath = {
 };
 
 const expandedGrowthPath: RoomUpgradePath = {
-  id: 'upgrade-expanded-growth',
+  id: 'upgrade-expanded-growth' as UpgradePathId,
   name: 'Expanded Growth',
   description: 'Extend the growing chambers to accommodate more workers.',
   cost: { gold: 50 },
@@ -36,7 +41,7 @@ const expandedGrowthPath: RoomUpgradePath = {
 };
 
 const tranquilGardenPath: RoomUpgradePath = {
-  id: 'upgrade-tranquil-garden',
+  id: 'upgrade-tranquil-garden' as UpgradePathId,
   name: 'Tranquil Garden',
   description: 'Calming spores eliminate all fear in the grove.',
   cost: { gold: 45 },
@@ -55,11 +60,11 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const mushroomGroveRoom: RoomDefinition & IsContentItem = {
-  id: MUSHROOM_GROVE_ID,
+  id: MUSHROOM_GROVE_ID as RoomId,
   name: 'Mushroom Grove',
   __type: 'room',
   description: 'A T-shaped grove of bioluminescent fungi.',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: { gold: 40 },
   production: { food: 1.6 },
   requiresWorkers: true,
@@ -79,11 +84,11 @@ const mushroomGroveRoom: RoomDefinition & IsContentItem = {
 };
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: '',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: {},
   production: { essence: 0.3 },
   requiresWorkers: false,
@@ -99,11 +104,11 @@ const soulWellRoom: RoomDefinition & IsContentItem = {
 };
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
-  id: SHADOW_LIBRARY_ID,
+  id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
   description: '',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: {},
   production: { research: 0.8 },
   requiresWorkers: true,
@@ -119,11 +124,11 @@ const shadowLibraryRoom: RoomDefinition & IsContentItem = {
 };
 
 const darkForgeRoom: RoomDefinition & IsContentItem = {
-  id: DARK_FORGE_ID,
+  id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
   description: '',
-  shapeId: 'shape-t',
+  shapeId: 'shape-t' as RoomShapeId,
   cost: {},
   production: { gold: 1.2 },
   requiresWorkers: true,
@@ -201,7 +206,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 0,
     biome: 'neutral',
@@ -218,7 +223,7 @@ function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-grove-1' as PlacedRoomId,
     roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-    shapeId: 'shape-t',
+    shapeId: 'shape-t' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -252,8 +257,8 @@ describe('Mushroom Grove: base production', () => {
     const grove = createPlacedRoom();
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,
@@ -272,7 +277,7 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
     const soulWell: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -290,14 +295,14 @@ describe('Mushroom Grove: Water adjacency bonus', () => {
     const well1: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const well2: PlacedRoom = {
       id: 'placed-well-2' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 0,
       anchorY: 2,
     };
@@ -317,7 +322,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
     const library: PlacedRoom = {
       id: 'placed-library-1' as PlacedRoomId,
       roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -335,7 +340,7 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
     const forge: PlacedRoom = {
       id: 'placed-forge-1' as PlacedRoomId,
       roomTypeId: DARK_FORGE_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -353,14 +358,14 @@ describe('Mushroom Grove: Dark adjacency bonus', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const library: PlacedRoom = {
       id: 'placed-library-1' as PlacedRoomId,
       roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 0,
       anchorY: 2,
     };
@@ -388,7 +393,7 @@ describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
 
   it('should expose effects when upgrade is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-bountiful-harvest',
+      appliedUpgradePathId: 'upgrade-bountiful-harvest' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -400,7 +405,7 @@ describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
 describe('Mushroom Grove: Expanded Growth upgrade', () => {
   it('should change capacity from 3 to 5', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-expanded-growth',
+      appliedUpgradePathId: 'upgrade-expanded-growth' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
     expect(effective).toBe(5);
@@ -425,7 +430,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 
   it('should expose fearReduction effect when applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-tranquil-garden',
+      appliedUpgradePathId: 'upgrade-tranquil-garden' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -435,7 +440,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 
   it('should not change capacity when Tranquil Garden is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-tranquil-garden',
+      appliedUpgradePathId: 'upgrade-tranquil-garden' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
     expect(effective).toBe(3);
@@ -445,7 +450,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 describe('Mushroom Grove: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-bountiful-harvest',
+      appliedUpgradePathId: 'upgrade-bountiful-harvest' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-growth');
     expect(result.valid).toBe(false);
@@ -465,14 +470,14 @@ describe('Mushroom Grove: full production with adjacency', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-t',
+      shapeId: 'shape-t' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,

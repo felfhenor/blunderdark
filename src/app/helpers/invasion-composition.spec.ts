@@ -3,6 +3,8 @@ import type {
   CompositionWeightConfig,
   DungeonProfile,
   GameState,
+  InvasionId,
+  InvaderId,
 } from '@interfaces';
 import type { InvaderClassType, InvaderDefinition } from '@interfaces/invader';
 import {
@@ -54,7 +56,7 @@ vi.mock('@helpers/invaders', () => ({
 const COMPOSITION_WEIGHTS_ID = 'test-composition-weights';
 
 const defaultWeightConfig: CompositionWeightConfig = {
-  id: COMPOSITION_WEIGHTS_ID,
+  id: COMPOSITION_WEIGHTS_ID as InvasionId,
   name: 'Composition Weights',
   balanced: {
     warrior: 20,
@@ -95,7 +97,7 @@ function makeDef(
   cls: InvaderClassType,
 ): InvaderDefinition {
   return {
-    id,
+    id: id as InvaderId,
     name: `${cls}-${id}`,
     description: '',
     invaderClass: cls,

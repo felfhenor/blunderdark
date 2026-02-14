@@ -1,11 +1,14 @@
 import type {
   Floor,
+  FloorId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,7 +23,7 @@ const CRYSTAL_MINE_ID = 'room-crystal-mine';
 // --- Upgrade paths ---
 
 const empoweredAltarPath: RoomUpgradePath = {
-  id: UPGRADE_LEVEL_2_ID,
+  id: UPGRADE_LEVEL_2_ID as UpgradePathId,
   name: 'Empowered Altar',
   description: 'Channel deeper magical energies.',
   cost: { gold: 150, crystals: 75, essence: 30 },
@@ -32,7 +35,7 @@ const empoweredAltarPath: RoomUpgradePath = {
 };
 
 const ascendantAltarPath: RoomUpgradePath = {
-  id: UPGRADE_LEVEL_3_ID,
+  id: UPGRADE_LEVEL_3_ID as UpgradePathId,
   name: 'Ascendant Altar',
   description: 'Unlock the altar full potential.',
   cost: { gold: 300, crystals: 150, essence: 60 },
@@ -72,11 +75,11 @@ vi.mock('@helpers/room-roles', () => ({
 }));
 
 const altarRoomDef: RoomDefinition & IsContentItem = {
-  id: ALTAR_ROOM_ID,
+  id: ALTAR_ROOM_ID as RoomId,
   name: 'Altar Room',
   __type: 'room',
   description: 'The dark heart of your dungeon.',
-  shapeId: ALTAR_SHAPE_ID,
+  shapeId: ALTAR_SHAPE_ID as RoomShapeId,
   cost: {},
   production: { essence: 0.2 },
   requiresWorkers: false,
@@ -92,11 +95,11 @@ const altarRoomDef: RoomDefinition & IsContentItem = {
 };
 
 const crystalMineRoom: RoomDefinition & IsContentItem = {
-  id: CRYSTAL_MINE_ID,
+  id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
   description: '',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 50 },
   production: { crystals: 1.0 },
   requiresWorkers: true,
@@ -160,7 +163,7 @@ import {
 
 function makeFloor(rooms: PlacedRoom[]): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -177,7 +180,7 @@ function createAltarRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-altar-1' as PlacedRoomId,
     roomTypeId: ALTAR_ROOM_ID as RoomId,
-    shapeId: ALTAR_SHAPE_ID,
+    shapeId: ALTAR_SHAPE_ID as RoomShapeId,
     anchorX: 8,
     anchorY: 8,
     ...overrides,
@@ -188,7 +191,7 @@ function createMineRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-mine-1' as PlacedRoomId,
     roomTypeId: CRYSTAL_MINE_ID as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 11,
     anchorY: 8,
     ...overrides,
@@ -260,13 +263,13 @@ describe('Altar Room: level system', () => {
   });
 
   it('should be Level 2 with Empowered Altar upgrade', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     expect(altarRoomGetLevel([floor])).toBe(2);
   });
 
   it('should be Level 3 with Ascendant Altar upgrade', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     expect(altarRoomGetLevel([floor])).toBe(3);
   });
@@ -293,7 +296,7 @@ describe('Altar Room: upgrade paths', () => {
   });
 
   it('should return Level 3 as next upgrade at Level 2', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     const next = altarRoomGetNextUpgrade([floor]);
     expect(next).toBeDefined();
@@ -302,7 +305,7 @@ describe('Altar Room: upgrade paths', () => {
   });
 
   it('should return undefined when fully upgraded', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     expect(altarRoomGetNextUpgrade([floor])).toBeUndefined();
   });
@@ -320,13 +323,13 @@ describe('Altar Room: fear reduction aura', () => {
   });
 
   it('should have fear reduction aura of 2 at Level 2', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     expect(altarRoomGetFearReductionAura([floor])).toBe(2);
   });
 
   it('should have fear reduction aura of 3 at Level 3', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID as UpgradePathId });
     const floor = makeFloor([altar]);
     expect(altarRoomGetFearReductionAura([floor])).toBe(3);
   });
@@ -369,7 +372,7 @@ describe('Altar Room: effective fear level', () => {
   });
 
   it('should reduce fear by 2 for adjacent room at Level 2', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const mine = createMineRoom({ anchorX: 11, anchorY: 8 });
     const floor = makeFloor([altar, mine]);
     // fearLevel: 2, aura: 2 → effective: 0
@@ -377,7 +380,7 @@ describe('Altar Room: effective fear level', () => {
   });
 
   it('should not reduce fear below 0', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID as UpgradePathId });
     const mine = createMineRoom({ anchorX: 11, anchorY: 8 });
     const floor = makeFloor([altar, mine]);
     // fearLevel: 1, aura: 3 → clamped to 0
@@ -407,7 +410,7 @@ describe('Altar Room: effective fear level', () => {
 
 describe('Altar Room: upgrade effects', () => {
   it('should expose Level 2 upgrade effects when applied', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const effects = roomUpgradeGetAppliedEffects(altar);
     expect(effects).toHaveLength(2);
     expect(effects[0].type).toBe('fearReductionAura');
@@ -416,7 +419,7 @@ describe('Altar Room: upgrade effects', () => {
   });
 
   it('should expose Level 3 upgrade effects when applied', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_3_ID as UpgradePathId });
     const effects = roomUpgradeGetAppliedEffects(altar);
     expect(effects).toHaveLength(3);
     expect(effects[0].type).toBe('fearReductionAura');
@@ -432,7 +435,7 @@ describe('Altar Room: upgrade effects', () => {
 
 describe('Altar Room: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade directly', () => {
-    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID });
+    const altar = createAltarRoom({ appliedUpgradePathId: UPGRADE_LEVEL_2_ID as UpgradePathId });
     const result = roomUpgradeCanApply(altar, UPGRADE_LEVEL_3_ID);
     expect(result.valid).toBe(false);
   });

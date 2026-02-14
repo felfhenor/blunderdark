@@ -11,11 +11,11 @@ import {
   hallwayRemoveUpgrade,
   hallwaySerialize,
 } from '@helpers/hallways';
-import type { Hallway, PlacedRoomId } from '@interfaces';
+import type { Hallway, HallwayId, PlacedRoomId } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 const testHallway: Hallway = {
-  id: 'hallway-1',
+  id: 'hallway-1' as HallwayId,
   startRoomId: 'room-a' as PlacedRoomId,
   endRoomId: 'room-b' as PlacedRoomId,
   tiles: [
@@ -69,7 +69,7 @@ describe('hallwayRemoveFromGrid', () => {
     let grid = gridCreateEmpty();
     const otherHallway: Hallway = {
       ...testHallway,
-      id: 'hallway-2',
+      id: 'hallway-2' as HallwayId,
       tiles: [{ x: 5, y: 5 }],
     };
     grid = hallwayAddToGrid(grid, otherHallway);
@@ -113,9 +113,9 @@ describe('hallwayIsTileBlocked', () => {
 
 describe('hallwayGetBetween', () => {
   const hallways: Hallway[] = [
-    { ...testHallway, id: 'h1', startRoomId: 'a' as PlacedRoomId, endRoomId: 'b' as PlacedRoomId },
-    { ...testHallway, id: 'h2', startRoomId: 'b' as PlacedRoomId, endRoomId: 'a' as PlacedRoomId },
-    { ...testHallway, id: 'h3', startRoomId: 'a' as PlacedRoomId, endRoomId: 'c' as PlacedRoomId },
+    { ...testHallway, id: 'h1' as HallwayId, startRoomId: 'a' as PlacedRoomId, endRoomId: 'b' as PlacedRoomId },
+    { ...testHallway, id: 'h2' as HallwayId, startRoomId: 'b' as PlacedRoomId, endRoomId: 'a' as PlacedRoomId },
+    { ...testHallway, id: 'h3' as HallwayId, startRoomId: 'a' as PlacedRoomId, endRoomId: 'c' as PlacedRoomId },
   ];
 
   it('should find hallways in both directions', () => {
@@ -138,13 +138,13 @@ describe('hallwayAdd / hallwayRemove', () => {
 
   it('should remove a hallway by id', () => {
     const hallways = hallwayAdd([], testHallway);
-    const result = hallwayRemove(hallways, 'hallway-1');
+    const result = hallwayRemove(hallways, 'hallway-1' as HallwayId);
     expect(result).toHaveLength(0);
   });
 
   it('should not remove hallways with different ids', () => {
     const hallways = hallwayAdd([], testHallway);
-    const result = hallwayRemove(hallways, 'nonexistent');
+    const result = hallwayRemove(hallways, 'nonexistent' as HallwayId);
     expect(result).toHaveLength(1);
   });
 });

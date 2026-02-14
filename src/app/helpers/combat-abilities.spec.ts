@@ -2,6 +2,7 @@ import type {
   AbilityEffectDefinition,
   AbilityState,
   CombatAbility,
+  CombatAbilityId,
   CombatUnit,
 } from '@interfaces';
 import { describe, expect, it, vi } from 'vitest';
@@ -194,7 +195,7 @@ describe('combatAbilityInitStates', () => {
 describe('combatAbilityTickStates', () => {
   it('should decrement cooldowns by 1', () => {
     const states: AbilityState[] = [
-      { abilityId: 'a', currentCooldown: 3, isActive: false, remainingDuration: 0 },
+      { abilityId: 'a' as CombatAbilityId, currentCooldown: 3, isActive: false, remainingDuration: 0 },
     ];
     const ticked = combatAbilityTickStates(states);
     expect(ticked[0].currentCooldown).toBe(2);
@@ -202,7 +203,7 @@ describe('combatAbilityTickStates', () => {
 
   it('should not go below 0 cooldown', () => {
     const states: AbilityState[] = [
-      { abilityId: 'a', currentCooldown: 0, isActive: false, remainingDuration: 0 },
+      { abilityId: 'a' as CombatAbilityId, currentCooldown: 0, isActive: false, remainingDuration: 0 },
     ];
     const ticked = combatAbilityTickStates(states);
     expect(ticked[0].currentCooldown).toBe(0);
@@ -210,7 +211,7 @@ describe('combatAbilityTickStates', () => {
 
   it('should decrement active duration and deactivate at 0', () => {
     const states: AbilityState[] = [
-      { abilityId: 'a', currentCooldown: 0, isActive: true, remainingDuration: 1 },
+      { abilityId: 'a' as CombatAbilityId, currentCooldown: 0, isActive: true, remainingDuration: 1 },
     ];
     const ticked = combatAbilityTickStates(states);
     expect(ticked[0].isActive).toBe(false);
@@ -219,7 +220,7 @@ describe('combatAbilityTickStates', () => {
 
   it('should keep active with remaining duration > 1', () => {
     const states: AbilityState[] = [
-      { abilityId: 'a', currentCooldown: 0, isActive: true, remainingDuration: 3 },
+      { abilityId: 'a' as CombatAbilityId, currentCooldown: 0, isActive: true, remainingDuration: 3 },
     ];
     const ticked = combatAbilityTickStates(states);
     expect(ticked[0].isActive).toBe(true);
@@ -228,7 +229,7 @@ describe('combatAbilityTickStates', () => {
 
   it('should not mutate original states', () => {
     const states: AbilityState[] = [
-      { abilityId: 'a', currentCooldown: 2, isActive: false, remainingDuration: 0 },
+      { abilityId: 'a' as CombatAbilityId, currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
     combatAbilityTickStates(states);
     expect(states[0].currentCooldown).toBe(2);
@@ -238,14 +239,14 @@ describe('combatAbilityTickStates', () => {
 describe('combatAbilityIsReady', () => {
   it('should return true when cooldown is 0', () => {
     const states: AbilityState[] = [
-      { abilityId: 'ability-breath-weapon', currentCooldown: 0, isActive: false, remainingDuration: 0 },
+      { abilityId: 'ability-breath-weapon' as CombatAbilityId, currentCooldown: 0, isActive: false, remainingDuration: 0 },
     ];
     expect(combatAbilityIsReady(breathWeapon, states)).toBe(true);
   });
 
   it('should return false when cooldown > 0', () => {
     const states: AbilityState[] = [
-      { abilityId: 'ability-breath-weapon', currentCooldown: 2, isActive: false, remainingDuration: 0 },
+      { abilityId: 'ability-breath-weapon' as CombatAbilityId, currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
     expect(combatAbilityIsReady(breathWeapon, states)).toBe(false);
   });
@@ -277,7 +278,7 @@ describe('combatAbilityTryActivate: damage abilities', () => {
 
   it('should not activate when on cooldown', () => {
     const states: AbilityState[] = [
-      { abilityId: 'ability-breath-weapon', currentCooldown: 2, isActive: false, remainingDuration: 0 },
+      { abilityId: 'ability-breath-weapon' as CombatAbilityId, currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
     const attacker = makeUnit({ attack: 80 });
     const result = combatAbilityTryActivate(breathWeapon, states, attacker, 3, fixedRng(0.5));
@@ -381,7 +382,7 @@ describe('combatAbilityApplyBerserkBuff', () => {
 describe('combatAbilityApplyShieldBuff', () => {
   it('should increase defense when shield is active', () => {
     const states: AbilityState[] = [
-      { abilityId: 'ability-shield', currentCooldown: 4, isActive: true, remainingDuration: 2 },
+      { abilityId: 'ability-shield' as CombatAbilityId, currentCooldown: 4, isActive: true, remainingDuration: 2 },
     ];
     const result = combatAbilityApplyShieldBuff(30, [lichShield], states);
     expect(result).toBe(45); // 30 * (1 + 50/100)
@@ -389,7 +390,7 @@ describe('combatAbilityApplyShieldBuff', () => {
 
   it('should not buff when shield is inactive', () => {
     const states: AbilityState[] = [
-      { abilityId: 'ability-shield', currentCooldown: 2, isActive: false, remainingDuration: 0 },
+      { abilityId: 'ability-shield' as CombatAbilityId, currentCooldown: 2, isActive: false, remainingDuration: 0 },
     ];
     const result = combatAbilityApplyShieldBuff(30, [lichShield], states);
     expect(result).toBe(30);

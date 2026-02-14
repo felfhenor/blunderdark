@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import type { GameState } from '@interfaces';
+import type { GameState, InvasionObjectiveId } from '@interfaces';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
   invasionObjectiveAssign,
@@ -176,7 +176,7 @@ function makeObjective(
   overrides: Partial<InvasionObjective> = {},
 ): InvasionObjective {
   return {
-    id: 'obj-1',
+    id: 'obj-1' as InvasionObjectiveId,
     type: 'DestroyAltar',
     name: 'Destroy Altar',
     description: 'Test objective',
@@ -440,13 +440,13 @@ describe('invasion-objectives', () => {
           progress: 100,
         }),
         makeObjective({
-          id: 'sec-1',
+          id: 'sec-1' as InvasionObjectiveId,
           type: 'StealTreasure',
           isPrimary: false,
           isCompleted: false,
         }),
         makeObjective({
-          id: 'sec-2',
+          id: 'sec-2' as InvasionObjectiveId,
           type: 'ScoutDungeon',
           isPrimary: false,
           isCompleted: false,
@@ -466,13 +466,13 @@ describe('invasion-objectives', () => {
           progress: 30,
         }),
         makeObjective({
-          id: 'sec-1',
+          id: 'sec-1' as InvasionObjectiveId,
           type: 'StealTreasure',
           isPrimary: false,
           isCompleted: false,
         }),
         makeObjective({
-          id: 'sec-2',
+          id: 'sec-2' as InvasionObjectiveId,
           type: 'ScoutDungeon',
           isPrimary: false,
           isCompleted: false,
@@ -487,13 +487,13 @@ describe('invasion-objectives', () => {
       const objectives = [
         makeObjective({ isPrimary: true, isCompleted: false }),
         makeObjective({
-          id: 'sec-1',
+          id: 'sec-1' as InvasionObjectiveId,
           type: 'StealTreasure',
           isPrimary: false,
           isCompleted: false,
         }),
         makeObjective({
-          id: 'sec-2',
+          id: 'sec-2' as InvasionObjectiveId,
           type: 'ScoutDungeon',
           isPrimary: false,
           isCompleted: false,
@@ -510,13 +510,13 @@ describe('invasion-objectives', () => {
       const objectives = [
         makeObjective({ isPrimary: true, isCompleted: false }),
         makeObjective({
-          id: 'sec-1',
+          id: 'sec-1' as InvasionObjectiveId,
           type: 'StealTreasure',
           isPrimary: false,
           isCompleted: true,
         }),
         makeObjective({
-          id: 'sec-2',
+          id: 'sec-2' as InvasionObjectiveId,
           type: 'ScoutDungeon',
           isPrimary: false,
           isCompleted: true,
@@ -532,13 +532,13 @@ describe('invasion-objectives', () => {
       const objectives = [
         makeObjective({ isPrimary: true, isCompleted: false }),
         makeObjective({
-          id: 'sec-1',
+          id: 'sec-1' as InvasionObjectiveId,
           type: 'StealTreasure',
           isPrimary: false,
           isCompleted: true,
         }),
         makeObjective({
-          id: 'sec-2',
+          id: 'sec-2' as InvasionObjectiveId,
           type: 'ScoutDungeon',
           isPrimary: false,
           isCompleted: false,
@@ -556,7 +556,7 @@ describe('invasion-objectives', () => {
         makeObjective({ isPrimary: true, isCompleted: false }),
         ...Array.from({ length: 5 }, (_, i) =>
           makeObjective({
-            id: `sec-${i}`,
+            id: `sec-${i}` as InvasionObjectiveId,
             type: 'ScoutDungeon',
             isPrimary: false,
             isCompleted: true,

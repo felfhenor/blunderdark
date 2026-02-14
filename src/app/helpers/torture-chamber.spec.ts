@@ -1,14 +1,20 @@
 import type {
   CapturedPrisoner,
   Floor,
+  FloorId,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
+  PrisonerId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
@@ -23,7 +29,7 @@ const GOBLIN_ID = 'tc200001-0001-0001-0001-000000000001';
 // --- Upgrade paths ---
 
 const grandInquisitorPath: RoomUpgradePath = {
-  id: 'upgrade-grand-inquisitor',
+  id: 'upgrade-grand-inquisitor' as UpgradePathId,
   name: 'Grand Inquisitor',
   description: 'Speed and conversion bonus.',
   cost: { gold: 120, essence: 40 },
@@ -35,7 +41,7 @@ const grandInquisitorPath: RoomUpgradePath = {
 };
 
 const corruptionEnginePath: RoomUpgradePath = {
-  id: 'upgrade-corruption-engine',
+  id: 'upgrade-corruption-engine' as UpgradePathId,
   name: 'Corruption Engine',
   description: 'Double corruption.',
   cost: { gold: 100, flux: 30 },
@@ -89,11 +95,11 @@ vi.mock('@helpers/room-shapes', () => ({
 // --- Room definitions ---
 
 const tortureChamberDef: RoomDefinition & IsContentItem = {
-  id: TORTURE_CHAMBER_ID,
+  id: TORTURE_CHAMBER_ID as RoomId,
   name: 'Torture Chamber',
   __type: 'room',
   description: 'Tortures prisoners.',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 120, crystals: 40, essence: 20 },
   production: { corruption: 0.4 },
   requiresWorkers: true,
@@ -110,11 +116,11 @@ const tortureChamberDef: RoomDefinition & IsContentItem = {
 };
 
 const soulWellDef: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: 'Soul stuff.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -131,11 +137,11 @@ const soulWellDef: RoomDefinition & IsContentItem = {
 };
 
 const barracksDef: RoomDefinition & IsContentItem = {
-  id: BARRACKS_ID,
+  id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',
   description: 'Barracks.',
-  shapeId: 'shape-bar',
+  shapeId: 'shape-bar' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -157,7 +163,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'torture-1' as PlacedRoomId,
     roomTypeId: TORTURE_CHAMBER_ID as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -168,8 +174,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inh-1',
-    definitionId: GOBLIN_ID,
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: GOBLIN_ID as InhabitantId,
     name: 'Goblin Torturer',
     state: 'normal',
     assignedRoomId: 'torture-1' as PlacedRoomId,
@@ -181,7 +187,7 @@ function makePrisoner(
   overrides: Partial<CapturedPrisoner> = {},
 ): CapturedPrisoner {
   return {
-    id: 'prisoner-1',
+    id: 'prisoner-1' as PrisonerId,
     invaderClass: 'warrior',
     name: 'Captured Warrior',
     stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
@@ -195,7 +201,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -326,7 +332,7 @@ describe('tortureCanStart', () => {
   it('should return false if there is an active job', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'p1',
+      prisonerId: 'p1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 10,
       targetTicks: 20,
@@ -366,7 +372,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should apply Grand Inquisitor upgrade (0.5x)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set());
     expect(ticks).toBe(Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5));
@@ -381,7 +387,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should combine upgrade and adjacency', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
     const afterUpgrade = Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5);
@@ -390,7 +396,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should never go below 1 tick', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
     expect(ticks).toBeGreaterThanOrEqual(1);
@@ -406,7 +412,7 @@ describe('Conversion Tick Calculation', () => {
 
   it('should apply Grand Inquisitor upgrade (0.5x)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const ticks = tortureGetConversionTicks(room, new Set());
     expect(ticks).toBe(Math.round(TORTURE_CONVERSION_BASE_TICKS * 0.5));
@@ -440,7 +446,7 @@ describe('Conversion Rate Calculation', () => {
 
   it('should apply Grand Inquisitor conversion bonus', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const rate = tortureGetConversionRate(room, new Set(), 'warrior');
     expect(rate).toBeCloseTo(0.55, 5); // 0.30 + 0.25
@@ -458,7 +464,7 @@ describe('Conversion Rate Calculation', () => {
 
   it('should cap at 95%', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     // rogue base: 0.50 + 0.25 (upgrade) + 0.10 (barracks) = 0.85
     const rate = tortureGetConversionRate(
@@ -473,7 +479,7 @@ describe('Conversion Rate Calculation', () => {
   it('should hard-cap even with extreme bonuses', () => {
     // Even with stacking, can't exceed 0.95
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor',
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
     });
     const rate = tortureGetConversionRate(
       room,
@@ -544,7 +550,7 @@ describe('tortureChamberProcess', () => {
   it('should decrement torture job ticks', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 10,
       targetTicks: 20,
@@ -567,7 +573,7 @@ describe('tortureChamberProcess', () => {
   it('should add corruption per tick while processing', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 10,
       targetTicks: 20,
@@ -594,7 +600,7 @@ describe('tortureChamberProcess', () => {
   it('should complete extraction and grant research when ticks reach 0', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 1,
       targetTicks: 20,
@@ -623,7 +629,7 @@ describe('tortureChamberProcess', () => {
   it('should remove prisoner after extraction', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 1,
       targetTicks: 20,
@@ -646,7 +652,7 @@ describe('tortureChamberProcess', () => {
   it('should clear job after completion', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 1,
       targetTicks: 20,
@@ -672,7 +678,7 @@ describe('tortureChamberProcess', () => {
     // Instead we test that the process runs correctly with the seeded rng
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'convert',
       ticksRemaining: 1,
       targetTicks: 40,
@@ -707,7 +713,7 @@ describe('tortureChamberProcess', () => {
   it('should not process rooms that are not torture chambers', () => {
     const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 1,
       targetTicks: 20,
@@ -726,7 +732,7 @@ describe('tortureChamberProcess', () => {
   it('should not process rooms without assigned workers', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'extract',
       ticksRemaining: 10,
       targetTicks: 20,
@@ -749,7 +755,7 @@ describe('tortureChamberProcess', () => {
   it('should sync floor inhabitants after successful conversion', () => {
     const room = makeRoom();
     room.tortureJob = {
-      prisonerId: 'prisoner-1',
+      prisonerId: 'prisoner-1' as PrisonerId,
       action: 'convert',
       ticksRemaining: 1,
       targetTicks: 40,

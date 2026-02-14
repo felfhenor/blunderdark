@@ -7,7 +7,7 @@ import { roomPlacementExitMode } from '@helpers/room-placement';
 import { stairPlacementExit } from '@helpers/stairs';
 import { elevatorPlacementExit } from '@helpers/elevators';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Floor, PortalInstance } from '@interfaces';
+import type { Floor, PortalId, PortalInstance } from '@interfaces';
 import type { PortalValidationResult, PortalRemovalInfo } from '@interfaces/portal';
 
 export const PORTAL_PLACEMENT_COST_FLUX = 100;
@@ -215,7 +215,7 @@ export async function portalPlacementExecute(
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   const portal: PortalInstance = {
-    id: rngUuid(),
+    id: rngUuid() as PortalId,
     floorDepthA: sourceFloorDepth,
     floorDepthB: destFloorDepth,
     positionA: { ...sourcePos },

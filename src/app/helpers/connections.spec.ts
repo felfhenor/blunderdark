@@ -8,7 +8,7 @@ import {
   connectionRemoveRoomFromFloor,
   connectionValidate,
 } from '@helpers/connections';
-import type { Connection, Floor, PlacedRoom, PlacedRoomId, RoomId } from '@interfaces';
+import type { Connection, ConnectionId, Floor, FloorId, PlacedRoom, PlacedRoomId, RoomId, RoomShapeId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGamestate = vi.fn();
@@ -38,7 +38,7 @@ vi.mock('@helpers/room-shapes', () => ({
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -54,7 +54,7 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
 
 function makeConnection(overrides: Partial<Connection> = {}): Connection {
   return {
-    id: 'conn-1',
+    id: 'conn-1' as ConnectionId,
     roomAId: 'room-a' as PlacedRoomId,
     roomBId: 'room-b' as PlacedRoomId,
     edgeTiles: [{ x: 2, y: 0 }],
@@ -66,7 +66,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'room-a' as PlacedRoomId,
     roomTypeId: 'room-type-1' as RoomId,
-    shapeId: 'shape-2x1',
+    shapeId: 'shape-2x1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -78,8 +78,8 @@ const defaultState = () => ({
     floors: [
       makeFloor({
         connections: [
-          makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
-          makeConnection({ id: 'conn-2', roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
+          makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
+          makeConnection({ id: 'conn-2' as ConnectionId, roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
         ],
       }),
     ],
@@ -152,7 +152,7 @@ describe('connectionAreConnected', () => {
 describe('connectionFind', () => {
   it('should find connection in A→B order', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
+      connections: [makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
     const result = connectionFind(floor, 'room-a' as PlacedRoomId, 'room-b' as PlacedRoomId);
     expect(result).toBeDefined();
@@ -161,7 +161,7 @@ describe('connectionFind', () => {
 
   it('should find connection in B→A order', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
+      connections: [makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
     const result = connectionFind(floor, 'room-b' as PlacedRoomId, 'room-a' as PlacedRoomId);
     expect(result).toBeDefined();
@@ -213,8 +213,8 @@ describe('connectionRemoveFromFloor', () => {
   it('should remove a connection by ID', () => {
     const floor = makeFloor({
       connections: [
-        makeConnection({ id: 'conn-1' }),
-        makeConnection({ id: 'conn-2', roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
+        makeConnection({ id: 'conn-1' as ConnectionId }),
+        makeConnection({ id: 'conn-2' as ConnectionId, roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
       ],
     });
     const result = connectionRemoveFromFloor(floor, 'conn-1');
@@ -224,13 +224,13 @@ describe('connectionRemoveFromFloor', () => {
   });
 
   it('should return undefined for nonexistent connection ID', () => {
-    const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' })] });
+    const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' as ConnectionId })] });
     const result = connectionRemoveFromFloor(floor, 'conn-99');
     expect(result).toBeUndefined();
   });
 
   it('should not mutate the original floor', () => {
-    const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' })] });
+    const floor = makeFloor({ connections: [makeConnection({ id: 'conn-1' as ConnectionId })] });
     connectionRemoveFromFloor(floor, 'conn-1');
     expect(floor.connections).toHaveLength(1);
   });
@@ -240,9 +240,9 @@ describe('connectionRemoveRoomFromFloor', () => {
   it('should remove all connections involving a room', () => {
     const floor = makeFloor({
       connections: [
-        makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
-        makeConnection({ id: 'conn-2', roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
-        makeConnection({ id: 'conn-3', roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
+        makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId }),
+        makeConnection({ id: 'conn-2' as ConnectionId, roomAId: 'room-b' as PlacedRoomId, roomBId: 'room-c' as PlacedRoomId }),
+        makeConnection({ id: 'conn-3' as ConnectionId, roomAId: 'room-c' as PlacedRoomId, roomBId: 'room-d' as PlacedRoomId }),
       ],
     });
     const result = connectionRemoveRoomFromFloor(floor, 'room-b' as PlacedRoomId);
@@ -252,7 +252,7 @@ describe('connectionRemoveRoomFromFloor', () => {
 
   it('should return unchanged floor if room has no connections', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
+      connections: [makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
     const result = connectionRemoveRoomFromFloor(floor, 'room-z' as PlacedRoomId);
     expect(result.connections).toHaveLength(1);
@@ -260,7 +260,7 @@ describe('connectionRemoveRoomFromFloor', () => {
 
   it('should not mutate the original floor', () => {
     const floor = makeFloor({
-      connections: [makeConnection({ id: 'conn-1', roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
+      connections: [makeConnection({ id: 'conn-1' as ConnectionId, roomAId: 'room-a' as PlacedRoomId, roomBId: 'room-b' as PlacedRoomId })],
     });
     connectionRemoveRoomFromFloor(floor, 'room-a' as PlacedRoomId);
     expect(floor.connections).toHaveLength(1);

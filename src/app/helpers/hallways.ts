@@ -3,7 +3,7 @@ import { gridGetTile, gridIsInBounds, gridSetTile } from '@helpers/grid';
 import type { PlacedRoomId } from '@interfaces';
 import type { Floor } from '@interfaces/floor';
 import type { GridState, GridTile } from '@interfaces/grid';
-import type { Hallway, HallwayUpgrade } from '@interfaces/hallway';
+import type { Hallway, HallwayId, HallwayUpgrade } from '@interfaces/hallway';
 import type { TileOffset } from '@interfaces/room-shape';
 
 export function hallwayAddToGrid(grid: GridState, hallway: Hallway): GridState {
@@ -85,7 +85,7 @@ export function hallwayAdd(hallways: Hallway[], hallway: Hallway): Hallway[] {
 
 export function hallwayRemove(
   hallways: Hallway[],
-  hallwayId: string,
+  hallwayId: HallwayId,
 ): Hallway[] {
   return hallways.filter((h) => h.id !== hallwayId);
 }
@@ -115,7 +115,7 @@ export function hallwayRemoveUpgrade(
  */
 export function hallwayFindAdjacentHallways(
   floor: Floor,
-  hallwayId: string,
+  hallwayId: HallwayId,
 ): Hallway[] {
   const hallway = floor.hallways.find((h) => h.id === hallwayId);
   if (!hallway) return [];
@@ -133,8 +133,8 @@ export function hallwayFindAdjacentHallways(
  */
 export function hallwayMergeOnFloor(
   floor: Floor,
-  targetId: string,
-  absorbedId: string,
+  targetId: HallwayId,
+  absorbedId: HallwayId,
 ): Floor {
   const target = floor.hallways.find((h) => h.id === targetId);
   const absorbed = floor.hallways.find((h) => h.id === absorbedId);
@@ -184,8 +184,8 @@ export function hallwayMergeOnFloor(
   const updatedConnections = floor.connections
     .map((conn) => {
       let { roomAId, roomBId } = conn;
-      if ((roomAId as string) === absorbedId) roomAId = targetId as PlacedRoomId;
-      if ((roomBId as string) === absorbedId) roomBId = targetId as PlacedRoomId;
+      if ((roomAId as string) === (absorbedId as string)) roomAId = targetId as unknown as PlacedRoomId;
+      if ((roomBId as string) === (absorbedId as string)) roomBId = targetId as unknown as PlacedRoomId;
       return { ...conn, roomAId, roomBId };
     })
     .filter((conn) => conn.roomAId !== conn.roomBId)
@@ -224,7 +224,7 @@ export function hallwayDeserialize(data: unknown[]): Hallway[] {
   return data.map((item) => {
     const h = item as Record<string, unknown>;
     return {
-      id: (h['id'] as string) ?? '',
+      id: ((h['id'] as string) ?? '') as HallwayId,
       startRoomId: ((h['startRoomId'] as string) || undefined) as PlacedRoomId | undefined,
       endRoomId: ((h['endRoomId'] as string) || undefined) as PlacedRoomId | undefined,
       tiles: (h['tiles'] as TileOffset[]) ?? [],

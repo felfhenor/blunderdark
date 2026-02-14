@@ -13,7 +13,7 @@ import {
   notifySuccess,
   productionGetRoomDefinition,
 } from '@helpers';
-import type { PlacedRoomId } from '@interfaces';
+import type { HallwayId, PlacedRoomId } from '@interfaces';
 
 @Component({
   selector: 'app-panel-hallway-info',
@@ -126,7 +126,7 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const ids = connectionGetAdjacentUnconnected(floor, info.hallwayId as PlacedRoomId);
+    const ids = connectionGetAdjacentUnconnected(floor, info.hallwayId as unknown as PlacedRoomId);
     return ids.map((id) => ({ id, name: getEntityName(floor, id) }));
   });
 
@@ -135,10 +135,10 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const connections = connectionGetRoomConnections(floor, info.hallwayId as PlacedRoomId);
+    const connections = connectionGetRoomConnections(floor, info.hallwayId as unknown as PlacedRoomId);
     return connections.map((conn) => {
       const otherId =
-        conn.roomAId === info.hallwayId ? conn.roomBId : conn.roomAId;
+        conn.roomAId === (info.hallwayId as unknown as PlacedRoomId) ? conn.roomBId : conn.roomAId;
       return {
         connectionId: conn.id,
         otherId,
@@ -147,11 +147,11 @@ export class PanelHallwayInfoComponent {
     });
   });
 
-  public async onConnect(entityId: string): Promise<void> {
+  public async onConnect(entityId: PlacedRoomId): Promise<void> {
     const info = this.selectedHallwayTile();
     if (!info) return;
 
-    const result = await connectionCreate(info.hallwayId as PlacedRoomId, entityId as PlacedRoomId);
+    const result = await connectionCreate(info.hallwayId as unknown as PlacedRoomId, entityId);
     if (result.error) {
       notifyError(result.error);
     } else {

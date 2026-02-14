@@ -1,18 +1,23 @@
 import type {
+  CombatAbilityId,
   GameState,
   IsContentItem,
   ResearchNode,
   UnlockEffect,
   UnlockedContent,
+  UpgradePathId,
 } from '@interfaces';
+import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { ResearchId } from '@interfaces/content-research';
+import type { RoomId } from '@interfaces/content-room';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
 
-const ROOM_ID_A = 'room-aaa-111';
-const ROOM_ID_B = 'room-bbb-222';
-const INHABITANT_ID = 'inhab-111';
-const NODE_ID = 'node-001';
+const ROOM_ID_A = 'room-aaa-111' as RoomId;
+const ROOM_ID_B = 'room-bbb-222' as RoomId;
+const INHABITANT_ID = 'inhab-111' as InhabitantId;
+const NODE_ID = 'node-001' as ResearchId;
 
 // --- Mock content ---
 
@@ -169,21 +174,21 @@ describe('researchUnlockIsUnlocked', () => {
   });
 
   it('should check ability unlock status', () => {
-    const content = makeUnlockedContent({ abilities: ['ability-1'] });
-    expect(researchUnlockIsUnlocked('ability', 'ability-1', content)).toBe(
+    const content = makeUnlockedContent({ abilities: ['ability-1' as CombatAbilityId] });
+    expect(researchUnlockIsUnlocked('ability', 'ability-1' as CombatAbilityId, content)).toBe(
       true,
     );
-    expect(researchUnlockIsUnlocked('ability', 'ability-2', content)).toBe(
+    expect(researchUnlockIsUnlocked('ability', 'ability-2' as CombatAbilityId, content)).toBe(
       false,
     );
   });
 
   it('should check upgrade unlock status', () => {
-    const content = makeUnlockedContent({ upgrades: ['upgrade-1'] });
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-1', content)).toBe(
+    const content = makeUnlockedContent({ upgrades: ['upgrade-1' as UpgradePathId] });
+    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-1' as UpgradePathId, content)).toBe(
       true,
     );
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-2', content)).toBe(
+    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-2' as UpgradePathId, content)).toBe(
       false,
     );
   });
@@ -287,18 +292,18 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should add ability unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'ability', targetId: 'ability-1' },
+      { type: 'ability', targetId: 'ability-1' as CombatAbilityId },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
-    expect(result.abilities).toEqual(['ability-1']);
+    expect(result.abilities).toEqual(['ability-1' as CombatAbilityId]);
   });
 
   it('should add upgrade unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'upgrade', targetId: 'upgrade-1' },
+      { type: 'upgrade', targetId: 'upgrade-1' as UpgradePathId },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
-    expect(result.upgrades).toEqual(['upgrade-1']);
+    expect(result.upgrades).toEqual(['upgrade-1' as UpgradePathId]);
   });
 });
 

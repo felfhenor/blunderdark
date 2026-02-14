@@ -11,6 +11,7 @@ import type {
   TrapCraftingJob,
   TrapCraftingQueue,
   TrapDefinition,
+  TrapId,
 } from '@interfaces';
 import type { ResourceCost } from '@interfaces/resource';
 import type { TrapWorkshopInfo } from '@interfaces/trap-workshop';
@@ -79,7 +80,7 @@ export function trapWorkshopGetQueue(
 export function trapWorkshopAddJob(
   queues: TrapCraftingQueue[],
   roomId: PlacedRoomId,
-  trapTypeId: string,
+  trapTypeId: TrapId,
   targetTicks: number,
 ): TrapCraftingQueue[] {
   const job: TrapCraftingJob = {

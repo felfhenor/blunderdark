@@ -1,3 +1,4 @@
+import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { IsContentItem } from '@interfaces/identifiable';
 
 export type CombatUnit = {
@@ -36,14 +37,14 @@ export type CombatAbility = IsContentItem & {
 };
 
 export type AbilityState = {
-  abilityId: string;
+  abilityId: CombatAbilityId;
   currentCooldown: number;
   isActive: boolean;
   remainingDuration: number;
 };
 
 export type AbilityActivation = {
-  abilityId: string;
+  abilityId: CombatAbilityId;
   abilityName: string;
   effectType: string;
   targetType: AbilityTargetType;

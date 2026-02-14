@@ -7,12 +7,12 @@ import {
   stairRemoveFromFloors,
   stairValidatePlacement,
 } from '@helpers/stairs';
-import type { Floor, PlacedRoomId, StairInstance } from '@interfaces';
+import type { Floor, FloorId, PlacedRoomId, StairId, StairInstance } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function makeFloor(depth: number, overrides: Partial<Floor> = {}): Floor {
   return {
-    id: `floor-${depth}`,
+    id: `floor-${depth}` as FloorId,
     name: `Floor ${depth}`,
     depth,
     biome: 'neutral',
@@ -28,7 +28,7 @@ function makeFloor(depth: number, overrides: Partial<Floor> = {}): Floor {
 
 function makeStair(overrides: Partial<StairInstance> = {}): StairInstance {
   return {
-    id: 'stair-1',
+    id: 'stair-1' as StairId,
     floorDepthA: 1,
     floorDepthB: 2,
     gridX: 5,
@@ -167,9 +167,9 @@ describe('stairRemoveFromFloors', () => {
 describe('stairGetOnFloor', () => {
   it('should return stairs touching the given floor', () => {
     const stairs = [
-      makeStair({ id: 's1', floorDepthA: 1, floorDepthB: 2 }),
-      makeStair({ id: 's2', floorDepthA: 2, floorDepthB: 3, gridX: 10 }),
-      makeStair({ id: 's3', floorDepthA: 3, floorDepthB: 4, gridX: 15 }),
+      makeStair({ id: 's1' as StairId, floorDepthA: 1, floorDepthB: 2 }),
+      makeStair({ id: 's2' as StairId, floorDepthA: 2, floorDepthB: 3, gridX: 10 }),
+      makeStair({ id: 's3' as StairId, floorDepthA: 3, floorDepthB: 4, gridX: 15 }),
     ];
 
     expect(stairGetOnFloor(stairs, 2)).toHaveLength(2);
@@ -192,8 +192,8 @@ describe('stairFloorsAreConnected', () => {
 
   it('should return true for transitively connected floors', () => {
     const stairs = [
-      makeStair({ id: 's1', floorDepthA: 1, floorDepthB: 2 }),
-      makeStair({ id: 's2', floorDepthA: 2, floorDepthB: 3 }),
+      makeStair({ id: 's1' as StairId, floorDepthA: 1, floorDepthB: 2 }),
+      makeStair({ id: 's2' as StairId, floorDepthA: 2, floorDepthB: 3 }),
     ];
     expect(stairFloorsAreConnected(stairs, 1, 3)).toBe(true);
     expect(stairFloorsAreConnected(stairs, 3, 1)).toBe(true);
@@ -221,8 +221,8 @@ describe('stairCountFloorsTraversed', () => {
 
   it('should return 2 for two-hop connection', () => {
     const stairs = [
-      makeStair({ id: 's1', floorDepthA: 1, floorDepthB: 2 }),
-      makeStair({ id: 's2', floorDepthA: 2, floorDepthB: 3 }),
+      makeStair({ id: 's1' as StairId, floorDepthA: 1, floorDepthB: 2 }),
+      makeStair({ id: 's2' as StairId, floorDepthA: 2, floorDepthB: 3 }),
     ];
     expect(stairCountFloorsTraversed(stairs, 1, 3)).toBe(2);
   });

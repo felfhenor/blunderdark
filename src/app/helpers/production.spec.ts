@@ -7,7 +7,7 @@ vi.mock('@helpers/content', () => {
     name: 'Crystal Mine',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { crystals: 1.0 },
     requiresWorkers: true,
@@ -20,7 +20,7 @@ vi.mock('@helpers/content', () => {
     name: 'Throne Room',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { gold: 0.5 },
     requiresWorkers: false,
@@ -31,7 +31,7 @@ vi.mock('@helpers/content', () => {
     name: 'Barracks',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: {},
     requiresWorkers: false,
@@ -43,7 +43,7 @@ vi.mock('@helpers/content', () => {
     name: 'Dark Forge',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { gold: 1.2 },
     requiresWorkers: true,
@@ -150,11 +150,15 @@ vi.mock('@helpers/content', () => {
 
 import type {
   Floor,
+  FloorId,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
+  RoomShapeId,
 } from '@interfaces';
 import {
   productionCalculateAdjacencyBonus,
@@ -210,7 +214,7 @@ describe('productionCalculateInhabitantBonus', () => {
   const placedRoom: PlacedRoom = {
     id: 'placed-room-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -224,8 +228,8 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should return 0 bonus and hasWorkers false when inhabitants are assigned to other rooms', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-room-other' as PlacedRoomId,
@@ -239,8 +243,8 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should calculate bonus for one inhabitant with production_bonus trait', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -255,15 +259,15 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should sum bonuses additively for multiple inhabitants', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -278,15 +282,15 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should handle inhabitants with different efficiency values', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-myconid',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-myconid' as InhabitantId,
         name: 'Myconid 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -303,8 +307,8 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should include workerEfficiency below 1.0 as negative bonus', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -319,8 +323,8 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should ignore non-production_bonus traits', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -335,8 +339,8 @@ describe('productionCalculateInhabitantBonus', () => {
   it('should skip inhabitants with unknown definitions', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-nonexistent',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-nonexistent' as InhabitantId,
         name: 'Unknown',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -353,7 +357,7 @@ describe('productionCalculateAdjacencyBonus', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -361,7 +365,7 @@ describe('productionCalculateAdjacencyBonus', () => {
   const darkForge: PlacedRoom = {
     id: 'placed-forge-1' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -369,7 +373,7 @@ describe('productionCalculateAdjacencyBonus', () => {
   const throne: PlacedRoom = {
     id: 'placed-throne-1' as PlacedRoomId,
     roomTypeId: 'room-throne' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 4,
     anchorY: 0,
   };
@@ -377,7 +381,7 @@ describe('productionCalculateAdjacencyBonus', () => {
   const barracks: PlacedRoom = {
     id: 'placed-barracks-1' as PlacedRoomId,
     roomTypeId: 'room-barracks' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 6,
     anchorY: 0,
   };
@@ -418,7 +422,7 @@ describe('productionCalculateAdjacencyBonus', () => {
     const secondForge: PlacedRoom = {
       id: 'placed-forge-2' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 2,
     };
@@ -446,7 +450,7 @@ describe('productionCalculateAdjacencyBonus', () => {
     const unknownRoom: PlacedRoom = {
       id: 'placed-unknown-1' as PlacedRoomId,
       roomTypeId: 'room-nonexistent' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -463,7 +467,7 @@ describe('productionCalculateConditionalModifiers', () => {
   const placedRoom: PlacedRoom = {
     id: 'placed-room-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -476,15 +480,15 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should return 1.0 when all assigned inhabitants are normal', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'normal',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -497,8 +501,8 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should return 0.5 when any assigned inhabitant is scared', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'scared',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -511,8 +515,8 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should return 0.75 when any assigned inhabitant is hungry', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'hungry',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -525,15 +529,15 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should multiply modifiers when both scared and hungry inhabitants present', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'scared',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'hungry',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -547,15 +551,15 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should average same state from multiple inhabitants', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'scared',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'scared',
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
@@ -569,8 +573,8 @@ describe('productionCalculateConditionalModifiers', () => {
   it('should ignore inhabitants assigned to other rooms', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'scared',
         assignedRoomId: 'placed-room-other' as PlacedRoomId,
@@ -586,7 +590,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 0,
     biome: 'neutral',
@@ -682,7 +686,7 @@ describe('productionCalculateTotal', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -695,7 +699,7 @@ describe('productionCalculateTotal', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -708,14 +712,14 @@ describe('productionCalculateTotal', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -731,14 +735,14 @@ describe('productionCalculateTotal', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const throne2: PlacedRoom = {
       id: 'placed-throne-2' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 4,
       anchorY: 0,
     };
@@ -755,28 +759,28 @@ describe('productionCalculateTotal', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const forge: PlacedRoom = {
       id: 'placed-forge' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 2',
         state: 'normal',
         assignedRoomId: 'placed-forge' as PlacedRoomId,
@@ -796,7 +800,7 @@ describe('productionProcess', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -811,7 +815,7 @@ describe('productionProcess', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -826,7 +830,7 @@ describe('productionProcess', () => {
     const barracks: PlacedRoom = {
       id: 'placed-barracks' as PlacedRoomId,
       roomTypeId: 'room-barracks' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -843,7 +847,7 @@ describe('productionCalculateSingleRoom', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -856,7 +860,7 @@ describe('productionCalculateSingleRoom', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -869,14 +873,14 @@ describe('productionCalculateSingleRoom', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -892,21 +896,21 @@ describe('productionCalculateSingleRoom', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const forge: PlacedRoom = {
       id: 'placed-forge' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -922,7 +926,7 @@ describe('productionCalculateSingleRoom', () => {
     const unknown: PlacedRoom = {
       id: 'placed-unknown' as PlacedRoomId,
       roomTypeId: 'room-nonexistent' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -937,7 +941,7 @@ describe('production changes on assignment state changes', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -950,8 +954,8 @@ describe('production changes on assignment state changes', () => {
     // Assign one inhabitant
     const floorAssigned = makeFloor([mine], [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -965,7 +969,7 @@ describe('production changes on assignment state changes', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -973,15 +977,15 @@ describe('production changes on assignment state changes', () => {
     // Two inhabitants assigned
     const floorTwo = makeFloor([mine], [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -994,15 +998,15 @@ describe('production changes on assignment state changes', () => {
     // Unassign one (only one remains)
     const floorOne = makeFloor([mine], [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 1',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin 2',
         state: 'normal',
         assignedRoomId: undefined,
@@ -1017,7 +1021,7 @@ describe('production changes on assignment state changes', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -1031,8 +1035,8 @@ describe('production changes on assignment state changes', () => {
     const floorsAssigned = [
       makeFloor([mine], [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -1063,7 +1067,7 @@ describe('productionGetActiveAdjacencyBonuses', () => {
   const crystalMine: PlacedRoom = {
     id: 'placed-mine-1' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -1071,7 +1075,7 @@ describe('productionGetActiveAdjacencyBonuses', () => {
   const darkForge: PlacedRoom = {
     id: 'placed-forge-1' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -1079,7 +1083,7 @@ describe('productionGetActiveAdjacencyBonuses', () => {
   const throne: PlacedRoom = {
     id: 'placed-throne-1' as PlacedRoomId,
     roomTypeId: 'room-throne' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 4,
     anchorY: 0,
   };
@@ -1119,7 +1123,7 @@ describe('productionGetActiveAdjacencyBonuses', () => {
     const secondForge: PlacedRoom = {
       id: 'placed-forge-2' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 1,
     };
@@ -1133,7 +1137,7 @@ describe('productionGetActiveAdjacencyBonuses', () => {
     const farForge: PlacedRoom = {
       id: 'placed-forge-far' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 10,
       anchorY: 10,
     };
@@ -1148,21 +1152,21 @@ describe('adjacency bonus deactivation on removal', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const forge: PlacedRoom = {
       id: 'placed-forge' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -1186,21 +1190,21 @@ describe('adjacency bonus deactivation on removal', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const forge: PlacedRoom = {
       id: 'placed-forge' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -1228,7 +1232,7 @@ describe('productionCalculateBreakdowns', () => {
     const throne: PlacedRoom = {
       id: 'placed-throne' as PlacedRoomId,
       roomTypeId: 'room-throne' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
@@ -1246,14 +1250,14 @@ describe('productionCalculateBreakdowns', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -1270,28 +1274,28 @@ describe('productionCalculateBreakdowns', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine' as PlacedRoomId,
       roomTypeId: 'room-crystal-mine' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };
     const forge: PlacedRoom = {
       id: 'placed-forge' as PlacedRoomId,
       roomTypeId: 'room-dark-forge' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
       },
       {
-        instanceId: 'inst-2',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton',
         state: 'normal',
         assignedRoomId: 'placed-forge' as PlacedRoomId,

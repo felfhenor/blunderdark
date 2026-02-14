@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import type { InvaderInstanceId, InvaderId } from '@interfaces';
 import type { InvaderInstance } from '@interfaces/invader';
 
 vi.mock('@helpers/invaders', () => ({
@@ -47,8 +48,8 @@ function makeInvader(
   statusEffects: InvaderInstance['statusEffects'] = [],
 ): InvaderInstance {
   return {
-    id,
-    definitionId: `def-${id}`,
+    id: id as InvaderInstanceId,
+    definitionId: `def-${id}` as InvaderId,
     currentHp: hp,
     maxHp: hp,
     statusEffects,

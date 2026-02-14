@@ -1,15 +1,21 @@
 import type {
   Floor,
+  FloorId,
   GameState,
   InhabitantDefinition,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
   SummonRecipeContent,
+  SummonRecipeId,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -28,7 +34,7 @@ const RECIPE_ADVANCED_ID = 'sc300001-0001-0001-0001-000000000003';
 // --- Upgrade paths ---
 
 const greaterSummoningPath: RoomUpgradePath = {
-  id: 'upgrade-greater-summoning',
+  id: 'upgrade-greater-summoning' as UpgradePathId,
   name: 'Greater Summoning',
   description: 'Unlock advanced recipes.',
   cost: { gold: 200, essence: 100, flux: 50 },
@@ -36,7 +42,7 @@ const greaterSummoningPath: RoomUpgradePath = {
 };
 
 const dualCirclePath: RoomUpgradePath = {
-  id: 'upgrade-dual-circle',
+  id: 'upgrade-dual-circle' as UpgradePathId,
   name: 'Dual Circle',
   description: 'Additional summoner slot.',
   cost: { gold: 150, crystals: 80 },
@@ -44,7 +50,7 @@ const dualCirclePath: RoomUpgradePath = {
 };
 
 const bindingMasteryPath: RoomUpgradePath = {
-  id: 'upgrade-binding-mastery',
+  id: 'upgrade-binding-mastery' as UpgradePathId,
   name: 'Binding Mastery',
   description: 'Longer temp, +1 stats.',
   cost: { gold: 180, essence: 60, flux: 40 },
@@ -106,7 +112,7 @@ vi.mock('@helpers/room-shapes', () => ({
 // --- Inhabitant definitions ---
 
 const fireElementalDef: InhabitantDefinition & IsContentItem = {
-  id: FIRE_ELEMENTAL_ID,
+  id: FIRE_ELEMENTAL_ID as InhabitantId,
   name: 'Fire Elemental',
   __type: 'inhabitant',
   type: 'demon',
@@ -121,7 +127,7 @@ const fireElementalDef: InhabitantDefinition & IsContentItem = {
 };
 
 const spectralServantDef: InhabitantDefinition & IsContentItem = {
-  id: SPECTRAL_SERVANT_ID,
+  id: SPECTRAL_SERVANT_ID as InhabitantId,
   name: 'Spectral Servant',
   __type: 'inhabitant',
   type: 'undead',
@@ -136,7 +142,7 @@ const spectralServantDef: InhabitantDefinition & IsContentItem = {
 };
 
 const goblinDef: InhabitantDefinition & IsContentItem = {
-  id: GOBLIN_ID,
+  id: GOBLIN_ID as InhabitantId,
   name: 'Goblin',
   __type: 'inhabitant',
   type: 'creature',
@@ -157,7 +163,7 @@ const fireRecipe: SummonRecipeContent & IsContentItem = {
   name: 'Summon Fire Elemental',
   __type: 'summonrecipe',
   description: 'Summon a fire elemental.',
-  resultInhabitantId: FIRE_ELEMENTAL_ID,
+  resultInhabitantId: FIRE_ELEMENTAL_ID as InhabitantId,
   summonType: 'permanent',
   cost: { essence: 100, crystals: 50 },
   timeMultiplier: 1.0,
@@ -170,7 +176,7 @@ const spectralRecipe: SummonRecipeContent & IsContentItem = {
   name: 'Summon Spectral Servant',
   __type: 'summonrecipe',
   description: 'Summon a temp servant.',
-  resultInhabitantId: SPECTRAL_SERVANT_ID,
+  resultInhabitantId: SPECTRAL_SERVANT_ID as InhabitantId,
   summonType: 'temporary',
   duration: 50,
   cost: { essence: 30 },
@@ -184,7 +190,7 @@ const advancedRecipe: SummonRecipeContent & IsContentItem = {
   name: 'Advanced Summon',
   __type: 'summonrecipe',
   description: 'An advanced recipe.',
-  resultInhabitantId: FIRE_ELEMENTAL_ID,
+  resultInhabitantId: FIRE_ELEMENTAL_ID as InhabitantId,
   summonType: 'permanent',
   cost: { essence: 200 },
   timeMultiplier: 1.5,
@@ -195,11 +201,11 @@ const advancedRecipe: SummonRecipeContent & IsContentItem = {
 // --- Room definitions ---
 
 const summoningCircleDef: RoomDefinition & IsContentItem = {
-  id: SUMMONING_CIRCLE_ID,
+  id: SUMMONING_CIRCLE_ID as RoomId,
   name: 'Summoning Circle',
   __type: 'room',
   description: 'Summons creatures.',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 150, essence: 80, flux: 40 },
   production: {},
   requiresWorkers: false,
@@ -216,11 +222,11 @@ const summoningCircleDef: RoomDefinition & IsContentItem = {
 };
 
 const libraryDef: RoomDefinition & IsContentItem = {
-  id: LIBRARY_ID,
+  id: LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
   description: 'Library.',
-  shapeId: 'shape-bar',
+  shapeId: 'shape-bar' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -237,11 +243,11 @@ const libraryDef: RoomDefinition & IsContentItem = {
 };
 
 const soulWellDef: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: 'Soul stuff.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -263,7 +269,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'summoning-1' as PlacedRoomId,
     roomTypeId: SUMMONING_CIRCLE_ID as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -274,8 +280,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inh-1',
-    definitionId: GOBLIN_ID,
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: GOBLIN_ID as InhabitantId,
     name: 'Goblin the Bold',
     state: 'normal',
     assignedRoomId: 'summoning-1' as PlacedRoomId,
@@ -288,7 +294,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -416,7 +422,7 @@ describe('Recipe Availability', () => {
   });
 
   it('should include advanced recipes with Greater Summoning upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-greater-summoning' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-greater-summoning' as UpgradePathId });
     const recipes = summoningGetAvailableRecipes(room);
     expect(recipes).toHaveLength(3); // fire + spectral + advanced
     expect(recipes.some((r) => r.tier === 'advanced')).toBe(true);
@@ -464,7 +470,7 @@ describe('Stat Bonus Calculation', () => {
   });
 
   it('should add Binding Mastery upgrade bonus to all stats', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
     const bonuses = summoningGetStatBonuses(room, new Set(), fireRecipe);
     // attack: 5 (recipe) + 1 (upgrade) = 6
     expect(bonuses.attack).toBe(6);
@@ -485,7 +491,7 @@ describe('Stat Bonus Calculation', () => {
   });
 
   it('should combine upgrade and adjacency bonuses', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
     const bonuses = summoningGetStatBonuses(room, new Set([SOUL_WELL_ID]), fireRecipe);
     // attack: 5 (recipe) + 1 (upgrade) + 2 (adjacency) = 8
     expect(bonuses.attack).toBe(8);
@@ -502,7 +508,7 @@ describe('Duration Calculation', () => {
   });
 
   it('should apply Binding Mastery multiplier', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
     const duration = summoningGetEffectiveDuration(room, 50);
     expect(duration).toBe(75); // 50 * 1.5
   });
@@ -523,7 +529,7 @@ describe('Summoning Can Start', () => {
 
   it('should return false when there is an active summon job', () => {
     const room = makeRoom();
-    room.summonJob = { recipeId: RECIPE_FIRE_ID, ticksRemaining: 10, targetTicks: 20 };
+    room.summonJob = { recipeId: RECIPE_FIRE_ID as SummonRecipeId, ticksRemaining: 10, targetTicks: 20 };
     const inhabitants = [makeInhabitant()];
     expect(summoningCanStart(room, inhabitants)).toBe(false);
   });
@@ -557,7 +563,7 @@ describe('summoningCircleProcess', () => {
   it('should decrement summon job ticks', () => {
     const room = makeRoom();
     room.summonJob = {
-      recipeId: RECIPE_FIRE_ID,
+      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
       ticksRemaining: 10,
       targetTicks: 20,
     };
@@ -575,7 +581,7 @@ describe('summoningCircleProcess', () => {
   it('should complete summon job when ticks reach 0', () => {
     const room = makeRoom();
     room.summonJob = {
-      recipeId: RECIPE_FIRE_ID,
+      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
       ticksRemaining: 1,
       targetTicks: 20,
     };
@@ -598,7 +604,7 @@ describe('summoningCircleProcess', () => {
   it('should create temporary inhabitant with duration for temp recipe', () => {
     const room = makeRoom();
     room.summonJob = {
-      recipeId: RECIPE_SPECTRAL_ID,
+      recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId,
       ticksRemaining: 1,
       targetTicks: 10,
     };
@@ -618,7 +624,7 @@ describe('summoningCircleProcess', () => {
   it('should decrement temporary inhabitant ticks', () => {
     const room = makeRoom();
     const tempInh = makeInhabitant({
-      instanceId: 'temp-1',
+      instanceId: 'temp-1' as InhabitantInstanceId,
       isTemporary: true,
       temporaryTicksRemaining: 10,
       isSummoned: true,
@@ -635,7 +641,7 @@ describe('summoningCircleProcess', () => {
   it('should remove temporary inhabitant when ticks reach 0', () => {
     const room = makeRoom();
     const tempInh = makeInhabitant({
-      instanceId: 'temp-1',
+      instanceId: 'temp-1' as InhabitantInstanceId,
       isTemporary: true,
       temporaryTicksRemaining: 1,
       isSummoned: true,
@@ -652,7 +658,7 @@ describe('summoningCircleProcess', () => {
   it('should sync floor inhabitants after summon completion', () => {
     const room = makeRoom();
     room.summonJob = {
-      recipeId: RECIPE_FIRE_ID,
+      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
       ticksRemaining: 1,
       targetTicks: 20,
     };
@@ -670,7 +676,7 @@ describe('summoningCircleProcess', () => {
   it('should sync floor inhabitants after temporary expiry', () => {
     const room = makeRoom();
     const tempInh = makeInhabitant({
-      instanceId: 'temp-1',
+      instanceId: 'temp-1' as InhabitantInstanceId,
       isTemporary: true,
       temporaryTicksRemaining: 1,
       isSummoned: true,
@@ -687,7 +693,7 @@ describe('summoningCircleProcess', () => {
   it('should not process rooms that are not summoning circles', () => {
     const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.summonJob = {
-      recipeId: RECIPE_FIRE_ID,
+      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
       ticksRemaining: 1,
       targetTicks: 20,
     };

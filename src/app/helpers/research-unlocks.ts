@@ -8,6 +8,10 @@ import type {
   UnlockEffect,
   UnlockedContent,
 } from '@interfaces';
+import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { RoomId } from '@interfaces/content-room';
+import type { UpgradePathId } from '@interfaces/room';
 import { Subject } from 'rxjs';
 
 // --- Unlock events ---
@@ -27,20 +31,20 @@ export const researchUnlock$ = researchUnlockSubject.asObservable();
  */
 export function researchUnlockIsUnlocked(
   type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
-  id: string,
+  id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId,
   unlockedContent?: UnlockedContent,
 ): boolean {
   const content =
     unlockedContent ?? gamestate().world.research.unlockedContent;
   switch (type) {
     case 'room':
-      return content.rooms.includes(id);
+      return content.rooms.includes(id as RoomId);
     case 'inhabitant':
-      return content.inhabitants.includes(id);
+      return content.inhabitants.includes(id as InhabitantId);
     case 'ability':
-      return content.abilities.includes(id);
+      return content.abilities.includes(id as CombatAbilityId);
     case 'upgrade':
-      return content.upgrades.includes(id);
+      return content.upgrades.includes(id as UpgradePathId);
   }
 }
 

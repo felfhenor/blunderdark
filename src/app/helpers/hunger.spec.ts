@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { GameState, InhabitantInstance } from '@interfaces';
+import type { GameState, InhabitantId, InhabitantInstance, InhabitantInstanceId } from '@interfaces';
 
 // --- Mocks ---
 
@@ -38,8 +38,8 @@ import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifi
 
 function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
   return {
-    instanceId: overrides.instanceId ?? 'inst-1',
-    definitionId: overrides.definitionId ?? 'def-goblin',
+    instanceId: overrides.instanceId ?? 'inst-1' as InhabitantInstanceId,
+    definitionId: overrides.definitionId ?? 'def-goblin' as InhabitantId,
     name: overrides.name ?? 'Goblin',
     state: overrides.state ?? 'normal',
     assignedRoomId: overrides.assignedRoomId ?? undefined,
@@ -222,16 +222,16 @@ describe('hungerCalculateTotalConsumption', () => {
 
   it('should return 0 for inappetent inhabitants only', () => {
     const inhabitants = [
-      makeInhabitant({ definitionId: 'def-skeleton' }),
-      makeInhabitant({ instanceId: 'inst-2', definitionId: 'def-skeleton' }),
+      makeInhabitant({ definitionId: 'def-skeleton' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, definitionId: 'def-skeleton' as InhabitantId }),
     ];
     expect(hungerCalculateTotalConsumption(inhabitants)).toBe(0);
   });
 
   it('should sum per-tick consumption for all inhabitants', () => {
     const inhabitants = [
-      makeInhabitant({ definitionId: 'def-goblin' }),  // 2/hr
-      makeInhabitant({ instanceId: 'inst-2', definitionId: 'def-myconid' }),  // 1/hr
+      makeInhabitant({ definitionId: 'def-goblin' as InhabitantId }),  // 2/hr
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, definitionId: 'def-myconid' as InhabitantId }),  // 1/hr
     ];
     const expected = (2 + 1) / HUNGER_TICKS_PER_HOUR;
     expect(hungerCalculateTotalConsumption(inhabitants)).toBeCloseTo(expected);
@@ -239,8 +239,8 @@ describe('hungerCalculateTotalConsumption', () => {
 
   it('should skip inappetent inhabitants in sum', () => {
     const inhabitants = [
-      makeInhabitant({ definitionId: 'def-goblin' }),   // 2/hr
-      makeInhabitant({ instanceId: 'inst-2', definitionId: 'def-skeleton' }),  // 0/hr
+      makeInhabitant({ definitionId: 'def-goblin' as InhabitantId }),   // 2/hr
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, definitionId: 'def-skeleton' as InhabitantId }),  // 0/hr
     ];
     const expected = 2 / HUNGER_TICKS_PER_HOUR;
     expect(hungerCalculateTotalConsumption(inhabitants)).toBeCloseTo(expected);
@@ -249,7 +249,7 @@ describe('hungerCalculateTotalConsumption', () => {
   it('should apply food consumption multiplier from state modifiers', () => {
     vi.mocked(stateModifierGetFoodConsumptionMultiplier).mockReturnValue(1.5);
     const inhabitants = [
-      makeInhabitant({ definitionId: 'def-goblin' }),  // 2/hr * 1.5 = 3/hr
+      makeInhabitant({ definitionId: 'def-goblin' as InhabitantId }),  // 2/hr * 1.5 = 3/hr
     ];
     const expected = (2 * 1.5) / HUNGER_TICKS_PER_HOUR;
     expect(hungerCalculateTotalConsumption(inhabitants)).toBeCloseTo(expected);
@@ -261,7 +261,7 @@ describe('hungerCalculateTotalConsumption', () => {
 describe('hungerProcess', () => {
   describe('food deduction', () => {
     it('should deduct food from resources', () => {
-      const goblin = makeInhabitant({ definitionId: 'def-goblin' });
+      const goblin = makeInhabitant({ definitionId: 'def-goblin' as InhabitantId });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 100 });
 
       hungerProcess(state);
@@ -271,7 +271,7 @@ describe('hungerProcess', () => {
     });
 
     it('should not deduct below zero', () => {
-      const goblin = makeInhabitant({ definitionId: 'def-goblin' });
+      const goblin = makeInhabitant({ definitionId: 'def-goblin' as InhabitantId });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0 });
 
       hungerProcess(state);
@@ -280,7 +280,7 @@ describe('hungerProcess', () => {
     });
 
     it('should set food to zero when consumption exceeds available', () => {
-      const goblin = makeInhabitant({ definitionId: 'def-goblin' });
+      const goblin = makeInhabitant({ definitionId: 'def-goblin' as InhabitantId });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0.001 });
 
       hungerProcess(state);
@@ -289,7 +289,7 @@ describe('hungerProcess', () => {
     });
 
     it('should not deduct food for inappetent inhabitants', () => {
-      const skeleton = makeInhabitant({ definitionId: 'def-skeleton' });
+      const skeleton = makeInhabitant({ definitionId: 'def-skeleton' as InhabitantId });
       const state = makeGameState({ inhabitants: [skeleton], foodCurrent: 100 });
 
       hungerProcess(state);
@@ -308,7 +308,7 @@ describe('hungerProcess', () => {
 
   describe('state transitions - starvation', () => {
     it('should increment hunger ticks when food runs out', () => {
-      const goblin = makeInhabitant({ definitionId: 'def-goblin', hungerTicksWithoutFood: 0 });
+      const goblin = makeInhabitant({ definitionId: 'def-goblin' as InhabitantId, hungerTicksWithoutFood: 0 });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0 });
 
       hungerProcess(state);
@@ -318,7 +318,7 @@ describe('hungerProcess', () => {
 
     it('should transition to hungry after enough ticks', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: HUNGER_TICKS_TO_HUNGRY - 1,
       });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0 });
@@ -331,7 +331,7 @@ describe('hungerProcess', () => {
 
     it('should transition to starving after enough ticks', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: HUNGER_TICKS_TO_STARVING - 1,
       });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0 });
@@ -344,7 +344,7 @@ describe('hungerProcess', () => {
 
     it('should keep starving state beyond threshold', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         state: 'starving',
         hungerTicksWithoutFood: HUNGER_TICKS_TO_STARVING + 50,
       });
@@ -360,7 +360,7 @@ describe('hungerProcess', () => {
   describe('state transitions - recovery', () => {
     it('should decrement hunger ticks when food is available', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: 10,
       });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 100 });
@@ -372,7 +372,7 @@ describe('hungerProcess', () => {
 
     it('should not decrement below zero', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: 1,
       });
       const state = makeGameState({ inhabitants: [goblin], foodCurrent: 100 });
@@ -384,7 +384,7 @@ describe('hungerProcess', () => {
 
     it('should transition from starving to hungry during recovery', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         state: 'starving',
         hungerTicksWithoutFood: HUNGER_TICKS_TO_STARVING,
       });
@@ -401,7 +401,7 @@ describe('hungerProcess', () => {
       // Use a tick count well above the hungry threshold so recovery doesn't drop below it
       const ticks = HUNGER_TICKS_TO_HUNGRY + HUNGER_RECOVERY_RATE + 10;
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         state: 'hungry',
         hungerTicksWithoutFood: ticks,
       });
@@ -415,7 +415,7 @@ describe('hungerProcess', () => {
 
     it('should fully recover to normal', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         state: 'hungry',
         hungerTicksWithoutFood: HUNGER_RECOVERY_RATE,
       });
@@ -431,7 +431,7 @@ describe('hungerProcess', () => {
   describe('inappetent inhabitants', () => {
     it('should keep skeleton at normal state regardless of food', () => {
       const skeleton = makeInhabitant({
-        definitionId: 'def-skeleton',
+        definitionId: 'def-skeleton' as InhabitantId,
         state: 'normal',
       });
       const state = makeGameState({ inhabitants: [skeleton], foodCurrent: 0 });
@@ -444,7 +444,7 @@ describe('hungerProcess', () => {
 
     it('should reset hungry inappetent inhabitant to normal', () => {
       const skeleton = makeInhabitant({
-        definitionId: 'def-skeleton',
+        definitionId: 'def-skeleton' as InhabitantId,
         state: 'hungry',
         hungerTicksWithoutFood: 100,
       });
@@ -458,7 +458,7 @@ describe('hungerProcess', () => {
 
     it('should reset starving inappetent inhabitant to normal', () => {
       const skeleton = makeInhabitant({
-        definitionId: 'def-skeleton',
+        definitionId: 'def-skeleton' as InhabitantId,
         state: 'starving',
         hungerTicksWithoutFood: 500,
       });
@@ -474,7 +474,7 @@ describe('hungerProcess', () => {
   describe('scared state preservation', () => {
     it('should not override scared state when food is available', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         state: 'scared',
         hungerTicksWithoutFood: 0,
       });
@@ -489,12 +489,12 @@ describe('hungerProcess', () => {
   describe('mixed inhabitants', () => {
     it('should process each inhabitant independently', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: HUNGER_TICKS_TO_HUNGRY - 1,
       });
       const skeleton = makeInhabitant({
-        instanceId: 'inst-2',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         state: 'normal',
       });
       const state = makeGameState({
@@ -517,12 +517,12 @@ describe('hungerProcess', () => {
   describe('floor inhabitant sync', () => {
     it('should sync state changes to floor inhabitants', () => {
       const goblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: HUNGER_TICKS_TO_HUNGRY - 1,
       });
       // Create a separate floor inhabitant with the same instanceId
       const floorGoblin = makeInhabitant({
-        definitionId: 'def-goblin',
+        definitionId: 'def-goblin' as InhabitantId,
         hungerTicksWithoutFood: HUNGER_TICKS_TO_HUNGRY - 1,
       });
       const state = makeGameState({
@@ -586,7 +586,7 @@ describe('hungerGetWarningLevel', () => {
 
 describe('Edge cases', () => {
   it('should handle unknown definition gracefully', () => {
-    const unknown = makeInhabitant({ definitionId: 'def-nonexistent' });
+    const unknown = makeInhabitant({ definitionId: 'def-nonexistent' as InhabitantId });
     const state = makeGameState({ inhabitants: [unknown], foodCurrent: 100 });
 
     // Should not throw
@@ -598,7 +598,7 @@ describe('Edge cases', () => {
   });
 
   it('should handle missing hungerTicksWithoutFood field', () => {
-    const goblin = makeInhabitant({ definitionId: 'def-goblin' });
+    const goblin = makeInhabitant({ definitionId: 'def-goblin' as InhabitantId });
     delete (goblin as Record<string, unknown>)['hungerTicksWithoutFood'];
     const state = makeGameState({ inhabitants: [goblin], foodCurrent: 0 });
 
@@ -612,8 +612,8 @@ describe('Edge cases', () => {
     const inhabitants: InhabitantInstance[] = [];
     for (let i = 0; i < 50; i++) {
       inhabitants.push(makeInhabitant({
-        instanceId: `inst-${i}`,
-        definitionId: 'def-goblin',
+        instanceId: `inst-${i}` as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
       }));
     }
     const state = makeGameState({ inhabitants, foodCurrent: 500 });

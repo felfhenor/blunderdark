@@ -1,4 +1,9 @@
+import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { RoomId } from '@interfaces/content-room';
+import type { Branded } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
+import type { UpgradePathId } from '@interfaces/room';
 
 export type ResearchBranch = 'dark' | 'arcane' | 'engineering';
 
@@ -11,22 +16,22 @@ export type UnlockEffectType =
 
 export type RoomUnlock = {
   type: 'room';
-  targetId: string;
+  targetId: RoomId;
 };
 
 export type InhabitantUnlock = {
   type: 'inhabitant';
-  targetId: string;
+  targetId: InhabitantId;
 };
 
 export type AbilityUnlock = {
   type: 'ability';
-  targetId: string;
+  targetId: CombatAbilityId;
 };
 
 export type UpgradeUnlock = {
   type: 'upgrade';
-  targetId: string;
+  targetId: UpgradePathId;
 };
 
 export type PassiveBonusUnlock = {
@@ -44,12 +49,12 @@ export type UnlockEffect =
   | PassiveBonusUnlock;
 
 export type ResearchNode = {
-  id: string;
+  id: Branded<string, 'ResearchId'>;
   name: string;
   description: string;
   branch: ResearchBranch;
   cost: ResourceCost;
-  prerequisiteResearchIds: string[];
+  prerequisiteResearchIds: Branded<string, 'ResearchId'>[];
   unlocks: UnlockEffect[];
   tier: number;
   requiredTicks: number;
@@ -62,16 +67,16 @@ export type ResearchTree = {
 };
 
 export type UnlockedContent = {
-  rooms: string[];
-  inhabitants: string[];
-  abilities: string[];
-  upgrades: string[];
+  rooms: RoomId[];
+  inhabitants: InhabitantId[];
+  abilities: CombatAbilityId[];
+  upgrades: UpgradePathId[];
   passiveBonuses: { bonusType: string; value: number; description: string }[];
 };
 
 export type ResearchState = {
-  completedNodes: string[];
-  activeResearch: string | undefined;
+  completedNodes: Branded<string, 'ResearchId'>[];
+  activeResearch: Branded<string, 'ResearchId'> | undefined;
   activeResearchProgress: number;
   activeResearchStartTick: number;
   unlockedContent: UnlockedContent;

@@ -1,6 +1,7 @@
 import { invasionObjectiveResolveOutcome } from '@helpers/invasion-objectives';
 import { moraleIsRetreating } from '@helpers/morale';
 import { rngUuid } from '@helpers/rng';
+import type { InvasionId } from '@interfaces/content-invasion';
 import type {
   DetailedInvasionResult,
   InvasionEndReason,
@@ -26,7 +27,7 @@ export function invasionWinLossCreateState(
   defenderCount: number,
 ): InvasionState {
   return {
-    invasionId: rngUuid(),
+    invasionId: rngUuid() as InvasionId,
     currentTurn: 0,
     maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
     altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,

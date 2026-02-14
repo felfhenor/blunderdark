@@ -2,12 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
   Floor,
+  FloorId,
   GridState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradeEffect,
   TileOffset,
 } from '@interfaces';
@@ -87,8 +91,8 @@ import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 
 function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
   return {
-    instanceId: overrides.instanceId ?? 'inst-1',
-    definitionId: overrides.definitionId ?? 'def-goblin',
+    instanceId: overrides.instanceId ?? 'inst-1' as InhabitantInstanceId,
+    definitionId: overrides.definitionId ?? 'def-goblin' as InhabitantId,
     name: overrides.name ?? 'Goblin',
     state: overrides.state ?? 'normal',
     assignedRoomId: overrides.assignedRoomId ?? undefined,
@@ -99,7 +103,7 @@ function makePlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: overrides.id ?? 'room-1' as PlacedRoomId,
     roomTypeId: overrides.roomTypeId ?? 'room-type-1' as RoomId,
-    shapeId: overrides.shapeId ?? 'shape-1',
+    shapeId: overrides.shapeId ?? 'shape-1' as RoomShapeId,
     anchorX: overrides.anchorX ?? 0,
     anchorY: overrides.anchorY ?? 0,
     appliedUpgradePathId: overrides.appliedUpgradePathId ?? undefined,
@@ -108,7 +112,7 @@ function makePlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
   return {
-    id: overrides.id ?? 'floor-1',
+    id: overrides.id ?? 'floor-1' as FloorId,
     name: overrides.name ?? 'Floor 1',
     depth: overrides.depth ?? 1,
     biome: overrides.biome ?? 'neutral',
@@ -216,15 +220,15 @@ describe('fearLevelCalculateInhabitantModifier', () => {
 
   it('should return 0 when no inhabitants assigned to room', () => {
     const inhabitants = [
-      makeInhabitant({ assignedRoomId: 'room-other' as PlacedRoomId, definitionId: 'def-dragon' }),
+      makeInhabitant({ assignedRoomId: 'room-other' as PlacedRoomId, definitionId: 'def-dragon' as InhabitantId }),
     ];
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(0);
   });
 
   it('should sum positive fearModifiers', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' }),
-      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-dragon' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-dragon' as InhabitantId }),
     ];
     // skeleton=1, dragon=2 => 3
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(3);
@@ -232,8 +236,8 @@ describe('fearLevelCalculateInhabitantModifier', () => {
 
   it('should sum negative fearModifiers', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' }),
-      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' as InhabitantId }),
     ];
     // myconid=-1 * 2 => -2
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(-2);
@@ -241,8 +245,8 @@ describe('fearLevelCalculateInhabitantModifier', () => {
 
   it('should handle mixed positive and negative modifiers', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' }),
-      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' as InhabitantId }),
     ];
     // skeleton=1, myconid=-1 => 0
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(0);
@@ -250,8 +254,8 @@ describe('fearLevelCalculateInhabitantModifier', () => {
 
   it('should ignore inhabitants assigned to other rooms', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' }),
-      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'def-dragon' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'def-dragon' as InhabitantId }),
     ];
     // only skeleton=1 is in room-1
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(1);
@@ -259,14 +263,14 @@ describe('fearLevelCalculateInhabitantModifier', () => {
 
   it('should ignore unassigned inhabitants', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: undefined, definitionId: 'def-dragon' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: undefined, definitionId: 'def-dragon' as InhabitantId }),
     ];
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(0);
   });
 
   it('should handle unknown definitions gracefully', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-unknown' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-unknown' as InhabitantId }),
     ];
     expect(fearLevelCalculateInhabitantModifier('room-1' as PlacedRoomId, inhabitants)).toBe(0);
   });
@@ -415,7 +419,7 @@ describe('fearLevelGetMaxPropagationDistance', () => {
 
   it('should return default when inhabitants have no extended distance', () => {
     const inhabitants = [
-      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-goblin' }),
+      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-goblin' as InhabitantId }),
     ];
     // goblin has fearPropagationDistance: 1 (default)
     expect(fearLevelGetMaxPropagationDistance('room-1' as PlacedRoomId, inhabitants)).toBe(1);
@@ -423,8 +427,8 @@ describe('fearLevelGetMaxPropagationDistance', () => {
 
   it('should return max distance from inhabitants', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-goblin' }),
-      makeInhabitant({ instanceId: 'inst-2', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-dragon' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-goblin' as InhabitantId }),
+      makeInhabitant({ instanceId: 'inst-2' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-dragon' as InhabitantId }),
     ];
     // dragon has fearPropagationDistance: 2
     expect(fearLevelGetMaxPropagationDistance('room-1' as PlacedRoomId, inhabitants)).toBe(2);
@@ -432,14 +436,14 @@ describe('fearLevelGetMaxPropagationDistance', () => {
 
   it('should ignore inhabitants in other rooms', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'def-dragon' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-2' as PlacedRoomId, definitionId: 'def-dragon' as InhabitantId }),
     ];
     expect(fearLevelGetMaxPropagationDistance('room-1' as PlacedRoomId, inhabitants)).toBe(1);
   });
 
   it('should handle unknown definitions gracefully', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'inst-1', assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-unknown' }),
+      makeInhabitant({ instanceId: 'inst-1' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-unknown' as InhabitantId }),
     ];
     expect(fearLevelGetMaxPropagationDistance('room-1' as PlacedRoomId, inhabitants)).toBe(1);
   });
@@ -678,7 +682,7 @@ describe('fearLevelGetForRoom', () => {
     const room = makePlacedRoom({ id: 'room-1' as PlacedRoomId });
     const roomDef = { fearLevel: 1 } as RoomDefinition;
     const inhabitants = [
-      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' }),
+      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' as InhabitantId }),
     ];
     const floor = makeFloor({ rooms: [room], inhabitants });
 
@@ -740,7 +744,7 @@ describe('fearLevelGetForRoom', () => {
     const room = makePlacedRoom({ id: 'room-1' as PlacedRoomId });
     const roomDef = { fearLevel: 2 } as RoomDefinition;
     const inhabitants = [
-      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' }),
+      makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' as InhabitantId }),
     ];
     const floor = makeFloor({ rooms: [room], inhabitants });
 
@@ -917,9 +921,9 @@ describe('fearLevelCalculateAllForFloor', () => {
     // Dragon (fearModifier: 2, fearPropagationDistance: 2) in source room
     // Source room base fear 2 + dragon modifier 2 = 4 (Very High)
     const dragonInhabitant = makeInhabitant({
-      instanceId: 'inst-dragon',
+      instanceId: 'inst-dragon' as InhabitantInstanceId,
       assignedRoomId: 'room-source' as PlacedRoomId,
-      definitionId: 'def-dragon',
+      definitionId: 'def-dragon' as InhabitantId,
     });
 
     const roomSource = makePlacedRoom({ id: 'room-source' as PlacedRoomId, roomTypeId: 'room-type-source' as RoomId, anchorX: 0, anchorY: 0 });

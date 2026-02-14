@@ -6,7 +6,7 @@ import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { stairPlacementExit } from '@helpers/stairs';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { ElevatorInstance, Floor } from '@interfaces';
+import type { ElevatorId, ElevatorInstance, Floor } from '@interfaces';
 import type { ElevatorValidationResult, ElevatorExtensionValidation, ElevatorRemovalInfo } from '@interfaces/elevator';
 
 export const ELEVATOR_PLACEMENT_COST_CRYSTALS = 50;
@@ -176,7 +176,7 @@ export async function elevatorPlacementExecute(
   const connectedFloors = [currentFloor.depth, adjacentFloor.depth].sort((a, b) => a - b);
 
   const elevator: ElevatorInstance = {
-    id: rngUuid(),
+    id: rngUuid() as ElevatorId,
     connectedFloors,
     gridX: x,
     gridY: y,

@@ -17,6 +17,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
   Hallway,
+  HallwayId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
@@ -24,6 +25,7 @@ import type {
   RoomId,
   RoomShape,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 
@@ -116,7 +118,7 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       if (!path) continue;
 
       const hallway: Hallway = {
-        id: rngUuid(),
+        id: rngUuid() as HallwayId,
         tiles: path,
         upgrades: [],
       };
@@ -191,7 +193,7 @@ export function altarRoomGetNextUpgrade(floors: Floor[]): RoomUpgradePath | unde
  * Apply the next upgrade to the Altar Room.
  */
 export async function altarRoomApplyUpgrade(
-  upgradePathId: string,
+  upgradePathId: UpgradePathId,
 ): Promise<{ success: boolean; error?: string }> {
   const state = gamestate();
   const altar = altarRoomFind(state.world.floors);

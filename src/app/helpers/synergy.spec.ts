@@ -8,7 +8,7 @@ vi.mock('@helpers/content', () => {
     name: 'Crystal Mine',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { crystals: 1.0 },
     requiresWorkers: true,
@@ -20,7 +20,7 @@ vi.mock('@helpers/content', () => {
     name: 'Dark Forge',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { gold: 1.2 },
     requiresWorkers: true,
@@ -32,7 +32,7 @@ vi.mock('@helpers/content', () => {
     name: 'Mushroom Grove',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { food: 1.6 },
     requiresWorkers: true,
@@ -44,7 +44,7 @@ vi.mock('@helpers/content', () => {
     name: 'Shadow Library',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { research: 0.8 },
     requiresWorkers: true,
@@ -56,7 +56,7 @@ vi.mock('@helpers/content', () => {
     name: 'Soul Well',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { essence: 0.3 },
     requiresWorkers: false,
@@ -68,7 +68,7 @@ vi.mock('@helpers/content', () => {
     name: 'Treasure Vault',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: { gold: 0.8 },
     requiresWorkers: false,
@@ -80,7 +80,7 @@ vi.mock('@helpers/content', () => {
     name: 'Barracks',
     __type: 'room',
     description: '',
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     cost: {},
     production: {},
     requiresWorkers: false,
@@ -160,12 +160,18 @@ vi.mock('@helpers/production', () => ({
 
 import type {
   Connection,
+  ConnectionId,
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
+  RoomShapeId,
   SynergyDefinition,
+  SynergyId,
 } from '@interfaces';
 import {
   synergyEvaluateCondition,
@@ -181,7 +187,7 @@ function makeFloor(
   connections: Connection[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -198,7 +204,7 @@ describe('synergyEvaluateCondition', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -206,7 +212,7 @@ describe('synergyEvaluateCondition', () => {
   const forge: PlacedRoom = {
     id: 'placed-forge' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -278,7 +284,7 @@ describe('synergyEvaluateCondition', () => {
   describe('connectedRoomType condition', () => {
     it('should return true when connected to matching room type', () => {
       const conn: Connection = {
-        id: 'conn-1',
+        id: 'conn-1' as ConnectionId,
         roomAId: 'placed-mine' as PlacedRoomId,
         roomBId: 'placed-forge' as PlacedRoomId,
         edgeTiles: [],
@@ -296,7 +302,7 @@ describe('synergyEvaluateCondition', () => {
 
     it('should return true for the reverse direction of connection', () => {
       const conn: Connection = {
-        id: 'conn-1',
+        id: 'conn-1' as ConnectionId,
         roomAId: 'placed-mine' as PlacedRoomId,
         roomBId: 'placed-forge' as PlacedRoomId,
         edgeTiles: [],
@@ -329,8 +335,8 @@ describe('synergyEvaluateCondition', () => {
     it('should return true when assigned inhabitant matches type', () => {
       const inhabitants: InhabitantInstance[] = [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -350,8 +356,8 @@ describe('synergyEvaluateCondition', () => {
     it('should return false when no inhabitant matches type', () => {
       const inhabitants: InhabitantInstance[] = [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-skeleton',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-skeleton' as InhabitantId,
           name: 'Skeleton',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -383,8 +389,8 @@ describe('synergyEvaluateCondition', () => {
     it('should ignore inhabitants assigned to other rooms', () => {
       const inhabitants: InhabitantInstance[] = [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin',
           state: 'normal',
           assignedRoomId: 'placed-forge' as PlacedRoomId,
@@ -406,15 +412,15 @@ describe('synergyEvaluateCondition', () => {
     it('should return true when inhabitant count meets minimum', () => {
       const inhabitants: InhabitantInstance[] = [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin 1',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
         },
         {
-          instanceId: 'inst-2',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-2' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin 2',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -434,8 +440,8 @@ describe('synergyEvaluateCondition', () => {
     it('should return false when inhabitant count is below minimum', () => {
       const inhabitants: InhabitantInstance[] = [
         {
-          instanceId: 'inst-1',
-          definitionId: 'def-goblin',
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
           name: 'Goblin',
           state: 'normal',
           assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -469,7 +475,7 @@ describe('synergyEvaluateCondition', () => {
 describe('synergyEvaluateForRoom', () => {
   const testSynergies: SynergyDefinition[] = [
     {
-      id: 'test-mine-forge',
+      id: 'test-mine-forge' as SynergyId,
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -480,7 +486,7 @@ describe('synergyEvaluateForRoom', () => {
       effects: [{ type: 'productionBonus', value: 0.15 }],
     },
     {
-      id: 'test-forge-staff',
+      id: 'test-forge-staff' as SynergyId,
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
@@ -494,7 +500,7 @@ describe('synergyEvaluateForRoom', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -502,7 +508,7 @@ describe('synergyEvaluateForRoom', () => {
   const forge: PlacedRoom = {
     id: 'placed-forge' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -510,8 +516,8 @@ describe('synergyEvaluateForRoom', () => {
   it('should activate synergy when all conditions are met', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -543,8 +549,8 @@ describe('synergyEvaluateForRoom', () => {
   it('should not activate synergy for wrong room type', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-forge' as PlacedRoomId,
@@ -564,7 +570,7 @@ describe('synergyEvaluateForRoom', () => {
 
   it('should activate multiple synergies for same room when conditions met', () => {
     const mineForgeMineSynergy: SynergyDefinition = {
-      id: 'test-mine-adjacent',
+      id: 'test-mine-adjacent' as SynergyId,
       name: 'Test Mine Adjacent',
       description: 'Mine near forge',
       conditions: [
@@ -576,8 +582,8 @@ describe('synergyEvaluateForRoom', () => {
     const allSynergies = [...testSynergies, mineForgeMineSynergy];
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -597,7 +603,7 @@ describe('synergyEvaluateForRoom', () => {
 describe('synergyEvaluateAll', () => {
   const testSynergies: SynergyDefinition[] = [
     {
-      id: 'test-mine-forge',
+      id: 'test-mine-forge' as SynergyId,
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -612,7 +618,7 @@ describe('synergyEvaluateAll', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -620,7 +626,7 @@ describe('synergyEvaluateAll', () => {
   const forge: PlacedRoom = {
     id: 'placed-forge' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -628,8 +634,8 @@ describe('synergyEvaluateAll', () => {
   it('should return map of active synergies across all floors', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -651,8 +657,8 @@ describe('synergyEvaluateAll', () => {
   it('should not share synergies across floors', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -669,7 +675,7 @@ describe('synergyEvaluateAll', () => {
 describe('synergy re-evaluation scenarios', () => {
   const testSynergies: SynergyDefinition[] = [
     {
-      id: 'test-mine-forge-creature',
+      id: 'test-mine-forge-creature' as SynergyId,
       name: 'Test',
       description: 'Test',
       conditions: [
@@ -680,7 +686,7 @@ describe('synergy re-evaluation scenarios', () => {
       effects: [{ type: 'productionBonus', value: 0.15 }],
     },
     {
-      id: 'test-connected',
+      id: 'test-connected' as SynergyId,
       name: 'Test Connected',
       description: 'Test',
       conditions: [
@@ -694,7 +700,7 @@ describe('synergy re-evaluation scenarios', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -702,7 +708,7 @@ describe('synergy re-evaluation scenarios', () => {
   const forge: PlacedRoom = {
     id: 'placed-forge' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -710,8 +716,8 @@ describe('synergy re-evaluation scenarios', () => {
   it('should activate on room placement when conditions are met', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -743,8 +749,8 @@ describe('synergy re-evaluation scenarios', () => {
     // Assign goblin (creature type)
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -760,8 +766,8 @@ describe('synergy re-evaluation scenarios', () => {
   it('should deactivate on inhabitant removal', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -776,8 +782,8 @@ describe('synergy re-evaluation scenarios', () => {
     // Unassign inhabitant
     const unassigned: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: undefined,
@@ -798,7 +804,7 @@ describe('synergy re-evaluation scenarios', () => {
     expect(before.size).toBe(0);
 
     const conn: Connection = {
-      id: 'conn-1',
+      id: 'conn-1' as ConnectionId,
       roomAId: 'placed-mine' as PlacedRoomId,
       roomBId: 'placed-forge' as PlacedRoomId,
       edgeTiles: [],
@@ -813,7 +819,7 @@ describe('synergy re-evaluation scenarios', () => {
 
   it('should deactivate connection-based synergy when disconnected', () => {
     const conn: Connection = {
-      id: 'conn-1',
+      id: 'conn-1' as ConnectionId,
       roomAId: 'placed-mine' as PlacedRoomId,
       roomBId: 'placed-forge' as PlacedRoomId,
       edgeTiles: [],
@@ -835,8 +841,8 @@ describe('synergy re-evaluation scenarios', () => {
   it('should deactivate synergy when adjacent room is removed', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -896,7 +902,7 @@ describe('synergyFormatEffect', () => {
 describe('synergyGetPotentialForRoom', () => {
   const testSynergies: SynergyDefinition[] = [
     {
-      id: 'test-mine-forge',
+      id: 'test-mine-forge' as SynergyId,
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -907,7 +913,7 @@ describe('synergyGetPotentialForRoom', () => {
       effects: [{ type: 'productionBonus', value: 0.15 }],
     },
     {
-      id: 'test-forge-staff',
+      id: 'test-forge-staff' as SynergyId,
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
@@ -917,7 +923,7 @@ describe('synergyGetPotentialForRoom', () => {
       effects: [{ type: 'productionBonus', value: 0.1 }],
     },
     {
-      id: 'test-library-well',
+      id: 'test-library-well' as SynergyId,
       name: 'Test Library Well',
       description: 'Library connected to well',
       conditions: [
@@ -931,7 +937,7 @@ describe('synergyGetPotentialForRoom', () => {
   const mine: PlacedRoom = {
     id: 'placed-mine' as PlacedRoomId,
     roomTypeId: 'room-crystal-mine' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
   };
@@ -939,7 +945,7 @@ describe('synergyGetPotentialForRoom', () => {
   const forge: PlacedRoom = {
     id: 'placed-forge' as PlacedRoomId,
     roomTypeId: 'room-dark-forge' as RoomId,
-    shapeId: 'shape-1',
+    shapeId: 'shape-1' as RoomShapeId,
     anchorX: 2,
     anchorY: 0,
   };
@@ -981,8 +987,8 @@ describe('synergyGetPotentialForRoom', () => {
   it('should not return fully active synergies as potential', () => {
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-goblin',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
         name: 'Goblin',
         state: 'normal',
         assignedRoomId: 'placed-mine' as PlacedRoomId,
@@ -1020,7 +1026,7 @@ describe('synergyGetPotentialForRoom', () => {
     const library: PlacedRoom = {
       id: 'placed-library' as PlacedRoomId,
       roomTypeId: 'room-shadow-library' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     };

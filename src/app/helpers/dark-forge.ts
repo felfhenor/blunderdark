@@ -9,6 +9,7 @@ import type {
   ForgeCraftingQueue,
   ForgeInventoryEntry,
   ForgeRecipeContent,
+  ForgeRecipeId,
   GameState,
   InhabitantStats,
   IsContentItem,
@@ -139,7 +140,7 @@ export function darkForgeGetQueue(
 export function darkForgeAddJob(
   queues: ForgeCraftingQueue[],
   roomId: PlacedRoomId,
-  recipeId: string,
+  recipeId: ForgeRecipeId,
   targetTicks: number,
 ): ForgeCraftingQueue[] {
   const job: ForgeCraftingJob = {
@@ -176,7 +177,7 @@ export function darkForgeRemoveJob(
 
 export function darkForgeAddToInventory(
   inventory: ForgeInventoryEntry[],
-  recipeId: string,
+  recipeId: ForgeRecipeId,
   count = 1,
 ): ForgeInventoryEntry[] {
   const updated = [...inventory];

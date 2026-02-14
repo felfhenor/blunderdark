@@ -1,5 +1,9 @@
+import type { Branded } from '@interfaces/identifiable';
+
+export type ElevatorId = Branded<string, 'ElevatorId'>;
+
 export type ElevatorInstance = {
-  id: string;
+  id: ElevatorId;
   connectedFloors: number[]; // sorted array of contiguous floor depths
   gridX: number;
   gridY: number;

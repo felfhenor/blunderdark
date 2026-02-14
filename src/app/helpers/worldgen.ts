@@ -18,6 +18,7 @@ import type {
   GameStateWorld,
   InhabitantContent,
   InhabitantInstance,
+  InhabitantInstanceId,
 } from '@interfaces';
 import { Subject } from 'rxjs';
 
@@ -43,7 +44,7 @@ export async function worldgenGenerateWorld(): Promise<
   const slimeDef = contentGetEntry<InhabitantContent>('Slime');
   const startingSlimes: InhabitantInstance[] = slimeDef
     ? Array.from({ length: 3 }, () => ({
-        instanceId: rngUuid(),
+        instanceId: rngUuid() as InhabitantInstanceId,
         definitionId: slimeDef.id,
         name: slimeDef.name,
         state: 'normal' as const,

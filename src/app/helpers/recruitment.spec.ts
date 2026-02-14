@@ -1,7 +1,9 @@
 import type {
   GameState,
   InhabitantDefinition,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   ResourceMap,
 } from '@interfaces';
@@ -69,7 +71,7 @@ vi.mock('@helpers/rng', () => ({
 let mockContentEntries: (InhabitantDefinition & IsContentItem)[];
 
 const goblinDef: InhabitantDefinition & IsContentItem = {
-  id: 'goblin-001',
+  id: 'goblin-001' as InhabitantId,
   name: 'Goblin',
   type: 'creature',
   tier: 1,
@@ -92,7 +94,7 @@ const goblinDef: InhabitantDefinition & IsContentItem = {
 };
 
 const skeletonDef: InhabitantDefinition & IsContentItem = {
-  id: 'skeleton-001',
+  id: 'skeleton-001' as InhabitantId,
   name: 'Skeleton',
   type: 'undead',
   tier: 1,
@@ -107,7 +109,7 @@ const skeletonDef: InhabitantDefinition & IsContentItem = {
 };
 
 const dragonDef: InhabitantDefinition & IsContentItem = {
-  id: 'dragon-001',
+  id: 'dragon-001' as InhabitantId,
   name: 'Dragon',
   type: 'dragon',
   tier: 4,
@@ -122,7 +124,7 @@ const dragonDef: InhabitantDefinition & IsContentItem = {
 };
 
 const tier2Def: InhabitantDefinition & IsContentItem = {
-  id: 'tier2-001',
+  id: 'tier2-001' as InhabitantId,
   name: 'Dark Elf',
   type: 'creature',
   tier: 2,
@@ -234,8 +236,8 @@ describe('recruitment helper', () => {
       mockInhabitants = Array.from(
         { length: RECRUITMENT_DEFAULT_MAX_INHABITANTS },
         (_, i) => ({
-          instanceId: `inst-${i}`,
-          definitionId: 'goblin-001',
+          instanceId: `inst-${i}` as InhabitantInstanceId,
+          definitionId: 'goblin-001' as InhabitantId,
           name: 'Goblin',
           state: 'normal' as const,
           assignedRoomId: undefined,

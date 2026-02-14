@@ -1,12 +1,13 @@
+import type { ForgeRecipeId } from '@interfaces/content-forgerecipe';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type ForgeInventoryEntry = {
-  recipeId: string;
+  recipeId: ForgeRecipeId;
   count: number;
 };
 
 export type ForgeCraftingJob = {
-  recipeId: string;
+  recipeId: ForgeRecipeId;
   progress: number;
   targetTicks: number;
 };

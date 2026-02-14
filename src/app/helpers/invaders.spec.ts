@@ -1,36 +1,40 @@
 import type {
   AbilityEffectDefinition,
   CombatAbility,
+  CombatAbilityId,
+  CombatantId,
   IsContentItem,
 } from '@interfaces';
 import type {
   InvaderDefinition,
   InvaderInstance,
 } from '@interfaces/invader';
+import type { InvaderId } from '@interfaces/content-invader';
+import type { InvaderInstanceId } from '@interfaces/invader';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Invader Definition IDs ---
 
-const WARRIOR_ID = 'aa900001-0001-0001-0001-000000000001';
-const ROGUE_ID = 'aa900001-0001-0001-0001-000000000002';
-const MAGE_ID = 'aa900001-0001-0001-0001-000000000003';
-const CLERIC_ID = 'aa900001-0001-0001-0001-000000000004';
-const PALADIN_ID = 'aa900001-0001-0001-0001-000000000005';
-const RANGER_ID = 'aa900001-0001-0001-0001-000000000006';
+const WARRIOR_ID = 'aa900001-0001-0001-0001-000000000001' as InvaderId;
+const ROGUE_ID = 'aa900001-0001-0001-0001-000000000002' as InvaderId;
+const MAGE_ID = 'aa900001-0001-0001-0001-000000000003' as InvaderId;
+const CLERIC_ID = 'aa900001-0001-0001-0001-000000000004' as InvaderId;
+const PALADIN_ID = 'aa900001-0001-0001-0001-000000000005' as InvaderId;
+const RANGER_ID = 'aa900001-0001-0001-0001-000000000006' as InvaderId;
 
 // --- Ability IDs ---
 
-const SHIELD_WALL_ID = 'ca000001-0000-4000-a000-000000000007';
-const DISARM_TRAP_ID = 'ca000001-0000-4000-a000-000000000008';
-const BACKSTAB_ID = 'ca000001-0000-4000-a000-000000000009';
-const ARCANE_BOLT_ID = 'ca000001-0000-4000-a000-000000000010';
-const DISPEL_ID = 'ca000001-0000-4000-a000-000000000011';
-const HEAL_ID = 'ca000001-0000-4000-a000-000000000012';
-const TURN_UNDEAD_ID = 'ca000001-0000-4000-a000-000000000013';
-const SMITE_EVIL_ID = 'ca000001-0000-4000-a000-000000000014';
-const AURA_OF_COURAGE_ID = 'ca000001-0000-4000-a000-000000000015';
-const SCOUT_ID = 'ca000001-0000-4000-a000-000000000016';
-const MARK_TARGET_ID = 'ca000001-0000-4000-a000-000000000017';
+const SHIELD_WALL_ID = 'ca000001-0000-4000-a000-000000000007' as CombatAbilityId;
+const DISARM_TRAP_ID = 'ca000001-0000-4000-a000-000000000008' as CombatAbilityId;
+const BACKSTAB_ID = 'ca000001-0000-4000-a000-000000000009' as CombatAbilityId;
+const ARCANE_BOLT_ID = 'ca000001-0000-4000-a000-000000000010' as CombatAbilityId;
+const DISPEL_ID = 'ca000001-0000-4000-a000-000000000011' as CombatAbilityId;
+const HEAL_ID = 'ca000001-0000-4000-a000-000000000012' as CombatAbilityId;
+const TURN_UNDEAD_ID = 'ca000001-0000-4000-a000-000000000013' as CombatAbilityId;
+const SMITE_EVIL_ID = 'ca000001-0000-4000-a000-000000000014' as CombatAbilityId;
+const AURA_OF_COURAGE_ID = 'ca000001-0000-4000-a000-000000000015' as CombatAbilityId;
+const SCOUT_ID = 'ca000001-0000-4000-a000-000000000016' as CombatAbilityId;
+const MARK_TARGET_ID = 'ca000001-0000-4000-a000-000000000017' as CombatAbilityId;
 
 // --- Mock content ---
 
@@ -315,7 +319,7 @@ function makeInvaderInstance(
   overrides: Partial<InvaderInstance> = {},
 ): InvaderInstance {
   return {
-    id: 'inv-1',
+    id: 'inv-1' as InvaderInstanceId,
     definitionId: WARRIOR_ID,
     currentHp: 30,
     maxHp: 30,
@@ -482,19 +486,19 @@ describe('invaderResolveAbility', () => {
         { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1' as CombatantId]);
     expect(result).toBeUndefined();
   });
 
   it('returns null when ability state is missing', () => {
     const invader = makeInvaderInstance({ abilityStates: [] });
-    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1' as CombatantId]);
     expect(result).toBeUndefined();
   });
 
   it('Shield Wall targets self and returns defense buff', () => {
     const invader = makeInvaderInstance();
-    const result = invaderResolveAbility(invader, shieldWallAbility, ['enemy-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['enemy-1' as CombatantId]);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Buff Defense');
     expect(result!.value).toBe(25);
@@ -510,11 +514,11 @@ describe('invaderResolveAbility', () => {
         { abilityId: BACKSTAB_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, backstabAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, backstabAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     // Rogue attack = 6, value = 200% → 6 * 2 = 12
     expect(result!.value).toBe(12);
-    expect(result!.targetIds).toEqual(['target-1']);
+    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
   });
 
   it('Arcane Bolt deals magic damage based on mage attack', () => {
@@ -524,7 +528,7 @@ describe('invaderResolveAbility', () => {
         { abilityId: ARCANE_BOLT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, arcaneBoltAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, arcaneBoltAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     // Mage attack = 10, value = 150% → 10 * 1.5 = 15
     expect(result!.value).toBe(15);
@@ -538,7 +542,7 @@ describe('invaderResolveAbility', () => {
         { abilityId: TURN_UNDEAD_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const targets = ['undead-1', 'undead-2', 'undead-3'];
+    const targets = ['undead-1' as CombatantId, 'undead-2' as CombatantId, 'undead-3' as CombatantId];
     const result = invaderResolveAbility(invader, turnUndeadAbility, targets);
     expect(result).toBeDefined();
     // Cleric attack = 4, value = 150% → 4 * 1.5 = 6
@@ -553,7 +557,7 @@ describe('invaderResolveAbility', () => {
         { abilityId: AURA_OF_COURAGE_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const allies = ['ally-1', 'ally-2'];
+    const allies = ['ally-1' as CombatantId, 'ally-2' as CombatantId];
     const result = invaderResolveAbility(invader, auraOfCourageAbility, allies);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Fear Immunity');
@@ -567,7 +571,7 @@ describe('invaderResolveAbility', () => {
         { abilityId: SCOUT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, scoutAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, scoutAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Scout');
     expect(result!.value).toBe(2);
@@ -581,12 +585,12 @@ describe('invaderResolveAbility', () => {
         { abilityId: MARK_TARGET_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, markTargetAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, markTargetAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Mark');
     expect(result!.value).toBe(20);
     expect(result!.duration).toBe(3);
-    expect(result!.targetIds).toEqual(['target-1']);
+    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
   });
 
   it('Dispel returns dispel effect with zero value', () => {
@@ -596,11 +600,11 @@ describe('invaderResolveAbility', () => {
         { abilityId: DISPEL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, dispelAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, dispelAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Dispel');
     expect(result!.value).toBe(0);
-    expect(result!.targetIds).toEqual(['target-1']);
+    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
   });
 });
 
@@ -617,7 +621,7 @@ describe('Rogue disarm', () => {
       ],
     });
     // rng returns 0.3 → roll = 30 → 30 <= 60 → success
-    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.3);
+    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1' as CombatantId], () => 0.3);
     expect(result).toBeDefined();
     expect(result!.effectType).toBe('Disarm');
     expect(result!.value).toBe(1);
@@ -631,7 +635,7 @@ describe('Rogue disarm', () => {
       ],
     });
     // rng returns 0.8 → roll = 80 → 80 > 60 → failure
-    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1'], () => 0.8);
+    const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1' as CombatantId], () => 0.8);
     expect(result).toBeDefined();
     expect(result!.value).toBe(0);
   });
@@ -647,7 +651,7 @@ describe('Cleric heal', () => {
         { abilityId: HEAL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, healAbility, ['ally-1']);
+    const result = invaderResolveAbility(invader, healAbility, ['ally-1' as CombatantId]);
     expect(result).toBeDefined();
     // maxHp = 20, value = 20% → 20 * 0.2 = 4
     expect(result!.value).toBe(4);
@@ -680,7 +684,7 @@ describe('Cooldown prevents ability reuse', () => {
         { abilityId: SHIELD_WALL_ID, currentCooldown: 2, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1' as CombatantId]);
     expect(result).toBeUndefined();
   });
 
@@ -721,12 +725,12 @@ describe('Cooldown prevents ability reuse', () => {
       ],
     });
     // Still on cooldown
-    expect(invaderResolveAbility(invader, shieldWallAbility, ['t'])).toBeUndefined();
+    expect(invaderResolveAbility(invader, shieldWallAbility, ['t' as CombatantId])).toBeUndefined();
     // Tick down
     invader = invaderTickCooldowns(invader);
     expect(invader.abilityStates[0].currentCooldown).toBe(0);
     // Now it should work
-    const result = invaderResolveAbility(invader, shieldWallAbility, ['t']);
+    const result = invaderResolveAbility(invader, shieldWallAbility, ['t' as CombatantId]);
     expect(result).toBeDefined();
   });
 });
@@ -739,12 +743,12 @@ describe('Paladin Smite Evil', () => {
         { abilityId: SMITE_EVIL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
       ],
     });
-    const result = invaderResolveAbility(invader, smiteEvilAbility, ['corrupted-1']);
+    const result = invaderResolveAbility(invader, smiteEvilAbility, ['corrupted-1' as CombatantId]);
     expect(result).toBeDefined();
     // Paladin attack = 7, value = 200% → 7 * 2 = 14
     expect(result!.value).toBe(14);
     expect(result!.effectType).toBe('Damage');
-    expect(result!.targetIds).toEqual(['corrupted-1']);
+    expect(result!.targetIds).toEqual(['corrupted-1' as CombatantId]);
     expect(result!.cooldownApplied).toBe(2);
   });
 });

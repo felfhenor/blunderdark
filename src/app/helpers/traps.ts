@@ -8,12 +8,13 @@ import type {
   TrapInstance,
   TrapInventoryEntry,
 } from '@interfaces';
-import type { TrapTriggerResult } from '@interfaces/trap';
+import type { TrapId } from '@interfaces/content-trap';
+import type { TrapInstanceId, TrapTriggerResult } from '@interfaces/trap';
 
 // --- Trap Definition Lookup ---
 
 export function trapGetDefinition(
-  trapTypeId: string,
+  trapTypeId: TrapId,
 ): (TrapDefinition & IsContentItem) | undefined {
   return contentGetEntry<TrapDefinition & IsContentItem>(trapTypeId);
 }
@@ -22,7 +23,7 @@ export function trapGetDefinition(
 
 export function trapAddToInventory(
   inventory: TrapInventoryEntry[],
-  trapTypeId: string,
+  trapTypeId: TrapId,
   count = 1,
 ): TrapInventoryEntry[] {
   const updated = [...inventory];
@@ -37,7 +38,7 @@ export function trapAddToInventory(
 
 export function trapRemoveFromInventory(
   inventory: TrapInventoryEntry[],
-  trapTypeId: string,
+  trapTypeId: TrapId,
   count = 1,
 ): TrapInventoryEntry[] | undefined {
   const existing = inventory.find((e) => e.trapTypeId === trapTypeId);
@@ -52,7 +53,7 @@ export function trapRemoveFromInventory(
 
 export function trapGetInventoryCount(
   inventory: TrapInventoryEntry[],
-  trapTypeId: string,
+  trapTypeId: TrapId,
 ): number {
   return inventory.find((e) => e.trapTypeId === trapTypeId)?.count ?? 0;
 }
@@ -85,7 +86,7 @@ export function trapCanPlace(
 
 export function trapPlace(
   floor: Floor,
-  trapTypeId: string,
+  trapTypeId: TrapId,
   tileX: number,
   tileY: number,
 ): { floor: Floor; trap: TrapInstance } | undefined {
@@ -99,7 +100,7 @@ export function trapPlace(
   if (!tile?.hallwayId) return undefined;
 
   const trap: TrapInstance = {
-    id: rngUuid(),
+    id: rngUuid() as TrapInstanceId,
     trapTypeId,
     hallwayId: tile.hallwayId,
     tileX,
@@ -119,7 +120,7 @@ export function trapPlace(
 
 export function trapRemove(
   floor: Floor,
-  trapId: string,
+  trapId: TrapInstanceId,
 ): { floor: Floor; trap: TrapInstance } | undefined {
   const trap = (floor.traps ?? []).find((t) => t.id === trapId);
   if (!trap) return undefined;
@@ -201,7 +202,7 @@ export function trapRollTrigger(
 
 export function trapApplyTrigger(
   floor: Floor,
-  trapId: string,
+  trapId: TrapInstanceId,
   result: TrapTriggerResult,
 ): Floor {
   if (!result.triggered && !result.disarmed) return floor;

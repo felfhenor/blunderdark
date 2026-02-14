@@ -1,4 +1,5 @@
 import type { RoomId } from '@interfaces/content-room';
+import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type SynergyConditionType =
@@ -24,7 +25,7 @@ export type SynergyEffect = {
 };
 
 export type SynergyDefinition = {
-  id: string;
+  id: Branded<string, 'SynergyId'>;
   name: string;
   description: string;
   conditions: SynergyCondition[];
@@ -32,7 +33,7 @@ export type SynergyDefinition = {
 };
 
 export type ActiveSynergy = {
-  synergyId: string;
+  synergyId: Branded<string, 'SynergyId'>;
   roomId: PlacedRoomId;
 };
 

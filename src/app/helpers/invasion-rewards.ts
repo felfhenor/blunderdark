@@ -6,6 +6,7 @@ import type {
   DefenseRewards,
   DetailedInvasionResult,
   PrisonerAction,
+  PrisonerId,
   PrisonerHandlingResult,
 } from '@interfaces/invasion';
 import type {
@@ -191,7 +192,7 @@ export function invasionRewardRollPrisonerCaptures(
       if (!def) continue;
 
       prisoners.push({
-        id: rngUuid(),
+        id: rngUuid() as PrisonerId,
         invaderClass: def.invaderClass,
         name: `Captured ${def.name}`,
         stats: { ...def.baseStats },

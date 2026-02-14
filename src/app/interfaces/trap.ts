@@ -1,3 +1,6 @@
+import type { TrapId } from '@interfaces/content-trap';
+import type { HallwayId } from '@interfaces/hallway';
+import type { Branded } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
@@ -8,7 +11,7 @@ export type TrapEffectType =
   | 'fear';
 
 export type TrapDefinition = {
-  id: string;
+  id: TrapId;
   name: string;
   description: string;
   effectType: TrapEffectType;
@@ -21,10 +24,12 @@ export type TrapDefinition = {
   sprite: string;
 };
 
+export type TrapInstanceId = Branded<string, 'TrapInstanceId'>;
+
 export type TrapInstance = {
-  id: string;
-  trapTypeId: string;
-  hallwayId: string;
+  id: TrapInstanceId;
+  trapTypeId: TrapId;
+  hallwayId: HallwayId;
   tileX: number;
   tileY: number;
   remainingCharges: number;
@@ -32,12 +37,12 @@ export type TrapInstance = {
 };
 
 export type TrapInventoryEntry = {
-  trapTypeId: string;
+  trapTypeId: TrapId;
   count: number;
 };
 
 export type TrapCraftingJob = {
-  trapTypeId: string;
+  trapTypeId: TrapId;
   progress: number;
   targetTicks: number;
 };

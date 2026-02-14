@@ -1,4 +1,8 @@
 import type { AbilityState } from '@interfaces/combat';
+import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { InvaderId } from '@interfaces/content-invader';
+import type { Branded } from '@interfaces/identifiable';
+import type { CombatantId } from '@interfaces/invasion';
 
 export type InvaderClassType =
   | 'warrior'
@@ -16,12 +20,12 @@ export type InvaderStats = {
 };
 
 export type InvaderDefinition = {
-  id: string;
+  id: InvaderId;
   name: string;
   description: string;
   invaderClass: InvaderClassType;
   baseStats: InvaderStats;
-  combatAbilityIds: string[];
+  combatAbilityIds: CombatAbilityId[];
   sprite: string;
 };
 
@@ -30,9 +34,11 @@ export type StatusEffect = {
   remainingDuration: number;
 };
 
+export type InvaderInstanceId = Branded<string, 'InvaderInstanceId'>;
+
 export type InvaderInstance = {
-  id: string;
-  definitionId: string;
+  id: InvaderInstanceId;
+  definitionId: InvaderId;
   currentHp: number;
   maxHp: number;
   statusEffects: StatusEffect[];
@@ -43,6 +49,6 @@ export type AbilityResult = {
   effectType: string;
   value: number;
   duration: number;
-  targetIds: string[];
+  targetIds: CombatantId[];
   cooldownApplied: number;
 };

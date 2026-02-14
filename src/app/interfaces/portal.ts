@@ -1,5 +1,9 @@
+import type { Branded } from '@interfaces/identifiable';
+
+export type PortalId = Branded<string, 'PortalId'>;
+
 export type PortalInstance = {
-  id: string;
+  id: PortalId;
   floorDepthA: number;
   floorDepthB: number;
   positionA: { x: number; y: number };

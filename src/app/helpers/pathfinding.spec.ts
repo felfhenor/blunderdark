@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DungeonGraph, PathEdge, PathNode } from '@interfaces/pathfinding';
-import type { Floor, GridState, GridTile, PlacedRoomId, RoomId } from '@interfaces';
+import type { ConnectionId, Floor, FloorId, GridState, GridTile, HallwayId, PlacedRoomId, RoomId, RoomShapeId } from '@interfaces';
 
 const {
   pathfindingBuildDungeonGraph,
@@ -47,7 +47,7 @@ function makeGraph(
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -69,8 +69,8 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('creates nodes from floor rooms', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 5, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 5, anchorY: 0 },
       ],
     });
 
@@ -83,11 +83,11 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('creates edges from connections', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c1' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
@@ -103,14 +103,14 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('creates edges from hallway connections', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 10, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 10, anchorY: 0 },
       ],
       hallways: [
-        { id: 'h1', tiles: [], upgrades: [] },
+        { id: 'h1' as HallwayId, tiles: [], upgrades: [] },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c1' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
@@ -122,15 +122,15 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('does not create duplicate edges for same room pair', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
-        { id: 'c2', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c1' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c2' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
       hallways: [
-        { id: 'h1', tiles: [], upgrades: [] },
+        { id: 'h1' as HallwayId, tiles: [], upgrades: [] },
       ],
     });
 
@@ -141,7 +141,7 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('applies fear levels from roomFearLevels map', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
       ],
     });
 
@@ -153,7 +153,7 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('defaults fear level to 0 when not in map', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
       ],
     });
 
@@ -164,11 +164,11 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('edges have default base cost of 1', () => {
     const floor = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 3, anchorY: 0 },
       ],
       connections: [
-        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c1' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
@@ -179,8 +179,8 @@ describe('pathfindingBuildDungeonGraph', () => {
   it('graph updates when rooms/connections change (rebuild)', () => {
     const floor1 = makeFloor({
       rooms: [
-        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 0, anchorY: 0 },
-        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1', anchorX: 3, anchorY: 0 },
+        { id: 'r1' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 0, anchorY: 0 },
+        { id: 'r2' as PlacedRoomId, roomTypeId: 'type-b' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 3, anchorY: 0 },
       ],
       connections: [],
     });
@@ -191,7 +191,7 @@ describe('pathfindingBuildDungeonGraph', () => {
     const floor2 = makeFloor({
       rooms: floor1.rooms,
       connections: [
-        { id: 'c1', roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
+        { id: 'c1' as ConnectionId, roomAId: 'r1' as PlacedRoomId, roomBId: 'r2' as PlacedRoomId, edgeTiles: [] },
       ],
     });
 
@@ -874,7 +874,7 @@ function hallwayTile(hallwayId: string): GridTile {
     occupied: true,
     occupiedBy: 'hallway',
     roomId: undefined,
-    hallwayId,
+    hallwayId: hallwayId as HallwayId,
     stairId: undefined,
     elevatorId: undefined,
     portalId: undefined,
@@ -1043,7 +1043,7 @@ function makeFloorWithRooms(
     }
   }
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -1051,7 +1051,7 @@ function makeFloorWithRooms(
     rooms: rooms.map((r) => ({
       id: r.id as PlacedRoomId,
       roomTypeId: 'type-a' as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: r.tiles[0].x,
       anchorY: r.tiles[0].y,
     })),
@@ -1120,14 +1120,14 @@ describe('tilePathfindingFindRoomToRoomPath', () => {
     grid = gridSetTile(grid, 15, 5, roomTile('room-b'));
 
     const floor: Floor = {
-      id: 'floor-1',
+      id: 'floor-1' as FloorId,
       name: 'Floor 1',
       depth: 1,
       biome: 'neutral',
       grid,
       rooms: [
-        { id: 'room-a' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 5, anchorY: 5 },
-        { id: 'room-b' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1', anchorX: 15, anchorY: 5 },
+        { id: 'room-a' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 5, anchorY: 5 },
+        { id: 'room-b' as PlacedRoomId, roomTypeId: 'type-a' as RoomId, shapeId: 's1' as RoomShapeId, anchorX: 15, anchorY: 5 },
       ],
       hallways: [],
       inhabitants: [],

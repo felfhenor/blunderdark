@@ -1,15 +1,21 @@
 import type {
   BreedingRecipeContent,
+  BreedingRecipeId,
   Floor,
+  FloorId,
   GameState,
   InhabitantDefinition,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
@@ -27,7 +33,7 @@ const RECIPE_GOBLIN_KOBOLD_ID = 'bb300001-0001-0001-0001-000000000001';
 // --- Upgrade paths ---
 
 const enhancedIncubatorsPath: RoomUpgradePath = {
-  id: 'upgrade-enhanced-incubators',
+  id: 'upgrade-enhanced-incubators' as UpgradePathId,
   name: 'Enhanced Incubators',
   description: 'Reduce breeding time.',
   cost: { gold: 150, crystals: 80, essence: 40 },
@@ -38,7 +44,7 @@ const enhancedIncubatorsPath: RoomUpgradePath = {
 };
 
 const mutationAmplifierPath: RoomUpgradePath = {
-  id: 'upgrade-mutation-amplifier',
+  id: 'upgrade-mutation-amplifier' as UpgradePathId,
   name: 'Mutation Amplifier',
   description: 'Better mutation odds.',
   cost: { gold: 130, crystals: 70, essence: 50 },
@@ -101,7 +107,7 @@ vi.mock('@helpers/room-shapes', () => ({
 // --- Inhabitant definitions ---
 
 const goblinDef: InhabitantDefinition & IsContentItem = {
-  id: GOBLIN_ID,
+  id: GOBLIN_ID as InhabitantId,
   name: 'Goblin',
   __type: 'inhabitant',
   type: 'creature',
@@ -116,7 +122,7 @@ const goblinDef: InhabitantDefinition & IsContentItem = {
 };
 
 const koboldDef: InhabitantDefinition & IsContentItem = {
-  id: KOBOLD_ID,
+  id: KOBOLD_ID as InhabitantId,
   name: 'Kobold',
   __type: 'inhabitant',
   type: 'creature',
@@ -131,7 +137,7 @@ const koboldDef: InhabitantDefinition & IsContentItem = {
 };
 
 const skeletonDef: InhabitantDefinition & IsContentItem = {
-  id: SKELETON_ID,
+  id: SKELETON_ID as InhabitantId,
   name: 'Skeleton',
   __type: 'inhabitant',
   type: 'undead',
@@ -152,8 +158,8 @@ const goblinKoboldRecipe: BreedingRecipeContent & IsContentItem = {
   name: 'Goblin Trapper',
   __type: 'breedingrecipe',
   description: 'A hybrid.',
-  parentInhabitantAId: GOBLIN_ID,
-  parentInhabitantBId: KOBOLD_ID,
+  parentInhabitantAId: GOBLIN_ID as InhabitantId,
+  parentInhabitantBId: KOBOLD_ID as InhabitantId,
   resultName: 'Goblin Trapper',
   statBonuses: { speed: 3, attack: 2 },
   timeMultiplier: 1.0,
@@ -162,11 +168,11 @@ const goblinKoboldRecipe: BreedingRecipeContent & IsContentItem = {
 // --- Room definitions ---
 
 const breedingPitsDef: RoomDefinition & IsContentItem = {
-  id: BREEDING_PITS_ID,
+  id: BREEDING_PITS_ID as RoomId,
   name: 'Breeding Pits',
   __type: 'room',
   description: 'Breeds creatures.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: { gold: 120, crystals: 60, essence: 30 },
   production: {},
   requiresWorkers: false,
@@ -183,11 +189,11 @@ const breedingPitsDef: RoomDefinition & IsContentItem = {
 };
 
 const spawningPoolDef: RoomDefinition & IsContentItem = {
-  id: SPAWNING_POOL_ID,
+  id: SPAWNING_POOL_ID as RoomId,
   name: 'Spawning Pool',
   __type: 'room',
   description: 'Spawns creatures.',
-  shapeId: 'shape-2x2',
+  shapeId: 'shape-2x2' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -204,11 +210,11 @@ const spawningPoolDef: RoomDefinition & IsContentItem = {
 };
 
 const soulWellDef: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: 'Soul stuff.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: {},
   requiresWorkers: false,
@@ -230,7 +236,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'breeding-1' as PlacedRoomId,
     roomTypeId: BREEDING_PITS_ID as RoomId,
-    shapeId: 'shape-3x3',
+    shapeId: 'shape-3x3' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -241,8 +247,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inh-1',
-    definitionId: GOBLIN_ID,
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: GOBLIN_ID as InhabitantId,
     name: 'Goblin the Bold',
     state: 'normal',
     assignedRoomId: 'breeding-1' as PlacedRoomId,
@@ -255,7 +261,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -396,8 +402,8 @@ describe('Recipe Matching', () => {
 
 describe('Available Recipes', () => {
   it('should find available recipes from assigned inhabitants', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
 
     const recipes = breedingGetAvailableRecipes([goblin, kobold]);
     expect(recipes).toHaveLength(1);
@@ -405,15 +411,15 @@ describe('Available Recipes', () => {
   });
 
   it('should return empty when no valid pairs exist', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const skeleton = makeInhabitant({ instanceId: 's1', definitionId: SKELETON_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const skeleton = makeInhabitant({ instanceId: 's1' as InhabitantInstanceId, definitionId: SKELETON_ID as InhabitantId });
 
     const recipes = breedingGetAvailableRecipes([goblin, skeleton]);
     expect(recipes).toHaveLength(0);
   });
 
   it('should return empty for single inhabitant', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
     const recipes = breedingGetAvailableRecipes([goblin]);
     expect(recipes).toHaveLength(0);
   });
@@ -421,8 +427,8 @@ describe('Available Recipes', () => {
 
 describe('Mutatable Inhabitants', () => {
   it('should return inhabitants that are not mutated', () => {
-    const normal = makeInhabitant({ instanceId: 'n1', mutated: false });
-    const mutated = makeInhabitant({ instanceId: 'm1', mutated: true });
+    const normal = makeInhabitant({ instanceId: 'n1' as InhabitantInstanceId, mutated: false });
+    const mutated = makeInhabitant({ instanceId: 'm1' as InhabitantInstanceId, mutated: true });
 
     const result = breedingGetMutatableInhabitants([normal, mutated]);
     expect(result).toHaveLength(1);
@@ -430,8 +436,8 @@ describe('Mutatable Inhabitants', () => {
   });
 
   it('should return all if none are mutated', () => {
-    const a = makeInhabitant({ instanceId: 'a', mutated: false });
-    const b = makeInhabitant({ instanceId: 'b' });
+    const a = makeInhabitant({ instanceId: 'a' as InhabitantInstanceId, mutated: false });
+    const b = makeInhabitant({ instanceId: 'b' as InhabitantInstanceId });
 
     const result = breedingGetMutatableInhabitants([a, b]);
     expect(result).toHaveLength(2);
@@ -452,7 +458,7 @@ describe('Hybrid Tick Calculation', () => {
   });
 
   it('should apply Enhanced Incubators upgrade (0.7x)', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
     const ticks = breedingGetHybridTicks(room, new Set(), 1.0);
     expect(ticks).toBe(Math.round(BREEDING_BASE_TICKS * 0.7));
   });
@@ -465,7 +471,7 @@ describe('Hybrid Tick Calculation', () => {
   });
 
   it('should combine upgrade and adjacency', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
     const ticks = breedingGetHybridTicks(room, new Set([SPAWNING_POOL_ID]), 1.0);
     // 25 * 0.7 = 17.5 → 18, then 18 * 0.75 = 13.5 → 14
     const afterUpgrade = Math.round(BREEDING_BASE_TICKS * 0.7);
@@ -473,7 +479,7 @@ describe('Hybrid Tick Calculation', () => {
   });
 
   it('should never go below 1 tick', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
     const ticks = breedingGetHybridTicks(room, new Set([SPAWNING_POOL_ID]), 0.01);
     expect(ticks).toBeGreaterThanOrEqual(1);
   });
@@ -510,7 +516,7 @@ describe('Mutation Odds', () => {
   });
 
   it('should increase positive odds with Mutation Amplifier upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' as UpgradePathId });
     const odds = breedingGetMutationOdds(room, new Set());
     expect(odds.positive).toBeCloseTo(0.75, 5);
   });
@@ -522,7 +528,7 @@ describe('Mutation Odds', () => {
   });
 
   it('should cap positive at 0.95', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' });
+    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' as UpgradePathId });
     // 0.6 + 0.15 (upgrade) + 0.10 (adjacency) + ... would exceed
     // Let's just verify the cap with both
     const odds = breedingGetMutationOdds(room, new Set([SOUL_WELL_ID]));
@@ -615,15 +621,15 @@ describe('breedingPitsProcess', () => {
   it('should decrement breeding job ticks', () => {
     const room = makeRoom();
     room.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 10,
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, assignedRoomId: room.id });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID, assignedRoomId: room.id });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: room.id });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: room.id });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -636,15 +642,15 @@ describe('breedingPitsProcess', () => {
   it('should complete breeding job when ticks reach 0', () => {
     const room = makeRoom();
     room.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 1,
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, assignedRoomId: room.id });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID, assignedRoomId: room.id });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: room.id });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: room.id });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -661,16 +667,16 @@ describe('breedingPitsProcess', () => {
   it('should remove both parents on breeding completion', () => {
     const room = makeRoom();
     room.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 1,
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID });
-    const bystander = makeInhabitant({ instanceId: 'b1', definitionId: GOBLIN_ID, assignedRoomId: undefined });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
+    const bystander = makeInhabitant({ instanceId: 'b1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: undefined });
     const floor = makeFloor([room], [goblin, kobold, bystander]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold, bystander];
@@ -688,15 +694,15 @@ describe('breedingPitsProcess', () => {
   it('should sync floor inhabitants after breeding completion', () => {
     const room = makeRoom();
     room.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 1,
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -710,12 +716,12 @@ describe('breedingPitsProcess', () => {
   it('should decrement mutation job ticks', () => {
     const room = makeRoom();
     room.mutationJob = {
-      targetInstanceId: 'g1',
+      targetInstanceId: 'g1' as InhabitantInstanceId,
       ticksRemaining: 10,
       targetTicks: 15,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
     const floor = makeFloor([room], [goblin]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin];
@@ -728,12 +734,12 @@ describe('breedingPitsProcess', () => {
   it('should complete mutation job when ticks reach 0', () => {
     const room = makeRoom();
     room.mutationJob = {
-      targetInstanceId: 'g1',
+      targetInstanceId: 'g1' as InhabitantInstanceId,
       ticksRemaining: 1,
       targetTicks: 15,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, mutated: false });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, mutated: false });
     const floor = makeFloor([room], [goblin]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin];
@@ -747,9 +753,9 @@ describe('breedingPitsProcess', () => {
   it('should not process rooms that are not breeding pits', () => {
     const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 1,
       targetTicks: 25,
     };
@@ -767,27 +773,27 @@ describe('breedingPitsProcess', () => {
   it('should process multiple breeding pits across floors', () => {
     const room1 = makeRoom({ id: 'bp-1' as PlacedRoomId });
     room1.breedingJob = {
-      parentAInstanceId: 'g1',
-      parentBInstanceId: 'k1',
-      recipeId: RECIPE_GOBLIN_KOBOLD_ID,
+      parentAInstanceId: 'g1' as InhabitantInstanceId,
+      parentBInstanceId: 'k1' as InhabitantInstanceId,
+      recipeId: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
       ticksRemaining: 5,
       targetTicks: 25,
     };
 
     const room2 = makeRoom({ id: 'bp-2' as PlacedRoomId });
     room2.mutationJob = {
-      targetInstanceId: 'g2',
+      targetInstanceId: 'g2' as InhabitantInstanceId,
       ticksRemaining: 3,
       targetTicks: 15,
     };
 
-    const g1 = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID, assignedRoomId: 'bp-1' as PlacedRoomId });
-    const k1 = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID, assignedRoomId: 'bp-1' as PlacedRoomId });
-    const g2 = makeInhabitant({ instanceId: 'g2', definitionId: GOBLIN_ID, assignedRoomId: 'bp-2' as PlacedRoomId });
+    const g1 = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: 'bp-1' as PlacedRoomId });
+    const k1 = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: 'bp-1' as PlacedRoomId });
+    const g2 = makeInhabitant({ instanceId: 'g2' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: 'bp-2' as PlacedRoomId });
 
     const floor1 = makeFloor([room1], [g1, k1]);
     const floor2 = makeFloor([room2], [g2]);
-    floor2.id = 'floor-2';
+    floor2.id = 'floor-2' as FloorId;
 
     const state = makeGameState({ floors: [floor1, floor2] });
     state.world.inhabitants = [g1, k1, g2];
@@ -801,8 +807,8 @@ describe('breedingPitsProcess', () => {
 
 describe('Hybrid Creation', () => {
   it('should create a hybrid with correct properties', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
 
     const hybrid = breedingCreateHybrid(goblin, kobold, goblinKoboldRecipe);
 
@@ -815,8 +821,8 @@ describe('Hybrid Creation', () => {
   });
 
   it('should store stat differences in mutationBonuses', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1', definitionId: GOBLIN_ID });
-    const kobold = makeInhabitant({ instanceId: 'k1', definitionId: KOBOLD_ID });
+    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
 
     const hybrid = breedingCreateHybrid(goblin, kobold, goblinKoboldRecipe);
 

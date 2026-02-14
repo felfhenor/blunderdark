@@ -1,5 +1,11 @@
-import type { Branded } from '@interfaces/identifiable';
+import type { BreedingRecipeId } from '@interfaces/content-breedingrecipe';
 import type { RoomId } from '@interfaces/content-room';
+import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { SummonRecipeId } from '@interfaces/content-summonrecipe';
+import type { Branded } from '@interfaces/identifiable';
+import type { InhabitantInstanceId } from '@interfaces/inhabitant';
+import type { PrisonerId } from '@interfaces/invasion';
+import type { UpgradePathId } from '@interfaces/room';
 
 export type PlacedRoomId = Branded<string, 'PlacedRoomId'>;
 
@@ -11,7 +17,7 @@ export type TileOffset = {
 export type Rotation = 0 | 1 | 2 | 3;
 
 export type RoomShape = {
-  id: string;
+  id: RoomShapeId;
   name: string;
   tiles: TileOffset[];
   width: number;
@@ -19,27 +25,27 @@ export type RoomShape = {
 };
 
 export type BreedingJob = {
-  parentAInstanceId: string;
-  parentBInstanceId: string;
-  recipeId: string;
+  parentAInstanceId: InhabitantInstanceId;
+  parentBInstanceId: InhabitantInstanceId;
+  recipeId: BreedingRecipeId;
   ticksRemaining: number;
   targetTicks: number;
 };
 
 export type MutationJob = {
-  targetInstanceId: string;
+  targetInstanceId: InhabitantInstanceId;
   ticksRemaining: number;
   targetTicks: number;
 };
 
 export type SummonJob = {
-  recipeId: string;
+  recipeId: SummonRecipeId;
   ticksRemaining: number;
   targetTicks: number;
 };
 
 export type TortureJob = {
-  prisonerId: string;
+  prisonerId: PrisonerId;
   action: 'extract' | 'convert';
   ticksRemaining: number;
   targetTicks: number;
@@ -48,11 +54,11 @@ export type TortureJob = {
 export type PlacedRoom = {
   id: PlacedRoomId;
   roomTypeId: RoomId;
-  shapeId: string;
+  shapeId: RoomShapeId;
   anchorX: number;
   anchorY: number;
   rotation?: Rotation;
-  appliedUpgradePathId?: string;
+  appliedUpgradePathId?: UpgradePathId;
   spawnTicksRemaining?: number;
   breedingJob?: BreedingJob;
   mutationJob?: MutationJob;

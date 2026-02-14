@@ -2,7 +2,9 @@ import { defaultCorruptionEffectState, defaultInvasionSchedule, defaultResources
 import type {
   CorruptionEffectState,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   InvasionSchedule,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -47,8 +49,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inst-1',
-    definitionId: 'def-1',
+    instanceId: 'inst-1' as InhabitantInstanceId,
+    definitionId: 'def-1' as InhabitantId,
     name: 'Test Creature',
     state: 'normal',
     assignedRoomId: undefined,
@@ -190,8 +192,8 @@ describe('corruptionEffectSelectMutationTarget', () => {
   it('should return a valid inhabitant', () => {
     const rng = seedrandom('valid');
     const inhabitants = [
-      makeInhabitant({ instanceId: 'a' }),
-      makeInhabitant({ instanceId: 'b' }),
+      makeInhabitant({ instanceId: 'a' as InhabitantInstanceId }),
+      makeInhabitant({ instanceId: 'b' as InhabitantInstanceId }),
     ];
     const result = corruptionEffectSelectMutationTarget(inhabitants, rng);
     expect(result).toBeDefined();

@@ -1,3 +1,5 @@
+import type { Branded } from '@interfaces/identifiable';
+
 export type ReputationType =
   | 'terror'
   | 'wealth'
@@ -27,7 +29,7 @@ export const REPUTATION_THRESHOLDS: Record<ReputationLevel, number> = {
  * Loaded from gamedata/reputationaction/ YAML files.
  */
 export type ReputationAction = {
-  id: string;
+  id: Branded<string, 'ReputationActionId'>;
   name: string;
   description: string;
   reputationRewards: Partial<Record<ReputationType, number>>;
@@ -37,7 +39,7 @@ export type ReputationAction = {
  * Event emitted when reputation is awarded for an action.
  */
 export type ReputationAwardEvent = {
-  actionId: string;
+  actionId: Branded<string, 'ReputationActionId'>;
   actionName: string;
   rewards: Partial<Record<ReputationType, number>>;
 };

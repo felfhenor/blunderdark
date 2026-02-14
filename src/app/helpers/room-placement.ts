@@ -17,6 +17,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
+  RoomShapeId,
   Rotation,
   RoomDefinition,
   RoomId,
@@ -387,7 +388,7 @@ export function roomPlacementRemoveFromFloor(
 
 export async function roomPlacementPlace(
   roomTypeId: RoomId,
-  shapeId: string,
+  shapeId: RoomShapeId,
   anchorX: number,
   anchorY: number,
   rotation: Rotation = 0,

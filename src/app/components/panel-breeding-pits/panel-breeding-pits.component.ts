@@ -19,7 +19,9 @@ import {
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   BreedingRecipeContent,
+  BreedingRecipeId,
   InhabitantDefinition,
+  InhabitantInstanceId,
   IsContentItem,
 } from '@interfaces';
 
@@ -120,9 +122,9 @@ export class PanelBreedingPitsComponent {
   });
 
   public async startBreeding(
-    parentAInstanceId: string,
-    parentBInstanceId: string,
-    recipeId: string,
+    parentAInstanceId: InhabitantInstanceId,
+    parentBInstanceId: InhabitantInstanceId,
+    recipeId: BreedingRecipeId,
     targetTicks: number,
   ): Promise<void> {
     const room = this.breedingRoom();
@@ -146,7 +148,7 @@ export class PanelBreedingPitsComponent {
     });
   }
 
-  public async startMutation(targetInstanceId: string): Promise<void> {
+  public async startMutation(targetInstanceId: InhabitantInstanceId): Promise<void> {
     const room = this.breedingRoom();
     if (!room) return;
 

@@ -6,6 +6,7 @@ import type {
   RoomId,
   RoomUpgradeEffect,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
 
@@ -64,7 +65,7 @@ export function roomUpgradeCanApply(
 
 export function roomUpgradeApply(
   placedRoom: PlacedRoom,
-  upgradePathId: string,
+  upgradePathId: UpgradePathId,
 ): PlacedRoom {
   return {
     ...placedRoom,

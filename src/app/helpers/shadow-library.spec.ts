@@ -1,12 +1,17 @@
 import type {
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +24,7 @@ const CRYSTAL_MINE_ID = 'room-crystal-mine';
 // --- Upgrade paths ---
 
 const arcaneFocusPath: RoomUpgradePath = {
-  id: 'upgrade-arcane-focus',
+  id: 'upgrade-arcane-focus' as UpgradePathId,
   name: 'Arcane Focus',
   description:
     'Enchanted reading lenses and amplified candlelight drastically improve research throughput.',
@@ -28,7 +33,7 @@ const arcaneFocusPath: RoomUpgradePath = {
 };
 
 const expandedArchivesPath: RoomUpgradePath = {
-  id: 'upgrade-expanded-archives',
+  id: 'upgrade-expanded-archives' as UpgradePathId,
   name: 'Expanded Archives',
   description:
     'Extend the library with additional reading chambers to accommodate more scholars.',
@@ -37,7 +42,7 @@ const expandedArchivesPath: RoomUpgradePath = {
 };
 
 const forbiddenKnowledgePath: RoomUpgradePath = {
-  id: 'upgrade-forbidden-knowledge',
+  id: 'upgrade-forbidden-knowledge' as UpgradePathId,
   name: 'Forbidden Knowledge',
   description:
     'Unlock the darkest tomes. Greatly boosts research but intensifies the fearsome aura.',
@@ -60,12 +65,12 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
-  id: SHADOW_LIBRARY_ID,
+  id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
   description:
     'A repository of forbidden knowledge shrouded in arcane darkness.',
-  shapeId: 'shape-small-l',
+  shapeId: 'shape-small-l' as RoomShapeId,
   cost: { gold: 80, crystals: 30 },
   production: { research: 0.6 },
   requiresWorkers: true,
@@ -85,11 +90,11 @@ const shadowLibraryRoom: RoomDefinition & IsContentItem = {
 };
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description: '',
-  shapeId: 'shape-small-l',
+  shapeId: 'shape-small-l' as RoomShapeId,
   cost: {},
   production: { essence: 0.3 },
   requiresWorkers: false,
@@ -105,11 +110,11 @@ const soulWellRoom: RoomDefinition & IsContentItem = {
 };
 
 const crystalMineRoom: RoomDefinition & IsContentItem = {
-  id: CRYSTAL_MINE_ID,
+  id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
   description: '',
-  shapeId: 'shape-small-l',
+  shapeId: 'shape-small-l' as RoomShapeId,
   cost: {},
   production: { crystals: 1.0 },
   requiresWorkers: true,
@@ -179,7 +184,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -198,7 +203,7 @@ function createPlacedLibrary(
   return {
     id: 'placed-library-1' as PlacedRoomId,
     roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-    shapeId: 'shape-small-l',
+    shapeId: 'shape-small-l' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -257,8 +262,8 @@ describe('Shadow Library: base production', () => {
     const library = createPlacedLibrary();
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 1',
         state: 'normal',
         assignedRoomId: 'placed-library-1' as PlacedRoomId,
@@ -277,7 +282,7 @@ describe('Shadow Library: adjacency bonuses', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
@@ -295,7 +300,7 @@ describe('Shadow Library: adjacency bonuses', () => {
     const mine: PlacedRoom = {
       id: 'placed-mine-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
@@ -313,7 +318,7 @@ describe('Shadow Library: adjacency bonuses', () => {
     const library2: PlacedRoom = {
       id: 'placed-library-2' as PlacedRoomId,
       roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
@@ -331,14 +336,14 @@ describe('Shadow Library: adjacency bonuses', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const mine: PlacedRoom = {
       id: 'placed-mine-1' as PlacedRoomId,
       roomTypeId: CRYSTAL_MINE_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 0,
       anchorY: 3,
     };
@@ -366,7 +371,7 @@ describe('Shadow Library: Arcane Focus upgrade', () => {
 
   it('should expose effects when upgrade is applied', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-arcane-focus',
+      appliedUpgradePathId: 'upgrade-arcane-focus' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -378,7 +383,7 @@ describe('Shadow Library: Arcane Focus upgrade', () => {
 describe('Shadow Library: Expanded Archives upgrade', () => {
   it('should change capacity from 1 to 3', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-expanded-archives',
+      appliedUpgradePathId: 'upgrade-expanded-archives' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, shadowLibraryRoom);
     expect(effective).toBe(3);
@@ -414,7 +419,7 @@ describe('Shadow Library: Forbidden Knowledge upgrade', () => {
 
   it('should expose both effects when applied', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-forbidden-knowledge',
+      appliedUpgradePathId: 'upgrade-forbidden-knowledge' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(2);
@@ -424,7 +429,7 @@ describe('Shadow Library: Forbidden Knowledge upgrade', () => {
 describe('Shadow Library: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-arcane-focus',
+      appliedUpgradePathId: 'upgrade-arcane-focus' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-archives');
     expect(result.valid).toBe(false);
@@ -443,14 +448,14 @@ describe('Shadow Library: full production with adjacency', () => {
     const well: PlacedRoom = {
       id: 'placed-well-1' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-small-l',
+      shapeId: 'shape-small-l' as RoomShapeId,
       anchorX: 2,
       anchorY: 0,
     };
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 1',
         state: 'normal',
         assignedRoomId: 'placed-library-1' as PlacedRoomId,

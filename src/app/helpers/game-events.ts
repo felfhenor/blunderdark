@@ -1,5 +1,5 @@
 import type { GameTime } from '@interfaces/game-time';
-import type { ScheduledEvent } from '@interfaces/game-event';
+import type { GameEventId, ScheduledEvent } from '@interfaces/game-event';
 
 let nextEventId = 1;
 let scheduledEvents: ScheduledEvent[] = [];
@@ -12,7 +12,7 @@ export function gameEventSchedule(
   triggerTime: GameTime,
   callback: () => void,
 ): string {
-  const id = `evt-${nextEventId++}`;
+  const id = `evt-${nextEventId++}` as GameEventId;
   scheduledEvents.push({ id, triggerTime, callback });
   return id;
 }

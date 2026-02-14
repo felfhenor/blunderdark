@@ -1,12 +1,17 @@
 import type {
   Floor,
+  FloorId,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +24,7 @@ const SHADOW_LIBRARY_ID = 'room-shadow-library';
 // --- Upgrade paths ---
 
 const necroticEnhancementPath: RoomUpgradePath = {
-  id: 'upgrade-necrotic-enhancement',
+  id: 'upgrade-necrotic-enhancement' as UpgradePathId,
   name: 'Necrotic Enhancement',
   description:
     'Deepen the well\'s connection to the spirit realm, boosting essence yield.',
@@ -31,7 +36,7 @@ const necroticEnhancementPath: RoomUpgradePath = {
 };
 
 const essenceMasteryPath: RoomUpgradePath = {
-  id: 'upgrade-essence-mastery',
+  id: 'upgrade-essence-mastery' as UpgradePathId,
   name: 'Essence Mastery',
   description:
     'Purify the well\'s output for greater efficiency, reducing fear.',
@@ -54,12 +59,12 @@ vi.mock('@helpers/content', () => ({
 }));
 
 const soulWellRoom: RoomDefinition & IsContentItem = {
-  id: SOUL_WELL_ID,
+  id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
   description:
     'A deep well reaching into the spiritual plane, drawing raw essence from departed souls.',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: { gold: 100, crystals: 50 },
   production: { essence: 0.3 },
   requiresWorkers: false,
@@ -79,11 +84,11 @@ const soulWellRoom: RoomDefinition & IsContentItem = {
 };
 
 const mushroomGroveRoom: RoomDefinition & IsContentItem = {
-  id: MUSHROOM_GROVE_ID,
+  id: MUSHROOM_GROVE_ID as RoomId,
   name: 'Mushroom Grove',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: { food: 1.6 },
   requiresWorkers: true,
@@ -99,11 +104,11 @@ const mushroomGroveRoom: RoomDefinition & IsContentItem = {
 };
 
 const shadowLibraryRoom: RoomDefinition & IsContentItem = {
-  id: SHADOW_LIBRARY_ID,
+  id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
   description: '',
-  shapeId: 'shape-3x3',
+  shapeId: 'shape-3x3' as RoomShapeId,
   cost: {},
   production: { research: 0.6 },
   requiresWorkers: true,
@@ -177,7 +182,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -194,7 +199,7 @@ function createPlacedWell(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-well-1' as PlacedRoomId,
     roomTypeId: SOUL_WELL_ID as RoomId,
-    shapeId: 'shape-3x3',
+    shapeId: 'shape-3x3' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -256,7 +261,7 @@ describe('Soul Well: adjacency bonuses', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -274,7 +279,7 @@ describe('Soul Well: adjacency bonuses', () => {
     const library: PlacedRoom = {
       id: 'placed-library-1' as PlacedRoomId,
       roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -292,7 +297,7 @@ describe('Soul Well: adjacency bonuses', () => {
     const well2: PlacedRoom = {
       id: 'placed-well-2' as PlacedRoomId,
       roomTypeId: SOUL_WELL_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -310,14 +315,14 @@ describe('Soul Well: adjacency bonuses', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
     const library: PlacedRoom = {
       id: 'placed-library-1' as PlacedRoomId,
       roomTypeId: SHADOW_LIBRARY_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 0,
       anchorY: 3,
     };
@@ -355,7 +360,7 @@ describe('Soul Well: Necrotic Enhancement upgrade', () => {
 
   it('should change capacity from 2 to 3', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-necrotic-enhancement',
+      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(3);
@@ -385,7 +390,7 @@ describe('Soul Well: Essence Mastery upgrade', () => {
 
   it('should not change capacity', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-essence-mastery',
+      appliedUpgradePathId: 'upgrade-essence-mastery' as UpgradePathId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(2);
@@ -395,7 +400,7 @@ describe('Soul Well: Essence Mastery upgrade', () => {
 describe('Soul Well: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-necrotic-enhancement',
+      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-essence-mastery');
     expect(result.valid).toBe(false);
@@ -414,7 +419,7 @@ describe('Soul Well: full production with adjacency', () => {
     const grove: PlacedRoom = {
       id: 'placed-grove-1' as PlacedRoomId,
       roomTypeId: MUSHROOM_GROVE_ID as RoomId,
-      shapeId: 'shape-3x3',
+      shapeId: 'shape-3x3' as RoomShapeId,
       anchorX: 3,
       anchorY: 0,
     };
@@ -428,8 +433,8 @@ describe('Soul Well: full production with adjacency', () => {
     const well = createPlacedWell();
     const inhabitants: InhabitantInstance[] = [
       {
-        instanceId: 'inst-1',
-        definitionId: 'def-skeleton',
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
         name: 'Skeleton 1',
         state: 'normal',
         assignedRoomId: 'placed-well-1' as PlacedRoomId,

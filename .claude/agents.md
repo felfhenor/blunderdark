@@ -10,6 +10,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Synergies are defined in `gamedata/synergy/base.yml`**, loaded via `contentGetEntriesByType('synergy')` — not hardcoded in TypeScript.
 - **In spec files**, define test-local arbitrary UUID constants — these are not hardcoded production references, they're test fixtures.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()` in Node.js.
+- **Always use branded ID types, never plain `string` for IDs.** All ID properties must use a branded type from `@interfaces` (e.g., `RoomId`, `PlacedRoomId`, `InhabitantInstanceId`, `FloorId`, `HallwayId`). The `Branded<T, K>` utility type is defined in `@interfaces/identifiable`. When creating new ID fields, define a new branded type (`type MyNewId = Branded<string, 'MyNewId'>`) in the appropriate interface file. Cast `string` values with `as MyBrandedId` at creation points (e.g., `rngUuid() as HallwayId`). In spec files, cast test fixture strings the same way (e.g., `'test-id' as PlacedRoomId`).
 
 ## Type Export Location Policy
 

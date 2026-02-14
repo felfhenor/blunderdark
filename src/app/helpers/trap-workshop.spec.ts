@@ -1,30 +1,36 @@
 import type {
   Floor,
+  FloorId,
   GameState,
+  InhabitantId,
   InhabitantInstance,
+  InhabitantInstanceId,
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
   TrapCraftingQueue,
   TrapDefinition,
+  TrapId,
   TrapInventoryEntry,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
 
 const TRAP_WORKSHOP_ID = 'aa100001-0001-0001-0001-000000000013';
-const PIT_TRAP_ID = 'aa800001-0001-0001-0001-000000000001';
-const ARROW_TRAP_ID = 'aa800001-0001-0001-0001-000000000002';
+const PIT_TRAP_ID = 'aa800001-0001-0001-0001-000000000001' as TrapId;
+const ARROW_TRAP_ID = 'aa800001-0001-0001-0001-000000000002' as TrapId;
 const DARK_FORGE_ID = 'aa100001-0001-0001-0001-000000000006';
 
 // --- Upgrade paths ---
 
 const masterTrapperPath: RoomUpgradePath = {
-  id: 'upgrade-master-trapper',
+  id: 'upgrade-master-trapper' as UpgradePathId,
   name: 'Master Trapper',
   description: 'Expand workshop capacity.',
   cost: { gold: 120, crystals: 60, essence: 20 },
@@ -35,7 +41,7 @@ const masterTrapperPath: RoomUpgradePath = {
 };
 
 const efficientAssemblyPath: RoomUpgradePath = {
-  id: 'upgrade-efficient-assembly',
+  id: 'upgrade-efficient-assembly' as UpgradePathId,
   name: 'Efficient Assembly',
   description: 'Reduce costs and time.',
   cost: { gold: 100, crystals: 50 },
@@ -46,7 +52,7 @@ const efficientAssemblyPath: RoomUpgradePath = {
 };
 
 const enchantedTrapsPath: RoomUpgradePath = {
-  id: 'upgrade-enchanted-traps',
+  id: 'upgrade-enchanted-traps' as UpgradePathId,
   name: 'Enchanted Traps',
   description: 'Adds bonus damage.',
   cost: { gold: 130, crystals: 70, essence: 30 },
@@ -75,7 +81,7 @@ vi.mock('@helpers/room-roles', () => ({
 // --- Trap definitions ---
 
 const pitTrapDef: TrapDefinition & IsContentItem = {
-  id: PIT_TRAP_ID,
+  id: PIT_TRAP_ID as TrapId,
   name: 'Pit Trap',
   __type: 'trap',
   description: 'A concealed pit.',
@@ -90,7 +96,7 @@ const pitTrapDef: TrapDefinition & IsContentItem = {
 };
 
 const arrowTrapDef: TrapDefinition & IsContentItem = {
-  id: ARROW_TRAP_ID,
+  id: ARROW_TRAP_ID as TrapId,
   name: 'Arrow Trap',
   __type: 'trap',
   description: 'Wall-mounted arrows.',
@@ -107,11 +113,11 @@ const arrowTrapDef: TrapDefinition & IsContentItem = {
 // --- Room definitions ---
 
 const workshopDef: RoomDefinition & IsContentItem = {
-  id: TRAP_WORKSHOP_ID,
+  id: TRAP_WORKSHOP_ID as RoomId,
   name: 'Trap Workshop',
   __type: 'room',
   description: 'Crafts traps.',
-  shapeId: 'shape-2x2',
+  shapeId: 'shape-2x2' as RoomShapeId,
   cost: { gold: 90, crystals: 30 },
   production: {},
   requiresWorkers: false,
@@ -138,7 +144,7 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'workshop-1' as PlacedRoomId,
     roomTypeId: TRAP_WORKSHOP_ID as RoomId,
-    shapeId: 'shape-2x2',
+    shapeId: 'shape-2x2' as RoomShapeId,
     anchorX: 0,
     anchorY: 0,
     ...overrides,
@@ -149,8 +155,8 @@ function makeInhabitant(
   overrides: Partial<InhabitantInstance> = {},
 ): InhabitantInstance {
   return {
-    instanceId: 'inh-1',
-    definitionId: 'def-1',
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: 'def-1' as InhabitantId,
     name: 'Worker',
     state: 'normal',
     assignedRoomId: 'workshop-1' as PlacedRoomId,
@@ -163,7 +169,7 @@ function makeFloor(
   inhabitants: InhabitantInstance[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
@@ -293,7 +299,7 @@ describe('Crafting Cost', () => {
 
   it('should reduce cost with Efficient Assembly upgrade', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly',
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
     });
     const cost = trapWorkshopGetCraftingCost(room, { gold: 40, crystals: 16 });
     // 0.75 multiplier: gold 40*0.75=30, crystals 16*0.75=12
@@ -303,7 +309,7 @@ describe('Crafting Cost', () => {
 
   it('should ceil fractional costs', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly',
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
     });
     const cost = trapWorkshopGetCraftingCost(room, { gold: 30, crystals: 10 });
     // gold 30*0.75=22.5→23, crystals 10*0.75=7.5→8
@@ -342,7 +348,7 @@ describe('Crafting Time', () => {
 
   it('should apply Efficient Assembly speed upgrade', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly',
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 0.7 multiplier: 15 * 0.7 = 10.5 → 11
@@ -351,7 +357,7 @@ describe('Crafting Time', () => {
 
   it('should apply Master Trapper speed upgrade (slower)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-master-trapper',
+      appliedUpgradePathId: 'upgrade-master-trapper' as UpgradePathId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 1.2 multiplier: 15 * 1.2 = 18
@@ -360,7 +366,7 @@ describe('Crafting Time', () => {
 
   it('should combine upgrade and worker bonuses', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly',
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 2);
     // 0.7 upgrade * 0.8 worker: 15 * 0.7 = 10.5 → 11 (rounded from upgrade)
@@ -578,11 +584,11 @@ describe('trapWorkshopProcess', () => {
   it('should process multiple workshops across floors', () => {
     const ws1 = makeRoom({ id: 'ws-1' as PlacedRoomId });
     const ws2 = makeRoom({ id: 'ws-2' as PlacedRoomId });
-    const w1 = makeInhabitant({ instanceId: 'w1', assignedRoomId: 'ws-1' as PlacedRoomId });
-    const w2 = makeInhabitant({ instanceId: 'w2', assignedRoomId: 'ws-2' as PlacedRoomId });
+    const w1 = makeInhabitant({ instanceId: 'w1' as InhabitantInstanceId, assignedRoomId: 'ws-1' as PlacedRoomId });
+    const w2 = makeInhabitant({ instanceId: 'w2' as InhabitantInstanceId, assignedRoomId: 'ws-2' as PlacedRoomId });
     const floor1 = makeFloor([ws1], [w1]);
     const floor2 = makeFloor([ws2], [w2]);
-    floor2.id = 'floor-2';
+    floor2.id = 'floor-2' as FloorId;
 
     const state = makeGameState({
       floors: [floor1, floor2],

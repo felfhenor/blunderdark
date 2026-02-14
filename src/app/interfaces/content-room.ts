@@ -1,3 +1,4 @@
+import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
 import type {
@@ -12,7 +13,7 @@ export type RoomId = Branded<string, 'RoomId'>;
 export type RoomContent = IsContentItem &
   HasDescription & {
     id: RoomId;
-    shapeId: string;
+    shapeId: RoomShapeId;
     cost: ResourceCost;
     production: RoomProduction;
     requiresWorkers: boolean;

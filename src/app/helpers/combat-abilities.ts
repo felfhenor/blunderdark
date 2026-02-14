@@ -3,6 +3,7 @@ import type {
   AbilityEffectDefinition,
   AbilityState,
   CombatAbility,
+  CombatAbilityId,
   CombatUnit,
 } from '@interfaces';
 
@@ -15,7 +16,7 @@ export function combatAbilityInitStates(
   abilities: CombatAbility[],
 ): AbilityState[] {
   return abilities.map((a) => ({
-    abilityId: a.id,
+    abilityId: a.id as CombatAbilityId,
     currentCooldown: 0,
     isActive: false,
     remainingDuration: 0,
@@ -117,7 +118,7 @@ export function combatAbilityTryActivate(
   }
 
   const activation: AbilityActivation = {
-    abilityId: ability.id,
+    abilityId: ability.id as CombatAbilityId,
     abilityName: ability.name,
     effectType: ability.effectType,
     targetType: ability.targetType,

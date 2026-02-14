@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { BiomeType, Floor, PlacedRoomId, RoomId } from '@interfaces';
+import type { BiomeType, Floor, FloorId, PlacedRoomId, RoomId, RoomShapeId } from '@interfaces';
 
 // Test-local room type IDs
 const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
@@ -32,7 +32,7 @@ function makeFloor(
   rooms: { id: string; roomTypeId: string }[] = [],
 ): Floor {
   return {
-    id: 'floor-1',
+    id: 'floor-1' as FloorId,
     name: 'Floor 1',
     depth: 1,
     biome,
@@ -40,7 +40,7 @@ function makeFloor(
     rooms: rooms.map((r) => ({
       id: r.id as PlacedRoomId,
       roomTypeId: r.roomTypeId as RoomId,
-      shapeId: 'shape-1',
+      shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
     })),

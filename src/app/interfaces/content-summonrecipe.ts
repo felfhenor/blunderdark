@@ -1,3 +1,4 @@
+import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { InhabitantStats } from '@interfaces/inhabitant';
 import type { ResourceType } from '@interfaces/resource';
@@ -8,7 +9,7 @@ export type SummonRecipeId = Branded<string, 'SummonRecipeId'>;
 export type SummonRecipeContent = IsContentItem &
   HasDescription & {
     id: SummonRecipeId;
-    resultInhabitantId: string;
+    resultInhabitantId: InhabitantId;
     summonType: 'permanent' | 'temporary';
     duration?: number;
     cost: Partial<Record<ResourceType, number>>;

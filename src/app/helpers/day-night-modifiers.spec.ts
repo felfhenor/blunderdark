@@ -27,7 +27,7 @@ import {
   dayNightGetPhaseLabel,
   dayNightGetResourceModifier,
 } from '@helpers/day-night-modifiers';
-import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
+import type { InhabitantId, InhabitantInstance, InhabitantInstanceId, PlacedRoomId } from '@interfaces';
 
 function makeInhabitant(
   instanceId: string,
@@ -35,8 +35,8 @@ function makeInhabitant(
   assignedRoomId: PlacedRoomId | undefined = undefined,
 ): InhabitantInstance {
   return {
-    instanceId,
-    definitionId,
+    instanceId: instanceId as InhabitantInstanceId,
+    definitionId: definitionId as InhabitantId,
     name: 'Test',
     state: 'normal',
     assignedRoomId,

@@ -1,7 +1,11 @@
+import type { Branded } from '@interfaces/identifiable';
+
+export type StairId = Branded<string, 'StairId'>;
+
 export type StairDirection = 'up' | 'down';
 
 export type StairInstance = {
-  id: string;
+  id: StairId;
   floorDepthA: number;
   floorDepthB: number;
   gridX: number;

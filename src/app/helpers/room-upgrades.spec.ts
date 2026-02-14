@@ -4,7 +4,9 @@ import type {
   PlacedRoomId,
   RoomDefinition,
   RoomId,
+  RoomShapeId,
   RoomUpgradePath,
+  UpgradePathId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -32,7 +34,7 @@ const {
 const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
 
 const efficiencyPath: RoomUpgradePath = {
-  id: 'upgrade-efficiency',
+  id: 'upgrade-efficiency' as UpgradePathId,
   name: 'Deep Vein Extraction',
   description: 'Increases crystal yield by 50%.',
   cost: { crystals: 75 },
@@ -40,7 +42,7 @@ const efficiencyPath: RoomUpgradePath = {
 };
 
 const capacityPath: RoomUpgradePath = {
-  id: 'upgrade-capacity',
+  id: 'upgrade-capacity' as UpgradePathId,
   name: 'Expanded Tunnels',
   description: 'Increases max inhabitants from 2 to 4.',
   cost: { crystals: 60 },
@@ -48,7 +50,7 @@ const capacityPath: RoomUpgradePath = {
 };
 
 const specializationPath: RoomUpgradePath = {
-  id: 'upgrade-specialization',
+  id: 'upgrade-specialization' as UpgradePathId,
   name: 'Crystal Resonance',
   description: 'Reduces fear and produces flux.',
   cost: { crystals: 80 },
@@ -59,7 +61,7 @@ const specializationPath: RoomUpgradePath = {
 };
 
 const darkUpgradePath: RoomUpgradePath = {
-  id: 'upgrade-dark',
+  id: 'upgrade-dark' as UpgradePathId,
   name: 'Corrupted Vein',
   description: 'Dark corruption doubles crystal output.',
   cost: { crystals: 100, essence: 30 },
@@ -68,11 +70,11 @@ const darkUpgradePath: RoomUpgradePath = {
 };
 
 const crystalMineRoom: RoomDefinition & IsContentItem = {
-  id: CRYSTAL_MINE_ID,
+  id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
   description: 'An L-shaped excavation.',
-  shapeId: 'shape-l',
+  shapeId: 'shape-l' as RoomShapeId,
   cost: { gold: 50 },
   production: { crystals: 1.0 },
   requiresWorkers: true,
@@ -91,7 +93,7 @@ function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'room-001' as PlacedRoomId,
     roomTypeId: CRYSTAL_MINE_ID as RoomId,
-    shapeId: 'shape-l',
+    shapeId: 'shape-l' as RoomShapeId,
     anchorX: 5,
     anchorY: 5,
     ...overrides,
@@ -123,7 +125,7 @@ describe('roomUpgradeGetPaths', () => {
   it('should return empty array for room with no upgrades', () => {
     const noUpgradeRoom: RoomDefinition & IsContentItem = {
       ...crystalMineRoom,
-      id: 'no-upgrades',
+      id: 'no-upgrades' as RoomId,
       upgradePaths: [],
     };
     mockContent.set('no-upgrades', noUpgradeRoom);
@@ -143,7 +145,7 @@ describe('roomUpgradeCanApply', () => {
 
   it('should reject if room already has an upgrade applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-capacity');
     expect(result.valid).toBe(false);
@@ -159,7 +161,7 @@ describe('roomUpgradeCanApply', () => {
 
   it('should reject same upgrade that is already applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-efficiency');
     expect(result.valid).toBe(false);
@@ -170,7 +172,7 @@ describe('roomUpgradeCanApply', () => {
 describe('roomUpgradeApply', () => {
   it('should return a new PlacedRoom with the upgrade applied', () => {
     const room = createPlacedRoom();
-    const upgraded = roomUpgradeApply(room, 'upgrade-efficiency');
+    const upgraded = roomUpgradeApply(room, 'upgrade-efficiency' as UpgradePathId);
 
     expect(upgraded.appliedUpgradePathId).toBe('upgrade-efficiency');
     expect(upgraded.id).toBe(room.id);
@@ -179,7 +181,7 @@ describe('roomUpgradeApply', () => {
 
   it('should not mutate the original room', () => {
     const room = createPlacedRoom();
-    roomUpgradeApply(room, 'upgrade-efficiency');
+    roomUpgradeApply(room, 'upgrade-efficiency' as UpgradePathId);
 
     expect(room.appliedUpgradePathId).toBeUndefined();
   });
@@ -193,7 +195,7 @@ describe('roomUpgradeGetApplied', () => {
 
   it('should return the applied upgrade path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const upgrade = roomUpgradeGetApplied(room);
     expect(upgrade).toBeDefined();
@@ -202,7 +204,7 @@ describe('roomUpgradeGetApplied', () => {
 
   it('should return null if applied upgrade ID does not match any path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'nonexistent',
+      appliedUpgradePathId: 'nonexistent' as UpgradePathId,
     });
     expect(roomUpgradeGetApplied(room)).toBeUndefined();
   });
@@ -216,7 +218,7 @@ describe('roomUpgradeGetAppliedEffects', () => {
 
   it('should return effects for efficiency upgrade', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -227,7 +229,7 @@ describe('roomUpgradeGetAppliedEffects', () => {
 
   it('should return multiple effects for specialization upgrade', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-specialization',
+      appliedUpgradePathId: 'upgrade-specialization' as UpgradePathId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(2);
@@ -264,7 +266,7 @@ describe('roomUpgradeGetAvailable', () => {
 
   it('should return empty array for a room with an upgrade applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const available = roomUpgradeGetAvailable(room);
     expect(available).toEqual([]);
@@ -310,7 +312,7 @@ describe('roomUpgradeGetVisible', () => {
   });
 
   it('should return empty array for room with upgrade applied', () => {
-    const room = createPlacedRoom({ appliedUpgradePathId: 'upgrade-efficiency' });
+    const room = createPlacedRoom({ appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId });
     const visible = roomUpgradeGetVisible(room);
     expect(visible).toEqual([]);
   });
@@ -340,7 +342,7 @@ describe('dark upgrade gating in roomUpgradeCanApply', () => {
 describe('mutual exclusivity', () => {
   it('should prevent applying efficiency path after capacity path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-capacity',
+      appliedUpgradePathId: 'upgrade-capacity' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-efficiency');
     expect(result.valid).toBe(false);
@@ -348,7 +350,7 @@ describe('mutual exclusivity', () => {
 
   it('should prevent applying capacity path after specialization path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-specialization',
+      appliedUpgradePathId: 'upgrade-specialization' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-capacity');
     expect(result.valid).toBe(false);
@@ -356,14 +358,14 @@ describe('mutual exclusivity', () => {
 
   it('should prevent applying specialization path after efficiency path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-specialization');
     expect(result.valid).toBe(false);
   });
 
   it('should show no available upgrades after any path is chosen', () => {
-    const room = roomUpgradeApply(createPlacedRoom(), 'upgrade-capacity');
+    const room = roomUpgradeApply(createPlacedRoom(), 'upgrade-capacity' as UpgradePathId);
     expect(roomUpgradeGetAvailable(room)).toEqual([]);
   });
 });
@@ -377,7 +379,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
 
   it('should return base + bonus when capacity upgrade is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-capacity',
+      appliedUpgradePathId: 'upgrade-capacity' as UpgradePathId,
     });
     const result = roomUpgradeGetEffectiveMaxInhabitants(room, crystalMineRoom);
     expect(result).toBe(4);
@@ -385,7 +387,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
 
   it('should return base when non-capacity upgrade is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-efficiency',
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
     });
     const result = roomUpgradeGetEffectiveMaxInhabitants(room, crystalMineRoom);
     expect(result).toBe(2);
@@ -394,7 +396,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
   it('should return -1 for unlimited capacity rooms regardless of upgrades', () => {
     const unlimitedRoom: RoomDefinition & IsContentItem = {
       ...crystalMineRoom,
-      id: 'unlimited-room',
+      id: 'unlimited-room' as RoomId,
       maxInhabitants: -1,
     };
     mockContent.set('unlimited-room', unlimitedRoom);
@@ -406,7 +408,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
 
   it('should return base when upgrade path ID does not match any path', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'nonexistent',
+      appliedUpgradePathId: 'nonexistent' as UpgradePathId,
     });
     const result = roomUpgradeGetEffectiveMaxInhabitants(room, crystalMineRoom);
     expect(result).toBe(2);

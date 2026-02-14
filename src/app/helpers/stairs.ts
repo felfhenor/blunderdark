@@ -5,7 +5,7 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Floor, StairDirection, StairInstance } from '@interfaces';
+import type { Floor, StairDirection, StairId, StairInstance } from '@interfaces';
 import type { StairValidationResult, StairRemovalInfo } from '@interfaces/stair';
 
 export const STAIR_PLACEMENT_COST = 20;
@@ -167,7 +167,7 @@ export async function stairPlacementExecute(
     : currentFloor.depth - 1;
 
   const stair: StairInstance = {
-    id: rngUuid(),
+    id: rngUuid() as StairId,
     floorDepthA: Math.min(currentFloor.depth, targetDepth),
     floorDepthB: Math.max(currentFloor.depth, targetDepth),
     gridX: x,

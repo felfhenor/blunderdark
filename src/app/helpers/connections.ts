@@ -5,7 +5,7 @@ import { rngUuid } from '@helpers/rng';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Connection, Floor, PlacedRoom, PlacedRoomId, TileOffset } from '@interfaces';
-import type { ConnectionValidationResult } from '@interfaces/connection';
+import type { ConnectionId, ConnectionValidationResult } from '@interfaces/connection';
 
 /**
  * Get the absolute tiles for a placed room by resolving its shape.
@@ -142,7 +142,7 @@ export function connectionAddToFloor(
   if (existing) return undefined;
 
   const connection: Connection = {
-    id: rngUuid(),
+    id: rngUuid() as ConnectionId,
     roomAId,
     roomBId,
     edgeTiles,
@@ -216,8 +216,8 @@ export function connectionGetAdjacentUnconnected(
   for (const hallway of floor.hallways) {
     if (hallway.id === entityId as string) continue;
     if (adjacencyAreRoomsAdjacent(sourceTiles, hallway.tiles)) {
-      if (!connectionFind(floor, entityId, hallway.id as PlacedRoomId)) {
-        adjacent.push(hallway.id as PlacedRoomId);
+      if (!connectionFind(floor, entityId, hallway.id as unknown as PlacedRoomId)) {
+        adjacent.push(hallway.id as unknown as PlacedRoomId);
       }
     }
   }

@@ -26,6 +26,7 @@ import type {
   IsContentItem,
   ResourceType,
   SummonRecipeContent,
+  SummonRecipeId,
 } from '@interfaces';
 
 @Component({
@@ -142,7 +143,7 @@ export class PanelSummoningCircleComponent {
       .join(', ');
   }
 
-  public async startSummoning(recipeId: string, targetTicks: number, cost: Partial<Record<ResourceType, number>>): Promise<void> {
+  public async startSummoning(recipeId: SummonRecipeId, targetTicks: number, cost: Partial<Record<ResourceType, number>>): Promise<void> {
     const room = this.summoningRoom();
     if (!room) return;
 

@@ -1,3 +1,5 @@
+import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { Branded } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
 
 export type RoomProduction = Partial<Record<string, number>>;
@@ -14,8 +16,10 @@ export type RoomUpgradeEffect = {
   resource?: string;
 };
 
+export type UpgradePathId = Branded<string, 'UpgradePathId'>;
+
 export type RoomUpgradePath = {
-  id: string;
+  id: UpgradePathId;
   name: string;
   description: string;
   cost: ResourceCost;
@@ -25,10 +29,10 @@ export type RoomUpgradePath = {
 };
 
 export type RoomDefinition = {
-  id: string;
+  id: Branded<string, 'RoomId'>;
   name: string;
   description: string;
-  shapeId: string;
+  shapeId: RoomShapeId;
   cost: ResourceCost;
   production: RoomProduction;
   requiresWorkers: boolean;
