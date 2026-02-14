@@ -1,14 +1,17 @@
 import { signal } from '@angular/core';
+import { elevatorPlacementExit } from '@helpers/elevators';
 import { floorCurrent } from '@helpers/floor';
 import { hallwayPlacementExit } from '@helpers/hallway-placement';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { stairPlacementExit } from '@helpers/stairs';
-import { elevatorPlacementExit } from '@helpers/elevators';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, PortalId, PortalInstance } from '@interfaces';
-import type { PortalValidationResult, PortalRemovalInfo } from '@interfaces/portal';
+import type {
+  PortalRemovalInfo,
+  PortalValidationResult,
+} from '@interfaces/portal';
 
 export const PORTAL_PLACEMENT_COST_FLUX = 100;
 export const PORTAL_PLACEMENT_COST_ESSENCE = 30;
@@ -17,10 +20,18 @@ export const PORTAL_REMOVAL_REFUND_RATIO = 0.5;
 // --- Placement mode state ---
 
 export const portalPlacementActive = signal(false);
-export const portalPlacementStep = signal<'selectSource' | 'selectDestination'>('selectSource');
-export const portalPlacementSourceFloorDepth = signal<number | undefined>(undefined);
-export const portalPlacementSourcePosition = signal<{ x: number; y: number } | undefined>(undefined);
-export const portalPlacementTargetFloorDepth = signal<number | undefined>(undefined);
+export const portalPlacementStep = signal<'selectSource' | 'selectDestination'>(
+  'selectSource',
+);
+export const portalPlacementSourceFloorDepth = signal<number | undefined>(
+  undefined,
+);
+export const portalPlacementSourcePosition = signal<
+  { x: number; y: number } | undefined
+>(undefined);
+export const portalPlacementTargetFloorDepth = signal<number | undefined>(
+  undefined,
+);
 
 export function portalPlacementEnter(): void {
   roomPlacementExitMode();
@@ -42,7 +53,11 @@ export function portalPlacementExit(): void {
   portalPlacementTargetFloorDepth.set(undefined);
 }
 
-export function portalPlacementSetSource(x: number, y: number, floorDepth: number): void {
+export function portalPlacementSetSource(
+  x: number,
+  y: number,
+  floorDepth: number,
+): void {
   portalPlacementSourceFloorDepth.set(floorDepth);
   portalPlacementSourcePosition.set({ x, y });
   portalPlacementStep.set('selectDestination');
@@ -85,12 +100,18 @@ export function portalValidatePlacement(
   // No existing portal connecting these exact floors at these positions
   const existingPortal = portals.find(
     (p) =>
-      (p.floorDepthA === floorDepthA && p.floorDepthB === floorDepthB &&
-        p.positionA.x === posA.x && p.positionA.y === posA.y &&
-        p.positionB.x === posB.x && p.positionB.y === posB.y) ||
-      (p.floorDepthA === floorDepthB && p.floorDepthB === floorDepthA &&
-        p.positionA.x === posB.x && p.positionA.y === posB.y &&
-        p.positionB.x === posA.x && p.positionB.y === posA.y),
+      (p.floorDepthA === floorDepthA &&
+        p.floorDepthB === floorDepthB &&
+        p.positionA.x === posA.x &&
+        p.positionA.y === posA.y &&
+        p.positionB.x === posB.x &&
+        p.positionB.y === posB.y) ||
+      (p.floorDepthA === floorDepthB &&
+        p.floorDepthB === floorDepthA &&
+        p.positionA.x === posB.x &&
+        p.positionA.y === posB.y &&
+        p.positionB.x === posA.x &&
+        p.positionB.y === posA.y),
   );
   if (existingPortal) {
     return { valid: false, error: 'Portal already exists at these positions' };
@@ -149,11 +170,15 @@ export function portalRemoveFromFloors(
   if (!portal) return floors;
 
   return floors.map((floor) => {
-    if (floor.depth !== portal.floorDepthA && floor.depth !== portal.floorDepthB) {
+    if (
+      floor.depth !== portal.floorDepthA &&
+      floor.depth !== portal.floorDepthB
+    ) {
       return floor;
     }
 
-    const pos = floor.depth === portal.floorDepthA ? portal.positionA : portal.positionB;
+    const pos =
+      floor.depth === portal.floorDepthA ? portal.positionA : portal.positionB;
     const tile = floor.grid[pos.y]?.[pos.x];
     if (!tile || tile.portalId !== portalId) return floor;
 
@@ -206,16 +231,22 @@ export async function portalPlacementExecute(
     return { success: false, error: validation.error };
   }
 
-  const cost = { flux: PORTAL_PLACEMENT_COST_FLUX, essence: PORTAL_PLACEMENT_COST_ESSENCE };
+  const cost = {
+    flux: PORTAL_PLACEMENT_COST_FLUX,
+    essence: PORTAL_PLACEMENT_COST_ESSENCE,
+  };
   if (!resourceCanAfford(cost)) {
-    return { success: false, error: 'Not enough resources (100 Flux + 30 Essence)' };
+    return {
+      success: false,
+      error: 'Not enough resources (100 Flux + 30 Essence)',
+    };
   }
 
   const paid = await resourcePayCost(cost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   const portal: PortalInstance = {
-    id: rngUuid() as PortalId,
+    id: rngUuid<PortalId>(),
     floorDepthA: sourceFloorDepth,
     floorDepthB: destFloorDepth,
     positionA: { ...sourcePos },
@@ -240,7 +271,10 @@ export async function portalPlacementExecute(
 
 // --- Query helpers ---
 
-export function portalGetOnFloor(portals: PortalInstance[], floorDepth: number): PortalInstance[] {
+export function portalGetOnFloor(
+  portals: PortalInstance[],
+  floorDepth: number,
+): PortalInstance[] {
   return portals.filter(
     (p) => p.floorDepthA === floorDepth || p.floorDepthB === floorDepth,
   );
@@ -250,11 +284,21 @@ export function portalRemovalGetInfo(portalId: string): PortalRemovalInfo {
   const state = gamestate();
   const portal = state.world.portals.find((p) => p.id === portalId);
   if (!portal) {
-    return { canRemove: false, refundFlux: 0, refundEssence: 0, traversingInhabitantNames: [], reason: 'Portal not found' };
+    return {
+      canRemove: false,
+      refundFlux: 0,
+      refundEssence: 0,
+      traversingInhabitantNames: [],
+      reason: 'Portal not found',
+    };
   }
 
-  const refundFlux = Math.floor(PORTAL_PLACEMENT_COST_FLUX * PORTAL_REMOVAL_REFUND_RATIO);
-  const refundEssence = Math.floor(PORTAL_PLACEMENT_COST_ESSENCE * PORTAL_REMOVAL_REFUND_RATIO);
+  const refundFlux = Math.floor(
+    PORTAL_PLACEMENT_COST_FLUX * PORTAL_REMOVAL_REFUND_RATIO,
+  );
+  const refundEssence = Math.floor(
+    PORTAL_PLACEMENT_COST_ESSENCE * PORTAL_REMOVAL_REFUND_RATIO,
+  );
 
   const traversing = state.world.inhabitants.filter(
     (i) => i.travelTicksRemaining !== undefined && i.travelTicksRemaining > 0,
@@ -278,14 +322,20 @@ export function portalRemovalGetInfo(portalId: string): PortalRemovalInfo {
   };
 }
 
-export async function portalRemovalExecute(portalId: string): Promise<{ success: boolean; error?: string }> {
+export async function portalRemovalExecute(
+  portalId: string,
+): Promise<{ success: boolean; error?: string }> {
   const info = portalRemovalGetInfo(portalId);
   if (!info.canRemove) {
     return { success: false, error: info.reason };
   }
 
   await updateGamestate((s) => {
-    const updatedFloors = portalRemoveFromFloors(s.world.floors, portalId, s.world.portals);
+    const updatedFloors = portalRemoveFromFloors(
+      s.world.floors,
+      portalId,
+      s.world.portals,
+    );
     const updatedPortals = s.world.portals.filter((p) => p.id !== portalId);
 
     const fluxResource = s.world.resources.flux;
@@ -301,11 +351,17 @@ export async function portalRemovalExecute(portalId: string): Promise<{ success:
           ...s.world.resources,
           flux: {
             ...fluxResource,
-            current: Math.min(fluxResource.current + info.refundFlux, fluxResource.max),
+            current: Math.min(
+              fluxResource.current + info.refundFlux,
+              fluxResource.max,
+            ),
           },
           essence: {
             ...essenceResource,
-            current: Math.min(essenceResource.current + info.refundEssence, essenceResource.max),
+            current: Math.min(
+              essenceResource.current + info.refundEssence,
+              essenceResource.max,
+            ),
           },
         },
       },

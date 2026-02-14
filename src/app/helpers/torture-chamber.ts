@@ -1,10 +1,13 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { roomRoleFindById } from '@helpers/room-roles';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
-import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { rngRandom, rngUuid } from '@helpers/rng';
+import { roomRoleFindById } from '@helpers/room-roles';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   CapturedPrisoner,
   GameState,
@@ -16,8 +19,11 @@ import type {
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
+import type {
+  TortureConversionCompleteEvent,
+  TortureExtractionCompleteEvent,
+} from '@interfaces/torture';
 import { Subject } from 'rxjs';
-import type { TortureExtractionCompleteEvent, TortureConversionCompleteEvent } from '@interfaces/torture';
 
 // --- Constants ---
 
@@ -163,7 +169,7 @@ export function tortureCreateConvertedInhabitant(
   prisoner: CapturedPrisoner,
 ): InhabitantInstance {
   return {
-    instanceId: rngUuid() as InhabitantInstanceId,
+    instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: CONVERTED_PRISONER_DEF_ID as InhabitantId,
     name: `${prisoner.name} (Converted)`,
     state: 'normal',
@@ -245,8 +251,7 @@ export function tortureChamberProcess(state: GameState): void {
           );
 
           if (job.action === 'extract') {
-            const researchGained =
-              tortureCalculateExtractionReward(prisoner);
+            const researchGained = tortureCalculateExtractionReward(prisoner);
             const researchRes = state.world.resources['research'];
             if (researchRes) {
               researchRes.current = Math.min(
@@ -272,8 +277,7 @@ export function tortureChamberProcess(state: GameState): void {
             const success = rng() < rate;
 
             if (success) {
-              const newInhabitant =
-                tortureCreateConvertedInhabitant(prisoner);
+              const newInhabitant = tortureCreateConvertedInhabitant(prisoner);
               state.world.inhabitants = [
                 ...state.world.inhabitants,
                 newInhabitant,

@@ -1,12 +1,12 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
-import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
-import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
-import { roomRoleFindById } from '@helpers/room-roles';
-import { rngUuid } from '@helpers/rng';
 import { hallwayPlacementFindPointPath } from '@helpers/hallway-placement';
 import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { rngUuid } from '@helpers/rng';
+import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
+import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 import {
   roomUpgradeApply,
@@ -39,9 +39,7 @@ export function altarRoomFind(
   if (!altarId) return undefined;
 
   for (const floor of floors) {
-    const room = floor.rooms.find(
-      (r) => r.roomTypeId === altarId,
-    );
+    const room = floor.rooms.find((r) => r.roomTypeId === altarId);
     if (room) return { floor, room };
   }
   return undefined;
@@ -60,7 +58,9 @@ export const altarRoomHas = computed<boolean>(() => {
  * if the center is already occupied.
  */
 export function altarRoomAutoPlace(floor: Floor): Floor {
-  const roomDefs = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const roomDefs = contentGetEntriesByType<RoomDefinition & IsContentItem>(
+    'room',
+  );
   const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
 
   let floorCurrent = floor;
@@ -87,14 +87,18 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       const anchorY = centerY + offset.y;
 
       const placedRoom: PlacedRoom = {
-        id: rngUuid() as PlacedRoomId,
+        id: rngUuid<PlacedRoomId>(),
         roomTypeId: roomDef.id as RoomId,
         shapeId: roomDef.shapeId,
         anchorX,
         anchorY,
       };
 
-      const updated = roomPlacementPlaceOnFloor(floorCurrent, placedRoom, shape);
+      const updated = roomPlacementPlaceOnFloor(
+        floorCurrent,
+        placedRoom,
+        shape,
+      );
       if (updated) {
         floorCurrent = updated;
         placedRoomIds.push(placedRoom.id);
@@ -118,7 +122,7 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       if (!path) continue;
 
       const hallway: Hallway = {
-        id: rngUuid() as HallwayId,
+        id: rngUuid<HallwayId>(),
         tiles: path,
         upgrades: [],
       };
@@ -148,11 +152,15 @@ export function altarRoomGetLevel(floors: Floor[]): number {
   if (!altarId) return 1;
 
   const paths = roomUpgradeGetPaths(altarId);
-  const appliedPath = paths.find((p) => p.id === altar.room.appliedUpgradePathId);
+  const appliedPath = paths.find(
+    (p) => p.id === altar.room.appliedUpgradePathId,
+  );
   if (appliedPath?.upgradeLevel) return appliedPath.upgradeLevel;
 
   // Fallback: use index position
-  const appliedIndex = paths.findIndex((p) => p.id === altar.room.appliedUpgradePathId);
+  const appliedIndex = paths.findIndex(
+    (p) => p.id === altar.room.appliedUpgradePathId,
+  );
   return appliedIndex >= 0 ? appliedIndex + 2 : 1;
 }
 
@@ -167,7 +175,9 @@ export const altarRoomLevel = computed<number>(() => {
  * Get the next available upgrade for the Altar Room.
  * Returns undefined if fully upgraded or no Altar exists.
  */
-export function altarRoomGetNextUpgrade(floors: Floor[]): RoomUpgradePath | undefined {
+export function altarRoomGetNextUpgrade(
+  floors: Floor[],
+): RoomUpgradePath | undefined {
   const altar = altarRoomFind(floors);
   if (!altar) return undefined;
 
@@ -208,9 +218,12 @@ export async function altarRoomApplyUpgrade(
 
   // Validate level ordering
   const currentLevel = altarRoomGetLevel(state.world.floors);
-  const targetLevel = path.upgradeLevel ?? (paths.indexOf(path) + 2);
+  const targetLevel = path.upgradeLevel ?? paths.indexOf(path) + 2;
   if (targetLevel !== currentLevel + 1) {
-    return { success: false, error: `Altar must be Level ${targetLevel - 1} to apply this upgrade` };
+    return {
+      success: false,
+      error: `Altar must be Level ${targetLevel - 1} to apply this upgrade`,
+    };
   }
 
   if (!resourceCanAfford(path.cost)) {
@@ -224,7 +237,9 @@ export async function altarRoomApplyUpgrade(
     const newFloors = s.world.floors.map((floor) => ({
       ...floor,
       rooms: floor.rooms.map((room) =>
-        room.id === altar.room.id ? roomUpgradeApply(room, upgradePathId) : room,
+        room.id === altar.room.id
+          ? roomUpgradeApply(room, upgradePathId)
+          : room,
       ),
     }));
     return {
@@ -244,7 +259,9 @@ export function altarRoomGetFearReductionAura(floors: Floor[]): number {
   const altar = altarRoomFind(floors);
   if (!altar) return 0;
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(altar.room.roomTypeId);
+  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(
+    altar.room.roomTypeId,
+  );
   if (!roomDef) return 0;
 
   // Check if upgrade overrides the fear reduction aura
@@ -261,24 +278,29 @@ export function altarRoomGetFearReductionAura(floors: Floor[]): number {
 /**
  * Check if a room is adjacent to the Altar Room on the same floor.
  */
-export function altarRoomIsAdjacent(
-  floor: Floor,
-  room: PlacedRoom,
-): boolean {
+export function altarRoomIsAdjacent(floor: Floor, room: PlacedRoom): boolean {
   const altarId = roomRoleFindById('altar');
   if (!altarId) return false;
 
-  const altarPlaced = floor.rooms.find(
-    (r) => r.roomTypeId === altarId,
-  );
+  const altarPlaced = floor.rooms.find((r) => r.roomTypeId === altarId);
   if (!altarPlaced) return false;
 
   const roomShape = contentGetEntry<RoomShape & IsContentItem>(room.shapeId);
-  const altarShape = contentGetEntry<RoomShape & IsContentItem>(altarPlaced.shapeId);
+  const altarShape = contentGetEntry<RoomShape & IsContentItem>(
+    altarPlaced.shapeId,
+  );
   if (!roomShape || !altarShape) return false;
 
-  const roomTiles = roomShapeGetAbsoluteTiles(roomShape, room.anchorX, room.anchorY);
-  const altarTiles = roomShapeGetAbsoluteTiles(altarShape, altarPlaced.anchorX, altarPlaced.anchorY);
+  const roomTiles = roomShapeGetAbsoluteTiles(
+    roomShape,
+    room.anchorX,
+    room.anchorY,
+  );
+  const altarTiles = roomShapeGetAbsoluteTiles(
+    altarShape,
+    altarPlaced.anchorX,
+    altarPlaced.anchorY,
+  );
 
   return adjacencyAreRoomsAdjacent(roomTiles, altarTiles);
 }

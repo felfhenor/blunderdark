@@ -71,7 +71,10 @@ export function trapCanPlace(
   }
 
   if (!tile.hallwayId) {
-    return { canPlace: false, reason: 'Traps can only be placed in hallway tiles' };
+    return {
+      canPlace: false,
+      reason: 'Traps can only be placed in hallway tiles',
+    };
   }
 
   const existingTrap = floor.traps?.find(
@@ -100,7 +103,7 @@ export function trapPlace(
   if (!tile?.hallwayId) return undefined;
 
   const trap: TrapInstance = {
-    id: rngUuid() as TrapInstanceId,
+    id: rngUuid<TrapInstanceId>(),
     trapTypeId,
     hallwayId: tile.hallwayId,
     tileX,

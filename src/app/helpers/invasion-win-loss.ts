@@ -2,12 +2,12 @@ import { invasionObjectiveResolveOutcome } from '@helpers/invasion-objectives';
 import { moraleIsRetreating } from '@helpers/morale';
 import { rngUuid } from '@helpers/rng';
 import type { InvasionId } from '@interfaces/content-invasion';
+import type { InvaderInstance } from '@interfaces/invader';
 import type {
   DetailedInvasionResult,
   InvasionEndReason,
   InvasionState,
 } from '@interfaces/invasion';
-import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 
 // --- Constants ---
@@ -27,7 +27,7 @@ export function invasionWinLossCreateState(
   defenderCount: number,
 ): InvasionState {
   return {
-    invasionId: rngUuid() as InvasionId,
+    invasionId: rngUuid<InvasionId>(),
     currentTurn: 0,
     maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
     altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
@@ -72,7 +72,9 @@ export function invasionWinLossAreSecondaryObjectivesCompleted(
 /**
  * Check if the turn limit has been reached.
  */
-export function invasionWinLossIsTurnLimitReached(state: InvasionState): boolean {
+export function invasionWinLossIsTurnLimitReached(
+  state: InvasionState,
+): boolean {
   return state.currentTurn >= state.maxTurns;
 }
 
@@ -104,7 +106,8 @@ export function invasionWinLossCheckEnd(
 
   // Invader victory conditions (checked first — losing takes priority)
   if (invasionWinLossIsAltarDestroyed(state)) return 'altar_destroyed';
-  if (invasionWinLossAreSecondaryObjectivesCompleted(state)) return 'objectives_completed';
+  if (invasionWinLossAreSecondaryObjectivesCompleted(state))
+    return 'objectives_completed';
 
   // Defender victory conditions
   if (invasionWinLossAreAllEliminated(state)) return 'all_invaders_eliminated';
@@ -148,7 +151,9 @@ export function invasionWinLossDamageAltar(
  * Advance the invasion turn counter by 1.
  * Returns a new InvasionState (does not mutate).
  */
-export function invasionWinLossAdvanceTurn(state: InvasionState): InvasionState {
+export function invasionWinLossAdvanceTurn(
+  state: InvasionState,
+): InvasionState {
   return {
     ...state,
     currentTurn: state.currentTurn + 1,
@@ -179,7 +184,9 @@ export function invasionWinLossMarkKilled(
  * Record a defender loss.
  * Returns a new InvasionState (does not mutate).
  */
-export function invasionWinLossRecordDefenderLoss(state: InvasionState): InvasionState {
+export function invasionWinLossRecordDefenderLoss(
+  state: InvasionState,
+): InvasionState {
   return {
     ...state,
     defendersLost: state.defendersLost + 1,
@@ -210,9 +217,7 @@ export function invasionWinLossResolveDetailedResult(
 ): DetailedInvasionResult {
   const objectiveResult = invasionObjectiveResolveOutcome(state.objectives);
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
-  const completedSecondaries = secondaries.filter(
-    (o) => o.isCompleted,
-  ).length;
+  const completedSecondaries = secondaries.filter((o) => o.isCompleted).length;
 
   return {
     invasionId: state.invasionId,

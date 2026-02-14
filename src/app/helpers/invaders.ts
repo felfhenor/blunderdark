@@ -6,13 +6,13 @@ import type {
   IsContentItem,
 } from '@interfaces';
 import type { CombatAbilityId } from '@interfaces/content-combatability';
-import type { CombatantId } from '@interfaces/invasion';
 import type {
   AbilityResult,
   InvaderDefinition,
   InvaderInstance,
   InvaderInstanceId,
 } from '@interfaces/invader';
+import type { CombatantId } from '@interfaces/invasion';
 
 // --- Content access ---
 
@@ -33,13 +33,15 @@ export function invaderCreateInstance(
   definition: InvaderDefinition,
 ): InvaderInstance {
   return {
-    id: rngUuid() as InvaderInstanceId,
+    id: rngUuid<InvaderInstanceId>(),
     definitionId: definition.id,
     currentHp: definition.baseStats.hp,
     maxHp: definition.baseStats.hp,
     statusEffects: [],
     abilityStates: definition.combatAbilityIds.map((abilityName) => {
-      const ability = contentGetEntry<CombatAbility & IsContentItem>(abilityName);
+      const ability = contentGetEntry<CombatAbility & IsContentItem>(
+        abilityName,
+      );
       return {
         abilityId: (ability?.id ?? abilityName) as CombatAbilityId,
         currentCooldown: 0,
@@ -142,7 +144,9 @@ export function invaderApplyCooldown(
  * Tick all ability cooldowns down by 1 (min 0).
  * Returns a new instance (does not mutate).
  */
-export function invaderTickCooldowns(invader: InvaderInstance): InvaderInstance {
+export function invaderTickCooldowns(
+  invader: InvaderInstance,
+): InvaderInstance {
   return {
     ...invader,
     abilityStates: invader.abilityStates.map((s) => ({
@@ -167,9 +171,7 @@ export function invaderApplyStatusEffect(
     return {
       ...invader,
       statusEffects: invader.statusEffects.map((s) =>
-        s.name === statusName
-          ? { ...s, remainingDuration: duration }
-          : s,
+        s.name === statusName ? { ...s, remainingDuration: duration } : s,
       ),
     };
   }
@@ -185,7 +187,9 @@ export function invaderApplyStatusEffect(
 /**
  * Tick all status effects and remove expired ones.
  */
-export function invaderTickStatusEffects(invader: InvaderInstance): InvaderInstance {
+export function invaderTickStatusEffects(
+  invader: InvaderInstance,
+): InvaderInstance {
   return {
     ...invader,
     statusEffects: invader.statusEffects
@@ -207,7 +211,9 @@ export function invaderHasStatusEffect(
 /**
  * Remove all status effects from an invader (for Dispel).
  */
-export function invaderClearStatusEffects(invader: InvaderInstance): InvaderInstance {
+export function invaderClearStatusEffects(
+  invader: InvaderInstance,
+): InvaderInstance {
   return { ...invader, statusEffects: [] };
 }
 

@@ -1,8 +1,8 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { rngChoice, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
-import { rngChoice, rngUuid } from '@helpers/rng';
 import type {
   GameState,
   InhabitantDefinition,
@@ -12,8 +12,8 @@ import type {
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
-import { Subject } from 'rxjs';
 import type { SpawningPoolEvent } from '@interfaces/spawning-pool';
+import { Subject } from 'rxjs';
 
 // --- Constants ---
 
@@ -93,10 +93,17 @@ export function spawningPoolCountUnassigned(
 export function spawningPoolCreateInhabitant(
   def: InhabitantDefinition & IsContentItem,
 ): InhabitantInstance {
-  const suffixes = ['the Bold', 'the Meek', 'the Swift', 'the Cunning', 'the Lucky', 'the Brave'];
+  const suffixes = [
+    'the Bold',
+    'the Meek',
+    'the Swift',
+    'the Cunning',
+    'the Lucky',
+    'the Brave',
+  ];
   const suffix = rngChoice(suffixes);
   return {
-    instanceId: rngUuid() as InhabitantInstanceId,
+    instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
     name: `${def.name} ${suffix}`,
     state: 'normal',
@@ -124,8 +131,7 @@ export function spawningPoolProcess(state: GameState): void {
   if (!roomDef) return;
 
   const baseRate = roomDef.spawnRate ?? SPAWNING_POOL_DEFAULT_RATE;
-  const baseCapacity =
-    roomDef.spawnCapacity ?? SPAWNING_POOL_DEFAULT_CAPACITY;
+  const baseCapacity = roomDef.spawnCapacity ?? SPAWNING_POOL_DEFAULT_CAPACITY;
   const baseSpawnType = roomDef.spawnType ?? 'Goblin';
 
   let inhabitantsChanged = false;
@@ -164,17 +170,14 @@ export function spawningPoolProcess(state: GameState): void {
 
         // Determine spawn type
         const spawnTypeName = spawningPoolGetSpawnType(room, baseSpawnType);
-        const spawnDef = contentGetEntry<
-          InhabitantDefinition & IsContentItem
-        >(spawnTypeName);
+        const spawnDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+          spawnTypeName,
+        );
         if (!spawnDef) continue;
 
         // Create and add the new inhabitant
         const newInhabitant = spawningPoolCreateInhabitant(spawnDef);
-        state.world.inhabitants = [
-          ...state.world.inhabitants,
-          newInhabitant,
-        ];
+        state.world.inhabitants = [...state.world.inhabitants, newInhabitant];
         inhabitantsChanged = true;
 
         // Emit spawn event for notifications

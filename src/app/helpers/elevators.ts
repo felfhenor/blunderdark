@@ -7,7 +7,11 @@ import { roomPlacementExitMode } from '@helpers/room-placement';
 import { stairPlacementExit } from '@helpers/stairs';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { ElevatorId, ElevatorInstance, Floor } from '@interfaces';
-import type { ElevatorValidationResult, ElevatorExtensionValidation, ElevatorRemovalInfo } from '@interfaces/elevator';
+import type {
+  ElevatorExtensionValidation,
+  ElevatorRemovalInfo,
+  ElevatorValidationResult,
+} from '@interfaces/elevator';
 
 export const ELEVATOR_PLACEMENT_COST_CRYSTALS = 50;
 export const ELEVATOR_PLACEMENT_COST_FLUX = 20;
@@ -69,7 +73,9 @@ export function elevatorValidatePlacement(
 
   // No existing elevator at this position connecting these floors
   const existingElevator = elevators.find(
-    (e) => e.gridX === x && e.gridY === y &&
+    (e) =>
+      e.gridX === x &&
+      e.gridY === y &&
       e.connectedFloors.includes(currentFloorDepth) &&
       e.connectedFloors.includes(adjacentFloor.depth),
   );
@@ -153,30 +159,43 @@ export async function elevatorPlacementExecute(
     state.world.floors,
     state.world.elevators,
     currentFloor.depth,
-    x, y,
+    x,
+    y,
   );
   if (!validation.valid) {
     return { success: false, error: validation.error };
   }
 
-  const cost = { crystals: ELEVATOR_PLACEMENT_COST_CRYSTALS, flux: ELEVATOR_PLACEMENT_COST_FLUX };
+  const cost = {
+    crystals: ELEVATOR_PLACEMENT_COST_CRYSTALS,
+    flux: ELEVATOR_PLACEMENT_COST_FLUX,
+  };
   if (!resourceCanAfford(cost)) {
-    return { success: false, error: 'Not enough resources (50 Crystals + 20 Flux)' };
+    return {
+      success: false,
+      error: 'Not enough resources (50 Crystals + 20 Flux)',
+    };
   }
 
   const paid = await resourcePayCost(cost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   // Connect to adjacent floor (prefer below, then above)
-  const belowFloor = state.world.floors.find((f) => f.depth === currentFloor.depth + 1);
-  const aboveFloor = state.world.floors.find((f) => f.depth === currentFloor.depth - 1);
+  const belowFloor = state.world.floors.find(
+    (f) => f.depth === currentFloor.depth + 1,
+  );
+  const aboveFloor = state.world.floors.find(
+    (f) => f.depth === currentFloor.depth - 1,
+  );
   const adjacentFloor = belowFloor ?? aboveFloor;
   if (!adjacentFloor) return { success: false, error: 'No adjacent floor' };
 
-  const connectedFloors = [currentFloor.depth, adjacentFloor.depth].sort((a, b) => a - b);
+  const connectedFloors = [currentFloor.depth, adjacentFloor.depth].sort(
+    (a, b) => a - b,
+  );
 
   const elevator: ElevatorInstance = {
-    id: rngUuid() as ElevatorId,
+    id: rngUuid<ElevatorId>(),
     connectedFloors,
     gridX: x,
     gridY: y,
@@ -203,12 +222,16 @@ export function elevatorValidateExtension(
   direction: 'up' | 'down',
 ): ElevatorExtensionValidation {
   const sortedFloors = [...elevator.connectedFloors].sort((a, b) => a - b);
-  const targetDepth = direction === 'down'
-    ? sortedFloors[sortedFloors.length - 1] + 1
-    : sortedFloors[0] - 1;
+  const targetDepth =
+    direction === 'down'
+      ? sortedFloors[sortedFloors.length - 1] + 1
+      : sortedFloors[0] - 1;
 
   // Must be adjacent to existing range
-  if (direction === 'down' && targetDepth !== sortedFloors[sortedFloors.length - 1] + 1) {
+  if (
+    direction === 'down' &&
+    targetDepth !== sortedFloors[sortedFloors.length - 1] + 1
+  ) {
     return { valid: false, error: 'Can only extend to adjacent floors' };
   }
   if (direction === 'up' && targetDepth !== sortedFloors[0] - 1) {
@@ -238,14 +261,24 @@ export async function elevatorExtendExecute(
   const elevator = state.world.elevators.find((e) => e.id === elevatorId);
   if (!elevator) return { success: false, error: 'Elevator not found' };
 
-  const validation = elevatorValidateExtension(state.world.floors, elevator, direction);
+  const validation = elevatorValidateExtension(
+    state.world.floors,
+    elevator,
+    direction,
+  );
   if (!validation.valid) {
     return { success: false, error: validation.error };
   }
 
-  const cost = { crystals: ELEVATOR_EXTENSION_COST_CRYSTALS, flux: ELEVATOR_EXTENSION_COST_FLUX };
+  const cost = {
+    crystals: ELEVATOR_EXTENSION_COST_CRYSTALS,
+    flux: ELEVATOR_EXTENSION_COST_FLUX,
+  };
   if (!resourceCanAfford(cost)) {
-    return { success: false, error: 'Not enough resources (25 Crystals + 10 Flux)' };
+    return {
+      success: false,
+      error: 'Not enough resources (25 Crystals + 10 Flux)',
+    };
   }
 
   const paid = await resourcePayCost(cost);
@@ -258,7 +291,9 @@ export async function elevatorExtendExecute(
       if (e.id !== elevatorId) return e;
       return {
         ...e,
-        connectedFloors: [...e.connectedFloors, targetDepth].sort((a, b) => a - b),
+        connectedFloors: [...e.connectedFloors, targetDepth].sort(
+          (a, b) => a - b,
+        ),
       };
     });
 
@@ -307,12 +342,19 @@ export async function elevatorShrinkExecute(
   // Can only shrink from ends
   const sorted = [...elevator.connectedFloors].sort((a, b) => a - b);
   if (floorDepth !== sorted[0] && floorDepth !== sorted[sorted.length - 1]) {
-    return { success: false, error: 'Can only remove floors from the top or bottom of the elevator' };
+    return {
+      success: false,
+      error: 'Can only remove floors from the top or bottom of the elevator',
+    };
   }
 
   // Must keep at least 2 floors
   if (elevator.connectedFloors.length <= 2) {
-    return { success: false, error: 'Elevator must connect at least 2 floors. Remove the elevator instead.' };
+    return {
+      success: false,
+      error:
+        'Elevator must connect at least 2 floors. Remove the elevator instead.',
+    };
   }
 
   // Check no traveling inhabitants
@@ -320,7 +362,10 @@ export async function elevatorShrinkExecute(
     (i) => i.travelTicksRemaining !== undefined && i.travelTicksRemaining > 0,
   );
   if (traversing.length > 0) {
-    return { success: false, error: 'Inhabitants are currently traveling between floors' };
+    return {
+      success: false,
+      error: 'Inhabitants are currently traveling between floors',
+    };
   }
 
   await updateGamestate((s) => {
@@ -357,8 +402,12 @@ export async function elevatorShrinkExecute(
     // Partial refund for the removed floor
     const crystalResource = s.world.resources.crystals;
     const fluxResource = s.world.resources.flux;
-    const crystalRefund = Math.floor(ELEVATOR_EXTENSION_COST_CRYSTALS * ELEVATOR_REMOVAL_REFUND_RATIO);
-    const fluxRefund = Math.floor(ELEVATOR_EXTENSION_COST_FLUX * ELEVATOR_REMOVAL_REFUND_RATIO);
+    const crystalRefund = Math.floor(
+      ELEVATOR_EXTENSION_COST_CRYSTALS * ELEVATOR_REMOVAL_REFUND_RATIO,
+    );
+    const fluxRefund = Math.floor(
+      ELEVATOR_EXTENSION_COST_FLUX * ELEVATOR_REMOVAL_REFUND_RATIO,
+    );
 
     return {
       ...s,
@@ -370,11 +419,17 @@ export async function elevatorShrinkExecute(
           ...s.world.resources,
           crystals: {
             ...crystalResource,
-            current: Math.min(crystalResource.current + crystalRefund, crystalResource.max),
+            current: Math.min(
+              crystalResource.current + crystalRefund,
+              crystalResource.max,
+            ),
           },
           flux: {
             ...fluxResource,
-            current: Math.min(fluxResource.current + fluxRefund, fluxResource.max),
+            current: Math.min(
+              fluxResource.current + fluxRefund,
+              fluxResource.max,
+            ),
           },
         },
       },
@@ -386,15 +441,26 @@ export async function elevatorShrinkExecute(
 
 // --- Query helpers ---
 
-export function elevatorGetOnFloor(elevators: ElevatorInstance[], floorDepth: number): ElevatorInstance[] {
+export function elevatorGetOnFloor(
+  elevators: ElevatorInstance[],
+  floorDepth: number,
+): ElevatorInstance[] {
   return elevators.filter((e) => e.connectedFloors.includes(floorDepth));
 }
 
-export function elevatorRemovalGetInfo(elevatorId: string): ElevatorRemovalInfo {
+export function elevatorRemovalGetInfo(
+  elevatorId: string,
+): ElevatorRemovalInfo {
   const state = gamestate();
   const elevator = state.world.elevators.find((e) => e.id === elevatorId);
   if (!elevator) {
-    return { canRemove: false, refundCrystals: 0, refundFlux: 0, traversingInhabitantNames: [], reason: 'Elevator not found' };
+    return {
+      canRemove: false,
+      refundCrystals: 0,
+      refundFlux: 0,
+      traversingInhabitantNames: [],
+      reason: 'Elevator not found',
+    };
   }
 
   const traversing = state.world.inhabitants.filter(
@@ -403,9 +469,15 @@ export function elevatorRemovalGetInfo(elevatorId: string): ElevatorRemovalInfo 
 
   // Base cost + extension costs
   const extensionFloors = elevator.connectedFloors.length - 2;
-  const totalCrystals = ELEVATOR_PLACEMENT_COST_CRYSTALS + extensionFloors * ELEVATOR_EXTENSION_COST_CRYSTALS;
-  const totalFlux = ELEVATOR_PLACEMENT_COST_FLUX + extensionFloors * ELEVATOR_EXTENSION_COST_FLUX;
-  const refundCrystals = Math.floor(totalCrystals * ELEVATOR_REMOVAL_REFUND_RATIO);
+  const totalCrystals =
+    ELEVATOR_PLACEMENT_COST_CRYSTALS +
+    extensionFloors * ELEVATOR_EXTENSION_COST_CRYSTALS;
+  const totalFlux =
+    ELEVATOR_PLACEMENT_COST_FLUX +
+    extensionFloors * ELEVATOR_EXTENSION_COST_FLUX;
+  const refundCrystals = Math.floor(
+    totalCrystals * ELEVATOR_REMOVAL_REFUND_RATIO,
+  );
   const refundFlux = Math.floor(totalFlux * ELEVATOR_REMOVAL_REFUND_RATIO);
 
   if (traversing.length > 0) {
@@ -426,15 +498,23 @@ export function elevatorRemovalGetInfo(elevatorId: string): ElevatorRemovalInfo 
   };
 }
 
-export async function elevatorRemovalExecute(elevatorId: string): Promise<{ success: boolean; error?: string }> {
+export async function elevatorRemovalExecute(
+  elevatorId: string,
+): Promise<{ success: boolean; error?: string }> {
   const info = elevatorRemovalGetInfo(elevatorId);
   if (!info.canRemove) {
     return { success: false, error: info.reason };
   }
 
   await updateGamestate((s) => {
-    const updatedFloors = elevatorRemoveFromFloors(s.world.floors, elevatorId, s.world.elevators);
-    const updatedElevators = s.world.elevators.filter((e) => e.id !== elevatorId);
+    const updatedFloors = elevatorRemoveFromFloors(
+      s.world.floors,
+      elevatorId,
+      s.world.elevators,
+    );
+    const updatedElevators = s.world.elevators.filter(
+      (e) => e.id !== elevatorId,
+    );
 
     const crystalResource = s.world.resources.crystals;
     const fluxResource = s.world.resources.flux;
@@ -449,11 +529,17 @@ export async function elevatorRemovalExecute(elevatorId: string): Promise<{ succ
           ...s.world.resources,
           crystals: {
             ...crystalResource,
-            current: Math.min(crystalResource.current + info.refundCrystals, crystalResource.max),
+            current: Math.min(
+              crystalResource.current + info.refundCrystals,
+              crystalResource.max,
+            ),
           },
           flux: {
             ...fluxResource,
-            current: Math.min(fluxResource.current + info.refundFlux, fluxResource.max),
+            current: Math.min(
+              fluxResource.current + info.refundFlux,
+              fluxResource.max,
+            ),
           },
         },
       },

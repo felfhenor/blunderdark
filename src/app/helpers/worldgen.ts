@@ -1,6 +1,7 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
 import { altarRoomAutoPlace } from '@helpers/altar-room';
+import { contentGetEntry } from '@helpers/content';
 import {
   defaultCorruptionEffectState,
   defaultFloor,
@@ -10,7 +11,6 @@ import {
   defaultResources,
   defaultSeasonState,
 } from '@helpers/defaults';
-import { contentGetEntry } from '@helpers/content';
 import { gridCreateEmpty } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import { worldResolveStartingBiome } from '@helpers/world';
@@ -44,7 +44,7 @@ export async function worldgenGenerateWorld(): Promise<
   const slimeDef = contentGetEntry<InhabitantContent>('Slime');
   const startingSlimes: InhabitantInstance[] = slimeDef
     ? Array.from({ length: 3 }, () => ({
-        instanceId: rngUuid() as InhabitantInstanceId,
+        instanceId: rngUuid<InhabitantInstanceId>(),
         definitionId: slimeDef.id,
         name: slimeDef.name,
         state: 'normal' as const,

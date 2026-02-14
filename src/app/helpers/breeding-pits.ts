@@ -1,10 +1,13 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { roomRoleFindById } from '@helpers/room-roles';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
-import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { rngChoice, rngRandom, rngUuid } from '@helpers/rng';
+import { roomRoleFindById } from '@helpers/room-roles';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   BreedingRecipeContent,
   GameState,
@@ -15,10 +18,14 @@ import type {
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
+import type {
+  BreedingCompletedEvent,
+  MutationCompletedEvent,
+  MutationOutcome,
+} from '@interfaces/breeding';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import { Subject } from 'rxjs';
 import type { PRNG } from 'seedrandom';
-import type { MutationOutcome, BreedingCompletedEvent, MutationCompletedEvent } from '@interfaces/breeding';
 
 // --- Constants ---
 
@@ -47,11 +54,15 @@ export function breedingFindRecipe(
   parentADefId: string,
   parentBDefId: string,
 ): (BreedingRecipeContent & IsContentItem) | undefined {
-  const recipes = contentGetEntriesByType<BreedingRecipeContent & IsContentItem>('breedingrecipe');
+  const recipes = contentGetEntriesByType<
+    BreedingRecipeContent & IsContentItem
+  >('breedingrecipe');
   return recipes.find(
     (r) =>
-      (r.parentInhabitantAId === parentADefId && r.parentInhabitantBId === parentBDefId) ||
-      (r.parentInhabitantAId === parentBDefId && r.parentInhabitantBId === parentADefId),
+      (r.parentInhabitantAId === parentADefId &&
+        r.parentInhabitantBId === parentBDefId) ||
+      (r.parentInhabitantAId === parentBDefId &&
+        r.parentInhabitantBId === parentADefId),
   );
 }
 
@@ -117,7 +128,9 @@ export function breedingGetHybridTicks(
   for (const adjTypeId of adjacentRoomTypeIds) {
     const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
     if (adjDef?.breedingAdjacencyEffects?.hybridTimeReduction) {
-      ticks = Math.round(ticks * (1 - adjDef.breedingAdjacencyEffects.hybridTimeReduction));
+      ticks = Math.round(
+        ticks * (1 - adjDef.breedingAdjacencyEffects.hybridTimeReduction),
+      );
     }
   }
 
@@ -151,7 +164,9 @@ export function breedingGetMutationOdds(
 
   const positive = Math.min(0.95, MUTATION_POSITIVE_CHANCE + positiveBonus);
   const remaining = 1 - positive;
-  const neutralRatio = MUTATION_NEUTRAL_CHANCE / (MUTATION_NEUTRAL_CHANCE + MUTATION_NEGATIVE_CHANCE);
+  const neutralRatio =
+    MUTATION_NEUTRAL_CHANCE /
+    (MUTATION_NEUTRAL_CHANCE + MUTATION_NEGATIVE_CHANCE);
   const neutral = remaining * neutralRatio;
   const negative = remaining * (1 - neutralRatio);
 
@@ -174,11 +189,15 @@ export function breedingCalculateHybridStats(
     attack: avg(parentADef.stats.attack, parentBDef.stats.attack),
     defense: avg(parentADef.stats.defense, parentBDef.stats.defense),
     speed: avg(parentADef.stats.speed, parentBDef.stats.speed),
-    workerEfficiency: (parentADef.stats.workerEfficiency + parentBDef.stats.workerEfficiency) / 2,
+    workerEfficiency:
+      (parentADef.stats.workerEfficiency + parentBDef.stats.workerEfficiency) /
+      2,
   };
 
   // Apply recipe stat bonuses
-  const bonusKeys = Object.keys(recipe.statBonuses) as Array<keyof InhabitantStats>;
+  const bonusKeys = Object.keys(recipe.statBonuses) as Array<
+    keyof InhabitantStats
+  >;
   for (const key of bonusKeys) {
     const bonus = recipe.statBonuses[key];
     if (bonus !== undefined) {
@@ -201,19 +220,34 @@ export function breedingCreateHybrid(
   recipe: BreedingRecipeContent,
   statBonusMultiplier = 1.0,
 ): InhabitantInstance {
-  const parentADef = contentGetEntry<InhabitantDefinition & IsContentItem>(parentA.definitionId);
-  const parentBDef = contentGetEntry<InhabitantDefinition & IsContentItem>(parentB.definitionId);
+  const parentADef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    parentA.definitionId,
+  );
+  const parentBDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    parentB.definitionId,
+  );
   if (!parentADef || !parentBDef) {
     throw new Error('Parent definitions not found');
   }
 
-  const stats = breedingCalculateHybridStats(parentADef, parentBDef, recipe, statBonusMultiplier);
-  const suffixes = ['the Hybrid', 'the Crossed', 'the Merged', 'the Blended', 'the Fused'];
+  const stats = breedingCalculateHybridStats(
+    parentADef,
+    parentBDef,
+    recipe,
+    statBonusMultiplier,
+  );
+  const suffixes = [
+    'the Hybrid',
+    'the Crossed',
+    'the Merged',
+    'the Blended',
+    'the Fused',
+  ];
   const suffix = rngChoice(suffixes);
 
   // Use parentA's definitionId as the base definition for the hybrid
   return {
-    instanceId: rngUuid() as InhabitantInstanceId,
+    instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: parentA.definitionId,
     name: `${recipe.resultName} ${suffix}`,
     state: 'normal',
@@ -227,10 +261,16 @@ export function breedingCreateHybrid(
       attack: stats.attack - parentADef.stats.attack,
       defense: stats.defense - parentADef.stats.defense,
       speed: stats.speed - parentADef.stats.speed,
-      workerEfficiency: Math.round((stats.workerEfficiency - parentADef.stats.workerEfficiency) * 100) / 100,
+      workerEfficiency:
+        Math.round(
+          (stats.workerEfficiency - parentADef.stats.workerEfficiency) * 100,
+        ) / 100,
     },
     isHybrid: true,
-    hybridParentIds: [parentA.definitionId as unknown as InhabitantInstanceId, parentB.definitionId as unknown as InhabitantInstanceId],
+    hybridParentIds: [
+      parentA.definitionId as unknown as InhabitantInstanceId,
+      parentB.definitionId as unknown as InhabitantInstanceId,
+    ],
   };
 }
 
@@ -243,10 +283,18 @@ export function breedingApplyMutation(
   outcome: MutationOutcome,
   rng: PRNG,
 ): InhabitantInstance {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(inhabitant.definitionId);
+  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    inhabitant.definitionId,
+  );
   if (!def) return { ...inhabitant, mutated: true };
 
-  const statKeys: Array<keyof InhabitantStats> = ['hp', 'attack', 'defense', 'speed', 'workerEfficiency'];
+  const statKeys: Array<keyof InhabitantStats> = [
+    'hp',
+    'attack',
+    'defense',
+    'speed',
+    'workerEfficiency',
+  ];
   const targetStat = statKeys[Math.floor(rng() * statKeys.length)];
   const baseStat = def.stats[targetStat];
 
@@ -331,7 +379,9 @@ export function breedingPitsProcess(state: GameState): void {
         room.breedingJob.ticksRemaining -= 1;
 
         if (room.breedingJob.ticksRemaining <= 0) {
-          const recipe = contentGetEntry<BreedingRecipeContent & IsContentItem>(room.breedingJob.recipeId);
+          const recipe = contentGetEntry<BreedingRecipeContent & IsContentItem>(
+            room.breedingJob.recipeId,
+          );
           const parentA = state.world.inhabitants.find(
             (i) => i.instanceId === room.breedingJob!.parentAInstanceId,
           );
@@ -349,11 +399,18 @@ export function breedingPitsProcess(state: GameState): void {
               }
             }
 
-            const hybrid = breedingCreateHybrid(parentA, parentB, recipe, statBonusMultiplier);
+            const hybrid = breedingCreateHybrid(
+              parentA,
+              parentB,
+              recipe,
+              statBonusMultiplier,
+            );
 
             // Remove parents from roster
             state.world.inhabitants = state.world.inhabitants.filter(
-              (i) => i.instanceId !== parentA.instanceId && i.instanceId !== parentB.instanceId,
+              (i) =>
+                i.instanceId !== parentA.instanceId &&
+                i.instanceId !== parentB.instanceId,
             );
 
             // Add hybrid
@@ -384,7 +441,11 @@ export function breedingPitsProcess(state: GameState): void {
             const odds = breedingGetMutationOdds(room, adjacentTypes);
             const rng = rngRandom();
             const outcome = breedingRollMutationOutcome(odds, rng);
-            const mutated = breedingApplyMutation(state.world.inhabitants[targetIdx], outcome, rng);
+            const mutated = breedingApplyMutation(
+              state.world.inhabitants[targetIdx],
+              outcome,
+              rng,
+            );
 
             state.world.inhabitants[targetIdx] = mutated;
             inhabitantsChanged = true;

@@ -3,8 +3,8 @@ import { pull, sumBy } from 'es-toolkit/compat';
 import seedrandom, { type PRNG } from 'seedrandom';
 import { v4 as uuid4 } from 'uuid';
 
-export function rngUuid(): string {
-  return uuid4();
+export function rngUuid<T extends string = string>(): T {
+  return uuid4() as T;
 }
 
 export function rngRandom(): PRNG {

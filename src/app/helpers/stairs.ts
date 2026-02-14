@@ -5,8 +5,16 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Floor, StairDirection, StairId, StairInstance } from '@interfaces';
-import type { StairValidationResult, StairRemovalInfo } from '@interfaces/stair';
+import type {
+  Floor,
+  StairDirection,
+  StairId,
+  StairInstance,
+} from '@interfaces';
+import type {
+  StairRemovalInfo,
+  StairValidationResult,
+} from '@interfaces/stair';
 
 export const STAIR_PLACEMENT_COST = 20;
 export const STAIR_REMOVAL_REFUND = 10;
@@ -37,7 +45,8 @@ export function stairValidatePlacement(
   y: number,
   direction: StairDirection,
 ): StairValidationResult {
-  const targetDepth = direction === 'down' ? currentFloorDepth + 1 : currentFloorDepth - 1;
+  const targetDepth =
+    direction === 'down' ? currentFloorDepth + 1 : currentFloorDepth - 1;
 
   // Adjacent floor must exist
   const currentFloor = floors.find((f) => f.depth === currentFloorDepth);
@@ -46,7 +55,10 @@ export function stairValidatePlacement(
     return { valid: false, error: 'Current floor not found' };
   }
   if (!targetFloor) {
-    return { valid: false, error: direction === 'down' ? 'No floor below' : 'No floor above' };
+    return {
+      valid: false,
+      error: direction === 'down' ? 'No floor below' : 'No floor above',
+    };
   }
 
   // Current floor tile must be empty
@@ -63,9 +75,11 @@ export function stairValidatePlacement(
 
   // No existing stair at this position connecting these floors
   const existingStair = stairs.find(
-    (s) => s.gridX === x && s.gridY === y &&
+    (s) =>
+      s.gridX === x &&
+      s.gridY === y &&
       ((s.floorDepthA === currentFloorDepth && s.floorDepthB === targetDepth) ||
-       (s.floorDepthA === targetDepth && s.floorDepthB === currentFloorDepth)),
+        (s.floorDepthA === targetDepth && s.floorDepthB === currentFloorDepth)),
   );
   if (existingStair) {
     return { valid: false, error: 'Stairs already exist at this position' };
@@ -81,7 +95,10 @@ export function stairPlaceOnFloors(
   stair: StairInstance,
 ): Floor[] {
   return floors.map((floor) => {
-    if (floor.depth !== stair.floorDepthA && floor.depth !== stair.floorDepthB) {
+    if (
+      floor.depth !== stair.floorDepthA &&
+      floor.depth !== stair.floorDepthB
+    ) {
       return floor;
     }
 
@@ -110,7 +127,10 @@ export function stairRemoveFromFloors(
   if (!stair) return floors;
 
   return floors.map((floor) => {
-    if (floor.depth !== stair.floorDepthA && floor.depth !== stair.floorDepthB) {
+    if (
+      floor.depth !== stair.floorDepthA &&
+      floor.depth !== stair.floorDepthB
+    ) {
       return floor;
     }
 
@@ -148,7 +168,8 @@ export async function stairPlacementExecute(
     state.world.floors,
     state.world.stairs,
     currentFloor.depth,
-    x, y,
+    x,
+    y,
     direction,
   );
   if (!validation.valid) {
@@ -162,12 +183,11 @@ export async function stairPlacementExecute(
   const paid = await resourcePayCost({ crystals: STAIR_PLACEMENT_COST });
   if (!paid) return { success: false, error: 'Not enough Crystals' };
 
-  const targetDepth = direction === 'down'
-    ? currentFloor.depth + 1
-    : currentFloor.depth - 1;
+  const targetDepth =
+    direction === 'down' ? currentFloor.depth + 1 : currentFloor.depth - 1;
 
   const stair: StairInstance = {
-    id: rngUuid() as StairId,
+    id: rngUuid<StairId>(),
     floorDepthA: Math.min(currentFloor.depth, targetDepth),
     floorDepthB: Math.max(currentFloor.depth, targetDepth),
     gridX: x,
@@ -191,13 +211,20 @@ export async function stairPlacementExecute(
 
 // --- Query helpers ---
 
-export function stairGetOnFloor(stairs: StairInstance[], floorDepth: number): StairInstance[] {
+export function stairGetOnFloor(
+  stairs: StairInstance[],
+  floorDepth: number,
+): StairInstance[] {
   return stairs.filter(
     (s) => s.floorDepthA === floorDepth || s.floorDepthB === floorDepth,
   );
 }
 
-export function stairGetAtPosition(stairs: StairInstance[], x: number, y: number): StairInstance | undefined {
+export function stairGetAtPosition(
+  stairs: StairInstance[],
+  x: number,
+  y: number,
+): StairInstance | undefined {
   return stairs.find((s) => s.gridX === x && s.gridY === y);
 }
 
@@ -275,7 +302,12 @@ export function stairRemovalGetInfo(stairId: string): StairRemovalInfo {
   const state = gamestate();
   const stair = state.world.stairs.find((s) => s.id === stairId);
   if (!stair) {
-    return { canRemove: false, refund: 0, traversingInhabitantNames: [], reason: 'Stair not found' };
+    return {
+      canRemove: false,
+      refund: 0,
+      traversingInhabitantNames: [],
+      reason: 'Stair not found',
+    };
   }
 
   const traversing = state.world.inhabitants.filter(
@@ -298,19 +330,28 @@ export function stairRemovalGetInfo(stairId: string): StairRemovalInfo {
   };
 }
 
-export async function stairRemovalExecute(stairId: string): Promise<{ success: boolean; error?: string }> {
+export async function stairRemovalExecute(
+  stairId: string,
+): Promise<{ success: boolean; error?: string }> {
   const info = stairRemovalGetInfo(stairId);
   if (!info.canRemove) {
     return { success: false, error: info.reason };
   }
 
   await updateGamestate((s) => {
-    const updatedFloors = stairRemoveFromFloors(s.world.floors, stairId, s.world.stairs);
+    const updatedFloors = stairRemoveFromFloors(
+      s.world.floors,
+      stairId,
+      s.world.stairs,
+    );
     const updatedStairs = s.world.stairs.filter((st) => st.id !== stairId);
 
     // Refund crystals
     const crystalResource = s.world.resources.crystals;
-    const refundAmount = Math.min(STAIR_REMOVAL_REFUND, crystalResource.max - crystalResource.current);
+    const refundAmount = Math.min(
+      STAIR_REMOVAL_REFUND,
+      crystalResource.max - crystalResource.current,
+    );
 
     return {
       ...s,
@@ -334,9 +375,14 @@ export async function stairRemovalExecute(stairId: string): Promise<{ success: b
 
 // --- Travel processing ---
 
-export function stairTravelProcess(state: { world: { inhabitants: { travelTicksRemaining?: number }[] } }): void {
+export function stairTravelProcess(state: {
+  world: { inhabitants: { travelTicksRemaining?: number }[] };
+}): void {
   for (const inhabitant of state.world.inhabitants) {
-    if (inhabitant.travelTicksRemaining !== undefined && inhabitant.travelTicksRemaining > 0) {
+    if (
+      inhabitant.travelTicksRemaining !== undefined &&
+      inhabitant.travelTicksRemaining > 0
+    ) {
       inhabitant.travelTicksRemaining -= 1;
     }
   }

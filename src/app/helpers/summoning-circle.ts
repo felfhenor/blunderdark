@@ -1,10 +1,13 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { roomRoleFindById } from '@helpers/room-roles';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
-import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { rngChoice, rngUuid } from '@helpers/rng';
+import { roomRoleFindById } from '@helpers/room-roles';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   GameState,
   InhabitantDefinition,
@@ -16,8 +19,11 @@ import type {
   RoomDefinition,
   SummonRecipeContent,
 } from '@interfaces';
+import type {
+  SummoningCompletedEvent,
+  SummoningExpiredEvent,
+} from '@interfaces/summoning';
 import { Subject } from 'rxjs';
-import type { SummoningCompletedEvent, SummoningExpiredEvent } from '@interfaces/summoning';
 
 // --- Constants ---
 
@@ -39,10 +45,14 @@ export const summoningExpired$ = summoningExpiredSubject.asObservable();
 export function summoningGetAvailableRecipes(
   room: PlacedRoom,
 ): Array<SummonRecipeContent & IsContentItem> {
-  const recipes = contentGetEntriesByType<SummonRecipeContent & IsContentItem>('summonrecipe');
+  const recipes = contentGetEntriesByType<SummonRecipeContent & IsContentItem>(
+    'summonrecipe',
+  );
 
   const effects = roomUpgradeGetAppliedEffects(room);
-  const hasGreaterSummoning = effects.some((e) => e.type === 'summonTierUnlock');
+  const hasGreaterSummoning = effects.some(
+    (e) => e.type === 'summonTierUnlock',
+  );
 
   return recipes.filter((r) => {
     if (r.tier === 'rare') return true;
@@ -65,7 +75,9 @@ export function summoningGetEffectiveTicks(
   for (const adjTypeId of adjacentRoomTypeIds) {
     const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
     if (adjDef?.summoningAdjacencyEffects?.summonTimeReduction) {
-      ticks = Math.round(ticks * (1 - adjDef.summoningAdjacencyEffects.summonTimeReduction));
+      ticks = Math.round(
+        ticks * (1 - adjDef.summoningAdjacencyEffects.summonTimeReduction),
+      );
     }
   }
 
@@ -102,7 +114,12 @@ export function summoningGetStatBonuses(
 
   const totalFlat = upgradeBonus + adjacencyBonus;
   if (totalFlat > 0) {
-    const statKeys: Array<keyof InhabitantStats> = ['hp', 'attack', 'defense', 'speed'];
+    const statKeys: Array<keyof InhabitantStats> = [
+      'hp',
+      'attack',
+      'defense',
+      'speed',
+    ];
     for (const key of statKeys) {
       bonuses[key] = (bonuses[key] ?? 0) + totalFlat;
     }
@@ -150,7 +167,13 @@ export function summoningCreateInhabitant(
   isTemporary: boolean,
   duration?: number,
 ): InhabitantInstance {
-  const suffixes = ['the Summoned', 'the Bound', 'the Called', 'the Conjured', 'the Invoked'];
+  const suffixes = [
+    'the Summoned',
+    'the Bound',
+    'the Called',
+    'the Conjured',
+    'the Invoked',
+  ];
   const suffix = rngChoice(suffixes);
 
   const mutationBonuses: Partial<InhabitantStats> = {};
@@ -163,7 +186,7 @@ export function summoningCreateInhabitant(
   }
 
   return {
-    instanceId: rngUuid() as InhabitantInstanceId,
+    instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
     name: `${def.name} ${suffix}`,
     state: 'normal',
@@ -172,7 +195,8 @@ export function summoningCreateInhabitant(
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
-    mutationBonuses: Object.keys(mutationBonuses).length > 0 ? mutationBonuses : undefined,
+    mutationBonuses:
+      Object.keys(mutationBonuses).length > 0 ? mutationBonuses : undefined,
     isSummoned: true,
     isTemporary: isTemporary || undefined,
     temporaryTicksRemaining: isTemporary ? duration : undefined,
@@ -228,20 +252,38 @@ export function summoningCircleProcess(state: GameState): void {
         room.summonJob.ticksRemaining -= 1;
 
         if (room.summonJob.ticksRemaining <= 0) {
-          const recipe = contentGetEntry<SummonRecipeContent & IsContentItem>(room.summonJob.recipeId);
+          const recipe = contentGetEntry<SummonRecipeContent & IsContentItem>(
+            room.summonJob.recipeId,
+          );
 
           if (recipe) {
-            const def = contentGetEntry<InhabitantDefinition & IsContentItem>(recipe.resultInhabitantId);
+            const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+              recipe.resultInhabitantId,
+            );
 
             if (def) {
-              const adjacentTypes = summoningGetAdjacentRoomTypeIds(room, floor);
-              const statBonuses = summoningGetStatBonuses(room, adjacentTypes, recipe);
+              const adjacentTypes = summoningGetAdjacentRoomTypeIds(
+                room,
+                floor,
+              );
+              const statBonuses = summoningGetStatBonuses(
+                room,
+                adjacentTypes,
+                recipe,
+              );
               const isTemporary = recipe.summonType === 'temporary';
-              const duration = isTemporary && recipe.duration
-                ? summoningGetEffectiveDuration(room, recipe.duration)
-                : undefined;
+              const duration =
+                isTemporary && recipe.duration
+                  ? summoningGetEffectiveDuration(room, recipe.duration)
+                  : undefined;
 
-              const summoned = summoningCreateInhabitant(def, recipe, statBonuses, isTemporary, duration);
+              const summoned = summoningCreateInhabitant(
+                def,
+                recipe,
+                statBonuses,
+                isTemporary,
+                duration,
+              );
 
               state.world.inhabitants = [...state.world.inhabitants, summoned];
               inhabitantsChanged = true;

@@ -6,9 +6,9 @@ import { floorCurrent } from '@helpers/floor';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import {
+  roomShapeGet,
   roomShapeGetAbsoluteTiles,
   roomShapeGetRotated,
-  roomShapeGet,
 } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -17,15 +17,19 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomShapeId,
-  Rotation,
   RoomDefinition,
   RoomId,
   RoomShape,
+  RoomShapeId,
+  Rotation,
   TileOffset,
 } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-import type { ValidationResult, OverlapValidationResult, PlacementValidationResult } from '@interfaces/room-placement';
+import type {
+  OverlapValidationResult,
+  PlacementValidationResult,
+  ValidationResult,
+} from '@interfaces/room-placement';
 
 export function roomPlacementValidateBounds(
   shape: RoomShape,
@@ -85,7 +89,12 @@ export function roomPlacementValidate(
     errors.push(boundsResult.error);
   }
 
-  const overlapResult = roomPlacementValidateNoOverlap(shape, anchorX, anchorY, grid);
+  const overlapResult = roomPlacementValidateNoOverlap(
+    shape,
+    anchorX,
+    anchorY,
+    grid,
+  );
   if (!overlapResult.valid && overlapResult.error) {
     errors.push(overlapResult.error);
   }
@@ -128,13 +137,18 @@ export const roomPlacementPlacedTypeIds = computed(() => {
 
 // --- Placement mode state ---
 
-export const roomPlacementSelectedTypeId = signal<RoomId | undefined>(undefined);
+export const roomPlacementSelectedTypeId = signal<RoomId | undefined>(
+  undefined,
+);
 export const roomPlacementRotation = signal<Rotation>(0);
 
 /** The base (unrotated) shape for the current placement. */
 const placementBaseShape = signal<RoomShape | undefined>(undefined);
 
-export function roomPlacementEnterMode(roomTypeId: RoomId, shape: RoomShape): void {
+export function roomPlacementEnterMode(
+  roomTypeId: RoomId,
+  shape: RoomShape,
+): void {
   roomPlacementSelectedTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
   roomPlacementRotation.set(0);
@@ -159,8 +173,12 @@ export function roomPlacementRotate(): void {
   roomPlacementPreviewShape.set(roomShapeGetRotated(base, next));
 }
 
-export const roomPlacementPreviewShape = signal<RoomShape | undefined>(undefined);
-export const roomPlacementPreviewPosition = signal<TileOffset | undefined>(undefined);
+export const roomPlacementPreviewShape = signal<RoomShape | undefined>(
+  undefined,
+);
+export const roomPlacementPreviewPosition = signal<TileOffset | undefined>(
+  undefined,
+);
 
 export const roomPlacementPreview = computed(() => {
   const shape = roomPlacementPreviewShape();
@@ -404,7 +422,7 @@ export async function roomPlacementPlace(
   if (!floor) return undefined;
 
   const room: PlacedRoom = {
-    id: rngUuid() as PlacedRoomId,
+    id: rngUuid<PlacedRoomId>(),
     roomTypeId,
     shapeId,
     anchorX,
@@ -440,7 +458,9 @@ export function roomPlacementIsRemovable(roomTypeId: RoomId): boolean {
   return roomDef.removable;
 }
 
-export async function roomPlacementRemove(roomId: PlacedRoomId): Promise<boolean> {
+export async function roomPlacementRemove(
+  roomId: PlacedRoomId,
+): Promise<boolean> {
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];

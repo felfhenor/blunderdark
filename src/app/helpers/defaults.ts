@@ -23,7 +23,7 @@ export function defaultGameState(): GameState {
       isPaused: false,
       createdAt: Date.now(),
     },
-    gameId: rngUuid() as GameId,
+    gameId: rngUuid<GameId>(),
     clock: {
       numTicks: 0,
       lastSaveTick: 0,
@@ -105,7 +105,7 @@ export function defaultFloor(
   biome: Floor['biome'] = 'neutral',
 ): Floor {
   return {
-    id: rngUuid() as FloorId,
+    id: rngUuid<FloorId>(),
     name: `Floor ${depth}`,
     depth,
     biome,

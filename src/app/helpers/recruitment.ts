@@ -143,7 +143,7 @@ export async function recruitmentRecruit(
   }
 
   const instance: InhabitantInstance = {
-    instanceId: rngUuid() as InhabitantInstanceId,
+    instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
     name: def.name,
     state: 'normal',

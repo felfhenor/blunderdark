@@ -11,10 +11,15 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { updateGamestate } from '@helpers/state-game';
-import type { Floor, GridState, Hallway, PlacedRoomId, TileOffset } from '@interfaces';
-import type { HallwayId } from '@interfaces/hallway';
+import type {
+  Floor,
+  GridState,
+  Hallway,
+  PlacedRoomId,
+  TileOffset,
+} from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-import type { HallwayBuildStep } from '@interfaces/hallway';
+import type { HallwayBuildStep, HallwayId } from '@interfaces/hallway';
 
 export const hallwayPlacementBuildStep = signal<HallwayBuildStep>('inactive');
 
@@ -22,8 +27,12 @@ export const hallwayPlacementIsBuildMode = computed(
   () => hallwayPlacementBuildStep() !== 'inactive',
 );
 
-export const hallwayPlacementSourceTile = signal<TileOffset | undefined>(undefined);
-export const hallwayPlacementDestTile = signal<TileOffset | undefined>(undefined);
+export const hallwayPlacementSourceTile = signal<TileOffset | undefined>(
+  undefined,
+);
+export const hallwayPlacementDestTile = signal<TileOffset | undefined>(
+  undefined,
+);
 
 export const HALLWAY_PLACEMENT_COST_PER_TILE = 5;
 
@@ -240,7 +249,7 @@ export async function hallwayPlacementConfirm(): Promise<boolean> {
   if (!paid) return false;
 
   const hallway: Hallway = {
-    id: rngUuid() as HallwayId,
+    id: rngUuid<HallwayId>(),
     tiles: [...path],
     upgrades: [],
   };
@@ -260,16 +269,28 @@ export async function hallwayPlacementConfirm(): Promise<boolean> {
     };
 
     // Merge adjacent hallways into the new one
-    const adjacentHallways = hallwayFindAdjacentHallways(updatedFloor, hallway.id);
+    const adjacentHallways = hallwayFindAdjacentHallways(
+      updatedFloor,
+      hallway.id,
+    );
     for (const adj of adjacentHallways) {
       updatedFloor = hallwayMergeOnFloor(updatedFloor, hallway.id, adj.id);
     }
 
     // Auto-connect to adjacent rooms (not hallways — those were merged)
     for (const room of floor.rooms) {
-      const validation = connectionValidate(updatedFloor, hallway.id as unknown as PlacedRoomId, room.id);
+      const validation = connectionValidate(
+        updatedFloor,
+        hallway.id as unknown as PlacedRoomId,
+        room.id,
+      );
       if (validation.valid && validation.edgeTiles) {
-        const result = connectionAddToFloor(updatedFloor, hallway.id as unknown as PlacedRoomId, room.id, validation.edgeTiles);
+        const result = connectionAddToFloor(
+          updatedFloor,
+          hallway.id as unknown as PlacedRoomId,
+          room.id,
+          validation.edgeTiles,
+        );
         if (result) {
           updatedFloor = result.floor;
         }

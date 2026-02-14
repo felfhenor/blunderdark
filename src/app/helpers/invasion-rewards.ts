@@ -1,20 +1,20 @@
 import { contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
+import type { IsContentItem } from '@interfaces/identifiable';
+import type {
+  InvaderClassType,
+  InvaderDefinition,
+  InvaderInstance,
+} from '@interfaces/invader';
 import type {
   CapturedPrisoner,
   DefensePenalties,
   DefenseRewards,
   DetailedInvasionResult,
   PrisonerAction,
-  PrisonerId,
   PrisonerHandlingResult,
+  PrisonerId,
 } from '@interfaces/invasion';
-import type {
-  InvaderClassType,
-  InvaderDefinition,
-  InvaderInstance,
-} from '@interfaces/invader';
-import type { IsContentItem } from '@interfaces/identifiable';
 import type { ResourceType } from '@interfaces/resource';
 
 // --- Constants ---
@@ -27,7 +27,9 @@ export const INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT = 0.2;
 export const INVASION_REWARD_PRISONER_CAPTURE_CHANCE = 0.3;
 export const INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER = 10;
 
-export const INVASION_REWARD_ALTAR_REBUILD_COST: Partial<Record<ResourceType, number>> = {
+export const INVASION_REWARD_ALTAR_REBUILD_COST: Partial<
+  Record<ResourceType, number>
+> = {
   crystals: 100,
   gold: 50,
   flux: 20,
@@ -44,21 +46,57 @@ type ClassLoot = {
 };
 
 const CLASS_LOOT: Record<InvaderClassType, ClassLoot> = {
-  warrior: { goldMin: 5, goldMax: 15, bonusResource: 'crystals', bonusMin: 2, bonusMax: 8 },
-  rogue: { goldMin: 10, goldMax: 25, bonusResource: 'essence', bonusMin: 1, bonusMax: 5 },
-  mage: { goldMin: 3, goldMax: 10, bonusResource: 'flux', bonusMin: 3, bonusMax: 10 },
-  cleric: { goldMin: 5, goldMax: 12, bonusResource: 'essence', bonusMin: 2, bonusMax: 6 },
-  paladin: { goldMin: 8, goldMax: 20, bonusResource: 'flux', bonusMin: 2, bonusMax: 8 },
-  ranger: { goldMin: 4, goldMax: 12, bonusResource: 'food', bonusMin: 3, bonusMax: 10 },
+  warrior: {
+    goldMin: 5,
+    goldMax: 15,
+    bonusResource: 'crystals',
+    bonusMin: 2,
+    bonusMax: 8,
+  },
+  rogue: {
+    goldMin: 10,
+    goldMax: 25,
+    bonusResource: 'essence',
+    bonusMin: 1,
+    bonusMax: 5,
+  },
+  mage: {
+    goldMin: 3,
+    goldMax: 10,
+    bonusResource: 'flux',
+    bonusMin: 3,
+    bonusMax: 10,
+  },
+  cleric: {
+    goldMin: 5,
+    goldMax: 12,
+    bonusResource: 'essence',
+    bonusMin: 2,
+    bonusMax: 6,
+  },
+  paladin: {
+    goldMin: 8,
+    goldMax: 20,
+    bonusResource: 'flux',
+    bonusMin: 2,
+    bonusMax: 8,
+  },
+  ranger: {
+    goldMin: 4,
+    goldMax: 12,
+    bonusResource: 'food',
+    bonusMin: 3,
+    bonusMax: 10,
+  },
 };
 
 // --- Prisoner handling constants ---
 
 const CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {
-  warrior: 0.30,
-  rogue: 0.50,
-  mage: 0.20,
-  cleric: 0.10,
+  warrior: 0.3,
+  rogue: 0.5,
+  mage: 0.2,
+  cleric: 0.1,
   paladin: 0.05,
   ranger: 0.35,
 };
@@ -94,7 +132,9 @@ export function invasionRewardCalculateDefenseRewards(
 
   // Experience
   const experienceGain = Math.round(
-    result.invaderCount * INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER * result.rewardMultiplier,
+    result.invaderCount *
+      INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER *
+      result.rewardMultiplier,
   );
 
   // Loot from killed invaders
@@ -129,7 +169,9 @@ export function invasionRewardCalculateDefensePenalties(
   result: DetailedInvasionResult,
   currentGold: number,
 ): DefensePenalties {
-  const goldLost = Math.round(currentGold * INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT);
+  const goldLost = Math.round(
+    currentGold * INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT,
+  );
   const reputationLoss = INVASION_REWARD_DEFEAT_REPUTATION_LOSS;
 
   // Resource losses scale with secondaries completed
@@ -152,7 +194,9 @@ export function invasionRewardCalculateDefensePenalties(
 /**
  * Get the loot table entry for an invader class.
  */
-export function invasionRewardGetClassLoot(invaderClass: InvaderClassType): ClassLoot {
+export function invasionRewardGetClassLoot(
+  invaderClass: InvaderClassType,
+): ClassLoot {
   return CLASS_LOOT[invaderClass];
 }
 
@@ -192,7 +236,7 @@ export function invasionRewardRollPrisonerCaptures(
       if (!def) continue;
 
       prisoners.push({
-        id: rngUuid() as PrisonerId,
+        id: rngUuid<PrisonerId>(),
         invaderClass: def.invaderClass,
         name: `Captured ${def.name}`,
         stats: { ...def.baseStats },
@@ -288,7 +332,10 @@ export function invasionRewardHandleExperiment(
 ): PrisonerHandlingResult {
   // Research scales with invader stats
   const totalStats =
-    prisoner.stats.hp + prisoner.stats.attack + prisoner.stats.defense + prisoner.stats.speed;
+    prisoner.stats.hp +
+    prisoner.stats.attack +
+    prisoner.stats.defense +
+    prisoner.stats.speed;
   const researchGain = Math.round(totalStats / 4);
 
   return {
@@ -326,21 +373,27 @@ export function invasionRewardHandlePrisoner(
 /**
  * Get the convert success rate for a given invader class.
  */
-export function invasionRewardGetConvertSuccessRate(invaderClass: InvaderClassType): number {
+export function invasionRewardGetConvertSuccessRate(
+  invaderClass: InvaderClassType,
+): number {
   return CONVERT_SUCCESS_RATES[invaderClass];
 }
 
 /**
  * Get the ransom gold value for a given invader class.
  */
-export function invasionRewardGetRansomGoldValue(invaderClass: InvaderClassType): number {
+export function invasionRewardGetRansomGoldValue(
+  invaderClass: InvaderClassType,
+): number {
   return RANSOM_GOLD[invaderClass];
 }
 
 /**
  * Get the altar rebuild cost.
  */
-export function invasionRewardGetAltarRebuildCost(): Partial<Record<ResourceType, number>> {
+export function invasionRewardGetAltarRebuildCost(): Partial<
+  Record<ResourceType, number>
+> {
   return { ...INVASION_REWARD_ALTAR_REBUILD_COST };
 }
 
