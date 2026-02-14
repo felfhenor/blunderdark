@@ -102,11 +102,26 @@ When adding a field to `GameStateWorld` (e.g., `stairs: StairInstance[]`):
 For features spanning multiple floors:
 1. Store globally in `GameStateWorld` (not per-floor) since they span two floors
 2. Mark grid tiles on BOTH connected floors via the per-floor grid
-3. Use BFS for connectivity queries (e.g., `stairFloorsAreConnected()`)
-4. Gate cross-floor inhabitant assignment on connectivity
-5. Travel time = `floorsTraversed * GAME_TIME_TICKS_PER_MINUTE`
-6. Filter traveling inhabitants from production calculations
-7. Process travel ticks in gameloop alongside other tick-based processes
+3. Use `verticalTransportFloorsAreConnected()` for connectivity (BFS on unified graph)
+4. Use `verticalTransportCalculateTravelTicks()` for optimal travel time (Dijkstra on weighted graph)
+5. Gate cross-floor inhabitant assignment on connectivity
+6. Travel speeds: stairs=5 ticks/floor, elevators=3 ticks/floor, portals=0 ticks
+7. Filter traveling inhabitants from production calculations
+8. Process travel ticks in gameloop alongside other tick-based processes
+
+### Vertical Transport Helpers
+
+- `vertical-transport.ts` — unified graph-based connectivity and travel time for stairs + elevators + portals
+- `elevators.ts` — elevator placement, extension (add floor), shrink (remove floor), removal
+- `portals.ts` — 2-step portal placement (source → destination), portal removal
+- `stairs.ts` — stair placement and removal (adjacent floors only, same grid position)
+
+### Multi-Mode Placement (Avoiding Circular Dependencies)
+
+When multiple placement modes are mutually exclusive (stairs, elevators, portals, rooms, hallways):
+- **Do NOT have helper files import each other's exit functions** — this creates circular deps
+- **Handle mutual exclusion at the UI layer** (e.g., `panel-floor-selector` component) by calling the previous mode's exit function before entering a new mode
+- **Exception:** One-way dependencies are OK (e.g., `portals.ts` can import `elevatorPlacementExit` since portals depend on elevators but not vice versa)
 
 ### Adding Fields to Floor Type
 
