@@ -13,7 +13,7 @@ import {
   notifySuccess,
   productionGetRoomDefinition,
 } from '@helpers';
-import type { HallwayId, PlacedRoomId } from '@interfaces';
+import type { PlacedRoomId } from '@interfaces';
 
 @Component({
   selector: 'app-panel-hallway-info',
@@ -27,7 +27,7 @@ import type { HallwayId, PlacedRoomId } from '@interfaces';
           @if (info.startRoomName && info.endRoomName) {
             <div class="text-xs opacity-50">
               <span>{{ info.startRoomName }}</span>
-              <span> — </span>
+              <span>—</span>
               <span>{{ info.endRoomName }}</span>
             </div>
           }
@@ -67,8 +67,13 @@ import type { HallwayId, PlacedRoomId } from '@interfaces';
             </div>
           }
 
-          @if (adjacentUnconnected().length === 0 && activeConnections().length === 0) {
-            <p class="text-xs opacity-50 mt-1">No adjacent entities to connect.</p>
+          @if (
+            adjacentUnconnected().length === 0 &&
+            activeConnections().length === 0
+          ) {
+            <p class="text-xs opacity-50 mt-1">
+              No adjacent entities to connect.
+            </p>
           }
 
           <div class="divider my-1"></div>
@@ -126,7 +131,10 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const ids = connectionGetAdjacentUnconnected(floor, info.hallwayId as unknown as PlacedRoomId);
+    const ids = connectionGetAdjacentUnconnected(
+      floor,
+      info.hallwayId as unknown as PlacedRoomId,
+    );
     return ids.map((id) => ({ id, name: getEntityName(floor, id) }));
   });
 
@@ -135,10 +143,15 @@ export class PanelHallwayInfoComponent {
     const floor = floorCurrent();
     if (!info || !floor) return [];
 
-    const connections = connectionGetRoomConnections(floor, info.hallwayId as unknown as PlacedRoomId);
+    const connections = connectionGetRoomConnections(
+      floor,
+      info.hallwayId as unknown as PlacedRoomId,
+    );
     return connections.map((conn) => {
       const otherId =
-        conn.roomAId === (info.hallwayId as unknown as PlacedRoomId) ? conn.roomBId : conn.roomAId;
+        conn.roomAId === (info.hallwayId as unknown as PlacedRoomId)
+          ? conn.roomBId
+          : conn.roomAId;
       return {
         connectionId: conn.id,
         otherId,
@@ -151,7 +164,10 @@ export class PanelHallwayInfoComponent {
     const info = this.selectedHallwayTile();
     if (!info) return;
 
-    const result = await connectionCreate(info.hallwayId as unknown as PlacedRoomId, entityId);
+    const result = await connectionCreate(
+      info.hallwayId as unknown as PlacedRoomId,
+      entityId,
+    );
     if (result.error) {
       notifyError(result.error);
     } else {

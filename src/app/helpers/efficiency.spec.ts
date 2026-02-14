@@ -179,18 +179,7 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
-import type {
-  FloorId,
-  InhabitantInstance,
-  InhabitantInstanceId,
-  InhabitantTrait,
-  PlacedRoom,
-  PlacedRoomId,
-  RoomId,
-  RoomProduction,
-  RoomShapeId,
-} from '@interfaces';
-import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
+import { contentGetEntry } from '@helpers/content';
 import {
   efficiencyCalculateInhabitantContribution,
   efficiencyCalculateMatchedInhabitantBonus,
@@ -200,7 +189,20 @@ import {
   efficiencyTotalBonusForResource,
 } from '@helpers/efficiency';
 import { gamestate } from '@helpers/state-game';
-import { contentGetEntry } from '@helpers/content';
+import type {
+  InhabitantInstance,
+  InhabitantInstanceId,
+  InhabitantTrait,
+  PlacedRoom,
+  PlacedRoomId,
+  RoomId,
+  RoomProduction,
+  RoomShapeId,
+} from '@interfaces';
+import type {
+  InhabitantContent,
+  InhabitantId,
+} from '@interfaces/content-inhabitant';
 
 // Helper to get a definition from the mock
 function getDef(id: string): InhabitantContent {
@@ -317,7 +319,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
-    const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
     expect(result).toBeDefined();
     expect(result!.name).toBe('Goblin');
     // workerEfficiency: 1.0 → 0 bonus, Miner trait matches crystals: +0.2
@@ -337,7 +342,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
     // Goblin Miner targets crystals, food room doesn't produce crystals
-    const result = efficiencyCalculateInhabitantContribution(instance, foodProduction);
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      foodProduction,
+    );
     expect(result).toBeDefined();
     expect(result!.traitBonuses[0].applies).toBe(false);
     // Only workerEfficiency bonus: 1.0 - 1.0 = 0
@@ -353,7 +361,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
     // Myconid in crystal mine: workerEfficiency 1.3 → 0.3, but Farmer targets food → no match
-    const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
     expect(result).toBeDefined();
     expect(result!.workerEfficiencyBonus).toBeCloseTo(0.3);
     expect(result!.traitBonuses[0].applies).toBe(false);
@@ -368,7 +379,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
-    const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
     expect(result).toBeUndefined();
   });
 
@@ -380,7 +394,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
-    const result = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
     expect(result).toBeDefined();
     // workerEfficiency 0.7 → -0.3, no production_bonus traits
     expect(result!.workerEfficiencyBonus).toBeCloseTo(-0.3);
@@ -396,11 +413,17 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
-    const resultCrystal = efficiencyCalculateInhabitantContribution(instance, crystalProduction);
+    const resultCrystal = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
     expect(resultCrystal!.traitBonuses[0].applies).toBe(true);
     expect(resultCrystal!.totalBonus).toBeCloseTo(0.1);
 
-    const resultFood = efficiencyCalculateInhabitantContribution(instance, foodProduction);
+    const resultFood = efficiencyCalculateInhabitantContribution(
+      instance,
+      foodProduction,
+    );
     expect(resultFood!.traitBonuses[0].applies).toBe(true);
     expect(resultFood!.totalBonus).toBeCloseTo(0.1);
   });
@@ -602,7 +625,10 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
-    const result = efficiencyCalculateMatchedInhabitantBonus(crystalMine, inhabitants);
+    const result = efficiencyCalculateMatchedInhabitantBonus(
+      crystalMine,
+      inhabitants,
+    );
     // Goblin in crystal mine: 0 workerEff + 0.2 Miner (crystals match) = 0.2
     expect(result.bonus).toBeCloseTo(0.2);
     expect(result.hasWorkers).toBe(true);
@@ -619,7 +645,10 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
       },
     ];
     // Goblin Miner targets crystals, grove produces food → no trait bonus
-    const result = efficiencyCalculateMatchedInhabitantBonus(mushroomGrove, inhabitants);
+    const result = efficiencyCalculateMatchedInhabitantBonus(
+      mushroomGrove,
+      inhabitants,
+    );
     expect(result.bonus).toBeCloseTo(0);
     expect(result.hasWorkers).toBe(true);
   });
@@ -634,7 +663,10 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         assignedRoomId: 'placed-grove-1' as PlacedRoomId,
       },
     ];
-    const result = efficiencyCalculateMatchedInhabitantBonus(mushroomGrove, inhabitants);
+    const result = efficiencyCalculateMatchedInhabitantBonus(
+      mushroomGrove,
+      inhabitants,
+    );
     // Myconid: 0.3 workerEff + 0.15 Farmer (food match) = 0.45
     expect(result.bonus).toBeCloseTo(0.45);
     expect(result.hasWorkers).toBe(true);
@@ -650,7 +682,10 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
-    const result = efficiencyCalculateMatchedInhabitantBonus(crystalMine, inhabitants);
+    const result = efficiencyCalculateMatchedInhabitantBonus(
+      crystalMine,
+      inhabitants,
+    );
     // workerEff 0 + 0.1 (all) = 0.1
     expect(result.bonus).toBeCloseTo(0.1);
     expect(result.hasWorkers).toBe(true);
