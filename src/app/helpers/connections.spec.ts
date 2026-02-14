@@ -267,6 +267,31 @@ describe('connectionRemoveRoomFromFloor', () => {
   });
 });
 
+describe('connectionAddToFloor - no resource cost', () => {
+  it('should create a connection without any resource deduction', () => {
+    const floor = makeFloor({
+      rooms: [
+        makeRoom({ id: 'room-a', anchorX: 0, anchorY: 0 }),
+        makeRoom({ id: 'room-b', anchorX: 2, anchorY: 0 }),
+      ],
+    });
+    const result = connectionAddToFloor(floor, 'room-a', 'room-b', [{ x: 1, y: 0 }]);
+    expect(result).toBeDefined();
+    expect(result!.floor.connections).toHaveLength(1);
+    // connectionAddToFloor is a pure function that only modifies connections —
+    // it does not call resourcePayCost or interact with the resource system at all
+  });
+
+  it('should not validate or check resource availability', () => {
+    // connectionAddToFloor accepts any valid parameters without resource checks
+    const floor = makeFloor({ connections: [] });
+    const result = connectionAddToFloor(floor, 'room-x', 'room-y', [{ x: 5, y: 5 }]);
+    expect(result).toBeDefined();
+    expect(result!.connection.roomAId).toBe('room-x');
+    // No resourceCanAfford or resourcePayCost is called — connections are free
+  });
+});
+
 describe('connectionValidate', () => {
   it('should reject self-connection', () => {
     const floor = makeFloor({

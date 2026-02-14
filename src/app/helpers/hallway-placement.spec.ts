@@ -1,6 +1,10 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
-import { hallwayPlacementFindPointPath } from '@helpers/hallway-placement';
-import type { GridState, GridTile } from '@interfaces';
+import {
+  calculateHallwayCost,
+  HALLWAY_PLACEMENT_COST_PER_TILE,
+  hallwayPlacementFindPointPath,
+} from '@helpers/hallway-placement';
+import type { GridState, GridTile, TileOffset } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function roomTile(roomId: string): GridTile {
@@ -114,5 +118,34 @@ describe('hallwayPlacementFindPointPath', () => {
     expect(path![0]).toEqual({ x: 3, y: 5 });
     // Path ends at an adjacent empty tile, not the room tile itself
     expect(path![path!.length - 1]).not.toEqual({ x: 6, y: 5 });
+  });
+});
+
+describe('calculateHallwayCost', () => {
+  it('should return 0 for an empty path', () => {
+    expect(calculateHallwayCost([])).toBe(0);
+  });
+
+  it('should return cost per tile for a single tile', () => {
+    const path: TileOffset[] = [{ x: 5, y: 5 }];
+    expect(calculateHallwayCost(path)).toBe(HALLWAY_PLACEMENT_COST_PER_TILE);
+  });
+
+  it('should return path.length * 5 for a multi-tile path', () => {
+    const path: TileOffset[] = [
+      { x: 3, y: 5 },
+      { x: 4, y: 5 },
+      { x: 5, y: 5 },
+    ];
+    expect(calculateHallwayCost(path)).toBe(15);
+  });
+
+  it('should scale linearly with path length', () => {
+    const path10: TileOffset[] = Array.from({ length: 10 }, (_, i) => ({ x: i, y: 0 }));
+    expect(calculateHallwayCost(path10)).toBe(50);
+  });
+
+  it('should use HALLWAY_PLACEMENT_COST_PER_TILE constant (5)', () => {
+    expect(HALLWAY_PLACEMENT_COST_PER_TILE).toBe(5);
   });
 });

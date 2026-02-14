@@ -190,12 +190,20 @@ export const hallwayPlacementPreviewTileSet = computed(() => {
 });
 
 /**
+ * Calculate the crystal cost for a hallway path.
+ * Pure function: cost = number of tiles * HALLWAY_PLACEMENT_COST_PER_TILE.
+ */
+export function calculateHallwayCost(path: TileOffset[]): number {
+  return path.length * HALLWAY_PLACEMENT_COST_PER_TILE;
+}
+
+/**
  * Total crystal cost for the current hallway path preview.
  */
 export const hallwayPlacementPreviewCost = computed(() => {
   const path = hallwayPlacementPreviewPath();
   if (!path) return 0;
-  return path.length * HALLWAY_PLACEMENT_COST_PER_TILE;
+  return calculateHallwayCost(path);
 });
 
 /**
@@ -217,7 +225,7 @@ export const hallwayPlacementStatusMessage = computed(() => {
   if (step === 'preview') {
     const path = hallwayPlacementPreviewPath();
     if (!path) return 'No valid path found';
-    return `${path.length} tiles — ${path.length * HALLWAY_PLACEMENT_COST_PER_TILE} Crystals`;
+    return `${path.length} tiles — ${calculateHallwayCost(path)} Crystals`;
   }
   return '';
 });
