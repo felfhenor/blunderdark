@@ -1145,3 +1145,13 @@ export type {Type}Content = IsContentItem &
 - Room gating: `panel-room-select` uses `isResearchLocked(room)` to grey out and disable research-gated rooms with "Requires: [Research Name]" tooltip
 - Inhabitant gating: `panel-altar` adds `researchLocked` and `researchRequirement` fields to `RecruitableEntry` — shows "Requires: [Research Name]" for locked creatures
 - When adding new fields to `ResearchState`, all spec files with inline `ResearchState` objects must be updated (check with `grep researchState` or look for `research:` in `makeGameState` helpers)
+
+## Torture Chamber / Prisoner System
+
+- **Prisoners stored in `GameStateWorld.prisoners: CapturedPrisoner[]`** — persistent world-level storage, not per-room. Prisoners are captured during invasions (see `invasionRewardRollPrisonerCaptures`) and consumed by torture chamber processing.
+- **`TortureJob` on `PlacedRoom`** — follows same pattern as `BreedingJob`, `MutationJob`, `SummonJob`: `{ prisonerId, action, ticksRemaining, targetTicks }`. Job types: `'extract'` (research gain) and `'convert'` (new inhabitant).
+- **Conversion success rates** match `CONVERT_SUCCESS_RATES` in `invasion-rewards.ts` — warrior 30%, rogue 50%, mage 20%, cleric 10%, paladin 5%, ranger 35%. The torture chamber replicates these as `TORTURE_CONVERT_SUCCESS_RATES`.
+- **Converted Prisoner inhabitant** has `restrictionTags: ['converted']` to exclude from recruitment panel, `workerEfficiency: 0.80` (-20% penalty), and `corruptionGeneration: 0.1`.
+- **`tortureAdjacencyEffects`** — new optional field on `RoomDefinition` with `tortureSpeedBonus` and `tortureConversionBonus`. Added to Soul Well (speed +15%) and Barracks (conversion +10%).
+- **Extra corruption during processing** — `TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING = 0.12` added directly to `corruption.current` each tick while a job is active.
+- **When adding new fields to `GameStateWorld`**, 16 spec files have `makeGameState` helpers that need updating. Some older spec files (invasion, hunger, corruption) were missing `forgeInventory`, `forgeCraftingQueues`, and `alchemyConversions` — add all missing fields when touching them.
