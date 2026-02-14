@@ -8,7 +8,7 @@ import type {
   RoomUpgradeEffect,
   TileOffset,
 } from '@interfaces';
-import type { AdjacencyMap } from '@helpers/adjacency';
+import type { AdjacencyMap } from '@interfaces/adjacency';
 
 // --- Mocks ---
 

@@ -11,6 +11,13 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **In spec files**, define test-local arbitrary UUID constants — these are not hardcoded production references, they're test fixtures.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()` in Node.js.
 
+## Type Export Location Policy
+
+- **NEVER export types from `src/app/helpers/`** — all `export type` definitions must live in `src/app/interfaces/`.
+- Helper files that need types should `import type { ... } from '@interfaces/...'` (or from a specific interface file like `@interfaces/room-placement`).
+- When adding a new type for a helper feature, create a corresponding file in `src/app/interfaces/` (e.g., `src/app/interfaces/pathfinding.ts` for pathfinding types) and export it from the `@interfaces` barrel (`src/app/interfaces/index.ts`).
+- Interface files may import from other interface files (e.g., `import type { BiomeType } from '@interfaces/biome'`) but NEVER from `@helpers/`.
+
 ## Circular Dependency Avoidance
 
 - **Do NOT import from `@helpers/notify` in helper files that have tests.** The `notify.ts` file imports `uiIsPageVisible` from the `@helpers` barrel, which triggers the entire barrel export chain including `state-game.ts` → `defaults.ts` → `rngUuid()`. This causes `ReferenceError: Cannot access '__vite_ssr_import_1__' before initialization` in Vitest.

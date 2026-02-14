@@ -6,7 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
-import type { FearLevelBreakdown } from '@helpers/fear-level';
+import type { FearLevelBreakdown } from '@interfaces/fear';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({

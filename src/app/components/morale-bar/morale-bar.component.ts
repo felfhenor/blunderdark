@@ -10,7 +10,7 @@ import {
   moraleIsRetreating,
   MORALE_MAX,
 } from '@helpers';
-import type { MoraleEvent } from '@helpers/morale';
+import type { MoraleEvent } from '@interfaces/morale';
 
 @Component({
   selector: 'app-morale-bar',

@@ -16,6 +16,7 @@ import type {
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { DarkForgeCompletedEvent } from '@interfaces/forge';
 
 // --- Constants ---
 
@@ -23,14 +24,6 @@ import { Subject } from 'rxjs';
 export const DARK_FORGE_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4;
 
 export const DARK_FORGE_MAX_QUEUE_SIZE = 5;
-
-// --- Events ---
-
-export type DarkForgeCompletedEvent = {
-  roomId: string;
-  recipeName: string;
-  category: 'equipment' | 'upgrade';
-};
 
 const darkForgeCompletedSubject = new Subject<DarkForgeCompletedEvent>();
 export const darkForgeCompleted$ = darkForgeCompletedSubject.asObservable();

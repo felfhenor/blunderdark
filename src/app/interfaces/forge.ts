@@ -13,3 +13,9 @@ export type ForgeCraftingQueue = {
   roomId: string;
   jobs: ForgeCraftingJob[];
 };
+
+export type DarkForgeCompletedEvent = {
+  roomId: string;
+  recipeName: string;
+  category: 'equipment' | 'upgrade';
+};

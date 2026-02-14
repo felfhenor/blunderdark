@@ -32,3 +32,8 @@ export type ActiveSynergy = {
   synergyId: string;
   roomId: string;
 };
+
+export type PotentialSynergy = {
+  synergy: SynergyDefinition;
+  missingConditions: string[];
+};

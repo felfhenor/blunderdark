@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import type { InvaderClassType, InvaderInstance } from '@interfaces/invader';
+import type { MoraleEventType, MoraleEvent } from '@interfaces/morale';
 
 // --- Constants ---
 
@@ -20,22 +21,6 @@ export const MORALE_HIGH_FEAR_ROOM_THRESHOLD = 3;
 
 export const MORALE_ROOM_CAPTURE_BONUS = 10;
 export const MORALE_HIGH_VALUE_ROOM_CAPTURE_BONUS = 15;
-
-// --- Types ---
-
-export type MoraleEventType =
-  | 'ally_death'
-  | 'trap_trigger'
-  | 'high_fear_room'
-  | 'room_capture';
-
-export type MoraleEvent = {
-  turn: number;
-  eventType: MoraleEventType;
-  delta: number;
-  newValue: number;
-  description: string;
-};
 
 // --- Signals ---
 

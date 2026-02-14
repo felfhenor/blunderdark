@@ -1,25 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import type { InhabitantDefinition, InhabitantInstance, IsContentItem } from '@interfaces';
-
-// --- Types ---
-
-export type DayNightPhase = 'day' | 'night' | 'dawn' | 'dusk';
-
-export type DayNightResourceModifier = {
-  source: 'time-of-day';
-  resourceType: string;
-  multiplier: number;
-  phase: DayNightPhase;
-  description: string;
-};
-
-export type DayNightCreatureModifier = {
-  source: 'time-of-day';
-  creatureType: string;
-  multiplier: number;
-  phase: DayNightPhase;
-  description: string;
-};
+import type { DayNightPhase, DayNightResourceModifier, DayNightCreatureModifier } from '@interfaces/day-night';
 
 // --- Constants ---
 

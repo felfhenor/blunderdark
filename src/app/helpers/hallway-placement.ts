@@ -13,12 +13,7 @@ import { roomPlacementExitMode } from '@helpers/room-placement';
 import { updateGamestate } from '@helpers/state-game';
 import type { Floor, GridState, Hallway, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-
-export type HallwayBuildStep =
-  | 'inactive'
-  | 'selectSource'
-  | 'selectDestination'
-  | 'preview';
+import type { HallwayBuildStep } from '@interfaces/hallway';
 
 export const hallwayPlacementBuildStep = signal<HallwayBuildStep>('inactive');
 

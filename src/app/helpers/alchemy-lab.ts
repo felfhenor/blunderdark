@@ -13,20 +13,12 @@ import type {
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { AlchemyLabCompletedEvent } from '@interfaces/alchemy';
 
 // --- Constants ---
 
 /** Base conversion cycle: 3 game-minutes = 15 ticks */
 export const ALCHEMY_LAB_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3;
-
-// --- Events ---
-
-export type AlchemyLabCompletedEvent = {
-  roomId: string;
-  recipeName: string;
-  outputResource: string;
-  outputAmount: number;
-};
 
 const alchemyLabCompletedSubject = new Subject<AlchemyLabCompletedEvent>();
 export const alchemyLabCompleted$ = alchemyLabCompletedSubject.asObservable();

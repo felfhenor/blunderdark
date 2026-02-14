@@ -1,10 +1,5 @@
-import type { GameTime } from '@helpers/game-time';
-
-export type ScheduledEvent = {
-  id: string;
-  triggerTime: GameTime;
-  callback: () => void;
-};
+import type { GameTime } from '@interfaces/game-time';
+import type { ScheduledEvent } from '@interfaces/game-event';
 
 let nextEventId = 1;
 let scheduledEvents: ScheduledEvent[] = [];

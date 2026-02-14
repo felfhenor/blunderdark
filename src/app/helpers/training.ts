@@ -16,6 +16,7 @@ import type {
   TrainingBonuses,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { TrainingRoomInfo } from '@interfaces/training';
 
 /** Base training time: 5 game-minutes = 25 ticks (GAME_TIME_TICKS_PER_MINUTE * 5) */
 export const TRAINING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 5;
@@ -190,15 +191,6 @@ export function trainingProcess(state: GameState): void {
 
 // --- Computed signals ---
 
-/**
- * Get all Training Grounds rooms across all floors with their training info.
- */
-export type TrainingRoomInfo = {
-  placedRoom: PlacedRoom;
-  floor: Floor;
-  targetTicks: number;
-  bonuses: TrainingBonuses;
-};
 
 export function trainingGetRoomInfo(
   roomId: string,

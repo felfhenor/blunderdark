@@ -10,7 +10,7 @@ import {
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import type { SynergyDefinition } from '@interfaces';
-import type { PotentialSynergy } from '@helpers/synergy';
+import type { PotentialSynergy } from '@interfaces/synergy';
 
 @Component({
   selector: 'app-synergy-tooltip',

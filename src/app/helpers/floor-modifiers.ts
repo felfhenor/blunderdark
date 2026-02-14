@@ -1,16 +1,4 @@
-// --- Types ---
-
-export type FloorDepthResourceModifier = {
-  resourceType: string;
-  percentage: number;
-  description: string;
-};
-
-export type FloorDepthModifierTier = {
-  minDepth: number;
-  maxDepth: number;
-  modifiers: FloorDepthResourceModifier[];
-};
+import type { FloorDepthResourceModifier, FloorDepthModifierTier } from '@interfaces/floor-modifier';
 
 // --- Configuration ---
 

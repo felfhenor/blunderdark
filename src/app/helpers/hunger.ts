@@ -9,6 +9,7 @@ import type {
   IsContentItem,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { HungerWarningLevel, HungerWarningEvent } from '@interfaces/hunger';
 
 // --- Constants ---
 
@@ -26,16 +27,6 @@ export const HUNGER_RECOVERY_RATE = 2;
 
 /** Minutes of food remaining to trigger a low food warning */
 export const HUNGER_WARNING_MINUTES = 5;
-
-// --- Warning events ---
-
-export type HungerWarningLevel = 'low' | 'critical';
-
-export type HungerWarningEvent = {
-  level: HungerWarningLevel;
-  foodRemaining: number;
-  consumptionPerTick: number;
-};
 
 const hungerWarningSubject = new Subject<HungerWarningEvent>();
 

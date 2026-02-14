@@ -15,6 +15,7 @@ import type {
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { TortureExtractionCompleteEvent, TortureConversionCompleteEvent } from '@interfaces/torture';
 
 // --- Constants ---
 
@@ -32,21 +33,6 @@ export const TORTURE_CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {
 };
 
 export const CONVERTED_PRISONER_DEF_ID = '1df0572f-4dc5-4ba8-9c4d-d1df84f58979';
-
-// --- Events ---
-
-export type TortureExtractionCompleteEvent = {
-  roomId: string;
-  prisonerName: string;
-  researchGained: number;
-};
-
-export type TortureConversionCompleteEvent = {
-  roomId: string;
-  prisonerName: string;
-  success: boolean;
-  inhabitantName?: string;
-};
 
 const tortureExtractionCompleteSubject =
   new Subject<TortureExtractionCompleteEvent>();

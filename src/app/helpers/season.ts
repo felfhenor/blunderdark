@@ -4,11 +4,6 @@ import type { Season, SeasonState } from '@interfaces';
 import { DAYS_PER_SEASON, SEASON_ORDER } from '@interfaces/season';
 import { Subject } from 'rxjs';
 
-export type SeasonTransitionEvent = {
-  previousSeason: Season;
-  newSeason: Season;
-};
-
 const seasonTransition = new Subject<SeasonTransitionEvent>();
 export const seasonTransition$ = seasonTransition.asObservable();
 

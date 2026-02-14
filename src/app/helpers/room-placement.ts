@@ -22,20 +22,7 @@ import type {
   TileOffset,
 } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-
-export type ValidationResult = {
-  valid: boolean;
-  error?: string;
-};
-
-export type OverlapValidationResult = ValidationResult & {
-  conflictingTiles?: TileOffset[];
-};
-
-export type PlacementValidationResult = {
-  valid: boolean;
-  errors: string[];
-};
+import type { ValidationResult, OverlapValidationResult, PlacementValidationResult } from '@interfaces/room-placement';
 
 export function roomPlacementValidateBounds(
   shape: RoomShape,
@@ -168,12 +155,6 @@ export function roomPlacementRotate(): void {
   roomPlacementRotation.set(next);
   roomPlacementPreviewShape.set(roomShapeGetRotated(base, next));
 }
-
-// --- Placement preview state ---
-
-export type PreviewTile = TileOffset & {
-  inBounds: boolean;
-};
 
 export const roomPlacementPreviewShape = signal<RoomShape | undefined>(undefined);
 export const roomPlacementPreviewPosition = signal<TileOffset | undefined>(undefined);

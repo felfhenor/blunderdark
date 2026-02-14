@@ -7,6 +7,7 @@ import {
 } from '@helpers/corruption';
 import type { CorruptionEffectState, GameState } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { CorruptionThresholdWarning } from '@interfaces/corruption-threshold';
 
 // --- Constants ---
 
@@ -17,15 +18,6 @@ export const CORRUPTION_THRESHOLD_ALL = [
 ] as const;
 
 export const CORRUPTION_THRESHOLD_WARNING_FACTOR = 0.8;
-
-// --- Types ---
-
-export type CorruptionThresholdWarning = {
-  threshold: number;
-  warningLevel: number;
-  currentCorruption: number;
-  effectDescription: string;
-};
 
 // --- Event subject (consumed by NotifyService for UI notifications) ---
 

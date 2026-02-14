@@ -12,3 +12,9 @@ export type Hallway = {
   tiles: TileOffset[];
   upgrades: HallwayUpgrade[];
 };
+
+export type HallwayBuildStep =
+  | 'inactive'
+  | 'selectSource'
+  | 'selectDestination'
+  | 'preview';

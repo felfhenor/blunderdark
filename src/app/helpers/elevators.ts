@@ -7,6 +7,7 @@ import { roomPlacementExitMode } from '@helpers/room-placement';
 import { stairPlacementExit } from '@helpers/stairs';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { ElevatorInstance, Floor } from '@interfaces';
+import type { ElevatorValidationResult, ElevatorExtensionValidation, ElevatorRemovalInfo } from '@interfaces/elevator';
 
 export const ELEVATOR_PLACEMENT_COST_CRYSTALS = 50;
 export const ELEVATOR_PLACEMENT_COST_FLUX = 20;
@@ -28,13 +29,6 @@ export function elevatorPlacementEnter(): void {
 export function elevatorPlacementExit(): void {
   elevatorPlacementActive.set(false);
 }
-
-// --- Pure validation ---
-
-export type ElevatorValidationResult = {
-  valid: boolean;
-  error?: string;
-};
 
 export function elevatorValidatePlacement(
   floors: Floor[],
@@ -202,14 +196,6 @@ export async function elevatorPlacementExecute(
 
   return { success: true };
 }
-
-// --- Extension ---
-
-export type ElevatorExtensionValidation = {
-  valid: boolean;
-  error?: string;
-  targetDepth?: number;
-};
 
 export function elevatorValidateExtension(
   floors: Floor[],
@@ -403,16 +389,6 @@ export async function elevatorShrinkExecute(
 export function elevatorGetOnFloor(elevators: ElevatorInstance[], floorDepth: number): ElevatorInstance[] {
   return elevators.filter((e) => e.connectedFloors.includes(floorDepth));
 }
-
-// --- Removal ---
-
-export type ElevatorRemovalInfo = {
-  canRemove: boolean;
-  refundCrystals: number;
-  refundFlux: number;
-  traversingInhabitantNames: string[];
-  reason?: string;
-};
 
 export function elevatorRemovalGetInfo(elevatorId: string): ElevatorRemovalInfo {
   const state = gamestate();

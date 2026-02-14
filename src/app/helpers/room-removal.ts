@@ -12,16 +12,7 @@ import type {
   ResourceType,
   RoomDefinition,
 } from '@interfaces';
-
-export type RemovalRefund = Record<string, number>;
-
-export type RemovalInfo = {
-  roomName: string;
-  refund: RemovalRefund;
-  displacedInhabitantNames: string[];
-  canRemove: boolean;
-  error?: string;
-};
+import type { RemovalRefund, RemovalInfo } from '@interfaces/room-removal';
 
 const REFUND_RATE = 0.5;
 

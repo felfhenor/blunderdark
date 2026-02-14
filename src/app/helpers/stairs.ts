@@ -6,6 +6,7 @@ import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, StairDirection, StairInstance } from '@interfaces';
+import type { StairValidationResult, StairRemovalInfo } from '@interfaces/stair';
 
 export const STAIR_PLACEMENT_COST = 20;
 export const STAIR_REMOVAL_REFUND = 10;
@@ -27,13 +28,6 @@ export function stairPlacementEnter(direction: StairDirection = 'down'): void {
 export function stairPlacementExit(): void {
   stairPlacementActive.set(false);
 }
-
-// --- Pure validation ---
-
-export type StairValidationResult = {
-  valid: boolean;
-  error?: string;
-};
 
 export function stairValidatePlacement(
   floors: Floor[],
@@ -276,15 +270,6 @@ export function stairCountFloorsTraversed(
 
   return undefined;
 }
-
-// --- Stair removal ---
-
-export type StairRemovalInfo = {
-  canRemove: boolean;
-  refund: number;
-  traversingInhabitantNames: string[];
-  reason?: string;
-};
 
 export function stairRemovalGetInfo(stairId: string): StairRemovalInfo {
   const state = gamestate();

@@ -2,16 +2,11 @@ import { computed } from '@angular/core';
 import { gamestate } from '@helpers/state-game';
 import { optionsGet, optionsSet } from '@helpers/state-options';
 import type { GameSpeed, GameStateClock } from '@interfaces';
+import type { GameTime } from '@interfaces/game-time';
 
 export const GAME_TIME_MINUTES_PER_HOUR = 60;
 export const GAME_TIME_HOURS_PER_DAY = 24;
 export const GAME_TIME_TICKS_PER_MINUTE = 5;
-
-export type GameTime = {
-  day: number;
-  hour: number;
-  minute: number;
-};
 
 export function gameTimeAdvance(
   clock: GameTime,

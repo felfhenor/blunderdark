@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { DungeonGraph, PathEdge, PathNode } from '@helpers/pathfinding';
+import type { DungeonGraph, PathEdge, PathNode } from '@interfaces/pathfinding';
 import type { Floor, GridState, GridTile } from '@interfaces';
 
 const {

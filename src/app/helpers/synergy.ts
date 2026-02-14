@@ -14,6 +14,7 @@ import type {
   SynergyDefinition,
   TileOffset,
 } from '@interfaces';
+import type { PotentialSynergy } from '@interfaces/synergy';
 
 export function synergyGetDefinitions(): SynergyDefinition[] {
   return contentGetEntriesByType<SynergyDefinition & IsContentItem>('synergy');
@@ -166,11 +167,6 @@ export function synergyGetActive(
 export const synergyActiveMap = computed(() => {
   return synergyEvaluateAll(gamestate().world.floors);
 });
-
-export type PotentialSynergy = {
-  synergy: SynergyDefinition;
-  missingConditions: string[];
-};
 
 function describeCondition(condition: SynergyCondition): string {
   switch (condition.type) {

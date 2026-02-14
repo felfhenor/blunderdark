@@ -22,11 +22,7 @@ import type {
   Season,
   TileOffset,
 } from '@interfaces';
-
-export type InhabitantBonusResult = {
-  bonus: number;
-  hasWorkers: boolean;
-};
+import type { InhabitantBonusResult, ActiveAdjacencyBonus, ResourceProductionBreakdown } from '@interfaces/production';
 
 export function productionGetBase(roomTypeId: string): RoomProduction {
   const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
@@ -117,13 +113,6 @@ export function productionCalculateAdjacencyBonus(
 
   return totalBonus;
 }
-
-export type ActiveAdjacencyBonus = {
-  sourceRoomId: string;
-  sourceRoomName: string;
-  bonus: number;
-  description: string;
-};
 
 export function productionGetActiveAdjacencyBonuses(
   placedRoom: PlacedRoom,
@@ -345,14 +334,6 @@ export function productionGetRoomRates(roomId: string): RoomProduction {
   }
   return {};
 }
-
-export type ResourceProductionBreakdown = {
-  base: number;
-  inhabitantBonus: number;
-  adjacencyBonus: number;
-  modifierEffect: number;
-  final: number;
-};
 
 export function productionCalculateBreakdowns(
   floors: Floor[],

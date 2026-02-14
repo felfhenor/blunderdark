@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
-import type { GameTime } from '@helpers/game-time';
+import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
 import { gamestate } from '@helpers/state-game';

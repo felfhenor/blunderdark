@@ -12,6 +12,7 @@ import type {
   RoomDefinition,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { SpawningPoolEvent } from '@interfaces/spawning-pool';
 
 // --- Constants ---
 
@@ -20,13 +21,6 @@ export const SPAWNING_POOL_DEFAULT_CAPACITY = 10;
 
 // Dark Spawning upgrade changes spawn type to Skeleton
 const DARK_SPAWN_TYPE = 'Skeleton';
-
-// --- Events ---
-
-export type SpawningPoolEvent = {
-  roomId: string;
-  inhabitantName: string;
-};
 
 const spawningPoolSpawn = new Subject<SpawningPoolEvent>();
 export const spawningPoolSpawn$ = spawningPoolSpawn.asObservable();

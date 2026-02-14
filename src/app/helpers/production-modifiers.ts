@@ -1,31 +1,6 @@
 import { contentGetEntriesByType } from '@helpers/content';
 import type { BiomeType, IsContentItem, RoomDefinition } from '@interfaces';
-
-// --- Types ---
-
-export type ProductionModifierType =
-  | 'time_of_day'
-  | 'biome';
-
-export type ProductionModifierContext = {
-  roomTypeId: string;
-  floorDepth: number;
-  floorBiome: BiomeType;
-  hour: number;
-};
-
-export type ProductionModifierResult = {
-  type: ProductionModifierType;
-  multiplier: number;
-  description: string;
-};
-
-export type ProductionModifierDefinition = {
-  id: string;
-  type: ProductionModifierType;
-  description: string;
-  evaluate: (context: ProductionModifierContext) => number;
-};
+import type { ProductionModifierContext, ProductionModifierResult, ProductionModifierDefinition } from '@interfaces/production-modifier';
 
 // --- Constants ---
 

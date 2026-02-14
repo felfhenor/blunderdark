@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
-import { adjacencyAreRoomsAdjacent, type AdjacencyMap } from '@helpers/adjacency';
+import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import type { AdjacencyMap } from '@interfaces/adjacency';
 import { altarRoomGetFearReductionAura, altarRoomIsAdjacent } from '@helpers/altar-room';
 import { contentGetEntry } from '@helpers/content';
 import { productionGetRoomDefinition } from '@helpers/production';
@@ -16,6 +17,7 @@ import type {
   RoomDefinition,
   TileOffset,
 } from '@interfaces';
+import type { FearPropagationSource, FearLevelBreakdown } from '@interfaces/fear';
 
 // --- Constants ---
 
@@ -36,24 +38,6 @@ export const FEAR_LEVEL_LABELS: Record<number, string> = {
   [FEAR_LEVEL_MEDIUM]: 'Medium',
   [FEAR_LEVEL_HIGH]: 'High',
   [FEAR_LEVEL_VERY_HIGH]: 'Very High',
-};
-
-// --- Types ---
-
-export type FearPropagationSource = {
-  sourceRoomId: string;
-  sourceRoomName: string;
-  amount: number;
-};
-
-export type FearLevelBreakdown = {
-  baseFear: number;
-  inhabitantModifier: number;
-  upgradeAdjustment: number;
-  altarAuraReduction: number;
-  propagatedFear: number;
-  propagationSources: FearPropagationSource[];
-  effectiveFear: number;
 };
 
 // --- Pure functions ---

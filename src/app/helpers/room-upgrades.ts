@@ -6,11 +6,7 @@ import type {
   RoomUpgradeEffect,
   RoomUpgradePath,
 } from '@interfaces';
-
-export type UpgradeValidation = {
-  valid: boolean;
-  reason?: string;
-};
+import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
 
 export function roomUpgradeGetPaths(roomTypeId: string): RoomUpgradePath[] {
   const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
@@ -84,12 +80,6 @@ export function roomUpgradeGetAvailable(
     (p) => !p.requiresDarkUpgrade || darkUpgradeUnlocked,
   );
 }
-
-export type VisibleUpgrade = {
-  path: RoomUpgradePath;
-  locked: boolean;
-  lockReason?: string;
-};
 
 /**
  * Returns all upgrade paths for a room with lock status.

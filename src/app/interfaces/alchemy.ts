@@ -5,3 +5,10 @@ export type AlchemyConversion = {
   targetTicks: number;
   inputConsumed: boolean;
 };
+
+export type AlchemyLabCompletedEvent = {
+  roomId: string;
+  recipeName: string;
+  outputResource: string;
+  outputAmount: number;
+};

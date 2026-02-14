@@ -1,15 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
 import type { BiomeType, Floor, IsContentItem, RoomDefinition } from '@interfaces';
+import type { BiomeRestrictionRule, BiomeRestrictionResult } from '@interfaces/biome-restriction';
 
-/**
- * Biome restriction rule.
- * - `blocked: true` means the room type cannot be built on that biome at all.
- * - `maxPerFloor` means at most N of that room type per floor.
- */
-export type BiomeRestrictionRule = {
-  blocked?: boolean;
-  maxPerFloor?: number;
-};
 
 /**
  * Map of biome type → room name → restriction rule.
@@ -42,11 +34,6 @@ export const BIOME_RESTRICTION_MAP: Record<
   },
   fungal: {},
   neutral: {},
-};
-
-export type BiomeRestrictionResult = {
-  allowed: boolean;
-  reason?: string;
 };
 
 /**

@@ -45,3 +45,14 @@ export type TrapCraftingQueue = {
   roomId: string;
   jobs: TrapCraftingJob[];
 };
+
+export type TrapTriggerResult = {
+  triggered: boolean;
+  disarmed: boolean;
+  damage: number;
+  effectType: string;
+  duration: number;
+  trapDestroyed: boolean;
+  trapName: string;
+  moralePenalty: number;
+};

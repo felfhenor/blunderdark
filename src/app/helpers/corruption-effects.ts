@@ -8,6 +8,7 @@ import type {
 } from '@interfaces';
 import { Subject } from 'rxjs';
 import type { PRNG } from 'seedrandom';
+import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 
 // --- Constants ---
 
@@ -25,18 +26,6 @@ export const CORRUPTION_EFFECT_MUTATION_MAX_DELTA = 5;
 export const CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE = 50;
 export const CORRUPTION_EFFECT_THRESHOLD_MUTATION = 100;
 export const CORRUPTION_EFFECT_THRESHOLD_CRUSADE = 200;
-
-// --- Event subject ---
-
-export type CorruptionEffectEventType =
-  | 'dark_upgrade_unlocked'
-  | 'mutation_applied'
-  | 'crusade_triggered';
-
-export type CorruptionEffectEvent = {
-  type: CorruptionEffectEventType;
-  description: string;
-};
 
 export const corruptionEffectEvent$ = new Subject<CorruptionEffectEvent>();
 

@@ -28,3 +28,8 @@ export type SeasonBonusDefinition = {
   recruitmentCostMultiplier: number;
   flags: string[];
 };
+
+export type SeasonTransitionEvent = {
+  previousSeason: Season;
+  newSeason: Season;
+};

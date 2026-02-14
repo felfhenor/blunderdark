@@ -10,24 +10,7 @@ import type {
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
 import { Subject } from 'rxjs';
 
-/**
- * Event emitted when reputation is awarded for an action.
- */
-export type ReputationAwardEvent = {
-  actionId: string;
-  actionName: string;
-  rewards: Partial<Record<ReputationType, number>>;
-};
 
-/**
- * Event emitted when a reputation type crosses a level threshold.
- */
-export type ReputationLevelUpEvent = {
-  type: ReputationType;
-  previousLevel: ReputationLevel;
-  newLevel: ReputationLevel;
-  points: number;
-};
 
 const reputationAward = new Subject<ReputationAwardEvent>();
 export const reputationAward$ = reputationAward.asObservable();

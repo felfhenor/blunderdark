@@ -17,6 +17,7 @@ import type {
 } from '@interfaces';
 import { Subject } from 'rxjs';
 import type { PRNG } from 'seedrandom';
+import type { MutationOutcome, BreedingCompletedEvent, MutationCompletedEvent } from '@interfaces/breeding';
 
 // --- Constants ---
 
@@ -29,21 +30,6 @@ export const MUTATION_NEGATIVE_CHANCE = 0.15;
 
 export const MUTATION_POSITIVE_BONUS = 0.2;
 export const MUTATION_NEGATIVE_PENALTY = 0.15;
-
-export type MutationOutcome = 'positive' | 'neutral' | 'negative';
-
-// --- Events ---
-
-export type BreedingCompletedEvent = {
-  roomId: string;
-  hybridName: string;
-};
-
-export type MutationCompletedEvent = {
-  roomId: string;
-  inhabitantName: string;
-  outcome: MutationOutcome;
-};
 
 const breedingCompletedSubject = new Subject<BreedingCompletedEvent>();
 export const breedingCompleted$ = breedingCompletedSubject.asObservable();

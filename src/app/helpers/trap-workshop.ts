@@ -12,6 +12,7 @@ import type {
   TrapDefinition,
 } from '@interfaces';
 import type { ResourceCost } from '@interfaces/resource';
+import type { TrapWorkshopInfo } from '@interfaces/trap-workshop';
 
 /** Base crafting time: 3 game-minutes = 15 ticks */
 export const TRAP_WORKSHOP_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3;
@@ -180,16 +181,6 @@ export function trapWorkshopProcess(state: GameState): void {
     }
   }
 }
-
-// --- Workshop info ---
-
-export type TrapWorkshopInfo = {
-  placedRoom: PlacedRoom;
-  assignedWorkerCount: number;
-  craftingTicks: number;
-  queue: TrapCraftingJob[];
-  availableTraps: (TrapDefinition & IsContentItem)[];
-};
 
 export function trapWorkshopGetInfo(
   roomId: string,

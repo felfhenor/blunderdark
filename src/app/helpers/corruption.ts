@@ -4,8 +4,7 @@ import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameState, InhabitantDefinition, InhabitantInstance, IsContentItem } from '@interfaces';
-
-export type CorruptionLevel = 'low' | 'medium' | 'high' | 'critical';
+import type { CorruptionLevel } from '@interfaces/corruption';
 
 export const CORRUPTION_THRESHOLD_LOW = 0;
 export const CORRUPTION_THRESHOLD_MEDIUM = 50;

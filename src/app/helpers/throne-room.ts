@@ -15,6 +15,7 @@ import {
   type RoomShape,
   type RulerBonuses,
 } from '@interfaces';
+import type { ThronePositionalBonuses } from '@interfaces/throne';
 
 // --- Pure functions ---
 
@@ -147,13 +148,6 @@ export const throneRoomFearLevel = computed<number | undefined>(() => {
 
 export const THRONE_ROOM_CENTRALITY_THRESHOLD = 5;
 export const THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER = 0.1;
-
-export type ThronePositionalBonuses = {
-  vaultAdjacent: boolean;
-  central: boolean;
-  goldProductionBonus: number;
-  rulerBonusMultiplier: number;
-};
 
 /**
  * Check if a room's center is within a Manhattan distance threshold of the grid center.

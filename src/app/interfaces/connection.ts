@@ -6,3 +6,9 @@ export type Connection = {
   roomBId: string;
   edgeTiles: TileOffset[];
 };
+
+export type ConnectionValidationResult = {
+  valid: boolean;
+  error?: string;
+  edgeTiles?: TileOffset[];
+};

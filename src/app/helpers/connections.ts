@@ -5,12 +5,7 @@ import { rngUuid } from '@helpers/rng';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Connection, Floor, PlacedRoom, TileOffset } from '@interfaces';
-
-export type ConnectionValidationResult = {
-  valid: boolean;
-  error?: string;
-  edgeTiles?: TileOffset[];
-};
+import type { ConnectionValidationResult } from '@interfaces/connection';
 
 /**
  * Get the absolute tiles for a placed room by resolving its shape.

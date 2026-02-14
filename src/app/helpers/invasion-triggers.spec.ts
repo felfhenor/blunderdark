@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import seedrandom from 'seedrandom';
 import type { GameState, InvasionSchedule } from '@interfaces';
-import type { GameTime } from '@helpers/game-time';
+import type { GameTime } from '@interfaces/game-time';
 import {
   invasionTriggerGetInterval,
   invasionTriggerIsInGracePeriod,

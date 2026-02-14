@@ -24,7 +24,7 @@ import {
   PORTAL_PLACEMENT_COST_FLUX,
   PORTAL_PLACEMENT_COST_ESSENCE,
 } from '@helpers';
-import type { FloorDepthResourceModifier } from '@helpers/floor-modifiers';
+import type { FloorDepthResourceModifier } from '@interfaces/floor-modifier';
 import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';

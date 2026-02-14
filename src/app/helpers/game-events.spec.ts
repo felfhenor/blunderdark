@@ -7,7 +7,7 @@ import {
   gameEventProcess,
   gameEventSchedule,
 } from '@helpers/game-events';
-import type { GameTime } from '@helpers/game-time';
+import type { GameTime } from '@interfaces/game-time';
 
 afterEach(() => {
   gameEventClearAll();

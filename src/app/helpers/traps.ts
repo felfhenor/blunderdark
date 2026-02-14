@@ -8,6 +8,7 @@ import type {
   TrapInstance,
   TrapInventoryEntry,
 } from '@interfaces';
+import type { TrapTriggerResult } from '@interfaces/trap';
 
 // --- Trap Definition Lookup ---
 
@@ -131,19 +132,6 @@ export function trapRemove(
     trap,
   };
 }
-
-// --- Trap Trigger Logic ---
-
-export type TrapTriggerResult = {
-  triggered: boolean;
-  disarmed: boolean;
-  damage: number;
-  effectType: string;
-  duration: number;
-  trapDestroyed: boolean;
-  trapName: string;
-  moralePenalty: number;
-};
 
 export function trapRollTrigger(
   trap: TrapInstance,

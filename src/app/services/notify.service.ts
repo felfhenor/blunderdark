@@ -9,8 +9,8 @@ import {
   researchUnlock$,
   contentGetEntry,
 } from '@helpers';
-import type { CorruptionEffectEvent } from '@helpers/corruption-effects';
-import type { ReputationLevelUpEvent } from '@helpers/reputation';
+import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
+import type { ReputationLevelUpEvent } from '@interfaces/reputation';
 import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 

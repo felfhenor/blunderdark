@@ -1,25 +1,6 @@
 import type { Floor, GridState, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
-
-// --- Graph types ---
-
-export type PathNode = {
-  roomId: string;
-  roomTypeId: string;
-  x: number;
-  y: number;
-  fearLevel: number;
-};
-
-export type PathEdge = {
-  toRoomId: string;
-  baseCost: number;
-};
-
-export type DungeonGraph = {
-  nodes: Map<string, PathNode>;
-  adjacency: Map<string, PathEdge[]>;
-};
+import type { PathNode, PathEdge, DungeonGraph, PathfindingOptions, SecondaryObjective } from '@interfaces/pathfinding';
 
 // --- Graph building ---
 
@@ -69,14 +50,6 @@ export function pathfindingBuildDungeonGraph(
 
   return { nodes, adjacency };
 }
-
-// --- A* pathfinding ---
-
-export type PathfindingOptions = {
-  morale?: number;
-  fearCostMultiplier?: number;
-  blockedNodes?: Set<string>;
-};
 
 function getTraversalCost(
   graph: DungeonGraph,
@@ -181,13 +154,6 @@ export function pathfindingGetCost(
 
   return totalCost;
 }
-
-// --- Secondary objectives ---
-
-export type SecondaryObjective = {
-  roomId: string;
-  priority: number;
-};
 
 /**
  * Find a path that may detour through a secondary objective if cost-effective.

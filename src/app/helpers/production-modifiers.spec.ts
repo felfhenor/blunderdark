@@ -39,7 +39,7 @@ import {
   productionModifierIsNightTime,
   productionModifierResetCache,
 } from '@helpers/production-modifiers';
-import type { ProductionModifierContext } from '@helpers/production-modifiers';
+import type { ProductionModifierContext } from '@interfaces/production-modifier';
 
 function makeContext(overrides: Partial<ProductionModifierContext> = {}): ProductionModifierContext {
   return {

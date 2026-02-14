@@ -19,10 +19,10 @@ import {
   productionRates,
   GAME_TIME_TICKS_PER_MINUTE,
 } from '@helpers';
-import type { CorruptionLevel } from '@helpers/corruption';
-import type { DayNightCreatureModifier, DayNightResourceModifier } from '@helpers/day-night-modifiers';
+import type { CorruptionLevel } from '@interfaces/corruption';
+import type { DayNightCreatureModifier, DayNightResourceModifier } from '@interfaces/day-night';
 import type { ResourceType } from '@interfaces';
-import type { ResourceProductionBreakdown } from '@helpers/production';
+import type { ResourceProductionBreakdown } from '@interfaces/production';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type ResourceDisplay = {

@@ -16,22 +16,11 @@ import type {
   SummonRecipeContent,
 } from '@interfaces';
 import { Subject } from 'rxjs';
+import type { SummoningCompletedEvent, SummoningExpiredEvent } from '@interfaces/summoning';
 
 // --- Constants ---
 
 export const SUMMONING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 20 ticks = 4 game-minutes
-
-// --- Events ---
-
-export type SummoningCompletedEvent = {
-  roomId: string;
-  inhabitantName: string;
-  summonType: 'permanent' | 'temporary';
-};
-
-export type SummoningExpiredEvent = {
-  inhabitantName: string;
-};
 
 const summoningCompletedSubject = new Subject<SummoningCompletedEvent>();
 export const summoningCompleted$ = summoningCompletedSubject.asObservable();

@@ -6,13 +6,7 @@ import type {
   PlacedRoom,
   RoomDefinition,
 } from '@interfaces';
-
-export type AssignmentValidation = {
-  allowed: boolean;
-  reason?: string;
-  currentCount: number;
-  maxCapacity: number;
-};
+import type { AssignmentValidation } from '@interfaces/assignment';
 
 /**
  * Check whether a given room (by roomId) can accept another inhabitant.

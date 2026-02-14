@@ -8,6 +8,7 @@ import { stairPlacementExit } from '@helpers/stairs';
 import { elevatorPlacementExit } from '@helpers/elevators';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, PortalInstance } from '@interfaces';
+import type { PortalValidationResult, PortalRemovalInfo } from '@interfaces/portal';
 
 export const PORTAL_PLACEMENT_COST_FLUX = 100;
 export const PORTAL_PLACEMENT_COST_ESSENCE = 30;
@@ -50,13 +51,6 @@ export function portalPlacementSetSource(x: number, y: number, floorDepth: numbe
 export function portalPlacementSetTargetFloor(floorDepth: number): void {
   portalPlacementTargetFloorDepth.set(floorDepth);
 }
-
-// --- Pure validation ---
-
-export type PortalValidationResult = {
-  valid: boolean;
-  error?: string;
-};
 
 export function portalValidatePlacement(
   floors: Floor[],
@@ -251,16 +245,6 @@ export function portalGetOnFloor(portals: PortalInstance[], floorDepth: number):
     (p) => p.floorDepthA === floorDepth || p.floorDepthB === floorDepth,
   );
 }
-
-// --- Removal ---
-
-export type PortalRemovalInfo = {
-  canRemove: boolean;
-  refundFlux: number;
-  refundEssence: number;
-  traversingInhabitantNames: string[];
-  reason?: string;
-};
 
 export function portalRemovalGetInfo(portalId: string): PortalRemovalInfo {
   const state = gamestate();

@@ -1,4 +1,5 @@
 import type { TileOffset } from '@interfaces';
+import type { AdjacencyMap } from '@interfaces/adjacency';
 
 /**
  * Checks if two sets of tiles share at least one edge (horizontal or vertical).
@@ -62,8 +63,6 @@ export function adjacencyGetSharedEdges(
 
   return edges;
 }
-
-export type AdjacencyMap = Record<string, string[]>;
 
 export function adjacencyCreateMap(): AdjacencyMap {
   return {};
