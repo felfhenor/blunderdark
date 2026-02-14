@@ -11,9 +11,10 @@
           (click)="selectFloor(i)"
         >
           <span class="biome-indicator"></span>
+          <span class="depth-number text-xs font-mono opacity-60">{{ floor.depth }}</span>
           <span class="biome-icon">{{ getBiomeIcon(floor.biome) }}</span>
           <span class="floor-name flex-1 text-left truncate">{{ floor.name }}</span>
-          <span class="biome-name text-xs opacity-70">{{ getBiomeData(floor.biome).name }}</span>
+          <span class="room-count text-xs opacity-50">{{ floor.rooms.length }}rm</span>
         </button>
       }
     </div>

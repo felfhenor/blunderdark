@@ -7,6 +7,7 @@ import { PanelAltarComponent } from '@components/panel-altar/panel-altar.compone
 import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
+import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/panel-floor-minimap.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
@@ -23,7 +24,13 @@ import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-too
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
-import { optionsGet } from '@helpers';
+import {
+  floorAll,
+  floorCurrent,
+  floorCurrentIndex,
+  floorSetCurrentByIndex,
+  optionsGet,
+} from '@helpers';
 
 @Component({
   selector: 'app-game-play',
@@ -37,6 +44,7 @@ import { optionsGet } from '@helpers';
     PanelAltarComponent,
     PanelBreedingPitsComponent,
     PanelDarkForgeComponent,
+    PanelFloorMinimapComponent,
     PanelFloorSelectorComponent,
     PanelHallwayInfoComponent,
     PanelReputationComponent,
@@ -54,8 +62,36 @@ import { optionsGet } from '@helpers';
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown.PageUp)': 'navigateFloorUp($event)',
+    '(document:keydown.PageDown)': 'navigateFloorDown($event)',
+  },
 })
 export class GamePlayComponent extends OptionsBaseComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public showResearch = signal(false);
+
+  public currentFloorDepth = computed(() => {
+    const floor = floorCurrent();
+    return floor?.depth ?? 1;
+  });
+
+  public totalFloors = computed(() => floorAll().length);
+
+  public navigateFloorUp(event: KeyboardEvent): void {
+    event.preventDefault();
+    const currentIdx = floorCurrentIndex();
+    if (currentIdx > 0) {
+      floorSetCurrentByIndex(currentIdx - 1);
+    }
+  }
+
+  public navigateFloorDown(event: KeyboardEvent): void {
+    event.preventDefault();
+    const currentIdx = floorCurrentIndex();
+    const total = floorAll().length;
+    if (currentIdx < total - 1) {
+      floorSetCurrentByIndex(currentIdx + 1);
+    }
+  }
 }

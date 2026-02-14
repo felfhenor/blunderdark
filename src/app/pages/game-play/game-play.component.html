@@ -1,11 +1,17 @@
 <div class="game-container relative flex flex-col">
   <div class="resource-bar-container px-4 pt-2 pb-1 flex-shrink-0">
-    <app-panel-resources />
+    <div class="flex items-center gap-4">
+      <app-panel-resources class="flex-1" />
+      <div class="floor-indicator text-xs font-mono opacity-70 whitespace-nowrap">
+        Floor {{ currentFloorDepth() }} / {{ totalFloors() }}
+      </div>
+    </div>
     <app-morale-bar />
   </div>
   <div class="flex gap-4 flex-1 min-h-0">
   <div class="sidebar w-64 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
     <app-panel-floor-selector />
+    <app-panel-floor-minimap />
     <app-panel-roster />
     <app-panel-room-info />
     <app-panel-hallway-info />
