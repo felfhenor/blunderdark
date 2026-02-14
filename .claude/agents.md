@@ -98,6 +98,7 @@ For cross-cutting events (level-ups, season transitions, notifications):
 ### Adding Fields to GameStateWorld
 
 When adding a field to `GameStateWorld` (e.g., `stairs: StairInstance[]`):
+
 1. Add to `GameStateWorld` interface in `state-game.ts`
 2. Add default in `defaultGameState()` in `defaults.ts`
 3. Add to `worldgenGenerateWorld()` return in `worldgen.ts`
@@ -107,6 +108,7 @@ When adding a field to `GameStateWorld` (e.g., `stairs: StairInstance[]`):
 ### Cross-Floor Feature Pattern (Stairs/Elevators/Portals)
 
 For features spanning multiple floors:
+
 1. Store globally in `GameStateWorld` (not per-floor) since they span two floors
 2. Mark grid tiles on BOTH connected floors via the per-floor grid
 3. Use `verticalTransportFloorsAreConnected()` for connectivity (BFS on unified graph)
@@ -126,6 +128,7 @@ For features spanning multiple floors:
 ### Multi-Mode Placement (Avoiding Circular Dependencies)
 
 When multiple placement modes are mutually exclusive (stairs, elevators, portals, rooms, hallways):
+
 - **Do NOT have helper files import each other's exit functions** — this creates circular deps
 - **Handle mutual exclusion at the UI layer** (e.g., `panel-floor-selector` component) by calling the previous mode's exit function before entering a new mode
 - **Exception:** One-way dependencies are OK (e.g., `portals.ts` can import `elevatorPlacementExit` since portals depend on elevators but not vice versa)
@@ -188,9 +191,9 @@ When multiple placement modes are mutually exclusive (stairs, elevators, portals
 - Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
 - Room YAML upgrade paths are defined in YAML data only, never referenced by code
 
-### Tile-Level A* Pathfinding
+### Tile-Level A\* Pathfinding
 
-- `tilePathfindingFindPath(grid, start, end)` — A* on GridState with Manhattan heuristic, binary min-heap; returns `TileOffset[] | null`
+- `tilePathfindingFindPath(grid, start, end)` — A\* on GridState with Manhattan heuristic, binary min-heap; returns `TileOffset[] | undefined`
 - `tilePathfindingFindRoomToRoomPath(floor, roomAId, roomBId)` — finds shortest empty-tile path between room edges; evaluates all edge-adjacent empty tile pairs; prefers fewer turns on equal-length paths
 - Uses `getRoomTilesFromGrid(grid, roomId)` to read room tiles directly from GridState (avoids content service dependency, keeping functions pure and testable without mocks)
 - Separate from room-level graph pathfinding (`pathfindingFindPath`) which uses Dijkstra on `DungeonGraph` nodes
@@ -1061,7 +1064,7 @@ All exported runtime symbols (functions, signals, constants) in `src/app/helpers
 | `production-modifiers.ts`  | `productionModifier`  | `PRODUCTION_MODIFIER`    |
 | `recruitment.ts`           | `recruitment`         | `RECRUITMENT`            |
 | `reputation.ts`            | `reputation`          | `REPUTATION`             |
-| `reputation-effects.ts`   | `reputationEffect`    | `REPUTATION_EFFECT`      |
+| `reputation-effects.ts`    | `reputationEffect`    | `REPUTATION_EFFECT`      |
 | `resources.ts`             | `resource`            | `RESOURCE`               |
 | `rng.ts`                   | `rng`                 | `RNG`                    |
 | `room-placement.ts`        | `roomPlacement`       | `ROOM_PLACEMENT`         |

@@ -9,7 +9,7 @@
       "description": "As a developer, I want feature-related data types and slot allocation logic so that the system is well-typed and rooms get the correct number of slots.",
       "acceptanceCriteria": [
         "A RoomFeature type is defined with: id, name, description, cost (resource costs), bonuses (array of bonus effects), category",
-        "A FeatureSlot type is defined with: slotIndex, attachedFeatureId: string | null",
+        "A FeatureSlot type is defined with: slotIndex, attachedFeatureId: string | undefined",
         "A RoomFeatureState type tracks feature slots for a room: slots: FeatureSlot[]",
         "Small rooms (1-2 tiles) receive 2 feature slots; large rooms (3+ tiles) receive 3 slots",
         "A helper function getFeatureSlotCount(roomSize) returns the correct count",
