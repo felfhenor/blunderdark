@@ -181,6 +181,15 @@ When multiple placement modes are mutually exclusive (stairs, elevators, portals
 - Upgrade effect types: `productionMultiplier` (scales base production), `maxInhabitantBonus` (adds to capacity), `fearReduction` (reduces fear level), `secondaryProduction` (adds new resource output)
 - Room YAML upgrade paths are defined in YAML data only, never referenced by code
 
+### Hallway Cost System
+
+- `HALLWAY_PLACEMENT_COST_PER_TILE = 5` (Crystals) — defined in `hallway-placement.ts`
+- `calculateHallwayCost(path)` — pure function: `path.length * 5`
+- `hallwayPlacementPreviewCost` — computed signal using `calculateHallwayCost`
+- `hallwayPlacementCanAfford` — computed signal using `resourceCanAfford({ crystals: cost })`
+- `hallwayPlacementConfirm()` — deducts crystals via `resourcePayCost` before creating hallway
+- **Direct adjacency connections are free** — `connectionAddToFloor` has no resource logic
+
 ### Room Placement
 
 - `roomPlacementPlaceOnFloor(floor, room, shape)` — pure function that validates placement, marks grid tiles, and adds room to floor. Returns updated Floor or null
