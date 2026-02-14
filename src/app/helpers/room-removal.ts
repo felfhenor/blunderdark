@@ -11,8 +11,8 @@ import type {
   PlacedRoomId,
   ResourceCost,
   ResourceType,
-  RoomDefinition,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import type { RemovalRefund, RemovalInfo } from '@interfaces/room-removal';
 
 const REFUND_RATE = 0.5;
@@ -43,7 +43,7 @@ export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefine
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return undefined;
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(room.roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
   if (!roomDef) return undefined;
 
   if (!roomPlacementIsRemovable(room.roomTypeId)) {
@@ -92,7 +92,7 @@ export async function roomRemovalExecute(
     return { success: false, error: 'This room cannot be removed' };
   }
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(room.roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
 
   const baseShape = roomShapeGet(room.shapeId);

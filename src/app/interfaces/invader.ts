@@ -1,5 +1,4 @@
 import type { AbilityState } from '@interfaces/combat';
-import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { InvaderId } from '@interfaces/content-invader';
 import type { Branded } from '@interfaces/identifiable';
 import type { CombatantId } from '@interfaces/invasion';
@@ -17,16 +16,6 @@ export type InvaderStats = {
   attack: number;
   defense: number;
   speed: number;
-};
-
-export type InvaderDefinition = {
-  id: InvaderId;
-  name: string;
-  description: string;
-  invaderClass: InvaderClassType;
-  baseStats: InvaderStats;
-  combatAbilityIds: CombatAbilityId[];
-  sprite: string;
 };
 
 export type StatusEffect = {

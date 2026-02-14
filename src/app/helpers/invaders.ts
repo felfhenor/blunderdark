@@ -1,14 +1,11 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
-import type {
-  AbilityEffectDefinition,
-  CombatAbility,
-  IsContentItem,
-} from '@interfaces';
-import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { IsContentItem } from '@interfaces';
+import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
+import type { InvaderContent } from '@interfaces/content-invader';
 import type {
   AbilityResult,
-  InvaderDefinition,
   InvaderInstance,
   InvaderInstanceId,
 } from '@interfaces/invader';
@@ -16,21 +13,20 @@ import type { CombatantId } from '@interfaces/invasion';
 
 // --- Content access ---
 
-export function invaderGetAllDefinitions(): (InvaderDefinition &
-  IsContentItem)[] {
-  return contentGetEntriesByType<InvaderDefinition & IsContentItem>('invader');
+export function invaderGetAllDefinitions(): InvaderContent[] {
+  return contentGetEntriesByType<InvaderContent>('invader');
 }
 
 export function invaderGetDefinitionById(
   id: string,
-): (InvaderDefinition & IsContentItem) | undefined {
-  return contentGetEntry<InvaderDefinition & IsContentItem>(id);
+): InvaderContent | undefined {
+  return contentGetEntry<InvaderContent>(id);
 }
 
 // --- Instance creation ---
 
 export function invaderCreateInstance(
-  definition: InvaderDefinition,
+  definition: InvaderContent,
 ): InvaderInstance {
   return {
     id: rngUuid<InvaderInstanceId>(),
@@ -39,7 +35,7 @@ export function invaderCreateInstance(
     maxHp: definition.baseStats.hp,
     statusEffects: [],
     abilityStates: definition.combatAbilityIds.map((abilityName) => {
-      const ability = contentGetEntry<CombatAbility & IsContentItem>(
+      const ability = contentGetEntry<CombatAbilityContent & IsContentItem>(
         abilityName,
       );
       return {
@@ -61,7 +57,7 @@ export function invaderCreateInstance(
  */
 export function invaderResolveAbility(
   invader: InvaderInstance,
-  ability: CombatAbility,
+  ability: CombatAbilityContent,
   targetIds: CombatantId[],
   rng: () => number = Math.random,
 ): AbilityResult | undefined {
@@ -70,7 +66,7 @@ export function invaderResolveAbility(
   if (!state || state.currentCooldown > 0) return undefined;
 
   // Look up effect definition by ability's effectType (name-based lookup)
-  const effect = contentGetEntry<AbilityEffectDefinition & IsContentItem>(
+  const effect = contentGetEntry<AbilityEffectContent & IsContentItem>(
     ability.effectType,
   );
   if (!effect) return undefined;

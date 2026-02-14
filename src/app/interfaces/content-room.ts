@@ -33,4 +33,29 @@ export type RoomContent = IsContentItem &
     objectiveTypes?: string[];
     trainingAdjacencyEffects?: { timeReduction?: number; statBonus?: number };
     throneAdjacencyEffects?: { goldProductionBonus?: number };
+    spawnRate?: number;
+    spawnType?: string;
+    spawnCapacity?: number;
+    breedingAdjacencyEffects?: {
+      hybridTimeReduction?: number;
+      mutationOddsBonus?: number;
+      researchBonus?: number;
+    };
+    summoningAdjacencyEffects?: {
+      summonTimeReduction?: number;
+      summonStatBonus?: number;
+    };
+    forgingAdjacencyEffects?: {
+      forgingSpeedBonus?: number;
+      forgingStatBonus?: number;
+      forgingEffectivenessBonus?: number;
+    };
+    alchemyAdjacencyEffects?: {
+      alchemySpeedBonus?: number;
+      alchemyCostReduction?: number;
+    };
+    tortureAdjacencyEffects?: {
+      tortureSpeedBonus?: number;
+      tortureConversionBonus?: number;
+    };
   };

@@ -24,15 +24,14 @@ import {
   researchUnlockGetRequiredResearchName,
 } from '@helpers';
 import type {
-  InhabitantDefinition,
-  IsContentItem,
   ResourceType,
   RoomUpgradePath,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type RecruitableEntry = {
-  def: InhabitantDefinition & IsContentItem;
+  def: InhabitantContent;
   affordable: boolean;
   locked: boolean;
   researchLocked: boolean;
@@ -147,7 +146,7 @@ export class PanelAltarComponent {
     }
   }
 
-  public async onRecruit(def: InhabitantDefinition): Promise<void> {
+  public async onRecruit(def: InhabitantContent): Promise<void> {
     const result = await recruitmentRecruit(def);
     if (result.success) {
       notifySuccess(`Recruited ${def.name}!`);

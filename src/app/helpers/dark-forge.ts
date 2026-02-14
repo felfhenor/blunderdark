@@ -15,10 +15,10 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
 } from '@interfaces';
-import { Subject } from 'rxjs';
+import type { RoomContent } from '@interfaces/content-room';
 import type { DarkForgeCompletedEvent } from '@interfaces/forge';
+import { Subject } from 'rxjs';
 
 // --- Constants ---
 
@@ -80,7 +80,7 @@ export function darkForgeGetCraftingTicks(
 
   // Check adjacent rooms for forgingAdjacencyEffects.forgingSpeedBonus
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.forgingAdjacencyEffects?.forgingSpeedBonus) {
       ticks = Math.round(ticks * (1 - adjDef.forgingAdjacencyEffects.forgingSpeedBonus));
     }
@@ -111,7 +111,7 @@ export function darkForgeGetStatBonuses(
   // Apply adjacency stat bonus (flat +N to all stats)
   let adjacencyBonus = 0;
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.forgingAdjacencyEffects?.forgingStatBonus) {
       adjacencyBonus += adjDef.forgingAdjacencyEffects.forgingStatBonus;
     }

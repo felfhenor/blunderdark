@@ -4,7 +4,6 @@ import type {
   Floor,
   FloorId,
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -17,6 +16,7 @@ import type {
   RoomUpgradePath,
   UpgradePathId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
 
@@ -106,7 +106,7 @@ vi.mock('@helpers/room-shapes', () => ({
 
 // --- Inhabitant definitions ---
 
-const goblinDef: InhabitantDefinition & IsContentItem = {
+const goblinDef: InhabitantContent = {
   id: GOBLIN_ID as InhabitantId,
   name: 'Goblin',
   __type: 'inhabitant',
@@ -121,7 +121,7 @@ const goblinDef: InhabitantDefinition & IsContentItem = {
   rulerFearLevel: 0,
 };
 
-const koboldDef: InhabitantDefinition & IsContentItem = {
+const koboldDef: InhabitantContent = {
   id: KOBOLD_ID as InhabitantId,
   name: 'Kobold',
   __type: 'inhabitant',
@@ -136,7 +136,7 @@ const koboldDef: InhabitantDefinition & IsContentItem = {
   rulerFearLevel: 0,
 };
 
-const skeletonDef: InhabitantDefinition & IsContentItem = {
+const skeletonDef: InhabitantContent = {
   id: SKELETON_ID as InhabitantId,
   name: 'Skeleton',
   __type: 'inhabitant',

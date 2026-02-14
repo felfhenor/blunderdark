@@ -6,7 +6,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 - **NEVER hardcode content UUIDs in TypeScript code.** All room IDs, trap IDs, invader IDs, etc. are assigned at build time from YAML. Code must not reference specific content items by their UUID.
 - **Use `roomRoleFindById(role)` from `room-roles.ts`** to look up rooms that have special gameplay logic (e.g., `'altar'`, `'throne'`, `'trainingGrounds'`, `'trapWorkshop'`). The `role` field is set in `gamedata/room/base.yml`.
-- **Use data fields on `RoomDefinition`** to drive behavior: `timeOfDayBonus`, `biomeBonuses`, `invasionProfile`, `objectiveTypes`, `trainingAdjacencyEffects`, `throneAdjacencyEffects`. Add new optional fields when rooms need new behavior — don't match on IDs.
+- **Use data fields on `RoomContent`** to drive behavior: `timeOfDayBonus`, `biomeBonuses`, `invasionProfile`, `objectiveTypes`, `trainingAdjacencyEffects`, `throneAdjacencyEffects`. Add new optional fields when rooms need new behavior — don't match on IDs.
 - **Synergies are defined in `gamedata/synergy/base.yml`**, loaded via `contentGetEntriesByType('synergy')` — not hardcoded in TypeScript.
 - **In spec files**, define test-local arbitrary UUID constants — these are not hardcoded production references, they're test fixtures.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()` in Node.js.
@@ -18,6 +18,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - Helper files that need types should `import type { ... } from '@interfaces/...'` (or from a specific interface file like `@interfaces/room-placement`).
 - When adding a new type for a helper feature, create a corresponding file in `src/app/interfaces/` (e.g., `src/app/interfaces/pathfinding.ts` for pathfinding types) and export it from the `@interfaces` barrel (`src/app/interfaces/index.ts`).
 - Interface files may import from other interface files (e.g., `import type { BiomeType } from '@interfaces/biome'`) but NEVER from `@helpers/`.
+- **Content types use `Content` suffix** — gamedata-backed types live in `src/app/interfaces/content-*.ts` files and are named `XContent` (e.g., `RoomContent`, `InhabitantContent`, `TrapContent`, `InvaderContent`, `CombatAbilityContent`, `AbilityEffectContent`). The old `XDefinition` suffix is no longer used. Runtime types (instances, state) remain in their own interface files without the `Content` suffix.
 
 ## Circular Dependency Avoidance
 
@@ -158,8 +159,8 @@ When multiple placement modes are mutually exclusive (stairs, elevators, portals
 ## Room & Production System
 
 - `PlacedRoom` type in `room-shape.ts` includes `roomTypeId` linking to the content definition — when adding fields to this type, update all test PlacedRoom literals in `room-shapes.spec.ts`
-- `RoomDefinition` type in `room.ts` includes `production: RoomProduction`, `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`, `isUnique: boolean`, `maxInhabitants: number` (-1 = unlimited), `inhabitantRestriction: string | undefined`, `fearLevel: number | 'variable'`
-- When adding fields to `RoomDefinition`, also update `ensureRoom()` in `content-initializers.ts` with defaults — the initializer is what populates missing fields from YAML
+- `RoomContent` type in `room.ts` includes `production: RoomProduction`, `requiresWorkers: boolean`, `adjacencyBonuses: AdjacencyBonus[]`, `isUnique: boolean`, `maxInhabitants: number` (-1 = unlimited), `inhabitantRestriction: string | undefined`, `fearLevel: number | 'variable'`
+- When adding fields to `RoomContent`, also update `ensureRoom()` in `content-initializers.ts` with defaults — the initializer is what populates missing fields from YAML
 - `roomPlacementIsUniqueTypePlaced(floors, roomTypeId)` checks all floors for an existing room of that type — used for dungeon-wide unique constraint enforcement
 - `roomPlacementPlacedTypeIds` computed signal exposes the set of room type IDs placed across all floors — reactive for UI bindings
 - Unique room enforcement is at the data level (`roomPlacementExecute`) and the UI level (`panel-room-select` disables button with tooltip)
@@ -167,15 +168,15 @@ When multiple placement modes are mutually exclusive (stairs, elevators, portals
 - `productionGetRoomDefinition(roomTypeId)` returns `undefined` for non-existent types — callers must check
 - Room YAML lives in `gamedata/room/base.yml` — 13 rooms defined with varying production rates, costs, and adjacency bonuses
 - `productionCalculateInhabitantBonus(placedRoom, inhabitants)` returns `{ bonus, hasWorkers }` — bonus is additive sum of `(workerEfficiency - 1.0)` + `production_bonus` trait effectValues per assigned inhabitant
-- `InhabitantDefinition` content type is `'inhabitant'` — loaded from `gamedata/inhabitant/base.yml` via ContentService; includes `restrictionTags: string[]` for room assignment restrictions
-- `restrictionTags` on `InhabitantDefinition` matches against `inhabitantRestriction` on `RoomDefinition` — if restriction is null, any inhabitant allowed; otherwise tag must be in the array
-- When adding fields to `InhabitantDefinition`, also update `ensureInhabitant()` in `content-initializers.ts` with defaults
+- `InhabitantContent` content type is `'inhabitant'` — loaded from `gamedata/inhabitant/base.yml` via ContentService; includes `restrictionTags: string[]` for room assignment restrictions
+- `restrictionTags` on `InhabitantContent` matches against `inhabitantRestriction` on `RoomContent` — if restriction is null, any inhabitant allowed; otherwise tag must be in the array
+- When adding fields to `InhabitantContent`, also update `ensureInhabitant()` in `content-initializers.ts` with defaults
 - `inhabitantCanAssignToRoom(def, roomDef, assignedCount)` checks restriction then capacity; `inhabitantGetEligible(allDefs, roomDef)` filters to eligible definitions
 - `inhabitantAssignToRoom(instanceId, roomId, roomTypeId)` enforces restrictions at the data level before updating state; `inhabitantUnassignFromRoom(instanceId)` clears assignedRoomId
-- `rulerBonuses: Record<string, number>` on `InhabitantDefinition` defines dungeon-wide bonuses for unique rulers — keys are bonus types (attack, fear, researchSpeed, fluxProduction, corruptionGeneration, invaderMorale), values are percentage modifiers
+- `rulerBonuses: Record<string, number>` on `InhabitantContent` defines dungeon-wide bonuses for unique rulers — keys are bonus types (attack, fear, researchSpeed, fluxProduction, corruptionGeneration, invaderMorale), values are percentage modifiers
 - `throne-room.ts` helper: `throneRoomFind(floors)` uses `roomRoleFindById('throne')` to locate the throne, `throneRoomGetSeatedRulerInstance(floor, roomId)` finds the assigned inhabitant, `throneRoomGetActiveRulerBonuses(floors)` returns the seated ruler's bonus record
 - Unique ruler creatures (Dragon, Lich, Demon Lord) are tier 4 with `restrictionTags: ['unique']` — they have `rulerBonuses`, `rulerFearLevel`, but empty `traits` since their bonuses are dungeon-wide, not room-specific
-- `rulerFearLevel: number` on `InhabitantDefinition` — the fear level this ruler provides (Dragon=4, Lich=3, Demon Lord=5); `throneRoomGetFearLevel(floors)` returns null if no throne, 1 (THRONE_ROOM_EMPTY_FEAR_LEVEL) if empty, or ruler's value
+- `rulerFearLevel: number` on `InhabitantContent` — the fear level this ruler provides (Dragon=4, Lich=3, Demon Lord=5); `throneRoomGetFearLevel(floors)` returns null if no throne, 1 (THRONE_ROOM_EMPTY_FEAR_LEVEL) if empty, or ruler's value
 - TypeScript `Record<string, number>` properties must use bracket notation (`bonuses['attack']`) not dot notation in strict mode — TS4111 error otherwise
 - `throneRoomGetPositionalBonuses(floors)` returns `ThronePositionalBonuses` — checks adjacent rooms for `throneAdjacencyEffects.goldProductionBonus` (data-driven, set in YAML), and checks central placement for ruler bonus multiplier
 - `throneRoomIsRoomCentral(anchorX, anchorY, shapeWidth, shapeHeight, gridSize, threshold)` — pure function using Manhattan distance from room center to grid center; threshold=5 for Throne Room
@@ -253,14 +254,14 @@ The room placement preview system uses module-level signals in `room-placement.t
 ## Altar Room & Auto-Placement
 
 - `altarRoomAutoPlace(floor)` finds all rooms with `autoPlace: true` and places them centered on the grid — called during `worldgenGenerateWorld()`
-- `removable: boolean` field on `RoomDefinition` — `roomPlacementIsRemovable(roomTypeId)` in `room-placement.ts` checks this before allowing removal
-- `autoPlace: boolean` field on `RoomDefinition` — rooms with `autoPlace: true` are excluded from the build panel and auto-placed during world generation
-- `fearReductionAura: number` field on `RoomDefinition` — base aura value, overridden by upgrade `fearReductionAura` effect type
+- `removable: boolean` field on `RoomContent` — `roomPlacementIsRemovable(roomTypeId)` in `room-placement.ts` checks this before allowing removal
+- `autoPlace: boolean` field on `RoomContent` — rooms with `autoPlace: true` are excluded from the build panel and auto-placed during world generation
+- `fearReductionAura: number` field on `RoomContent` — base aura value, overridden by upgrade `fearReductionAura` effect type
 - Altar uses sequential upgrade levels (1→2→3) on the existing mutually-exclusive `appliedUpgradePathId` system — `altarRoomGetLevel()` reads the `upgradeLevel` field from upgrade path definitions, `altarRoomApplyUpgrade()` validates level ordering
 - `altarRoomGetEffectiveFearLevel(floor, room, baseFearLevel)` reduces fear for rooms adjacent to the Altar — returns 'variable' unchanged, otherwise clamps to 0
 - `altarRoomIsAdjacent(floor, room)` uses `adjacencyAreRoomsAdjacent()` from adjacency.ts — checks edge-sharing between room tiles and Altar tiles
 - `panel-altar` component follows same pattern as `panel-throne-room` — shows when selected tile is the Altar, displays level/aura/recruitment/upgrade UI
-- When adding new fields to `RoomDefinition`, update defaults in `ensureRoom()` AND update all mock `RoomDefinition` objects in test files (mushroom-grove.spec.ts, inhabitants.spec.ts, etc.)
+- When adding new fields to `RoomContent`, update defaults in `ensureRoom()` AND update all mock `RoomContent` objects in test files (mushroom-grove.spec.ts, inhabitants.spec.ts, etc.)
 
 ## Room Removal System
 
@@ -472,7 +473,7 @@ When multiple build modes exist (room placement, hallway build):
 ## Pre-existing Test Typecheck Fixes
 
 - `GridTile` mock objects in spec files need `occupiedBy: 'room'` and `hallwayId: null` — these fields were added to the interface but not all test mocks were updated
-- `RoomDefinition` mock objects need `removable: true`, `fearReductionAura: 0`, `autoPlace: false` — same pattern, fields added to interface but test mocks lagged
+- `RoomContent` mock objects need `removable: true`, `fearReductionAura: 0`, `autoPlace: false` — same pattern, fields added to interface but test mocks lagged
 - `ContentType` union in `identifiable.ts` is the source of truth — test files using fictional types ('armor', 'skill', 'guardian') will fail typecheck; use valid types ('trinket', 'pet', 'monster')
 - When adding new fields to interfaces, grep for test mock objects across all spec files and update them
 
@@ -523,7 +524,7 @@ When multiple build modes exist (room placement, hallway build):
 
 - `synergy.ts` implements a data-driven synergy system — synergy definitions are loaded from `gamedata/synergy/base.yml` via `contentGetEntriesByType('synergy')`
 - 5 condition types: `roomType`, `adjacentRoomType`, `connectedRoomType`, `inhabitantType`, `minInhabitants` — evaluated per-room using pure functions
-- `synergyEvaluateAll(floors, synergies?)` returns `Map<string, SynergyDefinition[]>` mapping roomId → active synergies — builds adjacency map internally per floor
+- `synergyEvaluateAll(floors, synergies?)` returns `Map<string, SynergyContent[]>` mapping roomId → active synergies — builds adjacency map internally per floor
 - `synergyActiveMap` computed signal caches results, re-evaluates when `gamestate()` changes — no explicit invalidation needed
 - `synergyGetActive(roomId)` convenience function reads from the computed signal
 - To add new synergies, add entries to `gamedata/synergy/base.yml` — no code changes needed
@@ -546,7 +547,7 @@ When multiple build modes exist (room placement, hallway build):
 - `TRAINING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes of training)
 - Training fields on `InhabitantInstance` are **optional** (`trained?`, `trainingProgress?`, `trainingBonuses?`) — avoids breaking 13+ spec files that create inhabitant mocks
 - `inhabitantDeserialize()` provides defaults for training fields via `??` — backwards-compatible with saved data that predates training
-- Training adjacency effects are data-driven via `trainingAdjacencyEffects` field on `RoomDefinition` — `timeReduction` reduces training time, `statBonus` adds to all training stats. Set in `gamedata/room/base.yml` on rooms like Barracks and Altar.
+- Training adjacency effects are data-driven via `trainingAdjacencyEffects` field on `RoomContent` — `timeReduction` reduces training time, `statBonus` adds to all training stats. Set in `gamedata/room/base.yml` on rooms like Barracks and Altar.
 - `trainingGetAdjacentRoomTypeIds(room, floor, tileMap?)` returns a Set of adjacent room type IDs — reusable for any room-specific adjacency checks
 - New upgrade effect types: `trainingAttackBonus`, `trainingTimeMultiplier`, `trainingDefenseBonus` — handled in training.ts, transparent to existing room-upgrades.ts
 - `trainingCompleted$` observable emits on training completion — subscribe in a service for notifications
@@ -555,7 +556,7 @@ When multiple build modes exist (room placement, hallway build):
 ## Trap System
 
 - Trap definitions in `gamedata/trap/base.yml` — 5 types: Pit, Arrow, Rune, Magic, Fear Glyph
-- `TrapDefinition` (content type) vs `TrapInstance` (runtime placed trap) vs `TrapInventoryEntry` (unplaced inventory)
+- `TrapContent` (content type) vs `TrapInstance` (runtime placed trap) vs `TrapInventoryEntry` (unplaced inventory)
 - `TrapInstance` stored per-floor in `Floor.traps: TrapInstance[]` — similar to `Floor.hallways`
 - `TrapInventoryEntry[]` stored in `GameStateWorld.trapInventory` — player's unplaced trap stock
 - Trap placement: hallway tiles only, max 1 trap per tile, validated via `trapCanPlace(floor, tileX, tileY)`
@@ -585,7 +586,7 @@ When multiple build modes exist (room placement, hallway build):
 - Spawning Pool room is found via `roomRoleFindById('spawningPool')` — no hardcoded ID
 - `SPAWNING_POOL_DEFAULT_RATE = GAME_TIME_TICKS_PER_MINUTE * 5` (25 ticks = 5 game-minutes between spawns)
 - Timer state stored on `PlacedRoom.spawnTicksRemaining?: number` — per-room instance state, not global
-- Room config stored on `RoomDefinition`: `spawnRate?: number`, `spawnType?: string`, `spawnCapacity?: number` — data-driven from YAML
+- Room config stored on `RoomContent`: `spawnRate?: number`, `spawnType?: string`, `spawnCapacity?: number` — data-driven from YAML
 - Capacity checks unassigned inhabitants globally (not per-pool) — `spawningPoolCountUnassigned()` filters `assignedRoomId === undefined`
 - `spawningPoolCreateInhabitant(def)` creates full `InhabitantInstance` with random name suffix via `rngChoice()`
 - After spawning, `floor.inhabitants` must be synced with `state.world.inhabitants` — same dual-location pattern as hunger system
@@ -597,11 +598,11 @@ When multiple build modes exist (room placement, hallway build):
 ## Invader System
 
 - Invader definitions in `gamedata/invader/base.yml` — 6 classes: Warrior, Rogue, Mage, Cleric, Paladin, Ranger
-- `InvaderDefinition` (content type) vs `InvaderInstance` (runtime with HP, status effects, ability states)
+- `InvaderContent` (content type) vs `InvaderInstance` (runtime with HP, status effects, ability states)
 - `InvaderInstance.abilityStates: AbilityState[]` — reuses the same AbilityState type from combat system
 - `InvaderInstance.statusEffects: StatusEffect[]` — tracks named effects with durations (shielded, marked, courage, etc.)
 - `invaderResolveAbility(invader, ability, targetIds, rng)` — pure function returning `AbilityResult | undefined`
-- Invader abilities are CombatAbility entries referencing AbilityEffectDefinition by name via `effectType`
+- Invader abilities are `CombatAbilityContent` entries referencing `AbilityEffectContent` by name via `effectType`
 - **Mock content collision warning**: When mocking `@helpers/content` in tests, do NOT register abilities by name if effect names overlap (e.g., "Scout" effect vs "Scout" ability) — register abilities by ID only
 - `invaderCreateInstance(definition)` looks up ability IDs via `contentGetEntry` to initialize ability states
 - Cooldown/status helpers: `invaderApplyCooldown`, `invaderTickCooldowns`, `invaderApplyStatusEffect`, `invaderTickStatusEffects`, `invaderHasStatusEffect`, `invaderClearStatusEffects`, `invaderApplyHealing`
@@ -641,7 +642,7 @@ When multiple build modes exist (room placement, hallway build):
 - Composition weights stored in YAML: `gamedata/invasion/composition-weights.yml` — content type `'invasion'`
 - Weight profiles: balanced (all equal), highCorruption (Paladin+Cleric), highWealth (Rogue+Warrior), highKnowledge (Mage+Ranger)
 - `invasionCompositionGetWeights(profile, config)` — if any dimension >60, uses corresponding weight profile; multiple highs get averaged
-- `invasionCompositionSelectParty(profile, defs, weights, seed)` — pure function returning `InvaderDefinition[]`, testable without content mocks
+- `invasionCompositionSelectParty(profile, defs, weights, seed)` — pure function returning `InvaderContent[]`, testable without content mocks
 - Party size: 3-5 (≤10 rooms), 6-10 (11-25 rooms), 11-15 (26+ rooms)
 - Constraints: at least 1 warrior, no class >50% of party, balanced profiles have 3+ unique classes
 - For statistical composition tests, run 50 iterations and check aggregate ratios (>40% threshold)
@@ -650,10 +651,10 @@ When multiple build modes exist (room placement, hallway build):
 ### Invasion Objectives System
 
 - `invasion-objectives.ts` helper: `invasionObjectiveAssign(state, seed)` returns 1 primary (DestroyAltar) + 2 secondary objectives
-- Objective eligibility is data-driven via `objectiveTypes` field on `RoomDefinition` — rooms declare which objective types they support in YAML
+- Objective eligibility is data-driven via `objectiveTypes` field on `RoomContent` — rooms declare which objective types they support in YAML
 - Primary objective (DestroyAltar) uses `roomRoleFindById('altar')` to locate the target
 - 7 secondary templates: SlayMonster, StealTreasure, DefileLibrary, SealPortal, PlunderVault, RescuePrisoner, ScoutDungeon
-- SlayMonster targets tier 2+ inhabitants — must look up `InhabitantDefinition` via `contentGetEntry()` since `InhabitantInstance` has no `tier` field
+- SlayMonster targets tier 2+ inhabitants — must look up `InhabitantContent` via `contentGetEntry()` since `InhabitantInstance` has no `tier` field
 - `InhabitantInstance` uses `instanceId` (NOT `id`) for targeting
 - `invasionObjectiveResolveOutcome(objectives)` — altar destroyed = defeat (multiplier 0); victory = 1.0 + 0.25 per prevented - 0.25 per completed secondary
 - When mocking `@helpers/content` for inhabitant tier lookups, use a `Map<string, unknown>` and `registerInhabitantDefs()` helper
@@ -693,7 +694,7 @@ When multiple build modes exist (room placement, hallway build):
 
 - `state-modifiers.ts` helper: per-creature state modifier lookup with fallback defaults
 - `StateModifier` type: `productionMultiplier`, `foodConsumptionMultiplier`, optional `attackMultiplier`, `defenseMultiplier`
-- `InhabitantDefinition` has optional `fearTolerance?: number` and `stateModifiers?: Partial<Record<InhabitantState, StateModifier>>`
+- `InhabitantContent` has optional `fearTolerance?: number` and `stateModifiers?: Partial<Record<InhabitantState, StateModifier>>`
 - `stateModifierIsInhabitantScared(inhabitant, roomFearLevel)`: scared when fear > tolerance. `STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT = 2`
 - `stateModifierGet(definitionId, state)`: returns creature-specific modifier or fallback default
 - `stateModifierCalculatePerCreatureProduction(assignedInhabitants)`: averages per-creature production multipliers (replaces old flat state multiplication)
@@ -706,7 +707,7 @@ When multiple build modes exist (room placement, hallway build):
 - `ProductionModifierContext`: `{ roomTypeId, floorDepth, floorBiome, hour }` — all data needed to evaluate modifiers
 - `productionModifierCalculate(context)` — multiplies all registry modifiers together, returns combined multiplier
 - `productionModifierEvaluate(context)` — returns array of active modifier results for UI display
-- Time-of-day and biome bonuses are read from `timeOfDayBonus` and `biomeBonuses` fields on `RoomDefinition` — not hardcoded
+- Time-of-day and biome bonuses are read from `timeOfDayBonus` and `biomeBonuses` fields on `RoomContent` — not hardcoded
 - `productionModifierGetBiomeBonus(biome, roomTypeId)` — pure function returning multiplier (1.0 + bonus). Exported for direct use.
 - Production pipeline: `productionCalculateTotal(floors, hour?)` — optional `hour` param. When omitted, env modifiers = 1.0
 
@@ -732,7 +733,7 @@ When multiple build modes exist (room placement, hallway build):
 - `dayNightCalculateCreatureProductionModifierPure(hour, creatureTypes)` pure version for testing without content dependency
 - Both resource and creature modifiers are applied in the production pipeline alongside envModifier and depthModifier — all multiplicative
 - Day/night modifiers only apply when `hour` is provided to production functions (same pattern as envModifier)
-- `InhabitantDefinition.type` field identifies creature types: 'creature', 'undead', 'fungal', 'ooze', 'dragon', 'demon' — used for creature-type modifiers
+- `InhabitantContent.type` field identifies creature types: 'creature', 'undead', 'fungal', 'ooze', 'dragon', 'demon' — used for creature-type modifiers
 - Active modifiers displayed as badges in `PanelResourcesComponent` below the resource bar
 
 ## Season-Specific Bonuses
@@ -754,7 +755,7 @@ When multiple build modes exist (room placement, hallway build):
 
 - `hunger.ts` helper: tick-based food consumption and hunger state management
 - File-to-prefix: `hunger.ts` → `hunger` / `HUNGER`
-- `foodConsumptionRate` on `InhabitantDefinition` is in "food per game-hour" units — converted to per-tick via `rate / HUNGER_TICKS_PER_HOUR` (300 ticks/hour)
+- `foodConsumptionRate` on `InhabitantContent` is in "food per game-hour" units — converted to per-tick via `rate / HUNGER_TICKS_PER_HOUR` (300 ticks/hour)
 - `hungerProcess(state)` runs each tick BEFORE `productionProcess(state)` so production penalties apply immediately
 - Inappetent inhabitants (`foodConsumptionRate <= 0`) are always 'normal' — Skeleton and Lich are inappetent (undead don't eat)
 - Hunger state transition: normal → hungry (30 game-minutes without food) → starving (60 game-minutes)
@@ -804,8 +805,8 @@ When adding build-time validation for a content type:
 
 - `fear-level.ts` helper: per-room effective fear calculation with breakdown (base, inhabitant modifier, upgrade adjustment, altar aura reduction, propagated fear)
 - File-to-prefix: `fear-level.ts` → `fearLevel` / `FEAR_LEVEL`
-- `fearModifier` on `InhabitantDefinition` — positive values increase room fear (Skeleton=1, Dragon=2, Lich=1, Demon Lord=2), negative values decrease it (Myconid=-1), zero for common workers (Goblin, Kobold, Slime)
-- `fearPropagationDistance` on `InhabitantDefinition` — how far this inhabitant extends fear propagation from its room (default 1). Dragon=2, Demon Lord=2, all others=1
+- `fearModifier` on `InhabitantContent` — positive values increase room fear (Skeleton=1, Dragon=2, Lich=1, Demon Lord=2), negative values decrease it (Myconid=-1), zero for common workers (Goblin, Kobold, Slime)
+- `fearPropagationDistance` on `InhabitantContent` — how far this inhabitant extends fear propagation from its room (default 1). Dragon=2, Demon Lord=2, all others=1
 - `FearLevelBreakdown` type: `{ baseFear, inhabitantModifier, upgradeAdjustment, altarAuraReduction, propagatedFear, propagationSources, effectiveFear }` — all components of the fear calculation
 - `FearPropagationSource` type: `{ sourceRoomId, sourceRoomName, amount }` — identifies where propagated fear comes from
 - `fearLevelBreakdownMap` computed signal returns `Map<string, FearLevelBreakdown>` for all rooms across all floors — reads `gamestate()` so it auto-updates
@@ -858,7 +859,7 @@ When adding build-time validation for a content type:
 - Corruption already existed as a `ResourceType` — the corruption-resource feature added dedicated helper functions, level tracking, and enhanced UI
 - **Corruption generation has two separate pipelines:**
   - **Room-based**: corruption production values in room YAML (e.g., `corruption: 0.4` on Soul Well) flow through the standard `productionProcess` pipeline — no special code needed, just YAML data
-  - **Inhabitant-based**: `corruptionGeneration` field on `InhabitantDefinition` (per-minute rate) is processed by `corruptionGenerationProcess(state)` — a separate function called in gameloop.ts after productionProcess
+  - **Inhabitant-based**: `corruptionGeneration` field on `InhabitantContent` (per-minute rate) is processed by `corruptionGenerationProcess(state)` — a separate function called in gameloop.ts after productionProcess
 - `corruptionGenerationCalculateInhabitantRate(inhabitants, lookupDef?)` accepts optional lookup function for testability — defaults to `contentGetEntry` in production, injectable in tests
 - `corruptionGenerationProcess(state)` mutates state in-place (same pattern as productionProcess, hungerProcess) — applies day/night modifier via `dayNightGetResourceModifier()`
 - `corruptionGenerationCalculateTotalPerMinute(inhabitantRatePerTick, roomRatePerTick)` combines both pipelines for UI display
@@ -918,7 +919,7 @@ When adding build-time validation for a content type:
 - `breedingCreateHybrid(parentA, parentB, recipe, statBonusMultiplier)` averages parent stats + applies recipe `statBonuses` — creates full `InhabitantInstance` with `isHybrid: true` and `hybridParentIds`
 - Mutation outcomes: positive (60%, +20% to random stat), neutral (25%, no change), negative (15%, -15% to random stat) — weighted roll via cumulative threshold
 - `mutated: boolean` flag on `InhabitantInstance` prevents re-mutation; `mutationBonuses` stores stat changes
-- Adjacency effects are data-driven via `breedingAdjacencyEffects` field on `RoomDefinition` — `hybridTimeReduction`, `mutationOddsBonus`, `researchBonus`
+- Adjacency effects are data-driven via `breedingAdjacencyEffects` field on `RoomContent` — `hybridTimeReduction`, `mutationOddsBonus`, `researchBonus`
 - `breedingGetAdjacentRoomTypeIds(room, floor)` reuses `roomShapeResolve`/`roomShapeGetAbsoluteTiles`/`adjacencyAreRoomsAdjacent` — same adjacency pattern as training/production
 - `breedingCompleted$` / `mutationCompleted$` RxJS Subjects for cross-cutting event notifications — same pattern as `trainingCompleted$`, `spawningPoolSpawn$`
 - Upgrade effect types: `breedingTimeReduction` (reduces hybrid creation time), `mutationOddsBonus` (improves positive mutation chance), `breedingCapacityBonus` (increases max inhabitants)
@@ -940,7 +941,7 @@ When adding build-time validation for a content type:
 - Recipe tier gating: base rooms only see `tier: 'rare'`; Greater Summoning upgrade unlocks `tier: 'advanced'` via `summonTierUnlock` effect
 - Temporary inhabitants auto-despawn when `temporaryTicksRemaining <= 0` — Binding Mastery upgrade applies `summonDurationMultiplier: 1.5`
 - **Critical**: newly created temporary inhabitants must NOT have their timer decremented on the same tick they spawn — track `newTemporaryIds` Set and skip in expiry loop
-- Adjacency effects are data-driven via `summoningAdjacencyEffects` field on `RoomDefinition` — `summonTimeReduction` (Library, -25%) and `summonStatBonus` (Soul Well, +2)
+- Adjacency effects are data-driven via `summoningAdjacencyEffects` field on `RoomContent` — `summonTimeReduction` (Library, -25%) and `summonStatBonus` (Soul Well, +2)
 - `summoningCompleted$` / `summoningExpired$` RxJS Subjects for cross-cutting event notifications — same pattern as breeding/training/spawning
 - Upgrade effect types: `summonTierUnlock` (unlocks advanced recipes), `summonDurationMultiplier` (longer temp helpers), `summonStatBonus` (flat stat bonus)
 - When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/room-upgrades`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
@@ -957,7 +958,7 @@ When adding build-time validation for a content type:
 - `ForgeInventoryEntry[]` stored in `GameStateWorld.forgeInventory` — completed crafted items
 - Recipe tier gating: base rooms see `tier: 'basic'`; Infernal Forge upgrade unlocks `tier: 'advanced'` via `forgingTierUnlock` effect
 - Worker speed bonus: same as trap workshop — each additional worker beyond first reduces time by 20%, capped at 0.4 multiplier
-- Adjacency effects are data-driven via `forgingAdjacencyEffects` field on `RoomDefinition` — `forgingSpeedBonus` (Crystal Mine, 0.30), `forgingStatBonus` (Training Grounds, +1), `forgingEffectivenessBonus` (Trap Workshop, 0.20)
+- Adjacency effects are data-driven via `forgingAdjacencyEffects` field on `RoomContent` — `forgingSpeedBonus` (Crystal Mine, 0.30), `forgingStatBonus` (Training Grounds, +1), `forgingEffectivenessBonus` (Trap Workshop, 0.20)
 - Upgrade effect types: `forgingSpeedMultiplier` (Master Forge, -25% time), `forgingTierUnlock` (Infernal Forge, unlocks advanced), `forgingStatBonus` (Infernal Forge, +2 all stats), `maxInhabitantBonus` (Master Forge, +2 capacity)
 - `darkForgeCompleted$` RxJS Subject for cross-cutting event notifications — same pattern as training/spawning/breeding/summoning
 - When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`
@@ -975,7 +976,7 @@ When adding build-time validation for a content type:
 - `inputConsumed` boolean on `AlchemyConversion` tracks whether resources were consumed for the current cycle — prevents double consumption
 - Recipe tier gating: base rooms only see `tier: 'basic'`; Advanced Alchemy upgrade unlocks `tier: 'advanced'` via `alchemyTierUnlock` effect
 - Worker speed scaling: 25% reduction per extra worker beyond first, capped at 0.5 multiplier (different from Dark Forge/Trap Workshop which use 20%/0.4)
-- Adjacency effects are data-driven via `alchemyAdjacencyEffects` field on `RoomDefinition` — `alchemySpeedBonus` (Crystal Mine, 0.20), `alchemyCostReduction` (Mushroom Grove, 0.15)
+- Adjacency effects are data-driven via `alchemyAdjacencyEffects` field on `RoomContent` — `alchemySpeedBonus` (Crystal Mine, 0.20), `alchemyCostReduction` (Mushroom Grove, 0.15)
 - Upgrade effect types: `alchemyCostMultiplier` (Efficient Distillation, 0.6×), `alchemyTierUnlock` (Advanced Alchemy, unlocks advanced recipes), `maxInhabitantBonus` (Expanded Capacity, +2)
 - `alchemyLabCompleted$` RxJS Subject for cross-cutting event notifications — subscription-based testing fails with `vi.mock` + `await import()`, use side-effect verification instead
 - When mocking for tests: mock `@helpers/content`, `@helpers/room-roles`, `@helpers/rng`, `@helpers/room-shapes`, `@helpers/adjacency`; use `vi.mocked(contentGetEntriesByType)` pattern (not `require()`)
@@ -1230,6 +1231,6 @@ export type {Type}Content = IsContentItem &
 - **`TortureJob` on `PlacedRoom`** — follows same pattern as `BreedingJob`, `MutationJob`, `SummonJob`: `{ prisonerId, action, ticksRemaining, targetTicks }`. Job types: `'extract'` (research gain) and `'convert'` (new inhabitant).
 - **Conversion success rates** match `CONVERT_SUCCESS_RATES` in `invasion-rewards.ts` — warrior 30%, rogue 50%, mage 20%, cleric 10%, paladin 5%, ranger 35%. The torture chamber replicates these as `TORTURE_CONVERT_SUCCESS_RATES`.
 - **Converted Prisoner inhabitant** has `restrictionTags: ['converted']` to exclude from recruitment panel, `workerEfficiency: 0.80` (-20% penalty), and `corruptionGeneration: 0.1`.
-- **`tortureAdjacencyEffects`** — new optional field on `RoomDefinition` with `tortureSpeedBonus` and `tortureConversionBonus`. Added to Soul Well (speed +15%) and Barracks (conversion +10%).
+- **`tortureAdjacencyEffects`** — new optional field on `RoomContent` with `tortureSpeedBonus` and `tortureConversionBonus`. Added to Soul Well (speed +15%) and Barracks (conversion +10%).
 - **Extra corruption during processing** — `TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING = 0.12` added directly to `corruption.current` each tick while a job is active.
 - **When adding new fields to `GameStateWorld`**, 16 spec files have `makeGameState` helpers that need updating. Some older spec files (invasion, hunger, corruption) were missing `forgeInventory`, `forgeCraftingQueues`, and `alchemyConversions` — add all missing fields when touching them.

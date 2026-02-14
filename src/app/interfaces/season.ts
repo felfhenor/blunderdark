@@ -21,14 +21,6 @@ export type SeasonBonusModifier = {
   description: string;
 };
 
-export type SeasonBonusDefinition = {
-  season: Season;
-  description: string;
-  resourceModifiers: SeasonBonusModifier[];
-  recruitmentCostMultiplier: number;
-  flags: string[];
-};
-
 export type SeasonTransitionEvent = {
   previousSeason: Season;
   newSeason: Season;

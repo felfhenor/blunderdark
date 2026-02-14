@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
-import type { InhabitantDefinition, InhabitantInstance, IsContentItem, PlacedRoomId } from '@interfaces';
+import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { DayNightPhase, DayNightResourceModifier, DayNightCreatureModifier } from '@interfaces/day-night';
 
 // --- Constants ---
@@ -139,7 +140,7 @@ export function dayNightCalculateCreatureProductionModifier(
   let weightedSum = 0;
 
   for (const inhabitant of assigned) {
-    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantContent>(
       inhabitant.definitionId,
     );
     if (!def) {

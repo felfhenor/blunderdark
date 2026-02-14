@@ -10,8 +10,8 @@ import type {
   ResearchId,
   ResearchNode,
   ResearchState,
-  RoomDefinition,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { Subject } from 'rxjs';
 
 /** Base progress per tick before modifiers */
@@ -148,7 +148,7 @@ export function researchCalculateSpeedModifier(
   let bonus = 0;
 
   // Library room bonus: rooms that produce 'research' resource
-  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomContent>('room');
   const researchRoomTypeIds = new Set(
     rooms
       .filter((r) => r.production && r.production['research'])

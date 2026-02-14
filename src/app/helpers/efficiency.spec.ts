@@ -181,18 +181,16 @@ vi.mock('@helpers/state-game', () => ({
 
 import type {
   FloorId,
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantTrait,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
   RoomProduction,
   RoomShapeId,
 } from '@interfaces';
-import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import {
   efficiencyCalculateInhabitantContribution,
   efficiencyCalculateMatchedInhabitantBonus,
@@ -205,8 +203,8 @@ import { gamestate } from '@helpers/state-game';
 import { contentGetEntry } from '@helpers/content';
 
 // Helper to get a definition from the mock
-function getDef(id: string): InhabitantDefinition & IsContentItem {
-  return contentGetEntry<InhabitantDefinition & IsContentItem>(id)!;
+function getDef(id: string): InhabitantContent {
+  return contentGetEntry<InhabitantContent>(id)!;
 }
 
 describe('efficiencyGetTraits', () => {

@@ -1,11 +1,10 @@
 import { contentGetEntry } from '@helpers/content';
 import type {
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantState,
-  IsContentItem,
   StateModifier,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 // --- Default fallback modifiers (backwards-compatible with old flat STATE_MODIFIERS) ---
 
@@ -43,7 +42,7 @@ export function stateModifierIsInhabitantScared(
   inhabitant: InhabitantInstance,
   roomFearLevel: number,
 ): boolean {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantContent>(
     inhabitant.definitionId,
   );
   const tolerance = def?.fearTolerance ?? STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT;
@@ -57,7 +56,7 @@ export function stateModifierIsInhabitantScared(
 export function stateModifierGetFearTolerance(
   definitionId: string,
 ): number {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  const def = contentGetEntry<InhabitantContent>(definitionId);
   return def?.fearTolerance ?? STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT;
 }
 
@@ -71,7 +70,7 @@ export function stateModifierGet(
   definitionId: string,
   state: InhabitantState,
 ): StateModifier {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  const def = contentGetEntry<InhabitantContent>(definitionId);
   const creatureModifier = def?.stateModifiers?.[state];
   if (creatureModifier) return creatureModifier;
   return STATE_MODIFIER_DEFAULTS[state];

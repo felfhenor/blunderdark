@@ -13,11 +13,10 @@ import type {
   RoomShapeId,
   RoomUpgradePath,
   TrapCraftingQueue,
-  TrapDefinition,
-  TrapId,
   TrapInventoryEntry,
   UpgradePathId,
 } from '@interfaces';
+import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
@@ -80,7 +79,7 @@ vi.mock('@helpers/room-roles', () => ({
 
 // --- Trap definitions ---
 
-const pitTrapDef: TrapDefinition & IsContentItem = {
+const pitTrapDef: TrapContent = {
   id: PIT_TRAP_ID as TrapId,
   name: 'Pit Trap',
   __type: 'trap',
@@ -95,7 +94,7 @@ const pitTrapDef: TrapDefinition & IsContentItem = {
   sprite: 'trap-pit',
 };
 
-const arrowTrapDef: TrapDefinition & IsContentItem = {
+const arrowTrapDef: TrapContent = {
   id: ARROW_TRAP_ID as TrapId,
   name: 'Arrow Trap',
   __type: 'trap',

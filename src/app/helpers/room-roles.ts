@@ -1,10 +1,11 @@
 import { contentGetEntriesByType } from '@helpers/content';
-import type { IsContentItem, RoomDefinition, RoomId } from '@interfaces';
+import type { RoomId } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 
 let roleCache: Map<string, RoomId> | undefined = undefined;
 
 function buildRoleCache(): Map<string, RoomId> {
-  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomContent>('room');
   const map = new Map<string, RoomId>();
   for (const room of rooms) {
     if (room.role) {

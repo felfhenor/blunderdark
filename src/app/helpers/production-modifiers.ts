@@ -1,5 +1,6 @@
 import { contentGetEntriesByType } from '@helpers/content';
-import type { BiomeType, IsContentItem, RoomDefinition, RoomId } from '@interfaces';
+import type { BiomeType, RoomId } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import type { ProductionModifierContext, ProductionModifierResult, ProductionModifierDefinition } from '@interfaces/production-modifier';
 
 // --- Constants ---
@@ -14,7 +15,7 @@ let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | und
 let biomeMap: Map<string, Map<string, number>> | undefined = undefined;
 
 function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
-  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomContent>('room');
   const day = new Map<string, number>();
   const night = new Map<string, number>();
   for (const room of rooms) {
@@ -37,7 +38,7 @@ function getTimeOfDayMap(): { day: Map<string, number>; night: Map<string, numbe
 }
 
 function buildBiomeMap(): Map<string, Map<string, number>> {
-  const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+  const rooms = contentGetEntriesByType<RoomContent>('room');
   const map = new Map<string, Map<string, number>>();
   for (const room of rooms) {
     if (room.biomeBonuses) {

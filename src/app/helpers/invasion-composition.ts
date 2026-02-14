@@ -10,11 +10,11 @@ import type {
   GameState,
   InvaderClassWeights,
   IsContentItem,
-  RoomDefinition,
 } from '@interfaces';
+import type { InvaderContent } from '@interfaces/content-invader';
+import type { RoomContent } from '@interfaces/content-room';
 import type {
   InvaderClassType,
-  InvaderDefinition,
   InvaderInstance,
 } from '@interfaces/invader';
 import seedrandom from 'seedrandom';
@@ -41,7 +41,7 @@ function invasionCompositionGetProfileMap(): Map<
   { dimension: string; weight: number }
 > {
   if (!invasionProfileCache) {
-    const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>('room');
+    const rooms = contentGetEntriesByType<RoomContent>('room');
     invasionProfileCache = new Map();
     for (const room of rooms) {
       if (room.invasionProfile) {
@@ -192,16 +192,16 @@ export function invasionCompositionGetPartySize(roomCount: number, rng: () => nu
  */
 export function invasionCompositionSelectParty(
   profile: DungeonProfile,
-  invaderDefs: InvaderDefinition[],
+  invaderDefs: InvaderContent[],
   weights: InvaderClassWeights,
   seed: string,
-): InvaderDefinition[] {
+): InvaderContent[] {
   const rng = seedrandom(seed);
   const partySize = invasionCompositionGetPartySize(profile.size, rng);
   const maxPerClass = Math.floor(partySize * 0.5);
 
   // Group definitions by class
-  const defsByClass = new Map<InvaderClassType, InvaderDefinition[]>();
+  const defsByClass = new Map<InvaderClassType, InvaderContent[]>();
   for (const cls of INVADER_CLASSES) {
     defsByClass.set(
       cls,
@@ -217,7 +217,7 @@ export function invasionCompositionSelectParty(
     paladin: 0,
     ranger: 0,
   };
-  const party: InvaderDefinition[] = [];
+  const party: InvaderContent[] = [];
 
   // Guarantee at least one warrior
   const warriors = defsByClass.get('warrior') ?? [];
@@ -289,8 +289,8 @@ function weightedClassSelect(
  * Replace duplicate-class members to ensure at least 3 unique classes.
  */
 function ensureClassDiversity(
-  party: InvaderDefinition[],
-  defsByClass: Map<InvaderClassType, InvaderDefinition[]>,
+  party: InvaderContent[],
+  defsByClass: Map<InvaderClassType, InvaderContent[]>,
   classCounts: Record<InvaderClassType, number>,
 ): void {
   const uniqueClasses = new Set(party.map((d) => d.invaderClass));

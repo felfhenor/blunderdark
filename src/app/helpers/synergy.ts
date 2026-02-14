@@ -7,19 +7,18 @@ import { gamestate } from '@helpers/state-game';
 import type {
   Connection,
   Floor,
-  InhabitantDefinition,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
   SynergyCondition,
-  SynergyDefinition,
   TileOffset,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { SynergyContent } from '@interfaces/content-synergy';
 import type { PotentialSynergy } from '@interfaces/synergy';
 
-export function synergyGetDefinitions(): SynergyDefinition[] {
-  return contentGetEntriesByType<SynergyDefinition & IsContentItem>('synergy');
+export function synergyGetDefinitions(): SynergyContent[] {
+  return contentGetEntriesByType<SynergyContent>('synergy');
 }
 
 function buildAdjacencyMap(
@@ -100,7 +99,7 @@ export function synergyEvaluateCondition(
         (i) => i.assignedRoomId === room.id,
       );
       return assigned.some((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return def?.type === condition.inhabitantType;
@@ -123,8 +122,8 @@ export function synergyEvaluateForRoom(
   room: PlacedRoom,
   floor: Floor,
   adjacentRoomIds: string[],
-  synergies?: SynergyDefinition[],
-): SynergyDefinition[] {
+  synergies?: SynergyContent[],
+): SynergyContent[] {
   const defs = synergies ?? synergyGetDefinitions();
   return defs.filter((synergy) =>
     synergy.conditions.every((c) =>
@@ -135,9 +134,9 @@ export function synergyEvaluateForRoom(
 
 export function synergyEvaluateAll(
   floors: Floor[],
-  synergies?: SynergyDefinition[],
-): Map<string, SynergyDefinition[]> {
-  const result = new Map<string, SynergyDefinition[]>();
+  synergies?: SynergyContent[],
+): Map<string, SynergyContent[]> {
+  const result = new Map<string, SynergyContent[]>();
 
   for (const floor of floors) {
     const adjacencyMap = buildAdjacencyMap(floor);
@@ -162,7 +161,7 @@ export function synergyEvaluateAll(
 
 export function synergyGetActive(
   roomId: PlacedRoomId,
-): SynergyDefinition[] {
+): SynergyContent[] {
   return synergyActiveMap().get(roomId) ?? [];
 }
 
@@ -193,7 +192,7 @@ export function synergyGetPotentialForRoom(
   room: PlacedRoom,
   floor: Floor,
   adjacentRoomIds: string[],
-  synergies?: SynergyDefinition[],
+  synergies?: SynergyContent[],
 ): PotentialSynergy[] {
   const defs = synergies ?? synergyGetDefinitions();
   const potentials: PotentialSynergy[] = [];
@@ -228,7 +227,7 @@ export function synergyGetPotentialForRoom(
 }
 
 export function synergyFormatEffect(
-  effect: SynergyDefinition['effects'][0],
+  effect: SynergyContent['effects'][0],
 ): string {
   if (effect.type === 'productionBonus') {
     const pct = Math.round(effect.value * 100);

@@ -10,14 +10,13 @@ import { gamestate } from '@helpers/state-game';
 import { throneRoomGetFearLevel } from '@helpers/throne-room';
 import type {
   Floor,
-  InhabitantDefinition,
   InhabitantInstance,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   TileOffset,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { FearPropagationSource, FearLevelBreakdown } from '@interfaces/fear';
 
 // --- Constants ---
@@ -56,7 +55,7 @@ export function fearLevelCalculateInhabitantModifier(
   for (const inhabitant of inhabitants) {
     if (inhabitant.assignedRoomId !== roomId) continue;
 
-    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantContent>(
       inhabitant.definitionId,
     );
     if (!def) continue;
@@ -130,7 +129,7 @@ export function fearLevelGetMaxPropagationDistance(
   for (const inhabitant of inhabitants) {
     if (inhabitant.assignedRoomId !== roomId) continue;
 
-    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantContent>(
       inhabitant.definitionId,
     );
     if (!def) continue;
@@ -241,7 +240,7 @@ export function fearLevelCalculateAllPropagation(
 export function fearLevelGetForRoom(
   floor: Floor,
   placedRoom: PlacedRoom,
-  roomDef: RoomDefinition,
+  roomDef: RoomContent,
   throneRoomFear?: number,
 ): FearLevelBreakdown {
   const baseFear =

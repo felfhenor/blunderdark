@@ -2,12 +2,11 @@ import { contentGetEntry } from '@helpers/content';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
 } from '@interfaces';
 import type { AssignmentValidation } from '@interfaces/assignment';
+import type { RoomContent } from '@interfaces/content-room';
 
 /**
  * Check whether a given room (by roomId) can accept another inhabitant.
@@ -26,7 +25,7 @@ export function assignmentCanAssignToRoom(roomId: PlacedRoomId): AssignmentValid
     return { allowed: false, reason: 'Room not found', currentCount: 0, maxCapacity: 0 };
   }
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
   if (!roomDef) {
     return { allowed: false, reason: 'Unknown room type', currentCount: 0, maxCapacity: 0 };
   }
@@ -84,7 +83,7 @@ export function assignmentGetRoomInfo(
 
   if (!placedRoom) return undefined;
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(placedRoom.roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
   if (!roomDef) return undefined;
 
   const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(placedRoom, roomDef);

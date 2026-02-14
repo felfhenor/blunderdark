@@ -12,10 +12,10 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
 } from '@interfaces';
-import { Subject } from 'rxjs';
 import type { AlchemyLabCompletedEvent } from '@interfaces/alchemy';
+import type { RoomContent } from '@interfaces/content-room';
+import { Subject } from 'rxjs';
 
 // --- Constants ---
 
@@ -67,7 +67,7 @@ export function alchemyLabGetConversionTicks(
 
   // Check adjacent rooms for alchemyAdjacencyEffects.alchemySpeedBonus
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.alchemyAdjacencyEffects?.alchemySpeedBonus) {
       ticks = Math.round(ticks * (1 - adjDef.alchemyAdjacencyEffects.alchemySpeedBonus));
     }
@@ -96,7 +96,7 @@ export function alchemyLabGetEffectiveCost(
 
   // Apply adjacency cost reduction
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.alchemyAdjacencyEffects?.alchemyCostReduction) {
       costMultiplier *= (1 - adjDef.alchemyAdjacencyEffects.alchemyCostReduction);
     }

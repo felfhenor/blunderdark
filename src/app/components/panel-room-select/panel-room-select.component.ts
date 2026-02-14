@@ -26,7 +26,8 @@ import {
   researchUnlockIsUnlocked,
   researchUnlockGetRequiredResearchName,
 } from '@helpers';
-import type { IsContentItem, RoomDefinition, RoomId, RoomShape } from '@interfaces';
+import type { IsContentItem, RoomId, RoomShape } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -38,7 +39,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    contentGetEntriesByType<RoomDefinition & IsContentItem>('room').filter(
+    contentGetEntriesByType<RoomContent>('room').filter(
       (r) => !r.autoPlace,
     ),
   );
@@ -59,40 +60,40 @@ export class PanelRoomSelectComponent {
     return this.selectedId() === roomId;
   }
 
-  public isAffordable(room: RoomDefinition): boolean {
+  public isAffordable(room: RoomContent): boolean {
     return resourceCanAfford(room.cost);
   }
 
-  public isUniqueAndPlaced(room: RoomDefinition): boolean {
+  public isUniqueAndPlaced(room: RoomContent): boolean {
     if (!room.isUnique) return false;
     return this.roomPlacementPlacedTypeIds().has(room.id as RoomId);
   }
 
-  public isResearchLocked(room: RoomDefinition): boolean {
+  public isResearchLocked(room: RoomContent): boolean {
     if (!researchUnlockIsResearchGated('room', room.id)) return false;
     return !researchUnlockIsUnlocked('room', room.id);
   }
 
-  public getResearchRequirement(room: RoomDefinition): string {
+  public getResearchRequirement(room: RoomContent): string {
     const name = researchUnlockGetRequiredResearchName('room', room.id);
     return name ? `Requires: ${name}` : '';
   }
 
-  public isBiomeRestricted(room: RoomDefinition): boolean {
+  public isBiomeRestricted(room: RoomContent): boolean {
     const floor = floorCurrent();
     if (!floor) return false;
     const result = biomeRestrictionCanBuild(room.id as RoomId, floor.biome, floor);
     return !result.allowed;
   }
 
-  public getBiomeRestrictionTooltip(room: RoomDefinition): string {
+  public getBiomeRestrictionTooltip(room: RoomContent): string {
     const floor = floorCurrent();
     if (!floor) return '';
     const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
     return info.reason ?? '';
   }
 
-  public getBiomeLimitLabel(room: RoomDefinition): string | undefined {
+  public getBiomeLimitLabel(room: RoomContent): string | undefined {
     const floor = floorCurrent();
     if (!floor) return undefined;
     const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
@@ -103,20 +104,20 @@ export class PanelRoomSelectComponent {
   }
 
   public getRoomShapeForPreview(
-    room: RoomDefinition,
+    room: RoomContent,
   ): (RoomShape & IsContentItem) | undefined {
     return roomShapeGet(room.shapeId);
   }
 
   public getCostEntries(
-    room: RoomDefinition,
+    room: RoomContent,
   ): { type: string; amount: number }[] {
     return Object.entries(room.cost)
       .filter(([, amount]) => amount && amount > 0)
       .map(([type, amount]) => ({ type, amount: amount as number }));
   }
 
-  private getEffectiveShape(room: RoomDefinition): RoomShape | undefined {
+  private getEffectiveShape(room: RoomContent): RoomShape | undefined {
     const base = roomShapeGet(room.shapeId);
     if (!base) return undefined;
     if (this.isSelected(room.id)) {
@@ -126,14 +127,14 @@ export class PanelRoomSelectComponent {
   }
 
   public getShapeTiles(
-    room: RoomDefinition,
+    room: RoomContent,
   ): { x: number; y: number; key: string }[] {
     const shape = this.getEffectiveShape(room);
     if (!shape) return [];
     return shape.tiles.map((t) => ({ x: t.x, y: t.y, key: `${t.x},${t.y}` }));
   }
 
-  public getShapeGridSize(room: RoomDefinition): number {
+  public getShapeGridSize(room: RoomContent): number {
     const shape = this.getEffectiveShape(room);
     if (!shape) return 1;
     let max = 0;
@@ -144,7 +145,7 @@ export class PanelRoomSelectComponent {
     return max + 1;
   }
 
-  public selectRoom(room: RoomDefinition): void {
+  public selectRoom(room: RoomContent): void {
     if (this.isSelected(room.id)) {
       roomPlacementExitMode();
       return;

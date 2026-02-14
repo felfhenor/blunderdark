@@ -1,6 +1,5 @@
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -10,6 +9,7 @@ import type {
   RoomId,
   RoomShapeId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockInhabitants: InhabitantInstance[];
@@ -192,10 +192,11 @@ describe('inhabitant serialization', () => {
 // --- Test helpers for restriction tests ---
 
 function createTestInhabitantDef(
-  overrides: Partial<InhabitantDefinition> = {},
-): InhabitantDefinition {
+  overrides: Partial<InhabitantContent> = {},
+): InhabitantContent {
   return {
     id: 'def-goblin' as InhabitantId,
+    __type: 'inhabitant',
     name: 'Goblin',
     type: 'creature',
     tier: 1,

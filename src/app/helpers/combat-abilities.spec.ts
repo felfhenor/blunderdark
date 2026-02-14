@@ -1,10 +1,10 @@
 import type {
-  AbilityEffectDefinition,
   AbilityState,
-  CombatAbility,
   CombatAbilityId,
   CombatUnit,
 } from '@interfaces';
+import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent } from '@interfaces/content-combatability';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -19,9 +19,9 @@ import {
 
 // --- Effect definitions (mirrors gamedata/abilityeffect/base.yml) ---
 
-const effectDefinitions: Record<string, AbilityEffectDefinition> = {
+const effectDefinitions: Record<string, AbilityEffectContent> = {
   Damage: {
-    id: 'ae000001-0000-4000-a000-000000000001',
+    id: 'ae000001-0000-4000-a000-000000000001' as AbilityEffectId,
     name: 'Damage',
     __type: 'abilityeffect',
     dealsDamage: true,
@@ -29,7 +29,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     overrideTargetsHit: undefined,
   },
   Stun: {
-    id: 'ae000001-0000-4000-a000-000000000002',
+    id: 'ae000001-0000-4000-a000-000000000002' as AbilityEffectId,
     name: 'Stun',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -37,7 +37,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     overrideTargetsHit: undefined,
   },
   'Buff Attack': {
-    id: 'ae000001-0000-4000-a000-000000000003',
+    id: 'ae000001-0000-4000-a000-000000000003' as AbilityEffectId,
     name: 'Buff Attack',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -45,7 +45,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     overrideTargetsHit: undefined,
   },
   'Buff Defense': {
-    id: 'ae000001-0000-4000-a000-000000000004',
+    id: 'ae000001-0000-4000-a000-000000000004' as AbilityEffectId,
     name: 'Buff Defense',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -53,7 +53,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     overrideTargetsHit: undefined,
   },
   Evasion: {
-    id: 'ae000001-0000-4000-a000-000000000005',
+    id: 'ae000001-0000-4000-a000-000000000005' as AbilityEffectId,
     name: 'Evasion',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -61,7 +61,7 @@ const effectDefinitions: Record<string, AbilityEffectDefinition> = {
     overrideTargetsHit: 0,
   },
   Resurrect: {
-    id: 'ae000001-0000-4000-a000-000000000006',
+    id: 'ae000001-0000-4000-a000-000000000006' as AbilityEffectId,
     name: 'Resurrect',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -97,8 +97,8 @@ function makeUnit(overrides: Partial<CombatUnit> = {}): CombatUnit {
   };
 }
 
-const breathWeapon: CombatAbility = {
-  id: 'ability-breath-weapon',
+const breathWeapon: CombatAbilityContent = {
+  id: 'ability-breath-weapon' as CombatAbilityId,
   name: 'Breath Weapon',
   __type: 'combatability',
   description: 'AOE fire damage',
@@ -110,8 +110,8 @@ const breathWeapon: CombatAbility = {
   duration: 0,
 };
 
-const petrifyingGaze: CombatAbility = {
-  id: 'ability-petrifying-gaze',
+const petrifyingGaze: CombatAbilityContent = {
+  id: 'ability-petrifying-gaze' as CombatAbilityId,
   name: 'Petrifying Gaze',
   __type: 'combatability',
   description: 'Stuns a single target',
@@ -123,8 +123,8 @@ const petrifyingGaze: CombatAbility = {
   duration: 3,
 };
 
-const wraithEvasion: CombatAbility = {
-  id: 'ability-intangible',
+const wraithEvasion: CombatAbilityContent = {
+  id: 'ability-intangible' as CombatAbilityId,
   name: 'Intangible',
   __type: 'combatability',
   description: '50% chance to evade physical attacks',
@@ -136,8 +136,8 @@ const wraithEvasion: CombatAbility = {
   duration: 0,
 };
 
-const berserkRage: CombatAbility = {
-  id: 'ability-berserk-rage',
+const berserkRage: CombatAbilityContent = {
+  id: 'ability-berserk-rage' as CombatAbilityId,
   name: 'Berserk Rage',
   __type: 'combatability',
   description: '+100% attack when below 50% HP',
@@ -149,8 +149,8 @@ const berserkRage: CombatAbility = {
   duration: 0, // lasts until combat ends
 };
 
-const lichShield: CombatAbility = {
-  id: 'ability-shield',
+const lichShield: CombatAbilityContent = {
+  id: 'ability-shield' as CombatAbilityId,
   name: 'Arcane Shield',
   __type: 'combatability',
   description: '+50% defense for 3 turns',
@@ -162,8 +162,8 @@ const lichShield: CombatAbility = {
   duration: 3,
 };
 
-const deathBolt: CombatAbility = {
-  id: 'ability-death-bolt',
+const deathBolt: CombatAbilityContent = {
+  id: 'ability-death-bolt' as CombatAbilityId,
   name: 'Death Bolt',
   __type: 'combatability',
   description: 'Single target 200% magic damage',

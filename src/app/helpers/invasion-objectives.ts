@@ -3,10 +3,9 @@ import { rngShuffle, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import type {
   GameState,
-  InhabitantDefinition,
-  IsContentItem,
-  RoomDefinition,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type {
   InvasionObjective,
   InvasionObjectiveId,
@@ -18,7 +17,7 @@ import seedrandom from 'seedrandom';
 // --- Helpers ---
 
 function invasionObjectiveGetInhabitantTier(definitionId: string): number {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantContent>(
     definitionId,
   );
   return def?.tier ?? 1;
@@ -30,7 +29,7 @@ let objectiveTypeCache: Map<string, string[]> | undefined = undefined;
 
 function invasionObjectiveGetTypeMap(): Map<string, string[]> {
   if (!objectiveTypeCache) {
-    const rooms = contentGetEntriesByType<RoomDefinition & IsContentItem>(
+    const rooms = contentGetEntriesByType<RoomContent>(
       'room',
     );
     objectiveTypeCache = new Map();

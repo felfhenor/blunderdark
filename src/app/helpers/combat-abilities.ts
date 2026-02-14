@@ -1,11 +1,11 @@
 import type {
   AbilityActivation,
-  AbilityEffectDefinition,
   AbilityState,
-  CombatAbility,
   CombatAbilityId,
   CombatUnit,
 } from '@interfaces';
+import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent } from '@interfaces/content-combatability';
 
 import { contentGetEntry } from '@helpers/content';
 
@@ -13,7 +13,7 @@ import { contentGetEntry } from '@helpers/content';
  * Create initial ability states for a set of abilities (all off cooldown).
  */
 export function combatAbilityInitStates(
-  abilities: CombatAbility[],
+  abilities: CombatAbilityContent[],
 ): AbilityState[] {
   return abilities.map((a) => ({
     abilityId: a.id as CombatAbilityId,
@@ -57,7 +57,7 @@ export function combatAbilityTickStates(
  * Check if an ability is ready to use (off cooldown).
  */
 export function combatAbilityIsReady(
-  ability: CombatAbility,
+  ability: CombatAbilityContent,
   states: AbilityState[],
 ): boolean {
   const state = states.find((s) => s.abilityId === ability.id);
@@ -66,13 +66,13 @@ export function combatAbilityIsReady(
 }
 
 /**
- * Look up the AbilityEffectDefinition for an ability's effectType.
- * effectType on CombatAbility stores the name of the effect (e.g. "Damage").
+ * Look up the AbilityEffectContent for an ability's effectType.
+ * effectType on CombatAbilityContent stores the name of the effect (e.g. "Damage").
  */
 function getEffectDefinition(
-  ability: CombatAbility,
-): AbilityEffectDefinition | undefined {
-  return contentGetEntry<AbilityEffectDefinition>(ability.effectType);
+  ability: CombatAbilityContent,
+): AbilityEffectContent | undefined {
+  return contentGetEntry<AbilityEffectContent>(ability.effectType);
 }
 
 /**
@@ -80,7 +80,7 @@ function getEffectDefinition(
  * Returns null if the ability doesn't proc or is on cooldown.
  */
 export function combatAbilityTryActivate(
-  ability: CombatAbility,
+  ability: CombatAbilityContent,
   states: AbilityState[],
   attacker: CombatUnit,
   targetCount: number,
@@ -147,7 +147,7 @@ export function combatAbilityTryActivate(
  * Returns true if the attack is evaded.
  */
 export function combatAbilityCheckEvasion(
-  abilities: CombatAbility[],
+  abilities: CombatAbilityContent[],
   states: AbilityState[],
   rng: () => number,
 ): boolean {
@@ -168,7 +168,7 @@ export function combatAbilityCheckEvasion(
  */
 export function combatAbilityApplyBerserkBuff(
   baseAttack: number,
-  abilities: CombatAbility[],
+  abilities: CombatAbilityContent[],
   states: AbilityState[],
   unit: CombatUnit,
 ): number {
@@ -192,7 +192,7 @@ export function combatAbilityApplyBerserkBuff(
  */
 export function combatAbilityApplyShieldBuff(
   baseDefense: number,
-  abilities: CombatAbility[],
+  abilities: CombatAbilityContent[],
   states: AbilityState[],
 ): number {
   const shieldAbility = abilities.find((a) => {

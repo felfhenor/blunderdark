@@ -15,10 +15,9 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InvaderClassType,
-  IsContentItem,
   PlacedRoom,
-  RoomDefinition,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import type {
   TortureConversionCompleteEvent,
   TortureExtractionCompleteEvent,
@@ -85,7 +84,7 @@ export function tortureGetExtractionTicks(
   }
 
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.tortureAdjacencyEffects?.tortureSpeedBonus) {
       ticks = Math.round(
         ticks * (1 - adjDef.tortureAdjacencyEffects.tortureSpeedBonus),
@@ -113,7 +112,7 @@ export function tortureGetConversionTicks(
   }
 
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.tortureAdjacencyEffects?.tortureSpeedBonus) {
       ticks = Math.round(
         ticks * (1 - adjDef.tortureAdjacencyEffects.tortureSpeedBonus),
@@ -143,7 +142,7 @@ export function tortureGetConversionRate(
   }
 
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.tortureAdjacencyEffects?.tortureConversionBonus) {
       rate += adjDef.tortureAdjacencyEffects.tortureConversionBonus;
     }

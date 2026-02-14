@@ -3,7 +3,8 @@ import { contentGetEntry } from '@helpers/content';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { GameState, InhabitantDefinition, InhabitantInstance, IsContentItem } from '@interfaces';
+import type { GameState, InhabitantInstance } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { CorruptionLevel } from '@interfaces/corruption';
 
 export const CORRUPTION_THRESHOLD_LOW = 0;
@@ -100,15 +101,15 @@ export function corruptionCanAfford(amount: number): boolean {
 
 /**
  * Calculate per-tick corruption generation from stationed inhabitants.
- * corruptionGeneration on InhabitantDefinition is in per-game-minute units.
+ * corruptionGeneration on InhabitantContent is in per-game-minute units.
  * Only stationed (assigned to a room) inhabitants generate corruption.
  */
 export function corruptionGenerationCalculateInhabitantRate(
   inhabitants: InhabitantInstance[],
-  lookupDef?: (id: string) => InhabitantDefinition | undefined,
+  lookupDef?: (id: string) => InhabitantContent | undefined,
 ): number {
   const lookup = lookupDef ?? ((id: string) =>
-    contentGetEntry<InhabitantDefinition & IsContentItem>(id));
+    contentGetEntry<InhabitantContent>(id));
 
   let totalPerMinute = 0;
   for (const inst of inhabitants) {

@@ -1,7 +1,6 @@
 import type { TrapId } from '@interfaces/content-trap';
 import type { HallwayId } from '@interfaces/hallway';
 import type { Branded } from '@interfaces/identifiable';
-import type { ResourceCost } from '@interfaces/resource';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type TrapEffectType =
@@ -9,20 +8,6 @@ export type TrapEffectType =
   | 'magic'
   | 'debuff'
   | 'fear';
-
-export type TrapDefinition = {
-  id: TrapId;
-  name: string;
-  description: string;
-  effectType: TrapEffectType;
-  damage: number;
-  duration: number;
-  charges: number;
-  craftCost: ResourceCost;
-  triggerChance: number;
-  canBeDisarmed: boolean;
-  sprite: string;
-};
 
 export type TrapInstanceId = Branded<string, 'TrapInstanceId'>;
 

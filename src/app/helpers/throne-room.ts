@@ -7,14 +7,14 @@ import { gamestate } from '@helpers/state-game';
 import {
   GRID_SIZE,
   type Floor,
-  type InhabitantDefinition,
   type InhabitantInstance,
   type IsContentItem,
   type PlacedRoom,
-  type RoomDefinition,
   type RoomShape,
   type RulerBonuses,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { ThronePositionalBonuses } from '@interfaces/throne';
 
 // --- Pure functions ---
@@ -55,8 +55,8 @@ export function throneRoomGetSeatedRulerInstance(
  */
 export function throneRoomGetRulerDefinition(
   instance: InhabitantInstance,
-): (InhabitantDefinition & IsContentItem) | undefined {
-  return contentGetEntry<InhabitantDefinition & IsContentItem>(instance.definitionId) ?? undefined;
+): InhabitantContent | undefined {
+  return contentGetEntry<InhabitantContent>(instance.definitionId) ?? undefined;
 }
 
 /**
@@ -207,7 +207,7 @@ export function throneRoomGetPositionalBonuses(
     const adjTiles = roomShapeGetAbsoluteTiles(adjShape, adjRoom.anchorX, adjRoom.anchorY);
     if (!adjacencyAreRoomsAdjacent(throneTiles, adjTiles)) continue;
 
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjRoom.roomTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjRoom.roomTypeId);
     if (adjDef?.throneAdjacencyEffects?.goldProductionBonus) {
       vaultAdjacent = true;
       goldProductionBonus += adjDef.throneAdjacencyEffects.goldProductionBonus;

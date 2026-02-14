@@ -16,7 +16,7 @@ import {
   throneRoomFearLevel,
   inhabitantUnassignFromRoom,
 } from '@helpers';
-import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-throne-room',
@@ -67,13 +67,13 @@ export class PanelThroneRoomComponent {
     return floor.inhabitants
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return def ? inhabitantMeetsRestriction(def, 'unique') : false;
       })
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };

@@ -3,11 +3,10 @@ import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifiers';
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantState,
-  IsContentItem,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { Subject } from 'rxjs';
 import type { HungerWarningLevel, HungerWarningEvent } from '@interfaces/hunger';
 
@@ -64,7 +63,7 @@ export function hungerIsInappetent(foodConsumptionRate: number): boolean {
  * Returns 0 if not defined (inappetent).
  */
 export function hungerGetConsumptionRate(definitionId: string): number {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
+  const def = contentGetEntry<InhabitantContent>(definitionId);
   return def?.foodConsumptionRate ?? 0;
 }
 

@@ -5,13 +5,12 @@ import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
-  RoomDefinition,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { SpawningPoolEvent } from '@interfaces/spawning-pool';
 import { Subject } from 'rxjs';
 
@@ -91,7 +90,7 @@ export function spawningPoolCountUnassigned(
  * Create a new inhabitant instance from a definition.
  */
 export function spawningPoolCreateInhabitant(
-  def: InhabitantDefinition & IsContentItem,
+  def: InhabitantContent,
 ): InhabitantInstance {
   const suffixes = [
     'the Bold',
@@ -125,7 +124,7 @@ export function spawningPoolProcess(state: GameState): void {
   const spawningPoolTypeId = roomRoleFindById('spawningPool');
   if (!spawningPoolTypeId) return;
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(
+  const roomDef = contentGetEntry<RoomContent>(
     spawningPoolTypeId,
   );
   if (!roomDef) return;
@@ -170,7 +169,7 @@ export function spawningPoolProcess(state: GameState): void {
 
         // Determine spawn type
         const spawnTypeName = spawningPoolGetSpawnType(room, baseSpawnType);
-        const spawnDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const spawnDef = contentGetEntry<InhabitantContent>(
           spawnTypeName,
         );
         if (!spawnDef) continue;

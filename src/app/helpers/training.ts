@@ -9,14 +9,13 @@ import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   GameState,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   RoomId,
   TileOffset,
   TrainingBonuses,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { Subject } from 'rxjs';
 import type { TrainingRoomInfo } from '@interfaces/training';
 
@@ -101,7 +100,7 @@ export function trainingGetTicksForRoom(
 
   // Check adjacent rooms for trainingAdjacencyEffects.timeReduction
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.trainingAdjacencyEffects?.timeReduction) {
       ticks = Math.round(ticks * (1 - adjDef.trainingAdjacencyEffects.timeReduction));
     }
@@ -132,7 +131,7 @@ export function trainingGetBonusesForRoom(
 
   // Check adjacent rooms for trainingAdjacencyEffects.statBonus
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.trainingAdjacencyEffects?.statBonus) {
       bonuses.defense += adjDef.trainingAdjacencyEffects.statBonus;
       bonuses.attack += adjDef.trainingAdjacencyEffects.statBonus;

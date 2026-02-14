@@ -5,14 +5,12 @@ import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { trapAddToInventory } from '@helpers/traps';
 import type {
   GameState,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   TrapCraftingJob,
   TrapCraftingQueue,
-  TrapDefinition,
-  TrapId,
 } from '@interfaces';
+import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type { ResourceCost } from '@interfaces/resource';
 import type { TrapWorkshopInfo } from '@interfaces/trap-workshop';
 
@@ -203,7 +201,7 @@ export function trapWorkshopGetInfo(
       roomId,
     );
 
-    const allTraps = contentGetEntriesByType<TrapDefinition & IsContentItem>('trap');
+    const allTraps = contentGetEntriesByType<TrapContent>('trap');
 
     return {
       placedRoom: room,
@@ -218,6 +216,6 @@ export function trapWorkshopGetInfo(
 
 export function trapWorkshopGetDefinitionById(
   trapTypeId: string,
-): (TrapDefinition & IsContentItem) | undefined {
-  return contentGetEntry<TrapDefinition & IsContentItem>(trapTypeId);
+): TrapContent | undefined {
+  return contentGetEntry<TrapContent>(trapTypeId);
 }

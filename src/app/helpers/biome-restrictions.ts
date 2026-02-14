@@ -1,6 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
-import type { BiomeType, Floor, IsContentItem, RoomDefinition, RoomId } from '@interfaces';
+import type { BiomeType, Floor, RoomId } from '@interfaces';
 import type { BiomeRestrictionRule, BiomeRestrictionResult } from '@interfaces/biome-restriction';
+import type { RoomContent } from '@interfaces/content-room';
 
 
 /**
@@ -60,7 +61,7 @@ export function biomeRestrictionCanBuild(
   biome: BiomeType,
   floor: Floor,
 ): BiomeRestrictionResult {
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { allowed: true };
 
   const restrictions = BIOME_RESTRICTION_MAP[biome];
@@ -103,7 +104,7 @@ export function biomeRestrictionGetRoomInfo(
   currentCount?: number;
   maxCount?: number;
 } {
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { restricted: false };
 
   const restrictions = BIOME_RESTRICTION_MAP[biome];

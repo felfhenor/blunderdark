@@ -1,7 +1,6 @@
 import type {
   Floor,
   FloorId,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -12,6 +11,7 @@ import type {
   RoomShape,
   RoomShapeId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants (test-local) ---
@@ -81,8 +81,8 @@ function createInhabitantInstance(
 }
 
 function createInhabitantDef(
-  overrides: Partial<InhabitantDefinition> = {},
-): InhabitantDefinition & IsContentItem {
+  overrides: Partial<InhabitantContent> = {},
+): InhabitantContent {
   return {
     id: 'def-dragon' as InhabitantId,
     name: 'Dragon',
@@ -103,7 +103,7 @@ function createInhabitantDef(
     rulerBonuses: { attack: 0.1, fear: 0.05 },
     rulerFearLevel: 4,
     ...overrides,
-  } as InhabitantDefinition & IsContentItem;
+  } as InhabitantContent;
 }
 
 function floorCreate(overrides: Partial<Floor> = {}): Floor {

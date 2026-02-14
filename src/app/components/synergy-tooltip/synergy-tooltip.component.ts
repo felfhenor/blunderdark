@@ -9,7 +9,7 @@ import {
 } from '@helpers';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
-import type { SynergyDefinition } from '@interfaces';
+import type { SynergyContent } from '@interfaces/content-synergy';
 import type { PotentialSynergy } from '@interfaces/synergy';
 
 @Component({
@@ -65,7 +65,7 @@ export class SynergyTooltipComponent {
     };
   });
 
-  public formatEffect(synergy: SynergyDefinition): string {
+  public formatEffect(synergy: SynergyContent): string {
     return synergy.effects.map((e) => synergyFormatEffect(e)).join(', ');
   }
 

@@ -170,9 +170,9 @@ import type {
   PlacedRoomId,
   RoomId,
   RoomShapeId,
-  SynergyDefinition,
   SynergyId,
 } from '@interfaces';
+import type { SynergyContent } from '@interfaces/content-synergy';
 import {
   synergyEvaluateCondition,
   synergyEvaluateAll,
@@ -473,9 +473,10 @@ describe('synergyEvaluateCondition', () => {
 });
 
 describe('synergyEvaluateForRoom', () => {
-  const testSynergies: SynergyDefinition[] = [
+  const testSynergies: SynergyContent[] = [
     {
       id: 'test-mine-forge' as SynergyId,
+      __type: 'synergy',
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -487,6 +488,7 @@ describe('synergyEvaluateForRoom', () => {
     },
     {
       id: 'test-forge-staff' as SynergyId,
+      __type: 'synergy',
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
@@ -569,8 +571,9 @@ describe('synergyEvaluateForRoom', () => {
   });
 
   it('should activate multiple synergies for same room when conditions met', () => {
-    const mineForgeMineSynergy: SynergyDefinition = {
+    const mineForgeMineSynergy: SynergyContent = {
       id: 'test-mine-adjacent' as SynergyId,
+      __type: 'synergy',
       name: 'Test Mine Adjacent',
       description: 'Mine near forge',
       conditions: [
@@ -601,9 +604,10 @@ describe('synergyEvaluateForRoom', () => {
 });
 
 describe('synergyEvaluateAll', () => {
-  const testSynergies: SynergyDefinition[] = [
+  const testSynergies: SynergyContent[] = [
     {
       id: 'test-mine-forge' as SynergyId,
+      __type: 'synergy',
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -673,9 +677,10 @@ describe('synergyEvaluateAll', () => {
 });
 
 describe('synergy re-evaluation scenarios', () => {
-  const testSynergies: SynergyDefinition[] = [
+  const testSynergies: SynergyContent[] = [
     {
       id: 'test-mine-forge-creature' as SynergyId,
+      __type: 'synergy',
       name: 'Test',
       description: 'Test',
       conditions: [
@@ -687,6 +692,7 @@ describe('synergy re-evaluation scenarios', () => {
     },
     {
       id: 'test-connected' as SynergyId,
+      __type: 'synergy',
       name: 'Test Connected',
       description: 'Test',
       conditions: [
@@ -900,9 +906,10 @@ describe('synergyFormatEffect', () => {
 });
 
 describe('synergyGetPotentialForRoom', () => {
-  const testSynergies: SynergyDefinition[] = [
+  const testSynergies: SynergyContent[] = [
     {
       id: 'test-mine-forge' as SynergyId,
+      __type: 'synergy',
       name: 'Test Mine Forge',
       description: 'Mine near forge with creature worker',
       conditions: [
@@ -914,6 +921,7 @@ describe('synergyGetPotentialForRoom', () => {
     },
     {
       id: 'test-forge-staff' as SynergyId,
+      __type: 'synergy',
       name: 'Test Forge Staff',
       description: 'Forge with 2+ workers',
       conditions: [
@@ -924,6 +932,7 @@ describe('synergyGetPotentialForRoom', () => {
     },
     {
       id: 'test-library-well' as SynergyId,
+      __type: 'synergy',
       name: 'Test Library Well',
       description: 'Library connected to well',
       conditions: [

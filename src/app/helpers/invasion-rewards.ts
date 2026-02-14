@@ -1,9 +1,8 @@
 import { contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
-import type { IsContentItem } from '@interfaces/identifiable';
+import type { InvaderContent } from '@interfaces/content-invader';
 import type {
   InvaderClassType,
-  InvaderDefinition,
   InvaderInstance,
 } from '@interfaces/invader';
 import type {
@@ -230,7 +229,7 @@ export function invasionRewardRollPrisonerCaptures(
 
   for (const invader of retreatingInvaders) {
     if (rng() < INVASION_REWARD_PRISONER_CAPTURE_CHANCE) {
-      const def = contentGetEntry<InvaderDefinition & IsContentItem>(
+      const def = contentGetEntry<InvaderContent>(
         invader.definitionId,
       );
       if (!def) continue;

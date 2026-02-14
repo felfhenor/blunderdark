@@ -3,20 +3,18 @@ import { rngUuid } from '@helpers/rng';
 import type {
   Floor,
   GameState,
-  IsContentItem,
-  TrapDefinition,
   TrapInstance,
   TrapInventoryEntry,
 } from '@interfaces';
-import type { TrapId } from '@interfaces/content-trap';
+import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type { TrapInstanceId, TrapTriggerResult } from '@interfaces/trap';
 
 // --- Trap Definition Lookup ---
 
 export function trapGetDefinition(
   trapTypeId: TrapId,
-): (TrapDefinition & IsContentItem) | undefined {
-  return contentGetEntry<TrapDefinition & IsContentItem>(trapTypeId);
+): TrapContent | undefined {
+  return contentGetEntry<TrapContent>(trapTypeId);
 }
 
 // --- Trap Inventory ---

@@ -12,36 +12,35 @@ import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   GameState,
-  InhabitantDefinition,
   InhabitantInstance,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   ResourceType,
-  RoomDefinition,
   RoomId,
   RoomProduction,
   Season,
   TileOffset,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { InhabitantBonusResult, ActiveAdjacencyBonus, ResourceProductionBreakdown } from '@interfaces/production';
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
-  const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const room = contentGetEntry<RoomContent>(roomTypeId);
   if (!room) return {};
   return room.production ?? {};
 }
 
 export function productionGetRoomDefinition(
   roomTypeId: RoomId,
-): (RoomDefinition & IsContentItem) | undefined {
-  return contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+): RoomContent | undefined {
+  return contentGetEntry<RoomContent>(roomTypeId);
 }
 
 export function productionGetInhabitantDefinition(
   definitionId: string,
-): (InhabitantDefinition & IsContentItem) | undefined {
-  return contentGetEntry<InhabitantDefinition & IsContentItem>(definitionId);
+): InhabitantContent | undefined {
+  return contentGetEntry<InhabitantContent>(definitionId);
 }
 
 export function productionCalculateInhabitantBonus(
@@ -63,7 +62,7 @@ export function productionCalculateInhabitantBonus(
   let totalBonus = 0;
 
   for (const inhabitant of assignedInhabitants) {
-    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantContent>(
       inhabitant.definitionId,
     );
     if (!def) continue;

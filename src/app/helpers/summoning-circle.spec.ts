@@ -2,7 +2,6 @@ import type {
   Floor,
   FloorId,
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -17,6 +16,7 @@ import type {
   SummonRecipeId,
   UpgradePathId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
@@ -111,7 +111,7 @@ vi.mock('@helpers/room-shapes', () => ({
 
 // --- Inhabitant definitions ---
 
-const fireElementalDef: InhabitantDefinition & IsContentItem = {
+const fireElementalDef: InhabitantContent = {
   id: FIRE_ELEMENTAL_ID as InhabitantId,
   name: 'Fire Elemental',
   __type: 'inhabitant',
@@ -126,7 +126,7 @@ const fireElementalDef: InhabitantDefinition & IsContentItem = {
   rulerFearLevel: 0,
 };
 
-const spectralServantDef: InhabitantDefinition & IsContentItem = {
+const spectralServantDef: InhabitantContent = {
   id: SPECTRAL_SERVANT_ID as InhabitantId,
   name: 'Spectral Servant',
   __type: 'inhabitant',
@@ -141,7 +141,7 @@ const spectralServantDef: InhabitantDefinition & IsContentItem = {
   rulerFearLevel: 0,
 };
 
-const goblinDef: InhabitantDefinition & IsContentItem = {
+const goblinDef: InhabitantContent = {
   id: GOBLIN_ID as InhabitantId,
   name: 'Goblin',
   __type: 'inhabitant',

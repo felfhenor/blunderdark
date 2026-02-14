@@ -15,20 +15,19 @@ import {
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
 import type {
-  InhabitantDefinition,
   InhabitantInstance,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   RoomId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 type RosterFilter = 'all' | 'assigned' | 'unassigned';
 
 type RosterEntry = {
   instance: InhabitantInstance;
-  def: InhabitantDefinition & IsContentItem;
+  def: InhabitantContent;
   roomName: string | undefined;
 };
 
@@ -52,7 +51,7 @@ export class PanelRosterComponent {
 
     return inhabitants
       .map((inst) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           inst.definitionId,
         );
         if (!def) return undefined;
@@ -113,14 +112,14 @@ export class PanelRosterComponent {
     const floors = gamestate().world.floors;
     const rooms: Array<{
       room: PlacedRoom;
-      roomDef: RoomDefinition & IsContentItem;
+      roomDef: RoomContent;
       floorName: string;
       canAssign: boolean;
     }> = [];
 
     for (const floor of floors) {
       for (const room of floor.rooms) {
-        const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(
+        const roomDef = contentGetEntry<RoomContent>(
           room.roomTypeId,
         );
         if (!roomDef || roomDef.maxInhabitants === 0) continue;

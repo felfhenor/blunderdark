@@ -3,21 +3,20 @@ import { contentGetEntry } from '@helpers/content';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import type {
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantTrait,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomProduction,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown } from '@interfaces/efficiency';
 
 /**
  * Extract efficiency-related traits (production_bonus) from an inhabitant definition.
  */
 export function efficiencyGetTraits(
-  def: InhabitantDefinition,
+  def: InhabitantContent,
 ): EfficiencyTrait[] {
   return def.traits
     .filter((t) => t.effectType === 'production_bonus')
@@ -52,7 +51,7 @@ export function efficiencyCalculateInhabitantContribution(
   instance: InhabitantInstance,
   roomProduction: RoomProduction,
 ): InhabitantContribution | undefined {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantContent>(
     instance.definitionId,
   );
   if (!def) return undefined;
@@ -139,7 +138,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 
   let totalBonus = 0;
   for (const inst of assigned) {
-    const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+    const def = contentGetEntry<InhabitantContent>(
       inst.definitionId,
     );
     if (!def) continue;

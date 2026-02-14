@@ -1,12 +1,11 @@
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   ResourceMap,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Mock state ---
@@ -68,9 +67,9 @@ vi.mock('@helpers/rng', () => ({
 
 // --- Mock content entries ---
 
-let mockContentEntries: (InhabitantDefinition & IsContentItem)[];
+let mockContentEntries: InhabitantContent[];
 
-const goblinDef: InhabitantDefinition & IsContentItem = {
+const goblinDef: InhabitantContent = {
   id: 'goblin-001' as InhabitantId,
   name: 'Goblin',
   type: 'creature',
@@ -93,7 +92,7 @@ const goblinDef: InhabitantDefinition & IsContentItem = {
   __type: 'inhabitant',
 };
 
-const skeletonDef: InhabitantDefinition & IsContentItem = {
+const skeletonDef: InhabitantContent = {
   id: 'skeleton-001' as InhabitantId,
   name: 'Skeleton',
   type: 'undead',
@@ -108,7 +107,7 @@ const skeletonDef: InhabitantDefinition & IsContentItem = {
   __type: 'inhabitant',
 };
 
-const dragonDef: InhabitantDefinition & IsContentItem = {
+const dragonDef: InhabitantContent = {
   id: 'dragon-001' as InhabitantId,
   name: 'Dragon',
   type: 'dragon',
@@ -123,7 +122,7 @@ const dragonDef: InhabitantDefinition & IsContentItem = {
   __type: 'inhabitant',
 };
 
-const tier2Def: InhabitantDefinition & IsContentItem = {
+const tier2Def: InhabitantContent = {
   id: 'tier2-001' as InhabitantId,
   name: 'Dark Elf',
   type: 'creature',

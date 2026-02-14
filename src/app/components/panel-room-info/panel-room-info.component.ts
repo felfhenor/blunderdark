@@ -27,7 +27,8 @@ import {
   fearLevelGetLabel,
   FEAR_LEVEL_MAX,
 } from '@helpers';
-import type { InhabitantDefinition, IsContentItem, PlacedRoomId } from '@interfaces';
+import type { PlacedRoomId } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -73,7 +74,7 @@ export class PanelRoomInfoComponent {
     return this.inhabitants()
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };
@@ -149,7 +150,7 @@ export class PanelRoomInfoComponent {
     return this.inhabitants()
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return def
@@ -157,7 +158,7 @@ export class PanelRoomInfoComponent {
           : false;
       })
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return { instance: i, name: def?.name ?? i.name };

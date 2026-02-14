@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantState,
-  IsContentItem,
   StateModifier,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 const mockEntries = new Map<string, unknown>();
 
@@ -40,7 +39,7 @@ function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): Inhabitant
 
 function registerDef(
   id: string,
-  overrides: Partial<InhabitantDefinition & IsContentItem> = {},
+  overrides: Partial<InhabitantContent> = {},
 ): void {
   mockEntries.set(id, {
     __id: id,

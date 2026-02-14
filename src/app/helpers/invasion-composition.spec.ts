@@ -6,7 +6,8 @@ import type {
   InvasionId,
   InvaderId,
 } from '@interfaces';
-import type { InvaderClassType, InvaderDefinition } from '@interfaces/invader';
+import type { InvaderContent } from '@interfaces/content-invader';
+import type { InvaderClassType } from '@interfaces/invader';
 import {
   invasionCompositionCalculateDungeonProfile,
   invasionCompositionGetWeights,
@@ -41,7 +42,7 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/invaders', () => ({
   invaderGetAllDefinitions: vi.fn(() => []),
-  invaderCreateInstance: vi.fn((def: InvaderDefinition) => ({
+  invaderCreateInstance: vi.fn((def: InvaderContent) => ({
     id: `instance-${def.id}`,
     definitionId: def.id,
     currentHp: def.baseStats.hp,
@@ -95,10 +96,11 @@ const defaultWeightConfig: CompositionWeightConfig = {
 function makeDef(
   id: string,
   cls: InvaderClassType,
-): InvaderDefinition {
+): InvaderContent {
   return {
     id: id as InvaderId,
     name: `${cls}-${id}`,
+    __type: 'invader',
     description: '',
     invaderClass: cls,
     baseStats: { hp: 20, attack: 5, defense: 5, speed: 5 },
@@ -107,7 +109,7 @@ function makeDef(
   };
 }
 
-const allDefs: InvaderDefinition[] = [
+const allDefs: InvaderContent[] = [
   makeDef('w1', 'warrior'),
   makeDef('r1', 'rogue'),
   makeDef('m1', 'mage'),

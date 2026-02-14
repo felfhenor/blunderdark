@@ -26,5 +26,6 @@ export type InhabitantContent = IsContentItem &
     fearModifier?: number;
     fearPropagationDistance?: number;
     foodConsumptionRate?: number;
+    corruptionGeneration?: number;
     stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
   };

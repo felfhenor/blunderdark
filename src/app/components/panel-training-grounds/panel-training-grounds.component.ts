@@ -10,10 +10,9 @@ import {
 } from '@helpers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
-  InhabitantDefinition,
-  IsContentItem,
   TrainingBonuses,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-training-grounds',
@@ -44,7 +43,7 @@ export class PanelTrainingGroundsComponent {
     return state.world.inhabitants
       .filter((i) => i.assignedRoomId === info.placedRoom.id)
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         const progress = i.trainingProgress ?? 0;

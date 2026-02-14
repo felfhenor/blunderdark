@@ -7,14 +7,13 @@ import { rngUuid } from '@helpers/rng';
 import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
 import { gamestate } from '@helpers/state-game';
 import type {
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   ResourceCost,
   ResourceType,
   Season,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
 
@@ -52,9 +51,8 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
  * Get all inhabitant definitions available for display in the recruitment panel.
  * Filters out unique/ruler inhabitants and sorts by tier then name.
  */
-export function recruitmentGetRecruitable(): (InhabitantDefinition &
-  IsContentItem)[] {
-  const allDefs = contentGetEntriesByType<InhabitantDefinition & IsContentItem>(
+export function recruitmentGetRecruitable(): InhabitantContent[] {
+  const allDefs = contentGetEntriesByType<InhabitantContent>(
     'inhabitant',
   );
 
@@ -111,7 +109,7 @@ export function recruitmentGetAdjustedCost(
  * Returns the result with success/error info.
  */
 export async function recruitmentRecruit(
-  def: InhabitantDefinition,
+  def: InhabitantContent,
 ): Promise<{ success: boolean; error?: string }> {
   if (!altarRoomCanRecruit()) {
     return { success: false, error: 'Altar required for recruitment' };

@@ -21,13 +21,13 @@ import {
 } from '@helpers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
-  InhabitantDefinition,
   InhabitantStats,
   IsContentItem,
   ResourceType,
   SummonRecipeContent,
   SummonRecipeId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-summoning-circle',
@@ -73,7 +73,7 @@ export class PanelSummoningCircleComponent {
     return state.world.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(i.definitionId);
+        const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return { ...i, defName: def?.name ?? i.name };
       });
   });

@@ -1,4 +1,3 @@
-import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { Branded } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
 
@@ -28,53 +27,3 @@ export type RoomUpgradePath = {
   requiresDarkUpgrade?: boolean;
 };
 
-export type RoomDefinition = {
-  id: Branded<string, 'RoomId'>;
-  name: string;
-  description: string;
-  shapeId: RoomShapeId;
-  cost: ResourceCost;
-  production: RoomProduction;
-  requiresWorkers: boolean;
-  adjacencyBonuses: AdjacencyBonus[];
-  isUnique: boolean;
-  removable: boolean;
-  maxInhabitants: number;
-  inhabitantRestriction: string | undefined;
-  fearLevel: number | 'variable';
-  fearReductionAura: number;
-  upgradePaths: RoomUpgradePath[];
-  autoPlace: boolean;
-  role?: string;
-  timeOfDayBonus?: { period: 'day' | 'night'; bonus: number };
-  biomeBonuses?: Partial<Record<string, number>>;
-  invasionProfile?: { dimension: string; weight: number };
-  objectiveTypes?: string[];
-  trainingAdjacencyEffects?: { timeReduction?: number; statBonus?: number };
-  throneAdjacencyEffects?: { goldProductionBonus?: number };
-  spawnRate?: number;
-  spawnType?: string;
-  spawnCapacity?: number;
-  breedingAdjacencyEffects?: {
-    hybridTimeReduction?: number;
-    mutationOddsBonus?: number;
-    researchBonus?: number;
-  };
-  summoningAdjacencyEffects?: {
-    summonTimeReduction?: number;
-    summonStatBonus?: number;
-  };
-  forgingAdjacencyEffects?: {
-    forgingSpeedBonus?: number;
-    forgingStatBonus?: number;
-    forgingEffectivenessBonus?: number;
-  };
-  alchemyAdjacencyEffects?: {
-    alchemySpeedBonus?: number;
-    alchemyCostReduction?: number;
-  };
-  tortureAdjacencyEffects?: {
-    tortureSpeedBonus?: number;
-    tortureConversionBonus?: number;
-  };
-};

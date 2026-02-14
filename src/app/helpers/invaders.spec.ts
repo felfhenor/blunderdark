@@ -1,16 +1,15 @@
 import type {
-  AbilityEffectDefinition,
-  CombatAbility,
   CombatAbilityId,
   CombatantId,
   IsContentItem,
 } from '@interfaces';
+import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent } from '@interfaces/content-combatability';
+import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type {
-  InvaderDefinition,
   InvaderInstance,
+  InvaderInstanceId,
 } from '@interfaces/invader';
-import type { InvaderId } from '@interfaces/content-invader';
-import type { InvaderInstanceId } from '@interfaces/invader';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Invader Definition IDs ---
@@ -56,10 +55,10 @@ vi.mock('@helpers/rng', () => ({
 // --- Ability effect definitions ---
 
 function makeEffect(
-  overrides: Partial<AbilityEffectDefinition>,
-): AbilityEffectDefinition {
+  overrides: Partial<AbilityEffectContent>,
+): AbilityEffectContent {
   return {
-    id: 'ae-test',
+    id: 'ae-test' as AbilityEffectId,
     name: 'Test Effect',
     __type: 'abilityeffect',
     dealsDamage: false,
@@ -70,10 +69,10 @@ function makeEffect(
 }
 
 function makeAbility(
-  overrides: Partial<CombatAbility>,
-): CombatAbility {
+  overrides: Partial<CombatAbilityContent>,
+): CombatAbilityContent {
   return {
-    id: 'ca-test',
+    id: 'ca-test' as CombatAbilityId,
     name: 'Test Ability',
     __type: 'combatability',
     description: 'test',
@@ -249,8 +248,8 @@ const markTargetAbility = makeAbility({
 // --- Invader definitions ---
 
 function makeInvaderDef(
-  overrides: Partial<InvaderDefinition & IsContentItem> = {},
-): InvaderDefinition & IsContentItem {
+  overrides: Partial<InvaderContent> = {},
+): InvaderContent {
   return {
     id: WARRIOR_ID,
     name: 'Warrior',

@@ -8,14 +8,13 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameStateWorld,
-  InhabitantDefinition,
   InhabitantInstance,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   RoomId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 /**
  * Sync world.inhabitants into each floor's inhabitants array.
@@ -107,7 +106,7 @@ export function inhabitantDeserialize(
  * An undefined restriction means any inhabitant is allowed.
  */
 export function inhabitantMeetsRestriction(
-  inhabitantDef: InhabitantDefinition,
+  inhabitantDef: InhabitantContent,
   restriction: string | undefined,
 ): boolean {
   if (restriction === undefined) return true;
@@ -120,8 +119,8 @@ export function inhabitantMeetsRestriction(
  * If a PlacedRoom is provided, uses effective capacity (base + upgrade bonuses).
  */
 export function inhabitantCanAssignToRoom(
-  inhabitantDef: InhabitantDefinition,
-  roomDef: RoomDefinition,
+  inhabitantDef: InhabitantContent,
+  roomDef: RoomContent,
   currentAssignedCount: number,
   placedRoom?: PlacedRoom,
 ): { allowed: boolean; reason?: string } {
@@ -147,9 +146,9 @@ export function inhabitantCanAssignToRoom(
  * Filter a list of inhabitant definitions to only those eligible for a room.
  */
 export function inhabitantGetEligible(
-  allDefs: InhabitantDefinition[],
-  roomDef: RoomDefinition,
-): InhabitantDefinition[] {
+  allDefs: InhabitantContent[],
+  roomDef: RoomContent,
+): InhabitantContent[] {
   return allDefs.filter((def) =>
     inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction),
   );
@@ -175,10 +174,10 @@ export async function inhabitantAssignToRoom(
     return { success: false, error: 'Inhabitant is already assigned to a room' };
   }
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
 
-  const inhabitantDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const inhabitantDef = contentGetEntry<InhabitantContent>(
     instance.definitionId,
   );
   if (!inhabitantDef) {

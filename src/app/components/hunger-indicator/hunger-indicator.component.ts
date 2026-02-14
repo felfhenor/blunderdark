@@ -10,7 +10,7 @@ import {
   hungerIsInappetent,
   hungerGetConsumptionRate,
 } from '@helpers';
-import type { InhabitantDefinition, IsContentItem } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -95,7 +95,7 @@ export class HungerIndicatorComponent {
   private definition = computed(() => {
     const inh = this.inhabitant();
     if (!inh) return undefined;
-    return contentGetEntry<InhabitantDefinition & IsContentItem>(
+    return contentGetEntry<InhabitantContent>(
       inh.definitionId,
     );
   });

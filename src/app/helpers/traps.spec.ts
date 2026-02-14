@@ -3,14 +3,12 @@ import type {
   FloorId,
   GridTile,
   HallwayId,
-  IsContentItem,
   PlacedRoomId,
-  TrapDefinition,
-  TrapId,
   TrapInstance,
   TrapInstanceId,
   TrapInventoryEntry,
 } from '@interfaces';
+import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Trap Definition IDs ---
@@ -39,8 +37,8 @@ vi.mock('@helpers/rng', () => ({
 // --- Trap definitions ---
 
 function makeTrapDef(
-  overrides: Partial<TrapDefinition & IsContentItem> = {},
-): TrapDefinition & IsContentItem {
+  overrides: Partial<TrapContent> = {},
+): TrapContent {
   return {
     id: PIT_TRAP_ID,
     name: 'Pit Trap',

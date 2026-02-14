@@ -11,13 +11,13 @@ import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   BreedingRecipeContent,
   GameState,
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantStats,
   IsContentItem,
   PlacedRoom,
-  RoomDefinition,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type {
   BreedingCompletedEvent,
   MutationCompletedEvent,
@@ -126,7 +126,7 @@ export function breedingGetHybridTicks(
 
   // Check adjacent rooms for breedingAdjacencyEffects.hybridTimeReduction
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.breedingAdjacencyEffects?.hybridTimeReduction) {
       ticks = Math.round(
         ticks * (1 - adjDef.breedingAdjacencyEffects.hybridTimeReduction),
@@ -156,7 +156,7 @@ export function breedingGetMutationOdds(
 
   // Check adjacent rooms for breedingAdjacencyEffects.mutationOddsBonus
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.breedingAdjacencyEffects?.mutationOddsBonus) {
       positiveBonus += adjDef.breedingAdjacencyEffects.mutationOddsBonus;
     }
@@ -177,8 +177,8 @@ export function breedingGetMutationOdds(
  * Calculate hybrid stats from averaged parents + recipe bonuses.
  */
 export function breedingCalculateHybridStats(
-  parentADef: InhabitantDefinition,
-  parentBDef: InhabitantDefinition,
+  parentADef: InhabitantContent,
+  parentBDef: InhabitantContent,
   recipe: BreedingRecipeContent,
   statBonusMultiplier = 1.0,
 ): InhabitantStats {
@@ -220,10 +220,10 @@ export function breedingCreateHybrid(
   recipe: BreedingRecipeContent,
   statBonusMultiplier = 1.0,
 ): InhabitantInstance {
-  const parentADef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const parentADef = contentGetEntry<InhabitantContent>(
     parentA.definitionId,
   );
-  const parentBDef = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const parentBDef = contentGetEntry<InhabitantContent>(
     parentB.definitionId,
   );
   if (!parentADef || !parentBDef) {
@@ -283,7 +283,7 @@ export function breedingApplyMutation(
   outcome: MutationOutcome,
   rng: PRNG,
 ): InhabitantInstance {
-  const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+  const def = contentGetEntry<InhabitantContent>(
     inhabitant.definitionId,
   );
   if (!def) return { ...inhabitant, mutated: true };

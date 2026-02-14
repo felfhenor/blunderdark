@@ -17,11 +17,10 @@ import {
 } from '@helpers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
-  InhabitantDefinition,
   InvaderClassType,
-  IsContentItem,
   PrisonerId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-torture-chamber',
@@ -87,7 +86,7 @@ export class PanelTortureChamberComponent {
     return state.world.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
-        const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+        const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
         return { ...i, defName: def?.name ?? i.name };

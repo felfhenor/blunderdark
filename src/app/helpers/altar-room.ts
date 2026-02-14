@@ -21,12 +21,12 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   RoomId,
   RoomShape,
   RoomUpgradePath,
   UpgradePathId,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { GRID_SIZE } from '@interfaces/grid';
 
 /**
@@ -58,7 +58,7 @@ export const altarRoomHas = computed<boolean>(() => {
  * if the center is already occupied.
  */
 export function altarRoomAutoPlace(floor: Floor): Floor {
-  const roomDefs = contentGetEntriesByType<RoomDefinition & IsContentItem>(
+  const roomDefs = contentGetEntriesByType<RoomContent>(
     'room',
   );
   const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
@@ -259,7 +259,7 @@ export function altarRoomGetFearReductionAura(floors: Floor[]): number {
   const altar = altarRoomFind(floors);
   if (!altar) return 0;
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(
+  const roomDef = contentGetEntry<RoomContent>(
     altar.room.roomTypeId,
   );
   if (!roomDef) return 0;

@@ -2,7 +2,6 @@ import type {
   Floor,
   FloorId,
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -15,6 +14,7 @@ import type {
   RoomUpgradePath,
   UpgradePathId,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
@@ -74,7 +74,7 @@ vi.mock('@helpers/rng', () => ({
 
 // --- Definitions ---
 
-const goblinDef: InhabitantDefinition & IsContentItem = {
+const goblinDef: InhabitantContent = {
   id: GOBLIN_DEF_ID as InhabitantId,
   name: 'Goblin',
   __type: 'inhabitant',
@@ -93,7 +93,7 @@ const goblinDef: InhabitantDefinition & IsContentItem = {
   corruptionGeneration: 0,
 };
 
-const skeletonDef: InhabitantDefinition & IsContentItem = {
+const skeletonDef: InhabitantContent = {
   id: SKELETON_DEF_ID as InhabitantId,
   name: 'Skeleton',
   __type: 'inhabitant',

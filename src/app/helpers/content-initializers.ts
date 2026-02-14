@@ -1,36 +1,31 @@
 import type {
-  AbilityEffectDefinition,
   AlchemyRecipeContent,
   BreedingRecipeContent,
-  CombatAbility,
   CompositionWeightConfig,
   ContentType,
   ForgeRecipeContent,
-  InhabitantDefinition,
-  InvaderDefinition,
   IsContentItem,
   PassiveBonusUnlock,
   ReputationAction,
   ReputationEffectContent,
   ResearchNode,
-  RoomDefinition,
   RoomShape,
   Season,
-  SeasonBonusDefinition,
   SummonRecipeContent,
-  SynergyDefinition,
-  TrapDefinition,
   UnlockEffect,
 } from '@interfaces';
-import type { InhabitantId } from '@interfaces/content-inhabitant';
-import type { InvaderId } from '@interfaces/content-invader';
+import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
+import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
+import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
 import type { ReputationActionId } from '@interfaces/content-reputationaction';
-import type { RoomShapeId } from '@interfaces/content-roomshape';
-import type { SynergyId } from '@interfaces/content-synergy';
-import type { TrapId } from '@interfaces/content-trap';
 import type { ResearchId } from '@interfaces/content-research';
-import type { RoomId } from '@interfaces/content-room';
+import type { RoomContent, RoomId } from '@interfaces/content-room';
+import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { SeasonBonusContent, SeasonBonusId } from '@interfaces/content-seasonbonus';
+import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
+import type { TrapContent, TrapId } from '@interfaces/content-trap';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -172,8 +167,8 @@ function ensureUnlockEffect(
 }
 
 function ensureRoom(
-  room: Partial<RoomDefinition & IsContentItem>,
-): RoomDefinition & IsContentItem {
+  room: Partial<RoomContent>,
+): RoomContent {
   return {
     id: room.id ?? ('UNKNOWN' as RoomId),
     name: room.name ?? 'UNKNOWN',
@@ -233,8 +228,8 @@ function ensureSummonRecipe(
 }
 
 function ensureSynergy(
-  synergy: Partial<SynergyDefinition & IsContentItem>,
-): SynergyDefinition & IsContentItem {
+  synergy: Partial<SynergyContent>,
+): SynergyContent {
   return {
     id: synergy.id ?? ('UNKNOWN' as SynergyId),
     name: synergy.name ?? 'UNKNOWN',
@@ -246,8 +241,8 @@ function ensureSynergy(
 }
 
 function ensureInhabitant(
-  inhabitant: Partial<InhabitantDefinition & IsContentItem>,
-): InhabitantDefinition & IsContentItem {
+  inhabitant: Partial<InhabitantContent>,
+): InhabitantContent {
   return {
     id: inhabitant.id ?? ('UNKNOWN' as InhabitantId),
     name: inhabitant.name ?? 'UNKNOWN',
@@ -275,8 +270,8 @@ function ensureInhabitant(
 }
 
 function ensureInvader(
-  invader: Partial<InvaderDefinition & IsContentItem>,
-): InvaderDefinition & IsContentItem {
+  invader: Partial<InvaderContent>,
+): InvaderContent {
   return {
     id: invader.id ?? ('UNKNOWN' as InvaderId),
     name: invader.name ?? 'UNKNOWN',
@@ -303,10 +298,10 @@ function ensureRoomShape(
 }
 
 function ensureAbilityEffect(
-  effect: Partial<AbilityEffectDefinition>,
-): AbilityEffectDefinition {
+  effect: Partial<AbilityEffectContent>,
+): AbilityEffectContent {
   return {
-    id: effect.id ?? 'UNKNOWN',
+    id: (effect.id ?? 'UNKNOWN') as AbilityEffectId,
     name: effect.name ?? 'UNKNOWN',
     __type: 'abilityeffect',
     dealsDamage: effect.dealsDamage ?? false,
@@ -315,9 +310,9 @@ function ensureAbilityEffect(
   };
 }
 
-function ensureCombatAbility(ability: Partial<CombatAbility>): CombatAbility {
+function ensureCombatAbility(ability: Partial<CombatAbilityContent>): CombatAbilityContent {
   return {
-    id: ability.id ?? 'UNKNOWN',
+    id: (ability.id ?? 'UNKNOWN') as CombatAbilityId,
     name: ability.name ?? 'UNKNOWN',
     __type: 'combatability',
     description: ability.description ?? '',
@@ -331,8 +326,8 @@ function ensureCombatAbility(ability: Partial<CombatAbility>): CombatAbility {
 }
 
 function ensureTrap(
-  trap: Partial<TrapDefinition & IsContentItem>,
-): TrapDefinition & IsContentItem {
+  trap: Partial<TrapContent>,
+): TrapContent {
   return {
     id: trap.id ?? ('UNKNOWN' as TrapId),
     name: trap.name ?? 'UNKNOWN',
@@ -373,10 +368,10 @@ function ensureInvasion(
 }
 
 function ensureSeasonBonus(
-  bonus: Partial<SeasonBonusDefinition & IsContentItem>,
-): SeasonBonusDefinition & IsContentItem {
+  bonus: Partial<SeasonBonusContent>,
+): SeasonBonusContent {
   return {
-    id: bonus.id ?? 'UNKNOWN',
+    id: bonus.id ?? ('UNKNOWN' as SeasonBonusId),
     name: bonus.name ?? 'UNKNOWN',
     __type: 'seasonbonus',
     season: bonus.season ?? ('growth' as Season),

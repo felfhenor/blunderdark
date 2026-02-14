@@ -14,16 +14,15 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
   GridState,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
   RoomId,
   RoomShape,
   RoomShapeId,
   Rotation,
   TileOffset,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { GRID_SIZE } from '@interfaces/grid';
 import type {
   OverlapValidationResult,
@@ -282,7 +281,7 @@ export async function roomPlacementExecute(
     };
   }
 
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { success: false, error: 'Unknown room type' };
 
   // Non-autoPlace rooms require the Altar to be present
@@ -453,7 +452,7 @@ export async function roomPlacementPlace(
  * Returns false for rooms with removable: false (e.g., Altar Room).
  */
 export function roomPlacementIsRemovable(roomTypeId: RoomId): boolean {
-  const roomDef = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return true;
   return roomDef.removable;
 }

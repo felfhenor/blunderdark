@@ -10,15 +10,15 @@ import {
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
   IsContentItem,
   PlacedRoom,
-  RoomDefinition,
   SummonRecipeContent,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type {
   SummoningCompletedEvent,
   SummoningExpiredEvent,
@@ -73,7 +73,7 @@ export function summoningGetEffectiveTicks(
 
   // Check adjacent rooms for summoningAdjacencyEffects.summonTimeReduction
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.summoningAdjacencyEffects?.summonTimeReduction) {
       ticks = Math.round(
         ticks * (1 - adjDef.summoningAdjacencyEffects.summonTimeReduction),
@@ -106,7 +106,7 @@ export function summoningGetStatBonuses(
   // Apply adjacency stat bonus (flat +N to all stats)
   let adjacencyBonus = 0;
   for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomDefinition & IsContentItem>(adjTypeId);
+    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.summoningAdjacencyEffects?.summonStatBonus) {
       adjacencyBonus += adjDef.summoningAdjacencyEffects.summonStatBonus;
     }
@@ -161,7 +161,7 @@ export function summoningCanStart(
  * Create a summoned InhabitantInstance from a definition and recipe.
  */
 export function summoningCreateInhabitant(
-  def: InhabitantDefinition & IsContentItem,
+  def: InhabitantContent,
   recipe: SummonRecipeContent,
   statBonuses: Partial<InhabitantStats>,
   isTemporary: boolean,
@@ -257,7 +257,7 @@ export function summoningCircleProcess(state: GameState): void {
           );
 
           if (recipe) {
-            const def = contentGetEntry<InhabitantDefinition & IsContentItem>(
+            const def = contentGetEntry<InhabitantContent>(
               recipe.resultInhabitantId,
             );
 

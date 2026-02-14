@@ -2,13 +2,13 @@ import { defaultResources } from '@helpers/defaults';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   GameState,
-  InhabitantDefinition,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
   PlacedRoomId,
   ResourceMap,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
@@ -184,9 +184,10 @@ describe('corruptionGetLevelDescription', () => {
 });
 
 describe('corruptionGenerationCalculateInhabitantRate', () => {
-  function makeDef(overrides: Partial<InhabitantDefinition> = {}): InhabitantDefinition {
+  function makeDef(overrides: Partial<InhabitantContent> = {}): InhabitantContent {
     return {
       id: 'def-1' as InhabitantId,
+      __type: 'inhabitant',
       name: 'Test',
       type: 'creature',
       tier: 1,

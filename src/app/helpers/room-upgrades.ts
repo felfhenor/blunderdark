@@ -1,17 +1,16 @@
 import { contentGetEntry } from '@helpers/content';
 import type {
-  IsContentItem,
   PlacedRoom,
-  RoomDefinition,
   RoomId,
   RoomUpgradeEffect,
   RoomUpgradePath,
   UpgradePathId,
 } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
 
 export function roomUpgradeGetPaths(roomTypeId: RoomId): RoomUpgradePath[] {
-  const room = contentGetEntry<RoomDefinition & IsContentItem>(roomTypeId);
+  const room = contentGetEntry<RoomContent>(roomTypeId);
   if (!room) return [];
   return room.upgradePaths ?? [];
 }
@@ -109,7 +108,7 @@ export function roomUpgradeGetVisible(
  */
 export function roomUpgradeGetEffectiveMaxInhabitants(
   placedRoom: PlacedRoom,
-  roomDef: RoomDefinition,
+  roomDef: RoomContent,
 ): number {
   if (roomDef.maxInhabitants < 0) return -1;
 
