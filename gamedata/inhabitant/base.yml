@@ -515,6 +515,166 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
+- id: d2160512-af21-4715-a03e-fc57fdc8f459
+  name: Dryad
+  type: creature
+  tier: 2
+  description: A graceful nature spirit bound to the dungeon's deepest roots. Dryads purify corruption and nurture growth wherever they are assigned.
+  cost:
+    gold: 120
+    food: 60
+    essence: 30
+  stats:
+    hp: 50
+    attack: 8
+    defense: 18
+    speed: 14
+    workerEfficiency: 1.2
+  traits:
+    - id: trait-dryad-nature-affinity
+      name: Nature Affinity
+      description: Increases food production by 30% when assigned to a food-producing room.
+      effectType: production_bonus
+      effectValue: 0.3
+      targetResourceType: food
+    - id: trait-dryad-purifier
+      name: Purifier
+      description: Reduces corruption in the assigned room by 1 per game day.
+      effectType: corruption_reduction
+      effectValue: 1
+    - id: trait-dryad-regenerative
+      name: Regenerative
+      description: Passively heals 5% HP per minute outside of combat.
+      effectType: regeneration
+      effectValue: 0.05
+  fearTolerance: 1
+  fearModifier: -1
+  foodConsumptionRate: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 12ca53df-bf3f-4774-b12f-438bc08cb47f
+  name: Gargoyle
+  type: creature
+  tier: 2
+  description: A hulking stone sentinel carved from living rock. Gargoyles are nearly impervious to harm but move with glacial slowness.
+  cost:
+    gold: 150
+    crystals: 40
+    essence: 20
+  stats:
+    hp: 120
+    attack: 10
+    defense: 35
+    speed: 4
+    workerEfficiency: 0.7
+  traits:
+    - id: trait-gargoyle-stone-form
+      name: Stone Form
+      description: Takes 50% reduced damage from physical attacks and is immune to poison.
+      effectType: damage_reduction
+      effectValue: 0.5
+    - id: trait-gargoyle-sentinel
+      name: Sentinel
+      description: Automatically detects invaders within 2 tiles and alerts the dungeon.
+      effectType: detection
+      effectValue: 2
+    - id: trait-gargoyle-architectural
+      name: Architectural
+      description: Room the Gargoyle is assigned to gains +1 structural integrity.
+      effectType: structural_bonus
+      effectValue: 1
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.8
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.5
+      defenseMultiplier: 1.5
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: d9971bc8-c08c-4696-95e2-459c2d7fe7e8
+  name: Imp
+  type: demon
+  tier: 2
+  description: A cackling fiend of mischief and flame. Imps are fast and disruptive, spreading corruption and chaos wherever they go.
+  cost:
+    gold: 80
+    essence: 40
+    corruption: 20
+  stats:
+    hp: 25
+    attack: 18
+    defense: 6
+    speed: 22
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-imp-mischievous
+      name: Mischievous
+      description: 5% chance per game hour to cause a random minor event in the assigned room.
+      effectType: random_event
+      effectValue: 0.05
+    - id: trait-imp-firestarter
+      name: FireStarter
+      description: +25% damage with fire-based attacks. Assigned room gains fire hazard potential.
+      effectType: fire_damage_bonus
+      effectValue: 0.25
+    - id: trait-imp-corruptor
+      name: Corruptor
+      description: Increases corruption in the assigned room by 1 per game day.
+      effectType: corruption_generation
+      effectValue: 1
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 1
+  corruptionGeneration: 3
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.5
+    hungry:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.4
+      defenseMultiplier: 0.3
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
 - id: 1df0572f-4dc5-4ba8-9c4d-d1df84f58979
   name: Converted Prisoner
   type: creature

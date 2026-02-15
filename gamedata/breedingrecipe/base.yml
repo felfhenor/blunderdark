@@ -52,3 +52,69 @@
     attack: 3
     speed: 2
   timeMultiplier: 0.8
+
+- id: be36b6cc-3e59-4d3b-8792-9fc74db170c1
+  name: Treant Guardian
+  description: A massive living tree animated by dryad magic and reinforced with gargoyle stone. An immovable forest sentinel.
+  parentInhabitantAId: Dryad
+  parentInhabitantBId: Gargoyle
+  resultName: Treant Guardian
+  statBonuses:
+    hp: 10
+    defense: 8
+  timeMultiplier: 1.5
+
+- id: 15dc4bba-9220-45cf-aeba-bdccc0eaef74
+  name: Thornweaver
+  description: A vine-covered dryad hybrid with myconid spores woven into its bark. Excels at food production and regeneration.
+  parentInhabitantAId: Dryad
+  parentInhabitantBId: Myconid
+  resultName: Thornweaver
+  statBonuses:
+    hp: 3
+    workerEfficiency: 0.3
+  timeMultiplier: 1.2
+
+- id: 03bc936c-d8fc-4165-9a51-122c13e0ef75
+  name: Obsidian Sentinel
+  description: A gargoyle fused with skeletal reinforcement. Harder than stone and twice as relentless.
+  parentInhabitantAId: Gargoyle
+  parentInhabitantBId: Skeleton
+  resultName: Obsidian Sentinel
+  statBonuses:
+    defense: 6
+    hp: 8
+  timeMultiplier: 1.5
+
+- id: 7beba29b-966a-4d80-b79c-f9529379f91c
+  name: Stone Imp
+  description: An imp encased in stone armor. Retains its fiery temperament but gains surprising durability.
+  parentInhabitantAId: Imp
+  parentInhabitantBId: Gargoyle
+  resultName: Stone Imp
+  statBonuses:
+    defense: 5
+    attack: 3
+  timeMultiplier: 1.3
+
+- id: 7691e428-a9dd-4da3-8848-1185a645d1d3
+  name: Hellfire Sprite
+  description: A volatile fusion of imp cunning and goblin tenacity. Fast, chaotic, and wreathed in flame.
+  parentInhabitantAId: Imp
+  parentInhabitantBId: Goblin
+  resultName: Hellfire Sprite
+  statBonuses:
+    speed: 4
+    attack: 3
+  timeMultiplier: 0.8
+
+- id: 91d80a98-f916-44bf-b298-b698e8cf2bff
+  name: Blighted Dryad
+  description: A dryad corrupted by imp fire. Its nature magic is twisted but devastatingly powerful.
+  parentInhabitantAId: Dryad
+  parentInhabitantBId: Imp
+  resultName: Blighted Dryad
+  statBonuses:
+    attack: 5
+    workerEfficiency: 0.2
+  timeMultiplier: 1.4
