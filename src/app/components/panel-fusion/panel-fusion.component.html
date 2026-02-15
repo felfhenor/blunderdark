@@ -1,0 +1,301 @@
+<app-modal [(visible)]="visible" [widthClass]="'max-w-5xl'">
+  <div replacement>
+    <div class="fusion-container flex flex-col bg-base-100 rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="header flex items-center justify-between px-4 py-2 bg-base-200 flex-shrink-0">
+        <h1 class="text-lg font-bold">Fusion Chamber</h1>
+        <button class="btn btn-sm btn-ghost" (click)="close()">Close</button>
+      </div>
+
+      <!-- Tabs -->
+      <div role="tablist" class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0">
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="activeTab() === 'fuse'"
+          (click)="setTab('fuse')"
+        >Fuse</button>
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="activeTab() === 'recipes'"
+          (click)="setTab('recipes')"
+        >Recipes</button>
+      </div>
+
+      <!-- Fuse Tab -->
+      @if (activeTab() === 'fuse') {
+        <div class="flex flex-1 min-h-0">
+          <!-- Left: Inhabitant List -->
+          <div class="inhabitant-list-panel w-56 flex-shrink-0 border-r border-base-300 flex flex-col">
+            <div class="p-2">
+              <input
+                type="text"
+                placeholder="Search..."
+                class="input input-xs input-bordered w-full"
+                [value]="searchQuery()"
+                (input)="searchQuery.set($any($event.target).value)"
+              />
+            </div>
+            <div class="flex-1 overflow-y-auto px-2 pb-2">
+              @for (inst of filteredInhabitants(); track inst.instanceId) {
+                @if (getInhabitantDef(inst); as def) {
+                  <div
+                    class="inhabitant-entry"
+                    [class.selected]="isSelected(inst.instanceId)"
+                    [class.slot-a]="slotA() === inst.instanceId"
+                    [class.slot-b]="slotB() === inst.instanceId"
+                    (click)="selectInhabitant(inst.instanceId)"
+                  >
+                    <div class="flex items-center gap-1">
+                      <span class="badge badge-xs badge-outline font-mono">T{{ def.tier }}</span>
+                      <span class="text-xs font-semibold truncate">{{ def.name }}</span>
+                      @if (inst.isHybrid) {
+                        <span class="badge badge-xs badge-secondary">Hybrid</span>
+                      }
+                    </div>
+                    <div class="stats-row">
+                      <span [tp]="'HP'">{{ def.stats.hp }}</span>
+                      <span [tp]="'ATK'">{{ def.stats.attack }}</span>
+                      <span [tp]="'DEF'">{{ def.stats.defense }}</span>
+                      <span [tp]="'SPD'">{{ def.stats.speed }}</span>
+                    </div>
+                    @if (inst.assignedRoomId) {
+                      <div class="text-xs opacity-50">Assigned</div>
+                    }
+                  </div>
+                }
+              }
+              @if (filteredInhabitants().length === 0) {
+                <p class="text-xs opacity-50 p-2">No eligible inhabitants.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Right: Slots + Preview -->
+          <div class="flex-1 overflow-y-auto p-4">
+            <div class="flex gap-4 mb-4">
+              <!-- Slot A -->
+              <div class="flex-1">
+                <div class="text-xs font-semibold mb-1 opacity-70">Parent A</div>
+                @if (slotAEntry(); as entry) {
+                  <div class="slot-card slot-a-card">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-bold">{{ entry.def.name }}</span>
+                      <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0 mt-1 text-xs">
+                      <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp }}</div>
+                      <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack }}</div>
+                      <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense }}</div>
+                      <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed }}</div>
+                    </div>
+                    @if (entry.def.traits.length > 0) {
+                      <div class="flex flex-wrap gap-0.5 mt-1">
+                        @for (trait of entry.def.traits; track trait.id) {
+                          <span class="badge badge-xs badge-outline opacity-70" [tp]="trait.description">
+                            {{ trait.name }}
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="slot-card slot-empty">
+                    <span class="text-xs opacity-40">Select from list</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Slot B -->
+              <div class="flex-1">
+                <div class="text-xs font-semibold mb-1 opacity-70">Parent B</div>
+                @if (slotBEntry(); as entry) {
+                  <div class="slot-card slot-b-card">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-bold">{{ entry.def.name }}</span>
+                      <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0 mt-1 text-xs">
+                      <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp }}</div>
+                      <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack }}</div>
+                      <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense }}</div>
+                      <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed }}</div>
+                    </div>
+                    @if (entry.def.traits.length > 0) {
+                      <div class="flex flex-wrap gap-0.5 mt-1">
+                        @for (trait of entry.def.traits; track trait.id) {
+                          <span class="badge badge-xs badge-outline opacity-70" [tp]="trait.description">
+                            {{ trait.name }}
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="slot-card slot-empty">
+                    <span class="text-xs opacity-40">Select from list</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Preview -->
+            @if (preview(); as p) {
+              <div class="preview-section">
+                <div class="divider my-2 text-xs opacity-50">Result Preview</div>
+
+                <div class="card bg-base-200">
+                  <div class="card-body p-3 gap-2">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-sm font-bold">{{ p.hybridDef.name }}</h3>
+                      <span class="badge badge-xs badge-secondary">Hybrid T{{ p.hybridDef.tier }}</span>
+                    </div>
+                    <p class="text-xs opacity-60">{{ p.hybridDef.description }}</p>
+
+                    <!-- Stat Comparison -->
+                    <div class="text-xs font-semibold mt-1">Stats</div>
+                    <div class="grid grid-cols-5 gap-1 text-xs">
+                      @for (s of statComparison(); track s.stat) {
+                        <div class="stat-compare text-center">
+                          <div class="opacity-50">{{ formatStatName(s.stat) }}</div>
+                          <div class="font-bold">{{ s.hybridValue }}</div>
+                          <div class="text-xs" [class]="getDeltaClass(s.delta)">
+                            {{ formatDelta(s.delta) }}
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Traits -->
+                    @if (traitAnalysis().inherited.length > 0 || traitAnalysis().unique.length > 0) {
+                      <div class="text-xs font-semibold mt-1">Traits</div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (trait of traitAnalysis().inherited; track trait.id) {
+                          <span
+                            class="badge badge-xs badge-outline"
+                            [tp]="trait.description + ' (inherited)'"
+                          >{{ trait.name }}</span>
+                        }
+                        @for (trait of traitAnalysis().unique; track trait.id) {
+                          <span
+                            class="badge badge-xs badge-accent"
+                            [tp]="trait.description + ' (unique)'"
+                          >{{ trait.name }}</span>
+                        }
+                      </div>
+                    }
+
+                    <!-- Cost -->
+                    <div class="text-xs font-semibold mt-1">Cost</div>
+                    <div class="flex flex-wrap gap-1">
+                      @for (cost of p.costEntries; track cost.type) {
+                        <span
+                          class="badge badge-sm badge-outline capitalize"
+                          [class.badge-error]="!cost.sufficient"
+                          [tp]="'Have ' + cost.current + ' / Need ' + cost.amount"
+                        >
+                          {{ cost.amount }} {{ cost.type }}
+                        </span>
+                      }
+                    </div>
+                    @if (!p.canAfford) {
+                      <div class="text-xs text-error">Insufficient resources</div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2 mt-3">
+                  <button
+                    class="btn btn-sm btn-primary flex-1"
+                    [disabled]="!validation().valid"
+                    (click)="requestFuse()"
+                    [tp]="validation().valid ? 'Fuse these creatures' : validation().error ?? ''"
+                  >Fuse</button>
+                  <button class="btn btn-sm btn-ghost" (click)="resetSlots()">Reset</button>
+                </div>
+              </div>
+            } @else if (slotA() && slotB()) {
+              <div class="text-center py-4">
+                <p class="text-sm opacity-50">No fusion recipe exists for this pair.</p>
+                <button class="btn btn-xs btn-ghost mt-2" (click)="resetSlots()">Reset</button>
+              </div>
+            } @else {
+              <div class="text-center py-4">
+                <p class="text-sm opacity-50">Select two inhabitants to preview fusion.</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Recipes Tab -->
+      @if (activeTab() === 'recipes') {
+        <div class="flex-1 overflow-y-auto p-4">
+          <div class="mb-3">
+            <input
+              type="text"
+              placeholder="Search recipes..."
+              class="input input-sm input-bordered w-full max-w-xs"
+              [value]="recipeSearchQuery()"
+              (input)="recipeSearchQuery.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="grid gap-2">
+            @for (entry of filteredRecipes(); track entry.recipe.id) {
+              <div class="card bg-base-200">
+                <div class="card-body p-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="font-semibold">{{ entry.parentADef?.name ?? '?' }}</span>
+                      <span class="opacity-40">+</span>
+                      <span class="font-semibold">{{ entry.parentBDef?.name ?? '?' }}</span>
+                      <span class="opacity-40">=</span>
+                      <span class="font-bold text-secondary">{{ entry.hybridDef?.name ?? '?' }}</span>
+                    </div>
+                    @if (entry.canPerform) {
+                      <span class="badge badge-sm badge-success">Ready</span>
+                    }
+                  </div>
+                  <p class="text-xs opacity-60">{{ entry.recipe.description }}</p>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    @for (cost of formatCost(entry.recipe.cost); track cost.type) {
+                      <span class="badge badge-xs badge-outline capitalize">
+                        {{ cost.amount }} {{ cost.type }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+            @if (filteredRecipes().length === 0) {
+              <p class="text-sm opacity-50">No recipes found.</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>
+
+<!-- Confirmation Modal -->
+<app-modal [(visible)]="showConfirmation" [widthClass]="'max-w-sm'">
+  <span title>Confirm Fusion</span>
+  <div body>
+    <p class="text-sm">
+      This will permanently consume both parent creatures to create a new hybrid.
+      This action cannot be undone.
+    </p>
+    @if (preview(); as p) {
+      <p class="text-sm mt-2 font-semibold">
+        {{ p.parentADef.name }} + {{ p.parentBDef.name }} &rarr; {{ p.hybridDef.name }}
+      </p>
+    }
+  </div>
+  <div actions>
+    <button class="btn btn-sm btn-ghost" (click)="cancelFuse()">Cancel</button>
+    <button class="btn btn-sm btn-primary" (click)="confirmFuse()">Confirm Fusion</button>
+  </div>
+</app-modal>

@@ -13,6 +13,17 @@
     <app-panel-floor-selector />
     <app-panel-floor-minimap />
     <app-panel-roster />
+    @if (canShowFusion()) {
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body p-4">
+          <h3 class="card-title text-sm">Fusion Chamber</h3>
+          <p class="text-xs opacity-50">Combine two creatures into a hybrid.</p>
+          <button class="btn btn-xs btn-secondary" (click)="showFusion.set(true)">
+            Open Fusion
+          </button>
+        </div>
+      </div>
+    }
     <app-panel-room-info />
     <app-panel-hallway-info />
     <app-panel-stair-info />
@@ -38,5 +49,6 @@
 </div>
 
 <app-game-research [(visible)]="showResearch" />
+<app-panel-fusion [(visible)]="showFusion" />
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

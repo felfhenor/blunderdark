@@ -1,0 +1,94 @@
+:host {
+  @apply block;
+}
+
+.fusion-container {
+  height: 70vh;
+  max-height: 700px;
+}
+
+// --- Inhabitant List ---
+
+.inhabitant-list-panel {
+  background: oklch(var(--b2));
+}
+
+.inhabitant-entry {
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+  margin-bottom: 2px;
+
+  &:hover {
+    background-color: oklch(var(--b3));
+  }
+
+  &.selected {
+    background-color: oklch(var(--p) / 0.1);
+  }
+
+  &.slot-a {
+    border-color: oklch(var(--in));
+    background-color: oklch(var(--in) / 0.1);
+  }
+
+  &.slot-b {
+    border-color: oklch(var(--wa));
+    background-color: oklch(var(--wa) / 0.1);
+  }
+}
+
+.stats-row {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  font-family: monospace;
+  opacity: 0.7;
+}
+
+// --- Slots ---
+
+.slot-card {
+  @apply rounded-lg border-2 p-3;
+  min-height: 80px;
+}
+
+.slot-a-card {
+  border-color: oklch(var(--in));
+  background: oklch(var(--in) / 0.05);
+}
+
+.slot-b-card {
+  border-color: oklch(var(--wa));
+  background: oklch(var(--wa) / 0.05);
+}
+
+.slot-empty {
+  @apply flex items-center justify-center;
+  border-color: oklch(var(--bc) / 0.2);
+  border-style: dashed;
+}
+
+// --- Stat Comparison ---
+
+.stat-compare {
+  @apply rounded p-1;
+  background: oklch(var(--b2));
+}
+
+.stat-up {
+  color: oklch(var(--su));
+  font-weight: 700;
+}
+
+.stat-down {
+  color: oklch(var(--er));
+}
+
+// --- Preview ---
+
+.preview-section {
+  max-width: 500px;
+}

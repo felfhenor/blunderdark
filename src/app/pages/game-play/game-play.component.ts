@@ -9,6 +9,7 @@ import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-al
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/panel-floor-minimap.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
+import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
@@ -26,6 +27,7 @@ import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { fusionHasAvailableCreatures } from '@helpers/fusion';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 import {
   floorAll,
@@ -49,6 +51,7 @@ import {
     PanelDarkForgeComponent,
     PanelFloorMinimapComponent,
     PanelFloorSelectorComponent,
+    PanelFusionComponent,
     PanelHallwayInfoComponent,
     PanelStairInfoComponent,
     PanelElevatorInfoComponent,
@@ -76,6 +79,8 @@ import {
 export class GamePlayComponent extends OptionsBaseComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public showResearch = signal(false);
+  public showFusion = signal(false);
+  public canShowFusion = computed(() => fusionHasAvailableCreatures());
 
   public currentFloorDepth = computed(() => {
     const floor = floorCurrent();
