@@ -34,6 +34,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 | `inhabitant` | `InhabitantId` | `InhabitantContent` |
 | `invader` | `InvaderId` | `InvaderContent` |
 | `invasion` | `InvasionId` | `InvasionContent` |
+| `merchanttrade` | `MerchantTradeId` | `MerchantTradeContent` |
 | `reputationaction` | `ReputationActionId` | `ReputationActionContent` |
 | `reputationeffect` | `ReputationEffectId` | `ReputationEffectContent` |
 | `research` | `ResearchId` | `ResearchContent` |
@@ -301,6 +302,22 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `victory.ts` | `victory` | `VICTORY` |
 | `victory-conditions.ts` | `victoryCondition` | `VICTORY_CONDITION` |
+
+## Merchant System
+
+- **Content type**: `merchanttrade` in `gamedata/merchanttrade/trades.yml`, `MerchantTradeContent` with `MerchantTradeId` branded type
+- **Runtime state**: `MerchantState` on `GameStateWorld.merchant` — `isPresent`, `arrivalDay`, `departureDayRemaining`, `inventory: TradeOffer[]`
+- **TradeOffer**: lightweight reference `{ tradeId: MerchantTradeId, stock: number }` — look up content for display data
+- **Arrival**: merchant arrives on first day of Harvest season, stays `MERCHANT_VISIT_DURATION` (3) days
+- **Day tracking**: module-level `merchantLastProcessedDay` var, reset via `merchantResetLastProcessedDay()` in tests
+- **Process**: `merchantProcess(state)` called each tick in gameloop — checks day transition, handles arrival/departure
+- **Trade execution**: `merchantExecuteTrade(tradeId)` — pays cost via `resourcePayCost()`, grants rewards, decrements stock
+- **Events**: `merchantEvent$` Subject emits `{ type: 'arrival' | 'departure' }` — subscribe in components for notifications
+- **UI**: `PanelMerchantComponent` in sidebar — shows card when merchant present, opens modal with trade interface; tabs for All/Buy/Sell/Special categories
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `merchant.ts` | `merchant` | `MERCHANT` |
 
 ## Misc Gotchas
 
