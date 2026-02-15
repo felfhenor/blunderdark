@@ -75,6 +75,9 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - `InhabitantContent`: `restrictionTags`, `rulerBonuses`, `rulerFearLevel`, `fearModifier`, `fearPropagationDistance`, `foodConsumptionRate`, `corruptionGeneration`, `type` (creature/undead/fungal/etc.)
 - Optional fields on `InhabitantInstance` (`trained?`, `hungerTicksWithoutFood?`, `mutated?`, `isSummoned?`, etc.) — use `?:` to avoid breaking test mocks. `inhabitantDeserialize()` provides `??` defaults.
 - `inhabitantCanAssignToRoom` checks restriction then capacity; rooms with `maxInhabitants: -1` = unlimited
+- **Trait effectTypes**: `production_bonus` (with `targetResourceType`), `trap_bonus`, `defense_bonus`, `versatility`, `damage_reduction`, `detection`, `structural_bonus`, `random_event`, `fire_damage_bonus`, `corruption_reduction`, `corruption_generation`, `regeneration`
+- **Adding new inhabitants**: append to `gamedata/inhabitant/base.yml`, define all 4 stateModifiers (normal/scared/hungry/starving), use `crypto.randomUUID()` for IDs
+- **Breeding recipes**: reference inhabitants by name (not UUID) in `parentInhabitantAId`/`parentInhabitantBId`, add to `gamedata/breedingrecipe/base.yml`
 
 ## Room-Specific Systems
 
