@@ -1,0 +1,73 @@
+- id: 379e75a3-904f-4ab0-a1a1-0eef712a0302
+  name: Elder Runes
+  description: "Ancient runic inscriptions of immense power that amplify all production within the room by 50%. The runes pulse with primordial energy, enhancing every resource gathered."
+  category: prestige
+  cost:
+    gold: 500
+    crystals: 100
+    essence: 50
+    flux: 40
+  bonuses:
+    - type: production_bonus
+      value: 0.50
+      description: "+50% production for all resource types"
+
+- id: 9c7ec44c-66c0-44b8-a3a8-ab8dee7380ba
+  name: Void Gate
+  description: "A rift torn into the fabric of reality that periodically summons creatures from beyond. Most arrivals are useful minions, but some are hostile entities drawn by the gate's energy."
+  category: prestige
+  cost:
+    gold: 400
+    essence: 80
+    flux: 60
+  bonuses:
+    - type: daily_summon
+      value: 1
+      description: "Summons a random creature once per day (70% friendly, 30% hostile)"
+
+- id: 3345fad7-c6c4-487c-87ac-f05fe8834ba4
+  name: Time Dilation Field
+  description: "A localized distortion in the flow of time that accelerates everything within the room to 150% speed. Maintaining the field requires a constant flux of magical energy."
+  category: prestige
+  cost:
+    gold: 600
+    crystals: 80
+    flux: 100
+  maintenanceCost:
+    flux: 2
+  bonuses:
+    - type: speed_multiplier
+      value: 1.50
+      description: "150% speed for all production, XP, and timers"
+
+- id: 97b895b4-ccf5-4ca3-8a2c-194149a7f2f0
+  name: Phylactery
+  description: "A soul-binding vessel that captures the essence of fallen inhabitants, allowing them to be reanimated as undead with diminished but functional capabilities."
+  category: prestige
+  cost:
+    gold: 450
+    essence: 100
+    crystals: 50
+  bonuses:
+    - type: undead_respawn
+      value: 0.75
+      description: "Dead inhabitants respawn as undead at 75% stats (max 3 charges)"
+
+- id: 02d708ac-39c7-4af9-b288-a9b5b59489a7
+  name: "Dragon's Hoard Core"
+  description: "A magically condensed dragonhoard fragment that perpetually generates gold and vastly expands gold storage. Its unique aura prevents any other such core from existing in the dungeon."
+  category: prestige
+  unique: true
+  cost:
+    gold: 800
+    crystals: 150
+    essence: 75
+  bonuses:
+    - type: flat_production
+      value: 5
+      targetType: gold
+      description: "+5 Gold per minute"
+    - type: storage_bonus
+      value: 1.0
+      targetType: gold
+      description: "+100% Gold storage capacity"

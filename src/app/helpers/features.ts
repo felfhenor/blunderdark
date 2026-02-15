@@ -1,18 +1,42 @@
-import { contentGetEntry } from '@helpers/content';
+import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { rngChoice, rngSucceedsChance, rngUuid } from '@helpers/rng';
 import type {
   FeatureBonus,
   FeatureBonusType,
   FeatureContent,
   FeatureId,
 } from '@interfaces/content-feature';
+import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import type { Floor } from '@interfaces/floor';
-import type { InhabitantInstance } from '@interfaces/inhabitant';
+import type {
+  InhabitantInstance,
+  InhabitantInstanceId,
+} from '@interfaces/inhabitant';
 import type { RoomProduction } from '@interfaces/room';
 import type { PlacedRoom, PlacedRoomId, SacrificeBuff } from '@interfaces/room-shape';
 
 export const FEATURE_SLOT_COUNT_SMALL = 2;
 export const FEATURE_SLOT_COUNT_LARGE = 3;
 export const FEATURE_SLOT_SIZE_THRESHOLD = 3;
+
+/**
+ * Check if a unique feature is already placed anywhere in the dungeon.
+ * Returns true if a feature with the given ID exists on any room on any floor.
+ */
+export function featureIsUniquePlaced(
+  floors: Floor[],
+  featureId: FeatureId,
+): boolean {
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (!room.featureIds) continue;
+      for (const fid of room.featureIds) {
+        if (fid === featureId) return true;
+      }
+    }
+  }
+  return false;
+}
 
 /**
  * Get the number of feature slots for a room based on its tile count.
@@ -235,6 +259,80 @@ export function featureCalculateTrainingXpPerTick(
     total += b.value;
   }
   return total;
+}
+
+// --- Speed Multiplier (Time Dilation Field) ---
+
+/**
+ * Calculate the speed multiplier for a room from speed_multiplier features.
+ * Returns 1.0 if no speed multiplier features are present.
+ * Multiple speed multipliers stack multiplicatively.
+ */
+export function featureCalculateSpeedMultiplier(
+  placedRoom: PlacedRoom,
+): number {
+  const bonuses = featureGetBonuses(placedRoom, 'speed_multiplier');
+  if (bonuses.length === 0) return 1.0;
+  let multiplier = 1.0;
+  for (const b of bonuses) {
+    multiplier *= b.value;
+  }
+  return multiplier;
+}
+
+/**
+ * Process maintenance costs for features with maintenanceCost.
+ * For each room that has features with maintenanceCost, deducts resources per tick.
+ * If resources are insufficient, the feature's bonuses are temporarily disabled
+ * by setting `maintenanceActive: false` on the room.
+ * Mutates state in-place.
+ */
+export function featureMaintenanceProcess(
+  floors: Floor[],
+  resources: Record<string, number>,
+  ticksPerMinute: number,
+): void {
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const features = featureGetAllForRoom(room);
+      const totalCostPerTick: Record<string, number> = {};
+      let hasMaintenance = false;
+
+      for (const feature of features) {
+        if (!feature.maintenanceCost) continue;
+        hasMaintenance = true;
+        for (const [resource, amount] of Object.entries(feature.maintenanceCost)) {
+          if (amount && amount > 0) {
+            totalCostPerTick[resource] = (totalCostPerTick[resource] ?? 0) + amount / ticksPerMinute;
+          }
+        }
+      }
+
+      if (!hasMaintenance) {
+        room.maintenanceActive = undefined;
+        continue;
+      }
+
+      // Check if we can afford the maintenance
+      let canAfford = true;
+      for (const [resource, costPerTick] of Object.entries(totalCostPerTick)) {
+        if ((resources[resource] ?? 0) < costPerTick) {
+          canAfford = false;
+          break;
+        }
+      }
+
+      if (canAfford) {
+        // Deduct resources
+        for (const [resource, costPerTick] of Object.entries(totalCostPerTick)) {
+          resources[resource] = (resources[resource] ?? 0) - costPerTick;
+        }
+        room.maintenanceActive = true;
+      } else {
+        room.maintenanceActive = false;
+      }
+    }
+  }
 }
 
 /**
@@ -469,4 +567,168 @@ export function featureRemoveFromSlot(
 export function featureRemoveAllFromRoom(placedRoom: PlacedRoom): void {
   placedRoom.featureIds = undefined;
   placedRoom.sacrificeBuff = undefined;
+}
+
+// --- Void Gate (Daily Summon) ---
+
+export const FEATURE_VOID_GATE_FRIENDLY_CHANCE = 0.70;
+
+export type VoidGateSummonResult = {
+  summoned: boolean;
+  inhabitant?: InhabitantInstance;
+  hostile?: boolean;
+  damageDealt?: number;
+};
+
+/**
+ * Process Void Gate daily summon for all rooms across all floors.
+ * Once per game day, rooms with daily_summon bonus summon a random creature.
+ * 70% chance friendly (added to roster), 30% hostile (damages room inhabitants).
+ * Returns results for notification/UI purposes.
+ */
+export function featureVoidGateProcess(
+  floors: Floor[],
+  currentDay: number,
+  inhabitants: InhabitantInstance[],
+): VoidGateSummonResult[] {
+  const results: VoidGateSummonResult[] = [];
+
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const bonuses = featureGetBonuses(room, 'daily_summon');
+      if (bonuses.length === 0) continue;
+
+      // Only summon once per day
+      if (room.voidGateLastSummonDay !== undefined && currentDay <= room.voidGateLastSummonDay) {
+        continue;
+      }
+
+      room.voidGateLastSummonDay = currentDay;
+
+      // Get all base inhabitants (not hybrids, not legendary)
+      const allInhabitants = contentGetEntriesByType<InhabitantContent>('inhabitant')
+        .filter((c) => !c.restrictionTags?.includes('unique') && !c.restrictionTags?.includes('hybrid'));
+
+      if (allInhabitants.length === 0) {
+        results.push({ summoned: false });
+        continue;
+      }
+
+      const chosen = rngChoice(allInhabitants);
+      const isFriendly = rngSucceedsChance(FEATURE_VOID_GATE_FRIENDLY_CHANCE);
+
+      if (isFriendly) {
+        const newInhabitant: InhabitantInstance = {
+          instanceId: rngUuid<InhabitantInstanceId>(),
+          definitionId: chosen.id,
+          name: `${chosen.name} the Gatecomer`,
+          state: 'normal',
+          assignedRoomId: undefined,
+          isSummoned: true,
+        };
+        inhabitants.push(newInhabitant);
+        results.push({ summoned: true, inhabitant: newInhabitant, hostile: false });
+      } else {
+        // Hostile: deal damage to inhabitants in the room
+        let totalDamage = 0;
+        const attackDamage = chosen.stats?.attack ?? 3;
+
+        for (const inh of inhabitants) {
+          if (inh.assignedRoomId === room.id) {
+            totalDamage += attackDamage;
+          }
+        }
+
+        results.push({ summoned: true, hostile: true, damageDealt: totalDamage });
+      }
+    }
+  }
+
+  return results;
+}
+
+// --- Phylactery (Undead Respawn) ---
+
+export const FEATURE_PHYLACTERY_MAX_CHARGES = 3;
+export const FEATURE_PHYLACTERY_RESPAWN_TICKS = 150; // 30 seconds = 150 ticks at 5/min
+export const FEATURE_PHYLACTERY_STAT_MULTIPLIER = 0.75;
+
+export type PhylacteryRespawnEntry = {
+  definitionId: InhabitantId;
+  originalName: string;
+  ticksRemaining: number;
+  roomId: PlacedRoomId;
+};
+
+/**
+ * Queue an inhabitant for phylactery respawn when they die in a room with a phylactery feature.
+ * Returns true if queued (charges available), false otherwise.
+ */
+export function featurePhylacteryQueueRespawn(
+  room: PlacedRoom,
+  deadInhabitant: InhabitantInstance,
+  respawnQueue: PhylacteryRespawnEntry[],
+): boolean {
+  const bonuses = featureGetBonuses(room, 'undead_respawn');
+  if (bonuses.length === 0) return false;
+
+  const charges = room.phylacteryCharges ?? FEATURE_PHYLACTERY_MAX_CHARGES;
+  if (charges <= 0) return false;
+
+  room.phylacteryCharges = charges - 1;
+
+  respawnQueue.push({
+    definitionId: deadInhabitant.definitionId,
+    originalName: deadInhabitant.name,
+    ticksRemaining: FEATURE_PHYLACTERY_RESPAWN_TICKS,
+    roomId: room.id,
+  });
+
+  return true;
+}
+
+/**
+ * Process phylactery respawn queue. Ticks down timers and returns respawned inhabitants.
+ * Caller is responsible for adding returned inhabitants to the world.
+ */
+export function featurePhylacteryProcess(
+  respawnQueue: PhylacteryRespawnEntry[],
+): InhabitantInstance[] {
+  const respawned: InhabitantInstance[] = [];
+  const remaining: PhylacteryRespawnEntry[] = [];
+
+  for (const entry of respawnQueue) {
+    entry.ticksRemaining--;
+    if (entry.ticksRemaining <= 0) {
+      const definition = contentGetEntry<InhabitantContent>(entry.definitionId);
+      if (!definition) continue;
+
+      const stats = definition.stats;
+      const respawnedInhabitant: InhabitantInstance = {
+        instanceId: rngUuid<InhabitantInstanceId>(),
+        definitionId: definition.id,
+        name: `${entry.originalName} (Undead)`,
+        state: 'normal',
+        assignedRoomId: undefined,
+        isSummoned: true,
+        mutationBonuses: stats ? {
+          hp: Math.floor((stats.hp ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
+          attack: Math.floor((stats.attack ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
+          defense: Math.floor((stats.defense ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
+          speed: Math.floor((stats.speed ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
+          workerEfficiency: (stats.workerEfficiency ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1),
+        } : undefined,
+      };
+
+      respawned.push(respawnedInhabitant);
+    } else {
+      remaining.push(entry);
+    }
+  }
+
+  // Update the queue in-place
+  respawnQueue.length = 0;
+  respawnQueue.push(...remaining);
+
+  return respawned;
 }
