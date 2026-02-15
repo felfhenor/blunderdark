@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented featureIds array on PlacedRoom, featureGetSlotCount() for size-based slot allocation, featureAttachToSlot/featureRemoveFromSlot/featureRemoveAllFromRoom helpers. Used simpler array-based slot model instead of separate FeatureSlot/RoomFeatureState types since the array index serves as slot index."
     },
     {
       "id": "US-002",
@@ -34,8 +34,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Already implemented by the environmental-features PRD. gamedata/feature/base.yml contains 6 features, ensureFeature() initializer exists in content-initializers.ts, ContentService loads features at init."
     },
     {
       "id": "US-003",
@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Bonus application, removal, and stacking implemented in US-001. featureGetBonuses aggregates across all slots, featureRemoveFromSlot reverts bonuses, multi-feature stacking tested."
     },
     {
       "id": "US-004",
@@ -69,8 +69,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Feature slots section added to panel-room-info. Feature selection modal shows all features with cost/bonuses. Remove uses SweetAlert2 confirmation."
     },
     {
       "id": "US-005",
@@ -85,8 +85,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Feature indicator (diamond + occupied/total) shown at room anchor tiles on grid with Tippy tooltip listing feature names."
     },
     {
       "id": "US-006",
@@ -100,8 +100,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "featureIds is an optional field on PlacedRoom, which is nested in Floor[] within GameState. The entire GameState is persisted via signalIndexedDb, so featureIds is automatically serialized/deserialized. No migration needed since the field is optional — existing saves load with undefined which is the correct default."
     }
   ]
 }

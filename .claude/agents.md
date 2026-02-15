@@ -94,13 +94,17 @@ Reusable patterns and learnings for agents working on Blunderdark.
 ## Environmental Features System
 
 - **Content type**: `feature` → `FeatureContent` with `FeatureId` branded type, stored in `gamedata/feature/base.yml`
-- **Attachment**: `PlacedRoom.featureId?: FeatureId` — one feature per room
+- **Attachment**: `PlacedRoom.featureIds?: FeatureId[]` — multi-slot array where index = slot index
+- **Slot allocation**: `featureGetSlotCount(tileCount)` — rooms with 1-2 tiles get 2 slots, 3+ tiles get 3 slots
 - **Bonus types**: `capacity_bonus`, `fear_reduction`, `production_bonus`, `adjacent_production`, `flat_production`, `corruption_generation`, `combat_bonus`, `teleport_link`
-- **Feature helpers** in `features.ts`: prefix `feature` (e.g., `featureGetForRoom`, `featureCalculateFearReduction`)
+- **Feature helpers** in `features.ts`: prefix `feature` (e.g., `featureGetAllForRoom`, `featureGetForSlot`, `featureAttachToSlot`, `featureRemoveFromSlot`, `featureCalculateFearReduction`)
+- **Multi-slot aggregation**: all bonus calculation functions aggregate across all attached features via `featureGetAllForRoom()`
 - **Integration points**: fear-level.ts (`featureReduction` in breakdown), room-upgrades.ts (capacity bonus), production.ts (adjacent + production + flat bonuses), corruption.ts (corruption generation), gameloop.ts (sacrifice buff tick-down)
 - **Sacrifice system**: `SacrificeBuff` on `PlacedRoom`, Blood Altar consumes Food for temporary production/combat multiplier buff, ticked down in gameloop
 - **Fungal Network**: implicit many-to-many links — any room with `teleport_link` bonus can transfer to any other such room; `featureFungalTransfer()` sets `assignedRoomId` + `travelTicksRemaining=0`
-- **Feature removal**: `featureRemoveFromRoom()` clears `featureId` + `sacrificeBuff`; Fungal Network links break automatically since they're presence-based
+- **Feature removal**: `featureRemoveFromSlot()` clears slot entry; clears `sacrificeBuff` only if no `corruption_generation` features remain; `featureRemoveAllFromRoom()` clears entire array + sacrifice buff
+- **Grid indicators**: anchor tile shows `◆occupied/total` with Tippy tooltip listing feature names
+- **Feature UI**: panel-room-info shows feature slots section with attach/remove per slot; feature selection modal lists all features with cost/bonuses
 - **Corruption process gotcha**: `corruptionGenerationProcess` iterates `state.world.floors` — existing tests may not include `floors` in mock state, so use `?? []` defensive pattern
 
 ## Room-Specific Systems
