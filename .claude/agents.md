@@ -28,6 +28,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 | `alchemyrecipe` | `AlchemyRecipeId` | `AlchemyRecipeContent` |
 | `breedingrecipe` | `BreedingRecipeId` | `BreedingRecipeContent` |
 | `combatability` | `CombatAbilityId` | `CombatAbilityContent` |
+| `feature` | `FeatureId` | `FeatureContent` |
 | `forgerecipe` | `ForgeRecipeId` | `ForgeRecipeContent` |
 | `fusionrecipe` | `FusionRecipeId` | `FusionRecipeContent` |
 | `inhabitant` | `InhabitantId` | `InhabitantContent` |
@@ -89,6 +90,18 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Legendary YAML**: Dragon and Demon Lord in `gamedata/inhabitant/base.yml`; Beholder, Medusa, Ancient Treant in `gamedata/inhabitant/legendary.yml`
 - **Fusion system**: `FusionRecipeContent` in `content-fusionrecipe.ts`, recipes in `gamedata/fusionrecipe/base.yml`, hybrid inhabitants in `gamedata/inhabitant/hybrid.yml`. Lookup via `fusionFindRecipe(creatureAId, creatureBId)` (order-independent). Hybrids use `restrictionTags: ['hybrid']`. Cost always includes `essence`. `InhabitantInstance` already has `isHybrid`/`hybridParentIds` fields.
 - **Hybrid stat generation**: `fusionGenerateHybridStats(parentA, parentB)` averages stats (HP/attack/defense/speed floored, workerEfficiency decimal). `fusionApplyStatOverrides(stats, overrides)` applies `Partial<InhabitantStats>` from `InhabitantContent.statOverrides`. `fusionMergeTraits(parentA, parentB, hybrid)` unions parent traits (conflict resolution favors higher-tier parent by effectType+target key) then adds hybrid bonus traits. `fusionCreateHybridInstance()` produces an `InhabitantInstance` with hybrid flags. 5 hybrids in YAML have `statOverrides` demonstrating the override feature.
+
+## Environmental Features System
+
+- **Content type**: `feature` → `FeatureContent` with `FeatureId` branded type, stored in `gamedata/feature/base.yml`
+- **Attachment**: `PlacedRoom.featureId?: FeatureId` — one feature per room
+- **Bonus types**: `capacity_bonus`, `fear_reduction`, `production_bonus`, `adjacent_production`, `flat_production`, `corruption_generation`, `combat_bonus`, `teleport_link`
+- **Feature helpers** in `features.ts`: prefix `feature` (e.g., `featureGetForRoom`, `featureCalculateFearReduction`)
+- **Integration points**: fear-level.ts (`featureReduction` in breakdown), room-upgrades.ts (capacity bonus), production.ts (adjacent + production + flat bonuses), corruption.ts (corruption generation), gameloop.ts (sacrifice buff tick-down)
+- **Sacrifice system**: `SacrificeBuff` on `PlacedRoom`, Blood Altar consumes Food for temporary production/combat multiplier buff, ticked down in gameloop
+- **Fungal Network**: implicit many-to-many links — any room with `teleport_link` bonus can transfer to any other such room; `featureFungalTransfer()` sets `assignedRoomId` + `travelTicksRemaining=0`
+- **Feature removal**: `featureRemoveFromRoom()` clears `featureId` + `sacrificeBuff`; Fungal Network links break automatically since they're presence-based
+- **Corruption process gotcha**: `corruptionGenerationProcess` iterates `state.world.floors` — existing tests may not include `floors` in mock state, so use `?? []` defensive pattern
 
 ## Room-Specific Systems
 
@@ -198,6 +211,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 | `defaults.ts` | `default` | `DEFAULT` |
 | `efficiency.ts` | `efficiency` | `EFFICIENCY` |
 | `fear-level.ts` | `fearLevel` | `FEAR_LEVEL` |
+| `features.ts` | `feature` | `FEATURE` |
 | `floor.ts` | `floor` | `FLOOR` |
 | `fusion.ts` | `fusion` | `FUSION` |
 | `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
