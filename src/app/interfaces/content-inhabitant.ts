@@ -31,4 +31,5 @@ export type InhabitantContent = IsContentItem &
     stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
     upkeepCost?: Partial<Record<ResourceType, number>>;
     recruitmentRequirements?: RecruitmentRequirement[];
+    statOverrides?: Partial<InhabitantStats>;
   };

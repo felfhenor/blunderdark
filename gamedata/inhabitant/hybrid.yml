@@ -14,6 +14,10 @@
     defense: 12
     speed: 14
     workerEfficiency: 1.1
+  statOverrides:
+    hp: 40
+    attack: 14
+    defense: 12
   traits:
     - id: trait-hobgoblin-disciplined
       name: Disciplined
@@ -260,6 +264,10 @@
     defense: 20
     speed: 10
     workerEfficiency: 0.7
+  statOverrides:
+    hp: 55
+    attack: 22
+    defense: 20
   traits:
     - id: trait-death-knight-command
       name: Undead Commander
@@ -408,6 +416,9 @@
     defense: 28
     speed: 4
     workerEfficiency: 0.8
+  statOverrides:
+    hp: 70
+    defense: 28
   traits:
     - id: trait-bone-golem-fortress
       name: Living Fortress
@@ -452,6 +463,9 @@
     defense: 22
     speed: 6
     workerEfficiency: 0.9
+  statOverrides:
+    hp: 65
+    attack: 24
   traits:
     - id: trait-iron-brute-siege
       name: Siege Breaker
@@ -503,6 +517,9 @@
     attack: 28
     defense: 14
     speed: 12
+    workerEfficiency: 1.3
+  statOverrides:
+    attack: 28
     workerEfficiency: 1.3
   traits:
     - id: trait-dread-lich-necro

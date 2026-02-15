@@ -285,6 +285,7 @@ function ensureInhabitant(
     corruptionGeneration: inhabitant.corruptionGeneration ?? 0,
     upkeepCost: inhabitant.upkeepCost ?? undefined,
     recruitmentRequirements: inhabitant.recruitmentRequirements ?? undefined,
+    statOverrides: inhabitant.statOverrides ?? undefined,
   };
 }
 

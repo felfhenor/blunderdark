@@ -6,6 +6,8 @@ import type {
   FusionRecipeContent,
   InhabitantInstance,
   InhabitantInstanceId,
+  InhabitantStats,
+  InhabitantTrait,
   IsContentItem,
   ResourceType,
 } from '@interfaces';
@@ -140,6 +142,107 @@ export function fusionGetPreview(
 }
 
 /**
+ * Generate hybrid stats by averaging two parent definitions.
+ * HP, attack, defense, speed are floored; workerEfficiency is decimal.
+ */
+export function fusionGenerateHybridStats(
+  parentADef: InhabitantContent,
+  parentBDef: InhabitantContent,
+): InhabitantStats {
+  return {
+    hp: Math.floor((parentADef.stats.hp + parentBDef.stats.hp) / 2),
+    attack: Math.floor(
+      (parentADef.stats.attack + parentBDef.stats.attack) / 2,
+    ),
+    defense: Math.floor(
+      (parentADef.stats.defense + parentBDef.stats.defense) / 2,
+    ),
+    speed: Math.floor((parentADef.stats.speed + parentBDef.stats.speed) / 2),
+    workerEfficiency:
+      (parentADef.stats.workerEfficiency +
+        parentBDef.stats.workerEfficiency) /
+      2,
+  };
+}
+
+/**
+ * Apply stat overrides on top of generated stats.
+ * Only specified keys in overrides replace the generated values.
+ */
+export function fusionApplyStatOverrides(
+  generatedStats: InhabitantStats,
+  overrides?: Partial<InhabitantStats>,
+): InhabitantStats {
+  if (!overrides) return { ...generatedStats };
+  return {
+    hp: overrides.hp ?? generatedStats.hp,
+    attack: overrides.attack ?? generatedStats.attack,
+    defense: overrides.defense ?? generatedStats.defense,
+    speed: overrides.speed ?? generatedStats.speed,
+    workerEfficiency:
+      overrides.workerEfficiency ?? generatedStats.workerEfficiency,
+  };
+}
+
+/**
+ * Merge traits from two parents plus bonus traits from the hybrid definition.
+ * Conflicting traits (same effectType+target) resolved by favoring higher-tier parent.
+ * Hybrid definition traits are added as bonus traits on top.
+ */
+export function fusionMergeTraits(
+  parentADef: InhabitantContent,
+  parentBDef: InhabitantContent,
+  hybridDef: InhabitantContent,
+): InhabitantTrait[] {
+  const merged: InhabitantTrait[] = [];
+  const seenKeys = new Set<string>();
+
+  const higherTierParent =
+    parentADef.tier >= parentBDef.tier ? parentADef : parentBDef;
+  const lowerTierParent =
+    parentADef.tier >= parentBDef.tier ? parentBDef : parentADef;
+
+  for (const trait of higherTierParent.traits) {
+    const key = `${trait.effectType}:${trait.targetResourceType ?? ''}:${trait.targetRoomName ?? ''}`;
+    seenKeys.add(key);
+    merged.push(trait);
+  }
+
+  for (const trait of lowerTierParent.traits) {
+    const key = `${trait.effectType}:${trait.targetResourceType ?? ''}:${trait.targetRoomName ?? ''}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      merged.push(trait);
+    }
+  }
+
+  for (const trait of hybridDef.traits) {
+    merged.push(trait);
+  }
+
+  return merged;
+}
+
+/**
+ * Create a hybrid inhabitant instance with all required fields.
+ */
+export function fusionCreateHybridInstance(
+  parentAInstanceId: InhabitantInstanceId,
+  parentBInstanceId: InhabitantInstanceId,
+  hybridDef: InhabitantContent,
+): InhabitantInstance {
+  return {
+    instanceId: rngUuid<InhabitantInstanceId>(),
+    definitionId: hybridDef.id,
+    name: hybridDef.name,
+    state: 'normal',
+    assignedRoomId: undefined,
+    isHybrid: true,
+    hybridParentIds: [parentAInstanceId, parentBInstanceId],
+  };
+}
+
+/**
  * Execute a fusion between two inhabitant instances.
  */
 export async function fusionExecute(
@@ -174,15 +277,11 @@ export async function fusionExecute(
     return { success: false, error: 'Hybrid definition not found' };
   }
 
-  const hybridInstance: InhabitantInstance = {
-    instanceId: rngUuid<InhabitantInstanceId>(),
-    definitionId: hybridDef.id,
-    name: hybridDef.name,
-    state: 'normal',
-    assignedRoomId: undefined,
-    isHybrid: true,
-    hybridParentIds: [parentAInstanceId, parentBInstanceId],
-  };
+  const hybridInstance = fusionCreateHybridInstance(
+    parentAInstanceId,
+    parentBInstanceId,
+    hybridDef,
+  );
 
   await updateGamestate((state) => {
     const newInhabitants = state.world.inhabitants
