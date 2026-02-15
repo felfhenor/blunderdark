@@ -79,6 +79,8 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Fear immunity**: set `fearTolerance: 99` to make inhabitant effectively fearless (stateModifierIsInhabitantScared checks tolerance)
 - **Adding new inhabitants**: append to `gamedata/inhabitant/base.yml`, define all 4 stateModifiers (normal/scared/hungry/starving), use `crypto.randomUUID()` for IDs
 - **Breeding recipes**: reference inhabitants by name (not UUID) in `parentInhabitantAId`/`parentInhabitantBId`, add to `gamedata/breedingrecipe/base.yml`
+- **Inappetent pattern**: set `foodConsumptionRate: 0` — hunger system already skips inhabitants with rate ≤ 0, keeping them permanently in `normal` state. Set hungry/starving stateModifiers to 1.0 (unreachable but required).
+- **Room-specific production bonuses**: use multiple `production_bonus` traits with different `targetResourceType` values to make an inhabitant benefit multiple room types (e.g., `crystals` for Crystal Mine, `gold` for Dark Forge, `flux` for Ley Line Nexus)
 
 ## Room-Specific Systems
 

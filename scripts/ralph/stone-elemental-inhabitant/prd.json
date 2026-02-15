@@ -16,8 +16,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added to gamedata/inhabitant/base.yml with HP:100, Attack:20, Defense:25, Speed:6, tier:2"
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Inappetent trait defined with effectType: food_exemption. foodConsumptionRate: 0 ensures hunger system skips this inhabitant (existing behavior in hunger.ts). Hungry/starving state modifiers set to 1.0 (unreachable). Existing hunger tests already cover foodConsumptionRate 0 behavior."
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Geological trait uses effectType: production_bonus with effectValue: 0.4 and targetResourceType: crystals. The production system (production.ts) already consumes production_bonus traits additively, so this works with existing code."
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Sturdy trait defined with effectType: defense_bonus, effectValue: 1. Currently data-only (defense_bonus not yet consumed by combat system), matching pattern of Orc's attack_bonus trait."
     },
     {
       "id": "US-005",
@@ -76,8 +76,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Scared state: defenseMultiplier 1.75 (base 25 * 1.75 ≈ +19 defense), attackMultiplier 0.6, productionMultiplier 0.7. fearTolerance: 4 (high but not immune). Hungry/starving states set to 1.0 multipliers (unreachable due to foodConsumptionRate: 0)."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Room interactions implemented via production_bonus traits: Geological (+40% crystals in Crystal Mine), Forge Affinity (+20% gold in Dark Forge), Ley Conductor (+15% flux in Ley Line Nexus). All use the existing production_bonus system which checks targetResourceType against room production."
     },
     {
       "id": "US-007",
@@ -106,8 +106,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Two breeding recipes added: Magma Golem (Stone Elemental + Fire Elemental, +6 attack/+10 hp, 1.5x time) and Living Statue (Stone Elemental + Gargoyle, +8 defense/+4 speed, 1.3x time). Both compile successfully."
     }
   ]
 }
