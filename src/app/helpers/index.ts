@@ -89,5 +89,7 @@ export * from './traps';
 export * from './ui';
 export * from './version';
 export * from './vertical-transport';
+export * from './victory';
+export * from './victory-conditions';
 export * from './world';
 export * from './worldgen';

@@ -2,7 +2,9 @@ import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import type {
   GameState,
   InhabitantContent,
+  IsContentItem,
   ResourceType,
+  RoomContent,
   VictoryConditionProgress,
   VictoryPathContent,
   VictoryPathProgress,
@@ -87,7 +89,7 @@ export function victoryConditionCheckRoomsBuilt(
   const builtRoomNames = new Set<string>();
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
-      const roomContent = contentGetEntry<{ name: string }>(room.roomTypeId);
+      const roomContent = contentGetEntry<RoomContent>(room.roomTypeId);
       if (roomContent) {
         builtRoomNames.add(roomContent.name);
       }
@@ -121,8 +123,8 @@ export function victoryConditionCheckConsecutivePeacefulDays(
 export function victoryConditionCheckAllResearchComplete(
   state: GameState,
 ): VictoryConditionProgress {
-  const allResearch = contentGetEntriesByType<{ id: string }>('research');
-  const completedSet = new Set(state.world.research.completedNodes);
+  const allResearch = contentGetEntriesByType<IsContentItem>('research');
+  const completedSet = new Set<string>(state.world.research.completedNodes);
   const allDone =
     allResearch.length > 0 &&
     allResearch.every((r) => completedSet.has(r.id));
@@ -155,7 +157,7 @@ export function victoryConditionCheckRoomCountByName(
   let count = 0;
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
-      const roomContent = contentGetEntry<{ name: string }>(room.roomTypeId);
+      const roomContent = contentGetEntry<RoomContent>(room.roomTypeId);
       if (roomContent?.name === roomName) {
         count++;
       }

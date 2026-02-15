@@ -10,7 +10,7 @@ import type {
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 const TEST_DEMON_LORD_ID = 'demon-lord-id' as InhabitantId;
 const TEST_DRAGON_ID = 'dragon-id' as InhabitantId;
@@ -267,7 +267,7 @@ describe('Terror Lord conditions', () => {
         floors: [
           { id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
           { id: 'f10', name: 'Floor 10', depth: 10, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-        ] as GameState['world']['floors'],
+        ] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckFloorDepth(state, 10);
       expect(result.met).toBe(true);
@@ -278,7 +278,7 @@ describe('Terror Lord conditions', () => {
       const state = makeState({
         floors: [
           { id: 'f1', name: 'Floor 1', depth: 5, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-        ] as GameState['world']['floors'],
+        ] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckFloorDepth(state, 10);
       expect(result.met).toBe(false);
@@ -339,7 +339,7 @@ describe("Dragon's Hoard conditions", () => {
             makeRoom(TEST_DRAGON_LAIR_ID),
           ],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as GameState['world']['floors'],
+        }] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
@@ -356,7 +356,7 @@ describe("Dragon's Hoard conditions", () => {
           id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
           rooms: [makeRoom(TEST_THRONE_ROOM_ID)],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as GameState['world']['floors'],
+        }] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
@@ -485,7 +485,7 @@ describe('Mad Scientist conditions', () => {
             makeRoom(TEST_BREEDING_PITS_ID, { id: 'r3' as PlacedRoomId }),
           ],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as GameState['world']['floors'],
+        }] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckRoomCountByName(
         state,
@@ -503,7 +503,7 @@ describe('Mad Scientist conditions', () => {
           id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
           rooms: [makeRoom(TEST_BREEDING_PITS_ID)],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as GameState['world']['floors'],
+        }] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckRoomCountByName(
         state,
@@ -588,7 +588,7 @@ describe('Harmonious Kingdom conditions', () => {
       const floors = Array.from({ length: 7 }, (_, i) => ({
         id: `f${i}`, name: `Floor ${i + 1}`, depth: i + 1, biome: 'neutral',
         grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [],
-      })) as GameState['world']['floors'];
+      })) as unknown as GameState['world']['floors'];
       const state = makeState({ floors });
       const result = victoryConditionCheckFloorCount(state, 7);
       expect(result.met).toBe(true);
@@ -699,7 +699,7 @@ describe('Eternal Empire conditions', () => {
           ),
           hallways: [], inhabitants: [], connections: [], traps: [],
         },
-      ] as GameState['world']['floors'];
+      ] as unknown as GameState['world']['floors'];
       const state = makeState({ floors });
       const result = victoryConditionCheckTotalRoomCount(state, 100);
       expect(result.met).toBe(true);
@@ -783,7 +783,7 @@ describe('victoryConditionEvaluatePath', () => {
       defenseWins: 10,
       floors: [
         { id: 'f10', name: 'Floor 10', depth: 10, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-      ] as GameState['world']['floors'],
+      ] as unknown as GameState['world']['floors'],
       inhabitants: [makeInhabitant(TEST_DEMON_LORD_ID)],
     });
     const path: VictoryPathContent = {
