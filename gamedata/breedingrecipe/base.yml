@@ -184,3 +184,25 @@
     defense: 8
     speed: 4
   timeMultiplier: 1.3
+
+- id: 5f723044-e898-4893-99e2-37dc25c4bedd
+  name: Trapjaw
+  description: A Mimic crossbred with Kobold ingenuity. Its jaw-like maw snaps shut with mechanical precision, combining shapeshifting ambush tactics with expert trap-craft.
+  parentInhabitantAId: Mimic
+  parentInhabitantBId: Kobold
+  resultName: Trapjaw
+  statBonuses:
+    attack: 6
+    speed: 4
+  timeMultiplier: 1.4
+
+- id: 7d924689-7e19-4e93-b05f-be6fc08b032c
+  name: Doppelganger
+  description: A Mimic merged with Slime adaptability. This amorphous shapeshifter can perfectly replicate any creature it observes, making it the ultimate infiltrator.
+  parentInhabitantAId: Mimic
+  parentInhabitantBId: Slime
+  resultName: Doppelganger
+  statBonuses:
+    hp: 8
+    defense: 4
+  timeMultiplier: 1.3

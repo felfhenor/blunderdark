@@ -889,3 +889,57 @@
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
+
+- id: d0276755-5f68-457a-be36-263f1bc95e83
+  name: Mimic
+  type: creature
+  tier: 2
+  description: A cunning shapeshifter that disguises itself as treasure chests, doors, and other dungeon fixtures. Mimics are deceptively versatile workers, adapting to any role, though they truly excel at guarding vaults and ambushing the unwary.
+  cost:
+    gold: 110
+    essence: 50
+  stats:
+    hp: 50
+    attack: 16
+    defense: 14
+    speed: 8
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-mimic-shapeshifter
+      name: Shapeshifter
+      description: Disguises as a room object. When revealed, deals +100% damage on the first attack against an invader.
+      effectType: attack_bonus
+      effectValue: 1.0
+    - id: trait-mimic-treasure-guardian
+      name: Treasure Guardian
+      description: Gains +2 Defense when assigned to a Treasure Vault.
+      effectType: defense_bonus
+      effectValue: 2
+    - id: trait-mimic-versatile
+      name: Versatile
+      description: Can work in any room at 80% efficiency, applied as a final multiplier after other bonuses.
+      effectType: versatility
+      effectValue: 0.8
+  fearTolerance: 2
+  fearModifier: 1
+  foodConsumptionRate: 1
+  corruptionGeneration: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.3
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.0
+      defenseMultiplier: 2.0
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 1.2
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.2
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.6
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
