@@ -21,8 +21,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in panel-fusion component with modal UI, inhabitant list with search, slot A/B selection, and game-play sidebar integration."
     },
     {
       "id": "US-002",
@@ -39,8 +39,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Preview shows hybrid stats with delta comparison, inherited vs unique traits, cost entries with sufficiency indicators, and disabled fuse button when resources insufficient."
     },
     {
       "id": "US-003",
@@ -58,8 +58,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Confirmation modal warns about permanent consumption. fusionExecute atomically pays cost, removes parents, creates hybrid with hybridParentIds. State persisted via updateGamestate/IndexedDB."
     },
     {
       "id": "US-004",
@@ -75,8 +75,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Recipes tab shows all recipes with parent A + parent B = hybrid, cost breakdown, 'Ready' badge for performable recipes, and search filtering."
     }
   ]
 }
