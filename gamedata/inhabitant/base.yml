@@ -915,6 +915,7 @@
       description: Gains +2 Defense when assigned to a Treasure Vault.
       effectType: defense_bonus
       effectValue: 2
+      targetRoomName: Treasure Vault
     - id: trait-mimic-versatile
       name: Versatile
       description: Can work in any room at 80% efficiency, applied as a final multiplier after other bonuses.

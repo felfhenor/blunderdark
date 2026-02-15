@@ -9,6 +9,7 @@ export type InhabitantTrait = {
   effectType: string;
   effectValue: number;
   targetResourceType?: string;
+  targetRoomName?: string;
 };
 
 export type InhabitantStats = {
