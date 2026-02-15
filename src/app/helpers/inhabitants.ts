@@ -95,6 +95,7 @@ export function inhabitantDeserialize(
     isTemporary: i.isTemporary ?? undefined,
     temporaryTicksRemaining: i.temporaryTicksRemaining ?? undefined,
     travelTicksRemaining: i.travelTicksRemaining ?? undefined,
+    discontentedTicks: i.discontentedTicks ?? undefined,
   }));
 }
 

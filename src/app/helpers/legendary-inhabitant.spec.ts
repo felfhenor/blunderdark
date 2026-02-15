@@ -67,6 +67,46 @@ vi.mock('@helpers/content', () => {
     adjacencyBonuses: [],
   });
 
+  // Inhabitant definitions (for upkeep/aura tests)
+  entries.set('legendary-dragon', {
+    id: 'legendary-dragon',
+    name: 'Dragon',
+    __type: 'inhabitant',
+    description: '',
+    type: 'creature',
+    tier: 4,
+    cost: { gold: 500, flux: 200 },
+    stats: { hp: 500, attack: 70, defense: 60, speed: 20, workerEfficiency: 1 },
+    traits: [
+      { id: 't1', name: 'Draconic Fury', effectType: 'aura_attack_bonus', effectValue: 0.15, description: '' },
+    ],
+    restrictionTags: ['unique'],
+    rulerBonuses: {},
+    rulerFearLevel: 4,
+    fearTolerance: 99,
+    foodConsumptionRate: 5,
+    upkeepCost: { gold: 10, food: 8 },
+    recruitmentRequirements: [],
+  });
+
+  entries.set('regular-goblin', {
+    id: 'regular-goblin',
+    name: 'Goblin',
+    __type: 'inhabitant',
+    description: '',
+    type: 'creature',
+    tier: 1,
+    cost: { gold: 10 },
+    stats: { hp: 20, attack: 5, defense: 3, speed: 10, workerEfficiency: 1 },
+    traits: [],
+    restrictionTags: [],
+    rulerBonuses: {},
+    rulerFearLevel: 0,
+    fearTolerance: 2,
+    foodConsumptionRate: 1,
+    stateModifiers: {},
+  });
+
   const allEntries = [...entries.values()];
 
   return {
@@ -78,6 +118,10 @@ vi.mock('@helpers/content', () => {
     contentAllIdsByName: vi.fn(() => new Map()),
   };
 });
+
+vi.mock('@helpers/game-time', () => ({
+  GAME_TIME_TICKS_PER_MINUTE: 5,
+}));
 
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetPaths: vi.fn((roomTypeId: string) => {
@@ -92,19 +136,26 @@ vi.mock('@helpers/room-upgrades', () => ({
 }));
 
 import {
+  LEGENDARY_DISCONTENTED_DEPARTURE_TICKS,
   legendaryInhabitantCanRecruit,
+  legendaryInhabitantIsAuraActive,
+  legendaryInhabitantIsDiscontented,
   legendaryInhabitantIsRecruited,
+  legendaryInhabitantUpkeepProcess,
 } from './legendary-inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type {
   Floor,
+  FloorId,
+  GameState,
   InhabitantInstance,
   InhabitantInstanceId,
+  PlacedRoomId,
   ResourceMap,
+  RoomId,
+  RoomShapeId,
 } from '@interfaces';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
-import type { FloorId } from '@interfaces/floor';
-import type { PlacedRoomId, RoomId, RoomShapeId } from '@interfaces/room-shape';
 
 const DRAGON_ID = 'legendary-dragon' as InhabitantId;
 const DEMON_LORD_ID = 'legendary-demon-lord' as InhabitantId;
@@ -464,5 +515,248 @@ describe('legendaryInhabitantIsRecruited', () => {
 
   it('should return false for empty inhabitants array', () => {
     expect(legendaryInhabitantIsRecruited(DRAGON_ID, [])).toBe(false);
+  });
+});
+
+// --- Upkeep & Aura Tests ---
+
+const GOBLIN_ID = 'regular-goblin' as InhabitantId;
+
+function makeGameState(opts: {
+  inhabitants?: InhabitantInstance[];
+  resources?: Partial<Record<string, { current: number; max: number }>>;
+  floors?: Floor[];
+}): GameState {
+  const inhabitants = opts.inhabitants ?? [];
+  const floor = opts.floors?.[0] ?? makeFloor([]);
+  floor.inhabitants = inhabitants.filter((i) => i.assignedRoomId !== undefined);
+
+  return {
+    clock: { numTicks: 0, day: 1, hour: 12, minute: 0, lastSaveTick: 0 },
+    world: {
+      inhabitants,
+      resources: makeResources(opts.resources),
+      floors: opts.floors ?? [floor],
+      currentFloorIndex: 0,
+      hallways: [],
+      season: { currentSeason: 'growth', ticksInSeason: 0 },
+      research: { activeResearchId: undefined, completedResearchIds: [], researchProgress: 0 },
+      reputation: {},
+      grid: [],
+    },
+  } as unknown as GameState;
+}
+
+describe('legendaryInhabitantUpkeepProcess', () => {
+  describe('upkeep deduction', () => {
+    it('should deduct upkeep resources each tick', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.assignedRoomId = 'room-placed-0' as PlacedRoomId;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 100, max: 1000 },
+          food: { current: 100, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      // Dragon upkeep: 10 gold/min, 8 food/min
+      // Per tick: 10/5=2 gold, 8/5=1.6 food
+      expect(state.world.resources.gold.current).toBeCloseTo(98);
+      expect(state.world.resources.food.current).toBeCloseTo(98.4);
+    });
+
+    it('should not deduct upkeep for non-legendary inhabitants', () => {
+      const goblin = makeInhabitant(GOBLIN_ID, 'Goblin');
+      const state = makeGameState({
+        inhabitants: [goblin],
+        resources: {
+          gold: { current: 100, max: 1000 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.resources.gold.current).toBe(100);
+    });
+
+    it('should reset discontentedTicks when upkeep is paid', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = 5;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 100, max: 1000 },
+          food: { current: 100, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants[0].discontentedTicks).toBe(0);
+    });
+  });
+
+  describe('discontented state', () => {
+    it('should increment discontentedTicks when upkeep cannot be paid', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants[0].discontentedTicks).toBe(1);
+    });
+
+    it('should accumulate discontented ticks over multiple calls', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+      legendaryInhabitantUpkeepProcess(state);
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants[0].discontentedTicks).toBe(3);
+    });
+  });
+
+  describe('legendary departure', () => {
+    it('should remove legendary after 5 minutes of discontent', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants).toHaveLength(0);
+    });
+
+    it('should not remove legendary before 5 minutes of discontent', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 2;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants).toHaveLength(1);
+    });
+
+    it('should also remove from floor inhabitants', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.assignedRoomId = 'room-placed-0' as PlacedRoomId;
+      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
+
+      const floor = makeFloor([{ roomTypeId: 'room-treasure-vault' }]);
+      floor.inhabitants = [{ ...dragon }];
+
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+        floors: [floor],
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants).toHaveLength(0);
+      expect(state.world.floors[0].inhabitants).toHaveLength(0);
+    });
+
+    it('should keep non-legendary inhabitants when legendary departs', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
+      const goblin = makeInhabitant(GOBLIN_ID, 'Goblin');
+
+      const state = makeGameState({
+        inhabitants: [dragon, goblin],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(state.world.inhabitants).toHaveLength(1);
+      expect(state.world.inhabitants[0].name).toBe('Goblin');
+    });
+  });
+});
+
+describe('legendaryInhabitantIsAuraActive', () => {
+  it('should return true when assigned and not discontented', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    dragon.assignedRoomId = 'room-placed-0' as PlacedRoomId;
+    dragon.discontentedTicks = 0;
+
+    expect(legendaryInhabitantIsAuraActive(dragon)).toBe(true);
+  });
+
+  it('should return false when not assigned to a room', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    dragon.assignedRoomId = undefined;
+
+    expect(legendaryInhabitantIsAuraActive(dragon)).toBe(false);
+  });
+
+  it('should return false when discontented', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    dragon.assignedRoomId = 'room-placed-0' as PlacedRoomId;
+    dragon.discontentedTicks = 3;
+
+    expect(legendaryInhabitantIsAuraActive(dragon)).toBe(false);
+  });
+
+  it('should return false for non-legendary inhabitants', () => {
+    const goblin = makeInhabitant(GOBLIN_ID, 'Goblin');
+    goblin.assignedRoomId = 'room-placed-0' as PlacedRoomId;
+
+    expect(legendaryInhabitantIsAuraActive(goblin)).toBe(false);
+  });
+});
+
+describe('legendaryInhabitantIsDiscontented', () => {
+  it('should return true when discontentedTicks > 0', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    dragon.discontentedTicks = 1;
+    expect(legendaryInhabitantIsDiscontented(dragon)).toBe(true);
+  });
+
+  it('should return false when discontentedTicks is 0', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    dragon.discontentedTicks = 0;
+    expect(legendaryInhabitantIsDiscontented(dragon)).toBe(false);
+  });
+
+  it('should return false when discontentedTicks is undefined', () => {
+    const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+    expect(legendaryInhabitantIsDiscontented(dragon)).toBe(false);
   });
 });
