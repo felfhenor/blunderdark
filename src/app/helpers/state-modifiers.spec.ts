@@ -461,3 +461,46 @@ describe('Orc Grumpy behavior (hungry state)', () => {
     expect(stateModifierGetProductionMultiplier(orc)).toBe(1.0);
   });
 });
+
+// --- Wraith Fearless behavior tests ---
+
+describe('Wraith Fearless behavior', () => {
+  const WRAITH_ID = 'wraith-def' as InhabitantId;
+
+  beforeEach(() => {
+    registerDef(WRAITH_ID, {
+      fearTolerance: 99,
+      stateModifiers: {
+        scared: {
+          productionMultiplier: 1.0,
+          foodConsumptionMultiplier: 1.0,
+          attackMultiplier: 1.0,
+          defenseMultiplier: 1.0,
+        },
+        normal: {
+          productionMultiplier: 1.0,
+          foodConsumptionMultiplier: 1.0,
+        },
+      },
+    });
+  });
+
+  it('should never be scared due to extreme fear tolerance (Fearless)', () => {
+    const wraith = makeInhabitant({ definitionId: WRAITH_ID });
+    // Even at maximum fear level 4, Wraith should not be scared
+    expect(stateModifierIsInhabitantScared(wraith, 4)).toBe(false);
+    expect(stateModifierIsInhabitantScared(wraith, 10)).toBe(false);
+    expect(stateModifierIsInhabitantScared(wraith, 50)).toBe(false);
+  });
+
+  it('should maintain full production even if somehow in scared state', () => {
+    const wraith = makeInhabitant({ definitionId: WRAITH_ID, state: 'scared' });
+    expect(stateModifierGetProductionMultiplier(wraith)).toBe(1.0);
+  });
+
+  it('should maintain full attack/defense even if somehow in scared state', () => {
+    const wraith = makeInhabitant({ definitionId: WRAITH_ID, state: 'scared' });
+    expect(stateModifierGetAttackMultiplier(wraith)).toBe(1.0);
+    expect(stateModifierGetDefenseMultiplier(wraith)).toBe(1.0);
+  });
+});

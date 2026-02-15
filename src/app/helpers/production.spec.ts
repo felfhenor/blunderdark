@@ -128,6 +128,45 @@ vi.mock('@helpers/content', () => {
     ],
   });
 
+  entries.set('def-wraith', {
+    id: 'def-wraith',
+    name: 'Wraith',
+    __type: 'inhabitant',
+    type: 'undead',
+    tier: 2,
+    description: '',
+    cost: {},
+    stats: {
+      hp: 30,
+      attack: 16,
+      defense: 8,
+      speed: 20,
+      workerEfficiency: 1.1,
+    },
+    traits: [
+      {
+        id: 'trait-wraith-scholar',
+        name: 'Scholar',
+        description: '',
+        effectType: 'production_bonus',
+        effectValue: 0.2,
+        targetResourceType: 'research',
+      },
+    ],
+  });
+
+  entries.set('room-shadow-library', {
+    id: 'room-shadow-library',
+    name: 'Shadow Library',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1' as RoomShapeId,
+    cost: {},
+    production: { research: 0.6 },
+    requiresWorkers: true,
+    adjacencyBonuses: [],
+  });
+
   entries.set('shape-1', {
     id: 'shape-1',
     name: 'Test 2x1',
@@ -350,6 +389,78 @@ describe('productionCalculateInhabitantBonus', () => {
     // Unknown definition is skipped, but inhabitant was assigned so hasWorkers is true
     expect(result.bonus).toBe(0);
     expect(result.hasWorkers).toBe(true);
+  });
+});
+
+describe('Wraith Scholar trait in research rooms', () => {
+  const shadowLibrary: PlacedRoom = {
+    id: 'placed-library-1' as PlacedRoomId,
+    roomTypeId: 'room-shadow-library' as RoomId,
+    shapeId: 'shape-1' as RoomShapeId,
+    anchorX: 0,
+    anchorY: 0,
+  };
+
+  it('should apply Scholar +20% research bonus in research-producing room', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-wraith' as InhabitantId,
+        name: 'Wraith 1',
+        state: 'normal',
+        assignedRoomId: 'placed-library-1' as PlacedRoomId,
+      },
+    ];
+    const result = productionCalculateInhabitantBonus(shadowLibrary, inhabitants);
+    // Wraith: workerEfficiency (1.1 - 1.0) = 0.1, plus Scholar production_bonus 0.2 = 0.3
+    expect(result.bonus).toBeCloseTo(0.3);
+    expect(result.hasWorkers).toBe(true);
+  });
+
+  it('should not apply Scholar research bonus in non-research room', () => {
+    const crystalMineRoom: PlacedRoom = {
+      id: 'placed-mine-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-wraith' as InhabitantId,
+        name: 'Wraith 1',
+        state: 'normal',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
+      },
+    ];
+    const result = productionCalculateInhabitantBonus(crystalMineRoom, inhabitants);
+    // Wraith in crystal mine: workerEfficiency (1.1 - 1.0) = 0.1, Scholar does NOT apply (research != crystals)
+    expect(result.bonus).toBeCloseTo(0.1);
+  });
+
+  it('should stack Scholar bonus with other inhabitants', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-wraith' as InhabitantId,
+        name: 'Wraith 1',
+        state: 'normal',
+        assignedRoomId: 'placed-library-1' as PlacedRoomId,
+      },
+      {
+        instanceId: 'inst-2' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin 1',
+        state: 'normal',
+        assignedRoomId: 'placed-library-1' as PlacedRoomId,
+      },
+    ];
+    const result = productionCalculateInhabitantBonus(shadowLibrary, inhabitants);
+    // Wraith: (1.1 - 1.0) + 0.2 = 0.3
+    // Goblin: (1.0 - 1.0) + 0.2 = 0.2 (Goblin's production_bonus has no targetResourceType, applies to all)
+    // Total: 0.5
+    expect(result.bonus).toBeCloseTo(0.5);
   });
 });
 

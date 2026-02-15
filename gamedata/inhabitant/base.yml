@@ -733,6 +733,62 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
+- id: 5aa928ef-07a6-4d41-997d-9b20f1e31779
+  name: Wraith
+  type: undead
+  tier: 2
+  description: A spectral entity of pure malice and intellect, drifting between worlds. Wraiths are fearless, terrifying to behold, and impossible to strike with mundane weapons.
+  cost:
+    gold: 130
+    essence: 60
+  stats:
+    hp: 30
+    attack: 16
+    defense: 8
+    speed: 20
+    workerEfficiency: 1.1
+  traits:
+    - id: trait-wraith-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
+    - id: trait-wraith-terrifying
+      name: Terrifying
+      description: Adds +2 Fear to the room the Wraith is assigned to.
+      effectType: fear_bonus
+      effectValue: 2
+    - id: trait-wraith-intangible
+      name: Intangible
+      description: 50% chance to evade physical attacks. Magical attacks are unaffected.
+      effectType: physical_evasion
+      effectValue: 0.5
+    - id: trait-wraith-scholar
+      name: Scholar
+      description: Increases research production by 20% when assigned to a research-producing room.
+      effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: research
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  corruptionGeneration: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
 - id: 1df0572f-4dc5-4ba8-9c4d-d1df84f58979
   name: Converted Prisoner
   type: creature

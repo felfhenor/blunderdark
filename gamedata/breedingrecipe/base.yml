@@ -140,3 +140,25 @@
     hp: 8
     defense: 5
   timeMultiplier: 1.3
+
+- id: 829e3fb7-6741-4119-9cff-e9fbed367095
+  name: Phantom Scholar
+  description: A wraith fused with an arcane familiar, creating a spectral entity of unmatched intellect. Excels at research above all else.
+  parentInhabitantAId: Wraith
+  parentInhabitantBId: Arcane Familiar
+  resultName: Phantom Scholar
+  statBonuses:
+    speed: 3
+    workerEfficiency: 0.4
+  timeMultiplier: 1.2
+
+- id: 02690383-fd24-40df-83ee-e015120ce864
+  name: Banshee
+  description: A wraith merged with a frost wraith, amplifying its spectral horror into a wailing terror that freezes the blood of invaders.
+  parentInhabitantAId: Wraith
+  parentInhabitantBId: Frost Wraith
+  resultName: Banshee
+  statBonuses:
+    attack: 4
+    hp: 5
+  timeMultiplier: 1.4
