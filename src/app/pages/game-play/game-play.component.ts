@@ -13,6 +13,7 @@ import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.comp
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
+import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
 import { PanelStairInfoComponent } from '@components/panel-stair-info/panel-stair-info.component';
@@ -55,6 +56,7 @@ import {
     PanelFusionComponent,
     PanelHallwayInfoComponent,
     PanelVictoryComponent,
+    VictoryMenuComponent,
     PanelStairInfoComponent,
     PanelElevatorInfoComponent,
     PanelPortalInfoComponent,
@@ -82,6 +84,7 @@ export class GamePlayComponent extends OptionsBaseComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public showResearch = signal(false);
   public showFusion = signal(false);
+  public showVictoryMenu = signal(false);
   public canShowFusion = computed(() => fusionHasAvailableCreatures());
 
   public currentFloorDepth = computed(() => {

@@ -40,6 +40,7 @@ const {
   victoryAchievedPathId,
   victoryProgressMap,
   victoryIsAchieved,
+  victoryCalculatePathCompletionPercent,
 } = await import('@helpers/victory');
 
 function makePathContent(
@@ -339,5 +340,148 @@ describe('victoryReset', () => {
     expect(victoryAchievedPathId()).toBeUndefined();
     expect(victoryIsAchieved()).toBe(false);
     expect(victoryProgressMap().size).toBe(0);
+  });
+});
+
+describe('victoryCalculatePathCompletionPercent', () => {
+  function makeMultiConditionPath(
+    condCount: number,
+  ): VictoryPathContent {
+    return {
+      id: TEST_PATH_A_ID,
+      name: 'TestPath',
+      description: 'desc',
+      __type: 'victorypath',
+      conditions: Array.from({ length: condCount }, (_, i) => ({
+        id: `cond_${i}`,
+        description: `Condition ${i}`,
+        checkType: 'count' as const,
+        target: 100,
+      })),
+    };
+  }
+
+  it('returns 0 when progress is undefined', () => {
+    const path = makeMultiConditionPath(3);
+    expect(victoryCalculatePathCompletionPercent(path, undefined)).toBe(0);
+  });
+
+  it('returns 0 when path has no conditions', () => {
+    const path: VictoryPathContent = {
+      id: TEST_PATH_A_ID,
+      name: 'Empty',
+      description: 'desc',
+      __type: 'victorypath',
+      conditions: [],
+    };
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [],
+      complete: false,
+    };
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(0);
+  });
+
+  it('returns 100 when all conditions are fully met', () => {
+    const path = makeMultiConditionPath(3);
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [
+        { conditionId: 'cond_0', currentValue: 100, met: true },
+        { conditionId: 'cond_1', currentValue: 100, met: true },
+        { conditionId: 'cond_2', currentValue: 100, met: true },
+      ],
+      complete: true,
+    };
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(100);
+  });
+
+  it('returns weighted average for partial progress', () => {
+    const path = makeMultiConditionPath(2);
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [
+        { conditionId: 'cond_0', currentValue: 50, met: false },
+        { conditionId: 'cond_1', currentValue: 100, met: true },
+      ],
+      complete: false,
+    };
+    // (0.5 + 1.0) / 2 * 100 = 75
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(75);
+  });
+
+  it('clamps individual condition progress to 100%', () => {
+    const path = makeMultiConditionPath(1);
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [
+        { conditionId: 'cond_0', currentValue: 200, met: true },
+      ],
+      complete: true,
+    };
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(100);
+  });
+
+  it('handles flag conditions (target=1) correctly', () => {
+    const path: VictoryPathContent = {
+      id: TEST_PATH_A_ID,
+      name: 'FlagPath',
+      description: 'desc',
+      __type: 'victorypath',
+      conditions: [
+        { id: 'flag_cond', description: 'Flag', checkType: 'flag', target: 1 },
+        { id: 'count_cond', description: 'Count', checkType: 'count', target: 10 },
+      ],
+    };
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [
+        { conditionId: 'flag_cond', currentValue: 1, met: true },
+        { conditionId: 'count_cond', currentValue: 5, met: false },
+      ],
+      complete: false,
+    };
+    // (1.0 + 0.5) / 2 * 100 = 75
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(75);
+  });
+
+  it('returns 0 when no conditions have progress entries', () => {
+    const path = makeMultiConditionPath(2);
+    const progress: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [],
+      complete: false,
+    };
+    expect(victoryCalculatePathCompletionPercent(path, progress)).toBe(0);
+  });
+
+  it('handles tied paths (both return same percent)', () => {
+    const pathA = makeMultiConditionPath(2);
+    const pathB: VictoryPathContent = {
+      ...makeMultiConditionPath(2),
+      id: TEST_PATH_B_ID,
+    };
+
+    const progressA: VictoryPathProgress = {
+      pathId: TEST_PATH_A_ID,
+      conditions: [
+        { conditionId: 'cond_0', currentValue: 50, met: false },
+        { conditionId: 'cond_1', currentValue: 50, met: false },
+      ],
+      complete: false,
+    };
+    const progressB: VictoryPathProgress = {
+      pathId: TEST_PATH_B_ID,
+      conditions: [
+        { conditionId: 'cond_0', currentValue: 50, met: false },
+        { conditionId: 'cond_1', currentValue: 50, met: false },
+      ],
+      complete: false,
+    };
+
+    const percentA = victoryCalculatePathCompletionPercent(pathA, progressA);
+    const percentB = victoryCalculatePathCompletionPercent(pathB, progressB);
+    expect(percentA).toBe(percentB);
+    expect(percentA).toBe(50);
   });
 });

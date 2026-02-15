@@ -41,6 +41,17 @@
     <app-panel-research-summary (openResearch)="showResearch.set(true)" />
     <app-panel-room-select />
     <app-panel-reputation />
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between">
+          <h3 class="card-title text-sm">Victory Paths</h3>
+          <button class="btn btn-xs btn-outline" (click)="showVictoryMenu.set(true)">
+            Open
+          </button>
+        </div>
+        <p class="text-xs opacity-50">Track your progress toward victory.</p>
+      </div>
+    </div>
   </div>
   <div class="flex-1 overflow-auto">
     <app-grid />
@@ -51,5 +62,6 @@
 <app-game-research [(visible)]="showResearch" />
 <app-panel-fusion [(visible)]="showFusion" />
 <app-panel-victory />
+<app-victory-menu [(visible)]="showVictoryMenu" />
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

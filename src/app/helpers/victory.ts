@@ -68,6 +68,32 @@ export function victoryProcess(state: GameState): void {
   _victoryProgressMap.set(newMap);
 }
 
+export function victoryCalculatePathCompletionPercent(
+  path: VictoryPathContent,
+  progress: VictoryPathProgress | undefined,
+): number {
+  if (!progress || path.conditions.length === 0) return 0;
+
+  let totalWeight = 0;
+
+  for (const cond of path.conditions) {
+    const condProgress = progress.conditions.find(
+      (c) => c.conditionId === cond.id,
+    );
+    if (!condProgress) continue;
+
+    const fraction =
+      cond.target > 0
+        ? Math.min(1, condProgress.currentValue / cond.target)
+        : condProgress.met
+          ? 1
+          : 0;
+    totalWeight += fraction;
+  }
+
+  return (totalWeight / path.conditions.length) * 100;
+}
+
 export function victoryRecordDefenseWin(state: GameState): void {
   state.world.victoryProgress.totalInvasionDefenseWins++;
 }
