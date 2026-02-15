@@ -18,6 +18,7 @@ import type { CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
 import type { StairInstance } from '@interfaces/stair';
 import type { ElevatorInstance } from '@interfaces/elevator';
 import type { PortalInstance } from '@interfaces/portal';
+import type { VictoryProgress } from '@interfaces/victory';
 
 export interface GameStateWorld {
   grid: GridState;
@@ -40,6 +41,7 @@ export interface GameStateWorld {
   stairs: StairInstance[];
   elevators: ElevatorInstance[];
   portals: PortalInstance[];
+  victoryProgress: VictoryProgress;
 }
 
 export interface GameStateClock {

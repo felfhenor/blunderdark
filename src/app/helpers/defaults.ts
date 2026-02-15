@@ -13,6 +13,7 @@ import type {
   SeasonState,
   StatBlock,
   UnlockedContent,
+  VictoryProgress,
 } from '@interfaces';
 
 export function defaultGameState(): GameState {
@@ -52,6 +53,7 @@ export function defaultGameState(): GameState {
       stairs: [],
       elevators: [],
       portals: [],
+      victoryProgress: defaultVictoryProgress(),
     },
   };
 }
@@ -136,6 +138,16 @@ export function defaultCorruptionEffectState(): CorruptionEffectState {
     lastMutationCorruption: undefined,
     lastCrusadeCorruption: undefined,
     warnedThresholds: [],
+  };
+}
+
+export function defaultVictoryProgress(): VictoryProgress {
+  return {
+    consecutivePeacefulDays: 0,
+    lastPeacefulCheckDay: 0,
+    consecutiveZeroCorruptionDays: 0,
+    lastZeroCorruptionCheckDay: 0,
+    totalInvasionDefenseWins: 0,
   };
 }
 

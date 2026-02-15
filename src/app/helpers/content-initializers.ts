@@ -28,6 +28,7 @@ import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { SeasonBonusContent, SeasonBonusId } from '@interfaces/content-seasonbonus';
 import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
+import type { VictoryPathContent, VictoryPathId } from '@interfaces/content-victorypath';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +52,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
   trap: ensureTrap,
+  victorypath: ensureVictoryPath,
 };
 
 export function ensureContent<T extends IsContentItem>(content: T): T {
@@ -424,5 +426,22 @@ function ensureSeasonBonus(
     })),
     recruitmentCostMultiplier: bonus.recruitmentCostMultiplier ?? 1.0,
     flags: bonus.flags ?? [],
+  };
+}
+
+function ensureVictoryPath(
+  path: Partial<VictoryPathContent>,
+): VictoryPathContent {
+  return {
+    id: path.id ?? ('UNKNOWN' as VictoryPathId),
+    name: path.name ?? 'UNKNOWN',
+    __type: 'victorypath',
+    description: path.description ?? '',
+    conditions: (path.conditions ?? []).map((c) => ({
+      id: c.id ?? '',
+      description: c.description ?? '',
+      checkType: c.checkType ?? 'flag',
+      target: c.target ?? 0,
+    })),
   };
 }

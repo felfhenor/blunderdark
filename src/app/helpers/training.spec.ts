@@ -305,6 +305,7 @@ function makeGameState(
       stairs: [],
       elevators: [],
       portals: [],
+      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
     },
   };
 }

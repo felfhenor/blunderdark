@@ -17,7 +17,8 @@ export type ContentType =
   | 'seasonbonus'
   | 'summonrecipe'
   | 'synergy'
-  | 'trap';
+  | 'trap'
+  | 'victorypath';
 
 export interface Identifiable {
   id: string;

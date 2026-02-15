@@ -10,6 +10,7 @@ import {
   defaultResearchState,
   defaultResources,
   defaultSeasonState,
+  defaultVictoryProgress,
 } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
@@ -75,6 +76,7 @@ export async function worldgenGenerateWorld(): Promise<
     stairs: [],
     elevators: [],
     portals: [],
+    victoryProgress: defaultVictoryProgress(),
     didFinish: true,
   };
 }
