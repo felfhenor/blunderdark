@@ -86,6 +86,40 @@
         </div>
       }
 
+      <!-- Feature Slots -->
+      @if (featureSlots().length > 0) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Features:</h4>
+          <div class="flex flex-col gap-1">
+            @for (slot of featureSlots(); track slot.index) {
+              @if (slot.feature) {
+                <div class="flex items-center justify-between gap-2">
+                  <span
+                    class="text-xs truncate"
+                    [tp]="slot.feature.description"
+                    [tpDelay]="250"
+                  >{{ slot.feature.name }}</span>
+                  <button
+                    class="btn btn-xs btn-outline btn-error"
+                    [swal]="featureRemoveSwal"
+                    (click)="featureRemoveSlotIndex = slot.index"
+                  >
+                    Remove
+                  </button>
+                </div>
+              } @else {
+                <button
+                  class="btn btn-xs btn-outline btn-accent w-full"
+                  (click)="onOpenFeatureSelect(slot.index)"
+                >
+                  + Add Feature
+                </button>
+              }
+            }
+          </div>
+        </div>
+      }
+
       @if (room.maxInhabitants !== 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">
@@ -204,4 +238,68 @@
       }
     </div>
   </div>
+
+  <!-- Feature removal confirmation -->
+  <swal
+    #featureRemoveSwal
+    title="Remove Feature?"
+    text="This feature will be destroyed and cannot be recovered."
+    icon="warning"
+    confirmButtonText="Yes, remove"
+    cancelButtonText="No, keep"
+    [showCancelButton]="true"
+    (confirm)="onRemoveFeature(featureRemoveSlotIndex)"
+  ></swal>
+
+  <!-- Feature selection modal -->
+  <app-modal [(visible)]="showFeatureSelect">
+    <span title>Select Feature</span>
+    <div body>
+      @if (availableFeatures().length === 0) {
+        <p class="text-sm opacity-50">No features available.</p>
+      } @else {
+        <div class="flex flex-col gap-2 max-h-64 overflow-y-auto">
+          @for (entry of availableFeatures(); track entry.feature.id) {
+            <div
+              class="card card-compact bg-base-200"
+              [class.opacity-50]="!entry.affordable"
+            >
+              <div class="card-body p-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <h5 class="text-sm font-semibold">{{ entry.feature.name }}</h5>
+                    <p class="text-xs opacity-70">{{ entry.feature.description }}</p>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                      @for (bonus of entry.feature.bonuses; track bonus.description) {
+                        <span class="badge badge-xs badge-success badge-outline">{{ bonus.description }}</span>
+                      }
+                    </div>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                      @for (cost of entry.costEntries; track cost.type) {
+                        <span
+                          class="badge badge-xs"
+                          [class.badge-error]="!entry.affordable"
+                          [class.badge-outline]="entry.affordable"
+                        >{{ cost.amount }} {{ cost.type }}</span>
+                      }
+                    </div>
+                  </div>
+                  <button
+                    class="btn btn-xs btn-primary"
+                    [disabled]="!entry.affordable"
+                    (click)="onAttachFeature(entry.feature.id)"
+                  >
+                    Attach
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div actions>
+      <button class="btn btn-sm" (click)="showFeatureSelect.set(false)">Cancel</button>
+    </div>
+  </app-modal>
 }

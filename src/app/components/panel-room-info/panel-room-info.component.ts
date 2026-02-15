@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
+import { ModalComponent } from '@components/modal/modal.component';
 import {
   inhabitantAssignToRoom,
   inhabitantAll,
@@ -9,6 +10,7 @@ import {
   roomRemovalExecute,
   connectionGetAdjacentUnconnected,
   contentGetEntry,
+  contentGetEntriesByType,
   roomUpgradeGetEffectiveMaxInhabitants,
   roomRemovalGetInfo,
   connectionGetRoomConnections,
@@ -26,15 +28,26 @@ import {
   fearLevelBreakdownMap,
   fearLevelGetLabel,
   FEAR_LEVEL_MAX,
+  roomShapeResolve,
+  featureGetSlotCount,
+  featureGetForSlot,
+  featureAttachToSlot,
+  featureRemoveFromSlot,
+  resourceCanAfford,
+  resourcePayCost,
+  updateGamestate,
+  gamestate,
 } from '@helpers';
 import type { PlacedRoomId } from '@interfaces';
+import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { ResourceType } from '@interfaces/resource';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [SweetAlert2Module, HungerIndicatorComponent, TippyDirective],
+  imports: [SweetAlert2Module, HungerIndicatorComponent, TippyDirective, ModalComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -191,6 +204,53 @@ export class PanelRoomInfoComponent {
     });
   });
 
+  // --- Feature slots ---
+
+  public featureSlots = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return [];
+
+    const shape = roomShapeResolve(room.placedRoom);
+    const slotCount = featureGetSlotCount(shape.tiles.length);
+
+    const slots: { index: number; feature: FeatureContent | undefined }[] = [];
+    for (let i = 0; i < slotCount; i++) {
+      slots.push({
+        index: i,
+        feature: featureGetForSlot(room.placedRoom, i),
+      });
+    }
+    return slots;
+  });
+
+  public showFeatureSelect = signal(false);
+  public featureSelectSlotIndex = signal(0);
+  public featureRemoveSlotIndex = 0;
+
+  public availableFeatures = computed(() => {
+    const allFeatures = contentGetEntriesByType<FeatureContent>('feature');
+    const resources = gamestate().world.resources;
+
+    return allFeatures.map((f) => {
+      const affordable = resourceCanAfford(f.cost);
+      const shortfall: { type: string; needed: number; have: number }[] = [];
+      if (!affordable) {
+        for (const [type, amount] of Object.entries(f.cost)) {
+          const current = resources[type as ResourceType]?.current ?? 0;
+          if (current < amount) {
+            shortfall.push({ type, needed: amount, have: current });
+          }
+        }
+      }
+      const costEntries = Object.entries(f.cost)
+        .filter(([, v]) => v !== undefined && v > 0)
+        .map(([type, amount]) => ({ type, amount: amount as number }));
+      return { feature: f, affordable, shortfall, costEntries };
+    });
+  });
+
+  // --- Actions ---
+
   public async onConnect(otherRoomId: string): Promise<void> {
     const room = this.selectedRoom();
     if (!room) return;
@@ -295,5 +355,65 @@ export class PanelRoomInfoComponent {
     } else {
       notifyError(result.error ?? 'Failed to remove room');
     }
+  }
+
+  // --- Feature actions ---
+
+  public onOpenFeatureSelect(slotIndex: number): void {
+    this.featureSelectSlotIndex.set(slotIndex);
+    this.showFeatureSelect.set(true);
+  }
+
+  public async onAttachFeature(featureId: FeatureId): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const feature = contentGetEntry<FeatureContent>(featureId);
+    if (!feature) return;
+
+    const paid = await resourcePayCost(feature.cost);
+    if (!paid) {
+      notifyError('Cannot afford this feature');
+      return;
+    }
+
+    const slotIndex = this.featureSelectSlotIndex();
+    const shape = roomShapeResolve(room.placedRoom);
+    const totalSlots = featureGetSlotCount(shape.tiles.length);
+
+    await updateGamestate((state) => {
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          featureAttachToSlot(target, slotIndex, featureId, totalSlots);
+          break;
+        }
+      }
+      return state;
+    });
+
+    this.showFeatureSelect.set(false);
+    notifySuccess(`Attached ${feature.name}`);
+  }
+
+  public async onRemoveFeature(slotIndex: number): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const feature = featureGetForSlot(room.placedRoom, slotIndex);
+    const featureName = feature?.name ?? 'Feature';
+
+    await updateGamestate((state) => {
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          featureRemoveFromSlot(target, slotIndex);
+          break;
+        }
+      }
+      return state;
+    });
+
+    notifySuccess(`Removed ${featureName} (destroyed)`);
   }
 }
