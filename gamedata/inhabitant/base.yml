@@ -675,6 +675,64 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
+- id: 290bfe44-8d86-4932-927a-7d355b2d2c17
+  name: Orc
+  type: creature
+  tier: 2
+  description: A brutish green-skinned warrior bred for battle. Orcs are fierce fighters who thrive in barracks and forges, but their temper makes them volatile when scared.
+  cost:
+    gold: 100
+    food: 40
+  stats:
+    hp: 90
+    attack: 28
+    defense: 18
+    speed: 12
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-orc-warrior
+      name: Warrior
+      description: Increases training speed by 30% when assigned to a Barracks or Training Grounds.
+      effectType: training_bonus
+      effectValue: 0.3
+    - id: trait-orc-intimidating
+      name: Intimidating
+      description: Adds +1 Fear to the room the Orc is assigned to.
+      effectType: fear_bonus
+      effectValue: 1
+    - id: trait-orc-strong
+      name: Strong
+      description: Adds +2 Attack in combat encounters.
+      effectType: attack_bonus
+      effectValue: 2
+    - id: trait-orc-aggressive
+      name: Aggressive
+      description: Orcs always act first in combat, gaining initiative priority.
+      effectType: combat_priority
+      effectValue: 1
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 3
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.3
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 1.5
+      defenseMultiplier: 0.5
+    hungry:
+      productionMultiplier: 0.8
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
 - id: 1df0572f-4dc5-4ba8-9c4d-d1df84f58979
   name: Converted Prisoner
   type: creature

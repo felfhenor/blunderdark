@@ -118,3 +118,25 @@
     attack: 5
     workerEfficiency: 0.2
   timeMultiplier: 1.4
+
+- id: eeb601b9-061a-44e8-8b04-ebc34e469ca3
+  name: War Goblin
+  description: A goblin trained and bred alongside orcs, combining orcish brawn with goblin cunning. A fierce raider.
+  parentInhabitantAId: Orc
+  parentInhabitantBId: Goblin
+  resultName: War Goblin
+  statBonuses:
+    attack: 4
+    speed: 3
+  timeMultiplier: 1.0
+
+- id: 95ebd98c-5aa4-402c-8b12-aa86a36af1e8
+  name: Bone Crusher
+  description: An orc fused with skeletal reinforcement. Tireless, brutal, and nearly unbreakable on the front lines.
+  parentInhabitantAId: Orc
+  parentInhabitantBId: Skeleton
+  resultName: Bone Crusher
+  statBonuses:
+    hp: 8
+    defense: 5
+  timeMultiplier: 1.3
