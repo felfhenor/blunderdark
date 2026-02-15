@@ -10,6 +10,7 @@ import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark
 import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/panel-floor-minimap.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
+import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
@@ -55,6 +56,7 @@ import {
     PanelFloorSelectorComponent,
     PanelFusionComponent,
     PanelHallwayInfoComponent,
+    PanelMerchantComponent,
     PanelVictoryComponent,
     VictoryMenuComponent,
     PanelStairInfoComponent,

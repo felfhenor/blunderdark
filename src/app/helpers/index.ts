@@ -47,6 +47,7 @@ export * from './invasion-win-loss';
 export * from './legendary-inhabitant';
 export * from './lich';
 export * from './logging';
+export * from './merchant';
 export * from './migrate';
 export * from './mimic';
 export * from './morale';

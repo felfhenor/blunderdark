@@ -1,0 +1,120 @@
+@if (isPresent()) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <div class="flex items-center justify-between">
+        <h3 class="card-title text-sm">Traveling Merchant</h3>
+        <span class="badge badge-warning badge-xs">{{ daysRemaining() }} days left</span>
+      </div>
+      <p class="text-xs opacity-50">A merchant has arrived during Harvest season.</p>
+      <button class="btn btn-xs btn-secondary" (click)="open()">
+        Browse Trades
+      </button>
+    </div>
+  </div>
+}
+
+<app-modal [(visible)]="visible" [showCloseButton]="true" widthClass="max-w-2xl">
+  <span title>Traveling Merchant</span>
+
+  <div body>
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs opacity-70">
+        Departing in {{ daysRemaining() }} day{{ daysRemaining() === 1 ? '' : 's' }}
+      </span>
+    </div>
+
+    <div class="tabs tabs-boxed tabs-xs mb-3">
+      <button
+        class="tab"
+        [class.tab-active]="activeCategory() === 'all'"
+        (click)="setCategory('all')"
+      >All ({{ categoryCounts().all }})</button>
+      <button
+        class="tab"
+        [class.tab-active]="activeCategory() === 'buy'"
+        (click)="setCategory('buy')"
+      >Buy ({{ categoryCounts().buy }})</button>
+      <button
+        class="tab"
+        [class.tab-active]="activeCategory() === 'sell'"
+        (click)="setCategory('sell')"
+      >Sell ({{ categoryCounts().sell }})</button>
+      <button
+        class="tab"
+        [class.tab-active]="activeCategory() === 'special'"
+        (click)="setCategory('special')"
+      >Special ({{ categoryCounts().special }})</button>
+    </div>
+
+    <div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
+      @for (entry of filteredTrades(); track entry.trade.id) {
+        <div
+          class="card bg-base-200 shadow-sm"
+          [class.opacity-40]="entry.stock <= 0"
+        >
+          <div class="card-body p-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-sm">{{ entry.trade.name }}</span>
+                  <span
+                    class="badge badge-xs"
+                    [class]="getCategoryBadgeClass(entry.trade.type)"
+                  >{{ getCategoryLabel(entry.trade.type) }}</span>
+                </div>
+                <p class="text-xs opacity-60 mt-0.5">{{ entry.trade.description }}</p>
+
+                <div class="flex flex-wrap items-center gap-3 mt-1.5">
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs opacity-50">Cost:</span>
+                    @for (cost of entry.costEntries; track cost.type) {
+                      <span
+                        class="badge badge-xs"
+                        [class.badge-error]="!entry.affordable"
+                        [class.badge-outline]="entry.affordable"
+                      >{{ cost.amount }} {{ cost.type }}</span>
+                    }
+                  </div>
+
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs opacity-50">Gain:</span>
+                    @for (reward of entry.rewardEntries; track reward.type) {
+                      <span class="badge badge-xs badge-success badge-outline">
+                        +{{ reward.amount }} {{ reward.type }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                <span class="text-xs opacity-50">Stock: {{ entry.stock }}</span>
+                <button
+                  class="btn btn-xs btn-primary"
+                  [disabled]="entry.stock <= 0 || !entry.affordable"
+                  (click)="executeTrade(entry.trade.id)"
+                >
+                  @if (entry.stock <= 0) {
+                    Sold Out
+                  } @else if (!entry.affordable) {
+                    Can't Afford
+                  } @else {
+                    Trade
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-center text-xs opacity-50 py-4">
+          No trades available in this category.
+        </div>
+      }
+    </div>
+  </div>
+
+  <div actions>
+    <button class="btn btn-sm" (click)="close()">Close</button>
+  </div>
+</app-modal>

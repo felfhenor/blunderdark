@@ -1,9 +1,13 @@
-import { contentGetEntriesByType } from '@helpers/content';
+import { computed } from '@angular/core';
+import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
   MerchantState,
   MerchantTradeContent,
+  MerchantTradeId,
   TradeOffer,
 } from '@interfaces';
 import { Subject } from 'rxjs';
@@ -107,6 +111,90 @@ export function merchantDeparture(): MerchantState {
     departureDayRemaining: 0,
     inventory: [],
   };
+}
+
+// --- Computed signals ---
+
+export const merchantIsPresent = computed(
+  () => gamestate().world.merchant.isPresent,
+);
+
+export const merchantDaysRemaining = computed(
+  () => gamestate().world.merchant.departureDayRemaining,
+);
+
+export const merchantInventory = computed(
+  () => gamestate().world.merchant.inventory,
+);
+
+// --- Trade execution ---
+
+export function merchantCanAffordTrade(trade: MerchantTradeContent): boolean {
+  return resourceCanAfford(trade.cost);
+}
+
+export function merchantIsTradeInStock(tradeId: MerchantTradeId): boolean {
+  const offer = gamestate().world.merchant.inventory.find(
+    (o) => o.tradeId === tradeId,
+  );
+  return (offer?.stock ?? 0) > 0;
+}
+
+export async function merchantExecuteTrade(
+  tradeId: MerchantTradeId,
+): Promise<{ success: boolean; error?: string }> {
+  const trade = contentGetEntry<MerchantTradeContent>(tradeId);
+  if (!trade) return { success: false, error: 'Trade not found' };
+
+  if (!gamestate().world.merchant.isPresent) {
+    return { success: false, error: 'Merchant is not present' };
+  }
+
+  if (!merchantIsTradeInStock(tradeId)) {
+    return { success: false, error: 'Trade is sold out' };
+  }
+
+  if (!merchantCanAffordTrade(trade)) {
+    return { success: false, error: 'Insufficient resources' };
+  }
+
+  const paid = await resourcePayCost(trade.cost);
+  if (!paid) return { success: false, error: 'Payment failed' };
+
+  // Grant rewards
+  await updateGamestate((state) => {
+    const updatedResources = { ...state.world.resources };
+    for (const [type, amount] of Object.entries(trade.reward)) {
+      if (!amount || amount <= 0) continue;
+      const resource = updatedResources[type as keyof typeof updatedResources];
+      if (resource) {
+        updatedResources[type as keyof typeof updatedResources] = {
+          ...resource,
+          current: Math.min(resource.current + amount, resource.max),
+        };
+      }
+    }
+
+    const updatedInventory = state.world.merchant.inventory.map((offer) =>
+      offer.tradeId === tradeId
+        ? { ...offer, stock: offer.stock - 1 }
+        : offer,
+    );
+
+    return {
+      ...state,
+      world: {
+        ...state.world,
+        resources: updatedResources,
+        merchant: {
+          ...state.world.merchant,
+          inventory: updatedInventory,
+        },
+      },
+    };
+  });
+
+  return { success: true };
 }
 
 // --- State field for day tracking ---
