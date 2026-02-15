@@ -280,6 +280,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Content type**: `victorypath` in `gamedata/victorypath/paths.yml`, `VictoryPathContent` with `VictoryCondition[]`
 - **State**: `VictoryProgress` on `GameStateWorld.victoryProgress` — tracks counters, defense wins, achieved path
 - **Testing pattern**: mock `@helpers/victory-conditions` when testing `victory.ts` engine; mock `@helpers/content` when testing individual conditions
+- **Victory screen**: `PanelVictoryComponent` modal on game-play page — auto-shows via `effect()` watching `victoryIsAchieved()`, pauses game, shows path info + conditions with progress + stats, allows Continue Playing or Return to Menu
 
 | File | Prefix | SCREAMING |
 |---|---|---|
