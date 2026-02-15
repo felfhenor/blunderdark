@@ -1,7 +1,9 @@
 import { computed, type Signal } from '@angular/core';
 import { defaultResources } from '@helpers/defaults';
+import { featureCalculateStorageBonusMultiplier } from '@helpers/features';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  Floor,
   ResourceCost,
   ResourceMap,
   ResourceState,
@@ -137,6 +139,20 @@ export function resourceIsFull(type: ResourceType): Signal<boolean> {
     const resource = gamestate().world.resources[type];
     return resource.current === resource.max;
   });
+}
+
+/**
+ * Compute the effective max for a resource type, including storage bonuses.
+ * Corruption is excluded from storage bonuses (already MAX_SAFE_INTEGER).
+ */
+export function resourceEffectiveMax(
+  baseMax: number,
+  resourceType: ResourceType,
+  floors: Floor[],
+): number {
+  if (resourceType === 'corruption') return baseMax;
+  const multiplier = featureCalculateStorageBonusMultiplier(floors);
+  return Math.floor(baseMax * multiplier);
 }
 
 export function resourceMigrate(

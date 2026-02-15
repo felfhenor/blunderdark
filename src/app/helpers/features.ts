@@ -182,6 +182,73 @@ export function featureCalculateCorruptionGenerationPerTick(
   return totalPerMinute / ticksPerMinute;
 }
 
+// --- Storage Bonus ---
+
+/**
+ * Calculate the total storage bonus multiplier from all rooms across all floors.
+ * Each storage_bonus feature adds its value (e.g. 1.0 = +100%) to the multiplier.
+ * Returns a multiplier >= 1.0 (e.g. 2.0 for one storage expansion with value 1.0).
+ */
+export function featureCalculateStorageBonusMultiplier(
+  floors: Floor[],
+): number {
+  let totalBonus = 0;
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const bonuses = featureGetBonuses(room, 'storage_bonus');
+      for (const b of bonuses) {
+        totalBonus += b.value;
+      }
+    }
+  }
+  return 1 + totalBonus;
+}
+
+/**
+ * Check if any room on any floor has a corruption_seal feature.
+ * Returns a set of PlacedRoomIds that have corruption seals.
+ */
+export function featureGetCorruptionSealedRoomIds(
+  floors: Floor[],
+): Set<string> {
+  const sealed = new Set<string>();
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const bonuses = featureGetBonuses(room, 'corruption_seal');
+      if (bonuses.length > 0) {
+        sealed.add(room.id);
+      }
+    }
+  }
+  return sealed;
+}
+
+/**
+ * Calculate XP gain per tick from training_xp features on a room.
+ */
+export function featureCalculateTrainingXpPerTick(
+  placedRoom: PlacedRoom,
+): number {
+  const bonuses = featureGetBonuses(placedRoom, 'training_xp');
+  let total = 0;
+  for (const b of bonuses) {
+    total += b.value;
+  }
+  return total;
+}
+
+/**
+ * Get the resource converter bonus on a room (if any).
+ * Returns the conversion efficiency (e.g. 0.75 for 75%) or undefined if no converter.
+ */
+export function featureGetResourceConverterEfficiency(
+  placedRoom: PlacedRoom,
+): number | undefined {
+  const bonuses = featureGetBonuses(placedRoom, 'resource_converter');
+  if (bonuses.length === 0) return undefined;
+  return bonuses[0].value;
+}
+
 // --- Blood Altar Sacrifice ---
 
 export const FEATURE_SACRIFICE_FOOD_COST = 25;

@@ -6,6 +6,7 @@ import { featureCalculateAdjacentProductionBonus, featureCalculateFlatProduction
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
+import { resourceEffectiveMax } from '@helpers/resources';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
@@ -479,7 +480,8 @@ export function productionProcess(state: GameState): void {
     const resourceType = type as ResourceType;
     const resource = state.world.resources[resourceType];
     if (!resource) continue;
-    const available = resource.max - resource.current;
+    const effectiveMax = resourceEffectiveMax(resource.max, resourceType, state.world.floors);
+    const available = effectiveMax - resource.current;
     resource.current += Math.min(amount as number, available);
   }
 }

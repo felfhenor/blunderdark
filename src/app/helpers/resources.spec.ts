@@ -3,6 +3,11 @@ import type { GameState, ResourceMap } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
+let mockStorageMultiplier = 1;
+
+vi.mock('@helpers/features', () => ({
+  featureCalculateStorageBonusMultiplier: vi.fn(() => mockStorageMultiplier),
+}));
 
 vi.mock('@helpers/state-game', () => {
   return {
@@ -28,6 +33,7 @@ const {
   resourceIsLow,
   resourceIsFull,
   resourceMigrate,
+  resourceEffectiveMax,
 } = await import('@helpers/resources');
 
 describe('resourceAdd', () => {
@@ -281,5 +287,37 @@ describe('resourceMigrate', () => {
     resourceMigrate(saved);
     expect(saved.gold!.current).toBe(500);
     expect(saved.crystals).toBeUndefined();
+  });
+});
+
+describe('resourceEffectiveMax', () => {
+  beforeEach(() => {
+    mockStorageMultiplier = 1;
+  });
+
+  it('returns base max when no storage bonus (multiplier 1)', () => {
+    mockStorageMultiplier = 1;
+    expect(resourceEffectiveMax(1000, 'gold', [])).toBe(1000);
+  });
+
+  it('doubles max when storage bonus multiplier is 2', () => {
+    mockStorageMultiplier = 2;
+    expect(resourceEffectiveMax(500, 'crystals', [])).toBe(1000);
+  });
+
+  it('triples max when storage bonus multiplier is 3', () => {
+    mockStorageMultiplier = 3;
+    expect(resourceEffectiveMax(200, 'flux', [])).toBe(600);
+  });
+
+  it('always returns base max for corruption regardless of bonus', () => {
+    mockStorageMultiplier = 5;
+    expect(resourceEffectiveMax(Number.MAX_SAFE_INTEGER, 'corruption', [])).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  it('floors the result to integer', () => {
+    mockStorageMultiplier = 1.5;
+    // 200 * 1.5 = 300
+    expect(resourceEffectiveMax(200, 'essence', [])).toBe(300);
   });
 });

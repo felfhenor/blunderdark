@@ -32,6 +32,10 @@ import {
   featureAttachToSlot,
   featureRemoveFromSlot,
   featureRemoveAllFromRoom,
+  featureCalculateStorageBonusMultiplier,
+  featureGetCorruptionSealedRoomIds,
+  featureCalculateTrainingXpPerTick,
+  featureGetResourceConverterEfficiency,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { Floor, FloorId } from '@interfaces/floor';
@@ -46,6 +50,12 @@ const CRYSTALS_ID = 'crystals-test-id' as FeatureId;
 const VENTS_ID = 'vents-test-id' as FeatureId;
 const BLOOD_ALTAR_ID = 'blood-altar-test-id' as FeatureId;
 const FUNGAL_ID = 'fungal-test-id' as FeatureId;
+const STORAGE_ID = 'storage-test-id' as FeatureId;
+const EFFICIENCY_ID = 'efficiency-test-id' as FeatureId;
+const FEAR_WARD_ID = 'fear-ward-test-id' as FeatureId;
+const CORRUPTION_SEAL_ID = 'corruption-seal-test-id' as FeatureId;
+const TRAINING_STATION_ID = 'training-station-test-id' as FeatureId;
+const RESOURCE_CONVERTER_ID = 'resource-converter-test-id' as FeatureId;
 
 const coffinsContent: FeatureContent = {
   id: COFFINS_ID,
@@ -120,6 +130,78 @@ const fungalContent: FeatureContent = {
   cost: { gold: 60 },
   bonuses: [
     { type: 'teleport_link', value: 1, description: 'Enables instant transfer' },
+  ],
+};
+
+const storageContent: FeatureContent = {
+  id: STORAGE_ID,
+  name: 'Storage Expansion',
+  __type: 'feature',
+  description: 'Test storage',
+  category: 'functional',
+  cost: { gold: 100 },
+  bonuses: [
+    { type: 'storage_bonus', value: 1.0, description: '+100% storage capacity' },
+  ],
+};
+
+const efficiencyContent: FeatureContent = {
+  id: EFFICIENCY_ID,
+  name: 'Efficiency Enchantment',
+  __type: 'feature',
+  description: 'Test efficiency',
+  category: 'functional',
+  cost: { gold: 120 },
+  bonuses: [
+    { type: 'production_bonus', value: 0.20, description: '+20% base production' },
+  ],
+};
+
+const fearWardContent: FeatureContent = {
+  id: FEAR_WARD_ID,
+  name: 'Fear Ward',
+  __type: 'feature',
+  description: 'Test fear ward',
+  category: 'functional',
+  cost: { gold: 80 },
+  bonuses: [
+    { type: 'fear_reduction', value: 2, description: '-2 Fear in room' },
+  ],
+};
+
+const corruptionSealContent: FeatureContent = {
+  id: CORRUPTION_SEAL_ID,
+  name: 'Corruption Seal',
+  __type: 'feature',
+  description: 'Test corruption seal',
+  category: 'functional',
+  cost: { gold: 150 },
+  bonuses: [
+    { type: 'corruption_seal', value: 1, description: 'Prevents corruption generation' },
+  ],
+};
+
+const trainingStationContent: FeatureContent = {
+  id: TRAINING_STATION_ID,
+  name: 'Training Station',
+  __type: 'feature',
+  description: 'Test training station',
+  category: 'functional',
+  cost: { gold: 90 },
+  bonuses: [
+    { type: 'training_xp', value: 1, description: 'Inhabitants gain passive XP each tick' },
+  ],
+};
+
+const resourceConverterContent: FeatureContent = {
+  id: RESOURCE_CONVERTER_ID,
+  name: 'Resource Converter',
+  __type: 'feature',
+  description: 'Test converter',
+  category: 'functional',
+  cost: { gold: 200 },
+  bonuses: [
+    { type: 'resource_converter', value: 0.75, description: 'Convert output at 75% efficiency' },
   ],
 };
 
@@ -755,5 +837,148 @@ describe('featureRemoveAllFromRoom', () => {
     const room = makeRoom();
     featureRemoveAllFromRoom(room);
     expect(room.featureIds).toBeUndefined();
+  });
+});
+
+// --- Functional Features ---
+
+describe('featureCalculateStorageBonusMultiplier', () => {
+  it('returns 1.0 when no rooms have storage features', () => {
+    const floor = makeFloor({ rooms: [makeRoom()] });
+    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(1);
+  });
+
+  it('returns 2.0 when one room has Storage Expansion (+100%)', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(storageContent);
+    const room = makeRoom({ featureIds: [STORAGE_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(2.0);
+  });
+
+  it('stacks across multiple rooms', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(storageContent);
+    const room1 = makeRoom({ featureIds: [STORAGE_ID] });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureIds: [STORAGE_ID] });
+    const floor = makeFloor({ rooms: [room1, room2] });
+    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(3.0);
+  });
+
+  it('stacks across multiple floors', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(storageContent);
+    const room1 = makeRoom({ featureIds: [STORAGE_ID] });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureIds: [STORAGE_ID] });
+    const floor1 = makeFloor({ rooms: [room1] });
+    const floor2 = makeFloor({ id: 'floor-2' as FloorId, rooms: [room2] });
+    expect(featureCalculateStorageBonusMultiplier([floor1, floor2])).toBe(3.0);
+  });
+
+  it('ignores non-storage features', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(mossContent);
+    const room = makeRoom({ featureIds: [MOSS_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(1);
+  });
+});
+
+describe('Efficiency Enchantment (production_bonus)', () => {
+  it('provides 20% production bonus via existing featureCalculateProductionBonus', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(efficiencyContent);
+    const room = makeRoom({ featureIds: [EFFICIENCY_ID] });
+    expect(featureCalculateProductionBonus(room)).toBeCloseTo(0.20);
+  });
+
+  it('stacks with other production bonus features', () => {
+    vi.mocked(contentGetEntry).mockImplementation((id) => {
+      if (id === EFFICIENCY_ID) return efficiencyContent;
+      if (id === VENTS_ID) return ventsContent;
+      return undefined;
+    });
+    const room = makeRoom({ featureIds: [EFFICIENCY_ID, VENTS_ID] });
+    // Efficiency: +20% (untargeted), Vents: +15% (untargeted) → 35%
+    expect(featureCalculateProductionBonus(room, 'gold')).toBeCloseTo(0.35);
+  });
+
+  it('bonus is removed when feature is removed', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(undefined);
+    const room = makeRoom({ featureIds: [EFFICIENCY_ID] });
+    featureRemoveFromSlot(room, 0);
+    expect(featureCalculateProductionBonus(room)).toBe(0);
+  });
+});
+
+describe('Fear Ward (fear_reduction)', () => {
+  it('provides -2 fear reduction via existing featureCalculateFearReduction', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fearWardContent);
+    const room = makeRoom({ featureIds: [FEAR_WARD_ID] });
+    expect(featureCalculateFearReduction(room)).toBe(2);
+  });
+
+  it('stacks with other fear reduction features', () => {
+    vi.mocked(contentGetEntry).mockImplementation((id) => {
+      if (id === FEAR_WARD_ID) return fearWardContent;
+      if (id === MOSS_ID) return mossContent;
+      return undefined;
+    });
+    const room = makeRoom({ featureIds: [FEAR_WARD_ID, MOSS_ID] });
+    // Fear Ward: -2, Moss: -1 → total -3
+    expect(featureCalculateFearReduction(room)).toBe(3);
+  });
+
+  it('reduction is removed when feature is removed', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(undefined);
+    const room = makeRoom({ featureIds: [FEAR_WARD_ID] });
+    featureRemoveFromSlot(room, 0);
+    expect(featureCalculateFearReduction(room)).toBe(0);
+  });
+});
+
+describe('featureGetCorruptionSealedRoomIds', () => {
+  it('returns empty set when no rooms have corruption seals', () => {
+    const floor = makeFloor({ rooms: [makeRoom()] });
+    expect(featureGetCorruptionSealedRoomIds([floor]).size).toBe(0);
+  });
+
+  it('returns room IDs with corruption seals', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(corruptionSealContent);
+    const room = makeRoom({ featureIds: [CORRUPTION_SEAL_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const sealed = featureGetCorruptionSealedRoomIds([floor]);
+    expect(sealed.has(room.id)).toBe(true);
+  });
+
+  it('finds sealed rooms across multiple floors', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(corruptionSealContent);
+    const room1 = makeRoom({ featureIds: [CORRUPTION_SEAL_ID] });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureIds: [CORRUPTION_SEAL_ID] });
+    const floor1 = makeFloor({ rooms: [room1] });
+    const floor2 = makeFloor({ id: 'floor-2' as FloorId, rooms: [room2] });
+    const sealed = featureGetCorruptionSealedRoomIds([floor1, floor2]);
+    expect(sealed.size).toBe(2);
+  });
+});
+
+describe('featureCalculateTrainingXpPerTick', () => {
+  it('returns 0 when room has no training station', () => {
+    const room = makeRoom();
+    expect(featureCalculateTrainingXpPerTick(room)).toBe(0);
+  });
+
+  it('returns XP per tick from Training Station', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    expect(featureCalculateTrainingXpPerTick(room)).toBe(1);
+  });
+});
+
+describe('featureGetResourceConverterEfficiency', () => {
+  it('returns undefined when room has no converter', () => {
+    const room = makeRoom();
+    expect(featureGetResourceConverterEfficiency(room)).toBeUndefined();
+  });
+
+  it('returns 0.75 efficiency from Resource Converter', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({ featureIds: [RESOURCE_CONVERTER_ID] });
+    expect(featureGetResourceConverterEfficiency(room)).toBe(0.75);
   });
 });
