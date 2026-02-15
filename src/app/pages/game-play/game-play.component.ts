@@ -11,6 +11,7 @@ import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/pane
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
+import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
@@ -53,6 +54,7 @@ import {
     PanelFloorSelectorComponent,
     PanelFusionComponent,
     PanelHallwayInfoComponent,
+    PanelVictoryComponent,
     PanelStairInfoComponent,
     PanelElevatorInfoComponent,
     PanelPortalInfoComponent,
