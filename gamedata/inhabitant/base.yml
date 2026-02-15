@@ -826,3 +826,66 @@
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
+
+- id: 42956506-833d-42f5-a685-48f529d38048
+  name: Stone Elemental
+  type: creature
+  tier: 2
+  description: A hulking mass of living rock animated by deep-earth magic. Stone Elementals are tireless, requiring no sustenance, and excel at mining crystal veins. Their dense forms make them nearly immovable in battle but painfully slow.
+  cost:
+    gold: 120
+    crystals: 80
+  stats:
+    hp: 100
+    attack: 20
+    defense: 25
+    speed: 6
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-stone-elemental-inappetent
+      name: Inappetent
+      description: Does not require food. Never enters hungry or starving states.
+      effectType: food_exemption
+      effectValue: 1
+    - id: trait-stone-elemental-geological
+      name: Geological
+      description: Increases crystal mining production by 40% when assigned to a mining room.
+      effectType: production_bonus
+      effectValue: 0.4
+      targetResourceType: crystals
+    - id: trait-stone-elemental-sturdy
+      name: Sturdy
+      description: Grants +1 Defense from hardened stone hide.
+      effectType: defense_bonus
+      effectValue: 1
+    - id: trait-stone-elemental-forge-affinity
+      name: Forge Affinity
+      description: Increases gold production by 20% when assigned to a forge.
+      effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: gold
+    - id: trait-stone-elemental-ley-conductor
+      name: Ley Conductor
+      description: Generates 15% more flux when assigned to a Ley Line Nexus.
+      effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: flux
+  fearTolerance: 4
+  fearModifier: 0
+  foodConsumptionRate: 0
+  corruptionGeneration: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.6
+      defenseMultiplier: 1.75
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

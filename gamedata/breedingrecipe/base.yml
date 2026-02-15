@@ -162,3 +162,25 @@
     attack: 4
     hp: 5
   timeMultiplier: 1.4
+
+- id: 0362eaf7-2a66-4e31-af47-69dfdf3c0480
+  name: Magma Golem
+  description: A Stone Elemental fused with Fire Elemental energy. Molten veins pulse through its rocky frame, making it a devastating combatant and forge worker.
+  parentInhabitantAId: Stone Elemental
+  parentInhabitantBId: Fire Elemental
+  resultName: Magma Golem
+  statBonuses:
+    attack: 6
+    hp: 10
+  timeMultiplier: 1.5
+
+- id: 1ce5a488-7f0c-4bb9-b073-0d951da1e8d0
+  name: Living Statue
+  description: A Stone Elemental animated by gargoyle cunning. Faster and more aware than a pure elemental, yet retains its unyielding durability.
+  parentInhabitantAId: Stone Elemental
+  parentInhabitantBId: Gargoyle
+  resultName: Living Statue
+  statBonuses:
+    defense: 8
+    speed: 4
+  timeMultiplier: 1.3
