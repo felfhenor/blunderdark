@@ -107,6 +107,17 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Feature UI**: panel-room-info shows feature slots section with attach/remove per slot; feature selection modal lists all features with cost/bonuses
 - **Corruption process gotcha**: `corruptionGenerationProcess` iterates `state.world.floors` — existing tests may not include `floors` in mock state, so use `?? []` defensive pattern
 
+### Functional Features
+
+- **Category**: `'functional'` on `FeatureContent`, defined in `gamedata/feature/functional.yml`
+- **Additional bonus types**: `storage_bonus`, `corruption_seal`, `training_xp`, `resource_converter`
+- **Storage Expansion**: `storage_bonus` value is added to a global multiplier via `featureCalculateStorageBonusMultiplier(floors)` → `resourceEffectiveMax()` in resources.ts; excludes corruption; used in `productionProcess()`
+- **Efficiency Enchantment**: uses existing `production_bonus` type (value: 0.20) — no new code needed
+- **Fear Ward**: uses existing `fear_reduction` type (value: 2) — no new code needed
+- **Corruption Seal**: `corruption_seal` bonus → `featureGetCorruptionSealedRoomIds(floors)` returns `Set<string>` of sealed room IDs; `corruptionGenerationProcess` filters out sealed rooms before calculating feature corruption
+- **Training Station**: `training_xp` bonus → `featureTrainingStationProcess(floors, inhabitants)` grants XP per tick to inhabitants in rooms with this feature; `InhabitantInstance.xp?: number` field
+- **Resource Converter**: `resource_converter` bonus (value=efficiency, e.g. 0.75) → `PlacedRoom.convertedOutputResource?: string` stores target; `featureApplyResourceConversion()` redirects all production to target at efficiency rate; UI dropdown in panel-room-info; applied in both `productionCalculateTotal` and `productionCalculateSingleRoom`
+
 ## Room-Specific Systems
 
 All room-specific systems follow the same pattern:
