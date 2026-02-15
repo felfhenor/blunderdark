@@ -281,6 +281,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **State**: `VictoryProgress` on `GameStateWorld.victoryProgress` — tracks counters, defense wins, achieved path
 - **Testing pattern**: mock `@helpers/victory-conditions` when testing `victory.ts` engine; mock `@helpers/content` when testing individual conditions
 - **Victory screen**: `PanelVictoryComponent` modal on game-play page — auto-shows via `effect()` watching `victoryIsAchieved()`, pauses game, shows path info + conditions with progress + stats, allows Continue Playing or Return to Menu
+- **Victory progress UI**: `VictoryMenuComponent` → `VictoryPathCardComponent` → `VictoryConditionRowComponent` composable hierarchy; `victoryCalculatePathCompletionPercent()` pure function for weighted % (tested); closest path highlighted via max completion %; DaisyUI `radial-progress` for per-path %; `progress` element for per-condition bars; Helipopper tooltips on condition rows with checkType-specific hints
 
 | File | Prefix | SCREAMING |
 |---|---|---|
