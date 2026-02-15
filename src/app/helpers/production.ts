@@ -2,7 +2,7 @@ import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { dayNightCalculateCreatureProductionModifier, dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
-import { featureCalculateAdjacentProductionBonus } from '@helpers/features';
+import { featureCalculateAdjacentProductionBonus, featureCalculateFlatProduction, featureCalculateProductionBonus } from '@helpers/features';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
@@ -243,10 +243,19 @@ export function productionCalculateTotal(floors: Floor[], hour?: number, season?
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
+        const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
         totalProduction[resourceType] =
           (totalProduction[resourceType] ?? 0) + final;
+      }
+
+      // Add flat production from features (e.g. Arcane Crystals +1 Flux/min)
+      const flatProduction = featureCalculateFlatProduction(room, GAME_TIME_TICKS_PER_MINUTE);
+      for (const [resourceType, amount] of Object.entries(flatProduction)) {
+        if (!amount) continue;
+        totalProduction[resourceType] =
+          (totalProduction[resourceType] ?? 0) + amount;
       }
     }
   }
@@ -321,8 +330,16 @@ export function productionCalculateSingleRoom(
     const seasonMod = season
       ? seasonBonusGetResourceModifier(season, resourceType)
       : 1.0;
+    const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+  }
+
+  // Add flat production from features
+  const flatProduction = featureCalculateFlatProduction(room, GAME_TIME_TICKS_PER_MINUTE);
+  for (const [resourceType, amount] of Object.entries(flatProduction)) {
+    if (!amount) continue;
+    production[resourceType] = (production[resourceType] ?? 0) + amount;
   }
 
   return production;
@@ -420,8 +437,9 @@ export function productionCalculateBreakdowns(
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
+        const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
         const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
-        const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal + featureAdjacentBonus);
+        const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal + featureAdjacentBonus + featureProductionBonus);
         const finalAmount = withBonuses * modifier;
 
         if (!breakdowns[resourceType]) {

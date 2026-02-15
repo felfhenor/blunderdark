@@ -11,6 +11,9 @@ import {
   featureCalculateFearReduction,
   featureCalculateCapacityBonus,
   featureCalculateAdjacentProductionBonus,
+  featureCalculateFlatProduction,
+  featureCalculateProductionBonus,
+  featureGetCombatBonuses,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
@@ -19,6 +22,8 @@ import type { RoomShapeId } from '@interfaces/content-roomshape';
 
 const COFFINS_ID = 'coffins-test-id' as FeatureId;
 const MOSS_ID = 'moss-test-id' as FeatureId;
+const CRYSTALS_ID = 'crystals-test-id' as FeatureId;
+const VENTS_ID = 'vents-test-id' as FeatureId;
 
 const coffinsContent: FeatureContent = {
   id: COFFINS_ID,
@@ -43,6 +48,32 @@ const mossContent: FeatureContent = {
   bonuses: [
     { type: 'fear_reduction', value: 1, description: '-1 Fear in the attached room' },
     { type: 'adjacent_production', value: 0.05, description: '+5% production to adjacent rooms' },
+  ],
+};
+
+const crystalsContent: FeatureContent = {
+  id: CRYSTALS_ID,
+  name: 'Arcane Crystals',
+  __type: 'feature',
+  description: 'Test crystals',
+  category: 'environmental',
+  cost: { gold: 75 },
+  bonuses: [
+    { type: 'flat_production', value: 1, targetType: 'flux', description: '+1 Flux per minute' },
+    { type: 'production_bonus', value: 0.15, targetType: 'flux', description: '+15% magic efficiency' },
+  ],
+};
+
+const ventsContent: FeatureContent = {
+  id: VENTS_ID,
+  name: 'Geothermal Vents',
+  __type: 'feature',
+  description: 'Test vents',
+  category: 'environmental',
+  cost: { gold: 80 },
+  bonuses: [
+    { type: 'production_bonus', value: 0.15, description: '+15% production across all resources' },
+    { type: 'combat_bonus', value: 5, targetType: 'fire', description: 'Fire damage bonus' },
   ],
 };
 
@@ -179,5 +210,76 @@ describe('featureCalculateAdjacentProductionBonus', () => {
     vi.mocked(contentGetEntry).mockReturnValue(coffinsContent);
     const adjRoom = makeRoom({ id: 'room-2' as PlacedRoomId, featureId: COFFINS_ID });
     expect(featureCalculateAdjacentProductionBonus([adjRoom])).toBe(0);
+  });
+});
+
+describe('featureCalculateFlatProduction', () => {
+  it('returns empty production when room has no feature', () => {
+    const room = makeRoom();
+    const result = featureCalculateFlatProduction(room, 5);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it('returns per-tick flux production from Arcane Crystals (+1/min)', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(crystalsContent);
+    const room = makeRoom({ featureId: CRYSTALS_ID });
+    const result = featureCalculateFlatProduction(room, 5);
+    expect(result['flux']).toBeCloseTo(0.2); // 1/5 per tick
+  });
+
+  it('returns 0 for features without flat_production bonus', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(ventsContent);
+    const room = makeRoom({ featureId: VENTS_ID });
+    const result = featureCalculateFlatProduction(room, 5);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+});
+
+describe('featureCalculateProductionBonus', () => {
+  it('returns 0 when room has no feature', () => {
+    const room = makeRoom();
+    expect(featureCalculateProductionBonus(room, 'flux')).toBe(0);
+  });
+
+  it('returns 15% bonus for flux from Arcane Crystals', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(crystalsContent);
+    const room = makeRoom({ featureId: CRYSTALS_ID });
+    expect(featureCalculateProductionBonus(room, 'flux')).toBeCloseTo(0.15);
+  });
+
+  it('returns 0 for non-matching resource type from Arcane Crystals', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(crystalsContent);
+    const room = makeRoom({ featureId: CRYSTALS_ID });
+    expect(featureCalculateProductionBonus(room, 'gold')).toBe(0);
+  });
+
+  it('returns 15% bonus for any resource type from Geothermal Vents', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(ventsContent);
+    const room = makeRoom({ featureId: VENTS_ID });
+    expect(featureCalculateProductionBonus(room, 'gold')).toBeCloseTo(0.15);
+    expect(featureCalculateProductionBonus(room, 'crystals')).toBeCloseTo(0.15);
+    expect(featureCalculateProductionBonus(room, 'flux')).toBeCloseTo(0.15);
+  });
+});
+
+describe('featureGetCombatBonuses', () => {
+  it('returns empty array when room has no feature', () => {
+    const room = makeRoom();
+    expect(featureGetCombatBonuses(room)).toEqual([]);
+  });
+
+  it('returns fire damage bonus from Geothermal Vents', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(ventsContent);
+    const room = makeRoom({ featureId: VENTS_ID });
+    const bonuses = featureGetCombatBonuses(room);
+    expect(bonuses).toHaveLength(1);
+    expect(bonuses[0].value).toBe(5);
+    expect(bonuses[0].targetType).toBe('fire');
+  });
+
+  it('returns empty array for features without combat bonuses', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(crystalsContent);
+    const room = makeRoom({ featureId: CRYSTALS_ID });
+    expect(featureGetCombatBonuses(room)).toEqual([]);
   });
 });

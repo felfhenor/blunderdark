@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import type { FeatureBonus, FeatureBonusType, FeatureContent } from '@interfaces/content-feature';
+import type { RoomProduction } from '@interfaces/room';
 import type { PlacedRoom } from '@interfaces/room-shape';
 
 /**
@@ -76,4 +77,54 @@ export function featureCalculateAdjacentProductionBonus(
     }
   }
   return bonus;
+}
+
+/**
+ * Calculate flat production from a room's attached feature.
+ * Arcane Crystals add +1 Flux per minute (returned as per-tick values).
+ * Returns a RoomProduction map keyed by resource type.
+ */
+export function featureCalculateFlatProduction(
+  placedRoom: PlacedRoom,
+  ticksPerMinute: number,
+): RoomProduction {
+  const bonuses = featureGetBonuses(placedRoom, 'flat_production');
+  const result: RoomProduction = {};
+  for (const bonus of bonuses) {
+    if (bonus.targetType) {
+      result[bonus.targetType] =
+        (result[bonus.targetType] ?? 0) + bonus.value / ticksPerMinute;
+    }
+  }
+  return result;
+}
+
+/**
+ * Calculate the production multiplier bonus from a room's own attached feature.
+ * Arcane Crystals: +15% for flux. Geothermal Vents: +15% for all.
+ * Returns the bonus as a fraction (e.g. 0.15 for 15%).
+ */
+export function featureCalculateProductionBonus(
+  placedRoom: PlacedRoom,
+  resourceType?: string,
+): number {
+  const bonuses = featureGetBonuses(placedRoom, 'production_bonus');
+  let total = 0;
+  for (const bonus of bonuses) {
+    if (!bonus.targetType || bonus.targetType === resourceType) {
+      total += bonus.value;
+    }
+  }
+  return total;
+}
+
+/**
+ * Get combat bonuses from a room's attached feature.
+ * Geothermal Vents grant fire damage bonus.
+ * Returns array of { value, targetType } for consumption by combat system.
+ */
+export function featureGetCombatBonuses(
+  placedRoom: PlacedRoom,
+): FeatureBonus[] {
+  return featureGetBonuses(placedRoom, 'combat_bonus');
 }
