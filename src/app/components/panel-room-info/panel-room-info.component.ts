@@ -33,6 +33,7 @@ import {
   featureGetForSlot,
   featureAttachToSlot,
   featureRemoveFromSlot,
+  featureIsUniquePlaced,
   featureGetResourceConverterEfficiency,
   resourceCanAfford,
   resourcePayCost,
@@ -424,6 +425,14 @@ export class PanelRoomInfoComponent {
 
     const feature = contentGetEntry<FeatureContent>(featureId);
     if (!feature) return;
+
+    if (feature.unique) {
+      const state = gamestate();
+      if (state && featureIsUniquePlaced(state.world.floors, featureId)) {
+        notifyError(`${feature.name} is unique and already placed in the dungeon`);
+        return;
+      }
+    }
 
     const paid = await resourcePayCost(feature.cost);
     if (!paid) {

@@ -74,4 +74,7 @@ export type PlacedRoom = {
   featureIds?: FeatureId[];
   sacrificeBuff?: SacrificeBuff;
   convertedOutputResource?: string;
+  maintenanceActive?: boolean;
+  phylacteryCharges?: number;
+  voidGateLastSummonDay?: number;
 };

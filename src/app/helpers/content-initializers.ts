@@ -140,6 +140,8 @@ function ensureFeature(
       targetType: b.targetType ?? undefined,
       description: b.description ?? '',
     })),
+    unique: feature.unique ?? undefined,
+    maintenanceCost: feature.maintenanceCost ?? undefined,
   };
 }
 
