@@ -270,22 +270,64 @@
     defense: 30
     speed: 15
     workerEfficiency: 1.0
-  traits: []
+  traits:
+    - id: trait-lich-scholarly
+      name: Scholarly
+      description: Increases research production by 40% when assigned to a research-producing room.
+      effectType: production_bonus
+      effectValue: 0.4
+      targetResourceType: research
+    - id: trait-lich-undead-master
+      name: Undead Master
+      description: Undead inhabitants in the same or adjacent rooms gain +1 Attack and +1 Defense.
+      effectType: undead_master
+      effectValue: 1
+    - id: trait-lich-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state. Channels arcane energy as an Arcane Shield when confronted.
+      effectType: fear_immunity
+      effectValue: 1
+    - id: trait-lich-ancient-knowledge
+      name: Ancient Knowledge
+      description: Reveals one hidden research node per branch in the research tree.
+      effectType: ancient_knowledge
+      effectValue: 1
+    - id: trait-lich-throne-scholar
+      name: Throne Scholar
+      description: When assigned to the Throne Room, provides a dungeon-wide +10% Research bonus.
+      effectType: production_bonus
+      effectValue: 0.1
+      targetResourceType: research
+      targetRoomName: Throne Room
+    - id: trait-lich-soul-siphon
+      name: Soul Siphon
+      description: When assigned to the Soul Well, doubles Soul Essence generation.
+      effectType: production_bonus
+      effectValue: 1.0
+      targetResourceType: essence
+      targetRoomName: Soul Well
+    - id: trait-lich-library-specialist
+      name: Library Specialist
+      description: When assigned to the Shadow Library, grants +20% additional Research on top of Scholarly bonus.
+      effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: research
+      targetRoomName: Shadow Library
   restrictionTags:
     - unique
   rulerBonuses:
     researchSpeed: 0.20
     fluxProduction: 0.15
   rulerFearLevel: 3
-  fearTolerance: 4
+  fearTolerance: 99
   fearModifier: 1
   foodConsumptionRate: 0
   stateModifiers:
     scared:
-      productionMultiplier: 0.95
+      productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
-      attackMultiplier: 0.9
-      defenseMultiplier: 0.9
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
     hungry:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
