@@ -142,7 +142,7 @@ import {
   legendaryInhabitantIsDiscontented,
   legendaryInhabitantIsRecruited,
   legendaryInhabitantUpkeepProcess,
-} from './legendary-inhabitant';
+} from '@helpers/legendary-inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type {
   Floor,
@@ -160,8 +160,6 @@ import type { InhabitantId } from '@interfaces/content-inhabitant';
 const DRAGON_ID = 'legendary-dragon' as InhabitantId;
 const DEMON_LORD_ID = 'legendary-demon-lord' as InhabitantId;
 const BEHOLDER_ID = 'legendary-beholder' as InhabitantId;
-const MEDUSA_ID = 'legendary-medusa' as InhabitantId;
-const TREANT_ID = 'legendary-treant' as InhabitantId;
 
 function makeResources(
   overrides?: Partial<Record<string, { current: number; max: number }>>,
