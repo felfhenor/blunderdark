@@ -37,6 +37,7 @@ import {
   featureCalculateTrainingXpPerTick,
   featureGetResourceConverterEfficiency,
   featureTrainingStationProcess,
+  featureApplyResourceConversion,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { Floor, FloorId } from '@interfaces/floor';
@@ -1050,5 +1051,75 @@ describe('featureTrainingStationProcess', () => {
     // No more XP gained
     featureTrainingStationProcess([floor], [inhabitant]);
     expect(inhabitant.xp).toBe(1); // unchanged
+  });
+});
+
+describe('featureApplyResourceConversion', () => {
+  it('returns original production when room has no converter', () => {
+    const room = makeRoom();
+    const production = { crystals: 5 };
+    expect(featureApplyResourceConversion(production, room)).toEqual({ crystals: 5 });
+  });
+
+  it('returns original production when converter exists but no target set', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({ featureIds: [RESOURCE_CONVERTER_ID] });
+    const production = { crystals: 5 };
+    expect(featureApplyResourceConversion(production, room)).toEqual({ crystals: 5 });
+  });
+
+  it('converts production to target resource at 75% efficiency', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({
+      featureIds: [RESOURCE_CONVERTER_ID],
+      convertedOutputResource: 'gold',
+    });
+    const production = { crystals: 10 };
+    const result = featureApplyResourceConversion(production, room);
+    expect(result['gold']).toBeCloseTo(7.5); // 10 * 0.75
+    expect(result['crystals']).toBeUndefined();
+  });
+
+  it('sums all production types when converting', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({
+      featureIds: [RESOURCE_CONVERTER_ID],
+      convertedOutputResource: 'food',
+    });
+    const production = { crystals: 4, flux: 6 };
+    const result = featureApplyResourceConversion(production, room);
+    expect(result['food']).toBeCloseTo(7.5); // (4 + 6) * 0.75
+    expect(result['crystals']).toBeUndefined();
+    expect(result['flux']).toBeUndefined();
+  });
+
+  it('returns original production when total production is zero', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({
+      featureIds: [RESOURCE_CONVERTER_ID],
+      convertedOutputResource: 'gold',
+    });
+    const production = {};
+    const result = featureApplyResourceConversion(production, room);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it('switching output type takes effect immediately', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
+    const room = makeRoom({
+      featureIds: [RESOURCE_CONVERTER_ID],
+      convertedOutputResource: 'gold',
+    });
+    const production = { crystals: 10 };
+
+    // First conversion to gold
+    let result = featureApplyResourceConversion(production, room);
+    expect(result['gold']).toBeCloseTo(7.5);
+
+    // Switch to food
+    room.convertedOutputResource = 'food';
+    result = featureApplyResourceConversion(production, room);
+    expect(result['food']).toBeCloseTo(7.5);
+    expect(result['gold']).toBeUndefined();
   });
 });

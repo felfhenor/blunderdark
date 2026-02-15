@@ -33,6 +33,7 @@ import {
   featureGetForSlot,
   featureAttachToSlot,
   featureRemoveFromSlot,
+  featureGetResourceConverterEfficiency,
   resourceCanAfford,
   resourcePayCost,
   updateGamestate,
@@ -248,6 +249,59 @@ export class PanelRoomInfoComponent {
       return { feature: f, affordable, shortfall, costEntries };
     });
   });
+
+  // --- Resource Converter ---
+
+  private readonly CONVERTIBLE_RESOURCES: ResourceType[] = ['crystals', 'food', 'gold', 'flux', 'research', 'essence'];
+
+  public hasResourceConverter = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    return featureGetResourceConverterEfficiency(room.placedRoom) !== undefined;
+  });
+
+  public converterEfficiency = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return 0;
+    return featureGetResourceConverterEfficiency(room.placedRoom) ?? 0;
+  });
+
+  public convertedOutputResource = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+    return room.placedRoom.convertedOutputResource;
+  });
+
+  public availableConversionResources = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return [];
+    const roomDef = productionGetRoomDefinition(room.roomTypeId);
+    if (!roomDef?.production) return [];
+    const producedTypes = Object.keys(roomDef.production);
+    return this.CONVERTIBLE_RESOURCES.filter((r) => !producedTypes.includes(r));
+  });
+
+  public async onSetConvertedResource(resourceType: string | undefined): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    await updateGamestate((state) => {
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          target.convertedOutputResource = resourceType || undefined;
+          break;
+        }
+      }
+      return state;
+    });
+
+    if (resourceType) {
+      notifySuccess(`Converting output to ${resourceType}`);
+    } else {
+      notifySuccess('Conversion disabled');
+    }
+  }
 
   // --- Actions ---
 

@@ -73,4 +73,5 @@ export type PlacedRoom = {
   tortureJob?: TortureJob;
   featureIds?: FeatureId[];
   sacrificeBuff?: SacrificeBuff;
+  convertedOutputResource?: string;
 };

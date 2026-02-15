@@ -120,6 +120,26 @@
         </div>
       }
 
+      <!-- Resource Converter -->
+      @if (hasResourceConverter()) {
+        <div class="mt-2">
+          <h4 class="text-xs font-semibold opacity-70 mb-1">Resource Converter:</h4>
+          <div class="flex items-center gap-2">
+            <select
+              class="select select-xs select-bordered flex-1"
+              [value]="convertedOutputResource() ?? ''"
+              (change)="onSetConvertedResource($any($event.target).value)"
+            >
+              <option value="">No conversion</option>
+              @for (res of availableConversionResources(); track res) {
+                <option [value]="res">{{ res }}</option>
+              }
+            </select>
+            <span class="text-xs opacity-50">{{ (converterEfficiency() * 100).toFixed(0) }}% eff.</span>
+          </div>
+        </div>
+      }
+
       @if (room.maxInhabitants !== 0) {
         <div class="mt-2">
           <h4 class="text-xs font-semibold opacity-70 mb-1">

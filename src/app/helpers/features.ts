@@ -249,6 +249,37 @@ export function featureGetResourceConverterEfficiency(
   return bonuses[0].value;
 }
 
+// --- Resource Converter ---
+
+/**
+ * Apply resource conversion to a room's production output.
+ * If the room has a resource converter feature and convertedOutputResource is set,
+ * all original production is removed and replaced with the target resource at
+ * the converter's efficiency rate.
+ */
+export function featureApplyResourceConversion(
+  production: RoomProduction,
+  placedRoom: PlacedRoom,
+): RoomProduction {
+  const efficiency = featureGetResourceConverterEfficiency(placedRoom);
+  if (efficiency === undefined || !placedRoom.convertedOutputResource) return production;
+
+  const targetResource = placedRoom.convertedOutputResource;
+
+  // Sum all production values
+  let totalProduction = 0;
+  for (const amount of Object.values(production)) {
+    if (amount && amount > 0) {
+      totalProduction += amount;
+    }
+  }
+
+  if (totalProduction <= 0) return production;
+
+  // Convert all production to the target resource at efficiency rate
+  return { [targetResource]: totalProduction * efficiency };
+}
+
 // --- Training Station ---
 
 /**
