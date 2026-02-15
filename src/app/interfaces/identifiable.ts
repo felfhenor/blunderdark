@@ -9,6 +9,7 @@ export type ContentType =
   | 'inhabitant'
   | 'invader'
   | 'invasion'
+  | 'merchanttrade'
   | 'reputationaction'
   | 'reputationeffect'
   | 'research'

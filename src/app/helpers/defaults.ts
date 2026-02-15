@@ -7,6 +7,7 @@ import type {
   GameId,
   GameState,
   InvasionSchedule,
+  MerchantState,
   ReputationState,
   ResearchState,
   ResourceMap,
@@ -54,6 +55,7 @@ export function defaultGameState(): GameState {
       elevators: [],
       portals: [],
       victoryProgress: defaultVictoryProgress(),
+      merchant: defaultMerchantState(),
     },
   };
 }
@@ -148,6 +150,15 @@ export function defaultVictoryProgress(): VictoryProgress {
     consecutiveZeroCorruptionDays: 0,
     lastZeroCorruptionCheckDay: 0,
     totalInvasionDefenseWins: 0,
+  };
+}
+
+export function defaultMerchantState(): MerchantState {
+  return {
+    isPresent: false,
+    arrivalDay: 0,
+    departureDayRemaining: 0,
+    inventory: [],
   };
 }
 

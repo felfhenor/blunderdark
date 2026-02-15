@@ -21,6 +21,7 @@ import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
+import type { MerchantTradeContent, MerchantTradeId } from '@interfaces/content-merchanttrade';
 import type { ReputationActionId } from '@interfaces/content-reputationaction';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomContent, RoomId } from '@interfaces/content-room';
@@ -43,6 +44,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
   invasion: ensureInvasion,
+  merchanttrade: ensureMerchantTrade,
   reputationaction: ensureReputationAction,
   reputationeffect: ensureReputationEffect,
   research: ensureResearch,
@@ -409,6 +411,21 @@ function ensureInvasion(
     highCorruption: config.highCorruption ?? { ...defaultWeights },
     highWealth: config.highWealth ?? { ...defaultWeights },
     highKnowledge: config.highKnowledge ?? { ...defaultWeights },
+  };
+}
+
+function ensureMerchantTrade(
+  trade: Partial<MerchantTradeContent>,
+): MerchantTradeContent {
+  return {
+    id: trade.id ?? ('UNKNOWN' as MerchantTradeId),
+    name: trade.name ?? 'UNKNOWN',
+    __type: 'merchanttrade',
+    description: trade.description ?? '',
+    cost: trade.cost ?? {},
+    reward: trade.reward ?? {},
+    maxStock: trade.maxStock ?? 1,
+    type: trade.type ?? 'buy',
   };
 }
 

@@ -6,6 +6,7 @@ import {
   defaultCorruptionEffectState,
   defaultFloor,
   defaultInvasionSchedule,
+  defaultMerchantState,
   defaultReputationState,
   defaultResearchState,
   defaultResources,
@@ -77,6 +78,7 @@ export async function worldgenGenerateWorld(): Promise<
     elevators: [],
     portals: [],
     victoryProgress: defaultVictoryProgress(),
+    merchant: defaultMerchantState(),
     didFinish: true,
   };
 }

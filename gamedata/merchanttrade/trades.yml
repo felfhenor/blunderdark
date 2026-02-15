@@ -1,0 +1,110 @@
+# Buy trades - player spends resources to gain other resources
+- id: 18470b8d-0aff-4c4c-9337-3ad69a029303
+  name: Crystal Exchange
+  description: Trade gold for a cache of raw crystals from the merchant's mines.
+  cost:
+    gold: 100
+  reward:
+    crystals: 60
+  maxStock: 3
+  type: buy
+
+- id: 1fd50885-460c-4251-91fb-2413fca56adf
+  name: Ration Supply
+  description: Purchase preserved provisions to feed your dungeon's inhabitants.
+  cost:
+    gold: 80
+  reward:
+    food: 100
+  maxStock: 3
+  type: buy
+
+- id: 85b7a927-e7ff-473b-8764-02724dd485e5
+  name: Flux Canister
+  description: A sealed container of volatile magical flux, carefully stabilized for transport.
+  cost:
+    gold: 150
+    crystals: 25
+  reward:
+    flux: 30
+  maxStock: 2
+  type: buy
+
+- id: 26fa2715-97f3-4b62-a95e-496ced4a213d
+  name: Essence Vial
+  description: Distilled essence captured from ancient ley lines, concentrated into a portable form.
+  cost:
+    gold: 200
+    crystals: 50
+  reward:
+    essence: 25
+  maxStock: 2
+  type: buy
+
+# Sell trades - player sells resources for gold
+- id: 7e40d7ee-a8bf-42dc-9fcd-606f239b7103
+  name: Crystal Buyback
+  description: The merchant offers a fair price for surplus crystals from your mines.
+  cost:
+    crystals: 50
+  reward:
+    gold: 75
+  maxStock: 3
+  type: sell
+
+- id: 28cc20bf-27ed-4f93-969e-1d442f715328
+  name: Surplus Provisions
+  description: Sell excess food stores to the merchant's caravan at harvest-season prices.
+  cost:
+    food: 80
+  reward:
+    gold: 60
+  maxStock: 3
+  type: sell
+
+- id: 2de552ca-3559-4c1d-946a-63df29a76a7d
+  name: Flux Liquidation
+  description: Convert surplus flux into gold through the merchant's arcane contacts.
+  cost:
+    flux: 20
+  reward:
+    gold: 120
+  maxStock: 2
+  type: sell
+
+# Special trades - unique or rare exchanges
+- id: 82c09acc-1e51-4ac3-899b-43f6f987f7c9
+  name: Dark Pact
+  description: A forbidden exchange channeling corruption into pure essence through an ancient ritual.
+  cost:
+    corruption: 30
+    gold: 50
+  reward:
+    essence: 40
+  maxStock: 1
+  type: special
+
+- id: b7c5ee65-88f6-46e9-a7d7-cb3672c2d6a4
+  name: Alchemical Bounty
+  description: A rare merchant special offering a mix of resources at a bulk discount.
+  cost:
+    gold: 300
+  reward:
+    crystals: 40
+    food: 40
+    flux: 15
+    essence: 10
+  maxStock: 1
+  type: special
+
+- id: d4a8f078-fdf8-4601-895a-2bd2e2c6daf2
+  name: Harvest Blessing
+  description: The merchant shares a seasonal bounty, exchanging food for a diverse resource package.
+  cost:
+    food: 150
+  reward:
+    gold: 50
+    crystals: 30
+    flux: 10
+  maxStock: 1
+  type: special

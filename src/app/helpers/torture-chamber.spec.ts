@@ -277,6 +277,7 @@ function makeGameState(overrides: {
       elevators: [],
       portals: [],
       victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
+      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
     },
   };
 }
