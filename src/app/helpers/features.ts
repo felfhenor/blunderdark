@@ -1,7 +1,9 @@
 import { contentGetEntry } from '@helpers/content';
 import type { FeatureBonus, FeatureBonusType, FeatureContent } from '@interfaces/content-feature';
+import type { Floor } from '@interfaces/floor';
+import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { RoomProduction } from '@interfaces/room';
-import type { PlacedRoom, SacrificeBuff } from '@interfaces/room-shape';
+import type { PlacedRoom, PlacedRoomId, SacrificeBuff } from '@interfaces/room-shape';
 
 /**
  * Get the FeatureContent for a room's attached feature, if any.
@@ -207,4 +209,81 @@ export function featureSacrificeProcess(rooms: PlacedRoom[]): void {
       room.sacrificeBuff = undefined;
     }
   }
+}
+
+// --- Fungal Network ---
+
+/**
+ * Check if a room has a Fungal Network feature (teleport_link bonus).
+ */
+export function featureHasFungalNetwork(placedRoom: PlacedRoom): boolean {
+  return featureGetBonuses(placedRoom, 'teleport_link').length > 0;
+}
+
+/**
+ * Get all rooms on floors that have Fungal Network features, excluding a given room.
+ * These are the valid teleport destinations for a source room.
+ */
+export function featureGetFungalNetworkDestinations(
+  floors: Floor[],
+  sourceRoomId: PlacedRoomId,
+): { floor: Floor; room: PlacedRoom }[] {
+  const destinations: { floor: Floor; room: PlacedRoom }[] = [];
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (room.id === sourceRoomId) continue;
+      if (featureHasFungalNetwork(room)) {
+        destinations.push({ floor, room });
+      }
+    }
+  }
+  return destinations;
+}
+
+/**
+ * Check if an inhabitant can be transferred via Fungal Network.
+ * Source room must have a Fungal Network. At least one other room must also have one.
+ */
+export function featureCanFungalTransfer(
+  floors: Floor[],
+  sourceRoom: PlacedRoom,
+  inhabitant: InhabitantInstance,
+): { allowed: boolean; reason?: string } {
+  if (!featureHasFungalNetwork(sourceRoom)) {
+    return { allowed: false, reason: 'Source room has no Fungal Network' };
+  }
+
+  if (inhabitant.assignedRoomId !== sourceRoom.id) {
+    return { allowed: false, reason: 'Inhabitant is not assigned to this room' };
+  }
+
+  const destinations = featureGetFungalNetworkDestinations(floors, sourceRoom.id);
+  if (destinations.length === 0) {
+    return { allowed: false, reason: 'No other Fungal Network rooms available' };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Transfer an inhabitant instantly via Fungal Network.
+ * Updates the inhabitant's assignedRoomId to the destination room.
+ * Sets travelTicksRemaining to 0 (instant transfer).
+ */
+export function featureFungalTransfer(
+  inhabitant: InhabitantInstance,
+  destinationRoomId: PlacedRoomId,
+): void {
+  inhabitant.assignedRoomId = destinationRoomId;
+  inhabitant.travelTicksRemaining = 0;
+}
+
+/**
+ * Remove a feature from a room. Clears featureId and any associated state.
+ * If the feature was a Fungal Network, links are automatically broken
+ * (since links are implicit based on feature presence).
+ */
+export function featureRemoveFromRoom(placedRoom: PlacedRoom): void {
+  placedRoom.featureId = undefined;
+  placedRoom.sacrificeBuff = undefined;
 }

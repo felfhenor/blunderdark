@@ -20,8 +20,15 @@ import {
   featureSacrificeProcess,
   FEATURE_SACRIFICE_FOOD_COST,
   FEATURE_SACRIFICE_BUFF_TICKS,
+  featureHasFungalNetwork,
+  featureGetFungalNetworkDestinations,
+  featureCanFungalTransfer,
+  featureFungalTransfer,
+  featureRemoveFromRoom,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
+import type { Floor } from '@interfaces/floor';
+import type { InhabitantInstance, InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
@@ -31,6 +38,7 @@ const MOSS_ID = 'moss-test-id' as FeatureId;
 const CRYSTALS_ID = 'crystals-test-id' as FeatureId;
 const VENTS_ID = 'vents-test-id' as FeatureId;
 const BLOOD_ALTAR_ID = 'blood-altar-test-id' as FeatureId;
+const FUNGAL_ID = 'fungal-test-id' as FeatureId;
 
 const coffinsContent: FeatureContent = {
   id: COFFINS_ID,
@@ -95,6 +103,45 @@ const bloodAltarContent: FeatureContent = {
     { type: 'corruption_generation', value: 2, description: '+2 Corruption per minute' },
   ],
 };
+
+const fungalContent: FeatureContent = {
+  id: FUNGAL_ID,
+  name: 'Fungal Network',
+  __type: 'feature',
+  description: 'Test fungal network',
+  category: 'environmental',
+  cost: { gold: 60 },
+  bonuses: [
+    { type: 'teleport_link', value: 1, description: 'Enables instant transfer' },
+  ],
+};
+
+function makeFloor(overrides: Partial<Floor> = {}): Floor {
+  return {
+    id: 'floor-1',
+    name: 'Floor 1',
+    depth: 0,
+    biome: 'neutral',
+    grid: [],
+    rooms: [],
+    hallways: [],
+    inhabitants: [],
+    connections: [],
+    traps: [],
+    ...overrides,
+  } as Floor;
+}
+
+function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
+  return {
+    instanceId: 'inh-1' as InhabitantInstanceId,
+    definitionId: 'test-def',
+    name: 'Test Creature',
+    state: 'normal',
+    assignedRoomId: 'room-1' as PlacedRoomId,
+    ...overrides,
+  } as InhabitantInstance;
+}
 
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
@@ -426,5 +473,130 @@ describe('featureSacrificeProcess', () => {
     expect(room1.sacrificeBuff?.ticksRemaining).toBe(4);
     expect(room2.sacrificeBuff).toBeUndefined();
     expect(room3.sacrificeBuff).toBeUndefined();
+  });
+});
+
+describe('featureHasFungalNetwork', () => {
+  it('returns false for room without feature', () => {
+    const room = makeRoom();
+    expect(featureHasFungalNetwork(room)).toBe(false);
+  });
+
+  it('returns true for room with Fungal Network', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room = makeRoom({ featureId: FUNGAL_ID });
+    expect(featureHasFungalNetwork(room)).toBe(true);
+  });
+
+  it('returns false for room with non-fungal feature', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(mossContent);
+    const room = makeRoom({ featureId: MOSS_ID });
+    expect(featureHasFungalNetwork(room)).toBe(false);
+  });
+});
+
+describe('featureGetFungalNetworkDestinations', () => {
+  it('returns empty array when no other rooms have fungal networks', () => {
+    const room1 = makeRoom({ featureId: FUNGAL_ID });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId });
+    vi.mocked(contentGetEntry).mockImplementation((id) => {
+      if (id === FUNGAL_ID) return fungalContent;
+      return undefined;
+    });
+    const floor = makeFloor({ rooms: [room1, room2] });
+    const destinations = featureGetFungalNetworkDestinations([floor], room1.id);
+    expect(destinations).toHaveLength(0);
+  });
+
+  it('returns rooms with fungal networks, excluding source', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room1 = makeRoom({ featureId: FUNGAL_ID });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureId: FUNGAL_ID });
+    const room3 = makeRoom({ id: 'room-3' as PlacedRoomId, featureId: FUNGAL_ID });
+    const floor = makeFloor({ rooms: [room1, room2, room3] });
+    const destinations = featureGetFungalNetworkDestinations([floor], room1.id);
+    expect(destinations).toHaveLength(2);
+    expect(destinations[0].room.id).toBe('room-2');
+    expect(destinations[1].room.id).toBe('room-3');
+  });
+
+  it('finds destinations across multiple floors', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room1 = makeRoom({ featureId: FUNGAL_ID });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureId: FUNGAL_ID });
+    const floor1 = makeFloor({ rooms: [room1] });
+    const floor2 = makeFloor({ id: 'floor-2', rooms: [room2] });
+    const destinations = featureGetFungalNetworkDestinations([floor1, floor2], room1.id);
+    expect(destinations).toHaveLength(1);
+    expect(destinations[0].room.id).toBe('room-2');
+  });
+});
+
+describe('featureCanFungalTransfer', () => {
+  it('returns not allowed when source room has no fungal network', () => {
+    const room = makeRoom();
+    const inhabitant = makeInhabitant();
+    const result = featureCanFungalTransfer([], room, inhabitant);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Source room has no Fungal Network');
+  });
+
+  it('returns not allowed when inhabitant is not in source room', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room = makeRoom({ featureId: FUNGAL_ID });
+    const inhabitant = makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId });
+    const result = featureCanFungalTransfer([], room, inhabitant);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Inhabitant is not assigned to this room');
+  });
+
+  it('returns not allowed when no destinations exist', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room1 = makeRoom({ featureId: FUNGAL_ID });
+    const inhabitant = makeInhabitant({ assignedRoomId: room1.id });
+    const floor = makeFloor({ rooms: [room1] });
+    const result = featureCanFungalTransfer([floor], room1, inhabitant);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('No other Fungal Network rooms available');
+  });
+
+  it('returns allowed when conditions are met', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(fungalContent);
+    const room1 = makeRoom({ featureId: FUNGAL_ID });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureId: FUNGAL_ID });
+    const inhabitant = makeInhabitant({ assignedRoomId: room1.id });
+    const floor = makeFloor({ rooms: [room1, room2] });
+    const result = featureCanFungalTransfer([floor], room1, inhabitant);
+    expect(result.allowed).toBe(true);
+  });
+});
+
+describe('featureFungalTransfer', () => {
+  it('moves inhabitant to destination room instantly', () => {
+    const inhabitant = makeInhabitant({
+      assignedRoomId: 'room-1' as PlacedRoomId,
+      travelTicksRemaining: 5,
+    });
+    featureFungalTransfer(inhabitant, 'room-2' as PlacedRoomId);
+    expect(inhabitant.assignedRoomId).toBe('room-2');
+    expect(inhabitant.travelTicksRemaining).toBe(0);
+  });
+});
+
+describe('featureRemoveFromRoom', () => {
+  it('clears featureId and sacrificeBuff', () => {
+    const room = makeRoom({
+      featureId: BLOOD_ALTAR_ID,
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 10 },
+    });
+    featureRemoveFromRoom(room);
+    expect(room.featureId).toBeUndefined();
+    expect(room.sacrificeBuff).toBeUndefined();
+  });
+
+  it('handles room with no feature gracefully', () => {
+    const room = makeRoom();
+    featureRemoveFromRoom(room);
+    expect(room.featureId).toBeUndefined();
   });
 });
