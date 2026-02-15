@@ -22,6 +22,13 @@ export type InhabitantStats = {
 
 export type RulerBonuses = Record<string, number>;
 
+export type RecruitmentRequirement = {
+  requirementType: 'room' | 'room_level' | 'resource' | 'item';
+  targetName: string;
+  value?: number;
+  description: string;
+};
+
 export type InhabitantInstanceId = Branded<string, 'InhabitantInstanceId'>;
 
 export type InhabitantState = 'normal' | 'scared' | 'hungry' | 'starving';

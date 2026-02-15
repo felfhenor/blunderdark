@@ -266,6 +266,8 @@ function ensureInhabitant(
     fearPropagationDistance: inhabitant.fearPropagationDistance ?? 1,
     foodConsumptionRate: inhabitant.foodConsumptionRate ?? 0,
     corruptionGeneration: inhabitant.corruptionGeneration ?? 0,
+    upkeepCost: inhabitant.upkeepCost ?? undefined,
+    recruitmentRequirements: inhabitant.recruitmentRequirements ?? undefined,
   };
 }
 

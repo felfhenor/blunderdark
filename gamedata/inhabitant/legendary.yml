@@ -1,0 +1,234 @@
+- id: a7b8c9d0-e1f2-4a3b-5c6d-7e8f9a0b1c2d
+  name: Beholder
+  type: aberration
+  tier: 4
+  description: A floating orb of malevolent intellect ringed with eye stalks. Its all-seeing gaze renders traps deadlier and scouts useless.
+  cost:
+    gold: 400
+    essence: 250
+    crystals: 75
+  stats:
+    hp: 350
+    attack: 50
+    defense: 40
+    speed: 15
+    workerEfficiency: 1.0
+  traits:
+    - id: trait-beholder-trap-mastery
+      name: Trap Mastery
+      description: The Beholder's eye stalks optimize trap placement dungeon-wide, increasing trap effectiveness by 15%.
+      effectType: aura_trap_bonus
+      effectValue: 0.15
+    - id: trait-beholder-antimagic-gaze
+      name: Antimagic Gaze
+      description: The Beholder's central eye negates magical scouting, preventing invaders from detecting dungeon layout.
+      effectType: aura_negate_scout
+      effectValue: 1
+    - id: trait-beholder-all-seeing
+      name: All-Seeing
+      description: The Beholder's many eyes reveal all invaders on the map, even those hidden or invisible.
+      effectType: aura_reveal_invaders
+      effectValue: 1
+    - id: trait-beholder-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    trapEffectiveness: 0.10
+    detection: 0.15
+  rulerFearLevel: 3
+  fearTolerance: 99
+  fearModifier: 1
+  fearPropagationDistance: 2
+  foodConsumptionRate: 2
+  upkeepCost:
+    gold: 6
+    essence: 4
+  recruitmentRequirements:
+    - requirementType: room
+      targetName: Shadow Library
+      description: Requires a Shadow Library to house the Beholder's arcane collection.
+    - requirementType: resource
+      targetName: gold
+      value: 400
+      description: Requires 400 gold to fund the summoning ritual.
+    - requirementType: resource
+      targetName: essence
+      value: 300
+      description: Requires 300 essence to stabilize the Beholder's form.
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
+    hungry:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.95
+      defenseMultiplier: 0.95
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e
+  name: Medusa
+  type: aberration
+  tier: 4
+  description: A cursed being of terrible beauty whose gaze turns flesh to stone. Her presence fills the dungeon with paralyzing dread.
+  cost:
+    gold: 350
+    essence: 200
+    corruption: 50
+  stats:
+    hp: 280
+    attack: 55
+    defense: 35
+    speed: 18
+    workerEfficiency: 1.0
+  traits:
+    - id: trait-medusa-petrifying-presence
+      name: Petrifying Presence
+      description: The Medusa's aura grants a 5% chance to petrify invaders each combat round, stunning them for one turn.
+      effectType: aura_petrify
+      effectValue: 0.05
+    - id: trait-medusa-dread-gaze
+      name: Dread Gaze
+      description: The Medusa's terrifying visage increases dungeon-wide fear by 20%.
+      effectType: aura_fear_bonus
+      effectValue: 0.20
+    - id: trait-medusa-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    fear: 0.15
+    invaderMorale: -0.05
+  rulerFearLevel: 4
+  fearTolerance: 99
+  fearModifier: 2
+  fearPropagationDistance: 2
+  foodConsumptionRate: 2
+  corruptionGeneration: 3
+  upkeepCost:
+    gold: 5
+    essence: 3
+  recruitmentRequirements:
+    - requirementType: room
+      targetName: Soul Well
+      description: Requires a Soul Well to channel the Medusa's cursed essence.
+    - requirementType: resource
+      targetName: gold
+      value: 350
+      description: Requires 350 gold to prepare the binding ward.
+    - requirementType: resource
+      targetName: corruption
+      value: 200
+      description: Requires 200 corruption to lure the Medusa from her lair.
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
+    hungry:
+      productionMultiplier: 0.85
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f
+  name: Ancient Treant
+  type: fungal
+  tier: 4
+  description: A primordial tree spirit of staggering size and patience. Its roots permeate the dungeon, enriching food stores and accelerating growth of all living things.
+  cost:
+    gold: 300
+    food: 200
+    essence: 100
+  stats:
+    hp: 450
+    attack: 30
+    defense: 70
+    speed: 8
+    workerEfficiency: 1.0
+  traits:
+    - id: trait-treant-bountiful-roots
+      name: Bountiful Roots
+      description: The Ancient Treant's roots enrich the dungeon soil, increasing food production dungeon-wide by 20%.
+      effectType: aura_food_bonus
+      effectValue: 0.20
+    - id: trait-treant-natures-bounty
+      name: Nature's Bounty
+      description: All gathering and harvesting operations across the dungeon are 15% more efficient.
+      effectType: aura_gathering_bonus
+      effectValue: 0.15
+    - id: trait-treant-living-walls
+      name: Living Walls
+      description: The Treant's roots reinforce room structures, passively regenerating room durability over time.
+      effectType: aura_room_regen
+      effectValue: 1
+    - id: trait-treant-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    foodProduction: 0.15
+    roomDurability: 0.10
+  rulerFearLevel: 2
+  fearTolerance: 99
+  fearModifier: 0
+  fearPropagationDistance: 1
+  foodConsumptionRate: 0
+  upkeepCost:
+    gold: 4
+    food: 6
+  recruitmentRequirements:
+    - requirementType: room
+      targetName: Mushroom Farm
+      description: Requires a Mushroom Farm for the Treant to root into.
+    - requirementType: resource
+      targetName: food
+      value: 500
+      description: Requires 500 food to nourish the Treant's awakening.
+    - requirementType: resource
+      targetName: essence
+      value: 200
+      description: Requires 200 essence to call forth the ancient spirit.
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

@@ -224,17 +224,47 @@
     defense: 60
     speed: 20
     workerEfficiency: 1.0
-  traits: []
+  traits:
+    - id: trait-dragon-draconic-fury
+      name: Draconic Fury
+      description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power dungeon-wide by 15%.
+      effectType: aura_attack_bonus
+      effectValue: 0.15
+    - id: trait-dragon-fire-breath
+      name: Fire Breath
+      description: Devastating fire attacks deal 50% bonus fire damage to all invaders in combat.
+      effectType: fire_damage_bonus
+      effectValue: 0.5
+    - id: trait-dragon-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
   restrictionTags:
     - unique
   rulerBonuses:
     attack: 0.10
     fear: 0.05
   rulerFearLevel: 4
-  fearTolerance: 4
+  fearTolerance: 99
   fearModifier: 2
   fearPropagationDistance: 2
   foodConsumptionRate: 5
+  upkeepCost:
+    gold: 10
+    food: 8
+  recruitmentRequirements:
+    - requirementType: room
+      targetName: Treasure Vault
+      description: Requires a Treasure Vault to house the dragon's hoard.
+    - requirementType: resource
+      targetName: gold
+      value: 500
+      description: Requires 500 gold to entice the dragon.
+    - requirementType: resource
+      targetName: flux
+      value: 200
+      description: Requires 200 flux to bind the dragon's will.
   stateModifiers:
     scared:
       productionMultiplier: 0.9
@@ -353,7 +383,27 @@
     defense: 50
     speed: 25
     workerEfficiency: 1.0
-  traits: []
+  traits:
+    - id: trait-demonlord-abyssal-corruption
+      name: Abyssal Corruption
+      description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing corruption generation dungeon-wide by 25%.
+      effectType: aura_corruption_bonus
+      effectValue: 0.25
+    - id: trait-demonlord-dread-aura
+      name: Dread Aura
+      description: Radiates an overwhelming aura of dread that increases dungeon-wide fear by 10.
+      effectType: aura_fear_bonus
+      effectValue: 10
+    - id: trait-demonlord-crushing-presence
+      name: Crushing Presence
+      description: The Demon Lord's oppressive will reduces invader morale dungeon-wide by 15%.
+      effectType: aura_morale_penalty
+      effectValue: 0.15
+    - id: trait-demonlord-fearless
+      name: Fearless
+      description: Immune to all fear effects. Never enters the scared state.
+      effectType: fear_immunity
+      effectValue: 1
   restrictionTags:
     - unique
   rulerBonuses:
@@ -361,11 +411,27 @@
     fear: 0.10
     invaderMorale: -0.10
   rulerFearLevel: 5
-  fearTolerance: 4
+  fearTolerance: 99
   fearModifier: 2
   fearPropagationDistance: 2
   foodConsumptionRate: 3
   corruptionGeneration: 10
+  upkeepCost:
+    gold: 8
+    corruption: 5
+  recruitmentRequirements:
+    - requirementType: room_level
+      targetName: Altar Room
+      value: 3
+      description: Requires an Altar Room upgraded to level 3 to perform the binding ritual.
+    - requirementType: resource
+      targetName: gold
+      value: 300
+      description: Requires 300 gold as a tribute offering.
+    - requirementType: resource
+      targetName: corruption
+      value: 500
+      description: Requires 500 corruption to tear open the abyssal rift.
   stateModifiers:
     scared:
       productionMultiplier: 0.95

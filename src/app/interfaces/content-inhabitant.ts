@@ -3,6 +3,7 @@ import type {
   InhabitantState,
   InhabitantStats,
   InhabitantTrait,
+  RecruitmentRequirement,
   RulerBonuses,
   StateModifier,
 } from '@interfaces/inhabitant';
@@ -28,4 +29,6 @@ export type InhabitantContent = IsContentItem &
     foodConsumptionRate?: number;
     corruptionGeneration?: number;
     stateModifiers?: Partial<Record<InhabitantState, StateModifier>>;
+    upkeepCost?: Partial<Record<ResourceType, number>>;
+    recruitmentRequirements?: RecruitmentRequirement[];
   };

@@ -255,7 +255,7 @@ vi.mock('@helpers/content', () => {
 
   return {
     contentGetEntry: vi.fn((id: string) => entries.get(id)),
-    contentGetEntriesByType: vi.fn((_type: string) => researchNodes),
+    contentGetEntriesByType: vi.fn(() => researchNodes),
     getEntries: vi.fn(),
     contentAllIdsByName: vi.fn(() => new Map()),
   };
