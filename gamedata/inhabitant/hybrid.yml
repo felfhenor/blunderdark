@@ -1,0 +1,987 @@
+# Tier 1 Hybrids (from Tier 1 creature fusions)
+
+- id: a8f39e56-9179-4c0e-8889-19ae72f8518a
+  name: Hobgoblin
+  type: creature
+  tier: 2
+  description: A hulking brute born from goblin cunning and kobold resourcefulness. Stronger and more disciplined than either parent.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 40
+    attack: 14
+    defense: 12
+    speed: 14
+    workerEfficiency: 1.1
+  traits:
+    - id: trait-hobgoblin-disciplined
+      name: Disciplined
+      description: Increases production by 15% in any assigned room.
+      effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: crystals
+    - id: trait-hobgoblin-taskmaster
+      name: Taskmaster
+      description: Boosts training speed of nearby creatures.
+      effectType: training_bonus
+      effectValue: 0.1
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 2.5
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: d180840f-3057-42e6-b75c-3db3aadb0863
+  name: Bone Goblin
+  type: undead
+  tier: 2
+  description: A goblin skeleton reanimated with residual goblin instincts. Tireless and eerily efficient at mining.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 12
+    defense: 14
+    speed: 10
+    workerEfficiency: 1.2
+  traits:
+    - id: trait-bone-goblin-tireless
+      name: Tireless Miner
+      description: Increases crystal production by 25% when assigned to Crystal Mine.
+      effectType: production_bonus
+      effectValue: 0.25
+      targetResourceType: crystals
+    - id: trait-bone-goblin-undead
+      name: Undead Resilience
+      description: Takes reduced damage from physical attacks.
+      effectType: damage_reduction
+      effectValue: 0.1
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 6d75d3c3-229e-48c9-97d0-e3667400f485
+  name: Fire Kobold
+  type: creature
+  tier: 2
+  description: A kobold infused with imp fire. Its traps burn with hellish flame and it moves with supernatural speed.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 25
+    attack: 14
+    defense: 8
+    speed: 20
+    workerEfficiency: 0.95
+  traits:
+    - id: trait-fire-kobold-firetrap
+      name: Burning Traps
+      description: Traps deal additional fire damage.
+      effectType: fire_damage_bonus
+      effectValue: 0.3
+    - id: trait-fire-kobold-swift
+      name: Blazing Speed
+      description: Moves faster than any pure-blooded creature.
+      effectType: physical_evasion
+      effectValue: 0.15
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 2fdb586f-fe41-4a2c-965a-b9803ceff2ca
+  name: Flame Skeleton
+  type: undead
+  tier: 2
+  description: A skeleton wreathed in imp fire. Its bones glow with infernal heat, terrifying invaders and igniting anything it touches.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 30
+    attack: 16
+    defense: 10
+    speed: 12
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-flame-skeleton-burn
+      name: Burning Bones
+      description: Deals fire damage on contact with attackers.
+      effectType: fire_damage_bonus
+      effectValue: 0.25
+    - id: trait-flame-skeleton-fear
+      name: Terrifying Visage
+      description: Increases fear in assigned room.
+      effectType: fear_bonus
+      effectValue: 1
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: f4fe56f0-b88e-4376-b637-a0006224d754
+  name: Goblin Firestarter
+  type: creature
+  tier: 2
+  description: A goblin consumed by imp fire. Volatile and unpredictable, it excels at causing chaos among invaders.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 28
+    attack: 16
+    defense: 6
+    speed: 16
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-firestarter-arson
+      name: Arsonist
+      description: Deals bonus fire damage in combat.
+      effectType: fire_damage_bonus
+      effectValue: 0.35
+    - id: trait-firestarter-chaos
+      name: Chaotic Nature
+      description: Generates corruption passively.
+      effectType: corruption_generation
+      effectValue: 0.5
+  fearTolerance: 1
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 1.2
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+# Tier 2 Hybrids (from Tier 2 creature fusions)
+
+- id: 0f3124ad-474d-4de7-995c-43ca12f59d3b
+  name: Death Knight
+  type: undead
+  tier: 3
+  description: A skeleton empowered by wraith essence. Clad in spectral armor, it leads undead forces with ruthless efficiency.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 55
+    attack: 22
+    defense: 20
+    speed: 10
+    workerEfficiency: 0.7
+  traits:
+    - id: trait-death-knight-command
+      name: Undead Commander
+      description: Boosts attack of nearby undead inhabitants.
+      effectType: attack_bonus
+      effectValue: 0.2
+    - id: trait-death-knight-spectral
+      name: Spectral Armor
+      description: Reduces incoming damage significantly.
+      effectType: damage_reduction
+      effectValue: 0.2
+    - id: trait-death-knight-fear
+      name: Dread Presence
+      description: Greatly increases fear in assigned room.
+      effectType: fear_bonus
+      effectValue: 2
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: b8fae618-4f4c-4e3a-9c2a-2a1c4a7ee4d0
+  name: War Chief
+  type: creature
+  tier: 3
+  description: An orc-goblin hybrid that combines brute strength with cunning tactics. A natural leader of raiding parties.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 50
+    attack: 20
+    defense: 16
+    speed: 14
+    workerEfficiency: 1.0
+  traits:
+    - id: trait-war-chief-rally
+      name: Rally Cry
+      description: Boosts attack of all creatures in the same room.
+      effectType: attack_bonus
+      effectValue: 0.15
+    - id: trait-war-chief-cunning
+      name: Tactical Cunning
+      description: Boosts defense of creatures in the same room.
+      effectType: defense_bonus
+      effectValue: 0.1
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 3
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 3e320143-3940-42a4-a360-6fe080aa9787
+  name: Phantom Flame
+  type: undead
+  tier: 3
+  description: A wraith fused with imp fire. This spectral inferno phases through walls, leaving trails of ghostly flame.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 20
+    defense: 6
+    speed: 18
+    workerEfficiency: 0.6
+  traits:
+    - id: trait-phantom-flame-phase
+      name: Phase Strike
+      description: Attacks ignore a portion of enemy defense.
+      effectType: attack_bonus
+      effectValue: 0.25
+    - id: trait-phantom-flame-trail
+      name: Ghost Fire
+      description: Generates corruption from spectral flames.
+      effectType: corruption_generation
+      effectValue: 1
+    - id: trait-phantom-flame-fear
+      name: Spectral Terror
+      description: Increases fear in assigned room.
+      effectType: fear_bonus
+      effectValue: 1
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 4ad69db9-6260-4b45-b501-9b47750d44df
+  name: Bone Golem
+  type: undead
+  tier: 3
+  description: A Stone Elemental animated by skeletal necromancy. Its rock body is reinforced with enchanted bone, making it nearly indestructible.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 70
+    attack: 16
+    defense: 28
+    speed: 4
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-bone-golem-fortress
+      name: Living Fortress
+      description: Massive damage reduction from all sources.
+      effectType: damage_reduction
+      effectValue: 0.3
+    - id: trait-bone-golem-structural
+      name: Structural Reinforcement
+      description: Boosts structural integrity of assigned room.
+      effectType: structural_bonus
+      effectValue: 0.2
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c04feb7c-1f40-424c-82b9-c342111fe8c3
+  name: Iron Brute
+  type: creature
+  tier: 3
+  description: An orc fused with Stone Elemental essence. Its skin has hardened to iron, making it a walking siege engine.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 65
+    attack: 24
+    defense: 22
+    speed: 6
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-iron-brute-siege
+      name: Siege Breaker
+      description: Deals massive damage to structures and armored targets.
+      effectType: attack_bonus
+      effectValue: 0.3
+    - id: trait-iron-brute-iron
+      name: Iron Skin
+      description: Reduces all incoming damage.
+      effectType: damage_reduction
+      effectValue: 0.15
+  fearTolerance: 4
+  fearModifier: 1
+  foodConsumptionRate: 4
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    hungry:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+# Advanced Hybrids (from high-tier creature fusions)
+
+- id: 6b0b2867-7b73-4a40-8474-501c5ff44338
+  name: Dread Lich
+  type: undead
+  tier: 4
+  description: A Lich empowered by wraith essence. Its mastery of death magic is unparalleled, commanding spectral armies from beyond the veil.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 45
+    attack: 28
+    defense: 14
+    speed: 12
+    workerEfficiency: 1.3
+  traits:
+    - id: trait-dread-lich-necro
+      name: Supreme Necromancy
+      description: Massively boosts research speed.
+      effectType: production_bonus
+      effectValue: 0.4
+      targetResourceType: research
+    - id: trait-dread-lich-command
+      name: Spectral Command
+      description: Boosts all undead attack in the dungeon.
+      effectType: attack_bonus
+      effectValue: 0.15
+    - id: trait-dread-lich-fear
+      name: Aura of Dread
+      description: Greatly increases fear in assigned room.
+      effectType: fear_bonus
+      effectValue: 2
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 4664645d-8ef9-4e13-964c-90ac538372fc
+  name: Bone Lord
+  type: undead
+  tier: 4
+  description: A Lich that has fully merged with skeletal constructs. Its body is an ever-shifting mass of enchanted bones that reforms endlessly.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 60
+    attack: 24
+    defense: 22
+    speed: 8
+    workerEfficiency: 1.1
+  traits:
+    - id: trait-bone-lord-regen
+      name: Bone Reformation
+      description: Regenerates health over time.
+      effectType: regeneration
+      effectValue: 2
+    - id: trait-bone-lord-master
+      name: Skeletal Mastery
+      description: Boosts defense of nearby undead.
+      effectType: defense_bonus
+      effectValue: 0.2
+    - id: trait-bone-lord-research
+      name: Ancient Scholar
+      description: Boosts research production.
+      effectType: production_bonus
+      effectValue: 0.25
+      targetResourceType: research
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 91d2866c-0bbe-41ae-9766-fe1ed7c39bb1
+  name: Trap Mimic
+  type: creature
+  tier: 3
+  description: A Mimic crossbred with Kobold trap expertise. Disguises itself as dungeon furniture, springing devastating ambushes with mechanical precision.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 40
+    attack: 18
+    defense: 16
+    speed: 14
+    workerEfficiency: 0.85
+  traits:
+    - id: trait-trap-mimic-ambush
+      name: Perfect Ambush
+      description: Massively boosts trap effectiveness.
+      effectType: trap_bonus
+      effectValue: 0.4
+    - id: trait-trap-mimic-disguise
+      name: Furniture Form
+      description: Reduces detection by invaders.
+      effectType: detection
+      effectValue: -0.3
+    - id: trait-trap-mimic-versatile
+      name: Adaptive Form
+      description: Can work in any room type.
+      effectType: versatility
+      effectValue: 0.1
+  fearTolerance: 3
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 42581aa9-374f-46e0-ae3f-42a1805e2b3f
+  name: Phantom Colossus
+  type: undead
+  tier: 4
+  description: A Stone Elemental possessed by wraith energy. This towering spectral construct phases between solid and ethereal, making it nearly impossible to destroy.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 80
+    attack: 20
+    defense: 24
+    speed: 6
+    workerEfficiency: 0.7
+  traits:
+    - id: trait-phantom-colossus-phase
+      name: Phase Shift
+      description: Periodically becomes intangible, evading attacks.
+      effectType: physical_evasion
+      effectValue: 0.25
+    - id: trait-phantom-colossus-crush
+      name: Spectral Crush
+      description: Devastating melee attacks empowered by ghostly energy.
+      effectType: attack_bonus
+      effectValue: 0.2
+    - id: trait-phantom-colossus-fear
+      name: Towering Horror
+      description: Greatly increases fear in assigned room.
+      effectType: fear_bonus
+      effectValue: 2
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 62fe2a27-ee46-46a4-b1e7-2100d56fc74d
+  name: Death Warlord
+  type: undead
+  tier: 4
+  description: An Orc resurrected and empowered by Lich necromancy. This undead warlord combines brutal physical might with dark magical power.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 75
+    attack: 28
+    defense: 20
+    speed: 10
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-death-warlord-might
+      name: Undying Might
+      description: Massive attack bonus in combat.
+      effectType: attack_bonus
+      effectValue: 0.3
+    - id: trait-death-warlord-regen
+      name: Dark Regeneration
+      description: Slowly regenerates from wounds.
+      effectType: regeneration
+      effectValue: 1
+    - id: trait-death-warlord-fear
+      name: Warlord's Presence
+      description: Enemies cower before the Death Warlord.
+      effectType: fear_bonus
+      effectValue: 2
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+# Additional Hybrids (to reach 20+ recipes)
+
+- id: b69de17a-d56d-413e-a0c3-58519cddaab8
+  name: Slime Knight
+  type: creature
+  tier: 2
+  description: A skeleton encased in living slime. The ooze absorbs impacts while the bones provide structure.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 45
+    attack: 12
+    defense: 18
+    speed: 8
+    workerEfficiency: 0.9
+  traits:
+    - id: trait-slime-knight-absorb
+      name: Ooze Armor
+      description: Absorbs a portion of incoming damage.
+      effectType: damage_reduction
+      effectValue: 0.2
+    - id: trait-slime-knight-adapt
+      name: Adaptive Form
+      description: Can work in any room type with moderate efficiency.
+      effectType: versatility
+      effectValue: 0.1
+  fearTolerance: 3
+  fearModifier: 0
+  foodConsumptionRate: 1
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.2
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 1ab6be58-6d2a-4d42-b9e4-e824778ee1f4
+  name: Fungal Horror
+  type: fungal
+  tier: 2
+  description: A Myconid that has absorbed slime essence. A pulsating mass of spores and ooze that spreads corruption wherever it goes.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 10
+    defense: 12
+    speed: 6
+    workerEfficiency: 1.3
+  traits:
+    - id: trait-fungal-horror-farm
+      name: Bountiful Growth
+      description: Greatly increases food production.
+      effectType: production_bonus
+      effectValue: 0.3
+      targetResourceType: food
+    - id: trait-fungal-horror-corrupt
+      name: Spore Cloud
+      description: Generates corruption passively.
+      effectType: corruption_generation
+      effectValue: 0.5
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 1
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 1651911c-8641-4778-849b-82856e58d03e
+  name: Shadow Orc
+  type: creature
+  tier: 3
+  description: An Orc infused with Shadow Beast essence. Moves silently despite its bulk, striking from darkness with devastating force.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 55
+    attack: 22
+    defense: 14
+    speed: 14
+    workerEfficiency: 0.8
+  traits:
+    - id: trait-shadow-orc-stealth
+      name: Shadow Strike
+      description: Attacks from stealth deal bonus damage.
+      effectType: attack_bonus
+      effectValue: 0.25
+    - id: trait-shadow-orc-detect
+      name: Dark Vision
+      description: Reduces chance of being detected by invader scouts.
+      effectType: detection
+      effectValue: -0.2
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 3
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 8c65a99d-161a-4d05-8ed3-095ab0563db7
+  name: Frost Golem
+  type: undead
+  tier: 3
+  description: A Stone Elemental frozen solid by Frost Wraith magic. Radiates intense cold that slows everything around it.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 65
+    attack: 14
+    defense: 26
+    speed: 4
+    workerEfficiency: 0.75
+  traits:
+    - id: trait-frost-golem-aura
+      name: Freezing Aura
+      description: Slows nearby enemies in combat.
+      effectType: defense_bonus
+      effectValue: 0.2
+    - id: trait-frost-golem-wall
+      name: Ice Wall
+      description: Boosts structural integrity of assigned room.
+      effectType: structural_bonus
+      effectValue: 0.25
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 0a1be968-55a2-4378-a60f-586bf00d9fce
+  name: Arcane Wraith
+  type: undead
+  tier: 3
+  description: A Wraith merged with an Arcane Familiar. This spectral scholar hoards forbidden knowledge and manipulates magical energies.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 30
+    attack: 18
+    defense: 8
+    speed: 16
+    workerEfficiency: 1.4
+  traits:
+    - id: trait-arcane-wraith-study
+      name: Spectral Research
+      description: Massively boosts research production.
+      effectType: production_bonus
+      effectValue: 0.35
+      targetResourceType: research
+    - id: trait-arcane-wraith-flux
+      name: Flux Channeler
+      description: Boosts flux production.
+      effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: flux
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

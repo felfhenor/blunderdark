@@ -4,6 +4,7 @@ import type {
   CompositionWeightConfig,
   ContentType,
   ForgeRecipeContent,
+  FusionRecipeContent,
   IsContentItem,
   PassiveBonusUnlock,
   ReputationAction,
@@ -35,6 +36,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
   forgerecipe: ensureForgeRecipe,
+  fusionrecipe: ensureFusionRecipe,
   inhabitant: ensureInhabitant,
   invader: ensureInvader,
   invasion: ensureInvasion,
@@ -100,6 +102,21 @@ function ensureForgeRecipe(
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
     statBonuses: recipe.statBonuses ?? {},
     tier: recipe.tier ?? 'basic',
+  };
+}
+
+function ensureFusionRecipe(
+  recipe: Partial<FusionRecipeContent & IsContentItem>,
+): FusionRecipeContent & IsContentItem {
+  return {
+    id: (recipe.id ?? 'UNKNOWN') as FusionRecipeContent['id'],
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'fusionrecipe',
+    description: recipe.description ?? '',
+    creatureAId: recipe.creatureAId ?? ('' as InhabitantId),
+    creatureBId: recipe.creatureBId ?? ('' as InhabitantId),
+    resultHybridId: recipe.resultHybridId ?? ('' as InhabitantId),
+    cost: recipe.cost ?? {},
   };
 }
 

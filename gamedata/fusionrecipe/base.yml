@@ -1,0 +1,212 @@
+# Tier 1 Fusion Recipes (Tier 1 + Tier 1 creatures)
+# Essence costs: 40-60
+
+- id: 372a736d-6280-4eb8-8e92-e492c576f42b
+  name: Hobgoblin Fusion
+  description: Fuse a Goblin and Kobold to create a disciplined Hobgoblin warrior.
+  creatureAId: Goblin
+  creatureBId: Kobold
+  resultHybridId: Hobgoblin
+  cost:
+    essence: 40
+    gold: 60
+
+- id: 77cf1bd2-c897-42da-a98d-d90327d5d7bb
+  name: Bone Goblin Fusion
+  description: Fuse a Goblin and Skeleton to create an undead Bone Goblin miner.
+  creatureAId: Goblin
+  creatureBId: Skeleton
+  resultHybridId: Bone Goblin
+  cost:
+    essence: 45
+    gold: 50
+
+- id: 0a067dae-803d-43e9-897c-4ce4eb865b1f
+  name: Fire Kobold Fusion
+  description: Fuse a Kobold and Imp to create a Fire Kobold with burning traps.
+  creatureAId: Kobold
+  creatureBId: Imp
+  resultHybridId: Fire Kobold
+  cost:
+    essence: 50
+    gold: 40
+
+- id: 7c8ef6c8-59f8-4ccc-acbd-97f43e749db5
+  name: Flame Skeleton Fusion
+  description: Fuse a Skeleton and Imp to create a Flame Skeleton wreathed in fire.
+  creatureAId: Skeleton
+  creatureBId: Imp
+  resultHybridId: Flame Skeleton
+  cost:
+    essence: 50
+    gold: 40
+
+- id: 37ed9841-8a91-4bd5-8229-d947e698bbbc
+  name: Goblin Firestarter Fusion
+  description: Fuse a Goblin and Imp to create a volatile Goblin Firestarter.
+  creatureAId: Goblin
+  creatureBId: Imp
+  resultHybridId: Goblin Firestarter
+  cost:
+    essence: 45
+    gold: 50
+
+- id: 30ca18e9-1de8-4274-a250-eb7539775944
+  name: Slime Knight Fusion
+  description: Fuse a Slime and Skeleton to create an ooze-armored Slime Knight.
+  creatureAId: Slime
+  creatureBId: Skeleton
+  resultHybridId: Slime Knight
+  cost:
+    essence: 50
+    gold: 40
+
+- id: 1d6ce5ee-08bd-4c1c-b771-e5a06c85a884
+  name: Fungal Horror Fusion
+  description: Fuse a Myconid and Slime to create a spreading Fungal Horror.
+  creatureAId: Myconid
+  creatureBId: Slime
+  resultHybridId: Fungal Horror
+  cost:
+    essence: 45
+    gold: 30
+    food: 40
+
+# Tier 2 Fusion Recipes (involving Tier 2 creatures)
+# Essence costs: 80-120
+
+- id: 717133d8-dbee-4781-8599-00593caa55d3
+  name: Death Knight Fusion
+  description: Fuse a Skeleton and Wraith to create a spectral Death Knight commander.
+  creatureAId: Skeleton
+  creatureBId: Wraith
+  resultHybridId: Death Knight
+  cost:
+    essence: 100
+    gold: 80
+
+- id: 69ed557c-6b66-473d-a3a1-da2bdbd93a6c
+  name: War Chief Fusion
+  description: Fuse an Orc and Goblin to create a tactical War Chief leader.
+  creatureAId: Orc
+  creatureBId: Goblin
+  resultHybridId: War Chief
+  cost:
+    essence: 80
+    gold: 100
+
+- id: 9c90e2dd-93fd-46f2-a1fc-67c49d2115ca
+  name: Phantom Flame Fusion
+  description: Fuse a Wraith and Imp to create a phasing Phantom Flame.
+  creatureAId: Wraith
+  creatureBId: Imp
+  resultHybridId: Phantom Flame
+  cost:
+    essence: 90
+    gold: 60
+
+- id: 4db2f072-65e0-46a8-8a31-caca16a66b69
+  name: Bone Golem Fusion
+  description: Fuse a Stone Elemental and Skeleton to create a massive Bone Golem.
+  creatureAId: Stone Elemental
+  creatureBId: Skeleton
+  resultHybridId: Bone Golem
+  cost:
+    essence: 100
+    gold: 100
+
+- id: bba5685c-f8b1-4363-b55d-0f9025b348e1
+  name: Iron Brute Fusion
+  description: Fuse an Orc and Stone Elemental to create an Iron Brute siege engine.
+  creatureAId: Orc
+  creatureBId: Stone Elemental
+  resultHybridId: Iron Brute
+  cost:
+    essence: 100
+    gold: 120
+
+- id: 1befc7e2-3fac-4e43-b927-b919279810cc
+  name: Trap Mimic Fusion
+  description: Fuse a Mimic and Kobold to create a Trap Mimic ambush specialist.
+  creatureAId: Mimic
+  creatureBId: Kobold
+  resultHybridId: Trap Mimic
+  cost:
+    essence: 90
+    gold: 80
+
+- id: 0634d13a-e3c6-40a8-8dcc-1ffbab313693
+  name: Shadow Orc Fusion
+  description: Fuse an Orc and Shadow Beast to create a stealthy Shadow Orc.
+  creatureAId: Orc
+  creatureBId: Shadow Beast
+  resultHybridId: Shadow Orc
+  cost:
+    essence: 100
+    gold: 80
+
+- id: c984c854-2d43-4828-9fff-159a72e975ca
+  name: Frost Golem Fusion
+  description: Fuse a Stone Elemental and Frost Wraith to create a Frost Golem.
+  creatureAId: Stone Elemental
+  creatureBId: Frost Wraith
+  resultHybridId: Frost Golem
+  cost:
+    essence: 110
+    gold: 90
+
+- id: 8d3f01fc-d08a-4e13-aca4-94f2b1c60350
+  name: Arcane Wraith Fusion
+  description: Fuse a Wraith and Arcane Familiar to create a scholarly Arcane Wraith.
+  creatureAId: Wraith
+  creatureBId: Arcane Familiar
+  resultHybridId: Arcane Wraith
+  cost:
+    essence: 100
+    gold: 60
+    flux: 40
+
+# Advanced Fusion Recipes (involving Lich or high-tier creatures)
+# Essence costs: 150-250
+
+- id: d64b5a03-01ec-44be-b8f6-cdeff2903d63
+  name: Dread Lich Fusion
+  description: Fuse a Lich and Wraith to create the terrifying Dread Lich, master of death magic.
+  creatureAId: Lich
+  creatureBId: Wraith
+  resultHybridId: Dread Lich
+  cost:
+    essence: 200
+    gold: 150
+    flux: 80
+
+- id: ffc9b3dc-22f5-4059-9116-38ff5e32459a
+  name: Bone Lord Fusion
+  description: Fuse a Lich and Skeleton to create the Bone Lord, an ever-reforming skeletal horror.
+  creatureAId: Lich
+  creatureBId: Skeleton
+  resultHybridId: Bone Lord
+  cost:
+    essence: 180
+    gold: 120
+
+- id: 449c21ca-6f64-4ae8-a380-cbebd5bc7e12
+  name: Phantom Colossus Fusion
+  description: Fuse a Stone Elemental and Wraith to create the Phantom Colossus, a phasing giant.
+  creatureAId: Stone Elemental
+  creatureBId: Wraith
+  resultHybridId: Phantom Colossus
+  cost:
+    essence: 200
+    gold: 150
+
+- id: 9d91b206-66b7-4a45-b5cc-16c7e02f73d5
+  name: Death Warlord Fusion
+  description: Fuse an Orc and Lich to create the Death Warlord, undying champion of destruction.
+  creatureAId: Orc
+  creatureBId: Lich
+  resultHybridId: Death Warlord
+  cost:
+    essence: 250
+    gold: 200
+    flux: 100

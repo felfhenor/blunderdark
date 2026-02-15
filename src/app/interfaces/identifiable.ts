@@ -4,6 +4,7 @@ export type ContentType =
   | 'breedingrecipe'
   | 'combatability'
   | 'forgerecipe'
+  | 'fusionrecipe'
   | 'inhabitant'
   | 'invader'
   | 'invasion'
