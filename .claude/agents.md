@@ -83,6 +83,9 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Breeding recipes**: reference inhabitants by name (not UUID) in `parentInhabitantAId`/`parentInhabitantBId`, add to `gamedata/breedingrecipe/base.yml`
 - **Inappetent pattern**: set `foodConsumptionRate: 0` — hunger system already skips inhabitants with rate ≤ 0, keeping them permanently in `normal` state. Set hungry/starving stateModifiers to 1.0 (unreachable but required).
 - **Room-specific production bonuses**: use multiple `production_bonus` traits with different `targetResourceType` values to make an inhabitant benefit multiple room types (e.g., `crystals` for Crystal Mine, `gold` for Dark Forge, `flux` for Ley Line Nexus)
+- **Legendary inhabitants**: use `restrictionTags: ['unique']` + `upkeepCost` + `recruitmentRequirements` on `InhabitantContent`. Upkeep processed per-tick in `legendaryInhabitantUpkeepProcess()`. Aura active only when assigned and not discontented. `discontentedTicks` tracked on `InhabitantInstance`.
+- **Aura effectTypes for legendaries**: `aura_attack_bonus`, `aura_corruption_bonus`, `aura_fear_bonus`, `aura_morale_penalty`, `aura_trap_bonus`, `aura_negate_scout`, `aura_reveal_invaders`, `aura_petrify`, `aura_food_bonus`, `aura_gathering_bonus`, `aura_room_regen` — data-only, consumed by `legendaryInhabitantIsAuraActive()` check
+- **Legendary YAML**: Dragon and Demon Lord in `gamedata/inhabitant/base.yml`; Beholder, Medusa, Ancient Treant in `gamedata/inhabitant/legendary.yml`
 
 ## Room-Specific Systems
 

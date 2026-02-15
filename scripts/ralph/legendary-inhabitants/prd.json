@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Dragon and Demon Lord updated in base.yml; Beholder, Medusa, Ancient Treant added in legendary.yml. Types extended with upkeepCost and recruitmentRequirements."
     },
     {
       "id": "US-002",
@@ -34,8 +34,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented as legendaryInhabitantCanRecruit() pure function with room, room_level, resource, and item requirement types. 16 unit tests."
     },
     {
       "id": "US-003",
@@ -52,8 +52,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Upkeep processor deducts per-tick, tracks discontentedTicks, removes after 25 ticks (5 min). Aura active only when assigned and not discontented. Hooked into gameloop."
     },
     {
       "id": "US-004",
@@ -70,7 +70,7 @@
       ],
       "priority": 3,
       "passes": false,
-      "notes": ""
+      "notes": "Deferred - UI story requires component creation and browser verification."
     },
     {
       "id": "US-005",
@@ -87,8 +87,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "32 tests covering recruitment validation, uniqueness, upkeep deduction, discontented state, departure, and aura activation."
     }
   ]
 }
