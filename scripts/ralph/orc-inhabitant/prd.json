@@ -19,8 +19,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added to gamedata/inhabitant/base.yml with HP 90, Attack 28, Defense 18, Speed 12. 4 traits defined. Berserk: attackMultiplier 1.5, defenseMultiplier 0.5. Grumpy: productionMultiplier 0.8. 2 breeding recipes: War Goblin (Orc+Goblin), Bone Crusher (Orc+Skeleton)."
     },
     {
       "id": "US-002",
@@ -37,8 +37,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Traits defined as data-driven YAML. Berserk/Grumpy behaviors implemented via stateModifiers (scared/hungry states). Intimidating via fearModifier: 1. Training/combat traits use new effectTypes (training_bonus, attack_bonus, combat_priority) for future system consumption."
     },
     {
       "id": "US-003",
@@ -56,8 +56,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "9 tests added to state-modifiers.spec.ts: Berserk attack/defense/production multipliers, fear tolerance thresholds, normal state behavior, Grumpy production reduction, mixed-creature production averaging, normal state recovery. All 2205 tests pass."
     }
   ]
 }
