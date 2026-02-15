@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "FusionRecipeContent type defined in content-fusionrecipe.ts with FusionRecipeId branded type. Fields: creatureAId, creatureBId, resultHybridId (all InhabitantId), cost (Partial<Record<ResourceType, number>>). Registered in ContentType union and content-initializers."
     },
     {
       "id": "US-002",
@@ -35,8 +35,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "20 recipes in gamedata/fusionrecipe/base.yml. 7 Tier 1 (essence 40-50), 9 Tier 2 (essence 80-110), 4 Advanced (essence 180-250). All specified recipes included plus Slime Knight, Fungal Horror, Shadow Orc, Frost Golem, Arcane Wraith extras."
     },
     {
       "id": "US-003",
@@ -51,8 +51,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "20 hybrid inhabitants in gamedata/inhabitant/hybrid.yml. All have UUID, name, type, tier, description, stats, traits, stateModifiers. Hybrids marked with restrictionTags: ['hybrid'] (uses existing tag system rather than separate flag). Parent types tracked via fusion recipe references rather than parentTypes array (data-driven via recipe lookup)."
     },
     {
       "id": "US-004",
@@ -69,8 +69,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "fusionFindRecipe() and fusionGetAllRecipes() in fusion.ts. ContentService auto-loads fusionrecipe type via existing content pipeline (no changes needed). Lookup uses contentGetEntriesByType + find with order-independent comparison (matches breeding recipe pattern). 7 unit tests passing: valid pair, reversed pair, invalid pair, same creature twice, correct recipe selection, get all recipes, empty recipes."
     }
   ]
 }

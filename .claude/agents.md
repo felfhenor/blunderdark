@@ -29,6 +29,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 | `breedingrecipe` | `BreedingRecipeId` | `BreedingRecipeContent` |
 | `combatability` | `CombatAbilityId` | `CombatAbilityContent` |
 | `forgerecipe` | `ForgeRecipeId` | `ForgeRecipeContent` |
+| `fusionrecipe` | `FusionRecipeId` | `FusionRecipeContent` |
 | `inhabitant` | `InhabitantId` | `InhabitantContent` |
 | `invader` | `InvaderId` | `InvaderContent` |
 | `invasion` | `InvasionId` | `InvasionContent` |
@@ -86,6 +87,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Legendary inhabitants**: use `restrictionTags: ['unique']` + `upkeepCost` + `recruitmentRequirements` on `InhabitantContent`. Upkeep processed per-tick in `legendaryInhabitantUpkeepProcess()`. Aura active only when assigned and not discontented. `discontentedTicks` tracked on `InhabitantInstance`.
 - **Aura effectTypes for legendaries**: `aura_attack_bonus`, `aura_corruption_bonus`, `aura_fear_bonus`, `aura_morale_penalty`, `aura_trap_bonus`, `aura_negate_scout`, `aura_reveal_invaders`, `aura_petrify`, `aura_food_bonus`, `aura_gathering_bonus`, `aura_room_regen` — data-only, consumed by `legendaryInhabitantIsAuraActive()` check
 - **Legendary YAML**: Dragon and Demon Lord in `gamedata/inhabitant/base.yml`; Beholder, Medusa, Ancient Treant in `gamedata/inhabitant/legendary.yml`
+- **Fusion system**: `FusionRecipeContent` in `content-fusionrecipe.ts`, recipes in `gamedata/fusionrecipe/base.yml`, hybrid inhabitants in `gamedata/inhabitant/hybrid.yml`. Lookup via `fusionFindRecipe(creatureAId, creatureBId)` (order-independent). Hybrids use `restrictionTags: ['hybrid']`. Cost always includes `essence`. `InhabitantInstance` already has `isHybrid`/`hybridParentIds` fields.
 
 ## Room-Specific Systems
 
@@ -196,6 +198,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 | `efficiency.ts` | `efficiency` | `EFFICIENCY` |
 | `fear-level.ts` | `fearLevel` | `FEAR_LEVEL` |
 | `floor.ts` | `floor` | `FLOOR` |
+| `fusion.ts` | `fusion` | `FUSION` |
 | `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
 | `game-events.ts` | `gameEvent` | `GAME_EVENT` |
 | `game-time.ts` | `gameTime` | `GAME_TIME` |
