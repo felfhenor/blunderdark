@@ -22,6 +22,7 @@ export * from './discord';
 export * from './efficiency';
 export * from './elevators';
 export * from './fear-level';
+export * from './features';
 export * from './floor';
 export * from './floor-modifiers';
 export * from './fusion';

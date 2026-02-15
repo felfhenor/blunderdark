@@ -1,34 +1,76 @@
 import { contentGetEntry } from '@helpers/content';
-import type { FeatureBonus, FeatureBonusType, FeatureContent } from '@interfaces/content-feature';
+import type {
+  FeatureBonus,
+  FeatureBonusType,
+  FeatureContent,
+  FeatureId,
+} from '@interfaces/content-feature';
 import type { Floor } from '@interfaces/floor';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { RoomProduction } from '@interfaces/room';
 import type { PlacedRoom, PlacedRoomId, SacrificeBuff } from '@interfaces/room-shape';
 
+export const FEATURE_SLOT_COUNT_SMALL = 2;
+export const FEATURE_SLOT_COUNT_LARGE = 3;
+export const FEATURE_SLOT_SIZE_THRESHOLD = 3;
+
 /**
- * Get the FeatureContent for a room's attached feature, if any.
+ * Get the number of feature slots for a room based on its tile count.
+ * Small rooms (1-2 tiles) get 2 slots; large rooms (3+ tiles) get 3 slots.
  */
-export function featureGetForRoom(
-  placedRoom: PlacedRoom,
-): FeatureContent | undefined {
-  if (!placedRoom.featureId) return undefined;
-  return contentGetEntry<FeatureContent>(placedRoom.featureId);
+export function featureGetSlotCount(tileCount: number): number {
+  return tileCount < FEATURE_SLOT_SIZE_THRESHOLD
+    ? FEATURE_SLOT_COUNT_SMALL
+    : FEATURE_SLOT_COUNT_LARGE;
 }
 
 /**
- * Get all bonuses of a specific type from a room's attached feature.
+ * Get all FeatureContent entries for a room's attached features.
+ */
+export function featureGetAllForRoom(
+  placedRoom: PlacedRoom,
+): FeatureContent[] {
+  if (!placedRoom.featureIds || placedRoom.featureIds.length === 0) return [];
+  const features: FeatureContent[] = [];
+  for (const fid of placedRoom.featureIds) {
+    if (!fid) continue;
+    const content = contentGetEntry<FeatureContent>(fid);
+    if (content) features.push(content);
+  }
+  return features;
+}
+
+/**
+ * Get the FeatureContent for a specific slot index on a room.
+ */
+export function featureGetForSlot(
+  placedRoom: PlacedRoom,
+  slotIndex: number,
+): FeatureContent | undefined {
+  const fid = placedRoom.featureIds?.[slotIndex];
+  if (!fid) return undefined;
+  return contentGetEntry<FeatureContent>(fid);
+}
+
+/**
+ * Get all bonuses of a specific type from all of a room's attached features.
  */
 export function featureGetBonuses(
   placedRoom: PlacedRoom,
   bonusType: FeatureBonusType,
 ): FeatureBonus[] {
-  const feature = featureGetForRoom(placedRoom);
-  if (!feature) return [];
-  return feature.bonuses.filter((b) => b.type === bonusType);
+  const features = featureGetAllForRoom(placedRoom);
+  const bonuses: FeatureBonus[] = [];
+  for (const feature of features) {
+    for (const b of feature.bonuses) {
+      if (b.type === bonusType) bonuses.push(b);
+    }
+  }
+  return bonuses;
 }
 
 /**
- * Calculate the fear reduction from a room's attached feature.
+ * Calculate the fear reduction from all of a room's attached features.
  * Returns the total fear reduction value (positive number to subtract).
  */
 export function featureCalculateFearReduction(
@@ -37,8 +79,6 @@ export function featureCalculateFearReduction(
   const bonuses = featureGetBonuses(placedRoom, 'fear_reduction');
   let reduction = 0;
   for (const bonus of bonuses) {
-    // Only count non-targeted fear reduction (Bioluminescent Moss)
-    // Targeted fear reduction (Coffins - undead only) is handled separately
     if (!bonus.targetType) {
       reduction += bonus.value;
     }
@@ -47,8 +87,7 @@ export function featureCalculateFearReduction(
 }
 
 /**
- * Calculate the capacity bonus from a room's attached feature for a specific inhabitant type.
- * Coffins add +1 capacity for undead inhabitants.
+ * Calculate the capacity bonus from all of a room's attached features for a specific inhabitant type.
  */
 export function featureCalculateCapacityBonus(
   placedRoom: PlacedRoom,
@@ -66,7 +105,6 @@ export function featureCalculateCapacityBonus(
 
 /**
  * Calculate the adjacent production bonus from features on adjacent rooms.
- * Bioluminescent Moss grants +5% to adjacent rooms.
  */
 export function featureCalculateAdjacentProductionBonus(
   adjacentRooms: PlacedRoom[],
@@ -82,9 +120,8 @@ export function featureCalculateAdjacentProductionBonus(
 }
 
 /**
- * Calculate flat production from a room's attached feature.
- * Arcane Crystals add +1 Flux per minute (returned as per-tick values).
- * Returns a RoomProduction map keyed by resource type.
+ * Calculate flat production from all of a room's attached features.
+ * Returns a RoomProduction map keyed by resource type (per-tick values).
  */
 export function featureCalculateFlatProduction(
   placedRoom: PlacedRoom,
@@ -102,8 +139,7 @@ export function featureCalculateFlatProduction(
 }
 
 /**
- * Calculate the production multiplier bonus from a room's own attached feature.
- * Arcane Crystals: +15% for flux. Geothermal Vents: +15% for all.
+ * Calculate the production multiplier bonus from all of a room's attached features.
  * Returns the bonus as a fraction (e.g. 0.15 for 15%).
  */
 export function featureCalculateProductionBonus(
@@ -121,9 +157,7 @@ export function featureCalculateProductionBonus(
 }
 
 /**
- * Get combat bonuses from a room's attached feature.
- * Geothermal Vents grant fire damage bonus.
- * Returns array of { value, targetType } for consumption by combat system.
+ * Get combat bonuses from all of a room's attached features.
  */
 export function featureGetCombatBonuses(
   placedRoom: PlacedRoom,
@@ -133,7 +167,6 @@ export function featureGetCombatBonuses(
 
 /**
  * Calculate per-tick corruption generation from features across all rooms.
- * Blood Altar generates +2 Corruption per minute when attached.
  */
 export function featureCalculateCorruptionGenerationPerTick(
   rooms: PlacedRoom[],
@@ -163,13 +196,13 @@ export function featureCanSacrifice(
   placedRoom: PlacedRoom,
   currentFood: number,
 ): { allowed: boolean; reason?: string } {
-  const feature = featureGetForRoom(placedRoom);
-  if (!feature) {
+  const features = featureGetAllForRoom(placedRoom);
+  if (features.length === 0) {
     return { allowed: false, reason: 'Room has no feature attached' };
   }
 
-  const hasCorruptionGen = feature.bonuses.some(
-    (b) => b.type === 'corruption_generation',
+  const hasCorruptionGen = features.some((f) =>
+    f.bonuses.some((b) => b.type === 'corruption_generation'),
   );
   if (!hasCorruptionGen) {
     return { allowed: false, reason: 'Feature does not support sacrifice' };
@@ -222,7 +255,6 @@ export function featureHasFungalNetwork(placedRoom: PlacedRoom): boolean {
 
 /**
  * Get all rooms on floors that have Fungal Network features, excluding a given room.
- * These are the valid teleport destinations for a source room.
  */
 export function featureGetFungalNetworkDestinations(
   floors: Floor[],
@@ -242,7 +274,6 @@ export function featureGetFungalNetworkDestinations(
 
 /**
  * Check if an inhabitant can be transferred via Fungal Network.
- * Source room must have a Fungal Network. At least one other room must also have one.
  */
 export function featureCanFungalTransfer(
   floors: Floor[],
@@ -267,8 +298,6 @@ export function featureCanFungalTransfer(
 
 /**
  * Transfer an inhabitant instantly via Fungal Network.
- * Updates the inhabitant's assignedRoomId to the destination room.
- * Sets travelTicksRemaining to 0 (instant transfer).
  */
 export function featureFungalTransfer(
   inhabitant: InhabitantInstance,
@@ -279,11 +308,46 @@ export function featureFungalTransfer(
 }
 
 /**
- * Remove a feature from a room. Clears featureId and any associated state.
- * If the feature was a Fungal Network, links are automatically broken
- * (since links are implicit based on feature presence).
+ * Attach a feature to a specific slot on a room.
+ * Initializes featureIds array if needed and ensures proper length.
  */
-export function featureRemoveFromRoom(placedRoom: PlacedRoom): void {
-  placedRoom.featureId = undefined;
+export function featureAttachToSlot(
+  placedRoom: PlacedRoom,
+  slotIndex: number,
+  featureId: FeatureId,
+  totalSlots: number,
+): void {
+  if (!placedRoom.featureIds) {
+    placedRoom.featureIds = new Array(totalSlots).fill(undefined);
+  }
+  placedRoom.featureIds[slotIndex] = featureId;
+}
+
+/**
+ * Remove a feature from a specific slot on a room.
+ * Clears the slot and removes sacrificeBuff if no corruption_generation features remain.
+ */
+export function featureRemoveFromSlot(
+  placedRoom: PlacedRoom,
+  slotIndex: number,
+): void {
+  if (!placedRoom.featureIds) return;
+  placedRoom.featureIds[slotIndex] = undefined as unknown as FeatureId;
+
+  // If no features with corruption_generation remain, clear sacrifice buff
+  const features = featureGetAllForRoom(placedRoom);
+  const hasCorruptionGen = features.some((f) =>
+    f.bonuses.some((b) => b.type === 'corruption_generation'),
+  );
+  if (!hasCorruptionGen) {
+    placedRoom.sacrificeBuff = undefined;
+  }
+}
+
+/**
+ * Remove all features from a room. Clears featureIds and sacrificeBuff.
+ */
+export function featureRemoveAllFromRoom(placedRoom: PlacedRoom): void {
+  placedRoom.featureIds = undefined;
   placedRoom.sacrificeBuff = undefined;
 }

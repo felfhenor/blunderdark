@@ -71,6 +71,6 @@ export type PlacedRoom = {
   mutationJob?: MutationJob;
   summonJob?: SummonJob;
   tortureJob?: TortureJob;
-  featureId?: FeatureId;
+  featureIds?: FeatureId[];
   sacrificeBuff?: SacrificeBuff;
 };
