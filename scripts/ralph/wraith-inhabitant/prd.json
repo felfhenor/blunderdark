@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added to gamedata/inhabitant/base.yml with HP 30, Attack 16, Defense 8, Speed 20. Fearless via fearTolerance 99. Inappetent via foodConsumptionRate 0. All 4 stateModifiers at 1.0 (behaviors unreachable)."
     },
     {
       "id": "US-002",
@@ -33,8 +33,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fearless trait defined with effectType fear_immunity. fearTolerance 99 ensures stateModifierIsInhabitantScared always returns false. 3 tests in state-modifiers.spec.ts verify immunity at levels 4, 10, 50."
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Terrifying trait defined with effectType fear_bonus, effectValue 2. fearModifier: 2 on InhabitantContent is consumed by the existing fear-level system."
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Intangible trait defined with effectType physical_evasion, effectValue 0.5. Data-driven trait for future combat system consumption."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Scholar uses production_bonus effectType with targetResourceType: research. Actively consumed by production.ts. 3 tests in production.spec.ts verify: +20% in research room, no bonus in non-research room, stacking with other inhabitants."
     },
     {
       "id": "US-006",
@@ -93,8 +93,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Scholar production_bonus applies in Shadow Library (research room). Night/Soul Well bonuses are data-driven via traits. workerEfficiency 1.1 provides general bonus across all rooms."
     },
     {
       "id": "US-007",
@@ -107,8 +107,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2 breeding recipes: Phantom Scholar (Wraith + Arcane Familiar, speed/efficiency), Banshee (Wraith + Frost Wraith, attack/hp). 15 total recipes compile successfully."
     }
   ]
 }
