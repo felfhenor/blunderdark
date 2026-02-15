@@ -8,6 +8,11 @@ import type {
   PlacedRoomId,
   ResourceMap,
 } from '@interfaces';
+import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
+import type { Floor, FloorId } from '@interfaces/floor';
+import type { PlacedRoom } from '@interfaces/room-shape';
+import type { RoomId } from '@interfaces/content-room';
+import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -381,5 +386,150 @@ describe('corruptionGenerationCalculateTotalPerMinute', () => {
 
   it('should return 0 when both rates are 0', () => {
     expect(corruptionGenerationCalculateTotalPerMinute(0, 0)).toBe(0);
+  });
+});
+
+describe('Corruption Seal', () => {
+  const BLOOD_ALTAR_FID = 'blood-altar-fid' as FeatureId;
+  const SEAL_FID = 'seal-fid' as FeatureId;
+
+  const bloodAltarFeature: FeatureContent = {
+    id: BLOOD_ALTAR_FID,
+    name: 'Blood Altar',
+    __type: 'feature',
+    description: '',
+    category: 'environmental',
+    cost: {},
+    bonuses: [
+      { type: 'corruption_generation', value: 2, description: '' },
+    ],
+  };
+
+  const corruptionSealFeature: FeatureContent = {
+    id: SEAL_FID,
+    name: 'Corruption Seal',
+    __type: 'feature',
+    description: '',
+    category: 'functional',
+    cost: {},
+    bonuses: [
+      { type: 'corruption_seal', value: 1, description: '' },
+    ],
+  };
+
+  function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
+    return {
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-type-1' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      ...overrides,
+    };
+  }
+
+  function makeFloor(overrides: Partial<Floor> = {}): Floor {
+    return {
+      id: 'floor-1' as FloorId,
+      name: 'Floor 1',
+      depth: 0,
+      biome: 'neutral',
+      grid: [],
+      rooms: [],
+      hallways: [],
+      inhabitants: [],
+      connections: [],
+      traps: [],
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.0);
+  });
+
+  it('should prevent corruption generation from features in sealed rooms', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockImplementation((id) => {
+      if (id === BLOOD_ALTAR_FID) return bloodAltarFeature as ReturnType<typeof contentGetEntry>;
+      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
+      return undefined;
+    });
+
+    // Room has both Blood Altar (generates corruption) and Corruption Seal (blocks it)
+    const room = makeRoom({ featureIds: [BLOOD_ALTAR_FID, SEAL_FID] });
+    const floor = makeFloor({ rooms: [room] });
+
+    const state = {
+      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
+      world: {
+        resources: {
+          ...defaultResources(),
+          corruption: { current: 10, max: Number.MAX_SAFE_INTEGER },
+        },
+        inhabitants: [],
+        floors: [floor],
+      },
+    } as unknown as GameState;
+
+    corruptionGenerationProcess(state);
+    // Sealed room should not generate corruption — existing value preserved
+    expect(state.world.resources.corruption.current).toBe(10);
+  });
+
+  it('should still allow corruption from unsealed rooms', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockImplementation((id) => {
+      if (id === BLOOD_ALTAR_FID) return bloodAltarFeature as ReturnType<typeof contentGetEntry>;
+      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
+      return undefined;
+    });
+
+    const sealedRoom = makeRoom({ id: 'sealed' as PlacedRoomId, featureIds: [BLOOD_ALTAR_FID, SEAL_FID] });
+    const unsealedRoom = makeRoom({ id: 'unsealed' as PlacedRoomId, featureIds: [BLOOD_ALTAR_FID] });
+    const floor = makeFloor({ rooms: [sealedRoom, unsealedRoom] });
+
+    const state = {
+      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
+      world: {
+        resources: {
+          ...defaultResources(),
+          corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
+        },
+        inhabitants: [],
+        floors: [floor],
+      },
+    } as unknown as GameState;
+
+    corruptionGenerationProcess(state);
+    // Only unsealed room generates: 2/min / 5 = 0.4/tick
+    expect(state.world.resources.corruption.current).toBeCloseTo(0.4);
+  });
+
+  it('should not remove existing corruption, only prevent new generation', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockImplementation((id) => {
+      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
+      return undefined;
+    });
+
+    const room = makeRoom({ featureIds: [SEAL_FID] });
+    const floor = makeFloor({ rooms: [room] });
+
+    const state = {
+      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
+      world: {
+        resources: {
+          ...defaultResources(),
+          corruption: { current: 50, max: Number.MAX_SAFE_INTEGER },
+        },
+        inhabitants: [],
+        floors: [floor],
+      },
+    } as unknown as GameState;
+
+    corruptionGenerationProcess(state);
+    // Existing corruption preserved
+    expect(state.world.resources.corruption.current).toBe(50);
   });
 });

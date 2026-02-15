@@ -1,7 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
-import { featureCalculateCorruptionGenerationPerTick } from '@helpers/features';
+import { featureCalculateCorruptionGenerationPerTick, featureGetCorruptionSealedRoomIds } from '@helpers/features';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameState, InhabitantInstance } from '@interfaces';
@@ -137,10 +137,15 @@ export function corruptionGenerationProcess(state: GameState): void {
     state.world.inhabitants,
   );
 
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(state.world.floors ?? []);
+
   let featurePerTick = 0;
   for (const floor of state.world.floors ?? []) {
+    const unsealedRooms = sealedRoomIds.size > 0
+      ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
+      : floor.rooms;
     featurePerTick += featureCalculateCorruptionGenerationPerTick(
-      floor.rooms,
+      unsealedRooms,
       GAME_TIME_TICKS_PER_MINUTE,
     );
   }

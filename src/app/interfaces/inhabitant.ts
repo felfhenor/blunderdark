@@ -64,4 +64,5 @@ export type InhabitantInstance = {
   temporaryTicksRemaining?: number;
   travelTicksRemaining?: number;
   discontentedTicks?: number;
+  xp?: number;
 };

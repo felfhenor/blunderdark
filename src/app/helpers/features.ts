@@ -249,6 +249,27 @@ export function featureGetResourceConverterEfficiency(
   return bonuses[0].value;
 }
 
+// --- Training Station ---
+
+/**
+ * Process passive XP gain from Training Station features each tick.
+ * Inhabitants assigned to rooms with Training Station features gain XP.
+ * Mutates state in-place.
+ */
+export function featureTrainingStationProcess(floors: Floor[], allInhabitants: InhabitantInstance[]): void {
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const xpPerTick = featureCalculateTrainingXpPerTick(room);
+      if (xpPerTick <= 0) continue;
+
+      for (const inhabitant of allInhabitants) {
+        if (inhabitant.assignedRoomId !== room.id) continue;
+        inhabitant.xp = (inhabitant.xp ?? 0) + xpPerTick;
+      }
+    }
+  }
+}
+
 // --- Blood Altar Sacrifice ---
 
 export const FEATURE_SACRIFICE_FOOD_COST = 25;

@@ -36,6 +36,7 @@ import {
   featureGetCorruptionSealedRoomIds,
   featureCalculateTrainingXpPerTick,
   featureGetResourceConverterEfficiency,
+  featureTrainingStationProcess,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { Floor, FloorId } from '@interfaces/floor';
@@ -980,5 +981,74 @@ describe('featureGetResourceConverterEfficiency', () => {
     vi.mocked(contentGetEntry).mockReturnValue(resourceConverterContent);
     const room = makeRoom({ featureIds: [RESOURCE_CONVERTER_ID] });
     expect(featureGetResourceConverterEfficiency(room)).toBe(0.75);
+  });
+});
+
+describe('featureTrainingStationProcess', () => {
+  it('does nothing when no rooms have training stations', () => {
+    const room = makeRoom();
+    const floor = makeFloor({ rooms: [room] });
+    const inhabitant = makeInhabitant({ assignedRoomId: room.id });
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBeUndefined();
+  });
+
+  it('grants XP to inhabitants assigned to rooms with training stations', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const inhabitant = makeInhabitant({ assignedRoomId: room.id });
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBe(1);
+  });
+
+  it('accumulates XP over multiple ticks', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const inhabitant = makeInhabitant({ assignedRoomId: room.id });
+    featureTrainingStationProcess([floor], [inhabitant]);
+    featureTrainingStationProcess([floor], [inhabitant]);
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBe(3);
+  });
+
+  it('does not grant XP to inhabitants not assigned to the room', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const inhabitant = makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId });
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBeUndefined();
+  });
+
+  it('grants XP to multiple inhabitants in the same room', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const inh1 = makeInhabitant({ instanceId: 'i1' as InhabitantInstanceId, assignedRoomId: room.id });
+    const inh2 = makeInhabitant({ instanceId: 'i2' as InhabitantInstanceId, assignedRoomId: room.id });
+    featureTrainingStationProcess([floor], [inh1, inh2]);
+    expect(inh1.xp).toBe(1);
+    expect(inh2.xp).toBe(1);
+  });
+
+  it('XP reverts when feature is removed (no further gain)', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(trainingStationContent);
+    const room = makeRoom({ featureIds: [TRAINING_STATION_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    const inhabitant = makeInhabitant({ assignedRoomId: room.id });
+
+    // Gain XP
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBe(1);
+
+    // Remove feature
+    vi.mocked(contentGetEntry).mockReturnValue(undefined);
+    featureRemoveFromSlot(room, 0);
+
+    // No more XP gained
+    featureTrainingStationProcess([floor], [inhabitant]);
+    expect(inhabitant.xp).toBe(1); // unchanged
   });
 });
