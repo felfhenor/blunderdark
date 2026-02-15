@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
+import { TippyDirective } from '@ngneat/helipopper';
 import {
   roomPlacementClearPreviewPosition,
   floorCurrent,
@@ -38,6 +39,9 @@ import {
   portalPlacementExit,
   portalPlacementSetSource,
   portalGetOnFloor,
+  roomShapeResolve,
+  featureGetSlotCount,
+  featureGetForSlot,
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
 import { gridCreateEmpty } from '@helpers/grid';
@@ -77,7 +81,7 @@ function getRoomBorderColor(roomId: string): string {
 
 @Component({
   selector: 'app-grid',
-  imports: [FearIndicatorComponent],
+  imports: [FearIndicatorComponent, TippyDirective],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -543,6 +547,35 @@ export class GridComponent {
 
   public getPortalInfo(x: number, y: number): { connectsToDepth: number } | undefined {
     return this.portalTileMap().get(`${x},${y}`);
+  }
+
+  public featureIndicatorMap = computed(() => {
+    const floor = floorCurrent();
+    if (!floor) return new Map<string, { occupied: number; total: number; names: string[] }>();
+
+    const map = new Map<string, { occupied: number; total: number; names: string[] }>();
+    for (const room of floor.rooms) {
+      const shape = roomShapeResolve(room);
+      const total = featureGetSlotCount(shape.tiles.length);
+      let occupied = 0;
+      const names: string[] = [];
+      for (let i = 0; i < total; i++) {
+        const feature = featureGetForSlot(room, i);
+        if (feature) {
+          occupied++;
+          names.push(feature.name);
+        }
+      }
+      if (occupied > 0) {
+        map.set(room.id, { occupied, total, names });
+      }
+    }
+    return map;
+  });
+
+  public getFeatureInfo(roomId: string | undefined): { occupied: number; total: number; names: string[] } | undefined {
+    if (!roomId) return undefined;
+    return this.featureIndicatorMap().get(roomId);
   }
 
   public isHallwayPathTile(x: number, y: number): boolean {
