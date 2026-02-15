@@ -118,6 +118,20 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Training Station**: `training_xp` bonus → `featureTrainingStationProcess(floors, inhabitants)` grants XP per tick to inhabitants in rooms with this feature; `InhabitantInstance.xp?: number` field
 - **Resource Converter**: `resource_converter` bonus (value=efficiency, e.g. 0.75) → `PlacedRoom.convertedOutputResource?: string` stores target; `featureApplyResourceConversion()` redirects all production to target at efficiency rate; UI dropdown in panel-room-info; applied in both `productionCalculateTotal` and `productionCalculateSingleRoom`
 
+### Prestige Features
+
+- **Category**: `'prestige'` on `FeatureContent`, defined in `gamedata/feature/prestige.yml`
+- **Additional bonus types**: `speed_multiplier`, `daily_summon`, `undead_respawn`
+- **Unique constraint**: `FeatureContent.unique?: boolean` — `featureIsUniquePlaced(floors, featureId)` scans all rooms; panel-room-info checks before attaching
+- **Maintenance cost**: `FeatureContent.maintenanceCost?: ResourceCost` — `featureMaintenanceProcess(floors, resources, ticksPerMinute)` deducts per-tick costs; `PlacedRoom.maintenanceActive?: boolean` tracks active/inactive state
+- **Elder Runes**: uses existing `production_bonus` (value: 0.50) — no new code needed
+- **Time Dilation Field**: `speed_multiplier` bonus → `featureCalculateSpeedMultiplier(placedRoom)` returns multiplier (default 1.0); has `maintenanceCost: { flux: 2 }`; deactivates when flux insufficient
+- **Void Gate**: `daily_summon` bonus → `featureVoidGateProcess(floors, currentDay, inhabitants)` summons once per day; `PlacedRoom.voidGateLastSummonDay?: number` tracks last summon day; 70% friendly (added to roster), 30% hostile (damage to room inhabitants)
+- **Phylactery**: `undead_respawn` bonus → `featurePhylacteryQueueRespawn(room, deadInhabitant, queue)` + `featurePhylacteryProcess(queue)` tick-based respawn system; `PlacedRoom.phylacteryCharges?: number` (max 3); respawned at 75% stats via negative `mutationBonuses`; 150-tick (30s) respawn delay
+- **Dragon's Hoard Core**: uses existing `flat_production` (gold 5/min) + `storage_bonus` (gold 1.0); `unique: true` — only one per dungeon
+- **PlacedRoom fields added**: `maintenanceActive?: boolean`, `phylacteryCharges?: number`, `voidGateLastSummonDay?: number`
+- **Test mock pattern**: Void Gate/Phylactery tests mock `@helpers/rng` (rngChoice, rngSucceedsChance, rngUuid) alongside `@helpers/content`
+
 ## Room-Specific Systems
 
 All room-specific systems follow the same pattern:
