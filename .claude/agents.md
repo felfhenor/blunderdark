@@ -271,6 +271,21 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 | `trap-workshop.ts` | `trapWorkshop` | `TRAP_WORKSHOP` |
 | `traps.ts` | `trap` | `TRAP` |
 
+## Victory System
+
+- **Evaluation engine**: `victory.ts` — `victoryProcess()` called each tick in gameloop, runs day tracking every tick but full condition checks only every `VICTORY_CHECK_INTERVAL` (60) ticks
+- **Condition checks**: `victory-conditions.ts` — individual check functions prefixed `victoryConditionCheck*`, dispatched by conditionId via switch in `victoryConditionEvaluateSingle()`
+- **Signals**: `victoryAchievedPathId` (readonly), `victoryProgressMap` (readonly), `victoryIsAchieved` (computed)
+- **Day tracking**: peaceful day counter + zero corruption day counter, both reset on violation, checked once per day transition
+- **Content type**: `victorypath` in `gamedata/victorypath/paths.yml`, `VictoryPathContent` with `VictoryCondition[]`
+- **State**: `VictoryProgress` on `GameStateWorld.victoryProgress` — tracks counters, defense wins, achieved path
+- **Testing pattern**: mock `@helpers/victory-conditions` when testing `victory.ts` engine; mock `@helpers/content` when testing individual conditions
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `victory.ts` | `victory` | `VICTORY` |
+| `victory-conditions.ts` | `victoryCondition` | `VICTORY_CONDITION` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
