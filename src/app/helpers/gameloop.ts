@@ -21,6 +21,7 @@ import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { featureSacrificeProcess, featureTrainingStationProcess } from '@helpers/features';
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
+import { merchantProcess } from '@helpers/merchant';
 import { victoryProcess } from '@helpers/victory';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
@@ -91,6 +92,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       featureSacrificeProcess(floor.rooms);
     }
     hungerProcessWarnings(state);
+    merchantProcess(state);
     victoryProcess(state);
     return state;
   });
