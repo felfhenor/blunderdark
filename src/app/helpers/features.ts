@@ -1,7 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
 import type { FeatureBonus, FeatureBonusType, FeatureContent } from '@interfaces/content-feature';
 import type { RoomProduction } from '@interfaces/room';
-import type { PlacedRoom } from '@interfaces/room-shape';
+import type { PlacedRoom, SacrificeBuff } from '@interfaces/room-shape';
 
 /**
  * Get the FeatureContent for a room's attached feature, if any.
@@ -127,4 +127,84 @@ export function featureGetCombatBonuses(
   placedRoom: PlacedRoom,
 ): FeatureBonus[] {
   return featureGetBonuses(placedRoom, 'combat_bonus');
+}
+
+/**
+ * Calculate per-tick corruption generation from features across all rooms.
+ * Blood Altar generates +2 Corruption per minute when attached.
+ */
+export function featureCalculateCorruptionGenerationPerTick(
+  rooms: PlacedRoom[],
+  ticksPerMinute: number,
+): number {
+  let totalPerMinute = 0;
+  for (const room of rooms) {
+    const bonuses = featureGetBonuses(room, 'corruption_generation');
+    for (const bonus of bonuses) {
+      totalPerMinute += bonus.value;
+    }
+  }
+  return totalPerMinute / ticksPerMinute;
+}
+
+// --- Blood Altar Sacrifice ---
+
+export const FEATURE_SACRIFICE_FOOD_COST = 25;
+export const FEATURE_SACRIFICE_BUFF_TICKS = 50; // 10 minutes
+export const FEATURE_SACRIFICE_PRODUCTION_MULTIPLIER = 0.25;
+export const FEATURE_SACRIFICE_COMBAT_MULTIPLIER = 0.15;
+
+/**
+ * Check if a sacrifice can be performed on a room with a Blood Altar.
+ */
+export function featureCanSacrifice(
+  placedRoom: PlacedRoom,
+  currentFood: number,
+): { allowed: boolean; reason?: string } {
+  const feature = featureGetForRoom(placedRoom);
+  if (!feature) {
+    return { allowed: false, reason: 'Room has no feature attached' };
+  }
+
+  const hasCorruptionGen = feature.bonuses.some(
+    (b) => b.type === 'corruption_generation',
+  );
+  if (!hasCorruptionGen) {
+    return { allowed: false, reason: 'Feature does not support sacrifice' };
+  }
+
+  if (placedRoom.sacrificeBuff) {
+    return { allowed: false, reason: 'Sacrifice buff already active' };
+  }
+
+  if (currentFood < FEATURE_SACRIFICE_FOOD_COST) {
+    return { allowed: false, reason: 'Not enough Food' };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Create a sacrifice buff for a room with a Blood Altar.
+ */
+export function featureCreateSacrificeBuff(): SacrificeBuff {
+  return {
+    productionMultiplier: FEATURE_SACRIFICE_PRODUCTION_MULTIPLIER,
+    combatMultiplier: FEATURE_SACRIFICE_COMBAT_MULTIPLIER,
+    ticksRemaining: FEATURE_SACRIFICE_BUFF_TICKS,
+  };
+}
+
+/**
+ * Process sacrifice buff tick-down for all rooms on a floor.
+ * Removes expired buffs. Mutates rooms in-place.
+ */
+export function featureSacrificeProcess(rooms: PlacedRoom[]): void {
+  for (const room of rooms) {
+    if (!room.sacrificeBuff) continue;
+    room.sacrificeBuff.ticksRemaining--;
+    if (room.sacrificeBuff.ticksRemaining <= 0) {
+      room.sacrificeBuff = undefined;
+    }
+  }
 }

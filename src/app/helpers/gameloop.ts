@@ -19,6 +19,7 @@ import { stairTravelProcess } from '@helpers/stairs';
 import { tortureChamberProcess } from '@helpers/torture-chamber';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
+import { featureSacrificeProcess } from '@helpers/features';
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
@@ -84,6 +85,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
     stairTravelProcess(state);
     invasionTriggerProcessSchedule(state);
     legendaryInhabitantUpkeepProcess(state);
+    for (const floor of state.world.floors) {
+      featureSacrificeProcess(floor.rooms);
+    }
     hungerProcessWarnings(state);
     return state;
   });

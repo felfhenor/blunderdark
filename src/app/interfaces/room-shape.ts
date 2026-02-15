@@ -52,6 +52,12 @@ export type TortureJob = {
   targetTicks: number;
 };
 
+export type SacrificeBuff = {
+  productionMultiplier: number;
+  combatMultiplier: number;
+  ticksRemaining: number;
+};
+
 export type PlacedRoom = {
   id: PlacedRoomId;
   roomTypeId: RoomId;
@@ -66,4 +72,5 @@ export type PlacedRoom = {
   summonJob?: SummonJob;
   tortureJob?: TortureJob;
   featureId?: FeatureId;
+  sacrificeBuff?: SacrificeBuff;
 };

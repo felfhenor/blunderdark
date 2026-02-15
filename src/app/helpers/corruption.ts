@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
+import { featureCalculateCorruptionGenerationPerTick } from '@helpers/features';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameState, InhabitantInstance } from '@interfaces';
@@ -132,10 +133,19 @@ export function corruptionGenerationCalculateInhabitantRate(
  * Mutates state in-place (same pattern as productionProcess/hungerProcess).
  */
 export function corruptionGenerationProcess(state: GameState): void {
-  const basePerTick = corruptionGenerationCalculateInhabitantRate(
+  const inhabitantPerTick = corruptionGenerationCalculateInhabitantRate(
     state.world.inhabitants,
   );
 
+  let featurePerTick = 0;
+  for (const floor of state.world.floors ?? []) {
+    featurePerTick += featureCalculateCorruptionGenerationPerTick(
+      floor.rooms,
+      GAME_TIME_TICKS_PER_MINUTE,
+    );
+  }
+
+  const basePerTick = inhabitantPerTick + featurePerTick;
   if (basePerTick <= 0) return;
 
   const dayNightMod = dayNightGetResourceModifier(state.clock.hour, 'corruption');

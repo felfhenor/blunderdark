@@ -14,6 +14,12 @@ import {
   featureCalculateFlatProduction,
   featureCalculateProductionBonus,
   featureGetCombatBonuses,
+  featureCalculateCorruptionGenerationPerTick,
+  featureCanSacrifice,
+  featureCreateSacrificeBuff,
+  featureSacrificeProcess,
+  FEATURE_SACRIFICE_FOOD_COST,
+  FEATURE_SACRIFICE_BUFF_TICKS,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
@@ -24,6 +30,7 @@ const COFFINS_ID = 'coffins-test-id' as FeatureId;
 const MOSS_ID = 'moss-test-id' as FeatureId;
 const CRYSTALS_ID = 'crystals-test-id' as FeatureId;
 const VENTS_ID = 'vents-test-id' as FeatureId;
+const BLOOD_ALTAR_ID = 'blood-altar-test-id' as FeatureId;
 
 const coffinsContent: FeatureContent = {
   id: COFFINS_ID,
@@ -74,6 +81,18 @@ const ventsContent: FeatureContent = {
   bonuses: [
     { type: 'production_bonus', value: 0.15, description: '+15% production across all resources' },
     { type: 'combat_bonus', value: 5, targetType: 'fire', description: 'Fire damage bonus' },
+  ],
+};
+
+const bloodAltarContent: FeatureContent = {
+  id: BLOOD_ALTAR_ID,
+  name: 'Blood Altar',
+  __type: 'feature',
+  description: 'Test blood altar',
+  category: 'environmental',
+  cost: { gold: 100, essence: 25 },
+  bonuses: [
+    { type: 'corruption_generation', value: 2, description: '+2 Corruption per minute' },
   ],
 };
 
@@ -281,5 +300,131 @@ describe('featureGetCombatBonuses', () => {
     vi.mocked(contentGetEntry).mockReturnValue(crystalsContent);
     const room = makeRoom({ featureId: CRYSTALS_ID });
     expect(featureGetCombatBonuses(room)).toEqual([]);
+  });
+});
+
+describe('featureCalculateCorruptionGenerationPerTick', () => {
+  it('returns 0 when no rooms have features', () => {
+    const rooms = [makeRoom(), makeRoom({ id: 'room-2' as PlacedRoomId })];
+    expect(featureCalculateCorruptionGenerationPerTick(rooms, 5)).toBe(0);
+  });
+
+  it('returns per-tick corruption from Blood Altar (+2/min)', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(bloodAltarContent);
+    const rooms = [makeRoom({ featureId: BLOOD_ALTAR_ID })];
+    expect(featureCalculateCorruptionGenerationPerTick(rooms, 5)).toBeCloseTo(0.4);
+  });
+
+  it('sums corruption from multiple Blood Altars', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(bloodAltarContent);
+    const rooms = [
+      makeRoom({ featureId: BLOOD_ALTAR_ID }),
+      makeRoom({ id: 'room-2' as PlacedRoomId, featureId: BLOOD_ALTAR_ID }),
+    ];
+    expect(featureCalculateCorruptionGenerationPerTick(rooms, 5)).toBeCloseTo(0.8);
+  });
+
+  it('ignores rooms without corruption_generation bonuses', () => {
+    vi.mocked(contentGetEntry).mockImplementation((id) => {
+      if (id === BLOOD_ALTAR_ID) return bloodAltarContent;
+      if (id === MOSS_ID) return mossContent;
+      return undefined;
+    });
+    const rooms = [
+      makeRoom({ featureId: BLOOD_ALTAR_ID }),
+      makeRoom({ id: 'room-2' as PlacedRoomId, featureId: MOSS_ID }),
+    ];
+    expect(featureCalculateCorruptionGenerationPerTick(rooms, 5)).toBeCloseTo(0.4);
+  });
+});
+
+describe('featureCanSacrifice', () => {
+  it('returns not allowed when room has no feature', () => {
+    const room = makeRoom();
+    const result = featureCanSacrifice(room, 100);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Room has no feature attached');
+  });
+
+  it('returns not allowed when feature does not support sacrifice', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(mossContent);
+    const room = makeRoom({ featureId: MOSS_ID });
+    const result = featureCanSacrifice(room, 100);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Feature does not support sacrifice');
+  });
+
+  it('returns not allowed when sacrifice buff is already active', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(bloodAltarContent);
+    const room = makeRoom({
+      featureId: BLOOD_ALTAR_ID,
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 10 },
+    });
+    const result = featureCanSacrifice(room, 100);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Sacrifice buff already active');
+  });
+
+  it('returns not allowed when not enough food', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(bloodAltarContent);
+    const room = makeRoom({ featureId: BLOOD_ALTAR_ID });
+    const result = featureCanSacrifice(room, FEATURE_SACRIFICE_FOOD_COST - 1);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe('Not enough Food');
+  });
+
+  it('returns allowed when all conditions met', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(bloodAltarContent);
+    const room = makeRoom({ featureId: BLOOD_ALTAR_ID });
+    const result = featureCanSacrifice(room, FEATURE_SACRIFICE_FOOD_COST);
+    expect(result.allowed).toBe(true);
+  });
+});
+
+describe('featureCreateSacrificeBuff', () => {
+  it('creates a buff with correct properties', () => {
+    const buff = featureCreateSacrificeBuff();
+    expect(buff.productionMultiplier).toBe(0.25);
+    expect(buff.combatMultiplier).toBe(0.15);
+    expect(buff.ticksRemaining).toBe(FEATURE_SACRIFICE_BUFF_TICKS);
+  });
+});
+
+describe('featureSacrificeProcess', () => {
+  it('decrements tick counter on active buffs', () => {
+    const room = makeRoom({
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 10 },
+    });
+    featureSacrificeProcess([room]);
+    expect(room.sacrificeBuff?.ticksRemaining).toBe(9);
+  });
+
+  it('removes buff when ticks reach 0', () => {
+    const room = makeRoom({
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 1 },
+    });
+    featureSacrificeProcess([room]);
+    expect(room.sacrificeBuff).toBeUndefined();
+  });
+
+  it('ignores rooms without sacrifice buffs', () => {
+    const room = makeRoom();
+    featureSacrificeProcess([room]);
+    expect(room.sacrificeBuff).toBeUndefined();
+  });
+
+  it('handles multiple rooms with mixed buff states', () => {
+    const room1 = makeRoom({
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 5 },
+    });
+    const room2 = makeRoom({ id: 'room-2' as PlacedRoomId });
+    const room3 = makeRoom({
+      id: 'room-3' as PlacedRoomId,
+      sacrificeBuff: { productionMultiplier: 0.25, combatMultiplier: 0.15, ticksRemaining: 1 },
+    });
+    featureSacrificeProcess([room1, room2, room3]);
+    expect(room1.sacrificeBuff?.ticksRemaining).toBe(4);
+    expect(room2.sacrificeBuff).toBeUndefined();
+    expect(room3.sacrificeBuff).toBeUndefined();
   });
 });
