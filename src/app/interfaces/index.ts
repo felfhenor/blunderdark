@@ -11,6 +11,7 @@ export * from './content-abilityeffect';
 export * from './content-alchemyrecipe';
 export * from './content-breedingrecipe';
 export * from './content-combatability';
+export * from './content-feature';
 export * from './content-forgerecipe';
 export * from './content-fusionrecipe';
 export * from './content-inhabitant';

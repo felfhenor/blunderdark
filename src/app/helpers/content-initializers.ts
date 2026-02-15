@@ -17,6 +17,7 @@ import type {
 } from '@interfaces';
 import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
 import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
+import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
@@ -35,6 +36,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   alchemyrecipe: ensureAlchemyRecipe,
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
+  feature: ensureFeature,
   forgerecipe: ensureForgeRecipe,
   fusionrecipe: ensureFusionRecipe,
   inhabitant: ensureInhabitant,
@@ -117,6 +119,25 @@ function ensureFusionRecipe(
     creatureBId: recipe.creatureBId ?? ('' as InhabitantId),
     resultHybridId: recipe.resultHybridId ?? ('' as InhabitantId),
     cost: recipe.cost ?? {},
+  };
+}
+
+function ensureFeature(
+  feature: Partial<FeatureContent>,
+): FeatureContent {
+  return {
+    id: feature.id ?? ('UNKNOWN' as FeatureId),
+    name: feature.name ?? 'UNKNOWN',
+    __type: 'feature',
+    description: feature.description ?? '',
+    category: feature.category ?? 'environmental',
+    cost: feature.cost ?? {},
+    bonuses: (feature.bonuses ?? []).map((b) => ({
+      type: b.type ?? 'production_bonus',
+      value: b.value ?? 0,
+      targetType: b.targetType ?? undefined,
+      description: b.description ?? '',
+    })),
   };
 }
 
