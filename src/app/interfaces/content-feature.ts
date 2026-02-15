@@ -4,7 +4,7 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type FeatureId = Branded<string, 'FeatureId'>;
 
-export type FeatureCategory = 'environmental';
+export type FeatureCategory = 'environmental' | 'functional';
 
 export type FeatureBonusType =
   | 'capacity_bonus'
@@ -14,7 +14,11 @@ export type FeatureBonusType =
   | 'flat_production'
   | 'corruption_generation'
   | 'combat_bonus'
-  | 'teleport_link';
+  | 'teleport_link'
+  | 'storage_bonus'
+  | 'corruption_seal'
+  | 'training_xp'
+  | 'resource_converter';
 
 export type FeatureBonus = {
   type: FeatureBonusType;

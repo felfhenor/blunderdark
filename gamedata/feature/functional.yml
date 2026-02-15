@@ -1,0 +1,72 @@
+- id: f30a70a5-9853-4ccd-bb8f-d68dc99c2c7b
+  name: Storage Expansion
+  description: "Magical containers that double the room's resource storage capacity. Enchanted chests expand to hold far more than their physical size suggests."
+  category: functional
+  cost:
+    gold: 100
+    crystals: 25
+  bonuses:
+    - type: storage_bonus
+      value: 1.0
+      description: "+100% resource storage capacity"
+
+- id: d3ab3554-56a1-4a88-a9e7-392004e5b023
+  name: Efficiency Enchantment
+  description: "Arcane runes etched into the room's walls that amplify worker productivity. The enchantment hums with focused magical energy."
+  category: functional
+  cost:
+    gold: 120
+    flux: 20
+  bonuses:
+    - type: production_bonus
+      value: 0.20
+      description: "+20% base production"
+
+- id: 1654fd13-478e-434a-b9e8-8e15536a7dd8
+  name: Fear Ward
+  description: "Protective glyphs that suppress dread and panic within the room. Inhabitants feel an unnatural calm washing over them."
+  category: functional
+  cost:
+    gold: 80
+    essence: 15
+  bonuses:
+    - type: fear_reduction
+      value: 2
+      description: "-2 Fear in room"
+
+- id: cacbca5c-aea5-4035-a0a8-bea642ae0c60
+  name: Corruption Seal
+  description: "Sacred bindings that neutralize all corruption generation within the room. A faint golden shimmer keeps dark energies at bay."
+  category: functional
+  cost:
+    gold: 150
+    essence: 30
+  bonuses:
+    - type: corruption_seal
+      value: 1
+      description: "Prevents all corruption generation in this room"
+
+- id: f8c1a7ee-8364-4aa3-a6a1-baafdb35ab41
+  name: Training Station
+  description: "Practice dummies, weapon racks, and training manuals that allow inhabitants to hone their skills passively while working."
+  category: functional
+  cost:
+    gold: 90
+    crystals: 15
+  bonuses:
+    - type: training_xp
+      value: 1
+      description: "Inhabitants gain passive XP each tick"
+
+- id: bebc8602-b0e8-4c90-985c-ff60d1ef52de
+  name: Resource Converter
+  description: "An alchemical apparatus that can transform one resource into another, though some material is lost in the conversion process."
+  category: functional
+  cost:
+    gold: 200
+    flux: 30
+    crystals: 20
+  bonuses:
+    - type: resource_converter
+      value: 0.75
+      description: "Convert output to a different resource at 75% efficiency"
