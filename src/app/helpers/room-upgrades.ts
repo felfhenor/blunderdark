@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { featureCalculateCapacityBonus } from '@helpers/features';
 import type {
   PlacedRoom,
   RoomId,
@@ -119,6 +120,8 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
       bonus += effect.value;
     }
   }
+
+  bonus += featureCalculateCapacityBonus(placedRoom);
 
   return roomDef.maxInhabitants + bonus;
 }

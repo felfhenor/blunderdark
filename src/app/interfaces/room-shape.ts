@@ -1,4 +1,5 @@
 import type { BreedingRecipeId } from '@interfaces/content-breedingrecipe';
+import type { FeatureId } from '@interfaces/content-feature';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { SummonRecipeId } from '@interfaces/content-summonrecipe';
@@ -64,4 +65,5 @@ export type PlacedRoom = {
   mutationJob?: MutationJob;
   summonJob?: SummonJob;
   tortureJob?: TortureJob;
+  featureId?: FeatureId;
 };

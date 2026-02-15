@@ -3,6 +3,7 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import type { AdjacencyMap } from '@interfaces/adjacency';
 import { altarRoomGetFearReductionAura, altarRoomIsAdjacent } from '@helpers/altar-room';
 import { contentGetEntry } from '@helpers/content';
+import { featureCalculateFearReduction } from '@helpers/features';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
@@ -89,8 +90,9 @@ export function fearLevelCalculateEffective(
   upgradeAdjustment: number,
   altarAuraReduction: number,
   propagatedFear: number = 0,
+  featureReduction: number = 0,
 ): number {
-  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction + propagatedFear;
+  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction + propagatedFear;
   return Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw));
 }
 
@@ -259,11 +261,15 @@ export function fearLevelGetForRoom(
     ? altarRoomGetFearReductionAura([floor])
     : 0;
 
+  const featureReduction = featureCalculateFearReduction(placedRoom);
+
   const effectiveFear = fearLevelCalculateEffective(
     baseFear,
     inhabitantModifier,
     upgradeAdjustment,
     altarAuraReduction,
+    0,
+    featureReduction,
   );
 
   return {
@@ -271,6 +277,7 @@ export function fearLevelGetForRoom(
     inhabitantModifier,
     upgradeAdjustment,
     altarAuraReduction,
+    featureReduction,
     propagatedFear: 0,
     propagationSources: [],
     effectiveFear,
@@ -338,6 +345,7 @@ export function fearLevelCalculateAllForFloor(
         breakdown.upgradeAdjustment,
         breakdown.altarAuraReduction,
         breakdown.propagatedFear,
+        breakdown.featureReduction,
       );
     }
   }

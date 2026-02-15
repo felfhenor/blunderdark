@@ -9,6 +9,7 @@ export type FearLevelBreakdown = {
   inhabitantModifier: number;
   upgradeAdjustment: number;
   altarAuraReduction: number;
+  featureReduction: number;
   propagatedFear: number;
   propagationSources: FearPropagationSource[];
   effectiveFear: number;
