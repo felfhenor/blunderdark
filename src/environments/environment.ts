@@ -6,7 +6,8 @@ export const environment = {
     secret: '',
   },
   rollbar: {
-    accessToken: 'c43dd56f173f48c4837648a054f32749b9a40619068e3ffa646b9abaf329f21e593c91c2f7f9a3db33550457717b9b08',
+    accessToken:
+      '34d63140c2824f34ae7857d7a18a61ed5c39f3e7ea9512325ad600a9f02af03268897a1a9c9cff82785a9a182eff4485',
     hostBlockList: ['netlify.app'],
     captureUncaught: true,
     captureUnhandledRejections: true,
