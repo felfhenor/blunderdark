@@ -18,10 +18,7 @@ export function resourceAll(): Signal<ResourceMap> {
   return computed(() => gamestate().world.resources);
 }
 
-export async function resourceAdd(
-  type: ResourceType,
-  amount: number,
-): Promise<number> {
+export function resourceAdd(type: ResourceType, amount: number): number {
   if (amount < 0) {
     return 0;
   }
@@ -32,61 +29,48 @@ export async function resourceAdd(
 
   let actualAdded = 0;
 
-  await updateGamestate((state) => {
+  updateGamestate((state) => {
     const resource = state.world.resources[type];
     const available = resource.max - resource.current;
     actualAdded = Math.min(amount, available);
 
-    return {
-      ...state,
-      world: {
-        ...state.world,
-        resources: {
-          ...state.world.resources,
-          [type]: {
-            ...resource,
-            current: Math.min(resource.current + actualAdded, resource.max),
-          },
-        },
-      },
-    };
+    state.world.resources[type].current = Math.min(
+      resource.current + amount,
+      resource.max,
+    );
+
+    return state;
   });
 
   return actualAdded;
 }
 
-export async function resourceSubtract(
-  type: ResourceType,
-  amount: number,
-): Promise<boolean> {
+export function resourceSubtract(type: ResourceType, amount: number): number {
   if (amount < 0) {
-    return false;
+    return 0;
   }
 
   if (amount === 0) {
-    return true;
+    return 0;
   }
 
   const resource = gamestate().world.resources[type];
   if (resource.current < amount) {
-    return false;
+    return 0;
   }
 
-  await updateGamestate((state) => ({
-    ...state,
-    world: {
-      ...state.world,
-      resources: {
-        ...state.world.resources,
-        [type]: {
-          ...state.world.resources[type],
-          current: state.world.resources[type].current - amount,
-        },
-      },
-    },
-  }));
+  const subtractedAmount = Math.min(amount, resource.current);
 
-  return true;
+  updateGamestate((state) => {
+    state.world.resources[type].current = Math.max(
+      0,
+      state.world.resources[type].current - amount,
+    );
+
+    return state;
+  });
+
+  return subtractedAmount;
 }
 
 export function resourceCanAfford(costs: ResourceCost): boolean {
@@ -155,9 +139,7 @@ export function resourceEffectiveMax(
   return Math.floor(baseMax * multiplier);
 }
 
-export function resourceMigrate(
-  saved: Partial<ResourceMap>,
-): ResourceMap {
+export function resourceMigrate(saved: Partial<ResourceMap>): ResourceMap {
   const defaults = defaultResources();
   const result = { ...defaults };
 

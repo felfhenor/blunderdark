@@ -1,8 +1,12 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
-import { featureCalculateCorruptionGenerationPerTick, featureGetCorruptionSealedRoomIds } from '@helpers/features';
+import {
+  featureCalculateCorruptionGenerationPerTick,
+  featureGetCorruptionSealedRoomIds,
+} from '@helpers/features';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { resourceAdd } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameState, InhabitantInstance } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -109,8 +113,8 @@ export function corruptionGenerationCalculateInhabitantRate(
   inhabitants: InhabitantInstance[],
   lookupDef?: (id: string) => InhabitantContent | undefined,
 ): number {
-  const lookup = lookupDef ?? ((id: string) =>
-    contentGetEntry<InhabitantContent>(id));
+  const lookup =
+    lookupDef ?? ((id: string) => contentGetEntry<InhabitantContent>(id));
 
   let totalPerMinute = 0;
   for (const inst of inhabitants) {
@@ -137,13 +141,16 @@ export function corruptionGenerationProcess(state: GameState): void {
     state.world.inhabitants,
   );
 
-  const sealedRoomIds = featureGetCorruptionSealedRoomIds(state.world.floors ?? []);
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(
+    state.world.floors ?? [],
+  );
 
   let featurePerTick = 0;
   for (const floor of state.world.floors ?? []) {
-    const unsealedRooms = sealedRoomIds.size > 0
-      ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
-      : floor.rooms;
+    const unsealedRooms =
+      sealedRoomIds.size > 0
+        ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
+        : floor.rooms;
     featurePerTick += featureCalculateCorruptionGenerationPerTick(
       unsealedRooms,
       GAME_TIME_TICKS_PER_MINUTE,
@@ -153,12 +160,13 @@ export function corruptionGenerationProcess(state: GameState): void {
   const basePerTick = inhabitantPerTick + featurePerTick;
   if (basePerTick <= 0) return;
 
-  const dayNightMod = dayNightGetResourceModifier(state.clock.hour, 'corruption');
+  const dayNightMod = dayNightGetResourceModifier(
+    state.clock.hour,
+    'corruption',
+  );
   const finalPerTick = basePerTick * dayNightMod;
 
-  const resource = state.world.resources.corruption;
-  const available = resource.max - resource.current;
-  resource.current = Math.min(resource.current + Math.min(finalPerTick, available), resource.max);
+  resourceAdd('corruption', finalPerTick);
 }
 
 /**

@@ -1,16 +1,27 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
-import { dayNightCalculateCreatureProductionModifier, dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
-import { featureApplyResourceConversion, featureCalculateAdjacentProductionBonus, featureCalculateFlatProduction, featureCalculateProductionBonus } from '@helpers/features';
+import {
+  dayNightCalculateCreatureProductionModifier,
+  dayNightGetResourceModifier,
+} from '@helpers/day-night-modifiers';
+import {
+  featureApplyResourceConversion,
+  featureCalculateAdjacentProductionBonus,
+  featureCalculateFlatProduction,
+  featureCalculateProductionBonus,
+} from '@helpers/features';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { productionModifierCalculate } from '@helpers/production-modifiers';
-import { resourceEffectiveMax } from '@helpers/resources';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import { resourceAdd } from '@helpers/resources';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
-import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
+import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
   Floor,
   GameState,
@@ -25,7 +36,11 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
-import type { InhabitantBonusResult, ActiveAdjacencyBonus, ResourceProductionBreakdown } from '@interfaces/production';
+import type {
+  ActiveAdjacencyBonus,
+  InhabitantBonusResult,
+  ResourceProductionBreakdown,
+} from '@interfaces/production';
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
   const room = contentGetEntry<RoomContent>(roomTypeId);
@@ -50,7 +65,8 @@ export function productionCalculateInhabitantBonus(
   inhabitants: InhabitantInstance[],
 ): InhabitantBonusResult {
   const assignedInhabitants = inhabitants.filter(
-    (i) => i.assignedRoomId === placedRoom.id &&
+    (i) =>
+      i.assignedRoomId === placedRoom.id &&
       !(i.travelTicksRemaining !== undefined && i.travelTicksRemaining > 0),
   );
 
@@ -64,9 +80,7 @@ export function productionCalculateInhabitantBonus(
   let totalBonus = 0;
 
   for (const inhabitant of assignedInhabitants) {
-    const def = contentGetEntry<InhabitantContent>(
-      inhabitant.definitionId,
-    );
+    const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
     if (!def) continue;
 
     totalBonus += def.stats.workerEfficiency - 1.0;
@@ -176,7 +190,11 @@ export function productionCalculateConditionalModifiers(
   return stateModifierCalculatePerCreatureProduction(assigned);
 }
 
-export function productionCalculateTotal(floors: Floor[], hour?: number, season?: Season): RoomProduction {
+export function productionCalculateTotal(
+  floors: Floor[],
+  hour?: number,
+  season?: Season,
+): RoomProduction {
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
@@ -196,10 +214,8 @@ export function productionCalculateTotal(floors: Floor[], hour?: number, season?
       const base = roomDef.production;
       if (!base || Object.keys(base).length === 0) continue;
 
-      const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
-        room,
-        floor.inhabitants,
-      );
+      const { bonus: inhabitantBonus, hasWorkers } =
+        productionCalculateInhabitantBonus(room, floor.inhabitants);
 
       if (roomDef.requiresWorkers && !hasWorkers) continue;
 
@@ -221,42 +237,74 @@ export function productionCalculateTotal(floors: Floor[], hour?: number, season?
       const adjacentPlacedRooms = adjacentRoomIds
         .map((id) => floor.rooms.find((r) => r.id === id))
         .filter((r): r is PlacedRoom => r !== undefined);
-      const featureAdjacentBonus = featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
-      const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
-      const envModifier = hour !== undefined
-        ? productionModifierCalculate({
-            roomTypeId: room.roomTypeId,
-            floorDepth: floor.depth,
-            floorBiome: floor.biome,
-            hour,
-          })
-        : 1.0;
-      const creatureModifier = hour !== undefined
-        ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
-        : 1.0;
+      const featureAdjacentBonus =
+        featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
+      const stateModifier = productionCalculateConditionalModifiers(
+        room,
+        floor.inhabitants,
+      );
+      const envModifier =
+        hour !== undefined
+          ? productionModifierCalculate({
+              roomTypeId: room.roomTypeId,
+              floorDepth: floor.depth,
+              floorBiome: floor.biome,
+              hour,
+            })
+          : 1.0;
+      const creatureModifier =
+        hour !== undefined
+          ? dayNightCalculateCreatureProductionModifier(
+              hour,
+              floor.inhabitants,
+              room.id,
+            )
+          : 1.0;
 
       let roomProduction: RoomProduction = {};
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
-        const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
-        const dayNightResourceMod = hour !== undefined
-          ? dayNightGetResourceModifier(hour, resourceType)
-          : 1.0;
+        const depthModifier = floorModifierGetMultiplier(
+          floor.depth,
+          resourceType,
+        );
+        const dayNightResourceMod =
+          hour !== undefined
+            ? dayNightGetResourceModifier(hour, resourceType)
+            : 1.0;
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
-        const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
+        const featureProductionBonus = featureCalculateProductionBonus(
+          room,
+          resourceType,
+        );
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+          baseAmount *
+          (1 +
+            inhabitantBonus +
+            adjacencyBonus +
+            featureAdjacentBonus +
+            featureProductionBonus) *
+          stateModifier *
+          envModifier *
+          depthModifier *
+          dayNightResourceMod *
+          seasonMod *
+          creatureModifier;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }
 
       // Add flat production from features (e.g. Arcane Crystals +1 Flux/min)
-      const flatProduction = featureCalculateFlatProduction(room, GAME_TIME_TICKS_PER_MINUTE);
+      const flatProduction = featureCalculateFlatProduction(
+        room,
+        GAME_TIME_TICKS_PER_MINUTE,
+      );
       for (const [resourceType, amount] of Object.entries(flatProduction)) {
         if (!amount) continue;
-        roomProduction[resourceType] = (roomProduction[resourceType] ?? 0) + amount;
+        roomProduction[resourceType] =
+          (roomProduction[resourceType] ?? 0) + amount;
       }
 
       // Apply resource conversion if active
@@ -285,10 +333,8 @@ export function productionCalculateSingleRoom(
   const base = roomDef.production;
   if (!base || Object.keys(base).length === 0) return {};
 
-  const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
-    room,
-    floor.inhabitants,
-  );
+  const { bonus: inhabitantBonus, hasWorkers } =
+    productionCalculateInhabitantBonus(room, floor.inhabitants);
 
   if (roomDef.requiresWorkers && !hasWorkers) return {};
 
@@ -316,37 +362,65 @@ export function productionCalculateSingleRoom(
   const adjacentPlacedRooms = adjacentRoomIds
     .map((id) => floor.rooms.find((r) => r.id === id))
     .filter((r): r is PlacedRoom => r !== undefined);
-  const featureAdjacentBonus = featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
-  const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
-  const envModifier = hour !== undefined
-    ? productionModifierCalculate({
-        roomTypeId: room.roomTypeId,
-        floorDepth: floor.depth,
-        floorBiome: floor.biome,
-        hour,
-      })
-    : 1.0;
-  const creatureModifier = hour !== undefined
-    ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
-    : 1.0;
+  const featureAdjacentBonus =
+    featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
+  const stateModifier = productionCalculateConditionalModifiers(
+    room,
+    floor.inhabitants,
+  );
+  const envModifier =
+    hour !== undefined
+      ? productionModifierCalculate({
+          roomTypeId: room.roomTypeId,
+          floorDepth: floor.depth,
+          floorBiome: floor.biome,
+          hour,
+        })
+      : 1.0;
+  const creatureModifier =
+    hour !== undefined
+      ? dayNightCalculateCreatureProductionModifier(
+          hour,
+          floor.inhabitants,
+          room.id,
+        )
+      : 1.0;
 
   let production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
     if (!baseAmount) continue;
     const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
-    const dayNightResourceMod = hour !== undefined
-      ? dayNightGetResourceModifier(hour, resourceType)
-      : 1.0;
+    const dayNightResourceMod =
+      hour !== undefined
+        ? dayNightGetResourceModifier(hour, resourceType)
+        : 1.0;
     const seasonMod = season
       ? seasonBonusGetResourceModifier(season, resourceType)
       : 1.0;
-    const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
+    const featureProductionBonus = featureCalculateProductionBonus(
+      room,
+      resourceType,
+    );
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+      baseAmount *
+      (1 +
+        inhabitantBonus +
+        adjacencyBonus +
+        featureAdjacentBonus +
+        featureProductionBonus) *
+      stateModifier *
+      envModifier *
+      depthModifier *
+      dayNightResourceMod *
+      seasonMod *
+      creatureModifier;
   }
 
   // Add flat production from features
-  const flatProduction = featureCalculateFlatProduction(room, GAME_TIME_TICKS_PER_MINUTE);
+  const flatProduction = featureCalculateFlatProduction(
+    room,
+    GAME_TIME_TICKS_PER_MINUTE,
+  );
   for (const [resourceType, amount] of Object.entries(flatProduction)) {
     if (!amount) continue;
     production[resourceType] = (production[resourceType] ?? 0) + amount;
@@ -360,7 +434,11 @@ export function productionCalculateSingleRoom(
 
 export const productionRates = computed<RoomProduction>(() => {
   const state = gamestate();
-  return productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  return productionCalculateTotal(
+    state.world.floors,
+    state.clock.hour,
+    state.world.season.currentSeason,
+  );
 });
 
 export function productionPerMinute(perTickRate: number): number {
@@ -372,7 +450,12 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return productionCalculateSingleRoom(room, floor, state.clock.hour, state.world.season.currentSeason);
+      return productionCalculateSingleRoom(
+        room,
+        floor,
+        state.clock.hour,
+        state.world.season.currentSeason,
+      );
     }
   }
   return {};
@@ -402,10 +485,8 @@ export function productionCalculateBreakdowns(
       const base = roomDef.production;
       if (!base || Object.keys(base).length === 0) continue;
 
-      const { bonus: inhabitantBonus, hasWorkers } = productionCalculateInhabitantBonus(
-        room,
-        floor.inhabitants,
-      );
+      const { bonus: inhabitantBonus, hasWorkers } =
+        productionCalculateInhabitantBonus(room, floor.inhabitants);
 
       if (roomDef.requiresWorkers && !hasWorkers) continue;
 
@@ -427,32 +508,61 @@ export function productionCalculateBreakdowns(
       const adjacentPlacedRooms = adjacentRoomIds
         .map((id) => floor.rooms.find((r) => r.id === id))
         .filter((r): r is PlacedRoom => r !== undefined);
-      const featureAdjacentBonus = featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
-      const stateModifier = productionCalculateConditionalModifiers(room, floor.inhabitants);
-      const envModifier = hour !== undefined
-        ? productionModifierCalculate({
-            roomTypeId: room.roomTypeId,
-            floorDepth: floor.depth,
-            floorBiome: floor.biome,
-            hour,
-          })
-        : 1.0;
-      const creatureModifier = hour !== undefined
-        ? dayNightCalculateCreatureProductionModifier(hour, floor.inhabitants, room.id)
-        : 1.0;
+      const featureAdjacentBonus =
+        featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
+      const stateModifier = productionCalculateConditionalModifiers(
+        room,
+        floor.inhabitants,
+      );
+      const envModifier =
+        hour !== undefined
+          ? productionModifierCalculate({
+              roomTypeId: room.roomTypeId,
+              floorDepth: floor.depth,
+              floorBiome: floor.biome,
+              hour,
+            })
+          : 1.0;
+      const creatureModifier =
+        hour !== undefined
+          ? dayNightCalculateCreatureProductionModifier(
+              hour,
+              floor.inhabitants,
+              room.id,
+            )
+          : 1.0;
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
 
-        const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
-        const dayNightResourceMod = hour !== undefined
-          ? dayNightGetResourceModifier(hour, resourceType)
-          : 1.0;
+        const depthModifier = floorModifierGetMultiplier(
+          floor.depth,
+          resourceType,
+        );
+        const dayNightResourceMod =
+          hour !== undefined
+            ? dayNightGetResourceModifier(hour, resourceType)
+            : 1.0;
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
-        const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
-        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
-        const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal + featureAdjacentBonus + featureProductionBonus);
+        const featureProductionBonus = featureCalculateProductionBonus(
+          room,
+          resourceType,
+        );
+        const modifier =
+          stateModifier *
+          envModifier *
+          depthModifier *
+          dayNightResourceMod *
+          seasonMod *
+          creatureModifier;
+        const withBonuses =
+          baseAmount *
+          (1 +
+            inhabitantBonus +
+            adjacencyBonusVal +
+            featureAdjacentBonus +
+            featureProductionBonus);
         const finalAmount = withBonuses * modifier;
 
         if (!breakdowns[resourceType]) {
@@ -481,19 +591,24 @@ export function productionCalculateBreakdowns(
 
 export const productionBreakdowns = computed(() => {
   const state = gamestate();
-  return productionCalculateBreakdowns(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  return productionCalculateBreakdowns(
+    state.world.floors,
+    state.clock.hour,
+    state.world.season.currentSeason,
+  );
 });
 
 export function productionProcess(state: GameState): void {
-  const production = productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  const production = productionCalculateTotal(
+    state.world.floors,
+    state.clock.hour,
+    state.world.season.currentSeason,
+  );
 
   for (const [type, amount] of Object.entries(production)) {
     if (!amount || amount <= 0) continue;
     const resourceType = type as ResourceType;
-    const resource = state.world.resources[resourceType];
-    if (!resource) continue;
-    const effectiveMax = resourceEffectiveMax(resource.max, resourceType, state.world.floors);
-    const available = effectiveMax - resource.current;
-    resource.current = Math.min(resource.current + Math.min(amount as number, available), effectiveMax);
+
+    resourceAdd(resourceType, amount);
   }
 }

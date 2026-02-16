@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { resourceSubtract } from '@helpers/resources';
 import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifiers';
 import type {
   GameState,
@@ -7,8 +8,11 @@ import type {
   InhabitantState,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type {
+  HungerWarningEvent,
+  HungerWarningLevel,
+} from '@interfaces/hunger';
 import { Subject } from 'rxjs';
-import type { HungerWarningLevel, HungerWarningEvent } from '@interfaces/hunger';
 
 // --- Constants ---
 
@@ -38,7 +42,9 @@ let lastWarningLevel: HungerWarningLevel | undefined;
 /**
  * Get the per-tick food consumption for a given hourly rate.
  */
-export function hungerGetPerTickConsumption(foodConsumptionRate: number): number {
+export function hungerGetPerTickConsumption(
+  foodConsumptionRate: number,
+): number {
   return foodConsumptionRate / HUNGER_TICKS_PER_HOUR;
 }
 
@@ -82,7 +88,8 @@ export function hungerCalculateTotalConsumption(
     const rate = hungerGetConsumptionRate(inhabitant.definitionId);
     if (rate <= 0) continue;
 
-    const consumptionMultiplier = stateModifierGetFoodConsumptionMultiplier(inhabitant);
+    const consumptionMultiplier =
+      stateModifierGetFoodConsumptionMultiplier(inhabitant);
     const perTick = hungerGetPerTickConsumption(rate) * consumptionMultiplier;
     total += perTick;
   }
@@ -107,14 +114,11 @@ export function hungerProcess(state: GameState): void {
   const totalConsumption = hungerCalculateTotalConsumption(inhabitants);
 
   // Deduct food
-  const food = state.world.resources.food;
   let foodSufficient = true;
 
   if (totalConsumption > 0) {
-    if (food.current >= totalConsumption) {
-      food.current -= totalConsumption;
-    } else {
-      food.current = 0;
+    const actualSubtracted = resourceSubtract('food', totalConsumption);
+    if (actualSubtracted < totalConsumption) {
       foodSufficient = false;
     }
   }
@@ -151,7 +155,10 @@ function hungerUpdateInhabitant(
 
   if (foodSufficient) {
     // Recovering: decrement hunger ticks
-    inhabitant.hungerTicksWithoutFood = Math.max(0, currentTicks - HUNGER_RECOVERY_RATE);
+    inhabitant.hungerTicksWithoutFood = Math.max(
+      0,
+      currentTicks - HUNGER_RECOVERY_RATE,
+    );
   } else {
     // Starving: increment hunger ticks
     inhabitant.hungerTicksWithoutFood = currentTicks + 1;
@@ -172,7 +179,10 @@ function hungerUpdateInhabitant(
  * must be reflected there.
  */
 function hungerSyncFloorInhabitants(state: GameState): void {
-  const stateMap = new Map<string, { state: InhabitantState; hungerTicksWithoutFood: number }>();
+  const stateMap = new Map<
+    string,
+    { state: InhabitantState; hungerTicksWithoutFood: number }
+  >();
 
   for (const inhabitant of state.world.inhabitants) {
     stateMap.set(inhabitant.instanceId, {
@@ -207,7 +217,8 @@ export function hungerGetWarningLevel(
   if (foodCurrent <= 0) return 'critical';
 
   const ticksOfFoodRemaining = foodCurrent / totalConsumptionPerTick;
-  const warningThresholdTicks = HUNGER_WARNING_MINUTES * GAME_TIME_TICKS_PER_MINUTE;
+  const warningThresholdTicks =
+    HUNGER_WARNING_MINUTES * GAME_TIME_TICKS_PER_MINUTE;
 
   if (ticksOfFoodRemaining < warningThresholdTicks) return 'low';
 
@@ -220,7 +231,9 @@ export function hungerGetWarningLevel(
  * Emits events via hungerWarning$ observable.
  */
 export function hungerProcessWarnings(state: GameState): void {
-  const totalConsumption = hungerCalculateTotalConsumption(state.world.inhabitants);
+  const totalConsumption = hungerCalculateTotalConsumption(
+    state.world.inhabitants,
+  );
   const currentLevel = hungerGetWarningLevel(
     state.world.resources.food.current,
     totalConsumption,

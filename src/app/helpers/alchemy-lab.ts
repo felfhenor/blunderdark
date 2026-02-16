@@ -1,8 +1,12 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { resourceAdd, resourceSubtract } from '@helpers/resources';
 import { roomRoleFindById } from '@helpers/room-roles';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   AlchemyConversion,
@@ -11,6 +15,7 @@ import type {
   GameState,
   PlacedRoom,
   PlacedRoomId,
+  ResourceType,
 } from '@interfaces';
 import type { AlchemyLabCompletedEvent } from '@interfaces/alchemy';
 import type { RoomContent } from '@interfaces/content-room';
@@ -34,10 +39,13 @@ export const alchemyLabCompleted$ = alchemyLabCompletedSubject.asObservable();
 export function alchemyLabGetAvailableRecipes(
   room: PlacedRoom,
 ): Array<AlchemyRecipeContent> {
-  const recipes = contentGetEntriesByType<AlchemyRecipeContent>('alchemyrecipe');
+  const recipes =
+    contentGetEntriesByType<AlchemyRecipeContent>('alchemyrecipe');
 
   const effects = roomUpgradeGetAppliedEffects(room);
-  const hasAdvancedAlchemy = effects.some((e) => e.type === 'alchemyTierUnlock');
+  const hasAdvancedAlchemy = effects.some(
+    (e) => e.type === 'alchemyTierUnlock',
+  );
 
   return recipes.filter((r) => {
     if (r.tier === 'basic') return true;
@@ -68,7 +76,9 @@ export function alchemyLabGetConversionTicks(
   for (const adjTypeId of adjacentRoomTypeIds) {
     const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.alchemyAdjacencyEffects?.alchemySpeedBonus) {
-      ticks = Math.round(ticks * (1 - adjDef.alchemyAdjacencyEffects.alchemySpeedBonus));
+      ticks = Math.round(
+        ticks * (1 - adjDef.alchemyAdjacencyEffects.alchemySpeedBonus),
+      );
     }
   }
 
@@ -97,7 +107,7 @@ export function alchemyLabGetEffectiveCost(
   for (const adjTypeId of adjacentRoomTypeIds) {
     const adjDef = contentGetEntry<RoomContent>(adjTypeId);
     if (adjDef?.alchemyAdjacencyEffects?.alchemyCostReduction) {
-      costMultiplier *= (1 - adjDef.alchemyAdjacencyEffects.alchemyCostReduction);
+      costMultiplier *= 1 - adjDef.alchemyAdjacencyEffects.alchemyCostReduction;
     }
   }
 
@@ -244,13 +254,20 @@ export function alchemyLabProcess(state: GameState): void {
       // Step 1: Consume input resources at start of cycle
       if (!conversion.inputConsumed) {
         const adjacentTypes = alchemyLabGetAdjacentRoomTypeIds(room, floor);
-        const effectiveCost = alchemyLabGetEffectiveCost(room, recipe.inputCost, adjacentTypes);
+        const effectiveCost = alchemyLabGetEffectiveCost(
+          room,
+          recipe.inputCost,
+          adjacentTypes,
+        );
 
         // Check if we can afford
         let canAfford = true;
         for (const [resource, amount] of Object.entries(effectiveCost)) {
           if (!amount || amount <= 0) continue;
-          const res = state.world.resources[resource as keyof typeof state.world.resources];
+          const res =
+            state.world.resources[
+              resource as keyof typeof state.world.resources
+            ];
           if (!res || res.current < amount) {
             canAfford = false;
             break;
@@ -262,10 +279,7 @@ export function alchemyLabProcess(state: GameState): void {
         // Deduct resources
         for (const [resource, amount] of Object.entries(effectiveCost)) {
           if (!amount || amount <= 0) continue;
-          const res = state.world.resources[resource as keyof typeof state.world.resources];
-          if (res) {
-            res.current -= amount;
-          }
+          resourceSubtract(resource as ResourceType, amount);
         }
 
         conversion.inputConsumed = true;
@@ -277,10 +291,8 @@ export function alchemyLabProcess(state: GameState): void {
       // Step 3: Complete the conversion
       if (conversion.progress >= conversion.targetTicks) {
         // Add output resource
-        const outputRes = state.world.resources[recipe.outputResource as keyof typeof state.world.resources];
-        if (outputRes) {
-          outputRes.current = Math.min(outputRes.current + recipe.outputAmount, outputRes.max);
-        }
+        const outputType = recipe.outputResource as ResourceType;
+        resourceAdd(outputType, recipe.outputAmount);
 
         // Reset cycle for continuous conversion
         conversion.progress = 0;

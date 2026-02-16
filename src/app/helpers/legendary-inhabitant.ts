@@ -1,5 +1,6 @@
-import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { resourceSubtract } from '@helpers/resources';
 import { roomUpgradeGetPaths } from '@helpers/room-upgrades';
 import type {
   Floor,
@@ -65,9 +66,7 @@ function legendaryInhabitantGetRoomLevel(
     if (!placed.appliedUpgradePathId) return 1;
 
     const paths = roomUpgradeGetPaths(placed.roomTypeId);
-    const appliedPath = paths.find(
-      (p) => p.id === placed.appliedUpgradePathId,
-    );
+    const appliedPath = paths.find((p) => p.id === placed.appliedUpgradePathId);
     if (appliedPath?.upgradeLevel) return appliedPath.upgradeLevel;
 
     const appliedIndex = paths.findIndex(
@@ -89,8 +88,9 @@ function legendaryInhabitantCheckRequirement(
 ): boolean {
   switch (req.requirementType) {
     case 'room': {
-      return legendaryInhabitantFindRoomByName(floors, req.targetName) !==
-        undefined;
+      return (
+        legendaryInhabitantFindRoomByName(floors, req.targetName) !== undefined
+      );
     }
 
     case 'room_level': {
@@ -226,19 +226,13 @@ function legendaryInhabitantCanPayUpkeep(
  * Deduct per-tick upkeep cost from resources for one inhabitant.
  * Mutates resources in-place.
  */
-function legendaryInhabitantPayUpkeep(
-  def: InhabitantContent,
-  resources: ResourceMap,
-): void {
+function legendaryInhabitantPayUpkeep(def: InhabitantContent): void {
   if (!def.upkeepCost) return;
 
   for (const [type, amountPerMinute] of Object.entries(def.upkeepCost)) {
     const resourceType = type as ResourceType;
     const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
-    resources[resourceType].current = Math.max(
-      0,
-      resources[resourceType].current - perTick,
-    );
+    resourceSubtract(resourceType, perTick);
   }
 }
 
@@ -277,11 +271,10 @@ export function legendaryInhabitantUpkeepProcess(state: GameState): void {
     if (!def?.upkeepCost || Object.keys(def.upkeepCost).length === 0) continue;
 
     if (legendaryInhabitantCanPayUpkeep(def, state.world.resources)) {
-      legendaryInhabitantPayUpkeep(def, state.world.resources);
+      legendaryInhabitantPayUpkeep(def);
       inhabitant.discontentedTicks = 0;
     } else {
-      inhabitant.discontentedTicks =
-        (inhabitant.discontentedTicks ?? 0) + 1;
+      inhabitant.discontentedTicks = (inhabitant.discontentedTicks ?? 0) + 1;
 
       if (
         inhabitant.discontentedTicks >= LEGENDARY_DISCONTENTED_DEPARTURE_TICKS

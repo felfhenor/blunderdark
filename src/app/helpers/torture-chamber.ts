@@ -1,6 +1,7 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { resourceAdd } from '@helpers/resources';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -229,13 +230,7 @@ export function tortureChamberProcess(state: GameState): void {
       room.tortureJob.ticksRemaining -= 1;
 
       // Add extra corruption while processing
-      const corruptionRes = state.world.resources['corruption'];
-      if (corruptionRes) {
-        corruptionRes.current = Math.min(
-          corruptionRes.max,
-          corruptionRes.current + TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING,
-        );
-      }
+      resourceAdd('corruption', TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING);
 
       if (room.tortureJob.ticksRemaining <= 0) {
         const job = room.tortureJob;
@@ -251,13 +246,7 @@ export function tortureChamberProcess(state: GameState): void {
 
           if (job.action === 'extract') {
             const researchGained = tortureCalculateExtractionReward(prisoner);
-            const researchRes = state.world.resources['research'];
-            if (researchRes) {
-              researchRes.current = Math.min(
-                researchRes.max,
-                researchRes.current + researchGained,
-              );
-            }
+            resourceAdd('research', researchGained);
 
             tortureExtractionCompleteSubject.next({
               roomId: room.id,
