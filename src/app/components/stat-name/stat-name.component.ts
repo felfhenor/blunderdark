@@ -26,6 +26,7 @@ import type { StatType } from '@helpers/stat-icons';
       align-items: center;
       gap: 4px;
       vertical-align: baseline;
+      font-size: 1rem;
     }
 
     :host ::ng-deep svg {
