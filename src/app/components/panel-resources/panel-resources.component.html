@@ -34,18 +34,14 @@
     >
       <div class="flex items-center justify-between mb-0.5">
         <span class="text-sm font-semibold truncate"><app-currency-name [type]="res.type" /></span>
-        <span class="text-xs flex items-center gap-1">
-          @if (res.type === 'corruption') {
-            <span class="badge badge-xs" [class]="getCorruptionBadgeClass(corruptionInfo().level)">
-              {{ corruptionInfo().level | uppercase }}
-            </span>
-          } @else if (isFull(res.type)) {
-            <span class="badge badge-xs badge-warning">FULL</span>
-          }
-        </span>
+        @if (res.type === 'corruption') {
+          <span class="badge badge-xs" [class]="getCorruptionBadgeClass(corruptionInfo().level)">
+            {{ corruptionInfo().level | uppercase }}
+          </span>
+        }
       </div>
 
-      <div class="text-xs opacity-70">
+      <div class="text-xs" [class.text-success]="res.type !== 'corruption' && isFull(res.type)" [class.opacity-70]="res.type === 'corruption' || !isFull(res.type)">
         @if (res.type === 'corruption') {
           {{ getCurrent(res.type) | number: '1.0-0' }}
         } @else {
