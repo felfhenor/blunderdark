@@ -66,6 +66,7 @@ export * from './room-placement';
 export * from './room-removal';
 export * from './room-shape';
 export * from './room-upgrade';
+export * from './save';
 export * from './season';
 export * from './season-bonus';
 export * from './seasonal-event';

@@ -20,11 +20,24 @@
         <div class="card-title">Savefile Management</div>
 
         <p class="mb-3">
-          Export and import your savefile to create backups, or share to help
-          establish bug reports.
+          Save your game, or export and import savefiles for backups and bug
+          reports.
         </p>
 
         <div class="card-actions">
+          <button
+            class="btn btn-success"
+            (click)="saveNow()"
+            [disabled]="isSaving()"
+            appAnalyticsClick="Savefile:Save"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            @if (isSaving()) {
+              <span class="loading loading-spinner loading-xs"></span>
+            }
+            Save Now
+          </button>
           <app-button-savefile-export></app-button-savefile-export>
           <app-button-savefile-import></app-button-savefile-import>
         </div>

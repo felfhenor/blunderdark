@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { gamestate } from '@helpers';
+import { saveSerialize, notifySuccess, notifyError } from '@helpers';
 
 @Component({
   selector: 'app-button-savefile-export',
@@ -11,15 +11,21 @@ import { gamestate } from '@helpers';
 })
 export class ButtonSavefileExportComponent {
   exportSavefile() {
-    const state = gamestate();
+    try {
+      const saveData = saveSerialize();
 
-    const fileName = `${Date.now()}.grdh`;
-    const dataStr =
-      'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(state));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute('href', dataStr);
-    downloadAnchorNode.setAttribute('download', fileName);
-    downloadAnchorNode.click();
+      const fileName = `${Date.now()}.grdh`;
+      const dataStr =
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(JSON.stringify(saveData));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', fileName);
+      downloadAnchorNode.click();
+
+      notifySuccess('Game exported successfully!');
+    } catch {
+      notifyError('Failed to export save file.');
+    }
   }
 }

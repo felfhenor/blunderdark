@@ -4,11 +4,12 @@ import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   uiCloseAllMenus,
-  migrateGameState,
   notifySuccess,
-  gamestateSet,
+  notifyError,
+  saveParseLegacy,
+  saveValidate,
+  saveDeserialize,
 } from '@helpers';
-import type { GameState } from '@interfaces';
 
 @Component({
   selector: 'app-button-savefile-import',
@@ -29,23 +30,46 @@ export class ButtonSavefileImportComponent {
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const charFile = JSON.parse(
-        (ev.target as FileReader).result as string,
-      ) as GameState;
+      try {
+        const raw = JSON.parse(
+          (ev.target as FileReader).result as string,
+        ) as unknown;
 
-      const finish = () => {
+        const saveData = saveParseLegacy(raw);
+        if (!saveData) {
+          notifyError('Unrecognized save file format.');
+          fileInput.value = '';
+          return;
+        }
+
+        const validation = saveValidate(saveData);
+        if (!validation.valid) {
+          notifyError(
+            `Invalid save file: ${validation.errors[0]}`,
+          );
+          fileInput.value = '';
+          return;
+        }
+
+        if (validation.warnings.length > 0) {
+          // Warn but allow proceeding
+          for (const warning of validation.warnings) {
+            notifyError(warning);
+          }
+        }
+
+        saveDeserialize(saveData);
+        uiCloseAllMenus();
+
         fileInput.value = '';
-      };
 
-      gamestateSet(charFile);
-      migrateGameState();
-      uiCloseAllMenus();
+        notifySuccess('Successfully imported savefile!');
 
-      finish();
-
-      notifySuccess(`Successfully imported savefile!`);
-
-      this.router.navigate(['/game']);
+        this.router.navigate(['/game']);
+      } catch {
+        notifyError('Failed to parse save file.');
+        fileInput.value = '';
+      }
     };
 
     reader.readAsText(file);

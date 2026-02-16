@@ -1,11 +1,18 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { gameReset, gamestate, timerTicksElapsed } from '@helpers';
+import {
+  gameReset,
+  gamestate,
+  gamestateSave,
+  timerTicksElapsed,
+  notifySuccess,
+  notifyError,
+} from '@helpers';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
@@ -27,6 +34,19 @@ export class PanelOptionsSavefileComponent {
 
   public startedAt = computed(() => gamestate().meta.createdAt);
   public numTicks = computed(() => timerTicksElapsed());
+  public isSaving = signal(false);
+
+  saveNow() {
+    try {
+      this.isSaving.set(true);
+      gamestateSave();
+      notifySuccess('Game saved!');
+    } catch {
+      notifyError('Failed to save game.');
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
 
   async deleteSavefile() {
     await this.router.navigate(['/']);

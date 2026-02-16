@@ -68,6 +68,7 @@ export * from './room-removal';
 export * from './room-roles';
 export * from './room-shapes';
 export * from './room-upgrades';
+export * from './save';
 export * from './scheduler';
 export * from './season';
 export * from './season-bonuses';
