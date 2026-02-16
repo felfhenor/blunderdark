@@ -21,7 +21,6 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
-  IsContentItem,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { FusionPreview } from '@helpers/fusion';
@@ -37,7 +36,7 @@ type StatDelta = {
 };
 
 type RecipeEntry = {
-  recipe: FusionRecipeContent & IsContentItem;
+  recipe: FusionRecipeContent;
   parentADef: InhabitantContent | undefined;
   parentBDef: InhabitantContent | undefined;
   hybridDef: InhabitantContent | undefined;

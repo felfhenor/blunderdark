@@ -18,11 +18,10 @@ import type {
   Floor,
   Hallway,
   HallwayId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
-  RoomShape,
+  RoomShapeContent,
   RoomUpgradePath,
   UpgradePathId,
 } from '@interfaces';
@@ -58,16 +57,14 @@ export const altarRoomHas = computed<boolean>(() => {
  * if the center is already occupied.
  */
 export function altarRoomAutoPlace(floor: Floor): Floor {
-  const roomDefs = contentGetEntriesByType<RoomContent>(
-    'room',
-  );
+  const roomDefs = contentGetEntriesByType<RoomContent>('room');
   const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
 
   let floorCurrent = floor;
   const placedRoomIds: string[] = [];
 
   for (const roomDef of autoPlaceRooms) {
-    const shape = contentGetEntry<RoomShape & IsContentItem>(roomDef.shapeId);
+    const shape = contentGetEntry<RoomShapeContent>(roomDef.shapeId);
     if (!shape) continue;
 
     const centerX = Math.floor((GRID_SIZE - shape.width) / 2);
@@ -259,9 +256,7 @@ export function altarRoomGetFearReductionAura(floors: Floor[]): number {
   const altar = altarRoomFind(floors);
   if (!altar) return 0;
 
-  const roomDef = contentGetEntry<RoomContent>(
-    altar.room.roomTypeId,
-  );
+  const roomDef = contentGetEntry<RoomContent>(altar.room.roomTypeId);
   if (!roomDef) return 0;
 
   // Check if upgrade overrides the fear reduction aura
@@ -285,10 +280,8 @@ export function altarRoomIsAdjacent(floor: Floor, room: PlacedRoom): boolean {
   const altarPlaced = floor.rooms.find((r) => r.roomTypeId === altarId);
   if (!altarPlaced) return false;
 
-  const roomShape = contentGetEntry<RoomShape & IsContentItem>(room.shapeId);
-  const altarShape = contentGetEntry<RoomShape & IsContentItem>(
-    altarPlaced.shapeId,
-  );
+  const roomShape = contentGetEntry<RoomShapeContent>(room.shapeId);
+  const altarShape = contentGetEntry<RoomShapeContent>(altarPlaced.shapeId);
   if (!roomShape || !altarShape) return false;
 
   const roomTiles = roomShapeGetAbsoluteTiles(

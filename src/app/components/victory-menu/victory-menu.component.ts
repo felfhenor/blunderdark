@@ -15,7 +15,6 @@ import {
   victoryProgressMap,
 } from '@helpers/victory';
 import type {
-  IsContentItem,
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces';
@@ -75,7 +74,7 @@ export class VictoryMenuComponent {
 
   public paths = computed<PathViewModel[]>(() => {
     const allPaths =
-      contentGetEntriesByType<VictoryPathContent & IsContentItem>(
+      contentGetEntriesByType<VictoryPathContent>(
         'victorypath',
       );
     const progressMap = victoryProgressMap();

@@ -6,7 +6,6 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
-  IsContentItem,
   ResourceMap,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -117,8 +116,8 @@ vi.mock('@helpers/rng', () => ({
 // --- Test Data Helpers ---
 
 function makeRecipe(
-  overrides: Partial<FusionRecipeContent & IsContentItem> = {},
-): FusionRecipeContent & IsContentItem {
+  overrides: Partial<FusionRecipeContent> = {},
+): FusionRecipeContent {
   return {
     id: RECIPE_HOBGOBLIN_ID,
     name: 'Hobgoblin Fusion',

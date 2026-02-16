@@ -1,13 +1,15 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
-import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
 import type {
   Floor,
   InhabitantInstance,
-  IsContentItem,
   PlacedRoom,
   ResearchBranch,
-  ResearchNode,
+  ResearchNodeContent,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
@@ -29,10 +31,16 @@ export function lichHasAncientKnowledgeTrait(def: InhabitantContent): boolean {
  * Find assigned Lich-type inhabitants on a floor that have the Undead Master trait.
  * Returns pairs of instance + definition for each qualifying inhabitant.
  */
-function lichFindUndeadMasters(
-  floor: Floor,
-): { instance: InhabitantInstance; def: InhabitantContent; room: PlacedRoom }[] {
-  const results: { instance: InhabitantInstance; def: InhabitantContent; room: PlacedRoom }[] = [];
+function lichFindUndeadMasters(floor: Floor): {
+  instance: InhabitantInstance;
+  def: InhabitantContent;
+  room: PlacedRoom;
+}[] {
+  const results: {
+    instance: InhabitantInstance;
+    def: InhabitantContent;
+    room: PlacedRoom;
+  }[] = [];
 
   for (const instance of floor.inhabitants) {
     if (!instance.assignedRoomId) continue;
@@ -62,7 +70,10 @@ function lichFindUndeadMasters(
 export function lichCalculateUndeadMasterBonuses(
   floor: Floor,
 ): Map<string, { attackBonus: number; defenseBonus: number }> {
-  const bonusMap = new Map<string, { attackBonus: number; defenseBonus: number }>();
+  const bonusMap = new Map<
+    string,
+    { attackBonus: number; defenseBonus: number }
+  >();
 
   const masters = lichFindUndeadMasters(floor);
   if (masters.length === 0) return bonusMap;
@@ -71,14 +82,17 @@ export function lichCalculateUndeadMasterBonuses(
   const roomTiles = new Map<string, { x: number; y: number }[]>();
   for (const room of floor.rooms) {
     const shape = roomShapeResolve(room);
-    roomTiles.set(room.id, roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY));
+    roomTiles.set(
+      room.id,
+      roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
+    );
   }
 
   for (const master of masters) {
     const masterTiles = roomTiles.get(master.room.id) ?? [];
-    const auraValue = master.def.traits.find(
-      (t) => t.effectType === 'undead_master',
-    )?.effectValue ?? 0;
+    const auraValue =
+      master.def.traits.find((t) => t.effectType === 'undead_master')
+        ?.effectValue ?? 0;
 
     if (auraValue <= 0) continue;
 
@@ -148,15 +162,15 @@ export function lichGetAncientKnowledgeRevealCount(
 export function lichGetRevealedResearchNodes(
   inhabitants: InhabitantInstance[],
   completedNodeIds: string[],
-): ResearchNode[] {
+): ResearchNodeContent[] {
   const revealCount = lichGetAncientKnowledgeRevealCount(inhabitants);
   if (revealCount <= 0) return [];
 
-  const allNodes = contentGetEntriesByType<ResearchNode & IsContentItem>('research');
+  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
   const completedSet = new Set(completedNodeIds);
 
   // Group unrevealed nodes by branch
-  const branchNodes = new Map<ResearchBranch, (ResearchNode & IsContentItem)[]>();
+  const branchNodes = new Map<ResearchBranch, ResearchNodeContent[]>();
   for (const node of allNodes) {
     if (completedSet.has(node.id)) continue;
 
@@ -168,7 +182,7 @@ export function lichGetRevealedResearchNodes(
   }
 
   // Pick one lowest-tier node per branch
-  const revealed: ResearchNode[] = [];
+  const revealed: ResearchNodeContent[] = [];
   for (const [, nodes] of branchNodes) {
     if (nodes.length === 0) continue;
 

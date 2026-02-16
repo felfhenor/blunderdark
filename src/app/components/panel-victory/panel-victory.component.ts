@@ -19,7 +19,6 @@ import {
   victoryIsAchieved,
 } from '@helpers/victory';
 import type {
-  IsContentItem,
   VictoryPathContent,
 } from '@interfaces';
 
@@ -112,14 +111,14 @@ export class PanelVictoryComponent {
   public achievedPath = computed(() => {
     const pathId = victoryAchievedPathId();
     if (!pathId) return undefined;
-    return contentGetEntry<VictoryPathContent & IsContentItem>(pathId);
+    return contentGetEntry<VictoryPathContent>(pathId);
   });
 
   public conditionDetails = computed(() => {
     const pathId = victoryAchievedPathId();
     if (!pathId) return [];
 
-    const path = contentGetEntry<VictoryPathContent & IsContentItem>(pathId);
+    const path = contentGetEntry<VictoryPathContent>(pathId);
     const progress = victoryGetProgress(pathId);
     if (!path || !progress) return [];
 

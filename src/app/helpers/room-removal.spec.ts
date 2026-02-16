@@ -1,8 +1,21 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
-import { roomPlacementPlaceOnFloor, roomPlacementRemoveFromFloor } from '@helpers/room-placement';
+import {
+  roomPlacementPlaceOnFloor,
+  roomPlacementRemoveFromFloor,
+} from '@helpers/room-placement';
 import { roomRemovalCalculateRefund } from '@helpers/room-removal';
-import type { Floor, FloorId, HallwayId, InhabitantInstance, PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import type {
+  Floor,
+  FloorId,
+  HallwayId,
+  InhabitantInstance,
+  PlacedRoom,
+  PlacedRoomId,
+  RoomId,
+  RoomShapeContent,
+  RoomShapeId,
+} from '@interfaces';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Mock contentGetEntry to control removable/cost for roomPlacementIsRemovable ---
 const mockContent = new Map<string, unknown>();
@@ -13,15 +26,17 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/room-upgrades', () => ({
-  roomUpgradeGetEffectiveMaxInhabitants: (_room: PlacedRoom, def: { maxInhabitants: number }) =>
-    def.maxInhabitants,
+  roomUpgradeGetEffectiveMaxInhabitants: (
+    _room: PlacedRoom,
+    def: { maxInhabitants: number },
+  ) => def.maxInhabitants,
   roomUpgradeGetAppliedEffects: () => [],
   roomUpgradeGetPaths: () => [],
 }));
 
 // --- Test shapes ---
 
-const square2x2: RoomShape = {
+const square2x2: RoomShapeContent = {
   id: 'square-2x2' as RoomShapeId,
   name: 'Square 2x2',
   tiles: [
@@ -34,7 +49,7 @@ const square2x2: RoomShape = {
   height: 2,
 };
 
-const square3x3: RoomShape = {
+const square3x3: RoomShapeContent = {
   id: 'square-3x3' as RoomShapeId,
   name: 'Square 3x3',
   tiles: [
@@ -153,23 +168,33 @@ beforeEach(() => {
 
 describe('US-001: Altar Cannot Be Removed', () => {
   it('should flag altar as non-removable via roomPlacementIsRemovable', async () => {
-    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    const { roomPlacementIsRemovable } = await import(
+      '@helpers/room-placement'
+    );
     expect(roomPlacementIsRemovable(ALTAR_ROOM_TYPE_ID as RoomId)).toBe(false);
   });
 
   it('should allow removal of regular rooms via roomPlacementIsRemovable', async () => {
-    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    const { roomPlacementIsRemovable } = await import(
+      '@helpers/room-placement'
+    );
     expect(roomPlacementIsRemovable(CRYSTAL_MINE_TYPE_ID as RoomId)).toBe(true);
   });
 
   it('should allow removal of unique non-altar rooms', async () => {
-    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
+    const { roomPlacementIsRemovable } = await import(
+      '@helpers/room-placement'
+    );
     expect(roomPlacementIsRemovable(THRONE_ROOM_TYPE_ID as RoomId)).toBe(true);
   });
 
   it('should return true for unknown room types (safe default)', async () => {
-    const { roomPlacementIsRemovable } = await import('@helpers/room-placement');
-    expect(roomPlacementIsRemovable('nonexistent-room-type' as RoomId)).toBe(true);
+    const { roomPlacementIsRemovable } = await import(
+      '@helpers/room-placement'
+    );
+    expect(roomPlacementIsRemovable('nonexistent-room-type' as RoomId)).toBe(
+      true,
+    );
   });
 });
 
@@ -207,7 +232,11 @@ describe('US-002: Resource Refund on Removal', () => {
   });
 
   it('should handle large costs correctly', () => {
-    const refund = roomRemovalCalculateRefund({ gold: 1000, crystals: 500, essence: 250 });
+    const refund = roomRemovalCalculateRefund({
+      gold: 1000,
+      crystals: 500,
+      essence: 250,
+    });
     expect(refund).toEqual({ gold: 500, crystals: 250, essence: 125 });
   });
 });
@@ -227,7 +256,11 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
     expect(placed).toBeDefined();
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      placed,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
 
@@ -261,7 +294,11 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     let placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
     placed = roomPlacementPlaceOnFloor(placed, room2, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      placed,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
@@ -326,7 +363,11 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
     };
     const floor = makeFloor([room], grid);
 
-    const result = roomPlacementRemoveFromFloor(floor, 'room-1' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      floor,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeDefined();
     // Hallway data should be preserved
     expect(result!.grid[5][5].hallwayId).toBe('hallway-1');
@@ -336,7 +377,11 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
 
   it('should return undefined when trying to remove non-existent room', () => {
     const floor = makeFloor();
-    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      floor,
+      'nonexistent' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeUndefined();
   });
 
@@ -350,7 +395,11 @@ describe('US-003: Clear Grid Tiles on Removal', () => {
       anchorY: 5,
     };
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
-    const removed = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2)!;
+    const removed = roomPlacementRemoveFromFloor(
+      placed,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    )!;
 
     // Place a new room in the same spot
     const newRoom: PlacedRoom = {
@@ -385,7 +434,11 @@ describe('US-004: Inhabitant Displacement - roomRemovalGetInfo', () => {
   });
 
   it('should handle multi-resource costs', () => {
-    const refund = roomRemovalCalculateRefund({ gold: 80, crystals: 30, essence: 15 });
+    const refund = roomRemovalCalculateRefund({
+      gold: 80,
+      crystals: 30,
+      essence: 15,
+    });
     expect(refund).toEqual({ gold: 40, crystals: 15, essence: 7 });
   });
 });

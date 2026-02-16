@@ -5,6 +5,7 @@ export type RoomShapeId = Branded<string, 'RoomShapeId'>;
 
 export type RoomShapeContent = IsContentItem & {
   id: RoomShapeId;
+  name: string;
   tiles: TileOffset[];
   width: number;
   height: number;

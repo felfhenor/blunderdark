@@ -17,7 +17,7 @@ import type {
   PlacedRoom,
   PlacedRoomId,
   RoomId,
-  RoomShape,
+  RoomShapeContent,
   RoomShapeId,
   Rotation,
   TileOffset,
@@ -31,7 +31,7 @@ import type {
 } from '@interfaces/room-placement';
 
 export function roomPlacementValidateBounds(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   anchorX: number,
   anchorY: number,
   gridSize: number = GRID_SIZE,
@@ -49,7 +49,7 @@ export function roomPlacementValidateBounds(
 }
 
 export function roomPlacementValidateNoOverlap(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   anchorX: number,
   anchorY: number,
   grid: GridState,
@@ -76,7 +76,7 @@ export function roomPlacementValidateNoOverlap(
 }
 
 export function roomPlacementValidate(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   anchorX: number,
   anchorY: number,
   grid: GridState,
@@ -142,11 +142,11 @@ export const roomPlacementSelectedTypeId = signal<RoomId | undefined>(
 export const roomPlacementRotation = signal<Rotation>(0);
 
 /** The base (unrotated) shape for the current placement. */
-const placementBaseShape = signal<RoomShape | undefined>(undefined);
+const placementBaseShape = signal<RoomShapeContent | undefined>(undefined);
 
 export function roomPlacementEnterMode(
   roomTypeId: RoomId,
-  shape: RoomShape,
+  shape: RoomShapeContent,
 ): void {
   roomPlacementSelectedTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
@@ -172,7 +172,7 @@ export function roomPlacementRotate(): void {
   roomPlacementPreviewShape.set(roomShapeGetRotated(base, next));
 }
 
-export const roomPlacementPreviewShape = signal<RoomShape | undefined>(
+export const roomPlacementPreviewShape = signal<RoomShapeContent | undefined>(
   undefined,
 );
 export const roomPlacementPreviewPosition = signal<TileOffset | undefined>(
@@ -202,7 +202,7 @@ export const roomPlacementPreview = computed(() => {
 });
 
 export function roomPlacementSetPreview(
-  shape: RoomShape | undefined,
+  shape: RoomShapeContent | undefined,
   position?: TileOffset | undefined,
 ): void {
   roomPlacementPreviewShape.set(shape);
@@ -329,7 +329,7 @@ export async function roomPlacementExecute(
 export function roomPlacementPlaceOnFloor(
   floor: Floor,
   room: PlacedRoom,
-  shape: RoomShape,
+  shape: RoomShapeContent,
 ): Floor | undefined {
   const validation = roomPlacementValidate(
     shape,
@@ -365,7 +365,7 @@ export function roomPlacementPlaceOnFloor(
 export function roomPlacementRemoveFromFloor(
   floor: Floor,
   roomId: PlacedRoomId,
-  shape: RoomShape,
+  shape: RoomShapeContent,
 ): Floor | undefined {
   const room = floor.rooms.find((r) => r.id === roomId);
   if (!room) return undefined;

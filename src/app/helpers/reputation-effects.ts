@@ -3,7 +3,6 @@ import { contentGetEntriesByType } from '@helpers/content';
 import { reputationGetLevel } from '@helpers/reputation';
 import { gamestate } from '@helpers/state-game';
 import type {
-  IsContentItem,
   ReputationEffectContent,
   ReputationEffectType,
   ReputationLevel,
@@ -33,11 +32,11 @@ function levelMeetsMinimum(
  */
 export function reputationEffectGetActive(
   reputation: Record<ReputationType, number>,
-  allEffects?: (ReputationEffectContent & IsContentItem)[],
-): (ReputationEffectContent & IsContentItem)[] {
+  allEffects?: (ReputationEffectContent)[],
+): (ReputationEffectContent)[] {
   const effects =
     allEffects ??
-    contentGetEntriesByType<ReputationEffectContent & IsContentItem>(
+    contentGetEntriesByType<ReputationEffectContent>(
       'reputationeffect',
     );
 
@@ -55,7 +54,7 @@ export function reputationEffectGetActive(
 export function reputationEffectHas(
   effectName: string,
   reputation: Record<ReputationType, number>,
-  allEffects?: (ReputationEffectContent & IsContentItem)[],
+  allEffects?: (ReputationEffectContent)[],
 ): boolean {
   const active = reputationEffectGetActive(reputation, allEffects);
   return active.some((e) => e.name === effectName);
@@ -67,8 +66,8 @@ export function reputationEffectHas(
 export function reputationEffectGetByType(
   effectType: ReputationEffectType,
   reputation: Record<ReputationType, number>,
-  allEffects?: (ReputationEffectContent & IsContentItem)[],
-): (ReputationEffectContent & IsContentItem)[] {
+  allEffects?: (ReputationEffectContent)[],
+): (ReputationEffectContent)[] {
   return reputationEffectGetActive(reputation, allEffects).filter(
     (e) => e.effectType === effectType,
   );
@@ -82,7 +81,7 @@ export function reputationEffectGetByType(
  */
 export function reputationEffectGetInvasionRateMultiplier(
   reputation: Record<ReputationType, number>,
-  allEffects?: (ReputationEffectContent & IsContentItem)[],
+  allEffects?: (ReputationEffectContent)[],
 ): number {
   const invasionEffects = reputationEffectGetByType(
     'modify_invasion_rate',
@@ -118,7 +117,7 @@ export function reputationEffectGetInvasionRateMultiplier(
 export function reputationEffectGetProductionMultiplier(
   resourceType: string,
   reputation: Record<ReputationType, number>,
-  allEffects?: (ReputationEffectContent & IsContentItem)[],
+  allEffects?: (ReputationEffectContent)[],
 ): number {
   const productionEffects = reputationEffectGetByType(
     'modify_production',

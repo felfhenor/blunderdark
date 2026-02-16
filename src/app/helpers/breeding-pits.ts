@@ -13,7 +13,6 @@ import type {
   GameState,
   InhabitantInstance,
   InhabitantStats,
-  IsContentItem,
   PlacedRoom,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -53,10 +52,9 @@ export const mutationCompleted$ = mutationCompletedSubject.asObservable();
 export function breedingFindRecipe(
   parentADefId: string,
   parentBDefId: string,
-): (BreedingRecipeContent & IsContentItem) | undefined {
+): (BreedingRecipeContent) | undefined {
   const recipes = contentGetEntriesByType<
-    BreedingRecipeContent & IsContentItem
-  >('breedingrecipe');
+    BreedingRecipeContent  >('breedingrecipe');
   return recipes.find(
     (r) =>
       (r.parentInhabitantAId === parentADefId &&
@@ -75,12 +73,12 @@ export function breedingGetAvailableRecipes(
 ): Array<{
   parentA: InhabitantInstance;
   parentB: InhabitantInstance;
-  recipe: BreedingRecipeContent & IsContentItem;
+  recipe: BreedingRecipeContent;
 }> {
   const results: Array<{
     parentA: InhabitantInstance;
     parentB: InhabitantInstance;
-    recipe: BreedingRecipeContent & IsContentItem;
+    recipe: BreedingRecipeContent;
   }> = [];
 
   for (let i = 0; i < assignedInhabitants.length; i++) {
@@ -379,7 +377,7 @@ export function breedingPitsProcess(state: GameState): void {
         room.breedingJob.ticksRemaining -= 1;
 
         if (room.breedingJob.ticksRemaining <= 0) {
-          const recipe = contentGetEntry<BreedingRecipeContent & IsContentItem>(
+          const recipe = contentGetEntry<BreedingRecipeContent>(
             room.breedingJob.recipeId,
           );
           const parentA = state.world.inhabitants.find(

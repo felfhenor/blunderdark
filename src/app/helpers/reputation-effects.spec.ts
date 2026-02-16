@@ -6,7 +6,6 @@ import {
   reputationEffectHas,
 } from '@helpers/reputation-effects';
 import type {
-  IsContentItem,
   ReputationEffectContent,
   ReputationState,
 } from '@interfaces';
@@ -24,7 +23,7 @@ function freshState(): ReputationState {
 
 function makeEffect(
   overrides: Partial<ReputationEffectContent>,
-): ReputationEffectContent & IsContentItem {
+): ReputationEffectContent {
   return {
     id: 'test-effect-id',
     name: 'Test Effect',
@@ -36,7 +35,7 @@ function makeEffect(
     effectValue: 1.0,
     targetId: undefined,
     ...overrides,
-  } as ReputationEffectContent & IsContentItem;
+  } as ReputationEffectContent;
 }
 
 const terrorInvasionEffect = makeEffect({

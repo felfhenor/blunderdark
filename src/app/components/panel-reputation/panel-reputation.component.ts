@@ -7,7 +7,6 @@ import {
   reputationGetLevelLabel,
 } from '@helpers';
 import type {
-  IsContentItem,
   ReputationEffectContent,
   ReputationLevel,
   ReputationType,
@@ -79,7 +78,7 @@ export class PanelReputationComponent {
   public hasActiveEffects = computed(() => this.activeEffects().length > 0);
 
   public getEffectIcon(
-    effect: ReputationEffectContent & IsContentItem,
+    effect: ReputationEffectContent,
   ): string {
     const icons: Record<ReputationType, string> = {
       terror: '💀',
@@ -92,7 +91,7 @@ export class PanelReputationComponent {
   }
 
   public getEffectBadgeClass(
-    effect: ReputationEffectContent & IsContentItem,
+    effect: ReputationEffectContent,
   ): string {
     const classes: Record<ReputationType, string> = {
       terror: 'badge-error',

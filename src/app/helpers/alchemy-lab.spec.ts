@@ -8,7 +8,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -90,9 +89,9 @@ vi.mock('@helpers/adjacency', () => ({
 
 // --- Recipes ---
 
-function makeFluxRecipe(): AlchemyRecipeContent & IsContentItem {
+function makeFluxRecipe(): AlchemyRecipeContent {
   return {
-    id: FLUX_RECIPE_ID as AlchemyRecipeContent['id'],
+    id: FLUX_RECIPE_ID as AlchemyRecipeId,
     name: 'Flux Conversion',
     __type: 'alchemyrecipe',
     description: 'Convert crystals and food to flux.',
@@ -104,9 +103,9 @@ function makeFluxRecipe(): AlchemyRecipeContent & IsContentItem {
   };
 }
 
-function makeEssenceRecipe(): AlchemyRecipeContent & IsContentItem {
+function makeEssenceRecipe(): AlchemyRecipeContent {
   return {
-    id: ESSENCE_RECIPE_ID as AlchemyRecipeContent['id'],
+    id: ESSENCE_RECIPE_ID as AlchemyRecipeId,
     name: 'Essence Synthesis',
     __type: 'alchemyrecipe',
     description: 'Convert gold and crystals to essence.',
@@ -118,9 +117,9 @@ function makeEssenceRecipe(): AlchemyRecipeContent & IsContentItem {
   };
 }
 
-function makeDarkTransmuteRecipe(): AlchemyRecipeContent & IsContentItem {
+function makeDarkTransmuteRecipe(): AlchemyRecipeContent {
   return {
-    id: DARK_TRANSMUTE_ID as AlchemyRecipeContent['id'],
+    id: DARK_TRANSMUTE_ID as AlchemyRecipeId,
     name: 'Dark Transmutation',
     __type: 'alchemyrecipe',
     description: 'Convert food and corruption to flux.',

@@ -1,26 +1,23 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import type {
   GRID_SIZE,
-  IsContentItem,
   PlacedRoom,
+  RoomShapeContent,
   RoomShapeId,
   Rotation,
-  RoomShape,
   TileOffset,
 } from '@interfaces';
 
-export function roomShapeAll(): (RoomShape & IsContentItem)[] {
-  return contentGetEntriesByType<RoomShape & IsContentItem>('roomshape');
+export function roomShapeAll(): RoomShapeContent[] {
+  return contentGetEntriesByType<RoomShapeContent>('roomshape');
 }
 
-export function roomShapeGet(
-  idOrName: string,
-): (RoomShape & IsContentItem) | undefined {
-  return contentGetEntry<RoomShape & IsContentItem>(idOrName);
+export function roomShapeGet(idOrName: string): RoomShapeContent | undefined {
+  return contentGetEntry<RoomShapeContent>(idOrName);
 }
 
 export function roomShapeGetAbsoluteTiles(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   anchorX: number,
   anchorY: number,
 ): TileOffset[] {
@@ -30,7 +27,7 @@ export function roomShapeGetAbsoluteTiles(
   }));
 }
 
-export function roomShapeGetBounds(shape: RoomShape): {
+export function roomShapeGetBounds(shape: RoomShapeContent): {
   width: number;
   height: number;
 } {
@@ -50,7 +47,7 @@ export function roomShapeGetBounds(shape: RoomShape): {
 }
 
 export function roomShapeFitsInGrid(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   anchorX: number,
   anchorY: number,
   gridSize: typeof GRID_SIZE | number,
@@ -99,12 +96,17 @@ export function roomShapeRotateTiles(
  * If rotation is 0, returns the original shape unchanged.
  */
 export function roomShapeGetRotated(
-  shape: RoomShape,
+  shape: RoomShapeContent,
   rotation: Rotation,
-): RoomShape {
+): RoomShapeContent {
   if (rotation === 0) return shape;
 
-  const rotated = roomShapeRotateTiles(shape.tiles, shape.width, shape.height, rotation);
+  const rotated = roomShapeRotateTiles(
+    shape.tiles,
+    shape.width,
+    shape.height,
+    rotation,
+  );
 
   return {
     ...shape,
@@ -114,15 +116,16 @@ export function roomShapeGetRotated(
   };
 }
 
-const FALLBACK_SHAPE: RoomShape = {
+const FALLBACK_SHAPE: RoomShapeContent = {
   id: 'fallback' as RoomShapeId,
+  __type: 'roomshape',
   name: 'Fallback',
   tiles: [{ x: 0, y: 0 }],
   width: 1,
   height: 1,
 };
 
-export function roomShapeResolve(placedRoom: PlacedRoom): RoomShape {
+export function roomShapeResolve(placedRoom: PlacedRoom): RoomShapeContent {
   const base = roomShapeGet(placedRoom.shapeId) ?? FALLBACK_SHAPE;
   return roomShapeGetRotated(base, placedRoom.rotation ?? 0);
 }

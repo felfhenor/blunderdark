@@ -5,7 +5,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -112,7 +111,7 @@ const skeletonDef: InhabitantContent = {
   corruptionGeneration: 1,
 };
 
-const spawningPoolDef: RoomContent & IsContentItem = {
+const spawningPoolDef: RoomContent = {
   id: SPAWNING_POOL_ID as RoomId,
   name: 'Spawning Pool',
   __type: 'room',

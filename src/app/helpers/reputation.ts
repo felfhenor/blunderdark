@@ -1,17 +1,17 @@
 import { contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
-  IsContentItem,
-  ReputationAction,
+  ReputationActionContent,
   ReputationLevel,
   ReputationState,
-  ReputationType,
+  ReputationType
 } from '@interfaces';
+import type {
+  ReputationAwardEvent,
+  ReputationLevelUpEvent,
+} from '@interfaces/reputation';
 import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
-import type { ReputationAwardEvent, ReputationLevelUpEvent } from '@interfaces/reputation';
 import { Subject } from 'rxjs';
-
-
 
 const reputationAward = new Subject<ReputationAwardEvent>();
 export const reputationAward$ = reputationAward.asObservable();
@@ -77,7 +77,9 @@ export function reputationGetLevelLabel(level: ReputationLevel): string {
 export async function reputationAwardForAction(
   actionId: string,
 ): Promise<boolean> {
-  const action = contentGetEntry<ReputationAction & IsContentItem>(actionId);
+  const action = contentGetEntry<ReputationActionContent>(
+    actionId,
+  );
   if (!action) {
     return false;
   }
@@ -148,6 +150,8 @@ export async function reputationAwardForAction(
  */
 export function reputationGetAction(
   actionIdOrName: string,
-): (ReputationAction & IsContentItem) | undefined {
-  return contentGetEntry<ReputationAction & IsContentItem>(actionIdOrName);
+): (ReputationActionContent) | undefined {
+  return contentGetEntry<ReputationActionContent>(
+    actionIdOrName,
+  );
 }

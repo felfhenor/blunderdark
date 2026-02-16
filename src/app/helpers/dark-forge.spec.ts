@@ -9,7 +9,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -89,8 +88,8 @@ vi.mock('@helpers/adjacency', () => ({
 
 // --- Recipe definitions ---
 
-const ironSwordRecipe: ForgeRecipeContent & IsContentItem = {
-  id: IRON_SWORD_ID as ForgeRecipeContent['id'],
+const ironSwordRecipe: ForgeRecipeContent = {
+  id: IRON_SWORD_ID as ForgeRecipeId,
   name: 'Iron Sword',
   __type: 'forgerecipe',
   description: 'A sturdy iron blade.',
@@ -101,8 +100,8 @@ const ironSwordRecipe: ForgeRecipeContent & IsContentItem = {
   tier: 'basic',
 };
 
-const darkShieldRecipe: ForgeRecipeContent & IsContentItem = {
-  id: DARK_SHIELD_ID as ForgeRecipeContent['id'],
+const darkShieldRecipe: ForgeRecipeContent = {
+  id: DARK_SHIELD_ID as ForgeRecipeId,
   name: 'Dark Shield',
   __type: 'forgerecipe',
   description: 'A shadow shield.',
@@ -113,8 +112,8 @@ const darkShieldRecipe: ForgeRecipeContent & IsContentItem = {
   tier: 'basic',
 };
 
-const infernalBladeRecipe: ForgeRecipeContent & IsContentItem = {
-  id: INFERNAL_BLADE_ID as ForgeRecipeContent['id'],
+const infernalBladeRecipe: ForgeRecipeContent = {
+  id: INFERNAL_BLADE_ID as ForgeRecipeId,
   name: 'Infernal Blade',
   __type: 'forgerecipe',
   description: 'A fearsome weapon.',
@@ -127,7 +126,7 @@ const infernalBladeRecipe: ForgeRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const forgeDef: RoomContent & IsContentItem = {
+const forgeDef: RoomContent = {
   id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
@@ -148,7 +147,7 @@ const forgeDef: RoomContent & IsContentItem = {
   role: 'darkForge',
 };
 
-const crystalMineDef: RoomContent & IsContentItem = {
+const crystalMineDef: RoomContent = {
   id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
@@ -169,7 +168,7 @@ const crystalMineDef: RoomContent & IsContentItem = {
   forgingAdjacencyEffects: { forgingSpeedBonus: 0.30 },
 };
 
-const trainingGroundsDef: RoomContent & IsContentItem = {
+const trainingGroundsDef: RoomContent = {
   id: TRAINING_GROUNDS_ID as RoomId,
   name: 'Training Grounds',
   __type: 'room',

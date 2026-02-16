@@ -9,7 +9,6 @@ import type {
   AlchemyRecipeContent,
   AlchemyRecipeId,
   GameState,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
 } from '@interfaces';
@@ -34,8 +33,8 @@ export const alchemyLabCompleted$ = alchemyLabCompletedSubject.asObservable();
  */
 export function alchemyLabGetAvailableRecipes(
   room: PlacedRoom,
-): Array<AlchemyRecipeContent & IsContentItem> {
-  const recipes = contentGetEntriesByType<AlchemyRecipeContent & IsContentItem>('alchemyrecipe');
+): Array<AlchemyRecipeContent> {
+  const recipes = contentGetEntriesByType<AlchemyRecipeContent>('alchemyrecipe');
 
   const effects = roomUpgradeGetAppliedEffects(room);
   const hasAdvancedAlchemy = effects.some((e) => e.type === 'alchemyTierUnlock');
@@ -239,7 +238,7 @@ export function alchemyLabProcess(state: GameState): void {
       ).length;
       if (assignedCount < 1) continue;
 
-      const recipe = contentGetEntry<AlchemyRecipeContent & IsContentItem>(conversion.recipeId);
+      const recipe = contentGetEntry<AlchemyRecipeContent>(conversion.recipeId);
       if (!recipe) continue;
 
       // Step 1: Consume input resources at start of cycle

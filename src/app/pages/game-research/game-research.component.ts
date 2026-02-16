@@ -20,9 +20,8 @@ import {
 import { resourceCanAfford } from '@helpers/resources';
 import { gamestate } from '@helpers/state-game';
 import type {
-  IsContentItem,
   ResearchBranch,
-  ResearchNode,
+  ResearchNodeContent,
   ResourceCost,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -43,7 +42,7 @@ export class GameResearchComponent {
   public selectedNodeId = signal<string | undefined>(undefined);
 
   public allNodes = computed(() => {
-    return contentGetEntriesByType<ResearchNode & IsContentItem>('research');
+    return contentGetEntriesByType<ResearchNodeContent>('research');
   });
 
   public branchNodes = computed(() => {
@@ -56,7 +55,7 @@ export class GameResearchComponent {
   public activeResearchNode = computed(() => {
     const activeId = this.researchState().activeResearch;
     if (!activeId) return undefined;
-    return contentGetEntry<ResearchNode & IsContentItem>(activeId);
+    return contentGetEntry<ResearchNodeContent>(activeId);
   });
 
   public progressPercent = computed(() => {
@@ -73,7 +72,8 @@ export class GameResearchComponent {
     const remaining = active.requiredTicks - progress;
     if (remaining <= 0) return 'Complete';
     const speed = researchSpeedModifier();
-    const ticksRemaining = remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
+    const ticksRemaining =
+      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
     const gameMinutes = ticksRemaining / GAME_TIME_TICKS_PER_MINUTE;
     if (gameMinutes < 1) return '< 1 min';
     if (gameMinutes < 60) return `${Math.ceil(gameMinutes)} min`;
@@ -87,7 +87,10 @@ export class GameResearchComponent {
   public tierNodes = computed(() => {
     const nodes = this.branchNodes();
     const state = this.researchState();
-    const tiers = new Map<number, (ResearchNode & IsContentItem & { nodeState: NodeState })[]>();
+    const tiers = new Map<
+      number,
+      (ResearchNodeContent & { nodeState: NodeState })[]
+    >();
 
     for (const node of nodes) {
       const nodeState = this.getNodeState(node, state);
@@ -104,7 +107,7 @@ export class GameResearchComponent {
   public selectedNode = computed(() => {
     const id = this.selectedNodeId();
     if (!id) return undefined;
-    return contentGetEntry<ResearchNode & IsContentItem>(id);
+    return contentGetEntry<ResearchNodeContent>(id);
   });
 
   public selectedNodeState = computed((): NodeState | undefined => {
@@ -126,7 +129,7 @@ export class GameResearchComponent {
     return node.prerequisiteResearchIds
       .filter((id) => !completed.includes(id))
       .map((id) => {
-        const prereq = contentGetEntry<ResearchNode & IsContentItem>(id);
+        const prereq = contentGetEntry<ResearchNodeContent>(id);
         return prereq?.name ?? 'Unknown';
       });
   });
@@ -153,7 +156,7 @@ export class GameResearchComponent {
   });
 
   private getNodeState(
-    node: ResearchNode,
+    node: ResearchNodeContent,
     state: { completedNodes: string[]; activeResearch: string | undefined },
   ): NodeState {
     if (state.completedNodes.includes(node.id)) return 'completed';
@@ -197,8 +200,11 @@ export class GameResearchComponent {
   public getNodeProgressPercent(nodeId: string): number {
     const state = this.researchState();
     if (state.activeResearch !== nodeId) return 0;
-    const node = contentGetEntry<ResearchNode & IsContentItem>(nodeId);
+    const node = contentGetEntry<ResearchNodeContent>(nodeId);
     if (!node) return 0;
-    return Math.min(100, (state.activeResearchProgress / node.requiredTicks) * 100);
+    return Math.min(
+      100,
+      (state.activeResearchProgress / node.requiredTicks) * 100,
+    );
   }
 }

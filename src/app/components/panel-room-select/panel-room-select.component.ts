@@ -1,32 +1,32 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
-  resourceCanAfford,
-  hallwayPlacementCanAfford,
+  altarRoomHas,
   biomeRestrictionCanBuild,
-  hallwayPlacementConfirm,
-  floorCurrent,
-  hallwayPlacementEnter,
-  roomPlacementEnterMode,
-  hallwayPlacementExit,
-  roomPlacementExitMode,
-  contentGetEntriesByType,
   biomeRestrictionGetRoomInfo,
-  roomShapeGet,
-  roomShapeGetRotated,
+  contentGetEntriesByType,
+  floorCurrent,
+  hallwayPlacementCanAfford,
+  hallwayPlacementConfirm,
+  hallwayPlacementEnter,
+  hallwayPlacementExit,
+  hallwayPlacementIsBuildMode,
   hallwayPlacementPreviewCost,
   hallwayPlacementPreviewPath,
   hallwayPlacementStatusMessage,
-  altarRoomHas,
-  hallwayPlacementIsBuildMode,
-  roomPlacementPlacedTypeIds,
-  roomPlacementRotation,
-  roomPlacementRotate,
-  roomPlacementSelectedTypeId,
+  researchUnlockGetRequiredResearchName,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
-  researchUnlockGetRequiredResearchName,
+  resourceCanAfford,
+  roomPlacementEnterMode,
+  roomPlacementExitMode,
+  roomPlacementPlacedTypeIds,
+  roomPlacementRotate,
+  roomPlacementRotation,
+  roomPlacementSelectedTypeId,
+  roomShapeGet,
+  roomShapeGetRotated,
 } from '@helpers';
-import type { IsContentItem, RoomId, RoomShape } from '@interfaces';
+import type { RoomId, RoomShapeContent } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -39,9 +39,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    contentGetEntriesByType<RoomContent>('room').filter(
-      (r) => !r.autoPlace,
-    ),
+    contentGetEntriesByType<RoomContent>('room').filter((r) => !r.autoPlace),
   );
 
   public hasAltar = altarRoomHas;
@@ -82,21 +80,33 @@ export class PanelRoomSelectComponent {
   public isBiomeRestricted(room: RoomContent): boolean {
     const floor = floorCurrent();
     if (!floor) return false;
-    const result = biomeRestrictionCanBuild(room.id as RoomId, floor.biome, floor);
+    const result = biomeRestrictionCanBuild(
+      room.id as RoomId,
+      floor.biome,
+      floor,
+    );
     return !result.allowed;
   }
 
   public getBiomeRestrictionTooltip(room: RoomContent): string {
     const floor = floorCurrent();
     if (!floor) return '';
-    const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(
+      room.id as RoomId,
+      floor.biome,
+      floor,
+    );
     return info.reason ?? '';
   }
 
   public getBiomeLimitLabel(room: RoomContent): string | undefined {
     const floor = floorCurrent();
     if (!floor) return undefined;
-    const info = biomeRestrictionGetRoomInfo(room.id as RoomId, floor.biome, floor);
+    const info = biomeRestrictionGetRoomInfo(
+      room.id as RoomId,
+      floor.biome,
+      floor,
+    );
     if (info.maxCount !== undefined && info.currentCount !== undefined) {
       return `${info.currentCount}/${info.maxCount}`;
     }
@@ -105,19 +115,17 @@ export class PanelRoomSelectComponent {
 
   public getRoomShapeForPreview(
     room: RoomContent,
-  ): (RoomShape & IsContentItem) | undefined {
+  ): RoomShapeContent | undefined {
     return roomShapeGet(room.shapeId);
   }
 
-  public getCostEntries(
-    room: RoomContent,
-  ): { type: string; amount: number }[] {
+  public getCostEntries(room: RoomContent): { type: string; amount: number }[] {
     return Object.entries(room.cost)
       .filter(([, amount]) => amount && amount > 0)
       .map(([type, amount]) => ({ type, amount: amount as number }));
   }
 
-  private getEffectiveShape(room: RoomContent): RoomShape | undefined {
+  private getEffectiveShape(room: RoomContent): RoomShapeContent | undefined {
     const base = roomShapeGet(room.shapeId);
     if (!base) return undefined;
     if (this.isSelected(room.id)) {

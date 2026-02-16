@@ -24,7 +24,6 @@ import type {
   ForgeRecipeContent,
   ForgeRecipeId,
   InhabitantStats,
-  IsContentItem,
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -107,7 +106,7 @@ export class PanelDarkForgeComponent {
     if (!queue || queue.jobs.length === 0) return undefined;
 
     const jobs = queue.jobs.map((job, index) => {
-      const recipe = contentGetEntry<ForgeRecipeContent & IsContentItem>(job.recipeId);
+      const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
       const percent = Math.min(100, Math.round((job.progress / job.targetTicks) * 100));
       return {
         index,
@@ -123,7 +122,7 @@ export class PanelDarkForgeComponent {
   public forgeInventory = computed(() => {
     const state = gamestate();
     return state.world.forgeInventory.map((entry) => {
-      const recipe = contentGetEntry<ForgeRecipeContent & IsContentItem>(entry.recipeId);
+      const recipe = contentGetEntry<ForgeRecipeContent>(entry.recipeId);
       return {
         recipeId: entry.recipeId,
         name: recipe?.name ?? 'Unknown',

@@ -1,6 +1,5 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
-import type { IsContentItem } from '@interfaces';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
 import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
 import type { InvaderContent } from '@interfaces/content-invader';
@@ -35,7 +34,7 @@ export function invaderCreateInstance(
     maxHp: definition.baseStats.hp,
     statusEffects: [],
     abilityStates: definition.combatAbilityIds.map((abilityName) => {
-      const ability = contentGetEntry<CombatAbilityContent & IsContentItem>(
+      const ability = contentGetEntry<CombatAbilityContent>(
         abilityName,
       );
       return {
@@ -66,7 +65,7 @@ export function invaderResolveAbility(
   if (!state || state.currentCooldown > 0) return undefined;
 
   // Look up effect definition by ability's effectType (name-based lookup)
-  const effect = contentGetEntry<AbilityEffectContent & IsContentItem>(
+  const effect = contentGetEntry<AbilityEffectContent>(
     ability.effectType,
   );
   if (!effect) return undefined;

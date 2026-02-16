@@ -13,7 +13,6 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
-  IsContentItem,
   PlacedRoom,
   SummonRecipeContent,
 } from '@interfaces';
@@ -44,8 +43,8 @@ export const summoningExpired$ = summoningExpiredSubject.asObservable();
  */
 export function summoningGetAvailableRecipes(
   room: PlacedRoom,
-): Array<SummonRecipeContent & IsContentItem> {
-  const recipes = contentGetEntriesByType<SummonRecipeContent & IsContentItem>(
+): Array<SummonRecipeContent> {
+  const recipes = contentGetEntriesByType<SummonRecipeContent>(
     'summonrecipe',
   );
 
@@ -252,7 +251,7 @@ export function summoningCircleProcess(state: GameState): void {
         room.summonJob.ticksRemaining -= 1;
 
         if (room.summonJob.ticksRemaining <= 0) {
-          const recipe = contentGetEntry<SummonRecipeContent & IsContentItem>(
+          const recipe = contentGetEntry<SummonRecipeContent>(
             room.summonJob.recipeId,
           );
 

@@ -1,7 +1,6 @@
 import type {
   Floor,
   FloorId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -74,7 +73,7 @@ vi.mock('@helpers/room-roles', () => ({
   roomRoleResetCache: vi.fn(),
 }));
 
-const altarRoomDef: RoomContent & IsContentItem = {
+const altarRoomDef: RoomContent = {
   id: ALTAR_ROOM_ID as RoomId,
   name: 'Altar Room',
   __type: 'room',
@@ -94,7 +93,7 @@ const altarRoomDef: RoomContent & IsContentItem = {
   autoPlace: true,
 };
 
-const crystalMineRoom: RoomContent & IsContentItem = {
+const crystalMineRoom: RoomContent = {
   id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',

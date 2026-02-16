@@ -5,7 +5,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -111,7 +110,7 @@ const arrowTrapDef: TrapContent = {
 
 // --- Room definitions ---
 
-const workshopDef: RoomContent & IsContentItem = {
+const workshopDef: RoomContent = {
   id: TRAP_WORKSHOP_ID as RoomId,
   name: 'Trap Workshop',
   __type: 'room',

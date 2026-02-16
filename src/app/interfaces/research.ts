@@ -1,7 +1,7 @@
 import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { RoomId } from '@interfaces/content-room';
-import type { Branded } from '@interfaces/identifiable';
+import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
 import type { UpgradePathId } from '@interfaces/room';
 
@@ -48,7 +48,7 @@ export type UnlockEffect =
   | UpgradeUnlock
   | PassiveBonusUnlock;
 
-export type ResearchNode = {
+export type ResearchNodeContent = IsContentItem & {
   id: Branded<string, 'ResearchId'>;
   name: string;
   description: string;

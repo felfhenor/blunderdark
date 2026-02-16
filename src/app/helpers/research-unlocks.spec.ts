@@ -2,7 +2,7 @@ import type {
   CombatAbilityId,
   GameState,
   IsContentItem,
-  ResearchNode,
+  ResearchNodeContent,
   UnlockEffect,
   UnlockedContent,
   UpgradePathId,
@@ -68,8 +68,8 @@ function makeUnlockedContent(
 }
 
 function makeResearchNode(
-  overrides: Partial<ResearchNode & IsContentItem> = {},
-): ResearchNode & IsContentItem {
+  overrides: Partial<ResearchNodeContent> = {},
+): ResearchNodeContent {
   return {
     id: NODE_ID,
     name: 'Test Research',
@@ -132,8 +132,19 @@ function makeGameState(
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
       seasonalEvent: {
         triggeredEventIds: [],
         activeEffects: [],
@@ -182,23 +193,43 @@ describe('researchUnlockIsUnlocked', () => {
   });
 
   it('should check ability unlock status', () => {
-    const content = makeUnlockedContent({ abilities: ['ability-1' as CombatAbilityId] });
-    expect(researchUnlockIsUnlocked('ability', 'ability-1' as CombatAbilityId, content)).toBe(
-      true,
-    );
-    expect(researchUnlockIsUnlocked('ability', 'ability-2' as CombatAbilityId, content)).toBe(
-      false,
-    );
+    const content = makeUnlockedContent({
+      abilities: ['ability-1' as CombatAbilityId],
+    });
+    expect(
+      researchUnlockIsUnlocked(
+        'ability',
+        'ability-1' as CombatAbilityId,
+        content,
+      ),
+    ).toBe(true);
+    expect(
+      researchUnlockIsUnlocked(
+        'ability',
+        'ability-2' as CombatAbilityId,
+        content,
+      ),
+    ).toBe(false);
   });
 
   it('should check upgrade unlock status', () => {
-    const content = makeUnlockedContent({ upgrades: ['upgrade-1' as UpgradePathId] });
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-1' as UpgradePathId, content)).toBe(
-      true,
-    );
-    expect(researchUnlockIsUnlocked('upgrade', 'upgrade-2' as UpgradePathId, content)).toBe(
-      false,
-    );
+    const content = makeUnlockedContent({
+      upgrades: ['upgrade-1' as UpgradePathId],
+    });
+    expect(
+      researchUnlockIsUnlocked(
+        'upgrade',
+        'upgrade-1' as UpgradePathId,
+        content,
+      ),
+    ).toBe(true);
+    expect(
+      researchUnlockIsUnlocked(
+        'upgrade',
+        'upgrade-2' as UpgradePathId,
+        content,
+      ),
+    ).toBe(false);
   });
 
   it('should read from gamestate when no content provided', () => {

@@ -1,5 +1,10 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  output,
+} from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import {
@@ -7,7 +12,7 @@ import {
   researchSpeedModifier,
 } from '@helpers/research-progress';
 import { gamestate } from '@helpers/state-game';
-import type { IsContentItem, ResearchNode } from '@interfaces';
+import type { ResearchNodeContent } from '@interfaces';
 
 @Component({
   selector: 'app-panel-research-summary',
@@ -30,7 +35,8 @@ import type { IsContentItem, ResearchNode } from '@interfaces';
             max="100"
           ></progress>
           <div class="text-xs opacity-70">
-            {{ progressPercent() | number:'1.0-0' }}% &middot; {{ timeRemaining() }}
+            {{ progressPercent() | number: '1.0-0' }}% &middot;
+            {{ timeRemaining() }}
           </div>
         } @else {
           <div class="text-xs opacity-50">No active research</div>
@@ -46,7 +52,7 @@ export class PanelResearchSummaryComponent {
   public activeNode = computed(() => {
     const activeId = gamestate().world.research.activeResearch;
     if (!activeId) return undefined;
-    return contentGetEntry<ResearchNode & IsContentItem>(activeId);
+    return contentGetEntry<ResearchNodeContent>(activeId);
   });
 
   public progressPercent = computed(() => {
@@ -63,7 +69,8 @@ export class PanelResearchSummaryComponent {
     const remaining = active.requiredTicks - progress;
     if (remaining <= 0) return 'Complete';
     const speed = researchSpeedModifier();
-    const ticksRemaining = remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
+    const ticksRemaining =
+      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
     const gameMinutes = ticksRemaining / GAME_TIME_TICKS_PER_MINUTE;
     if (gameMinutes < 1) return '< 1 min';
     if (gameMinutes < 60) return `${Math.ceil(gameMinutes)} min`;

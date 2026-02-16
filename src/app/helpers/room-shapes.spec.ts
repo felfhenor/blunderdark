@@ -1,17 +1,23 @@
-import type { PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
+import type {
+  PlacedRoom,
+  PlacedRoomId,
+  RoomId,
+  RoomShapeContent,
+  RoomShapeId,
+} from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import {
+  roomShapeFitsInGrid,
   roomShapeGetAbsoluteTiles,
-  roomShapeGetRotated,
   roomShapeGetBounds,
+  roomShapeGetRotated,
   roomShapeResolve,
   roomShapeRotateTile90,
   roomShapeRotateTiles,
-  roomShapeFitsInGrid,
 } from '@helpers/room-shapes';
 
-const square2x2: RoomShape = {
+const square2x2: RoomShapeContent = {
   id: 'test-2x2' as RoomShapeId,
   name: 'Square 2x2',
   width: 2,
@@ -24,7 +30,7 @@ const square2x2: RoomShape = {
   ],
 };
 
-const lShape: RoomShape = {
+const lShape: RoomShapeContent = {
   id: 'test-l' as RoomShapeId,
   name: 'L-Shape',
   width: 3,
@@ -38,7 +44,7 @@ const lShape: RoomShape = {
   ],
 };
 
-const iShape: RoomShape = {
+const iShape: RoomShapeContent = {
   id: 'test-i' as RoomShapeId,
   name: 'I-Shape',
   width: 1,
@@ -51,7 +57,7 @@ const iShape: RoomShape = {
   ],
 };
 
-const emptyShape: RoomShape = {
+const emptyShape: RoomShapeContent = {
   id: 'test-empty' as RoomShapeId,
   name: 'Empty',
   width: 0,
@@ -214,7 +220,12 @@ describe('roomShapeRotateTile90', () => {
 
 describe('roomShapeRotateTiles', () => {
   it('should return original tiles for rotation 0', () => {
-    const result = roomShapeRotateTiles(lShape.tiles, lShape.width, lShape.height, 0);
+    const result = roomShapeRotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      0,
+    );
     expect(result.tiles).toEqual(lShape.tiles);
     expect(result.width).toBe(3);
     expect(result.height).toBe(3);
@@ -225,7 +236,12 @@ describe('roomShapeRotateTiles', () => {
     //   X . .                       X X X
     //   X . .                       X . .
     //   X X X                       X . .
-    const result = roomShapeRotateTiles(lShape.tiles, lShape.width, lShape.height, 1);
+    const result = roomShapeRotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      1,
+    );
     expect(result.width).toBe(3);
     expect(result.height).toBe(3);
 
@@ -243,7 +259,12 @@ describe('roomShapeRotateTiles', () => {
     //   X . .          X X X
     //   X . .          . . X
     //   X X X          . . X
-    const result = roomShapeRotateTiles(lShape.tiles, lShape.width, lShape.height, 2);
+    const result = roomShapeRotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      2,
+    );
     expect(result.width).toBe(3);
     expect(result.height).toBe(3);
 
@@ -261,7 +282,12 @@ describe('roomShapeRotateTiles', () => {
     //   X . .          . . X
     //   X . .          . . X
     //   X X X          X X X
-    const result = roomShapeRotateTiles(lShape.tiles, lShape.width, lShape.height, 3);
+    const result = roomShapeRotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      3,
+    );
     expect(result.width).toBe(3);
     expect(result.height).toBe(3);
 
@@ -276,7 +302,12 @@ describe('roomShapeRotateTiles', () => {
 
   it('should rotate I-shape 90° to horizontal', () => {
     // I-shape is 1x4 vertical → after 90° should be 4x1 horizontal
-    const result = roomShapeRotateTiles(iShape.tiles, iShape.width, iShape.height, 1);
+    const result = roomShapeRotateTiles(
+      iShape.tiles,
+      iShape.width,
+      iShape.height,
+      1,
+    );
     expect(result.width).toBe(4);
     expect(result.height).toBe(1);
 
@@ -288,7 +319,12 @@ describe('roomShapeRotateTiles', () => {
   });
 
   it('should return to original after 4 rotations', () => {
-    const result = roomShapeRotateTiles(lShape.tiles, lShape.width, lShape.height, 0);
+    const result = roomShapeRotateTiles(
+      lShape.tiles,
+      lShape.width,
+      lShape.height,
+      0,
+    );
     // Rotate 4 times manually
     let { tiles, width, height } = roomShapeRotateTiles(
       lShape.tiles,
@@ -303,9 +339,7 @@ describe('roomShapeRotateTiles', () => {
     expect(width).toBe(lShape.width);
     expect(height).toBe(lShape.height);
 
-    const originalSet = new Set(
-      result.tiles.map((t) => `${t.x},${t.y}`),
-    );
+    const originalSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
     const rotatedSet = new Set(tiles.map((t) => `${t.x},${t.y}`));
     expect(rotatedSet).toEqual(originalSet);
   });
@@ -328,9 +362,7 @@ describe('roomShapeGetRotated', () => {
   it('should preserve symmetric shapes', () => {
     // 2x2 square is rotationally symmetric
     const result = roomShapeGetRotated(square2x2, 1);
-    const originalSet = new Set(
-      square2x2.tiles.map((t) => `${t.x},${t.y}`),
-    );
+    const originalSet = new Set(square2x2.tiles.map((t) => `${t.x},${t.y}`));
     const rotatedSet = new Set(result.tiles.map((t) => `${t.x},${t.y}`));
     expect(rotatedSet).toEqual(originalSet);
   });

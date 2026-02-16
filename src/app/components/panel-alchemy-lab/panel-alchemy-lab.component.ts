@@ -22,7 +22,6 @@ import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   AlchemyRecipeContent,
   AlchemyRecipeId,
-  IsContentItem,
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -100,7 +99,7 @@ export class PanelAlchemyLabComponent {
     const conversion = alchemyLabGetConversion(state.world.alchemyConversions, room.id);
     if (!conversion) return undefined;
 
-    const recipe = contentGetEntry<AlchemyRecipeContent & IsContentItem>(conversion.recipeId);
+    const recipe = contentGetEntry<AlchemyRecipeContent>(conversion.recipeId);
     const percent = Math.min(100, Math.round((conversion.progress / conversion.targetTicks) * 100));
 
     return {

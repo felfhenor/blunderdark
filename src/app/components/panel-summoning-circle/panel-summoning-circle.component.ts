@@ -22,7 +22,6 @@ import {
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
   InhabitantStats,
-  IsContentItem,
   ResourceType,
   SummonRecipeContent,
   SummonRecipeId,
@@ -114,7 +113,7 @@ export class PanelSummoningCircleComponent {
     const job = room.summonJob;
     const elapsed = job.targetTicks - job.ticksRemaining;
     const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
-    const recipe = contentGetEntry<SummonRecipeContent & IsContentItem>(job.recipeId);
+    const recipe = contentGetEntry<SummonRecipeContent>(job.recipeId);
     return { percent, recipeName: recipe?.name ?? 'Unknown', ticksRemaining: job.ticksRemaining };
   });
 

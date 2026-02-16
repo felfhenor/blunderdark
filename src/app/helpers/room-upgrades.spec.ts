@@ -1,5 +1,4 @@
 import type {
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -69,7 +68,7 @@ const darkUpgradePath: RoomUpgradePath = {
   requiresDarkUpgrade: true,
 };
 
-const crystalMineRoom: RoomContent & IsContentItem = {
+const crystalMineRoom: RoomContent = {
   id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
@@ -123,7 +122,7 @@ describe('roomUpgradeGetPaths', () => {
   });
 
   it('should return empty array for room with no upgrades', () => {
-    const noUpgradeRoom: RoomContent & IsContentItem = {
+    const noUpgradeRoom: RoomContent = {
       ...crystalMineRoom,
       id: 'no-upgrades' as RoomId,
       upgradePaths: [],
@@ -394,7 +393,7 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
   });
 
   it('should return -1 for unlimited capacity rooms regardless of upgrades', () => {
-    const unlimitedRoom: RoomContent & IsContentItem = {
+    const unlimitedRoom: RoomContent = {
       ...crystalMineRoom,
       id: 'unlimited-room' as RoomId,
       maxInhabitants: -1,

@@ -8,7 +8,6 @@ import type {
   InhabitantInstanceId,
   InhabitantStats,
   InhabitantTrait,
-  IsContentItem,
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -29,7 +28,7 @@ export type FusionCostEntry = {
 };
 
 export type FusionPreview = {
-  recipe: FusionRecipeContent & IsContentItem;
+  recipe: FusionRecipeContent;
   hybridDef: InhabitantContent;
   parentADef: InhabitantContent;
   parentBDef: InhabitantContent;
@@ -44,10 +43,9 @@ export type FusionPreview = {
 export function fusionFindRecipe(
   creatureADefId: string,
   creatureBDefId: string,
-): (FusionRecipeContent & IsContentItem) | undefined {
+): (FusionRecipeContent) | undefined {
   const recipes = contentGetEntriesByType<
-    FusionRecipeContent & IsContentItem
-  >('fusionrecipe');
+    FusionRecipeContent  >('fusionrecipe');
 
   return recipes.find(
     (r) =>
@@ -61,8 +59,8 @@ export function fusionFindRecipe(
 /**
  * Get all available fusion recipes.
  */
-export function fusionGetAllRecipes(): (FusionRecipeContent & IsContentItem)[] {
-  return contentGetEntriesByType<FusionRecipeContent & IsContentItem>(
+export function fusionGetAllRecipes(): (FusionRecipeContent)[] {
+  return contentGetEntriesByType<FusionRecipeContent>(
     'fusionrecipe',
   );
 }

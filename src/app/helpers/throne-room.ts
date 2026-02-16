@@ -2,15 +2,17 @@ import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { roomRoleFindById } from '@helpers/room-roles';
-import { roomShapeGetAbsoluteTiles, roomShapeGetBounds } from '@helpers/room-shapes';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeGetBounds,
+} from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import {
   GRID_SIZE,
   type Floor,
   type InhabitantInstance,
-  type IsContentItem,
   type PlacedRoom,
-  type RoomShape,
+  type RoomShapeContent,
   type RulerBonuses,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -30,9 +32,7 @@ export function throneRoomFind(
   if (!throneId) return undefined;
 
   for (const floor of floors) {
-    const room = floor.rooms.find(
-      (r) => r.roomTypeId === throneId,
-    );
+    const room = floor.rooms.find((r) => r.roomTypeId === throneId);
     if (room) return { floor, room };
   }
   return undefined;
@@ -46,7 +46,8 @@ export function throneRoomGetSeatedRulerInstance(
   throneRoomId: string,
 ): InhabitantInstance | undefined {
   return (
-    floor.inhabitants.find((i) => i.assignedRoomId === throneRoomId) ?? undefined
+    floor.inhabitants.find((i) => i.assignedRoomId === throneRoomId) ??
+    undefined
   );
 }
 
@@ -92,12 +93,14 @@ export function throneRoomGetRulerBonusValue(
 /**
  * The currently seated ruler instance, or null if no Throne Room or empty.
  */
-export const throneRoomSeatedRuler = computed<InhabitantInstance | undefined>(() => {
-  const floors = gamestate().world.floors;
-  const throne = throneRoomFind(floors);
-  if (!throne) return undefined;
-  return throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
-});
+export const throneRoomSeatedRuler = computed<InhabitantInstance | undefined>(
+  () => {
+    const floors = gamestate().world.floors;
+    const throne = throneRoomFind(floors);
+    if (!throne) return undefined;
+    return throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
+  },
+);
 
 /**
  * The active ruler bonuses as a reactive signal.
@@ -186,9 +189,7 @@ export function throneRoomGetPositionalBonuses(
   const throne = throneRoomFind(floors);
   if (!throne) return defaultBonuses;
 
-  const throneShape = contentGetEntry<RoomShape & IsContentItem>(
-    throne.room.shapeId,
-  );
+  const throneShape = contentGetEntry<RoomShapeContent>(throne.room.shapeId);
   if (!throneShape) return defaultBonuses;
 
   const throneTiles = roomShapeGetAbsoluteTiles(
@@ -202,9 +203,13 @@ export function throneRoomGetPositionalBonuses(
   let vaultAdjacent = false;
   for (const adjRoom of throne.floor.rooms) {
     if (adjRoom.id === throne.room.id) continue;
-    const adjShape = contentGetEntry<RoomShape & IsContentItem>(adjRoom.shapeId);
+    const adjShape = contentGetEntry<RoomShapeContent>(adjRoom.shapeId);
     if (!adjShape) continue;
-    const adjTiles = roomShapeGetAbsoluteTiles(adjShape, adjRoom.anchorX, adjRoom.anchorY);
+    const adjTiles = roomShapeGetAbsoluteTiles(
+      adjShape,
+      adjRoom.anchorX,
+      adjRoom.anchorY,
+    );
     if (!adjacencyAreRoomsAdjacent(throneTiles, adjTiles)) continue;
 
     const adjDef = contentGetEntry<RoomContent>(adjRoom.roomTypeId);
@@ -229,7 +234,9 @@ export function throneRoomGetPositionalBonuses(
     vaultAdjacent,
     central,
     goldProductionBonus,
-    rulerBonusMultiplier: central ? THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER : 0,
+    rulerBonusMultiplier: central
+      ? THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER
+      : 0,
   };
 }
 

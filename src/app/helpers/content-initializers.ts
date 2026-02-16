@@ -1,36 +1,63 @@
 import type {
   AlchemyRecipeContent,
+  AlchemyRecipeId,
   BreedingRecipeContent,
+  BreedingRecipeId,
   CompositionWeightConfig,
   ContentType,
   ForgeRecipeContent,
+  ForgeRecipeId,
   FusionRecipeContent,
+  FusionRecipeId,
   IsContentItem,
   PassiveBonusUnlock,
-  ReputationAction,
+  ReputationActionContent,
   ReputationEffectContent,
-  ResearchNode,
-  RoomShape,
+  ReputationEffectId,
+  ResearchNodeContent,
+  RoomShapeContent,
   Season,
   SummonRecipeContent,
+  SummonRecipeId,
   UnlockEffect,
 } from '@interfaces';
-import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
-import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
+import type {
+  AbilityEffectContent,
+  AbilityEffectId,
+} from '@interfaces/content-abilityeffect';
+import type {
+  CombatAbilityContent,
+  CombatAbilityId,
+} from '@interfaces/content-combatability';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
-import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
+import type {
+  InhabitantContent,
+  InhabitantId,
+} from '@interfaces/content-inhabitant';
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
-import type { MerchantTradeContent, MerchantTradeId } from '@interfaces/content-merchanttrade';
+import type {
+  MerchantTradeContent,
+  MerchantTradeId,
+} from '@interfaces/content-merchanttrade';
 import type { ReputationActionId } from '@interfaces/content-reputationaction';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomContent, RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
-import type { SeasonalEventContent, SeasonalEventId } from '@interfaces/content-seasonalevent';
-import type { SeasonBonusContent, SeasonBonusId } from '@interfaces/content-seasonbonus';
+import type {
+  SeasonalEventContent,
+  SeasonalEventId,
+} from '@interfaces/content-seasonalevent';
+import type {
+  SeasonBonusContent,
+  SeasonBonusId,
+} from '@interfaces/content-seasonbonus';
 import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
-import type { VictoryPathContent, VictoryPathId } from '@interfaces/content-victorypath';
+import type {
+  VictoryPathContent,
+  VictoryPathId,
+} from '@interfaces/content-victorypath';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,10 +93,10 @@ export function ensureContent<T extends IsContentItem>(content: T): T {
 }
 
 function ensureAlchemyRecipe(
-  recipe: Partial<AlchemyRecipeContent & IsContentItem>,
-): AlchemyRecipeContent & IsContentItem {
+  recipe: Partial<AlchemyRecipeContent>,
+): AlchemyRecipeContent {
   return {
-    id: (recipe.id ?? 'UNKNOWN') as AlchemyRecipeContent['id'],
+    id: (recipe.id ?? 'UNKNOWN') as AlchemyRecipeId,
     name: recipe.name ?? 'UNKNOWN',
     __type: 'alchemyrecipe',
     description: recipe.description ?? '',
@@ -82,10 +109,10 @@ function ensureAlchemyRecipe(
 }
 
 function ensureBreedingRecipe(
-  recipe: Partial<BreedingRecipeContent & IsContentItem>,
-): BreedingRecipeContent & IsContentItem {
+  recipe: Partial<BreedingRecipeContent>,
+): BreedingRecipeContent {
   return {
-    id: (recipe.id ?? 'UNKNOWN') as BreedingRecipeContent['id'],
+    id: (recipe.id ?? 'UNKNOWN') as BreedingRecipeId,
     name: recipe.name ?? 'UNKNOWN',
     __type: 'breedingrecipe',
     description: recipe.description ?? '',
@@ -98,10 +125,10 @@ function ensureBreedingRecipe(
 }
 
 function ensureForgeRecipe(
-  recipe: Partial<ForgeRecipeContent & IsContentItem>,
-): ForgeRecipeContent & IsContentItem {
+  recipe: Partial<ForgeRecipeContent>,
+): ForgeRecipeContent {
   return {
-    id: (recipe.id ?? 'UNKNOWN') as ForgeRecipeContent['id'],
+    id: (recipe.id ?? 'UNKNOWN') as ForgeRecipeId,
     name: recipe.name ?? 'UNKNOWN',
     __type: 'forgerecipe',
     description: recipe.description ?? '',
@@ -114,10 +141,10 @@ function ensureForgeRecipe(
 }
 
 function ensureFusionRecipe(
-  recipe: Partial<FusionRecipeContent & IsContentItem>,
-): FusionRecipeContent & IsContentItem {
+  recipe: Partial<FusionRecipeContent>,
+): FusionRecipeContent {
   return {
-    id: (recipe.id ?? 'UNKNOWN') as FusionRecipeContent['id'],
+    id: (recipe.id ?? 'UNKNOWN') as FusionRecipeId,
     name: recipe.name ?? 'UNKNOWN',
     __type: 'fusionrecipe',
     description: recipe.description ?? '',
@@ -128,9 +155,7 @@ function ensureFusionRecipe(
   };
 }
 
-function ensureFeature(
-  feature: Partial<FeatureContent>,
-): FeatureContent {
+function ensureFeature(feature: Partial<FeatureContent>): FeatureContent {
   return {
     id: feature.id ?? ('UNKNOWN' as FeatureId),
     name: feature.name ?? 'UNKNOWN',
@@ -150,8 +175,8 @@ function ensureFeature(
 }
 
 function ensureReputationAction(
-  action: Partial<ReputationAction & IsContentItem>,
-): ReputationAction & IsContentItem {
+  action: Partial<ReputationActionContent>,
+): ReputationActionContent {
   return {
     id: action.id ?? ('UNKNOWN' as ReputationActionId),
     name: action.name ?? 'UNKNOWN',
@@ -162,10 +187,10 @@ function ensureReputationAction(
 }
 
 function ensureReputationEffect(
-  effect: Partial<ReputationEffectContent & IsContentItem>,
-): ReputationEffectContent & IsContentItem {
+  effect: Partial<ReputationEffectContent>,
+): ReputationEffectContent {
   return {
-    id: (effect.id ?? 'UNKNOWN') as ReputationEffectContent['id'],
+    id: (effect.id ?? 'UNKNOWN') as ReputationEffectId,
     name: effect.name ?? 'UNKNOWN',
     __type: 'reputationeffect',
     description: effect.description ?? '',
@@ -178,8 +203,8 @@ function ensureReputationEffect(
 }
 
 function ensureResearch(
-  node: Partial<ResearchNode & IsContentItem>,
-): ResearchNode & IsContentItem {
+  node: Partial<ResearchNodeContent>,
+): ResearchNodeContent {
   return {
     id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',
@@ -194,9 +219,7 @@ function ensureResearch(
   };
 }
 
-function ensureUnlockEffect(
-  effect: Partial<UnlockEffect>,
-): UnlockEffect {
+function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
   const type = effect.type ?? 'room';
   if (type === 'passive_bonus') {
     return {
@@ -212,9 +235,7 @@ function ensureUnlockEffect(
   } as UnlockEffect;
 }
 
-function ensureRoom(
-  room: Partial<RoomContent>,
-): RoomContent {
+function ensureRoom(room: Partial<RoomContent>): RoomContent {
   return {
     id: room.id ?? ('UNKNOWN' as RoomId),
     name: room.name ?? 'UNKNOWN',
@@ -256,10 +277,10 @@ function ensureRoom(
 }
 
 function ensureSummonRecipe(
-  recipe: Partial<SummonRecipeContent & IsContentItem>,
-): SummonRecipeContent & IsContentItem {
+  recipe: Partial<SummonRecipeContent>,
+): SummonRecipeContent {
   return {
-    id: (recipe.id ?? 'UNKNOWN') as SummonRecipeContent['id'],
+    id: (recipe.id ?? 'UNKNOWN') as SummonRecipeId,
     name: recipe.name ?? 'UNKNOWN',
     __type: 'summonrecipe',
     description: recipe.description ?? '',
@@ -273,9 +294,7 @@ function ensureSummonRecipe(
   };
 }
 
-function ensureSynergy(
-  synergy: Partial<SynergyContent>,
-): SynergyContent {
+function ensureSynergy(synergy: Partial<SynergyContent>): SynergyContent {
   return {
     id: synergy.id ?? ('UNKNOWN' as SynergyId),
     name: synergy.name ?? 'UNKNOWN',
@@ -318,9 +337,7 @@ function ensureInhabitant(
   };
 }
 
-function ensureInvader(
-  invader: Partial<InvaderContent>,
-): InvaderContent {
+function ensureInvader(invader: Partial<InvaderContent>): InvaderContent {
   return {
     id: invader.id ?? ('UNKNOWN' as InvaderId),
     name: invader.name ?? 'UNKNOWN',
@@ -333,9 +350,7 @@ function ensureInvader(
   };
 }
 
-function ensureRoomShape(
-  shape: Partial<RoomShape & IsContentItem>,
-): RoomShape & IsContentItem {
+function ensureRoomShape(shape: Partial<RoomShapeContent>): RoomShapeContent {
   return {
     id: shape.id ?? ('UNKNOWN' as RoomShapeId),
     name: shape.name ?? 'UNKNOWN',
@@ -359,7 +374,9 @@ function ensureAbilityEffect(
   };
 }
 
-function ensureCombatAbility(ability: Partial<CombatAbilityContent>): CombatAbilityContent {
+function ensureCombatAbility(
+  ability: Partial<CombatAbilityContent>,
+): CombatAbilityContent {
   return {
     id: (ability.id ?? 'UNKNOWN') as CombatAbilityId,
     name: ability.name ?? 'UNKNOWN',
@@ -374,9 +391,7 @@ function ensureCombatAbility(ability: Partial<CombatAbilityContent>): CombatAbil
   };
 }
 
-function ensureTrap(
-  trap: Partial<TrapContent>,
-): TrapContent {
+function ensureTrap(trap: Partial<TrapContent>): TrapContent {
   return {
     id: trap.id ?? ('UNKNOWN' as TrapId),
     name: trap.name ?? 'UNKNOWN',

@@ -21,7 +21,6 @@ import type {
   BreedingRecipeContent,
   BreedingRecipeId,
   InhabitantInstanceId,
-  IsContentItem,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
@@ -107,7 +106,7 @@ export class PanelBreedingPitsComponent {
     const job = room.breedingJob;
     const elapsed = job.targetTicks - job.ticksRemaining;
     const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
-    const recipe = contentGetEntry<BreedingRecipeContent & IsContentItem>(job.recipeId);
+    const recipe = contentGetEntry<BreedingRecipeContent>(job.recipeId);
     return { percent, recipeName: recipe?.resultName ?? 'Unknown', ticksRemaining: job.ticksRemaining };
   });
 

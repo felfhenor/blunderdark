@@ -4,11 +4,10 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
-  RoomShape,
+  RoomShapeContent,
   RoomShapeId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -166,22 +165,33 @@ describe('throneRoomFind', () => {
 describe('throneRoomGetSeatedRulerInstance', () => {
   it('should return undefined when no inhabitants are assigned', () => {
     const floor = floorCreate({ inhabitants: [] });
-    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId)).toBeUndefined();
+    expect(
+      throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId),
+    ).toBeUndefined();
   });
 
   it('should return undefined when no inhabitant is assigned to the throne room', () => {
     const floor = floorCreate({
       inhabitants: [
-        createInhabitantInstance({ assignedRoomId: 'other-room' as PlacedRoomId }),
+        createInhabitantInstance({
+          assignedRoomId: 'other-room' as PlacedRoomId,
+        }),
       ],
     });
-    expect(throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId)).toBeUndefined();
+    expect(
+      throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId),
+    ).toBeUndefined();
   });
 
   it('should return the seated ruler', () => {
-    const ruler = createInhabitantInstance({ assignedRoomId: 'room-001' as PlacedRoomId });
+    const ruler = createInhabitantInstance({
+      assignedRoomId: 'room-001' as PlacedRoomId,
+    });
     const floor = floorCreate({ inhabitants: [ruler] });
-    const result = throneRoomGetSeatedRulerInstance(floor, 'room-001' as PlacedRoomId);
+    const result = throneRoomGetSeatedRulerInstance(
+      floor,
+      'room-001' as PlacedRoomId,
+    );
     expect(result).toBeDefined();
     expect(result!.instanceId).toBe('ruler-001');
   });
@@ -257,7 +267,11 @@ describe('throneRoomGetActiveRulerBonuses', () => {
     const demonDef = createInhabitantDef({
       id: 'def-demon' as InhabitantId,
       name: 'Demon Lord',
-      rulerBonuses: { corruptionGeneration: 0.25, fear: 0.1, invaderMorale: -0.1 },
+      rulerBonuses: {
+        corruptionGeneration: 0.25,
+        fear: 0.1,
+        invaderMorale: -0.1,
+      },
     });
     mockContent.set('def-demon', demonDef);
 
@@ -285,9 +299,7 @@ describe('throneRoomGetActiveRulerBonuses', () => {
 
     const floor = floorCreate({
       rooms: [createPlacedRoom()],
-      inhabitants: [
-        createInhabitantInstance({ assignedRoomId: undefined }),
-      ],
+      inhabitants: [createInhabitantInstance({ assignedRoomId: undefined })],
     });
 
     const bonuses = throneRoomGetActiveRulerBonuses([floor]);
@@ -461,8 +473,8 @@ describe('throneRoomGetFearLevel', () => {
 // --- Room shape helpers for adjacency tests ---
 
 function createRoomShape(
-  overrides: Partial<RoomShape & IsContentItem> = {},
-): RoomShape & IsContentItem {
+  overrides: Partial<RoomShapeContent> = {},
+): RoomShapeContent {
   return {
     id: 'shape-4x4' as RoomShapeId,
     name: 'Square 4x4',
@@ -470,25 +482,43 @@ function createRoomShape(
     width: 4,
     height: 4,
     tiles: [
-      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 },
-      { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
-      { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
-      { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 },
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 3, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 2, y: 1 },
+      { x: 3, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+      { x: 2, y: 2 },
+      { x: 3, y: 2 },
+      { x: 0, y: 3 },
+      { x: 1, y: 3 },
+      { x: 2, y: 3 },
+      { x: 3, y: 3 },
     ],
     ...overrides,
-  } as RoomShape & IsContentItem;
+  } as RoomShapeContent;
 }
 
-function createVaultShape(): RoomShape & IsContentItem {
+function createVaultShape(): RoomShapeContent {
   return createRoomShape({
     id: 'shape-3x3' as RoomShapeId,
     name: 'Square 3x3',
     width: 3,
     height: 3,
     tiles: [
-      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
-      { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 },
-      { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 },
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 2, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+      { x: 2, y: 2 },
     ],
   });
 }
@@ -509,27 +539,37 @@ function createVaultRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 describe('throneRoomIsRoomCentral', () => {
   it('should return true when room center is at grid center', () => {
     // 4x4 room at anchor (8,8): center = (10, 10), grid center = (10, 10)
-    expect(throneRoomIsRoomCentral(8, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
+    expect(
+      throneRoomIsRoomCentral(8, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD),
+    ).toBe(true);
   });
 
   it('should return true when room center is within threshold', () => {
     // 4x4 room at anchor (6,6): center = (8, 8), distance = 4
-    expect(throneRoomIsRoomCentral(6, 6, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
+    expect(
+      throneRoomIsRoomCentral(6, 6, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD),
+    ).toBe(true);
   });
 
   it('should return false when room center is beyond threshold', () => {
     // 4x4 room at anchor (0,0): center = (2, 2), distance = 16
-    expect(throneRoomIsRoomCentral(0, 0, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(false);
+    expect(
+      throneRoomIsRoomCentral(0, 0, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD),
+    ).toBe(false);
   });
 
   it('should return true at exactly the threshold distance', () => {
     // 4x4 room at anchor (3,8): center = (5, 10), distance = |5-10| + |10-10| = 5
-    expect(throneRoomIsRoomCentral(3, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(true);
+    expect(
+      throneRoomIsRoomCentral(3, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD),
+    ).toBe(true);
   });
 
   it('should return false just beyond the threshold', () => {
     // 4x4 room at anchor (2,8): center = (4, 10), distance = |4-10| + |10-10| = 6
-    expect(throneRoomIsRoomCentral(2, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD)).toBe(false);
+    expect(
+      throneRoomIsRoomCentral(2, 8, 4, 4, 20, THRONE_ROOM_CENTRALITY_THRESHOLD),
+    ).toBe(false);
   });
 });
 
@@ -539,7 +579,9 @@ describe('throneRoomGetPositionalBonuses', () => {
     mockContent.set(TREASURE_VAULT_TYPE_ID, {
       id: TREASURE_VAULT_TYPE_ID,
       __type: 'room',
-      throneAdjacencyEffects: { goldProductionBonus: VAULT_ADJACENCY_GOLD_BONUS },
+      throneAdjacencyEffects: {
+        goldProductionBonus: VAULT_ADJACENCY_GOLD_BONUS,
+      },
     });
   });
 
@@ -553,7 +595,9 @@ describe('throneRoomGetPositionalBonuses', () => {
 
   it('should return default bonuses when throne shape is unknown', () => {
     const floor = floorCreate({
-      rooms: [createPlacedRoom({ shapeId: 'nonexistent-shape' as RoomShapeId })],
+      rooms: [
+        createPlacedRoom({ shapeId: 'nonexistent-shape' as RoomShapeId }),
+      ],
     });
     const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.vaultAdjacent).toBe(false);
@@ -627,7 +671,9 @@ describe('throneRoomGetPositionalBonuses', () => {
 
     const result = throneRoomGetPositionalBonuses([floor]);
     expect(result.central).toBe(true);
-    expect(result.rulerBonusMultiplier).toBe(THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER);
+    expect(result.rulerBonusMultiplier).toBe(
+      THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER,
+    );
   });
 
   it('should not detect central placement when far from center', () => {
@@ -662,7 +708,9 @@ describe('throneRoomGetPositionalBonuses', () => {
     expect(result.vaultAdjacent).toBe(true);
     expect(result.central).toBe(true);
     expect(result.goldProductionBonus).toBe(VAULT_ADJACENCY_GOLD_BONUS);
-    expect(result.rulerBonusMultiplier).toBe(THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER);
+    expect(result.rulerBonusMultiplier).toBe(
+      THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER,
+    );
   });
 
   it('should ignore non-vault rooms for adjacency', () => {

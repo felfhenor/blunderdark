@@ -4,7 +4,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -62,7 +61,7 @@ vi.mock('@helpers/content', () => ({
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
-const undergroundLakeRoom: RoomContent & IsContentItem = {
+const undergroundLakeRoom: RoomContent = {
   id: UNDERGROUND_LAKE_ID as RoomId,
   name: 'Underground Lake',
   __type: 'room',
@@ -86,7 +85,7 @@ const undergroundLakeRoom: RoomContent & IsContentItem = {
   autoPlace: false,
 };
 
-const mushroomGroveRoom: RoomContent & IsContentItem = {
+const mushroomGroveRoom: RoomContent = {
   id: MUSHROOM_GROVE_ID as RoomId,
   name: 'Mushroom Grove',
   __type: 'room',
@@ -106,7 +105,7 @@ const mushroomGroveRoom: RoomContent & IsContentItem = {
   autoPlace: false,
 };
 
-const soulWellRoom: RoomContent & IsContentItem = {
+const soulWellRoom: RoomContent = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',

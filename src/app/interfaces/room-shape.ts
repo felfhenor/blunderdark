@@ -17,14 +17,6 @@ export type TileOffset = {
 
 export type Rotation = 0 | 1 | 2 | 3;
 
-export type RoomShape = {
-  id: RoomShapeId;
-  name: string;
-  tiles: TileOffset[];
-  width: number;
-  height: number;
-};
-
 export type BreedingJob = {
   parentAInstanceId: InhabitantInstanceId;
   parentBInstanceId: InhabitantInstanceId;

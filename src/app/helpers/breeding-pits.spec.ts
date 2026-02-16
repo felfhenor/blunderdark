@@ -7,7 +7,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -153,8 +152,8 @@ const skeletonDef: InhabitantContent = {
 
 // --- Recipe definitions ---
 
-const goblinKoboldRecipe: BreedingRecipeContent & IsContentItem = {
-  id: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeContent['id'],
+const goblinKoboldRecipe: BreedingRecipeContent = {
+  id: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
   name: 'Goblin Trapper',
   __type: 'breedingrecipe',
   description: 'A hybrid.',
@@ -167,7 +166,7 @@ const goblinKoboldRecipe: BreedingRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const breedingPitsDef: RoomContent & IsContentItem = {
+const breedingPitsDef: RoomContent = {
   id: BREEDING_PITS_ID as RoomId,
   name: 'Breeding Pits',
   __type: 'room',
@@ -188,7 +187,7 @@ const breedingPitsDef: RoomContent & IsContentItem = {
   role: 'breedingPits',
 };
 
-const spawningPoolDef: RoomContent & IsContentItem = {
+const spawningPoolDef: RoomContent = {
   id: SPAWNING_POOL_ID as RoomId,
   name: 'Spawning Pool',
   __type: 'room',
@@ -209,7 +208,7 @@ const spawningPoolDef: RoomContent & IsContentItem = {
   breedingAdjacencyEffects: { hybridTimeReduction: 0.25 },
 };
 
-const soulWellDef: RoomContent & IsContentItem = {
+const soulWellDef: RoomContent = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',

@@ -6,7 +6,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  ResearchNode,
+  ResearchNodeContent,
   ResearchState,
   RoomContent,
   RoomId,
@@ -17,9 +17,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Constants ---
 
-const NODE_DARK_FUNDAMENTALS_ID = 'aa000001-0001-0001-0001-000000000001' as ResearchId;
-const NODE_SOUL_MANIPULATION_ID = 'aa000001-0001-0001-0001-000000000002' as ResearchId;
-const NODE_SHADOW_MAGIC_ID = 'aa000001-0001-0001-0001-000000000003' as ResearchId;
+const NODE_DARK_FUNDAMENTALS_ID =
+  'aa000001-0001-0001-0001-000000000001' as ResearchId;
+const NODE_SOUL_MANIPULATION_ID =
+  'aa000001-0001-0001-0001-000000000002' as ResearchId;
+const NODE_SHADOW_MAGIC_ID =
+  'aa000001-0001-0001-0001-000000000003' as ResearchId;
 const SHADOW_LIBRARY_ID = 'aa000001-0001-0001-0001-000000000010' as RoomId;
 
 // --- Mock content ---
@@ -57,12 +60,10 @@ vi.mock('@helpers/resources', () => ({
 }));
 
 vi.mock('@helpers/throne-room', () => ({
-  throneRoomGetRulerBonusValue: vi.fn(
-    (_floors: Floor[], bonusType: string) => {
-      if (bonusType === 'researchSpeed') return 0;
-      return 0;
-    },
-  ),
+  throneRoomGetRulerBonusValue: vi.fn((_floors: Floor[], bonusType: string) => {
+    if (bonusType === 'researchSpeed') return 0;
+    return 0;
+  }),
 }));
 
 const mockResearchUnlockProcessCompletion = vi.fn();
@@ -88,7 +89,7 @@ import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 
 // --- Mock data ---
 
-const darkFundamentalsNode: ResearchNode & IsContentItem = {
+const darkFundamentalsNode: ResearchNodeContent = {
   id: NODE_DARK_FUNDAMENTALS_ID,
   name: 'Dark Arts Fundamentals',
   __type: 'research',
@@ -101,7 +102,7 @@ const darkFundamentalsNode: ResearchNode & IsContentItem = {
   requiredTicks: 50,
 };
 
-const soulManipulationNode: ResearchNode & IsContentItem = {
+const soulManipulationNode: ResearchNodeContent = {
   id: NODE_SOUL_MANIPULATION_ID,
   name: 'Soul Manipulation',
   __type: 'research',
@@ -114,7 +115,7 @@ const soulManipulationNode: ResearchNode & IsContentItem = {
   requiredTicks: 150,
 };
 
-const shadowMagicNode: ResearchNode & IsContentItem = {
+const shadowMagicNode: ResearchNodeContent = {
   id: NODE_SHADOW_MAGIC_ID,
   name: 'Shadow Magic',
   __type: 'research',
@@ -127,7 +128,7 @@ const shadowMagicNode: ResearchNode & IsContentItem = {
   requiredTicks: 150,
 };
 
-const shadowLibraryRoom: RoomContent & IsContentItem = {
+const shadowLibraryRoom: RoomContent = {
   id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
@@ -175,7 +176,13 @@ function makeResearchState(
     activeResearch: undefined,
     activeResearchProgress: 0,
     activeResearchStartTick: 0,
-    unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+    unlockedContent: {
+      rooms: [],
+      inhabitants: [],
+      abilities: [],
+      upgrades: [],
+      passiveBonuses: [],
+    },
     ...overrides,
   };
 }
@@ -238,8 +245,19 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
       seasonalEvent: {
         triggeredEventIds: [],
         activeEffects: [],
@@ -261,9 +279,11 @@ beforeEach(() => {
   mockContent.set(SHADOW_LIBRARY_ID, shadowLibraryRoom);
 
   mockGameState = makeGameState();
-  mockUpdateGamestate.mockImplementation(async (fn: (s: GameState) => GameState) => {
-    mockGameState = fn(mockGameState);
-  });
+  mockUpdateGamestate.mockImplementation(
+    async (fn: (s: GameState) => GameState) => {
+      mockGameState = fn(mockGameState);
+    },
+  );
   mockResourceCanAfford.mockReturnValue(true);
   mockResourcePayCost.mockResolvedValue(true);
   mockResearchUnlockProcessCompletion.mockReset();
@@ -664,9 +684,7 @@ describe('US-004: Research Completion', () => {
     researchProcess(state);
 
     expect(state.world.research.completedNodes).toEqual([]);
-    expect(state.world.research.activeResearch).toBe(
-      NODE_DARK_FUNDAMENTALS_ID,
-    );
+    expect(state.world.research.activeResearch).toBe(NODE_DARK_FUNDAMENTALS_ID);
   });
 });
 

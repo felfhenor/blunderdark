@@ -5,7 +5,6 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -158,8 +157,8 @@ const goblinDef: InhabitantContent = {
 
 // --- Recipe definitions ---
 
-const fireRecipe: SummonRecipeContent & IsContentItem = {
-  id: RECIPE_FIRE_ID as SummonRecipeContent['id'],
+const fireRecipe: SummonRecipeContent = {
+  id: RECIPE_FIRE_ID as SummonRecipeId,
   name: 'Summon Fire Elemental',
   __type: 'summonrecipe',
   description: 'Summon a fire elemental.',
@@ -171,8 +170,8 @@ const fireRecipe: SummonRecipeContent & IsContentItem = {
   tier: 'rare',
 };
 
-const spectralRecipe: SummonRecipeContent & IsContentItem = {
-  id: RECIPE_SPECTRAL_ID as SummonRecipeContent['id'],
+const spectralRecipe: SummonRecipeContent = {
+  id: RECIPE_SPECTRAL_ID as SummonRecipeId,
   name: 'Summon Spectral Servant',
   __type: 'summonrecipe',
   description: 'Summon a temp servant.',
@@ -185,8 +184,8 @@ const spectralRecipe: SummonRecipeContent & IsContentItem = {
   tier: 'rare',
 };
 
-const advancedRecipe: SummonRecipeContent & IsContentItem = {
-  id: RECIPE_ADVANCED_ID as SummonRecipeContent['id'],
+const advancedRecipe: SummonRecipeContent = {
+  id: RECIPE_ADVANCED_ID as SummonRecipeId,
   name: 'Advanced Summon',
   __type: 'summonrecipe',
   description: 'An advanced recipe.',
@@ -200,7 +199,7 @@ const advancedRecipe: SummonRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const summoningCircleDef: RoomContent & IsContentItem = {
+const summoningCircleDef: RoomContent = {
   id: SUMMONING_CIRCLE_ID as RoomId,
   name: 'Summoning Circle',
   __type: 'room',
@@ -221,7 +220,7 @@ const summoningCircleDef: RoomContent & IsContentItem = {
   role: 'summoningCircle',
 };
 
-const libraryDef: RoomContent & IsContentItem = {
+const libraryDef: RoomContent = {
   id: LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
@@ -242,7 +241,7 @@ const libraryDef: RoomContent & IsContentItem = {
   summoningAdjacencyEffects: { summonTimeReduction: 0.25 },
 };
 
-const soulWellDef: RoomContent & IsContentItem = {
+const soulWellDef: RoomContent = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',

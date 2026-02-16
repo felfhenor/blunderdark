@@ -14,7 +14,6 @@
 .node-card {
   @apply flex flex-col items-center justify-center gap-1;
   @apply rounded-lg border-2 p-3 cursor-pointer transition-all;
-  @apply bg-base-100;
   min-width: 120px;
   max-width: 160px;
   border-color: oklch(var(--bc) / 0.2);
@@ -82,7 +81,8 @@
 // --- Animations ---
 
 @keyframes pulse-border {
-  0%, 100% {
+  0%,
+  100% {
     border-color: oklch(var(--in));
     box-shadow: 0 0 4px oklch(var(--in) / 0.3);
   }

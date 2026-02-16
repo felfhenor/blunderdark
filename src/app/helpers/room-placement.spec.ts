@@ -1,17 +1,25 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
-import type { Floor, FloorId, PlacedRoom, PlacedRoomId, RoomId, RoomShape, RoomShapeId } from '@interfaces';
-import { describe, expect, it } from 'vitest';
 import {
   roomPlacementFormatErrors,
   roomPlacementIsUniqueTypePlaced,
   roomPlacementPlaceOnFloor,
   roomPlacementRemoveFromFloor,
+  roomPlacementValidate,
   roomPlacementValidateBounds,
   roomPlacementValidateNoOverlap,
-  roomPlacementValidate,
 } from '@helpers/room-placement';
+import type {
+  Floor,
+  FloorId,
+  PlacedRoom,
+  PlacedRoomId,
+  RoomId,
+  RoomShapeContent,
+  RoomShapeId,
+} from '@interfaces';
+import { describe, expect, it } from 'vitest';
 
-const square2x2: RoomShape = {
+const square2x2: RoomShapeContent = {
   id: 'square-2x2' as RoomShapeId,
   name: 'Square 2x2',
   tiles: [
@@ -24,7 +32,7 @@ const square2x2: RoomShape = {
   height: 2,
 };
 
-const lShape: RoomShape = {
+const lShape: RoomShapeContent = {
   id: 'l-shape' as RoomShapeId,
   name: 'L-Shape',
   tiles: [
@@ -37,7 +45,7 @@ const lShape: RoomShape = {
   height: 3,
 };
 
-const iShape: RoomShape = {
+const iShape: RoomShapeContent = {
   id: 'i-shape' as RoomShapeId,
   name: 'I-Shape',
   tiles: [
@@ -233,7 +241,9 @@ describe('roomPlacementFormatErrors', () => {
   });
 
   it('should format a single bounds error as player-friendly message', () => {
-    const message = roomPlacementFormatErrors(['Room extends beyond grid boundary']);
+    const message = roomPlacementFormatErrors([
+      'Room extends beyond grid boundary',
+    ]);
     expect(message).toBe(
       'Cannot place room: room extends beyond the grid boundary',
     );
@@ -260,10 +270,7 @@ describe('roomPlacementFormatErrors', () => {
   });
 });
 
-function makeFloor(
-  rooms: PlacedRoom[] = [],
-  grid = gridCreateEmpty(),
-): Floor {
+function makeFloor(rooms: PlacedRoom[] = [], grid = gridCreateEmpty()): Floor {
   return {
     id: 'floor-1' as FloorId,
     name: 'Floor 1',
@@ -389,7 +396,11 @@ describe('roomPlacementRemoveFromFloor', () => {
     };
     const placed = roomPlacementPlaceOnFloor(floor, room, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      placed,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(0);
     expect(result!.grid[5][5].occupied).toBe(false);
@@ -401,7 +412,11 @@ describe('roomPlacementRemoveFromFloor', () => {
 
   it('should return undefined for non-existent room', () => {
     const floor = makeFloor();
-    const result = roomPlacementRemoveFromFloor(floor, 'nonexistent' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      floor,
+      'nonexistent' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeUndefined();
   });
 
@@ -424,7 +439,11 @@ describe('roomPlacementRemoveFromFloor', () => {
     let placed = roomPlacementPlaceOnFloor(floor, room1, square2x2)!;
     placed = roomPlacementPlaceOnFloor(placed, room2, square2x2)!;
 
-    const result = roomPlacementRemoveFromFloor(placed, 'room-1' as PlacedRoomId, square2x2);
+    const result = roomPlacementRemoveFromFloor(
+      placed,
+      'room-1' as PlacedRoomId,
+      square2x2,
+    );
     expect(result).toBeDefined();
     expect(result!.rooms).toHaveLength(1);
     expect(result!.rooms[0].id).toBe('room-2');
@@ -456,7 +475,9 @@ describe('roomPlacementRemoveFromFloor', () => {
 describe('roomPlacementIsUniqueTypePlaced', () => {
   it('should return false when no rooms are placed', () => {
     const floors = [makeFloor()];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(false);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId),
+    ).toBe(false);
   });
 
   it('should return true when the room type is placed on the current floor', () => {
@@ -468,7 +489,9 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
       anchorY: 0,
     };
     const floors = [makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId),
+    ).toBe(true);
   });
 
   it('should return true when the room type is placed on a different floor', () => {
@@ -480,7 +503,9 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
       anchorY: 0,
     };
     const floors = [makeFloor(), makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId),
+    ).toBe(true);
   });
 
   it('should return false for a different room type', () => {
@@ -492,7 +517,9 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
       anchorY: 0,
     };
     const floors = [makeFloor([existingRoom])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(false);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId),
+    ).toBe(false);
   });
 
   it('should check across multiple floors', () => {
@@ -511,8 +538,14 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
       anchorY: 5,
     };
     const floors = [makeFloor([room1]), makeFloor([room2])];
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId)).toBe(true);
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-crystal-mine' as RoomId)).toBe(true);
-    expect(roomPlacementIsUniqueTypePlaced(floors, 'room-barracks' as RoomId)).toBe(false);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-throne' as RoomId),
+    ).toBe(true);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-crystal-mine' as RoomId),
+    ).toBe(true);
+    expect(
+      roomPlacementIsUniqueTypePlaced(floors, 'room-barracks' as RoomId),
+    ).toBe(false);
   });
 });

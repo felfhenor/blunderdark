@@ -1,10 +1,9 @@
 import { computed } from '@angular/core';
-import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
-  IsContentItem,
-  ResearchNode,
+  ResearchNodeContent,
   UnlockEffect,
   UnlockedContent,
 } from '@interfaces';
@@ -34,8 +33,7 @@ export function researchUnlockIsUnlocked(
   id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId,
   unlockedContent?: UnlockedContent,
 ): boolean {
-  const content =
-    unlockedContent ?? gamestate().world.research.unlockedContent;
+  const content = unlockedContent ?? gamestate().world.research.unlockedContent;
   switch (type) {
     case 'room':
       return content.rooms.includes(id as RoomId);
@@ -55,8 +53,7 @@ export function researchUnlockGetPassiveBonuses(
   bonusType: string,
   unlockedContent?: UnlockedContent,
 ): number {
-  const content =
-    unlockedContent ?? gamestate().world.research.unlockedContent;
+  const content = unlockedContent ?? gamestate().world.research.unlockedContent;
   return content.passiveBonuses
     .filter((b) => b.bonusType === bonusType)
     .reduce((sum, b) => sum + b.value, 0);
@@ -77,12 +74,14 @@ export function researchUnlockGetRequiredResearchName(
   type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
   id: string,
 ): string | undefined {
-  const allNodes = contentGetEntriesByType<ResearchNode & IsContentItem>(
-    'research',
-  );
+  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
   for (const node of allNodes) {
     for (const unlock of node.unlocks) {
-      if (unlock.type === type && 'targetId' in unlock && unlock.targetId === id) {
+      if (
+        unlock.type === type &&
+        'targetId' in unlock &&
+        unlock.targetId === id
+      ) {
         return node.name;
       }
     }
@@ -97,9 +96,7 @@ export function researchUnlockIsResearchGated(
   type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
   id: string,
 ): boolean {
-  const allNodes = contentGetEntriesByType<ResearchNode & IsContentItem>(
-    'research',
-  );
+  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
   return allNodes.some((node) =>
     node.unlocks.some(
       (unlock) =>
@@ -168,10 +165,8 @@ export function researchUnlockApplyEffects(
  * Handle research completion: apply unlock effects to game state.
  * Called when a research node completes (subscribe to researchCompleted$).
  */
-export async function researchUnlockOnComplete(
-  nodeId: string,
-): Promise<void> {
-  const node = contentGetEntry<ResearchNode & IsContentItem>(nodeId);
+export async function researchUnlockOnComplete(nodeId: string): Promise<void> {
+  const node = contentGetEntry<ResearchNodeContent>(nodeId);
   if (!node || node.unlocks.length === 0) return;
 
   await updateGamestate((s) => {
@@ -207,7 +202,7 @@ export function researchUnlockProcessCompletion(
   nodeId: string,
   state: GameState,
 ): void {
-  const node = contentGetEntry<ResearchNode & IsContentItem>(nodeId);
+  const node = contentGetEntry<ResearchNodeContent>(nodeId);
   if (!node || node.unlocks.length === 0) return;
 
   state.world.research.unlockedContent = researchUnlockApplyEffects(

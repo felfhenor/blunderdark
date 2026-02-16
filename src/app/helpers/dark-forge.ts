@@ -12,7 +12,6 @@ import type {
   ForgeRecipeId,
   GameState,
   InhabitantStats,
-  IsContentItem,
   PlacedRoom,
   PlacedRoomId,
 } from '@interfaces';
@@ -39,8 +38,8 @@ export const darkForgeCompleted$ = darkForgeCompletedSubject.asObservable();
  */
 export function darkForgeGetAvailableRecipes(
   room: PlacedRoom,
-): Array<ForgeRecipeContent & IsContentItem> {
-  const recipes = contentGetEntriesByType<ForgeRecipeContent & IsContentItem>('forgerecipe');
+): Array<ForgeRecipeContent> {
+  const recipes = contentGetEntriesByType<ForgeRecipeContent>('forgerecipe');
 
   const effects = roomUpgradeGetAppliedEffects(room);
   const hasInfernalForge = effects.some((e) => e.type === 'forgingTierUnlock');
@@ -296,7 +295,7 @@ export function darkForgeProcess(state: GameState): void {
           job.recipeId,
         );
 
-        const recipe = contentGetEntry<ForgeRecipeContent & IsContentItem>(job.recipeId);
+        const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
 
         queue.jobs.shift();
 
