@@ -210,6 +210,8 @@ All room-specific systems follow the same pattern:
 - **Keyboard shortcuts**: `@ngneat/hotkeys` with `[hotkeys]`, `isGlobal`, `(hotkey)`
 - **Build mode mutual exclusion**: each mode has enter/exit signals; `enterX()` calls `exitY()` (one-way imports to avoid circular deps)
 - **Gap values must be multiples of 2** — use `gap-2`, `gap-4`, `gap-6`, etc. Never use odd values like `gap-1`, `gap-3`, `gap-5`
+- **Section dividers** — section headers within cards/panels use the daisyUI divider pattern: `<div class="divider my-2 text-xs opacity-60">Label</div>`. Remove trailing colons from labels. Do NOT use `<h4>` with `font-semibold opacity-70 mb-1` for section dividers.
+- **Icons over entities/emoji** — use `<app-icon name="tablerXxx" />` (`IconComponent`) instead of HTML entities (`&check;`, `&times;`, etc.) or emoji. Available icons are registered in `ICON_ALL` (`src/app/helpers/icons.ts`). If unsure which icon to use, ask the user.
 
 ## Naming Conventions
 
