@@ -13,7 +13,6 @@ import {
   hallwayPlacementPreviewCost,
   hallwayPlacementPreviewPath,
   hallwayPlacementStatusMessage,
-  researchUnlockGetRequiredResearchName,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   resourceCanAfford,
@@ -39,7 +38,9 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    contentGetEntriesByType<RoomContent>('room').filter((r) => !r.autoPlace),
+    contentGetEntriesByType<RoomContent>('room').filter(
+      (r) => !r.autoPlace && !this.isResearchLocked(r),
+    ),
   );
 
   public hasAltar = altarRoomHas;
@@ -70,11 +71,6 @@ export class PanelRoomSelectComponent {
   public isResearchLocked(room: RoomContent): boolean {
     if (!researchUnlockIsResearchGated('room', room.id)) return false;
     return !researchUnlockIsUnlocked('room', room.id);
-  }
-
-  public getResearchRequirement(room: RoomContent): string {
-    const name = researchUnlockGetRequiredResearchName('room', room.id);
-    return name ? `Requires: ${name}` : '';
   }
 
   public isBiomeRestricted(room: RoomContent): boolean {
