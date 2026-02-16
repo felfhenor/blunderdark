@@ -86,7 +86,7 @@
                 <div class="tier-label text-xs opacity-50 mb-2 text-center">
                   Tier {{ tierGroup.tier | number:'1.0-2' }}
                 </div>
-                <div class="tier-nodes flex gap-4 justify-center flex-wrap">
+                <div class="tier-nodes" [style.grid-template-columns]="'repeat(' + tierGroup.nodes.length + ', 1fr)'">
                   @for (node of tierGroup.nodes; track node.id) {
                     <button
                       class="node-card bg-base-100"
@@ -174,7 +174,7 @@
 
                 <!-- Cost -->
                 <div>
-                  <div class="text-xs font-semibold mb-1">Cost:</div>
+                  <div class="text-xs font-semibold mb-1">Cost</div>
                   <div class="flex flex-wrap gap-1">
                     @for (cost of formatCost(node.cost); track cost.type) {
                       <span class="badge badge-sm badge-outline capitalize">
@@ -187,7 +187,7 @@
                 <!-- Unlocks -->
                 @if (selectedNodeUnlocks().length > 0) {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Unlocks:</div>
+                    <div class="text-xs font-semibold mb-1">Unlocks</div>
                     <div class="flex flex-col gap-1">
                       @for (unlock of selectedNodeUnlocks(); track unlock.name) {
                         <div class="flex items-center gap-1 text-xs">
@@ -202,7 +202,7 @@
                 <!-- Prerequisites -->
                 @if (node.prerequisiteResearchIds.length > 0) {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Prerequisites:</div>
+                    <div class="text-xs font-semibold mb-1">Prerequisites</div>
                     @if (selectedNodeState() === 'locked') {
                       <div class="text-xs text-error">
                         Missing:
@@ -226,7 +226,7 @@
                 <!-- Active Progress -->
                 @if (selectedNodeState() === 'active') {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Progress:</div>
+                    <div class="text-xs font-semibold mb-1">Progress</div>
                     <progress
                       class="progress progress-info w-full"
                       [value]="progressPercent()"

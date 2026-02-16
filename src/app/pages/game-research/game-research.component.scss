@@ -14,8 +14,6 @@
 .node-card {
   @apply relative flex flex-col items-center justify-center gap-1;
   @apply rounded-lg border-2 p-3 cursor-pointer transition-all;
-  min-width: 120px;
-  max-width: 160px;
   border-color: color-mix(in oklch, var(--color-base-content) 20%, transparent);
 
   &:hover {
@@ -66,6 +64,11 @@
 
 .tier-group {
   @apply w-full;
+}
+
+.tier-nodes {
+  display: grid;
+  gap: 1rem;
 }
 
 .tier-connector {
