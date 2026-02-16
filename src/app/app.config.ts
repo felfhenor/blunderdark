@@ -83,7 +83,10 @@ export const appConfig: ApplicationConfig = {
     provideTippyConfig({
       defaultVariation: 'tooltip',
       variations: {
-        tooltip: tooltipVariation,
+        tooltip: {
+          ...tooltipVariation,
+          className: 'game-tooltip',
+        },
         popper: popperVariation,
         contextMenu: {
           ...withContextMenuVariation(popperVariation),

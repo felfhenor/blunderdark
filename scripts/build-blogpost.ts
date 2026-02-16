@@ -27,7 +27,7 @@ const content = `${header}
 
 ${changelog}
 
-> Play the latest update [online](https://play.blunderdark.com).
+> Play the latest update [online](https://blunderdark.felfhenor.com).
 {: .prompt-info }
 `;
 

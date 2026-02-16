@@ -20,7 +20,6 @@ import { TippyDirective } from '@ngneat/helipopper';
         [ngClass]="['fear-badge', fearClass()]"
         [tp]="fearTip"
         [tpDelay]="250"
-        [tpClassName]="'game-tooltip'"
       >
         {{ fearLabel() }}
       </span>

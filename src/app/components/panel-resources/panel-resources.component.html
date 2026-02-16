@@ -31,7 +31,6 @@
       [class]="getWarningClass(res.type)"
       [tp]="resourceTip"
       [tpDelay]="250"
-      [tpClassName]="'game-tooltip'"
     >
       <div class="flex items-center justify-between mb-0.5">
         <span class="text-xs font-semibold truncate">{{ res.label }}</span>
@@ -116,7 +115,6 @@
     class="resource-item corruption-item flex-1 min-w-[120px]"
     [tp]="corruptionTip"
     [tpDelay]="250"
-    [tpClassName]="'game-tooltip'"
   >
     <div class="flex items-center justify-between mb-0.5">
       <span class="text-xs font-semibold truncate" [class]="getCorruptionColorClass(corruptionInfo().level)">

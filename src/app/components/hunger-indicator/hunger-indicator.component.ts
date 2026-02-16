@@ -24,7 +24,6 @@ import { TippyDirective } from '@ngneat/helipopper';
         [class]="hungerClass()"
         [tp]="hungerTip"
         [tpDelay]="250"
-        [tpClassName]="'game-tooltip'"
       >
         {{ hungerLabel() }}
       </span>
