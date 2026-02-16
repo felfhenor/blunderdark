@@ -8,8 +8,8 @@ export type FusionRecipeId = Branded<string, 'FusionRecipeId'>;
 export type FusionRecipeContent = IsContentItem &
   HasDescription & {
     id: FusionRecipeId;
-    creatureAId: InhabitantId;
-    creatureBId: InhabitantId;
-    resultHybridId: InhabitantId;
+    firstInhabitantId: InhabitantId;
+    secondInhabitantId: InhabitantId;
+    resultInhabitantId: InhabitantId;
     cost: Partial<Record<ResourceType, number>>;
   };

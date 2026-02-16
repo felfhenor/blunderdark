@@ -123,9 +123,9 @@ function makeRecipe(
     name: 'Hobgoblin Fusion',
     __type: 'fusionrecipe',
     description: 'Fuse a Goblin and Kobold.',
-    creatureAId: GOBLIN_ID,
-    creatureBId: KOBOLD_ID,
-    resultHybridId: HOBGOBLIN_ID,
+    firstInhabitantId: GOBLIN_ID,
+    secondInhabitantId: KOBOLD_ID,
+    resultInhabitantId: HOBGOBLIN_ID,
     cost: { essence: 40, gold: 60 },
     ...overrides,
   };
@@ -224,9 +224,9 @@ describe('fusion', () => {
       id: RECIPE_BONE_GOBLIN_ID,
       name: 'Bone Goblin Fusion',
       description: 'Fuse a Goblin and Skeleton.',
-      creatureAId: GOBLIN_ID,
-      creatureBId: SKELETON_ID,
-      resultHybridId: BONE_GOBLIN_ID,
+      firstInhabitantId: GOBLIN_ID,
+      secondInhabitantId: SKELETON_ID,
+      resultInhabitantId: BONE_GOBLIN_ID,
       cost: { essence: 45, gold: 50 },
     });
     mockContent.set(recipe2.id, recipe2);
@@ -242,7 +242,7 @@ describe('fusion', () => {
       const recipe = fusionFindRecipe(GOBLIN_ID, KOBOLD_ID);
       expect(recipe).toBeDefined();
       expect(recipe!.name).toBe('Hobgoblin Fusion');
-      expect(recipe!.resultHybridId).toBe(HOBGOBLIN_ID);
+      expect(recipe!.resultInhabitantId).toBe(HOBGOBLIN_ID);
     });
 
     it('should find a recipe for a reversed pair (B, A)', async () => {
@@ -269,7 +269,7 @@ describe('fusion', () => {
       const recipe = fusionFindRecipe(SKELETON_ID, GOBLIN_ID);
       expect(recipe).toBeDefined();
       expect(recipe!.name).toBe('Bone Goblin Fusion');
-      expect(recipe!.resultHybridId).toBe(BONE_GOBLIN_ID);
+      expect(recipe!.resultInhabitantId).toBe(BONE_GOBLIN_ID);
     });
   });
 

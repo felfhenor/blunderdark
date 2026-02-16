@@ -153,9 +153,9 @@ function ensureFusionRecipe(
     name: recipe.name ?? 'UNKNOWN',
     __type: 'fusionrecipe',
     description: recipe.description ?? '',
-    creatureAId: recipe.creatureAId ?? ('' as InhabitantId),
-    creatureBId: recipe.creatureBId ?? ('' as InhabitantId),
-    resultHybridId: recipe.resultHybridId ?? ('' as InhabitantId),
+    firstInhabitantId: recipe.firstInhabitantId ?? ('' as InhabitantId),
+    secondInhabitantId: recipe.secondInhabitantId ?? ('' as InhabitantId),
+    resultInhabitantId: recipe.resultInhabitantId ?? ('' as InhabitantId),
     cost: recipe.cost ?? {},
   };
 }

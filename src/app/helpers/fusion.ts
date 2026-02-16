@@ -49,10 +49,10 @@ export function fusionFindRecipe(
 
   return recipes.find(
     (r) =>
-      (r.creatureAId === creatureADefId &&
-        r.creatureBId === creatureBDefId) ||
-      (r.creatureAId === creatureBDefId &&
-        r.creatureBId === creatureADefId),
+      (r.firstInhabitantId === creatureADefId &&
+        r.secondInhabitantId === creatureBDefId) ||
+      (r.firstInhabitantId === creatureBDefId &&
+        r.secondInhabitantId === creatureADefId),
   );
 }
 
@@ -114,7 +114,7 @@ export function fusionGetPreview(
   const recipe = fusionFindRecipe(parentADefId, parentBDefId);
   if (!recipe) return undefined;
 
-  const hybridDef = contentGetEntry<InhabitantContent>(recipe.resultHybridId);
+  const hybridDef = contentGetEntry<InhabitantContent>(recipe.resultInhabitantId);
   if (!hybridDef) return undefined;
 
   const parentADef = contentGetEntry<InhabitantContent>(parentADefId);
@@ -270,7 +270,7 @@ export async function fusionExecute(
     return { success: false, error: 'Failed to pay fusion cost' };
   }
 
-  const hybridDef = contentGetEntry<InhabitantContent>(recipe.resultHybridId);
+  const hybridDef = contentGetEntry<InhabitantContent>(recipe.resultInhabitantId);
   if (!hybridDef) {
     return { success: false, error: 'Hybrid definition not found' };
   }

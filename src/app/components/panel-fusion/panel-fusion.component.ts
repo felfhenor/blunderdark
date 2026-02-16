@@ -166,24 +166,24 @@ export class PanelFusionComponent {
 
     return recipes.map((recipe) => {
       const parentADef = contentGetEntry<InhabitantContent>(
-        recipe.creatureAId,
+        recipe.firstInhabitantId,
       );
       const parentBDef = contentGetEntry<InhabitantContent>(
-        recipe.creatureBId,
+        recipe.secondInhabitantId,
       );
       const hybridDef = contentGetEntry<InhabitantContent>(
-        recipe.resultHybridId,
+        recipe.resultInhabitantId,
       );
 
       const hasParentA = inhabitants.some(
         (i) =>
-          i.definitionId === recipe.creatureAId &&
+          i.definitionId === recipe.firstInhabitantId &&
           !i.isTemporary &&
           !(i.travelTicksRemaining && i.travelTicksRemaining > 0),
       );
       const hasParentB = inhabitants.some(
         (i) =>
-          i.definitionId === recipe.creatureBId &&
+          i.definitionId === recipe.secondInhabitantId &&
           !i.isTemporary &&
           !(i.travelTicksRemaining && i.travelTicksRemaining > 0),
       );
