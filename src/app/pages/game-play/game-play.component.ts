@@ -8,7 +8,6 @@ import { PanelAltarComponent } from '@components/panel-altar/panel-altar.compone
 import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
-import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/panel-floor-minimap.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
@@ -63,7 +62,6 @@ import {
     PanelAltarComponent,
     PanelBreedingPitsComponent,
     PanelDarkForgeComponent,
-    PanelFloorMinimapComponent,
     PanelFloorSelectorComponent,
     PanelFusionComponent,
     PanelHallwayInfoComponent,
