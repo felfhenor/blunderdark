@@ -11,12 +11,14 @@
     <app-panel-seasonal-event />
     @if (canShowFusion()) {
       <div class="card bg-base-100 shadow-xl">
-        <div class="card-body p-4">
-          <h3 class="card-title text-sm">Fusion Chamber</h3>
+        <div class="card-body p-4 gap-2">
+          <div class="flex items-center justify-between">
+            <h3 class="card-title text-sm">Fusion Chamber</h3>
+            <button class="btn btn-xs btn-outline" (click)="showFusion.set(true)">
+              Open
+            </button>
+          </div>
           <p class="text-xs opacity-50">Combine two creatures into a hybrid.</p>
-          <button class="btn btn-xs btn-secondary" (click)="showFusion.set(true)">
-            Open Fusion
-          </button>
         </div>
       </div>
     }
