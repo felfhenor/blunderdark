@@ -80,11 +80,6 @@
         </div>
       }
 
-      <div class="flex justify-between text-xs mb-2">
-        <span class="opacity-70">Rate:</span>
-        <span [class]="getRateClass(res.type)">{{ formatRate(res.type) }}</span>
-      </div>
-
       @if (res.type === 'corruption') {
         <div class="divider my-1 h-0"></div>
         <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
@@ -121,7 +116,7 @@
           <div class="divider my-0.5 h-0"></div>
           <div class="flex justify-between font-semibold">
             <span>Total:</span>
-            <span>{{ formatBreakdownRate(bd.final) }}/min</span>
+            <span [class]="bd.final > 0 ? 'text-success' : bd.final < 0 ? 'text-error' : ''">{{ formatBreakdownRate(bd.final) }}/min</span>
           </div>
         </div>
       }
