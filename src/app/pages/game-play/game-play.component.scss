@@ -1,5 +1,6 @@
 :host {
   @apply block w-full h-full;
+  user-select: none;
 }
 
 .should-layer {
