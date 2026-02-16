@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "camera.ts helper created with cameraPosition, cameraZoom, cameraTransform signals. Transform applied via [style.transform] on grid-container with transform-origin: 0 0."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Mouse drag panning via onCameraMouseDown/Move/Up. 5px threshold before drag activates. wasDragging flag prevents accidental tile clicks after drag."
     },
     {
       "id": "US-003",
@@ -45,8 +45,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "WASD and arrow keys via host bindings. CAMERA_PAN_SPEED=40. Skips input/textarea/contentEditable targets and modal-open state."
     },
     {
       "id": "US-004",
@@ -61,8 +61,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Mouse wheel zoom via onWheel handler. Dynamic min zoom (fits grid in viewport) to 3x max. Cursor-centered via inverse-transform math."
     },
     {
       "id": "US-005",
@@ -76,8 +76,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "cameraClampPosition centers grid when smaller than viewport, clamps to edges when larger. Effective min zoom computed from viewport dimensions. ResizeObserver recalculates on viewport resize."
     },
     {
       "id": "US-006",
@@ -92,8 +92,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Reset button in bottom-right of grid viewport. Home key shortcut via host binding. Smooth animation via .camera-animating CSS class with 0.3s transition."
     }
   ]
 }

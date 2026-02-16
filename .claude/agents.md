@@ -400,6 +400,25 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `save-migrations.ts` | `saveMigration` | `SAVE_MIGRATION` |
 
+## Camera System
+
+- **Helper**: `camera.ts` — signal-based camera state for grid pan/zoom
+- **Grid layout**: 20×64px tiles + 19×1px gaps = `CAMERA_GRID_TOTAL` (1299px)
+- **Viewport wrapper**: `div.grid-viewport` wraps the grid-container in `grid.component.html`; has `overflow: hidden`
+- **Transform**: `transform: translate(x, y) scale(zoom)` on `.grid-container` with `transform-origin: 0 0`
+- **Zoom**: cursor-centered via inverse-transform math; effective min zoom = `min(vpWidth/gridTotal, vpHeight/gridTotal)` floored at 0.3
+- **Bounds**: auto-centers grid when smaller than viewport; clamps to edges when larger
+- **Drag panning**: threshold of 5px before drag activates; `wasDragging` flag prevents tile click after drag
+- **Keyboard**: WASD/arrows via host bindings; checks `target.tagName` to skip when input/textarea focused; checks `uiIsAnyModalOpen()`
+- **Reset**: `cameraReset()` animates via `.camera-animating` CSS class (transition 0.3s); clears via `setTimeout`
+- **ResizeObserver**: tracks viewport size; cleaned up via `DestroyRef`
+- **Game-play layout**: parent div uses `overflow-hidden` (not `overflow-auto`) since camera manages scrolling
+- **Lint**: `AfterViewInit` and `ElementRef` from Angular core must use `type` imports when only used as type constraints
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `camera.ts` | `camera` | `CAMERA` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
