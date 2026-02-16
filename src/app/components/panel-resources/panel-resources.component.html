@@ -59,15 +59,16 @@
     </div>
 
     <ng-template #resourceTip>
+      <div class="w-[300px]">
       <div class="font-semibold text-sm mb-1">{{ res.label }}</div>
       <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
 
-      <div class="text-xs mb-1">
+      <div class="flex justify-between text-xs mb-1">
         <span class="opacity-70">Amount:</span>
-        {{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}
+        <span>{{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}</span>
       </div>
 
-      <div class="text-xs mb-2">
+      <div class="flex justify-between text-xs mb-2">
         <span class="opacity-70">Rate:</span>
         <span [class]="getRateClass(res.type)">{{ formatRate(res.type) }}</span>
       </div>
@@ -107,6 +108,7 @@
           </div>
         </div>
       }
+      </div>
     </ng-template>
   }
 
@@ -146,24 +148,25 @@
   </div>
 
   <ng-template #corruptionTip>
+    <div class="w-[300px]">
     <div class="font-semibold text-sm mb-1" [class]="getCorruptionColorClass(corruptionInfo().level)">
       Corruption
     </div>
     <div class="text-xs opacity-70 mb-2">{{ corruptionDisplay.description }}</div>
 
-    <div class="text-xs mb-1">
+    <div class="flex justify-between text-xs mb-1">
       <span class="opacity-70">Amount:</span>
-      {{ getCurrent('corruption') | number: '1.0-0' }}
+      <span>{{ getCurrent('corruption') | number: '1.0-0' }}</span>
     </div>
 
-    <div class="text-xs mb-1">
+    <div class="flex justify-between text-xs mb-1">
       <span class="opacity-70">Level:</span>
       <span class="font-semibold" [class]="getCorruptionColorClass(corruptionInfo().level)">
         {{ corruptionInfo().level | uppercase }}
       </span>
     </div>
 
-    <div class="text-xs mb-2">
+    <div class="flex justify-between text-xs mb-2">
       <span class="opacity-70">Rate:</span>
       <span [class]="getRateClass('corruption')">{{ formatRate('corruption') }}</span>
     </div>
@@ -206,6 +209,7 @@
         </div>
       </div>
     }
+    </div>
   </ng-template>
 </div>
 
