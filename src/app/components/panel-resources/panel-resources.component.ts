@@ -6,7 +6,6 @@ import {
   signal,
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
-import { IconComponent } from '@components/icon/icon.component';
 import {
   corruptionGetLevel,
   corruptionGetLevelDescription,
@@ -84,15 +83,13 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-panel-resources',
-  imports: [DecimalPipe, UpperCasePipe, CurrencyNameComponent, IconComponent, TippyDirective],
+  imports: [DecimalPipe, UpperCasePipe, CurrencyNameComponent, TippyDirective],
   templateUrl: './panel-resources.component.html',
   styleUrl: './panel-resources.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelResourcesComponent {
-  public readonly Math = Math;
-  public readonly resources = RESOURCE_DISPLAY.filter(r => r.type !== 'corruption');
-  public readonly corruptionDisplay = RESOURCE_DISPLAY.find(r => r.type === 'corruption')!;
+  public readonly resources = RESOURCE_DISPLAY;
 
   public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
@@ -139,6 +136,9 @@ export class PanelResourcesComponent {
 
   public getPercent(type: ResourceType): number {
     const res = this.resourceAll()[type];
+    if (type === 'corruption') {
+      return res.current === 0 ? 0 : Math.min(100, (res.current / 200) * 100);
+    }
     if (res.max === 0) return 0;
     return (res.current / res.max) * 100;
   }
