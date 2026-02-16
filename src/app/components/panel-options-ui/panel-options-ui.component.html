@@ -4,7 +4,34 @@
       <div class="card-body">
         <div class="card-title">Gameplay</div>
 
-        Come back soon!
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('autosaveEnabled')"
+              class="checkbox checkbox-secondary"
+              (click)="toggleAutosave()"
+            />
+            <span class="label-text">Autosave</span>
+          </label>
+        </div>
+
+        @if (optionsGet('autosaveEnabled')) {
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <span class="label-text !ml-0 mr-2">Autosave Interval</span>
+              <select
+                class="select select-bordered select-xs"
+                [value]="optionsGet('autosaveIntervalMinutes')"
+                (change)="setAutosaveInterval(+$any($event.target).value)"
+              >
+                @for (interval of autosaveIntervals; track interval.value) {
+                  <option [value]="interval.value">{{ interval.label }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        }
       </div>
     </div>
 

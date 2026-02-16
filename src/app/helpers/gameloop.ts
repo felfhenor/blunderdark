@@ -25,6 +25,7 @@ import { merchantProcess } from '@helpers/merchant';
 import { seasonProcess } from '@helpers/season';
 import { seasonalEventProcess } from '@helpers/seasonal-event';
 import { victoryProcess } from '@helpers/victory';
+import { autosaveCheckPreInvasion } from '@helpers/autosave';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
 import { setupIs } from '@helpers/setup';
@@ -102,6 +103,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
   });
 
   gameEventProcess(gamestate().clock);
+
+  // Check for pre-invasion autosave after state is updated
+  autosaveCheckPreInvasion(gamestate().world.invasionSchedule.warningActive);
 
   gamestateTickEnd();
 

@@ -2,6 +2,8 @@ import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
+import { autosaveReset } from '@helpers/autosave';
+import type { AutosaveInterval } from '@interfaces';
 
 @Component({
   selector: 'app-panel-options-ui',
@@ -11,6 +13,24 @@ import { OptionsBaseComponent } from '@components/panel-options/option-base-page
 })
 export class PanelOptionsUIComponent extends OptionsBaseComponent {
   public currentTheme = signal<string>(this.optionsGet('uiTheme') as string);
+
+  public readonly autosaveIntervals: { value: AutosaveInterval; label: string }[] = [
+    { value: 1, label: '1 minute' },
+    { value: 3, label: '3 minutes' },
+    { value: 5, label: '5 minutes' },
+    { value: 10, label: '10 minutes' },
+  ];
+
+  toggleAutosave(): void {
+    const enabled = !this.optionsGet('autosaveEnabled');
+    this.optionsSet('autosaveEnabled', enabled);
+    autosaveReset();
+  }
+
+  setAutosaveInterval(value: AutosaveInterval): void {
+    this.optionsSet('autosaveIntervalMinutes', value);
+    autosaveReset();
+  }
 
   public readonly themes = [
     { name: 'acid', type: 'light' },

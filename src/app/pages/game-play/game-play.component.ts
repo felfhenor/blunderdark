@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, type OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 
 import { GridComponent } from '@components/grid/grid.component';
@@ -31,7 +32,16 @@ import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import {
+  autosaveEvent$,
+  autosaveInstallBeforeUnload,
+  autosaveIsSaving,
+  autosaveRemoveBeforeUnload,
+  autosaveStart,
+  autosaveStop,
+} from '@helpers/autosave';
 import { fusionHasAvailableCreatures } from '@helpers/fusion';
+import { notifyError } from '@helpers/notify';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 import {
   floorAll,
@@ -84,12 +94,33 @@ import {
     '(document:keydown.PageDown)': 'navigateFloorDown($event)',
   },
 })
-export class GamePlayComponent extends OptionsBaseComponent {
+export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public showResearch = signal(false);
   public showFusion = signal(false);
   public showVictoryMenu = signal(false);
   public canShowFusion = computed(() => fusionHasAvailableCreatures());
+  public isAutosaving = autosaveIsSaving;
+
+  ngOnInit(): void {
+    autosaveStart();
+    autosaveInstallBeforeUnload();
+
+    autosaveEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event.type === 'error' && event.message) {
+          notifyError(event.message);
+        }
+      });
+
+    this.destroyRef.onDestroy(() => {
+      autosaveStop();
+      autosaveRemoveBeforeUnload();
+    });
+  }
 
   public currentFloorDepth = computed(() => {
     const floor = floorCurrent();

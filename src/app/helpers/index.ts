@@ -3,6 +3,7 @@ export * from './alchemy-lab';
 export * from './altar-room';
 export * from './analytics';
 export * from './assignment';
+export * from './autosave';
 export * from './biome-restrictions';
 export * from './breeding-pits';
 export * from './clipboard';

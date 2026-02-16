@@ -23,6 +23,9 @@ export function optionsDefault(): GameOptions {
     gameloopPaused: false,
     gameSpeed: 1,
     optionsTab: 'UI',
+
+    autosaveEnabled: true,
+    autosaveIntervalMinutes: 5,
   };
 }
 

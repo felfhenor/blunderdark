@@ -66,4 +66,11 @@
 <app-panel-victory />
 <app-victory-menu [(visible)]="showVictoryMenu" />
 
+@if (isAutosaving()) {
+  <div class="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2 shadow-lg opacity-80 pointer-events-none">
+    <span class="loading loading-spinner loading-xs"></span>
+    <span class="text-xs font-mono">Saving...</span>
+  </div>
+}
+
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

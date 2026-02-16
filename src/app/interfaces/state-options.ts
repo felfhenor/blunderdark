@@ -7,7 +7,8 @@ export type GameOption =
   | 'debugAllowBackgroundOperations'
   | 'sfxPlay'
   | 'bgmPlay'
-  | 'gameloopPaused';
+  | 'gameloopPaused'
+  | 'autosaveEnabled';
 
 export type NotificationCategory = 'Error' | 'Success' | 'Invasion' | 'Corruption' | 'Breeding' | 'Summoning' | 'Forging' | 'Alchemy' | 'Torture' | 'Merchant' | 'SeasonalEvent';
 
@@ -21,6 +22,8 @@ export interface OptionsTabLink {
 
 export type GameSpeed = 1 | 2 | 4;
 
+export type AutosaveInterval = 1 | 3 | 5 | 10;
+
 export type GameOptions = Record<GameOption, boolean> & {
   uiTheme: string;
   sfxVolume: number;
@@ -29,4 +32,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugTickMultiplier: number;
   debugSaveInterval: number;
   optionsTab: OptionsTab;
+  autosaveIntervalMinutes: AutosaveInterval;
 };
