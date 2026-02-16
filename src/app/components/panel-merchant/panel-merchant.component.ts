@@ -21,7 +21,6 @@ import type {
   MerchantTradeType,
   ResourceCost,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 
 type TradeCategory = 'all' | MerchantTradeType;
 
@@ -35,7 +34,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [ModalComponent, TippyDirective],
+  imports: [ModalComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -142,9 +141,7 @@ export class PanelMerchantComponent {
     }
   }
 
-  private formatCost(
-    cost: ResourceCost,
-  ): { type: string; amount: number }[] {
+  private formatCost(cost: ResourceCost): { type: string; amount: number }[] {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
       .map(([type, amount]) => ({ type, amount: amount! }));

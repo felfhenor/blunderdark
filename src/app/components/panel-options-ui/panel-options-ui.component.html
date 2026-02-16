@@ -23,7 +23,7 @@
               <select
                 class="select select-bordered select-xs"
                 [value]="optionsGet('autosaveIntervalMinutes')"
-                (change)="setAutosaveInterval(+$any($event.target).value)"
+                (change)="setAutosaveInterval($any(+$any($event.target).value))"
               >
                 @for (interval of autosaveIntervals; track interval.value) {
                   <option [value]="interval.value">{{ interval.label }}</option>
