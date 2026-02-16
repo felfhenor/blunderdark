@@ -68,9 +68,9 @@ const soulWellRoom: RoomContent = {
   production: { essence: 0.3 },
   requiresWorkers: false,
   adjacencyBonuses: [
-    { adjacentRoomType: MUSHROOM_GROVE_ID, bonus: 0.2, description: '' },
-    { adjacentRoomType: SHADOW_LIBRARY_ID, bonus: 0.15, description: '' },
-    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.25, description: '' },
+    { adjacentRoomId: MUSHROOM_GROVE_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: SHADOW_LIBRARY_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: SOUL_WELL_ID, bonus: 0.25, description: '' },
   ],
   isUnique: false,
   removable: true,

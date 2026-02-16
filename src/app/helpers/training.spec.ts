@@ -83,9 +83,9 @@ const trainingGroundsRoom: RoomContent = {
   production: {},
   requiresWorkers: false,
   adjacencyBonuses: [
-    { adjacentRoomType: BARRACKS_ID, bonus: 0.2, description: '' },
-    { adjacentRoomType: DARK_FORGE_ID, bonus: 0.1, description: '' },
-    { adjacentRoomType: ALTAR_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: BARRACKS_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: DARK_FORGE_ID, bonus: 0.1, description: '' },
+    { adjacentRoomId: ALTAR_ID, bonus: 0.15, description: '' },
   ],
   isUnique: false,
   removable: true,

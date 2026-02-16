@@ -67,9 +67,9 @@ const barracksRoom: RoomContent = {
   production: {},
   requiresWorkers: false,
   adjacencyBonuses: [
-    { adjacentRoomType: DARK_FORGE_ID, bonus: 0.15, description: '' },
-    { adjacentRoomType: THRONE_ROOM_ID, bonus: 0.2, description: '' },
-    { adjacentRoomType: BARRACKS_ID, bonus: 0.1, description: '' },
+    { adjacentRoomId: DARK_FORGE_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: THRONE_ROOM_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: BARRACKS_ID, bonus: 0.1, description: '' },
   ],
   isUnique: false,
   removable: true,

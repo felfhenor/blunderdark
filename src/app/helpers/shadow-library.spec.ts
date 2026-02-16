@@ -74,9 +74,9 @@ const shadowLibraryRoom: RoomContent = {
   production: { research: 0.6 },
   requiresWorkers: true,
   adjacencyBonuses: [
-    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.15, description: '' },
-    { adjacentRoomType: CRYSTAL_MINE_ID, bonus: 0.1, description: '' },
-    { adjacentRoomType: SHADOW_LIBRARY_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: SOUL_WELL_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: CRYSTAL_MINE_ID, bonus: 0.1, description: '' },
+    { adjacentRoomId: SHADOW_LIBRARY_ID, bonus: 0.2, description: '' },
   ],
   isUnique: false,
   removable: true,

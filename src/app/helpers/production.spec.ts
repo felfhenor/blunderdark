@@ -12,7 +12,7 @@ vi.mock('@helpers/content', () => {
     production: { crystals: 1.0 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomType: 'room-dark-forge', bonus: 0.1, description: 'Forge heats rock' },
+      { adjacentRoomId: 'room-dark-forge', bonus: 0.1, description: 'Forge heats rock' },
     ],
   });
   entries.set('room-throne', {
@@ -48,7 +48,7 @@ vi.mock('@helpers/content', () => {
     production: { gold: 1.2 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomType: 'room-crystal-mine', bonus: 0.15, description: 'Raw crystal ore fuels forging' },
+      { adjacentRoomId: 'room-crystal-mine', bonus: 0.15, description: 'Raw crystal ore fuels forging' },
     ],
   });
 

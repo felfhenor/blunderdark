@@ -125,7 +125,7 @@ const workshopDef: RoomContent = {
   fearReductionAura: 0,
   adjacencyBonuses: [
     {
-      adjacentRoomType: DARK_FORGE_ID,
+      adjacentRoomId: DARK_FORGE_ID,
       bonus: 0.2,
       description: 'Dark Forge bonus.',
     },
@@ -291,7 +291,7 @@ describe('Trap Workshop Room Definition', () => {
 
   it('should have adjacency bonuses', () => {
     expect(workshopDef.adjacencyBonuses).toHaveLength(1);
-    expect(workshopDef.adjacencyBonuses[0].adjacentRoomType).toBe(DARK_FORGE_ID);
+    expect(workshopDef.adjacencyBonuses[0].adjacentRoomId).toBe(DARK_FORGE_ID);
     expect(workshopDef.adjacencyBonuses[0].bonus).toBe(0.2);
   });
 });

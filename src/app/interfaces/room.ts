@@ -4,7 +4,7 @@ import type { ResourceCost } from '@interfaces/resource';
 export type RoomProduction = Partial<Record<string, number>>;
 
 export type AdjacencyBonus = {
-  adjacentRoomType: string;
+  adjacentRoomId: string;
   bonus: number;
   description: string;
 };

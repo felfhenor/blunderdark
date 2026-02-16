@@ -275,7 +275,7 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
     production: room.production ?? {},
     requiresWorkers: room.requiresWorkers ?? false,
     adjacencyBonuses: (room.adjacencyBonuses ?? []).map((b) => ({
-      adjacentRoomType: b.adjacentRoomType ?? '',
+      adjacentRoomId: b.adjacentRoomId ?? '',
       bonus: b.bonus ?? 0,
       description: b.description ?? '',
     })),

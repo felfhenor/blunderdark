@@ -115,7 +115,7 @@ export function productionCalculateAdjacencyBonus(
 
   let totalBonus = 0;
   for (const rule of bonusRules) {
-    const matchCount = adjacentRoomTypeIds.get(rule.adjacentRoomType) ?? 0;
+    const matchCount = adjacentRoomTypeIds.get(rule.adjacentRoomId) ?? 0;
     totalBonus += rule.bonus * matchCount;
   }
 
@@ -150,7 +150,7 @@ export function productionGetActiveAdjacencyBonuses(
     if (!adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) continue;
 
     for (const rule of bonusRules) {
-      if (rule.adjacentRoomType === other.roomTypeId) {
+      if (rule.adjacentRoomId === other.roomTypeId) {
         const otherDef = productionGetRoomDefinition(other.roomTypeId);
         activeBonuses.push({
           sourceRoomId: other.id,

@@ -93,13 +93,13 @@
   alchemyAdjacencyEffects:
     alchemySpeedBonus: 0.20
   adjacencyBonuses:
-    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+    - adjacentRoomId: Crystal Mine
       bonus: 0.1
       description: Shared mineral veins between adjacent mines boost extraction.
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.15
       description: Nearby forge heats rock, making crystal extraction easier.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.1
       description: Library scholars identify optimal mining patterns.
   upgradePaths:
@@ -167,13 +167,13 @@
   alchemyAdjacencyEffects:
     alchemyCostReduction: 0.15
   adjacencyBonuses:
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.4
       description: Soul Well moisture accelerates fungal growth dramatically.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Library knowledge improves cultivation techniques.
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.15
       description: Forge warmth creates ideal growing conditions.
   upgradePaths:
@@ -247,13 +247,13 @@
   summoningAdjacencyEffects:
     summonTimeReduction: 0.25
   adjacencyBonuses:
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.15
       description: Soul essence enhances arcane research comprehension.
-    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+    - adjacentRoomId: Crystal Mine
       bonus: 0.1
       description: Crystal mine ore samples provide material for arcane study.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.2
       description: Adjacent libraries share knowledge and cross-reference tomes.
   upgradePaths:
@@ -341,13 +341,13 @@
   tortureAdjacencyEffects:
     tortureSpeedBonus: 0.15
   adjacencyBonuses:
-    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+    - adjacentRoomId: Mushroom Grove
       bonus: 0.2
       description: Living fungi attract wandering spirits to the well.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Arcane knowledge from the library focuses the well's spiritual draw.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.25
       description: Nearby wells create a spiritual resonance that amplifies essence flow.
   upgradePaths:
@@ -411,7 +411,7 @@
   biomeBonuses:
     volcanic: 0.50
   adjacencyBonuses:
-    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+    - adjacentRoomId: Crystal Mine
       bonus: 0.15
       description: Raw crystal ore fuels the forge's smelting process.
   upgradePaths:
@@ -454,13 +454,13 @@
   biomeBonuses:
     flooded: 0.50
   adjacencyBonuses:
-    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+    - adjacentRoomId: Mushroom Grove
       bonus: 0.3
       description: Lake moisture dramatically boosts fungal growth in the adjacent grove.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.15
       description: Spiritual waters from the Soul Well attract richer fish populations.
-    - adjacentRoomType: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
+    - adjacentRoomId: Underground Lake
       bonus: 0.2
       description: Connected lakes form a larger ecosystem with more abundant catches.
   upgradePaths:
@@ -516,13 +516,13 @@
   tortureAdjacencyEffects:
     tortureConversionBonus: 0.10
   adjacencyBonuses:
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.15
       description: The Dark Forge provides weapons and armor for garrisoned troops.
-    - adjacentRoomType: c9a1e8f5-2347-4885-b477-3363f9617077
+    - adjacentRoomId: Throne Room
       bonus: 0.2
       description: Proximity to the Throne Room improves command structure and morale.
-    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+    - adjacentRoomId: Barracks
       bonus: 0.1
       description: Connected barracks share training resources and patrol routes.
   upgradePaths:
@@ -576,16 +576,16 @@
   throneAdjacencyEffects:
     goldProductionBonus: 0.05
   adjacencyBonuses:
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.15
       description: Forged valuables fill the vault more efficiently.
-    - adjacentRoomType: f48589fe-4326-4320-9506-64fe2ff5bcca
+    - adjacentRoomId: Altar Room
       bonus: 0.25
       description: The altar's dark power blesses the vault's gold, increasing its yield.
-    - adjacentRoomType: c9a1e8f5-2347-4885-b477-3363f9617077
+    - adjacentRoomId: Throne Room
       bonus: 0.2
       description: Proximity to the Throne Room encourages tribute and efficient accounting.
-    - adjacentRoomType: 827472bd-6bbb-482f-86c8-ad30d5613237
+    - adjacentRoomId: Treasure Vault
       bonus: 0.1
       description: Connected vaults share security infrastructure, reducing overhead.
   upgradePaths:
@@ -643,13 +643,13 @@
   forgingAdjacencyEffects:
     forgingStatBonus: 1
   adjacencyBonuses:
-    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+    - adjacentRoomId: Barracks
       bonus: 0.2
       description: Shared training resources and weapon racks reduce training time by 20%.
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.1
       description: Forged weapons and armor improve training quality.
-    - adjacentRoomType: f48589fe-4326-4320-9506-64fe2ff5bcca
+    - adjacentRoomId: Altar Room
       bonus: 0.15
       description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
   upgradePaths:
@@ -708,13 +708,13 @@
   maxInhabitants: 2
   fearLevel: 2
   adjacencyBonuses:
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.2
       description: Arcane knowledge from the Shadow Library amplifies ley line channeling.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.15
       description: Soul essence from the Well resonates with the ley line's magical frequency.
-    - adjacentRoomType: a7ef7e24-f250-45e7-986d-ad06b3610b52
+    - adjacentRoomId: Ley Line Nexus
       bonus: 0.25
       description: Adjacent nexus points create a powerful ley line network with amplified output.
   upgradePaths:
@@ -787,13 +787,13 @@
   forgingAdjacencyEffects:
     forgingEffectivenessBonus: 0.20
   adjacencyBonuses:
-    - adjacentRoomType: ae673803-b514-4da9-a0d4-df448aa412a4
+    - adjacentRoomId: Dark Forge
       bonus: 0.2
       description: The Dark Forge provides superior materials, increasing trap durability.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Library research improves trap design efficiency.
-    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+    - adjacentRoomId: Crystal Mine
       bonus: 0.1
       description: Crystal Mine provides raw materials for trap mechanisms.
   upgradePaths:
@@ -849,10 +849,10 @@
   breedingAdjacencyEffects:
     hybridTimeReduction: 0.25
   adjacencyBonuses:
-    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+    - adjacentRoomId: Mushroom Grove
       bonus: 0.15
       description: Organic matter from the Mushroom Grove feeds the pool.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.2
       description: Soul essence from the Well accelerates spawning.
   upgradePaths:
@@ -898,13 +898,13 @@
   fearLevel: 4
   role: breedingPits
   adjacencyBonuses:
-    - adjacentRoomType: bf618a8c-5b95-4a63-9168-98da24e061c4
+    - adjacentRoomId: Spawning Pool
       bonus: 0.15
       description: Primordial ooze from the Spawning Pool accelerates hybrid gestation.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.1
       description: Soul essence stabilizes mutagenic processes.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.1
       description: Library knowledge improves breeding recipe accuracy.
   upgradePaths:
@@ -948,10 +948,10 @@
   fearLevel: 3
   role: summoningCircle
   adjacencyBonuses:
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Arcane knowledge from the Shadow Library enhances summoning rituals.
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.1
       description: Soul essence from the Well stabilizes planar connections.
   upgradePaths:
@@ -1003,10 +1003,10 @@
   biomeBonuses:
     crystal: 0.20
   adjacencyBonuses:
-    - adjacentRoomType: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+    - adjacentRoomId: Crystal Mine
       bonus: 0.15
       description: Crystal Mine provides a steady supply of raw materials.
-    - adjacentRoomType: 7fb314ad-a447-469f-82df-4b8c68f9deff
+    - adjacentRoomId: Mushroom Grove
       bonus: 0.10
       description: Fresh mushroom substrate aids in reagent preparation.
   upgradePaths:
@@ -1061,13 +1061,13 @@
     dimension: corruption
     weight: 10
   adjacencyBonuses:
-    - adjacentRoomType: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+    - adjacentRoomId: Soul Well
       bonus: 0.20
       description: Soul Well's spectral energy intensifies the chamber's dark methods.
-    - adjacentRoomType: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+    - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Forbidden knowledge from the Shadow Library refines interrogation techniques.
-    - adjacentRoomType: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+    - adjacentRoomId: Barracks
       bonus: 0.10
       description: Military discipline from the Barracks aids in prisoner control.
   upgradePaths:

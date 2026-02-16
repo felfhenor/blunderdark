@@ -71,9 +71,9 @@ const leyLineNexusRoom: RoomContent = {
   production: { flux: 2.0 },
   requiresWorkers: true,
   adjacencyBonuses: [
-    { adjacentRoomType: SHADOW_LIBRARY_ID, bonus: 0.2, description: '' },
-    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.15, description: '' },
-    { adjacentRoomType: LEY_LINE_NEXUS_ID, bonus: 0.25, description: '' },
+    { adjacentRoomId: SHADOW_LIBRARY_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: SOUL_WELL_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: LEY_LINE_NEXUS_ID, bonus: 0.25, description: '' },
   ],
   isUnique: false,
   removable: true,

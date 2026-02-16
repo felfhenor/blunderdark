@@ -71,9 +71,9 @@ const undergroundLakeRoom: RoomContent = {
   production: { food: 1.0 },
   requiresWorkers: true,
   adjacencyBonuses: [
-    { adjacentRoomType: MUSHROOM_GROVE_ID, bonus: 0.3, description: '' },
-    { adjacentRoomType: SOUL_WELL_ID, bonus: 0.15, description: '' },
-    { adjacentRoomType: UNDERGROUND_LAKE_ID, bonus: 0.2, description: '' },
+    { adjacentRoomId: MUSHROOM_GROVE_ID, bonus: 0.3, description: '' },
+    { adjacentRoomId: SOUL_WELL_ID, bonus: 0.15, description: '' },
+    { adjacentRoomId: UNDERGROUND_LAKE_ID, bonus: 0.2, description: '' },
   ],
   isUnique: false,
   removable: true,
