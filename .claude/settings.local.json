@@ -10,7 +10,9 @@
       "Bash(git status:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(npx ng build:*)"
+      "Bash(npx ng build:*)",
+      "mcp__angular-cli__get_best_practices",
+      "Bash(xargs cat:*)"
     ]
   }
 }
