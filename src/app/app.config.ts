@@ -85,7 +85,6 @@ export const appConfig: ApplicationConfig = {
       variations: {
         tooltip: {
           ...tooltipVariation,
-          className: 'game-tooltip',
         },
         popper: popperVariation,
         contextMenu: {
