@@ -12,13 +12,8 @@
     defense: 8
     speed: 12
     workerEfficiency: 1.0
-  traits:
-    - id: trait-goblin-miner
-      name: Miner
-      description: Increases crystal production by 20% when assigned to a crystal-producing room.
-      effectType: production_bonus
-      effectValue: 0.2
-      targetResourceType: crystals
+  inhabitantTraitIds:
+    - Miner
   fearTolerance: 1
   fearModifier: 0
   foodConsumptionRate: 2
@@ -56,12 +51,8 @@
     defense: 5
     speed: 18
     workerEfficiency: 0.9
-  traits:
-    - id: trait-kobold-trapper
-      name: Trapper
-      description: Skilled at laying traps that slow and damage invaders.
-      effectType: trap_bonus
-      effectValue: 0.25
+  inhabitantTraitIds:
+    - Trapper
   fearTolerance: 2
   fearModifier: 0
   foodConsumptionRate: 1.5
@@ -99,12 +90,8 @@
     defense: 15
     speed: 6
     workerEfficiency: 0.7
-  traits:
-    - id: trait-skeleton-guardian
-      name: Guardian
-      description: Increases room defense effectiveness against invaders.
-      effectType: defense_bonus
-      effectValue: 0.3
+  inhabitantTraitIds:
+    - Guardian
   fearTolerance: 4
   fearModifier: 1
   foodConsumptionRate: 0
@@ -139,13 +126,8 @@
     defense: 10
     speed: 8
     workerEfficiency: 1.3
-  traits:
-    - id: trait-myconid-farmer
-      name: Farmer
-      description: Increases food production by 15% when assigned to a food-producing room.
-      effectType: production_bonus
-      effectValue: 0.15
-      targetResourceType: food
+  inhabitantTraitIds:
+    - Farmer
   fearTolerance: 1
   fearModifier: -1
   foodConsumptionRate: 1
@@ -182,12 +164,8 @@
     defense: 3
     speed: 5
     workerEfficiency: 0.6
-  traits:
-    - id: trait-slime-adaptable
-      name: Adaptable
-      description: Can be assigned to any room type without penalty.
-      effectType: versatility
-      effectValue: 1.0
+  inhabitantTraitIds:
+    - Adaptable
   fearTolerance: 0
   fearModifier: 0
   foodConsumptionRate: 0.5
@@ -224,22 +202,10 @@
     defense: 60
     speed: 20
     workerEfficiency: 1.0
-  traits:
-    - id: trait-dragon-draconic-fury
-      name: Draconic Fury
-      description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power dungeon-wide by 15%.
-      effectType: aura_attack_bonus
-      effectValue: 0.15
-    - id: trait-dragon-fire-breath
-      name: Fire Breath
-      description: Devastating fire attacks deal 50% bonus fire damage to all invaders in combat.
-      effectType: fire_damage_bonus
-      effectValue: 0.5
-    - id: trait-dragon-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
+  inhabitantTraitIds:
+    - Draconic Fury
+    - Fire Breath
+    - Fearless
   restrictionTags:
     - unique
   rulerBonuses:
@@ -300,49 +266,14 @@
     defense: 30
     speed: 15
     workerEfficiency: 1.0
-  traits:
-    - id: trait-lich-scholarly
-      name: Scholarly
-      description: Increases research production by 40% when assigned to a research-producing room.
-      effectType: production_bonus
-      effectValue: 0.4
-      targetResourceType: research
-    - id: trait-lich-undead-master
-      name: Undead Master
-      description: Undead inhabitants in the same or adjacent rooms gain +1 Attack and +1 Defense.
-      effectType: undead_master
-      effectValue: 1
-    - id: trait-lich-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state. Channels arcane energy as an Arcane Shield when confronted.
-      effectType: fear_immunity
-      effectValue: 1
-    - id: trait-lich-ancient-knowledge
-      name: Ancient Knowledge
-      description: Reveals one hidden research node per branch in the research tree.
-      effectType: ancient_knowledge
-      effectValue: 1
-    - id: trait-lich-throne-scholar
-      name: Throne Scholar
-      description: When assigned to the Throne Room, provides a dungeon-wide +10% Research bonus.
-      effectType: production_bonus
-      effectValue: 0.1
-      targetResourceType: research
-      targetRoomName: Throne Room
-    - id: trait-lich-soul-siphon
-      name: Soul Siphon
-      description: When assigned to the Soul Well, doubles Soul Essence generation.
-      effectType: production_bonus
-      effectValue: 1.0
-      targetResourceType: essence
-      targetRoomName: Soul Well
-    - id: trait-lich-library-specialist
-      name: Library Specialist
-      description: When assigned to the Shadow Library, grants +20% additional Research on top of Scholarly bonus.
-      effectType: production_bonus
-      effectValue: 0.2
-      targetResourceType: research
-      targetRoomName: Shadow Library
+  inhabitantTraitIds:
+    - Scholarly
+    - Undead Master
+    - Fearless
+    - Ancient Knowledge
+    - Throne Scholar
+    - Soul Siphon
+    - Library Specialist
   restrictionTags:
     - unique
   rulerBonuses:
@@ -383,27 +314,11 @@
     defense: 50
     speed: 25
     workerEfficiency: 1.0
-  traits:
-    - id: trait-demonlord-abyssal-corruption
-      name: Abyssal Corruption
-      description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing corruption generation dungeon-wide by 25%.
-      effectType: aura_corruption_bonus
-      effectValue: 0.25
-    - id: trait-demonlord-dread-aura
-      name: Dread Aura
-      description: Radiates an overwhelming aura of dread that increases dungeon-wide fear by 10.
-      effectType: aura_fear_bonus
-      effectValue: 10
-    - id: trait-demonlord-crushing-presence
-      name: Crushing Presence
-      description: The Demon Lord's oppressive will reduces invader morale dungeon-wide by 15%.
-      effectType: aura_morale_penalty
-      effectValue: 0.15
-    - id: trait-demonlord-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
+  inhabitantTraitIds:
+    - Abyssal Corruption
+    - Dread Aura
+    - Crushing Presence
+    - Fearless
   restrictionTags:
     - unique
   rulerBonuses:
@@ -464,7 +379,7 @@
     defense: 15
     speed: 14
     workerEfficiency: 0.8
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - summoned
   fearModifier: 1
@@ -498,7 +413,7 @@
     defense: 12
     speed: 22
     workerEfficiency: 1.1
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - summoned
   fearModifier: 0
@@ -535,7 +450,7 @@
     defense: 25
     speed: 10
     workerEfficiency: 0.9
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - summoned
   fearModifier: 1
@@ -569,7 +484,7 @@
     defense: 2
     speed: 15
     workerEfficiency: 1.5
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - summoned
   fearModifier: 0
@@ -602,7 +517,7 @@
     defense: 5
     speed: 20
     workerEfficiency: 1.3
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - summoned
   fearModifier: 0
@@ -638,23 +553,10 @@
     defense: 18
     speed: 14
     workerEfficiency: 1.2
-  traits:
-    - id: trait-dryad-nature-affinity
-      name: Nature Affinity
-      description: Increases food production by 30% when assigned to a food-producing room.
-      effectType: production_bonus
-      effectValue: 0.3
-      targetResourceType: food
-    - id: trait-dryad-purifier
-      name: Purifier
-      description: Reduces corruption in the assigned room by 1 per game day.
-      effectType: corruption_reduction
-      effectValue: 1
-    - id: trait-dryad-regenerative
-      name: Regenerative
-      description: Passively heals 5% HP per minute outside of combat.
-      effectType: regeneration
-      effectValue: 0.05
+  inhabitantTraitIds:
+    - Nature Affinity
+    - Purifier
+    - Regenerative
   fearTolerance: 1
   fearModifier: -1
   foodConsumptionRate: 2
@@ -693,22 +595,10 @@
     defense: 35
     speed: 4
     workerEfficiency: 0.7
-  traits:
-    - id: trait-gargoyle-stone-form
-      name: Stone Form
-      description: Takes 50% reduced damage from physical attacks and is immune to poison.
-      effectType: damage_reduction
-      effectValue: 0.5
-    - id: trait-gargoyle-sentinel
-      name: Sentinel
-      description: Automatically detects invaders within 2 tiles and alerts the dungeon.
-      effectType: detection
-      effectValue: 2
-    - id: trait-gargoyle-architectural
-      name: Architectural
-      description: Room the Gargoyle is assigned to gains +1 structural integrity.
-      effectType: structural_bonus
-      effectValue: 1
+  inhabitantTraitIds:
+    - Stone Form
+    - Sentinel
+    - Architectural
   fearTolerance: 3
   fearModifier: 1
   foodConsumptionRate: 0
@@ -743,22 +633,10 @@
     defense: 6
     speed: 22
     workerEfficiency: 0.9
-  traits:
-    - id: trait-imp-mischievous
-      name: Mischievous
-      description: 5% chance per game hour to cause a random minor event in the assigned room.
-      effectType: random_event
-      effectValue: 0.05
-    - id: trait-imp-firestarter
-      name: FireStarter
-      description: +25% damage with fire-based attacks. Assigned room gains fire hazard potential.
-      effectType: fire_damage_bonus
-      effectValue: 0.25
-    - id: trait-imp-corruptor
-      name: Corruptor
-      description: Increases corruption in the assigned room by 1 per game day.
-      effectType: corruption_generation
-      effectValue: 1
+  inhabitantTraitIds:
+    - Mischievous
+    - FireStarter
+    - Corruptor
   fearTolerance: 2
   fearModifier: 0
   foodConsumptionRate: 1
@@ -797,27 +675,11 @@
     defense: 18
     speed: 12
     workerEfficiency: 0.8
-  traits:
-    - id: trait-orc-warrior
-      name: Warrior
-      description: Increases training speed by 30% when assigned to a Barracks or Training Grounds.
-      effectType: training_bonus
-      effectValue: 0.3
-    - id: trait-orc-intimidating
-      name: Intimidating
-      description: Adds +1 Fear to the room the Orc is assigned to.
-      effectType: fear_bonus
-      effectValue: 1
-    - id: trait-orc-strong
-      name: Strong
-      description: Adds +2 Attack in combat encounters.
-      effectType: attack_bonus
-      effectValue: 2
-    - id: trait-orc-aggressive
-      name: Aggressive
-      description: Orcs always act first in combat, gaining initiative priority.
-      effectType: combat_priority
-      effectValue: 1
+  inhabitantTraitIds:
+    - Warrior
+    - Intimidating
+    - Strong
+    - Aggressive
   fearTolerance: 3
   fearModifier: 1
   foodConsumptionRate: 3
@@ -855,28 +717,11 @@
     defense: 8
     speed: 20
     workerEfficiency: 1.1
-  traits:
-    - id: trait-wraith-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
-    - id: trait-wraith-terrifying
-      name: Terrifying
-      description: Adds +2 Fear to the room the Wraith is assigned to.
-      effectType: fear_bonus
-      effectValue: 2
-    - id: trait-wraith-intangible
-      name: Intangible
-      description: 50% chance to evade physical attacks. Magical attacks are unaffected.
-      effectType: physical_evasion
-      effectValue: 0.5
-    - id: trait-wraith-scholar
-      name: Scholar
-      description: Increases research production by 20% when assigned to a research-producing room.
-      effectType: production_bonus
-      effectValue: 0.2
-      targetResourceType: research
+  inhabitantTraitIds:
+    - Fearless
+    - Terrifying
+    - Intangible
+    - Scholar
   fearTolerance: 99
   fearModifier: 2
   foodConsumptionRate: 0
@@ -909,7 +754,7 @@
     defense: 5
     speed: 8
     workerEfficiency: 0.80
-  traits: []
+  inhabitantTraitIds: []
   restrictionTags:
     - converted
   fearModifier: 0
@@ -949,35 +794,12 @@
     defense: 25
     speed: 6
     workerEfficiency: 0.9
-  traits:
-    - id: trait-stone-elemental-inappetent
-      name: Inappetent
-      description: Does not require food. Never enters hungry or starving states.
-      effectType: food_exemption
-      effectValue: 1
-    - id: trait-stone-elemental-geological
-      name: Geological
-      description: Increases crystal mining production by 40% when assigned to a mining room.
-      effectType: production_bonus
-      effectValue: 0.4
-      targetResourceType: crystals
-    - id: trait-stone-elemental-sturdy
-      name: Sturdy
-      description: Grants +1 Defense from hardened stone hide.
-      effectType: defense_bonus
-      effectValue: 1
-    - id: trait-stone-elemental-forge-affinity
-      name: Forge Affinity
-      description: Increases gold production by 20% when assigned to a forge.
-      effectType: production_bonus
-      effectValue: 0.2
-      targetResourceType: gold
-    - id: trait-stone-elemental-ley-conductor
-      name: Ley Conductor
-      description: Generates 15% more flux when assigned to a Ley Line Nexus.
-      effectType: production_bonus
-      effectValue: 0.15
-      targetResourceType: flux
+  inhabitantTraitIds:
+    - Inappetent
+    - Geological
+    - Sturdy
+    - Forge Affinity
+    - Ley Conductor
   fearTolerance: 4
   fearModifier: 0
   foodConsumptionRate: 0
@@ -1012,23 +834,10 @@
     defense: 14
     speed: 8
     workerEfficiency: 0.8
-  traits:
-    - id: trait-mimic-shapeshifter
-      name: Shapeshifter
-      description: Disguises as a room object. When revealed, deals +100% damage on the first attack against an invader.
-      effectType: attack_bonus
-      effectValue: 1.0
-    - id: trait-mimic-treasure-guardian
-      name: Treasure Guardian
-      description: Gains +2 Defense when assigned to a Treasure Vault.
-      effectType: defense_bonus
-      effectValue: 2
-      targetRoomName: Treasure Vault
-    - id: trait-mimic-versatile
-      name: Versatile
-      description: Can work in any room at 80% efficiency, applied as a final multiplier after other bonuses.
-      effectType: versatility
-      effectValue: 0.8
+  inhabitantTraitIds:
+    - Shapeshifter
+    - Treasure Guardian
+    - Versatile
   fearTolerance: 2
   fearModifier: 1
   foodConsumptionRate: 1

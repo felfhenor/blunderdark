@@ -1,0 +1,597 @@
+# Base inhabitant traits
+
+- id: 40136c39-3429-48bb-a6e2-6c1fd3bfd9cf
+  name: Miner
+  description: Increases crystal production by 20% when assigned to a crystal-producing room.
+  effectType: production_bonus
+  effectValue: 0.2
+  targetResourceType: crystals
+
+- id: 910d1644-50dd-4c59-a2e7-6656c5b522e0
+  name: Trapper
+  description: Skilled at laying traps that slow and damage invaders.
+  effectType: trap_bonus
+  effectValue: 0.25
+
+- id: b03356e0-d8c2-4be1-a631-750b4dfa93b5
+  name: Guardian
+  description: Increases room defense effectiveness against invaders.
+  effectType: defense_bonus
+  effectValue: 0.3
+
+- id: 055276be-6f7f-4460-a277-3c1b9a5f75ab
+  name: Farmer
+  description: Increases food production by 15% when assigned to a food-producing room.
+  effectType: production_bonus
+  effectValue: 0.15
+  targetResourceType: food
+
+- id: 65ebed0a-1c53-4c12-9a0b-29be8134bb51
+  name: Adaptable
+  description: Can be assigned to any room type without penalty.
+  effectType: versatility
+  effectValue: 1.0
+
+- id: f09ea869-8705-4193-b917-e48a7f1d64f7
+  name: Draconic Fury
+  description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power dungeon-wide by 15%.
+  effectType: aura_attack_bonus
+  effectValue: 0.15
+
+- id: 239c7292-eed6-4206-b931-776fc3cc1819
+  name: Fire Breath
+  description: Devastating fire attacks deal 50% bonus fire damage to all invaders in combat.
+  effectType: fire_damage_bonus
+  effectValue: 0.5
+
+- id: ca911967-8236-49a3-8cac-e60b5267b123
+  name: Fearless
+  description: Immune to all fear effects. Never enters the scared state.
+  effectType: fear_immunity
+  effectValue: 1
+
+- id: 4f8df10a-4c3a-4f26-b45c-01fcdf3ca800
+  name: Scholarly
+  description: Increases research production by 40% when assigned to a research-producing room.
+  effectType: production_bonus
+  effectValue: 0.4
+  targetResourceType: research
+
+- id: b950768f-5733-42db-824e-a99ad84be591
+  name: Undead Master
+  description: Undead inhabitants in the same or adjacent rooms gain +1 Attack and +1 Defense.
+  effectType: undead_master
+  effectValue: 1
+
+- id: 3c6a8954-51a0-427b-9067-60ede3b1b6fc
+  name: Ancient Knowledge
+  description: Reveals one hidden research node per branch in the research tree.
+  effectType: ancient_knowledge
+  effectValue: 1
+
+- id: 10f78dcf-af4b-4ba4-80cb-b7d5ed54931b
+  name: Throne Scholar
+  description: When assigned to the Throne Room, provides a dungeon-wide +10% Research bonus.
+  effectType: production_bonus
+  effectValue: 0.1
+  targetResourceType: research
+  targetRoomId: Throne Room
+
+- id: cd1286ea-ea19-4371-8967-3a2cd8440f70
+  name: Soul Siphon
+  description: When assigned to the Soul Well, doubles Soul Essence generation.
+  effectType: production_bonus
+  effectValue: 1.0
+  targetResourceType: essence
+  targetRoomId: Soul Well
+
+- id: 02efe8bd-c9ba-4ebf-919e-f002925d4b67
+  name: Library Specialist
+  description: When assigned to the Shadow Library, grants +20% additional Research on top of Scholarly bonus.
+  effectType: production_bonus
+  effectValue: 0.2
+  targetResourceType: research
+  targetRoomId: Shadow Library
+
+- id: 7f0b4906-56c5-4306-8345-7876b366d025
+  name: Abyssal Corruption
+  description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing corruption generation dungeon-wide by 25%.
+  effectType: aura_corruption_bonus
+  effectValue: 0.25
+
+- id: a5010fb7-37ed-4698-8950-8269d80f1f02
+  name: Dread Aura
+  description: Radiates an overwhelming aura of dread that increases dungeon-wide fear by 10.
+  effectType: aura_fear_bonus
+  effectValue: 10
+
+- id: 0ec6bc83-4d3c-4b73-8f9b-9e952acaabcb
+  name: Crushing Presence
+  description: The Demon Lord's oppressive will reduces invader morale dungeon-wide by 15%.
+  effectType: aura_morale_penalty
+  effectValue: 0.15
+
+- id: ecb71c53-b413-469e-82ab-87e0f46b7ab1
+  name: Nature Affinity
+  description: Increases food production by 30% when assigned to a food-producing room.
+  effectType: production_bonus
+  effectValue: 0.3
+  targetResourceType: food
+
+- id: 997df7af-9dce-442e-a341-720e44d34e22
+  name: Purifier
+  description: Reduces corruption in the assigned room by 1 per game day.
+  effectType: corruption_reduction
+  effectValue: 1
+
+- id: a4af2314-d74f-4b4e-aebc-8e5a2aa532f4
+  name: Regenerative
+  description: Passively heals 5% HP per minute outside of combat.
+  effectType: regeneration
+  effectValue: 0.05
+
+- id: 544a6d63-8f8a-49bf-b9b7-56dfb21990d5
+  name: Stone Form
+  description: Takes 50% reduced damage from physical attacks and is immune to poison.
+  effectType: damage_reduction
+  effectValue: 0.5
+
+- id: 4b11cbde-ad5c-4b29-b324-6720894cd99f
+  name: Sentinel
+  description: Automatically detects invaders within 2 tiles and alerts the dungeon.
+  effectType: detection
+  effectValue: 2
+
+- id: fedaba9b-e8bf-4718-8637-bd26d680b9e9
+  name: Architectural
+  description: Room the Gargoyle is assigned to gains +1 structural integrity.
+  effectType: structural_bonus
+  effectValue: 1
+
+- id: 1337742f-ada0-4f90-a3da-81c3c064f538
+  name: Mischievous
+  description: 5% chance per game hour to cause a random minor event in the assigned room.
+  effectType: random_event
+  effectValue: 0.05
+
+- id: 41a302f7-699c-4557-8062-7f5d11100eb4
+  name: FireStarter
+  description: +25% damage with fire-based attacks. Assigned room gains fire hazard potential.
+  effectType: fire_damage_bonus
+  effectValue: 0.25
+
+- id: 8316523a-b303-4fe6-9e1c-003555a815d7
+  name: Corruptor
+  description: Increases corruption in the assigned room by 1 per game day.
+  effectType: corruption_generation
+  effectValue: 1
+
+- id: 6e524753-0d97-43fe-81f2-b566a52b1ea6
+  name: Warrior
+  description: Increases training speed by 30% when assigned to a Barracks or Training Grounds.
+  effectType: training_bonus
+  effectValue: 0.3
+
+- id: 6a093167-21eb-4662-b75d-f5602e0b4376
+  name: Intimidating
+  description: Adds +1 Fear to the room the Orc is assigned to.
+  effectType: fear_bonus
+  effectValue: 1
+
+- id: bf1f858e-f77f-415b-9452-b8e02049e5fc
+  name: Strong
+  description: Adds +2 Attack in combat encounters.
+  effectType: attack_bonus
+  effectValue: 2
+
+- id: 6cc9a1d7-f5a1-4dd1-a354-b98137a942c2
+  name: Aggressive
+  description: Orcs always act first in combat, gaining initiative priority.
+  effectType: combat_priority
+  effectValue: 1
+
+- id: 2d6acb8d-bf56-4cac-be22-e9435493a7f1
+  name: Terrifying
+  description: Adds +2 Fear to the room the Wraith is assigned to.
+  effectType: fear_bonus
+  effectValue: 2
+
+- id: b4c7b56b-59ec-4686-a753-c450157ce750
+  name: Intangible
+  description: 50% chance to evade physical attacks. Magical attacks are unaffected.
+  effectType: physical_evasion
+  effectValue: 0.5
+
+- id: 79f34764-c8d9-4c28-8ebe-ac0867bd279b
+  name: Scholar
+  description: Increases research production by 20% when assigned to a research-producing room.
+  effectType: production_bonus
+  effectValue: 0.2
+  targetResourceType: research
+
+- id: 06b86f11-4426-45f1-931d-e6048080d700
+  name: Inappetent
+  description: Does not require food. Never enters hungry or starving states.
+  effectType: food_exemption
+  effectValue: 1
+
+- id: 0a75910b-8135-41ca-98e5-91dd1088d07a
+  name: Geological
+  description: Increases crystal mining production by 40% when assigned to a mining room.
+  effectType: production_bonus
+  effectValue: 0.4
+  targetResourceType: crystals
+
+- id: cece9c54-66eb-4513-8e5b-ae2d47f043a1
+  name: Sturdy
+  description: Grants +1 Defense from hardened stone hide.
+  effectType: defense_bonus
+  effectValue: 1
+
+- id: 335cd443-8edb-4897-aff5-a504e3010f70
+  name: Forge Affinity
+  description: Increases gold production by 20% when assigned to a forge.
+  effectType: production_bonus
+  effectValue: 0.2
+  targetResourceType: gold
+
+- id: 87aa7c6a-078b-43e5-8c3f-2efca7c74464
+  name: Ley Conductor
+  description: Generates 15% more flux when assigned to a Ley Line Nexus.
+  effectType: production_bonus
+  effectValue: 0.15
+  targetResourceType: flux
+
+- id: 3eb825b4-f880-4655-a4e4-90a794e203d5
+  name: Shapeshifter
+  description: Disguises as a room object. When revealed, deals +100% damage on the first attack against an invader.
+  effectType: attack_bonus
+  effectValue: 1.0
+
+- id: 1aa5685a-9490-4e48-9f8d-c893171f0dfe
+  name: Treasure Guardian
+  description: Gains +2 Defense when assigned to a Treasure Vault.
+  effectType: defense_bonus
+  effectValue: 2
+  targetRoomId: Treasure Vault
+
+- id: 6e84c750-889b-45bf-b83c-94f81f126f47
+  name: Versatile
+  description: Can work in any room at 80% efficiency, applied as a final multiplier after other bonuses.
+  effectType: versatility
+  effectValue: 0.8
+
+# Hybrid inhabitant traits
+
+- id: 89f628f4-2478-4ed9-a0fc-65674d086ee8
+  name: Disciplined
+  description: Increases production by 15% in any assigned room.
+  effectType: production_bonus
+  effectValue: 0.15
+  targetResourceType: crystals
+
+- id: 197aaf41-3b08-4638-abe7-ca15dc2c461e
+  name: Taskmaster
+  description: Boosts training speed of nearby creatures.
+  effectType: training_bonus
+  effectValue: 0.1
+
+- id: e6df7464-8b01-48f9-b9a8-d4cf6c1f72a5
+  name: Tireless Miner
+  description: Increases crystal production by 25% when assigned to Crystal Mine.
+  effectType: production_bonus
+  effectValue: 0.25
+  targetResourceType: crystals
+
+- id: 29c3a242-49eb-4420-bae0-5a03b99172ba
+  name: Undead Resilience
+  description: Takes reduced damage from physical attacks.
+  effectType: damage_reduction
+  effectValue: 0.1
+
+- id: 009eefe7-ad22-41f5-a72e-07cc93cffb75
+  name: Burning Traps
+  description: Traps deal additional fire damage.
+  effectType: fire_damage_bonus
+  effectValue: 0.3
+
+- id: af4c4222-609b-4189-9313-49a8fcfe48ee
+  name: Blazing Speed
+  description: Moves faster than any pure-blooded creature.
+  effectType: physical_evasion
+  effectValue: 0.15
+
+- id: def6dae6-84ee-4a23-bfa5-854a2b4763af
+  name: Burning Bones
+  description: Deals fire damage on contact with attackers.
+  effectType: fire_damage_bonus
+  effectValue: 0.25
+
+- id: e13f771d-041e-485c-bada-27fc43a99640
+  name: Terrifying Visage
+  description: Increases fear in assigned room.
+  effectType: fear_bonus
+  effectValue: 1
+
+- id: 2e7c4dfc-e42f-4be9-b9e9-571688e748f1
+  name: Arsonist
+  description: Deals bonus fire damage in combat.
+  effectType: fire_damage_bonus
+  effectValue: 0.35
+
+- id: 731a596c-f7ad-4356-97fa-1e01cfd6c6ad
+  name: Chaotic Nature
+  description: Generates corruption passively.
+  effectType: corruption_generation
+  effectValue: 0.5
+
+- id: 6b09d1ed-a562-4fcd-9e9e-09c7ff601588
+  name: Undead Commander
+  description: Boosts attack of nearby undead inhabitants.
+  effectType: attack_bonus
+  effectValue: 0.2
+
+- id: 266fa9dd-3c9f-4916-a0e4-c461e849504f
+  name: Spectral Armor
+  description: Reduces incoming damage significantly.
+  effectType: damage_reduction
+  effectValue: 0.2
+
+- id: 15a8eaf9-5bff-4147-97ec-0421d7e4ca0f
+  name: Dread Presence
+  description: Greatly increases fear in assigned room.
+  effectType: fear_bonus
+  effectValue: 2
+
+- id: d721314e-0cd2-4ca0-90e6-86565aa8b110
+  name: Rally Cry
+  description: Boosts attack of all creatures in the same room.
+  effectType: attack_bonus
+  effectValue: 0.15
+
+- id: daee97e2-5185-4ded-ba5e-efa7f9bf4f58
+  name: Tactical Cunning
+  description: Boosts defense of creatures in the same room.
+  effectType: defense_bonus
+  effectValue: 0.1
+
+- id: 1ab59513-c6e1-4eb6-a88b-ec5679291d87
+  name: Phase Strike
+  description: Attacks ignore a portion of enemy defense.
+  effectType: attack_bonus
+  effectValue: 0.25
+
+- id: b0e8bd1e-de4a-4219-93cc-b77275369380
+  name: Ghost Fire
+  description: Generates corruption from spectral flames.
+  effectType: corruption_generation
+  effectValue: 1
+
+- id: e8573297-088e-4dd1-a37d-5e36f7f77225
+  name: Spectral Terror
+  description: Increases fear in assigned room.
+  effectType: fear_bonus
+  effectValue: 1
+
+- id: 8d9f4555-a0a6-4598-b787-340c37132873
+  name: Living Fortress
+  description: Massive damage reduction from all sources.
+  effectType: damage_reduction
+  effectValue: 0.3
+
+- id: 960f2769-19dd-4157-8f08-aaf7d5b6b988
+  name: Structural Reinforcement
+  description: Boosts structural integrity of assigned room.
+  effectType: structural_bonus
+  effectValue: 0.2
+
+- id: 76fb01be-294c-4ca6-bd22-3c750fda3933
+  name: Siege Breaker
+  description: Deals massive damage to structures and armored targets.
+  effectType: attack_bonus
+  effectValue: 0.3
+
+- id: e4c83e64-bc49-4afd-95b2-9735a970e860
+  name: Iron Skin
+  description: Reduces all incoming damage.
+  effectType: damage_reduction
+  effectValue: 0.15
+
+- id: 0eefb6d2-3997-497c-824c-1234e9d70a13
+  name: Supreme Necromancy
+  description: Massively boosts research speed.
+  effectType: production_bonus
+  effectValue: 0.4
+  targetResourceType: research
+
+- id: 5dce4068-8c96-45ed-bb00-d443a0775835
+  name: Spectral Command
+  description: Boosts all undead attack in the dungeon.
+  effectType: attack_bonus
+  effectValue: 0.15
+
+- id: 3ed31727-6016-4fe6-87f7-785e96104d18
+  name: Aura of Dread
+  description: Greatly increases fear in assigned room.
+  effectType: fear_bonus
+  effectValue: 2
+
+- id: 7ce9d62c-9d3d-465d-85d6-e4f36a05461f
+  name: Bone Reformation
+  description: Regenerates health over time.
+  effectType: regeneration
+  effectValue: 2
+
+- id: 506ef520-77f2-4af8-bfd6-d87e7619bab4
+  name: Skeletal Mastery
+  description: Boosts defense of nearby undead.
+  effectType: defense_bonus
+  effectValue: 0.2
+
+- id: cf4c0490-a115-421a-873e-696654c57099
+  name: Ancient Scholar
+  description: Boosts research production.
+  effectType: production_bonus
+  effectValue: 0.25
+  targetResourceType: research
+
+- id: 2bdbc569-f6f2-400f-9e9d-90fc8143fbdc
+  name: Perfect Ambush
+  description: Massively boosts trap effectiveness.
+  effectType: trap_bonus
+  effectValue: 0.4
+
+- id: 01263db5-ce15-4c68-9fb4-5af35cb0fc71
+  name: Furniture Form
+  description: Reduces detection by invaders.
+  effectType: detection
+  effectValue: -0.3
+
+- id: 65f81999-353c-48ee-bc43-a7f321e298f8
+  name: Adaptive Form
+  description: Can work in any room type.
+  effectType: versatility
+  effectValue: 0.1
+
+- id: 86bac394-98f4-46e4-9b39-62669ec2eb10
+  name: Phase Shift
+  description: Periodically becomes intangible, evading attacks.
+  effectType: physical_evasion
+  effectValue: 0.25
+
+- id: 2a0cf51f-07a0-4637-b799-2b53197d4a96
+  name: Spectral Crush
+  description: Devastating melee attacks empowered by ghostly energy.
+  effectType: attack_bonus
+  effectValue: 0.2
+
+- id: 18d8acf7-ac96-45a2-9e0d-d4eac701e655
+  name: Towering Horror
+  description: Greatly increases fear in assigned room.
+  effectType: fear_bonus
+  effectValue: 2
+
+- id: 1f1b6ac3-7de5-4595-bcbc-a3255e0dc558
+  name: Undying Might
+  description: Massive attack bonus in combat.
+  effectType: attack_bonus
+  effectValue: 0.3
+
+- id: 40a673a1-882a-4d56-9374-7ad71b0c2344
+  name: Dark Regeneration
+  description: Slowly regenerates from wounds.
+  effectType: regeneration
+  effectValue: 1
+
+- id: 251e7682-f837-4688-a154-0ff508769fac
+  name: Warlord's Presence
+  description: Enemies cower before the Death Warlord.
+  effectType: fear_bonus
+  effectValue: 2
+
+- id: 99d87e67-805f-4edd-908c-ab4d466dc5fc
+  name: Ooze Armor
+  description: Absorbs a portion of incoming damage.
+  effectType: damage_reduction
+  effectValue: 0.2
+
+- id: b1ba8c29-4714-4957-86d1-573c7306c351
+  name: Bountiful Growth
+  description: Greatly increases food production.
+  effectType: production_bonus
+  effectValue: 0.3
+  targetResourceType: food
+
+- id: 8dc41657-e164-4763-bc9c-40e5b54d6271
+  name: Spore Cloud
+  description: Generates corruption passively.
+  effectType: corruption_generation
+  effectValue: 0.5
+
+- id: 3a57e23d-672e-4eae-b87e-6476dd7c73c4
+  name: Shadow Strike
+  description: Attacks from stealth deal bonus damage.
+  effectType: attack_bonus
+  effectValue: 0.25
+
+- id: ea0749a6-cf7c-4c37-a58d-ce1dd925c857
+  name: Dark Vision
+  description: Reduces chance of being detected by invader scouts.
+  effectType: detection
+  effectValue: -0.2
+
+- id: 5b0f94fb-4d63-4788-a406-36ddd6ee518d
+  name: Freezing Aura
+  description: Slows nearby enemies in combat.
+  effectType: defense_bonus
+  effectValue: 0.2
+
+- id: a0aa00d4-178a-444e-b136-6053f5ddee8c
+  name: Ice Wall
+  description: Boosts structural integrity of assigned room.
+  effectType: structural_bonus
+  effectValue: 0.25
+
+- id: 64d84d87-a9f0-44f0-bc77-f74c73d52cef
+  name: Spectral Research
+  description: Massively boosts research production.
+  effectType: production_bonus
+  effectValue: 0.35
+  targetResourceType: research
+
+- id: 05a60662-a990-455a-a21e-acd681850bf1
+  name: Flux Channeler
+  description: Boosts flux production.
+  effectType: production_bonus
+  effectValue: 0.2
+  targetResourceType: flux
+
+# Legendary inhabitant traits
+
+- id: c558ab3d-f524-455f-b949-d1c1607b033f
+  name: Trap Mastery
+  description: The Beholder's eye stalks optimize trap placement dungeon-wide, increasing trap effectiveness by 15%.
+  effectType: aura_trap_bonus
+  effectValue: 0.15
+
+- id: 91abb690-826e-41a3-96ba-c47ee79787d4
+  name: Antimagic Gaze
+  description: The Beholder's central eye negates magical scouting, preventing invaders from detecting dungeon layout.
+  effectType: aura_negate_scout
+  effectValue: 1
+
+- id: 9895b24b-3a4d-4f9f-88a5-73b2d218e89a
+  name: All-Seeing
+  description: The Beholder's many eyes reveal all invaders on the map, even those hidden or invisible.
+  effectType: aura_reveal_invaders
+  effectValue: 1
+
+- id: a3f68631-4ca0-416d-a357-e013640f83cb
+  name: Petrifying Presence
+  description: The Medusa's aura grants a 5% chance to petrify invaders each combat round, stunning them for one turn.
+  effectType: aura_petrify
+  effectValue: 0.05
+
+- id: ca855a60-61e7-4119-932e-7bce40fb4fe4
+  name: Dread Gaze
+  description: The Medusa's terrifying visage increases dungeon-wide fear by 20%.
+  effectType: aura_fear_bonus
+  effectValue: 0.20
+
+- id: f31f5327-671f-4a54-933b-8482d9cfd4e3
+  name: Bountiful Roots
+  description: The Ancient Treant's roots enrich the dungeon soil, increasing food production dungeon-wide by 20%.
+  effectType: aura_food_bonus
+  effectValue: 0.20
+
+- id: ff2aaae9-484c-46e9-904a-ca010b410c61
+  name: Nature's Bounty
+  description: All gathering and harvesting operations across the dungeon are 15% more efficient.
+  effectType: aura_gathering_bonus
+  effectValue: 0.15
+
+- id: 15e33456-029c-4f60-a5c7-22e1120d191f
+  name: Living Walls
+  description: The Treant's roots reinforce room structures, passively regenerating room durability over time.
+  effectType: aura_room_regen
+  effectValue: 1

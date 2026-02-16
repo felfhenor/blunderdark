@@ -7,6 +7,7 @@ export type ContentType =
   | 'forgerecipe'
   | 'fusionrecipe'
   | 'inhabitant'
+  | 'inhabitanttrait'
   | 'invader'
   | 'invasion'
   | 'merchanttrade'

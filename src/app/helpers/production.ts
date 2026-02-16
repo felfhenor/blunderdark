@@ -74,7 +74,7 @@ export function productionCalculateInhabitantBonus(
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {
         // Skip trait if it targets a specific room and this room doesn't match
-        if (trait.targetRoomName && roomDef?.name !== trait.targetRoomName) continue;
+        if (trait.targetRoomId && roomDef?.id !== trait.targetRoomId) continue;
 
         // Only apply trait if it targets this room's production or has no target
         if (

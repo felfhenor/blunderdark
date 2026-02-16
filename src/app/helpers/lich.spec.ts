@@ -121,7 +121,7 @@ vi.mock('@helpers/content', () => {
         effectType: 'production_bonus',
         effectValue: 0.1,
         targetResourceType: 'research',
-        targetRoomName: 'Throne Room',
+        targetRoomId: 'room-throne',
       },
       {
         id: 'trait-lich-soul-siphon',
@@ -130,7 +130,7 @@ vi.mock('@helpers/content', () => {
         effectType: 'production_bonus',
         effectValue: 1.0,
         targetResourceType: 'essence',
-        targetRoomName: 'Soul Well',
+        targetRoomId: 'room-soul-well',
       },
       {
         id: 'trait-lich-library-specialist',
@@ -139,7 +139,7 @@ vi.mock('@helpers/content', () => {
         effectType: 'production_bonus',
         effectValue: 0.2,
         targetResourceType: 'research',
-        targetRoomName: 'Shadow Library',
+        targetRoomId: 'room-shadow-library',
       },
     ],
     fearTolerance: 99,
@@ -374,7 +374,7 @@ describe('Lich Scholarly trait: 40% research bonus', () => {
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // Lich: workerEfficiency (1.0 - 1.0) = 0
     // Scholarly: +0.4 (targetResourceType: research, library produces research)
-    // Library Specialist: +0.2 (targetRoomName: Shadow Library, matches)
+    // Library Specialist: +0.2 (targetRoomId: Shadow Library, matches)
     // Total: 0.6
     expect(result.bonus).toBeCloseTo(0.6);
     expect(result.hasWorkers).toBe(true);
@@ -657,7 +657,7 @@ describe('Lich Throne Room interaction: +10% Research', () => {
     const result = productionCalculateInhabitantBonus(throne, inhabitants);
     // Throne Room produces gold, not research.
     // Scholarly: NOT applied (no research production)
-    // Throne Scholar: has targetRoomName = 'Throne Room' AND targetResourceType = 'research'
+    // Throne Scholar: has targetRoomId = 'room-throne' AND targetResourceType = 'research'
     //   BUT Throne Room doesn't produce research, so this bonus doesn't apply through production
     // Library Specialist: NOT applied (wrong room)
     // Soul Siphon: NOT applied (wrong room, wrong resource)
@@ -682,7 +682,7 @@ describe('Lich Shadow Library interaction: total +60% Research', () => {
 
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // Scholarly: +0.4 (research production present)
-    // Library Specialist: +0.2 (targetRoomName matches Shadow Library)
+    // Library Specialist: +0.2 (targetRoomId matches Shadow Library)
     // workerEfficiency: (1.0 - 1.0) = 0
     // Total: 0.6 (60%)
     expect(result.bonus).toBeCloseTo(0.6);
@@ -727,7 +727,7 @@ describe('Lich Soul Well interaction: double essence', () => {
     ];
 
     const result = productionCalculateInhabitantBonus(soulWell, inhabitants);
-    // Soul Siphon: +1.0 (targetRoomName = Soul Well, targetResourceType = essence, room produces essence)
+    // Soul Siphon: +1.0 (targetRoomId = Soul Well, targetResourceType = essence, room produces essence)
     // Scholarly: NOT applied (Soul Well doesn't produce research)
     // workerEfficiency: (1.0 - 1.0) = 0
     expect(result.bonus).toBeCloseTo(1.0);

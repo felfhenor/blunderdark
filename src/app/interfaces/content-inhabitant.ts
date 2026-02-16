@@ -1,4 +1,5 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { InhabitantTraitId } from '@interfaces/content-inhabitanttrait';
 import type {
   InhabitantState,
   InhabitantStats,
@@ -19,6 +20,7 @@ export type InhabitantContent = IsContentItem &
     tier: number;
     cost: Partial<Record<ResourceType, number>>;
     stats: InhabitantStats;
+    inhabitantTraitIds: InhabitantTraitId[];
     traits: InhabitantTrait[];
     restrictionTags: string[];
     rulerBonuses: RulerBonuses;

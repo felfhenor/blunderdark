@@ -38,6 +38,10 @@ import type {
   InhabitantContent,
   InhabitantId,
 } from '@interfaces/content-inhabitant';
+import type {
+  InhabitantTraitContent,
+  InhabitantTraitId,
+} from '@interfaces/content-inhabitanttrait';
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
 import type {
@@ -71,6 +75,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   forgerecipe: ensureForgeRecipe,
   fusionrecipe: ensureFusionRecipe,
   inhabitant: ensureInhabitant,
+  inhabitanttrait: ensureInhabitantTrait,
   invader: ensureInvader,
   invasion: ensureInvasion,
   merchanttrade: ensureMerchantTrade,
@@ -329,6 +334,21 @@ function ensureSynergy(synergy: Partial<SynergyContent>): SynergyContent {
   };
 }
 
+function ensureInhabitantTrait(
+  trait: Partial<InhabitantTraitContent>,
+): InhabitantTraitContent {
+  return {
+    id: (trait.id ?? 'UNKNOWN') as InhabitantTraitId,
+    name: trait.name ?? 'UNKNOWN',
+    __type: 'inhabitanttrait',
+    description: trait.description ?? '',
+    effectType: trait.effectType ?? '',
+    effectValue: trait.effectValue ?? 0,
+    targetResourceType: trait.targetResourceType ?? undefined,
+    targetRoomId: trait.targetRoomId ?? undefined,
+  };
+}
+
 function ensureInhabitant(
   inhabitant: Partial<InhabitantContent>,
 ): InhabitantContent {
@@ -347,6 +367,7 @@ function ensureInhabitant(
       speed: 0,
       workerEfficiency: 1.0,
     },
+    inhabitantTraitIds: inhabitant.inhabitantTraitIds ?? [],
     traits: inhabitant.traits ?? [],
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},

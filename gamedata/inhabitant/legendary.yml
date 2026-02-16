@@ -13,27 +13,11 @@
     defense: 40
     speed: 15
     workerEfficiency: 1.0
-  traits:
-    - id: trait-beholder-trap-mastery
-      name: Trap Mastery
-      description: The Beholder's eye stalks optimize trap placement dungeon-wide, increasing trap effectiveness by 15%.
-      effectType: aura_trap_bonus
-      effectValue: 0.15
-    - id: trait-beholder-antimagic-gaze
-      name: Antimagic Gaze
-      description: The Beholder's central eye negates magical scouting, preventing invaders from detecting dungeon layout.
-      effectType: aura_negate_scout
-      effectValue: 1
-    - id: trait-beholder-all-seeing
-      name: All-Seeing
-      description: The Beholder's many eyes reveal all invaders on the map, even those hidden or invisible.
-      effectType: aura_reveal_invaders
-      effectValue: 1
-    - id: trait-beholder-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
+  inhabitantTraitIds:
+    - Trap Mastery
+    - Antimagic Gaze
+    - All-Seeing
+    - Fearless
   restrictionTags:
     - unique
   rulerBonuses:
@@ -94,22 +78,10 @@
     defense: 35
     speed: 18
     workerEfficiency: 1.0
-  traits:
-    - id: trait-medusa-petrifying-presence
-      name: Petrifying Presence
-      description: The Medusa's aura grants a 5% chance to petrify invaders each combat round, stunning them for one turn.
-      effectType: aura_petrify
-      effectValue: 0.05
-    - id: trait-medusa-dread-gaze
-      name: Dread Gaze
-      description: The Medusa's terrifying visage increases dungeon-wide fear by 20%.
-      effectType: aura_fear_bonus
-      effectValue: 0.20
-    - id: trait-medusa-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
+  inhabitantTraitIds:
+    - Petrifying Presence
+    - Dread Gaze
+    - Fearless
   restrictionTags:
     - unique
   rulerBonuses:
@@ -171,27 +143,11 @@
     defense: 70
     speed: 8
     workerEfficiency: 1.0
-  traits:
-    - id: trait-treant-bountiful-roots
-      name: Bountiful Roots
-      description: The Ancient Treant's roots enrich the dungeon soil, increasing food production dungeon-wide by 20%.
-      effectType: aura_food_bonus
-      effectValue: 0.20
-    - id: trait-treant-natures-bounty
-      name: Nature's Bounty
-      description: All gathering and harvesting operations across the dungeon are 15% more efficient.
-      effectType: aura_gathering_bonus
-      effectValue: 0.15
-    - id: trait-treant-living-walls
-      name: Living Walls
-      description: The Treant's roots reinforce room structures, passively regenerating room durability over time.
-      effectType: aura_room_regen
-      effectValue: 1
-    - id: trait-treant-fearless
-      name: Fearless
-      description: Immune to all fear effects. Never enters the scared state.
-      effectType: fear_immunity
-      effectValue: 1
+  inhabitantTraitIds:
+    - Bountiful Roots
+    - Nature's Bounty
+    - Living Walls
+    - Fearless
   restrictionTags:
     - unique
   rulerBonuses:

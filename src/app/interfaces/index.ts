@@ -15,6 +15,7 @@ export * from './content-feature';
 export * from './content-forgerecipe';
 export * from './content-fusionrecipe';
 export * from './content-inhabitant';
+export * from './content-inhabitanttrait';
 export * from './content-invader';
 export * from './content-invasion';
 export * from './content-merchanttrade';

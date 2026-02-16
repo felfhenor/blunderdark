@@ -15,8 +15,8 @@ const MIMIC_LIVING_TRAP_SLOW_DURATION = 2;
  * Calculate bonus defense from defense_bonus traits that target a specific room.
  * Returns the total defense bonus from matching traits.
  *
- * Traits with targetRoomName only apply when the assigned room matches.
- * Traits without targetRoomName apply unconditionally.
+ * Traits with targetRoomId only apply when the assigned room matches.
+ * Traits without targetRoomId apply unconditionally.
  */
 export function mimicCalculateDefenseBonus(
   traits: InhabitantTrait[],
@@ -30,9 +30,9 @@ export function mimicCalculateDefenseBonus(
   let bonus = 0;
   for (const trait of traits) {
     if (trait.effectType !== 'defense_bonus') continue;
-    if (!trait.targetRoomName) {
+    if (!trait.targetRoomId) {
       bonus += trait.effectValue;
-    } else if (roomDef.name === trait.targetRoomName) {
+    } else if (roomDef.id === trait.targetRoomId) {
       bonus += trait.effectValue;
     }
   }

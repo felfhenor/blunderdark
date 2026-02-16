@@ -56,7 +56,7 @@ vi.mock('@helpers/content', () => {
         description: '',
         effectType: 'defense_bonus',
         effectValue: 2,
-        targetRoomName: 'Treasure Vault',
+        targetRoomId: 'room-treasure-vault',
       },
       {
         id: 'trait-mimic-versatile',
@@ -192,7 +192,7 @@ describe('mimicCalculateDefenseBonus', () => {
     expect(bonus).toBe(0);
   });
 
-  it('should apply unconditional defense_bonus when no targetRoomName', () => {
+  it('should apply unconditional defense_bonus when no targetRoomId', () => {
     const traits: InhabitantTrait[] = [
       {
         id: 'trait-test',
