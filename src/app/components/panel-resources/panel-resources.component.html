@@ -45,19 +45,12 @@
         </span>
       </div>
 
-      <div class="flex items-center justify-between">
+      <div class="text-xs opacity-70">
         @if (res.type === 'corruption') {
-          <span class="text-xs opacity-70">
-            {{ getCurrent(res.type) | number: '1.0-0' }}
-          </span>
+          {{ getCurrent(res.type) | number: '1.0-0' }}
         } @else {
-          <span class="text-xs opacity-70">
-            {{ getCurrent(res.type) | number: '1.0-0' }}/{{ getMax(res.type) | number: '1.0-0' }}
-          </span>
+          {{ getCurrent(res.type) | number: '1.0-0' }}/{{ getMax(res.type) | number: '1.0-0' }}
         }
-        <span class="text-xs" [class]="getRateClass(res.type)">
-          {{ formatRate(res.type) }}
-        </span>
       </div>
     </div>
 
