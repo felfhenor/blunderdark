@@ -628,8 +628,8 @@ describe('spawningPoolProcess', () => {
 });
 
 describe('Constants', () => {
-  it('should have default rate of 25 ticks (5 game-minutes)', () => {
-    expect(SPAWNING_POOL_DEFAULT_RATE).toBe(25);
+  it('should have default rate of 5 ticks (5 game-minutes)', () => {
+    expect(SPAWNING_POOL_DEFAULT_RATE).toBe(5);
   });
 
   it('should have default capacity of 10', () => {

@@ -234,7 +234,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
     const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'skeleton' as InhabitantId });
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
-    // 1 per minute / 5 ticks per minute = 0.2 per tick
+    // 1 per minute / 1 tick per minute = 1.0 per tick
     expect(rate).toBeCloseTo(1 / GAME_TIME_TICKS_PER_MINUTE);
   });
 
@@ -242,7 +242,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
     const inst = makeInst({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'demon-lord' as InhabitantId });
     const def = makeDef({ corruptionGeneration: 10 });
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
-    // 10 per minute / 5 ticks per minute = 2.0 per tick
+    // 10 per minute / 1 tick per minute = 10.0 per tick
     expect(rate).toBeCloseTo(10 / GAME_TIME_TICKS_PER_MINUTE);
   });
 
@@ -253,7 +253,7 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
     ];
     const def = makeDef({ corruptionGeneration: 1 });
     const rate = corruptionGenerationCalculateInhabitantRate(inhabitants, () => def);
-    // 2 per minute total / 5 = 0.4 per tick
+    // 2 per minute total / 1 = 2.0 per tick
     expect(rate).toBeCloseTo(2 / GAME_TIME_TICKS_PER_MINUTE);
   });
 
@@ -331,8 +331,8 @@ describe('corruptionGenerationProcess', () => {
 
     const state = makeState([makeInst()]);
     corruptionGenerationProcess(state);
-    // 1/min / 5 ticks/min = 0.2 per tick
-    expect(state.world.resources.corruption.current).toBeCloseTo(0.2);
+    // 1/min / 1 tick/min = 1.0 per tick
+    expect(state.world.resources.corruption.current).toBeCloseTo(1.0);
   });
 
   it('should apply night modifier (+50%)', async () => {
@@ -357,8 +357,8 @@ describe('corruptionGenerationProcess', () => {
 
     const state = makeState([makeInst()], 22);
     corruptionGenerationProcess(state);
-    // 0.2 per tick * 1.5 night = 0.3
-    expect(state.world.resources.corruption.current).toBeCloseTo(0.3);
+    // 1.0 per tick * 1.5 night = 1.5
+    expect(state.world.resources.corruption.current).toBeCloseTo(1.5);
   });
 
   it('should not add corruption from unstationed inhabitants', async () => {
@@ -379,9 +379,9 @@ describe('corruptionGenerationProcess', () => {
 describe('corruptionGenerationCalculateTotalPerMinute', () => {
   it('should combine inhabitant and room rates into per-minute', () => {
     // 0.2 per tick (inhabitant) + 0.4 per tick (room) = 0.6 per tick
-    // 0.6 * 5 = 3.0 per minute
+    // 0.6 * 1 = 0.6 per minute
     const total = corruptionGenerationCalculateTotalPerMinute(0.2, 0.4);
-    expect(total).toBeCloseTo(3.0);
+    expect(total).toBeCloseTo(0.6);
   });
 
   it('should return 0 when both rates are 0', () => {
@@ -502,8 +502,8 @@ describe('Corruption Seal', () => {
     } as unknown as GameState;
 
     corruptionGenerationProcess(state);
-    // Only unsealed room generates: 2/min / 5 = 0.4/tick
-    expect(state.world.resources.corruption.current).toBeCloseTo(0.4);
+    // Only unsealed room generates: 2/min / 1 = 2.0/tick
+    expect(state.world.resources.corruption.current).toBeCloseTo(2.0);
   });
 
   it('should not remove existing corruption, only prevent new generation', async () => {

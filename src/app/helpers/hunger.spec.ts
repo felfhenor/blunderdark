@@ -156,7 +156,7 @@ describe('Constants', () => {
 
 describe('hungerGetPerTickConsumption', () => {
   it('should convert hourly rate to per-tick rate', () => {
-    expect(hungerGetPerTickConsumption(300)).toBeCloseTo(1.0);
+    expect(hungerGetPerTickConsumption(300)).toBeCloseTo(5.0);
     expect(hungerGetPerTickConsumption(0)).toBe(0);
     expect(hungerGetPerTickConsumption(2)).toBeCloseTo(2 / HUNGER_TICKS_PER_HOUR);
   });

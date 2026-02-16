@@ -19,7 +19,7 @@ import type { RoomContent } from '@interfaces/content-room';
 import { Subject } from 'rxjs';
 import type { TrainingRoomInfo } from '@interfaces/training';
 
-/** Base training time: 5 game-minutes = 25 ticks (GAME_TIME_TICKS_PER_MINUTE * 5) */
+/** Base training time: 5 game-minutes */
 export const TRAINING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 5;
 
 // --- Training completion events ---

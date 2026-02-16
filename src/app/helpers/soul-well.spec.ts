@@ -240,10 +240,10 @@ describe('Soul Well: definition', () => {
 });
 
 describe('Soul Well: base production', () => {
-  it('should have base production of 0.3 essence/tick (1.5 essence/min)', () => {
+  it('should have base production of 0.3 essence/tick (0.3 essence/min)', () => {
     const production = productionGetBase(SOUL_WELL_ID as RoomId);
     expect(production).toEqual({ essence: 0.3 });
-    expect(productionPerMinute(production['essence']!)).toBeCloseTo(1.5);
+    expect(productionPerMinute(production['essence']!)).toBeCloseTo(0.3);
   });
 
   it('should produce essence even without workers (passive)', () => {

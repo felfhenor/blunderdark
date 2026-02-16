@@ -269,10 +269,10 @@ describe('Treasure Vault: definition', () => {
 });
 
 describe('Treasure Vault: base production', () => {
-  it('should have base production of 0.8 gold/tick (4 gold/min)', () => {
+  it('should have base production of 0.8 gold/tick (0.8 gold/min)', () => {
     const production = productionGetBase(TREASURE_VAULT_ID as RoomId);
     expect(production).toEqual({ gold: 0.8 });
-    expect(productionPerMinute(production['gold']!)).toBeCloseTo(4.0);
+    expect(productionPerMinute(production['gold']!)).toBeCloseTo(0.8);
   });
 
   it('should produce gold even without workers (passive)', () => {

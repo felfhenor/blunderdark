@@ -26,8 +26,8 @@ import { Subject } from 'rxjs';
 
 // --- Constants ---
 
-export const TORTURE_EXTRACTION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 20 ticks
-export const TORTURE_CONVERSION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 8; // 40 ticks
+export const TORTURE_EXTRACTION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 4 game-minutes
+export const TORTURE_CONVERSION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 8; // 8 game-minutes
 export const TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING = 0.12;
 
 export const TORTURE_CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {

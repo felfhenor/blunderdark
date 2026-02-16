@@ -239,10 +239,10 @@ beforeEach(() => {
 });
 
 describe('Mushroom Grove: base production', () => {
-  it('should have base production of 1.6 food/tick (8 food/min)', () => {
+  it('should have base production of 1.6 food/tick (1.6 food/min)', () => {
     const production = productionGetBase(MUSHROOM_GROVE_ID as RoomId);
     expect(production).toEqual({ food: 1.6 });
-    expect(productionPerMinute(production['food']!)).toBeCloseTo(8.0);
+    expect(productionPerMinute(production['food']!)).toBeCloseTo(1.6);
   });
 
   it('should produce 0 food when no workers are assigned', () => {

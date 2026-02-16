@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
 
 // --- Constants ---
 
-export const SPAWNING_POOL_DEFAULT_RATE = GAME_TIME_TICKS_PER_MINUTE * 5; // 25 ticks = 5 game-minutes
+export const SPAWNING_POOL_DEFAULT_RATE = GAME_TIME_TICKS_PER_MINUTE * 5; // 5 game-minutes
 export const SPAWNING_POOL_DEFAULT_CAPACITY = 10;
 
 // Dark Spawning upgrade changes spawn type to Skeleton

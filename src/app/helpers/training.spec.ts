@@ -612,7 +612,7 @@ describe('Training Grounds: trainingProcess', () => {
     const inh1 = createInhabitant({
       instanceId: 'inst-1' as InhabitantInstanceId,
       assignedRoomId: 'placed-tg-1' as PlacedRoomId,
-      trainingProgress: 10,
+      trainingProgress: 1,
     });
     const inh2 = createInhabitant({
       instanceId: 'inst-2' as InhabitantInstanceId,
@@ -625,7 +625,7 @@ describe('Training Grounds: trainingProcess', () => {
 
     trainingProcess(state);
 
-    expect(state.world.inhabitants[0].trainingProgress).toBe(11);
+    expect(state.world.inhabitants[0].trainingProgress).toBe(2);
     expect(state.world.inhabitants[0].trained).toBe(false);
     expect(state.world.inhabitants[1].trainingProgress).toBe(
       TRAINING_BASE_TICKS,

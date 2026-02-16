@@ -120,7 +120,7 @@ vi.mock('@helpers/content', () => {
 });
 
 vi.mock('@helpers/game-time', () => ({
-  GAME_TIME_TICKS_PER_MINUTE: 5,
+  GAME_TIME_TICKS_PER_MINUTE: 1,
 }));
 
 vi.mock('@helpers/room-upgrades', () => ({
@@ -561,9 +561,9 @@ describe('legendaryInhabitantUpkeepProcess', () => {
       legendaryInhabitantUpkeepProcess(state);
 
       // Dragon upkeep: 10 gold/min, 8 food/min
-      // Per tick: 10/5=2 gold, 8/5=1.6 food
-      expect(state.world.resources.gold.current).toBeCloseTo(98);
-      expect(state.world.resources.food.current).toBeCloseTo(98.4);
+      // Per tick: 10/1=10 gold, 8/1=8 food
+      expect(state.world.resources.gold.current).toBeCloseTo(90);
+      expect(state.world.resources.food.current).toBeCloseTo(92);
     });
 
     it('should not deduct upkeep for non-legendary inhabitants', () => {

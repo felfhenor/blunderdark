@@ -1169,8 +1169,8 @@ describe('production changes on assignment state changes', () => {
 
 describe('productionPerMinute', () => {
   it('should convert per-tick rate to per-minute', () => {
-    // GAME_TIME_TICKS_PER_MINUTE = 5
-    expect(productionPerMinute(1.0)).toBe(5.0);
+    // GAME_TIME_TICKS_PER_MINUTE = 1
+    expect(productionPerMinute(1.0)).toBe(1.0);
   });
 
   it('should handle zero rate', () => {
@@ -1178,7 +1178,7 @@ describe('productionPerMinute', () => {
   });
 
   it('should handle fractional rates', () => {
-    expect(productionPerMinute(0.5)).toBeCloseTo(2.5);
+    expect(productionPerMinute(0.5)).toBeCloseTo(0.5);
   });
 });
 

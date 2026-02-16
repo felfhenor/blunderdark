@@ -244,10 +244,10 @@ describe('Shadow Library: definition', () => {
 });
 
 describe('Shadow Library: base production', () => {
-  it('should have base production of 0.6 research/tick (3 research/min)', () => {
+  it('should have base production of 0.6 research/tick (0.6 research/min)', () => {
     const production = productionGetBase(SHADOW_LIBRARY_ID as RoomId);
     expect(production).toEqual({ research: 0.6 });
-    expect(productionPerMinute(production['research']!)).toBeCloseTo(3.0);
+    expect(productionPerMinute(production['research']!)).toBeCloseTo(0.6);
   });
 
   it('should produce 0 research when no workers are assigned', () => {

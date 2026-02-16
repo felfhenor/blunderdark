@@ -6,7 +6,7 @@ import type { GameTime } from '@interfaces/game-time';
 
 export const GAME_TIME_MINUTES_PER_HOUR = 60;
 export const GAME_TIME_HOURS_PER_DAY = 24;
-export const GAME_TIME_TICKS_PER_MINUTE = 5;
+export const GAME_TIME_TICKS_PER_MINUTE = 1;
 
 export function gameTimeAdvance(
   clock: GameTime,

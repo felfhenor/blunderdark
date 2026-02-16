@@ -261,10 +261,10 @@ describe('Ley Line Nexus: definition', () => {
 });
 
 describe('Ley Line Nexus: base production', () => {
-  it('should have base production of 2.0 flux/tick (10 flux/min)', () => {
+  it('should have base production of 2.0 flux/tick (2.0 flux/min)', () => {
     const production = productionGetBase(LEY_LINE_NEXUS_ID as RoomId);
     expect(production).toEqual({ flux: 2.0 });
-    expect(productionPerMinute(production['flux']!)).toBeCloseTo(10.0);
+    expect(productionPerMinute(production['flux']!)).toBeCloseTo(2.0);
   });
 
   it('should produce 0 flux when no workers are assigned', () => {

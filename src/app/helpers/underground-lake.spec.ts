@@ -238,10 +238,10 @@ describe('Underground Lake: definition', () => {
 });
 
 describe('Underground Lake: base production', () => {
-  it('should have base production of 1.0 food/tick (5 food/min)', () => {
+  it('should have base production of 1.0 food/tick (1.0 food/min)', () => {
     const production = productionGetBase(UNDERGROUND_LAKE_ID as RoomId);
     expect(production).toEqual({ food: 1.0 });
-    expect(productionPerMinute(production['food']!)).toBeCloseTo(5.0);
+    expect(productionPerMinute(production['food']!)).toBeCloseTo(1.0);
   });
 
   it('should produce 0 food when no workers are assigned', () => {

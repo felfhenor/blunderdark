@@ -789,8 +789,8 @@ describe('tortureChamberProcess', () => {
 
 describe('Constants', () => {
   it('should have correct base ticks', () => {
-    expect(TORTURE_EXTRACTION_BASE_TICKS).toBe(20);
-    expect(TORTURE_CONVERSION_BASE_TICKS).toBe(40);
+    expect(TORTURE_EXTRACTION_BASE_TICKS).toBe(4);
+    expect(TORTURE_CONVERSION_BASE_TICKS).toBe(8);
   });
 
   it('should have correct corruption per tick', () => {
