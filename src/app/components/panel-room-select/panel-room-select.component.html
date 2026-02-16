@@ -79,7 +79,7 @@
           <div class="cost-row flex gap-2 w-full">
             @for (cost of getCostEntries(room); track cost.type) {
               <span class="text-xs opacity-70">
-                {{ cost.amount | number:'1.0-2' }} {{ capitalizeFirst(cost.type) }}
+                {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
               </span>
             }
             @if (getCostEntries(room).length === 0) {

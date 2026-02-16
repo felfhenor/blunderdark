@@ -12,7 +12,7 @@
               <span class="badge badge-xs badge-warning">Converting</span>
             </div>
             <span class="text-xs opacity-50">
-              Output: +{{ conv.outputAmount | number:'1.0-2' }} {{ conv.outputResource }}
+              Output: +{{ conv.outputAmount | number:'1.0-2' }} <app-currency-name [type]="conv.outputResource" />
             </span>
             @if (conv.inputConsumed) {
               <progress
@@ -56,9 +56,13 @@
                   }
                 </div>
                 <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
-                <span class="text-xs opacity-50">Input: {{ formatCost(entry.effectiveCost) }}</span>
+                <span class="text-xs opacity-50">Input:
+                  @for (cost of formatCost(entry.effectiveCost); track cost.type) {
+                    {{ cost.amount }} <app-currency-name [type]="cost.type" />@if (!$last) {, }
+                  }
+                </span>
                 <span class="text-xs opacity-50">
-                  Output: +{{ entry.recipe.outputAmount | number:'1.0-2' }} {{ entry.recipe.outputResource }}
+                  Output: +{{ entry.recipe.outputAmount | number:'1.0-2' }} <app-currency-name [type]="entry.recipe.outputResource" />
                 </span>
                 <span class="text-xs opacity-50">Cycle: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
                 <button

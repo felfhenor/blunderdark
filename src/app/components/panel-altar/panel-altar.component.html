@@ -25,7 +25,7 @@
             <div class="cost-row flex gap-2">
               @for (cost of getCostEntries(upgrade); track cost.type) {
                 <span class="text-xs opacity-70">
-                  {{ cost.amount | number:'1.0-2' }} {{ capitalizeFirst(cost.type) }}
+                  {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
                 </span>
               }
             </div>
@@ -93,7 +93,7 @@
                 <div class="flex flex-wrap gap-2 mb-1">
                   @for (cost of entry.costEntries; track cost.type) {
                     <span class="text-xs" [class.text-error]="!entry.affordable && isResourceShort(entry, cost.type)">
-                      {{ cost.amount | number:'1.0-2' }} {{ capitalizeFirst(cost.type) }}
+                      {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
                     </span>
                   }
                 </div>

@@ -147,7 +147,7 @@
                   [class.badge-success]="mod.percentage > 0"
                   [class.badge-error]="mod.percentage < 0"
                 >
-                  {{ formatModifier(mod.percentage) }} {{ getResourceLabel(mod.resourceType) }}
+                  {{ formatModifier(mod.percentage) }} <app-currency-name [type]="$any(mod.resourceType)" />
                 </span>
               }
             </div>

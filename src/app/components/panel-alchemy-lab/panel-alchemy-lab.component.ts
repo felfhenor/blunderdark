@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   alchemyLabCanConvert,
   alchemyLabCompleted$,
@@ -29,7 +30,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, CurrencyNameComponent],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -113,11 +114,10 @@ export class PanelAlchemyLabComponent {
     };
   });
 
-  public formatCost(cost: Partial<Record<ResourceType, number>>): string {
+  public formatCost(cost: Partial<Record<ResourceType, number>>): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, v]) => v && v > 0)
-      .map(([k, v]) => `${v} ${k}`)
-      .join(', ');
+      .map(([type, v]) => ({ type: type as ResourceType, amount: v! }));
   }
 
   public async selectRecipe(recipeId: AlchemyRecipeId, targetTicks: number): Promise<void> {

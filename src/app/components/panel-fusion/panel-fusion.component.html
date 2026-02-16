@@ -191,11 +191,11 @@
                     <div class="flex flex-wrap gap-1">
                       @for (cost of p.costEntries; track cost.type) {
                         <span
-                          class="badge badge-sm badge-outline capitalize"
+                          class="badge badge-sm badge-outline"
                           [class.badge-error]="!cost.sufficient"
                           [tp]="'Have ' + cost.current + ' / Need ' + cost.amount"
                         >
-                          {{ cost.amount | number:'1.0-2' }} {{ cost.type }}
+                          {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="$any(cost.type)" />
                         </span>
                       }
                     </div>
@@ -262,8 +262,8 @@
                   <p class="text-xs opacity-60">{{ entry.recipe.description }}</p>
                   <div class="flex flex-wrap gap-1 mt-1">
                     @for (cost of formatCost(entry.recipe.cost); track cost.type) {
-                      <span class="badge badge-xs badge-outline capitalize">
-                        {{ cost.amount }} {{ cost.type }}
+                      <span class="badge badge-xs badge-outline">
+                        {{ cost.amount }} <app-currency-name [type]="cost.type" />
                       </span>
                     }
                   </div>

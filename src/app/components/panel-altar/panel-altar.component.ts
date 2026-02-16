@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   altarRoomFearReductionAura,
   altarRoomLevel,
@@ -8,6 +9,7 @@ import {
   altarRoomCanRecruit,
   floorCurrent,
   recruitmentCurrentInhabitantCount,
+  RESOURCE_LABEL_MAP,
   roomRoleFindById,
   gamestate,
   altarRoomGetNextUpgrade,
@@ -34,12 +36,12 @@ type RecruitableEntry = {
   def: InhabitantContent;
   affordable: boolean;
   shortfall: { type: ResourceType; needed: number }[];
-  costEntries: { type: string; amount: number }[];
+  costEntries: { type: ResourceType; amount: number }[];
 };
 
 @Component({
   selector: 'app-panel-altar',
-  imports: [DecimalPipe, TippyDirective],
+  imports: [DecimalPipe, CurrencyNameComponent, TippyDirective],
   templateUrl: './panel-altar.component.html',
   styleUrl: './panel-altar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,7 +97,7 @@ export class PanelAltarComponent {
           : [];
         const costEntries = Object.entries(def.cost)
           .filter(([, amount]) => amount && amount > 0)
-          .map(([type, amount]) => ({ type, amount: amount as number }));
+          .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
 
         return { def, affordable, shortfall, costEntries };
       });
@@ -103,14 +105,10 @@ export class PanelAltarComponent {
 
   public getCostEntries(
     upgrade: RoomUpgradePath,
-  ): { type: string; amount: number }[] {
+  ): { type: ResourceType; amount: number }[] {
     return Object.entries(upgrade.cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type, amount: amount as number }));
-  }
-
-  public capitalizeFirst(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
   }
 
   public isResourceShort(entry: RecruitableEntry, costType: string): boolean {
@@ -121,7 +119,7 @@ export class PanelAltarComponent {
     if (this.rosterFull()) return 'Roster full';
     if (!entry.affordable) {
       const parts = entry.shortfall.map(
-        (s) => `${s.needed} more ${this.capitalizeFirst(s.type)}`,
+        (s) => `${s.needed} more ${RESOURCE_LABEL_MAP[s.type]}`,
       );
       return `Need: ${parts.join(', ')}`;
     }

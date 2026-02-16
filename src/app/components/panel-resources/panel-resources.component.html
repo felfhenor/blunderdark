@@ -33,7 +33,7 @@
       [tpDelay]="250"
     >
       <div class="flex items-center justify-between mb-0.5">
-        <span class="text-xs font-semibold truncate">{{ res.label }}</span>
+        <span class="text-xs font-semibold truncate"><app-currency-name [type]="res.type" /></span>
         <span class="text-xs flex items-center gap-1">
           @if (isFull(res.type)) {
             <span class="badge badge-xs badge-warning">FULL</span>
@@ -60,7 +60,7 @@
 
     <ng-template #resourceTip>
       <div class="w-[300px]">
-      <div class="font-semibold text-sm mb-1">{{ res.label }}</div>
+      <div class="font-semibold text-sm mb-1"><app-currency-name [type]="res.type" /></div>
       <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
 
       <div class="flex justify-between text-xs mb-1">
@@ -121,7 +121,7 @@
     <div class="flex items-center justify-between mb-0.5">
       <span class="text-xs font-semibold truncate" [class]="getCorruptionColorClass(corruptionInfo().level)">
         @if (corruptionInfo().level !== 'low') {
-          <span class="corruption-warning-icon">&#9888;</span>
+          <app-icon name="gameBurningBlobs" color="var(--color-error)" />
         }
         Corruption
       </span>
@@ -223,7 +223,7 @@
         [class.badge-error]="!isPositiveModifier(mod)"
         [tp]="mod.description"
       >
-        {{ formatMultiplier(mod) }} {{ getResourceLabel(mod.resourceType) }}
+        {{ formatMultiplier(mod) }} <app-currency-name [type]="$any(mod.resourceType)" />
       </span>
     }
     @for (mod of activeTimeModifiers().creatureModifiers; track mod.creatureType + mod.phase) {

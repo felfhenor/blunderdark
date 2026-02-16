@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
@@ -24,6 +25,7 @@ import type {
   ResearchBranch,
   ResearchContent,
   ResourceCost,
+  ResourceType,
   RoomContent,
   UnlockEffect,
 } from '@interfaces';
@@ -33,7 +35,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
 
 @Component({
   selector: 'app-game-research',
-  imports: [DecimalPipe, ModalComponent, TippyDirective, IconComponent],
+  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent, TippyDirective, IconComponent],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -198,10 +200,10 @@ export class GameResearchComponent {
     this.visible.set(false);
   }
 
-  public formatCost(cost: ResourceCost): { type: string; amount: number }[] {
+  public formatCost(cost: ResourceCost): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type, amount: amount! }));
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
   }
 
   private formatUnlock(unlock: UnlockEffect): {

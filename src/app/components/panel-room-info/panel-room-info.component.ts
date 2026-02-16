@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
@@ -50,7 +51,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, SweetAlert2Module, HungerIndicatorComponent, TippyDirective, ModalComponent],
+  imports: [DecimalPipe, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -106,7 +107,7 @@ export class PanelRoomInfoComponent {
     return Object.entries(rates)
       .filter(([, v]) => v && v !== 0)
       .map(([type, perTick]) => ({
-        type,
+        type: type as ResourceType,
         perMinute: productionPerMinute(perTick as number),
       }));
   });
@@ -247,7 +248,7 @@ export class PanelRoomInfoComponent {
       }
       const costEntries = Object.entries(f.cost)
         .filter(([, v]) => v !== undefined && v > 0)
-        .map(([type, amount]) => ({ type, amount: amount as number }));
+        .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
       return { feature: f, affordable, shortfall, costEntries };
     });
   });

@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import type { FusionPreview } from '@helpers/fusion';
@@ -23,6 +24,7 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
+  ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -46,7 +48,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, ModalComponent, TippyDirective],
+  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -284,10 +286,10 @@ export class PanelFusionComponent {
 
   public formatCost(
     cost: Partial<Record<string, number>>,
-  ): { type: string; amount: number }[] {
+  ): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type, amount: amount! }));
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
   }
 
   public getDeltaClass(delta: number): string {

@@ -42,7 +42,11 @@
                   <span class="badge badge-xs" [class.badge-info]="entry.recipe.summonType === 'permanent'" [class.badge-warning]="entry.recipe.summonType === 'temporary'">{{ entry.recipe.summonType }}</span>
                 </div>
                 <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
-                <span class="text-xs opacity-50">Cost: {{ formatCost(entry.recipe.cost) }}</span>
+                <span class="text-xs opacity-50">Cost:
+                  @for (cost of formatCost(entry.recipe.cost); track cost.type) {
+                    {{ cost.amount }} <app-currency-name [type]="cost.type" />@if (!$last) {, }
+                  }
+                </span>
                 <span class="text-xs opacity-50">Time: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
                 @if (formatStatBonuses(entry.statBonuses); as bonusStr) {
                   @if (bonusStr) {

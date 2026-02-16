@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   floorAll,
   floorCanCreate,
@@ -32,7 +33,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [DecimalPipe, SweetAlert2Module],
+  imports: [DecimalPipe, CurrencyNameComponent, SweetAlert2Module],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -110,19 +111,6 @@ export class PanelFloorSelectorComponent {
 
   public formatModifier(percentage: number): string {
     return floorModifierFormatPercentage(percentage);
-  }
-
-  public getResourceLabel(resourceType: string): string {
-    const labels: Record<string, string> = {
-      crystals: 'Crystals',
-      food: 'Food',
-      gold: 'Gold',
-      flux: 'Flux',
-      essence: 'Essence',
-      corruption: 'Corruption',
-      research: 'Research',
-    };
-    return labels[resourceType] ?? resourceType;
   }
 
   public trackByFloorId(_index: number, floor: Floor): string {

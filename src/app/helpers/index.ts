@@ -63,6 +63,7 @@ export * from './reputation';
 export * from './reputation-effects';
 export * from './research-progress';
 export * from './research-unlocks';
+export * from './resource-icons';
 export * from './resources';
 export * from './rng';
 export * from './room-placement';

@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import {
@@ -21,6 +22,7 @@ import type {
   MerchantTradeId,
   MerchantTradeType,
   ResourceCost,
+  ResourceType,
 } from '@interfaces';
 
 type TradeCategory = 'all' | MerchantTradeType;
@@ -29,13 +31,13 @@ type TradeEntry = {
   trade: MerchantTradeContent;
   stock: number;
   affordable: boolean;
-  costEntries: { type: string; amount: number }[];
-  rewardEntries: { type: string; amount: number }[];
+  costEntries: { type: ResourceType; amount: number }[];
+  rewardEntries: { type: ResourceType; amount: number }[];
 };
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [DecimalPipe, ModalComponent],
+  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -142,9 +144,9 @@ export class PanelMerchantComponent {
     }
   }
 
-  private formatCost(cost: ResourceCost): { type: string; amount: number }[] {
+  private formatCost(cost: ResourceCost): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type, amount: amount! }));
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
   }
 }

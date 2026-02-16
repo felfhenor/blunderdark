@@ -182,8 +182,8 @@
                   <div class="divider my-2 text-xs opacity-60">Cost</div>
                   <div class="flex flex-wrap gap-1">
                     @for (cost of formatCost(node.cost); track cost.type) {
-                      <span class="badge badge-sm badge-outline capitalize">
-                        {{ cost.amount | number: '1.0-2' }} {{ cost.type }}
+                      <span class="badge badge-sm badge-outline">
+                        {{ cost.amount | number: '1.0-2' }} <app-currency-name [type]="cost.type" />
                       </span>
                     }
                   </div>

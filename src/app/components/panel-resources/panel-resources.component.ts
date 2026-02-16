@@ -5,6 +5,8 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { IconComponent } from '@components/icon/icon.component';
 import {
   corruptionGetLevel,
   corruptionGetLevelDescription,
@@ -82,7 +84,7 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-panel-resources',
-  imports: [DecimalPipe, UpperCasePipe, TippyDirective],
+  imports: [DecimalPipe, UpperCasePipe, CurrencyNameComponent, IconComponent, TippyDirective],
   templateUrl: './panel-resources.component.html',
   styleUrl: './panel-resources.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -197,19 +199,6 @@ export class PanelResourcesComponent {
 
   public isPositiveModifier(mod: DayNightResourceModifier | DayNightCreatureModifier): boolean {
     return mod.multiplier > 1.0;
-  }
-
-  public getResourceLabel(resourceType: string): string {
-    const labels: Record<string, string> = {
-      crystals: 'Crystals',
-      food: 'Food',
-      gold: 'Gold',
-      flux: 'Flux',
-      essence: 'Essence',
-      corruption: 'Corruption',
-      research: 'Research',
-    };
-    return labels[resourceType] ?? resourceType;
   }
 
   public corruptionInfo = computed(() => {

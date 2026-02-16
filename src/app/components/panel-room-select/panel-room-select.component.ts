@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   altarRoomHas,
   biomeRestrictionCanBuild,
@@ -26,13 +27,13 @@ import {
   roomShapeGet,
   roomShapeGetRotated,
 } from '@helpers';
-import type { RoomId, RoomShapeContent } from '@interfaces';
+import type { ResourceType, RoomId, RoomShapeContent } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-room-select',
-  imports: [DecimalPipe, TippyDirective],
+  imports: [DecimalPipe, CurrencyNameComponent, TippyDirective],
   templateUrl: './panel-room-select.component.html',
   styleUrl: './panel-room-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,10 +117,10 @@ export class PanelRoomSelectComponent {
     return roomShapeGet(room.shapeId);
   }
 
-  public getCostEntries(room: RoomContent): { type: string; amount: number }[] {
+  public getCostEntries(room: RoomContent): { type: ResourceType; amount: number }[] {
     return Object.entries(room.cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type, amount: amount as number }));
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
   }
 
   private getEffectiveShape(room: RoomContent): RoomShapeContent | undefined {
@@ -179,7 +180,4 @@ export class PanelRoomSelectComponent {
     roomPlacementRotate();
   }
 
-  public capitalizeFirst(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
 }

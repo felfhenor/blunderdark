@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   contentGetEntry,
@@ -31,7 +32,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, ModalComponent],
+  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -129,11 +130,10 @@ export class PanelSummoningCircleComponent {
       }));
   });
 
-  public formatCost(cost: Partial<Record<ResourceType, number>>): string {
+  public formatCost(cost: Partial<Record<ResourceType, number>>): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, v]) => v && v > 0)
-      .map(([k, v]) => `${v} ${k}`)
-      .join(', ');
+      .map(([type, v]) => ({ type: type as ResourceType, amount: v! }));
   }
 
   public formatStatBonuses(bonuses: Partial<InhabitantStats>): string {
