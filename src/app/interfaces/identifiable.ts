@@ -15,7 +15,6 @@ export type ContentType =
   | 'research'
   | 'room'
   | 'roomshape'
-  | 'seasonalevent'
   | 'seasonbonus'
   | 'summonrecipe'
   | 'synergy'

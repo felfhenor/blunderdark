@@ -23,7 +23,6 @@ import { featureSacrificeProcess, featureTrainingStationProcess } from '@helpers
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { merchantProcess } from '@helpers/merchant';
 import { seasonProcess } from '@helpers/season';
-import { seasonalEventProcess } from '@helpers/seasonal-event';
 import { victoryProcess } from '@helpers/victory';
 import { autosaveCheckPreInvasion } from '@helpers/autosave';
 import { debug } from '@helpers/logging';
@@ -96,7 +95,6 @@ export async function gameloop(totalTicks: number): Promise<void> {
     }
     hungerProcessWarnings(state);
     seasonProcess(state);
-    seasonalEventProcess(state);
     merchantProcess(state);
     victoryProcess(state);
     return state;

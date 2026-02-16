@@ -145,12 +145,6 @@ function makeGameState(
         departureDayRemaining: 0,
         inventory: [],
       },
-      seasonalEvent: {
-        triggeredEventIds: [],
-        activeEffects: [],
-        pendingEvent: undefined,
-        lastSeasonCycleForReset: 0,
-      },
     },
   };
 }

@@ -77,7 +77,6 @@ export * from './save-slots-storage';
 export * from './scheduler';
 export * from './season';
 export * from './season-bonuses';
-export * from './seasonal-event';
 export * from './setup';
 export * from './sfx';
 export * from './signal';

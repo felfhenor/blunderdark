@@ -19,7 +19,6 @@ import type { StairInstance } from '@interfaces/stair';
 import type { ElevatorInstance } from '@interfaces/elevator';
 import type { PortalInstance } from '@interfaces/portal';
 import type { MerchantState } from '@interfaces/merchant';
-import type { SeasonalEventState } from '@interfaces/seasonal-event';
 import type { VictoryProgress } from '@interfaces/victory';
 
 export interface GameStateWorld {
@@ -45,7 +44,6 @@ export interface GameStateWorld {
   portals: PortalInstance[];
   victoryProgress: VictoryProgress;
   merchant: MerchantState;
-  seasonalEvent: SeasonalEventState;
 }
 
 export interface GameStateClock {

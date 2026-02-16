@@ -155,12 +155,6 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
           departureDayRemaining: 0,
           inventory: [],
         },
-        seasonalEvent: {
-          triggeredEventIds: [],
-          activeEffects: [],
-          pendingEvent: undefined,
-          lastSeasonCycleForReset: 0,
-        },
       },
     } as unknown as GameState,
     ...overrides,

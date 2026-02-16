@@ -29,7 +29,6 @@ import { PanelResourcesComponent } from '@components/panel-resources/panel-resou
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
-import { PanelSeasonalEventComponent } from '@components/panel-seasonal-event/panel-seasonal-event.component';
 import { PanelStairInfoComponent } from '@components/panel-stair-info/panel-stair-info.component';
 import { PanelSummoningCircleComponent } from '@components/panel-summoning-circle/panel-summoning-circle.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
@@ -73,7 +72,6 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelFusionComponent,
     PanelHallwayInfoComponent,
     PanelMerchantComponent,
-    PanelSeasonalEventComponent,
     PanelVictoryComponent,
     VictoryMenuComponent,
     PanelStairInfoComponent,

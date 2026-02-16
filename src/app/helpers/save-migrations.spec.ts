@@ -105,12 +105,6 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
         departureDayRemaining: 0,
         inventory: [],
       },
-      seasonalEvent: {
-        triggeredEventIds: [],
-        activeEffects: [],
-        pendingEvent: undefined,
-        lastSeasonCycleForReset: 0,
-      },
     },
     ...overrides,
   } as unknown as GameState;
