@@ -119,7 +119,7 @@
     [tpDelay]="250"
   >
     <div class="flex items-center justify-between mb-0.5">
-      <span class="text-xs font-semibold truncate" [class]="getCorruptionColorClass(corruptionInfo().level)">
+      <span class="text-sm font-semibold truncate" [class]="getCorruptionColorClass(corruptionInfo().level)">
         @if (corruptionInfo().level !== 'low') {
           <app-icon name="gameBurningBlobs" color="var(--color-error)" />
         }
