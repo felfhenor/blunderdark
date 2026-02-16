@@ -353,6 +353,21 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `save.ts` | `save` | `SAVE` |
 
+## Autosave System
+
+- **Real-time timer**: `autosave.ts` uses `setInterval` (not game ticks) for periodic saves; `autosaveStart()` / `autosaveStop()` / `autosaveReset()` manage the timer
+- **Pre-invasion**: `autosaveCheckPreInvasion(warningActive)` called from gameloop after tick; triggers save on warning false→true transition; tracks previous state via module-level variable
+- **Quit save**: `autosaveInstallBeforeUnload()` / `autosaveRemoveBeforeUnload()` — registered in game-play component lifecycle
+- **Error handling**: `autosaveEvent$` Subject emits `{ type: 'success' | 'error', message? }` — components subscribe and call notify; avoids importing notify directly (circular dep prevention)
+- **UI indicator**: `autosaveIsSaving` signal; `AUTOSAVE_MIN_DISPLAY_MS` (1000ms) ensures indicator shows for at least 1 second
+- **Options**: `autosaveEnabled` (boolean, default true) and `autosaveIntervalMinutes` (`AutosaveInterval` = 1|3|5|10, default 5) in `GameOptions`; changing settings calls `autosaveReset()` to restart timer
+- **Integration**: game-play component starts timer + installs beforeunload in `ngOnInit`; cleans up via `DestroyRef.onDestroy()`; subscribes to `autosaveEvent$` with `takeUntilDestroyed`
+- **Testing**: mock `@helpers/state-game`, `@helpers/state-options`, `@helpers/logging`; use `vi.useFakeTimers()` for interval tests; use `mockImplementationOnce` (not `mockImplementation`) to avoid state leaking between tests; cast mock implementations as `typeof optionsGet` to satisfy generic type
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `autosave.ts` | `autosave` | `AUTOSAVE` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
