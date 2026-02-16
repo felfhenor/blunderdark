@@ -10,7 +10,7 @@
 #   │   └── Automated Defenses (T3)
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
 #   └── Advanced Manufacturing (T2)
-#       └── Dark Forge (T3)
+#       └── Dark Forge Mastery (T3)
 #           └── Golem Assembly (T4) [+Master Architecture]
 #   War Machines (T5) [Siege Works + Mechanical Sentinels]
 #   Industrial Mastery (T5) [Golem Assembly + Siege Works]
@@ -106,7 +106,7 @@
   requiredTicks: 300
 
 - id: e1af3b41-800b-4190-82de-7e8a2e626986
-  name: Dark Forge
+  name: Dark Forge Mastery
   description: Construct a forge powered by dungeon energy, capable of smelting exotic materials into powerful equipment.
   branch: engineering
   cost:
@@ -171,7 +171,7 @@
     gold: 30
     crystals: 15
   prerequisiteResearchIds:
-    - Dark Forge
+    - Dark Forge Mastery
     - Master Architecture
   unlocks:
     - type: passive_bonus

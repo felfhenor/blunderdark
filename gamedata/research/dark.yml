@@ -4,16 +4,16 @@
 # Tree structure:
 #   Dark Arts Fundamentals (T1)
 #   ├── Soul Manipulation (T2)
-#   │   └── Soul Well (T3)
+#   │   └── Soul Well Mastery (T3)
 #   │       └── Soul Forge (T5) [+Dark Rituals]
 #   ├── Shadow Magic (T2)
 #   │   └── Corruption Control (T3)
 #   │       └── Shadow Weaving (T4) [+Shadow Magic]
 #   └── Necromancy (T2)
 #       └── Undead Mastery (T3)
-#           └── Dark Rituals (T4) [+Soul Well]
+#           └── Dark Rituals (T4) [+Soul Well Mastery]
 #               ├── Abyssal Gateway (T5) [+Shadow Weaving]
-#               └── Soul Forge (T5) [+Soul Well→ already via Dark Rituals]
+#               └── Soul Forge (T5) [+Soul Well Mastery→ already via Dark Rituals]
 #   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
 
 # --- TIER 2: Three paths branch from Dark Arts Fundamentals ---
@@ -87,7 +87,7 @@
   requiredTicks: 300
 
 - id: 8a4edb8b-65bb-4d08-a30c-45097e1e8483
-  name: Soul Well
+  name: Soul Well Mastery
   description: Construct a reservoir for captured souls, providing a steady stream of dark energy.
   branch: dark
   cost:
@@ -133,7 +133,7 @@
     corruption: 15
   prerequisiteResearchIds:
     - Undead Mastery
-    - Soul Well
+    - Soul Well Mastery
   unlocks:
     - type: passive_bonus
       bonusType: essenceProduction
