@@ -11,7 +11,7 @@
 
         <div class="flex items-center gap-3">
           <span class="text-sm opacity-70">
-            Speed: {{ speedModifier() | number: '1.0-0' }}%
+            Speed: {{ speedModifier() * 100 | number: '1.0-0' }}%
           </span>
           <button class="btn btn-sm btn-ghost" (click)="close()">Close</button>
         </div>
