@@ -14,7 +14,7 @@ import type {
   ReputationActionContent,
   ReputationEffectContent,
   ReputationEffectId,
-  ResearchNodeContent,
+  ResearchContent,
   RoomShapeContent,
   Season,
   SummonRecipeContent,
@@ -203,8 +203,8 @@ function ensureReputationEffect(
 }
 
 function ensureResearch(
-  node: Partial<ResearchNodeContent>,
-): ResearchNodeContent {
+  node: Partial<ResearchContent>,
+): ResearchContent {
   return {
     id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',

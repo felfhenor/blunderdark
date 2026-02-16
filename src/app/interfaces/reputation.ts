@@ -1,4 +1,4 @@
-import type { Branded } from '@interfaces/identifiable';
+import type { ReputationActionId } from '@interfaces/content-reputationaction';
 
 export type ReputationType =
   | 'terror'
@@ -23,7 +23,7 @@ export const REPUTATION_THRESHOLDS: Record<ReputationLevel, number> = {
  * Event emitted when reputation is awarded for an action.
  */
 export type ReputationAwardEvent = {
-  actionId: Branded<string, 'ReputationActionId'>;
+  actionId: ReputationActionId;
   actionName: string;
   rewards: Partial<Record<ReputationType, number>>;
 };

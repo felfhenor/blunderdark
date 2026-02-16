@@ -13,4 +13,5 @@ export type ResearchContent = IsContentItem &
     prerequisiteResearchIds: ResearchId[];
     unlocks: UnlockEffect[];
     tier: number;
+    requiredTicks: number;
   };

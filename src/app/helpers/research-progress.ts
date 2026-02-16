@@ -7,7 +7,7 @@ import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import type {
   GameState,
   ResearchId,
-  ResearchNodeContent,
+  ResearchContent,
   ResearchState,
 } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
@@ -34,7 +34,7 @@ export const researchCompleted$ = researchCompletedSubject.asObservable();
  * Check if all prerequisites for a research node are completed.
  */
 export function researchArePrerequisitesMet(
-  node: ResearchNodeContent,
+  node: ResearchContent,
   completedNodes: string[],
 ): boolean {
   return node.prerequisiteResearchIds.every((id) =>
@@ -54,7 +54,7 @@ export function researchCanStart(
     return { canStart: false, error: 'Another research is already active' };
   }
 
-  const node = contentGetEntry<ResearchNodeContent>(nodeId);
+  const node = contentGetEntry<ResearchContent>(nodeId);
   if (!node) {
     return { canStart: false, error: 'Research node not found' };
   }
@@ -89,7 +89,7 @@ export async function researchStart(
     return { success: false, error: validation.error };
   }
 
-  const node = contentGetEntry<ResearchNodeContent>(nodeId)!;
+  const node = contentGetEntry<ResearchContent>(nodeId)!;
 
   const paid = await resourcePayCost(node.cost);
   if (!paid) {
@@ -185,7 +185,7 @@ export function researchProcess(state: GameState): void {
   const research = state.world.research;
   if (!research.activeResearch) return;
 
-  const node = contentGetEntry<ResearchNodeContent>(research.activeResearch);
+  const node = contentGetEntry<ResearchContent>(research.activeResearch);
   if (!node) return;
 
   const speedModifier = researchCalculateSpeedModifier(state.world.floors);

@@ -2,7 +2,7 @@ import type {
   CombatAbilityId,
   GameState,
   IsContentItem,
-  ResearchNodeContent,
+  ResearchContent,
   UnlockEffect,
   UnlockedContent,
   UpgradePathId,
@@ -68,8 +68,8 @@ function makeUnlockedContent(
 }
 
 function makeResearchNode(
-  overrides: Partial<ResearchNodeContent> = {},
-): ResearchNodeContent {
+  overrides: Partial<ResearchContent> = {},
+): ResearchContent {
   return {
     id: NODE_ID,
     name: 'Test Research',

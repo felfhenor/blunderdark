@@ -3,7 +3,7 @@ import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
-  ResearchNodeContent,
+  ResearchContent,
   UnlockEffect,
   UnlockedContent,
 } from '@interfaces';
@@ -74,7 +74,7 @@ export function researchUnlockGetRequiredResearchName(
   type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
   id: string,
 ): string | undefined {
-  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
+  const allNodes = contentGetEntriesByType<ResearchContent>('research');
   for (const node of allNodes) {
     for (const unlock of node.unlocks) {
       if (
@@ -96,7 +96,7 @@ export function researchUnlockIsResearchGated(
   type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
   id: string,
 ): boolean {
-  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
+  const allNodes = contentGetEntriesByType<ResearchContent>('research');
   return allNodes.some((node) =>
     node.unlocks.some(
       (unlock) =>
@@ -166,7 +166,7 @@ export function researchUnlockApplyEffects(
  * Called when a research node completes (subscribe to researchCompleted$).
  */
 export async function researchUnlockOnComplete(nodeId: string): Promise<void> {
-  const node = contentGetEntry<ResearchNodeContent>(nodeId);
+  const node = contentGetEntry<ResearchContent>(nodeId);
   if (!node || node.unlocks.length === 0) return;
 
   await updateGamestate((s) => {
@@ -202,7 +202,7 @@ export function researchUnlockProcessCompletion(
   nodeId: string,
   state: GameState,
 ): void {
-  const node = contentGetEntry<ResearchNodeContent>(nodeId);
+  const node = contentGetEntry<ResearchContent>(nodeId);
   if (!node || node.unlocks.length === 0) return;
 
   state.world.research.unlockedContent = researchUnlockApplyEffects(

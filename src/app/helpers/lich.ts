@@ -9,7 +9,7 @@ import type {
   InhabitantInstance,
   PlacedRoom,
   ResearchBranch,
-  ResearchNodeContent,
+  ResearchContent,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
@@ -162,15 +162,15 @@ export function lichGetAncientKnowledgeRevealCount(
 export function lichGetRevealedResearchNodes(
   inhabitants: InhabitantInstance[],
   completedNodeIds: string[],
-): ResearchNodeContent[] {
+): ResearchContent[] {
   const revealCount = lichGetAncientKnowledgeRevealCount(inhabitants);
   if (revealCount <= 0) return [];
 
-  const allNodes = contentGetEntriesByType<ResearchNodeContent>('research');
+  const allNodes = contentGetEntriesByType<ResearchContent>('research');
   const completedSet = new Set(completedNodeIds);
 
   // Group unrevealed nodes by branch
-  const branchNodes = new Map<ResearchBranch, ResearchNodeContent[]>();
+  const branchNodes = new Map<ResearchBranch, ResearchContent[]>();
   for (const node of allNodes) {
     if (completedSet.has(node.id)) continue;
 
@@ -182,7 +182,7 @@ export function lichGetRevealedResearchNodes(
   }
 
   // Pick one lowest-tier node per branch
-  const revealed: ResearchNodeContent[] = [];
+  const revealed: ResearchContent[] = [];
   for (const [, nodes] of branchNodes) {
     if (nodes.length === 0) continue;
 

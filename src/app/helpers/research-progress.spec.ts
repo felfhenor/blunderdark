@@ -6,7 +6,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  ResearchNodeContent,
+  ResearchContent,
   ResearchState,
   RoomContent,
   RoomId,
@@ -89,7 +89,7 @@ import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 
 // --- Mock data ---
 
-const darkFundamentalsNode: ResearchNodeContent = {
+const darkFundamentalsNode: ResearchContent = {
   id: NODE_DARK_FUNDAMENTALS_ID,
   name: 'Dark Arts Fundamentals',
   __type: 'research',
@@ -102,7 +102,7 @@ const darkFundamentalsNode: ResearchNodeContent = {
   requiredTicks: 50,
 };
 
-const soulManipulationNode: ResearchNodeContent = {
+const soulManipulationNode: ResearchContent = {
   id: NODE_SOUL_MANIPULATION_ID,
   name: 'Soul Manipulation',
   __type: 'research',
@@ -115,7 +115,7 @@ const soulManipulationNode: ResearchNodeContent = {
   requiredTicks: 150,
 };
 
-const shadowMagicNode: ResearchNodeContent = {
+const shadowMagicNode: ResearchContent = {
   id: NODE_SHADOW_MAGIC_ID,
   name: 'Shadow Magic',
   __type: 'research',

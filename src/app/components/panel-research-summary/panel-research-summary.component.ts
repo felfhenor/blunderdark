@@ -12,7 +12,7 @@ import {
   researchSpeedModifier,
 } from '@helpers/research-progress';
 import { gamestate } from '@helpers/state-game';
-import type { ResearchNodeContent } from '@interfaces';
+import type { ResearchContent } from '@interfaces';
 
 @Component({
   selector: 'app-panel-research-summary',
@@ -52,7 +52,7 @@ export class PanelResearchSummaryComponent {
   public activeNode = computed(() => {
     const activeId = gamestate().world.research.activeResearch;
     if (!activeId) return undefined;
-    return contentGetEntry<ResearchNodeContent>(activeId);
+    return contentGetEntry<ResearchContent>(activeId);
   });
 
   public progressPercent = computed(() => {

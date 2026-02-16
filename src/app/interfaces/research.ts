@@ -1,8 +1,7 @@
 import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
+import type { ResearchId } from '@interfaces/content-research';
 import type { RoomId } from '@interfaces/content-room';
-import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { ResourceCost } from '@interfaces/resource';
 import type { UpgradePathId } from '@interfaces/room';
 
 export type ResearchBranch = 'dark' | 'arcane' | 'engineering';
@@ -48,18 +47,6 @@ export type UnlockEffect =
   | UpgradeUnlock
   | PassiveBonusUnlock;
 
-export type ResearchNodeContent = IsContentItem & {
-  id: Branded<string, 'ResearchId'>;
-  name: string;
-  description: string;
-  branch: ResearchBranch;
-  cost: ResourceCost;
-  prerequisiteResearchIds: Branded<string, 'ResearchId'>[];
-  unlocks: UnlockEffect[];
-  tier: number;
-  requiredTicks: number;
-};
-
 export type UnlockedContent = {
   rooms: RoomId[];
   inhabitants: InhabitantId[];
@@ -69,8 +56,8 @@ export type UnlockedContent = {
 };
 
 export type ResearchState = {
-  completedNodes: Branded<string, 'ResearchId'>[];
-  activeResearch: Branded<string, 'ResearchId'> | undefined;
+  completedNodes: ResearchId[];
+  activeResearch: ResearchId | undefined;
   activeResearchProgress: number;
   activeResearchStartTick: number;
   unlockedContent: UnlockedContent;
