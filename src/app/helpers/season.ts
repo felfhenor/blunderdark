@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Season, SeasonState } from '@interfaces';
+import type { GameState, Season, SeasonState } from '@interfaces';
 import { DAYS_PER_SEASON, SEASON_ORDER } from '@interfaces/season';
 import type { SeasonTransitionEvent } from '@interfaces/season';
 import { Subject } from 'rxjs';
@@ -59,6 +59,31 @@ export function seasonAdvanceDay(seasonState: SeasonState): SeasonState {
     ...seasonState,
     dayInSeason: newDay,
   };
+}
+
+// --- State field for day tracking ---
+
+let seasonLastProcessedDay = 0;
+
+export function seasonResetLastProcessedDay(): void {
+  seasonLastProcessedDay = 0;
+}
+
+// --- Process function (called from gameloop) ---
+
+export function seasonProcess(state: GameState): void {
+  const currentDay = state.clock.day;
+
+  if (currentDay <= seasonLastProcessedDay) return;
+  seasonLastProcessedDay = currentDay;
+
+  const oldSeason = state.world.season.currentSeason;
+  state.world.season = seasonAdvanceDay(state.world.season);
+  const newSeason = state.world.season.currentSeason;
+
+  if (newSeason !== oldSeason) {
+    seasonTransition.next({ previousSeason: oldSeason, newSeason });
+  }
 }
 
 export async function seasonAdvanceGameDay(): Promise<void> {

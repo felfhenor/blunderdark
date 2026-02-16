@@ -1,0 +1,69 @@
+# Growth season events - abundance and new life
+- id: 5f106fba-0238-42cf-a70f-2617035f0535
+  name: Verdant Bloom
+  description: An unusual burst of magical growth sweeps through your dungeon.
+  season: growth
+  weight: 8
+  flavorText: Strange luminescent vines push through cracks in the stone, filling the air with a sweet, energizing fragrance.
+  effects:
+    - type: resource_gain
+      resourceType: food
+      amount: 40
+      description: Edible fungi sprout across the dungeon floors.
+    - type: production_modifier
+      resourceType: food
+      multiplier: 1.3
+      durationDays: 3
+      description: Magical growth enhances food production.
+  choices: []
+
+- id: a28839ab-6c5c-48a5-98c6-6a9e95f559a3
+  name: Crystal Seedlings
+  description: Tiny crystal formations begin to grow in the deeper tunnels.
+  season: growth
+  weight: 7
+  flavorText: Glittering seeds of raw crystal push up from the bedrock, humming with latent energy.
+  effects: []
+  choices:
+    - label: Harvest Immediately
+      description: Gather the crystals now for an immediate windfall.
+      effects:
+        - type: resource_gain
+          resourceType: crystals
+          amount: 60
+          description: Harvest the crystal seedlings.
+    - label: Let Them Grow
+      description: Allow the crystals to mature for a lasting production boost.
+      effects:
+        - type: production_modifier
+          resourceType: crystals
+          multiplier: 1.25
+          durationDays: 5
+          description: Crystal seedlings boost crystal production as they mature.
+
+- id: f9925b89-2b2a-49ee-9f9c-0cb2f74131c1
+  name: Migrating Creatures
+  description: A wave of strange subterranean creatures passes through your domain.
+  season: growth
+  weight: 6
+  flavorText: Bioluminescent creatures flood the lower passages, leaving trails of glowing residue that your inhabitants collect eagerly.
+  effects: []
+  choices:
+    - label: Hunt for Essence
+      description: Your inhabitants hunt the creatures for their magical essence.
+      effects:
+        - type: resource_gain
+          resourceType: essence
+          amount: 25
+          description: Harvested essence from migrating creatures.
+    - label: Trade with Them
+      description: Offer food to the creatures in exchange for gold they've collected.
+      effects:
+        - type: resource_loss
+          resourceType: food
+          amount: 30
+          description: Food offered to the migrating creatures.
+        - type: resource_gain
+          resourceType: gold
+          amount: 80
+          description: Gold traded from the creatures.

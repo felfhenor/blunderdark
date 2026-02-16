@@ -1,0 +1,68 @@
+# Harvest season events - abundance and visitors
+- id: 854fddf9-f25b-4666-937e-3740097c5de8
+  name: Bountiful Harvest
+  description: The season's bounty exceeds all expectations.
+  season: harvest
+  weight: 8
+  flavorText: The underground gardens overflow with produce, and your storerooms struggle to contain the abundance.
+  effects:
+    - type: resource_gain
+      resourceType: food
+      amount: 60
+      description: Overflowing harvest fills your stores.
+    - type: resource_gain
+      resourceType: gold
+      amount: 30
+      description: Surplus goods attract buyers.
+  choices: []
+
+- id: ca455d88-dc5e-4e16-aa52-baddaaf57766
+  name: Ancient Artifacts
+  description: Workers unearth a cache of ancient relics while expanding the dungeon.
+  season: harvest
+  weight: 6
+  flavorText: Behind a collapsed wall, your workers discover a sealed chamber filled with artifacts from a forgotten age.
+  effects: []
+  choices:
+    - label: Study the Relics
+      description: Have your scholars examine the artifacts for research value.
+      effects:
+        - type: resource_gain
+          resourceType: research
+          amount: 50
+          description: Knowledge gained from studying ancient relics.
+    - label: Sell the Artifacts
+      description: Sell the relics to surface traders for a handsome profit.
+      effects:
+        - type: resource_gain
+          resourceType: gold
+          amount: 150
+          description: Gold earned from selling ancient artifacts.
+
+- id: 672d88fb-f911-4e91-9e68-c23a309ea5b4
+  name: Tax Collector
+  description: A representative from the surface kingdoms demands tribute.
+  season: harvest
+  weight: 7
+  flavorText: A stern figure arrives at your gates bearing an official decree, demanding payment for your dungeon's continued existence.
+  effects: []
+  choices:
+    - label: Pay the Tax
+      description: Hand over gold to avoid trouble with the surface kingdoms.
+      effects:
+        - type: resource_loss
+          resourceType: gold
+          amount: 80
+          description: Gold paid as tribute to surface kingdoms.
+    - label: Refuse and Intimidate
+      description: Send the collector away empty-handed, but risk angering the surface.
+      effects:
+        - type: resource_gain
+          resourceType: corruption
+          amount: 15
+          description: Your defiance draws dark energy.
+        - type: production_modifier
+          resourceType: gold
+          multiplier: 1.2
+          durationDays: 3
+          description: Emboldened inhabitants work harder.

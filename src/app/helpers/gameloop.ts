@@ -22,6 +22,8 @@ import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import { featureSacrificeProcess, featureTrainingStationProcess } from '@helpers/features';
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { merchantProcess } from '@helpers/merchant';
+import { seasonProcess } from '@helpers/season';
+import { seasonalEventProcess } from '@helpers/seasonal-event';
 import { victoryProcess } from '@helpers/victory';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
@@ -92,6 +94,8 @@ export async function gameloop(totalTicks: number): Promise<void> {
       featureSacrificeProcess(floor.rooms);
     }
     hungerProcessWarnings(state);
+    seasonProcess(state);
+    seasonalEventProcess(state);
     merchantProcess(state);
     victoryProcess(state);
     return state;

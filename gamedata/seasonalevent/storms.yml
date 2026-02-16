@@ -1,0 +1,101 @@
+# Storms season events - chaos and disruption
+- id: b04108dc-6196-4ccc-9494-bfb747705403
+  name: Flux Storm
+  description: A violent magical storm rages above, sending shockwaves through the earth.
+  season: storms
+  weight: 8
+  flavorText: The walls shake and dust falls from the ceiling as a magical tempest above unleashes its fury upon the land.
+  effects:
+    - type: resource_gain
+      resourceType: flux
+      amount: 35
+      description: Raw magical energy seeps through from the storm.
+    - type: production_modifier
+      resourceType: crystals
+      multiplier: 0.8
+      durationDays: 2
+      description: Storm vibrations disrupt crystal mining.
+  choices: []
+
+- id: 808e863e-d155-4356-9b70-550a44de27a7
+  name: Lightning Strike
+  description: A bolt of arcane lightning penetrates deep into the earth.
+  season: storms
+  weight: 7
+  flavorText: A blinding flash illuminates every corridor as lightning carves a molten path from the surface to your deepest level.
+  effects: []
+  choices:
+    - label: Mine the Fulgurite
+      description: Harvest the crystallized lightning for valuable resources.
+      effects:
+        - type: resource_gain
+          resourceType: crystals
+          amount: 45
+          description: Fulgurite crystals harvested from the lightning strike.
+        - type: resource_gain
+          resourceType: flux
+          amount: 15
+          description: Residual magical energy collected.
+    - label: Study the Strike Pattern
+      description: Analyze the lightning's path for scientific insight.
+      effects:
+        - type: resource_gain
+          resourceType: research
+          amount: 35
+          description: Research gained from analyzing the lightning.
+        - type: production_modifier
+          resourceType: research
+          multiplier: 1.2
+          durationDays: 3
+          description: Lightning insights boost research productivity.
+
+- id: 18f6fdac-9c39-4b04-b78c-c4ca1da1920d
+  name: Arcane Convergence
+  description: Multiple ley lines converge beneath your dungeon during the storm.
+  season: storms
+  weight: 6
+  flavorText: Your most sensitive inhabitants feel an overwhelming surge of magical power as ancient ley lines align beneath the dungeon.
+  effects:
+    - type: production_modifier
+      resourceType: flux
+      multiplier: 1.5
+      durationDays: 3
+      description: Converging ley lines amplify flux generation.
+    - type: production_modifier
+      resourceType: essence
+      multiplier: 1.3
+      durationDays: 3
+      description: Magical convergence enhances essence production.
+  choices: []
+
+- id: befb37eb-227e-4530-a114-8296b674c06f
+  name: Tunnel Collapse
+  description: Storm tremors cause a section of tunnel to cave in.
+  season: storms
+  weight: 9
+  flavorText: A deafening rumble echoes through the halls as unstable passages crumble, revealing what lies behind the rubble.
+  effects: []
+  choices:
+    - label: Dig Through the Rubble
+      description: Clear the collapse to access hidden mineral deposits.
+      effects:
+        - type: resource_loss
+          resourceType: food
+          amount: 20
+          description: Extra rations for the excavation crew.
+        - type: resource_gain
+          resourceType: gold
+          amount: 70
+          description: Gold veins exposed by the collapse.
+        - type: resource_gain
+          resourceType: crystals
+          amount: 30
+          description: Crystal deposits found in the rubble.
+    - label: Seal It Off
+      description: Collapse the passage further to reinforce your defenses.
+      effects:
+        - type: production_modifier
+          resourceType: food
+          multiplier: 1.15
+          durationDays: 4
+          description: Sealed passages reduce pest infiltration.

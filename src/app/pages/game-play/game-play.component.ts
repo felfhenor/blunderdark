@@ -11,6 +11,7 @@ import { PanelFloorMinimapComponent } from '@components/panel-floor-minimap/pane
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
+import { PanelSeasonalEventComponent } from '@components/panel-seasonal-event/panel-seasonal-event.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
@@ -57,6 +58,7 @@ import {
     PanelFusionComponent,
     PanelHallwayInfoComponent,
     PanelMerchantComponent,
+    PanelSeasonalEventComponent,
     PanelVictoryComponent,
     VictoryMenuComponent,
     PanelStairInfoComponent,

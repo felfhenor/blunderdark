@@ -11,6 +11,7 @@ import {
   defaultResearchState,
   defaultResources,
   defaultSeasonState,
+  defaultSeasonalEventState,
   defaultVictoryProgress,
 } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
@@ -79,6 +80,7 @@ export async function worldgenGenerateWorld(): Promise<
     portals: [],
     victoryProgress: defaultVictoryProgress(),
     merchant: defaultMerchantState(),
+    seasonalEvent: defaultSeasonalEventState(),
     didFinish: true,
   };
 }

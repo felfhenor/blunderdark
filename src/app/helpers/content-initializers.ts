@@ -26,6 +26,7 @@ import type { ReputationActionId } from '@interfaces/content-reputationaction';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomContent, RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { SeasonalEventContent, SeasonalEventId } from '@interfaces/content-seasonalevent';
 import type { SeasonBonusContent, SeasonBonusId } from '@interfaces/content-seasonbonus';
 import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
@@ -50,6 +51,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   research: ensureResearch,
   room: ensureRoom,
   roomshape: ensureRoomShape,
+  seasonalevent: ensureSeasonalEvent,
   seasonbonus: ensureSeasonBonus,
   summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
@@ -426,6 +428,42 @@ function ensureMerchantTrade(
     reward: trade.reward ?? {},
     maxStock: trade.maxStock ?? 1,
     type: trade.type ?? 'buy',
+  };
+}
+
+function ensureSeasonalEvent(
+  event: Partial<SeasonalEventContent>,
+): SeasonalEventContent {
+  return {
+    id: event.id ?? ('UNKNOWN' as SeasonalEventId),
+    name: event.name ?? 'UNKNOWN',
+    __type: 'seasonalevent',
+    description: event.description ?? '',
+    season: event.season ?? ('growth' as Season),
+    weight: event.weight ?? 10,
+    flavorText: event.flavorText ?? '',
+    effects: (event.effects ?? []).map((e) => ({
+      type: e.type ?? 'resource_gain',
+      resourceType: e.resourceType ?? 'gold',
+      amount: e.amount ?? undefined,
+      percentage: e.percentage ?? undefined,
+      multiplier: e.multiplier ?? undefined,
+      durationDays: e.durationDays ?? undefined,
+      description: e.description ?? '',
+    })),
+    choices: (event.choices ?? []).map((c) => ({
+      label: c.label ?? '',
+      description: c.description ?? '',
+      effects: (c.effects ?? []).map((e) => ({
+        type: e.type ?? 'resource_gain',
+        resourceType: e.resourceType ?? 'gold',
+        amount: e.amount ?? undefined,
+        percentage: e.percentage ?? undefined,
+        multiplier: e.multiplier ?? undefined,
+        durationDays: e.durationDays ?? undefined,
+        description: e.description ?? '',
+      })),
+    })),
   };
 }
 

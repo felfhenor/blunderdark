@@ -9,9 +9,11 @@ import { productionModifierCalculate } from '@helpers/production-modifiers';
 import { resourceEffectiveMax } from '@helpers/resources';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
+import { seasonalEventGetProductionModifier } from '@helpers/seasonal-event';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import { gamestate } from '@helpers/state-game';
 import type {
+  ActiveSeasonalEffect,
   Floor,
   GameState,
   InhabitantInstance,
@@ -176,7 +178,7 @@ export function productionCalculateConditionalModifiers(
   return stateModifierCalculatePerCreatureProduction(assigned);
 }
 
-export function productionCalculateTotal(floors: Floor[], hour?: number, season?: Season): RoomProduction {
+export function productionCalculateTotal(floors: Floor[], hour?: number, season?: Season, activeSeasonalEffects?: ActiveSeasonalEffect[]): RoomProduction {
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
@@ -245,9 +247,12 @@ export function productionCalculateTotal(floors: Floor[], hour?: number, season?
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
+        const seasonalEventMod = activeSeasonalEffects
+          ? seasonalEventGetProductionModifier(activeSeasonalEffects, resourceType as ResourceType)
+          : 1.0;
         const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
         const final =
-          baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+          baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * seasonalEventMod * creatureModifier;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }
@@ -278,6 +283,7 @@ export function productionCalculateSingleRoom(
   floor: Floor,
   hour?: number,
   season?: Season,
+  activeSeasonalEffects?: ActiveSeasonalEffect[],
 ): RoomProduction {
   const roomDef = productionGetRoomDefinition(room.roomTypeId);
   if (!roomDef) return {};
@@ -340,9 +346,12 @@ export function productionCalculateSingleRoom(
     const seasonMod = season
       ? seasonBonusGetResourceModifier(season, resourceType)
       : 1.0;
+    const seasonalEventMod = activeSeasonalEffects
+      ? seasonalEventGetProductionModifier(activeSeasonalEffects, resourceType as ResourceType)
+      : 1.0;
     const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
     production[resourceType] =
-      baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+      baseAmount * (1 + inhabitantBonus + adjacencyBonus + featureAdjacentBonus + featureProductionBonus) * stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * seasonalEventMod * creatureModifier;
   }
 
   // Add flat production from features
@@ -360,7 +369,7 @@ export function productionCalculateSingleRoom(
 
 export const productionRates = computed<RoomProduction>(() => {
   const state = gamestate();
-  return productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  return productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason, state.world.seasonalEvent.activeEffects);
 });
 
 export function productionPerMinute(perTickRate: number): number {
@@ -372,7 +381,7 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
   for (const floor of state.world.floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
-      return productionCalculateSingleRoom(room, floor, state.clock.hour, state.world.season.currentSeason);
+      return productionCalculateSingleRoom(room, floor, state.clock.hour, state.world.season.currentSeason, state.world.seasonalEvent.activeEffects);
     }
   }
   return {};
@@ -382,6 +391,7 @@ export function productionCalculateBreakdowns(
   floors: Floor[],
   hour?: number,
   season?: Season,
+  activeSeasonalEffects?: ActiveSeasonalEffect[],
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
 
@@ -450,8 +460,11 @@ export function productionCalculateBreakdowns(
         const seasonMod = season
           ? seasonBonusGetResourceModifier(season, resourceType)
           : 1.0;
+        const seasonalEventMod = activeSeasonalEffects
+          ? seasonalEventGetProductionModifier(activeSeasonalEffects, resourceType as ResourceType)
+          : 1.0;
         const featureProductionBonus = featureCalculateProductionBonus(room, resourceType);
-        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * creatureModifier;
+        const modifier = stateModifier * envModifier * depthModifier * dayNightResourceMod * seasonMod * seasonalEventMod * creatureModifier;
         const withBonuses = baseAmount * (1 + inhabitantBonus + adjacencyBonusVal + featureAdjacentBonus + featureProductionBonus);
         const finalAmount = withBonuses * modifier;
 
@@ -481,11 +494,11 @@ export function productionCalculateBreakdowns(
 
 export const productionBreakdowns = computed(() => {
   const state = gamestate();
-  return productionCalculateBreakdowns(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  return productionCalculateBreakdowns(state.world.floors, state.clock.hour, state.world.season.currentSeason, state.world.seasonalEvent.activeEffects);
 });
 
 export function productionProcess(state: GameState): void {
-  const production = productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason);
+  const production = productionCalculateTotal(state.world.floors, state.clock.hour, state.world.season.currentSeason, state.world.seasonalEvent.activeEffects);
 
   for (const [type, amount] of Object.entries(production)) {
     if (!amount || amount <= 0) continue;

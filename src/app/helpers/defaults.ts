@@ -12,6 +12,7 @@ import type {
   ResearchState,
   ResourceMap,
   SeasonState,
+  SeasonalEventState,
   StatBlock,
   UnlockedContent,
   VictoryProgress,
@@ -56,6 +57,7 @@ export function defaultGameState(): GameState {
       portals: [],
       victoryProgress: defaultVictoryProgress(),
       merchant: defaultMerchantState(),
+      seasonalEvent: defaultSeasonalEventState(),
     },
   };
 }
@@ -150,6 +152,15 @@ export function defaultVictoryProgress(): VictoryProgress {
     consecutiveZeroCorruptionDays: 0,
     lastZeroCorruptionCheckDay: 0,
     totalInvasionDefenseWins: 0,
+  };
+}
+
+export function defaultSeasonalEventState(): SeasonalEventState {
+  return {
+    triggeredEventIds: [],
+    activeEffects: [],
+    pendingEvent: undefined,
+    lastSeasonCycleForReset: 0,
   };
 }
 
