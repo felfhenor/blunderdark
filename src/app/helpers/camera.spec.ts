@@ -14,7 +14,7 @@ import {
   CAMERA_GRID_TOTAL,
   CAMERA_PAN_SPEED,
   CAMERA_ZOOM_STEP,
-} from './camera';
+} from '@helpers/camera';
 
 describe('camera', () => {
   beforeEach(() => {
