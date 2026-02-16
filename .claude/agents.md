@@ -368,6 +368,22 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `autosave.ts` | `autosave` | `AUTOSAVE` |
 
+## Save Slots System
+
+- **Types**: `SaveSlotId` = `'autosave' | 'slot-1' | 'slot-2' | 'slot-3'`; `SaveSlotMeta` stores metadata (timestamp, dungeonName, playtime, floorCount, roomCount, dayNumber, isEmpty); `SaveSlotMetaIndex` = `Record<SaveSlotId, SaveSlotMeta>`
+- **Storage layer**: `save-slots-storage.ts` wraps IndexedDB with `saveSlotStorageGet/Put/Delete` — separate module for mockability
+- **IndexedDB keys**: save data stored at `saveslot:{slotId}`, metadata index at `saveslot-meta`
+- **Signal state**: `saveSlotMetaIndex` signal holds current meta for reactive UI; refreshed from DB via `saveSlotRefreshMeta()`
+- **CRUD**: `saveSlotWrite(slotId, saveData?)` serializes current gamestate if no data provided; `saveSlotRead(slotId)` returns `SaveData | undefined`; `saveSlotDelete(slotId)` clears data + resets meta
+- **Autosave integration**: `autosavePerform()` and `onBeforeUnload()` both call `saveSlotWrite('autosave')` fire-and-forget
+- **UI**: `PanelSaveSlotsComponent` — standalone, OnPush, uses `swalConfirm()` helper for confirmation dialogs via dynamic `import('sweetalert2')`
+- **Testing**: mock `@helpers/save-slots-storage` with in-memory `Map<string, unknown>` for IndexedDB simulation; mock `@helpers/save`, `@helpers/state-game`, `@helpers/logging`
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `save-slots.ts` | `saveSlot` | `SAVE_SLOT` |
+| `save-slots-storage.ts` | `saveSlotStorage` | `SAVE_SLOT_STORAGE` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)

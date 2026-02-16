@@ -17,8 +17,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "All types, storage layer, CRUD operations, and 21 unit tests implemented."
     },
     {
       "id": "US-002",
@@ -36,8 +36,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelSaveSlotsComponent implemented with all UI features, SweetAlert2 confirmations, storage usage display, and integration into options page."
     }
   ]
 }
