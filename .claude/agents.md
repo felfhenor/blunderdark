@@ -209,6 +209,7 @@ All room-specific systems follow the same pattern:
 - **Panel components**: card pattern (`card bg-base-100 shadow-xl` → `card-body p-4` → `card-title text-sm`), conditionally render via computed signal + `@if`
 - **Keyboard shortcuts**: `@ngneat/hotkeys` with `[hotkeys]`, `isGlobal`, `(hotkey)`
 - **Build mode mutual exclusion**: each mode has enter/exit signals; `enterX()` calls `exitY()` (one-way imports to avoid circular deps)
+- **Gap values must be multiples of 2** — use `gap-2`, `gap-4`, `gap-6`, etc. Never use odd values like `gap-1`, `gap-3`, `gap-5`
 
 ## Naming Conventions
 
