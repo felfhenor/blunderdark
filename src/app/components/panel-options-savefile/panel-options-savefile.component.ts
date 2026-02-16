@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
+import { PanelSaveSlotsComponent } from '@components/panel-save-slots/panel-save-slots.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
@@ -23,6 +24,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     DecimalPipe,
     ButtonSavefileExportComponent,
     ButtonSavefileImportComponent,
+    PanelSaveSlotsComponent,
     AnalyticsClickDirective,
     SFXDirective,
   ],

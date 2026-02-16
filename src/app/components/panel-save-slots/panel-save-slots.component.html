@@ -1,0 +1,102 @@
+<div class="flex flex-col gap-3">
+  <h3 class="text-sm font-bold">Save Slots</h3>
+
+  <div class="grid grid-cols-2 gap-3">
+    @for (slotId of slotIds; track slotId) {
+      @let meta = slotMeta(slotId);
+      <div
+        class="card shadow-sm"
+        [class.bg-base-200]="slotId !== 'autosave'"
+        [class.bg-primary]="slotId === 'autosave' && !meta.isEmpty"
+        [class.bg-opacity-10]="slotId === 'autosave' && !meta.isEmpty"
+        [class.bg-base-300]="slotId === 'autosave' && meta.isEmpty"
+        [class.border]="slotId === 'autosave'"
+        [class.border-primary]="slotId === 'autosave'"
+        [class.border-opacity-30]="slotId === 'autosave'"
+      >
+        <div class="card-body p-3">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm">
+              {{ slotDisplayName(slotId) }}
+            </span>
+            @if (slotId === 'autosave') {
+              <span class="badge badge-primary badge-xs">Auto</span>
+            }
+            @if (!meta.isEmpty) {
+              <span class="badge badge-ghost badge-xs">Day {{ meta.dayNumber }}</span>
+            }
+          </div>
+
+          @if (meta.isEmpty) {
+            <p class="text-xs opacity-40 my-1">Empty</p>
+            @if (isManualSlot(slotId)) {
+              <div class="card-actions mt-1">
+                <button
+                  class="btn btn-xs btn-success"
+                  [disabled]="isBusy()"
+                  (click)="saveToSlot(slotId)"
+                >
+                  New Save
+                </button>
+              </div>
+            }
+          } @else {
+            <div class="text-xs opacity-60 flex flex-col gap-0.5 my-1">
+              <span>{{ meta.dungeonName }}</span>
+              <span>{{ meta.floorCount }} floors, {{ meta.roomCount }} rooms</span>
+              <span>{{ meta.timestamp | date: 'short' }}</span>
+              <span>Playtime: {{ formatPlaytime(meta.playtimeSeconds) }}</span>
+            </div>
+
+            <div class="card-actions mt-1 flex flex-wrap gap-1">
+              @if (isManualSlot(slotId)) {
+                <button
+                  class="btn btn-xs btn-warning"
+                  [disabled]="isBusy()"
+                  (click)="saveToSlot(slotId)"
+                >
+                  Overwrite
+                </button>
+              }
+              <button
+                class="btn btn-xs btn-info"
+                [disabled]="isBusy()"
+                (click)="loadFromSlot(slotId)"
+              >
+                Load
+              </button>
+              @if (isManualSlot(slotId)) {
+                <button
+                  class="btn btn-xs btn-error"
+                  [disabled]="isBusy()"
+                  (click)="deleteSlot(slotId)"
+                >
+                  Delete
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (storageQuota() > 0) {
+    <div class="mt-1">
+      <div class="flex items-center justify-between text-xs opacity-60 mb-1">
+        <span>Storage: {{ formatBytes(storageUsed()) }} / {{ formatBytes(storageQuota()) }}</span>
+        <span>{{ storagePercent() }}%</span>
+      </div>
+      <progress
+        class="progress w-full"
+        [class.progress-warning]="storageWarning()"
+        [class.progress-info]="!storageWarning()"
+        [value]="storagePercent()"
+        max="100"
+      ></progress>
+      @if (storageWarning()) {
+        <p class="text-xs text-warning mt-1">Storage is running low. Consider deleting old saves.</p>
+      }
+    </div>
+  }
+</div>

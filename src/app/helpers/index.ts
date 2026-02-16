@@ -70,6 +70,8 @@ export * from './room-roles';
 export * from './room-shapes';
 export * from './room-upgrades';
 export * from './save';
+export * from './save-slots';
+export * from './save-slots-storage';
 export * from './scheduler';
 export * from './season';
 export * from './season-bonuses';

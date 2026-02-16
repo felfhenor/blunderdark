@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debug } from '@helpers/logging';
+import { saveSlotWrite } from '@helpers/save-slots';
 import { gamestateSave } from '@helpers/state-game';
 import { optionsGet } from '@helpers/state-options';
 
@@ -30,6 +31,12 @@ export function autosavePerform(): boolean {
   try {
     autosaveIsSaving.set(true);
     gamestateSave();
+
+    // Also write to the autosave save slot (fire-and-forget)
+    saveSlotWrite('autosave').catch(() => {
+      debug('Autosave', 'Failed to write to autosave slot');
+    });
+
     debug('Autosave', 'Autosave completed');
 
     // Keep indicator visible for minimum display time
@@ -96,6 +103,7 @@ function onBeforeUnload(): void {
   if (!optionsGet('autosaveEnabled')) return;
   try {
     gamestateSave();
+    saveSlotWrite('autosave').catch(() => {});
   } catch {
     // Swallow - browser is closing
   }
