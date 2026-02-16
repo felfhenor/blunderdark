@@ -28,7 +28,7 @@
     - Arcane Basics
   unlocks:
     - type: room
-      targetId: a7ef7e24-f250-45e7-986d-ad06b3610b52
+      targetRoomId: Ley Line Nexus
   tier: 2
   requiredTicks: 150
 

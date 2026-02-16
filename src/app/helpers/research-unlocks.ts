@@ -7,6 +7,7 @@ import type {
   UnlockEffect,
   UnlockedContent,
 } from '@interfaces';
+import { getUnlockTargetId } from '@interfaces/research';
 import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { RoomId } from '@interfaces/content-room';
@@ -77,11 +78,7 @@ export function researchUnlockGetRequiredResearchName(
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
   for (const node of allNodes) {
     for (const unlock of node.unlocks) {
-      if (
-        unlock.type === type &&
-        'targetId' in unlock &&
-        unlock.targetId === id
-      ) {
+      if (unlock.type === type && getUnlockTargetId(unlock) === id) {
         return node.name;
       }
     }
@@ -99,8 +96,7 @@ export function researchUnlockIsResearchGated(
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
   return allNodes.some((node) =>
     node.unlocks.some(
-      (unlock) =>
-        unlock.type === type && 'targetId' in unlock && unlock.targetId === id,
+      (unlock) => unlock.type === type && getUnlockTargetId(unlock) === id,
     ),
   );
 }
@@ -126,23 +122,29 @@ export function researchUnlockApplyEffects(
   for (const unlock of unlocks) {
     switch (unlock.type) {
       case 'room':
-        if (!result.rooms.includes(unlock.targetId)) {
-          result.rooms = [...result.rooms, unlock.targetId];
+        if (!result.rooms.includes(unlock.targetRoomId)) {
+          result.rooms = [...result.rooms, unlock.targetRoomId];
         }
         break;
       case 'inhabitant':
-        if (!result.inhabitants.includes(unlock.targetId)) {
-          result.inhabitants = [...result.inhabitants, unlock.targetId];
+        if (!result.inhabitants.includes(unlock.targetInhabitantId)) {
+          result.inhabitants = [
+            ...result.inhabitants,
+            unlock.targetInhabitantId,
+          ];
         }
         break;
       case 'ability':
-        if (!result.abilities.includes(unlock.targetId)) {
-          result.abilities = [...result.abilities, unlock.targetId];
+        if (!result.abilities.includes(unlock.targetCombatabilityId)) {
+          result.abilities = [
+            ...result.abilities,
+            unlock.targetCombatabilityId,
+          ];
         }
         break;
       case 'upgrade':
-        if (!result.upgrades.includes(unlock.targetId)) {
-          result.upgrades = [...result.upgrades, unlock.targetId];
+        if (!result.upgrades.includes(unlock.targetUpgradepathId)) {
+          result.upgrades = [...result.upgrades, unlock.targetUpgradepathId];
         }
         break;
       case 'passive_bonus':

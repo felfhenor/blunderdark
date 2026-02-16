@@ -242,12 +242,20 @@ const validateResearchTree = () => {
         }
         return;
       }
-      if (!unlock.targetId) {
-        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) is missing "targetId"`);
+      const targetFieldMap: Record<string, string> = {
+        room: 'targetRoomId',
+        inhabitant: 'targetInhabitantId',
+        ability: 'targetCombatabilityId',
+        upgrade: 'targetUpgradepathId',
+      };
+      const targetField = targetFieldMap[unlock.type];
+      const targetId = targetField ? unlock[targetField] : undefined;
+      if (!targetId) {
+        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) is missing "${targetField}"`);
         return;
       }
-      if (!allContentIds.has(unlock.targetId)) {
-        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) references invalid ID "${unlock.targetId}"`);
+      if (!allContentIds.has(targetId)) {
+        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) references invalid ID "${targetId}"`);
       }
     });
   });

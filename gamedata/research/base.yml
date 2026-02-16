@@ -13,7 +13,7 @@
   prerequisiteResearchIds: []
   unlocks:
     - type: room
-      targetId: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+      targetRoomId: Soul Well
   tier: 1
   requiredTicks: 50
 
@@ -26,7 +26,7 @@
   prerequisiteResearchIds: []
   unlocks:
     - type: room
-      targetId: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+      targetRoomId: Shadow Library
   tier: 1
   requiredTicks: 50
 
@@ -40,8 +40,8 @@
   prerequisiteResearchIds: []
   unlocks:
     - type: room
-      targetId: ae673803-b514-4da9-a0d4-df448aa412a4
+      targetRoomId: Dark Forge
     - type: room
-      targetId: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+      targetRoomId: Barracks
   tier: 1
   requiredTicks: 50

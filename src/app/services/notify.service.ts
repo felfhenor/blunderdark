@@ -12,6 +12,7 @@ import {
 import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 import type { ReputationLevelUpEvent } from '@interfaces/reputation';
 import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
+import { getUnlockTargetId } from '@interfaces/research';
 import { LoggerService } from '@services/logger.service';
 
 const REPUTATION_FLAVOR_TEXT: Record<ReputationType, string> = {
@@ -90,9 +91,10 @@ export class NotifyService {
     if (unlock.type === 'passive_bonus') {
       return unlock.description;
     }
-    const entry = contentGetEntry<IsContentItem>(unlock.targetId);
+    const targetId = getUnlockTargetId(unlock)!;
+    const entry = contentGetEntry<IsContentItem>(targetId);
     const label = unlock.type === 'room' ? 'Room' : unlock.type === 'inhabitant' ? 'Creature' : unlock.type === 'ability' ? 'Ability' : 'Upgrade';
-    return `${label}: ${entry?.name ?? unlock.targetId}`;
+    return `${label}: ${entry?.name ?? targetId}`;
   }
 
   private showResearchUnlock(event: { nodeName: string; unlocks: UnlockEffect[] }): void {

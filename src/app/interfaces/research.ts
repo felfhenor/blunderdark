@@ -15,22 +15,22 @@ export type UnlockEffectType =
 
 export type RoomUnlock = {
   type: 'room';
-  targetId: RoomId;
+  targetRoomId: RoomId;
 };
 
 export type InhabitantUnlock = {
   type: 'inhabitant';
-  targetId: InhabitantId;
+  targetInhabitantId: InhabitantId;
 };
 
 export type AbilityUnlock = {
   type: 'ability';
-  targetId: CombatAbilityId;
+  targetCombatabilityId: CombatAbilityId;
 };
 
 export type UpgradeUnlock = {
   type: 'upgrade';
-  targetId: UpgradePathId;
+  targetUpgradepathId: UpgradePathId;
 };
 
 export type PassiveBonusUnlock = {
@@ -54,6 +54,23 @@ export type UnlockedContent = {
   upgrades: UpgradePathId[];
   passiveBonuses: { bonusType: string; value: number; description: string }[];
 };
+
+export function getUnlockTargetId(
+  unlock: UnlockEffect,
+): string | undefined {
+  switch (unlock.type) {
+    case 'room':
+      return unlock.targetRoomId;
+    case 'inhabitant':
+      return unlock.targetInhabitantId;
+    case 'ability':
+      return unlock.targetCombatabilityId;
+    case 'upgrade':
+      return unlock.targetUpgradepathId;
+    case 'passive_bonus':
+      return undefined;
+  }
+}
 
 export type ResearchState = {
   completedNodes: ResearchId[];

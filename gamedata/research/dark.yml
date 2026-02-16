@@ -63,7 +63,7 @@
     - Dark Arts Fundamentals
   unlocks:
     - type: inhabitant
-      targetId: c970d8c0-e920-4844-95ff-362f971abf06
+      targetInhabitantId: Skeleton
   tier: 2
   requiredTicks: 150
 

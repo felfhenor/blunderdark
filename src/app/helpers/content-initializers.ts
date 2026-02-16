@@ -1,4 +1,5 @@
 import type {
+  AbilityUnlock,
   AlchemyRecipeContent,
   AlchemyRecipeId,
   BreedingRecipeContent,
@@ -9,6 +10,7 @@ import type {
   ForgeRecipeId,
   FusionRecipeContent,
   FusionRecipeId,
+  InhabitantUnlock,
   IsContentItem,
   PassiveBonusUnlock,
   ReputationActionContent,
@@ -16,10 +18,12 @@ import type {
   ReputationEffectId,
   ResearchContent,
   RoomShapeContent,
+  RoomUnlock,
   Season,
   SummonRecipeContent,
   SummonRecipeId,
   UnlockEffect,
+  UpgradeUnlock,
 } from '@interfaces';
 import type {
   AbilityEffectContent,
@@ -58,6 +62,7 @@ import type {
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces/content-victorypath';
+import type { UpgradePathId } from '@interfaces/room';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -221,18 +226,42 @@ function ensureResearch(
 
 function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
   const type = effect.type ?? 'room';
-  if (type === 'passive_bonus') {
-    return {
-      type: 'passive_bonus',
-      bonusType: (effect as Partial<PassiveBonusUnlock>).bonusType ?? '',
-      value: (effect as Partial<PassiveBonusUnlock>).value ?? 0,
-      description: (effect as Partial<PassiveBonusUnlock>).description ?? '',
-    };
+  switch (type) {
+    case 'passive_bonus':
+      return {
+        type: 'passive_bonus',
+        bonusType: (effect as Partial<PassiveBonusUnlock>).bonusType ?? '',
+        value: (effect as Partial<PassiveBonusUnlock>).value ?? 0,
+        description: (effect as Partial<PassiveBonusUnlock>).description ?? '',
+      };
+    case 'room':
+      return {
+        type: 'room',
+        targetRoomId:
+          (effect as Partial<RoomUnlock>).targetRoomId ?? ('' as RoomId),
+      };
+    case 'inhabitant':
+      return {
+        type: 'inhabitant',
+        targetInhabitantId:
+          (effect as Partial<InhabitantUnlock>).targetInhabitantId ??
+          ('' as InhabitantId),
+      };
+    case 'ability':
+      return {
+        type: 'ability',
+        targetCombatabilityId:
+          (effect as Partial<AbilityUnlock>).targetCombatabilityId ??
+          ('' as CombatAbilityId),
+      };
+    case 'upgrade':
+      return {
+        type: 'upgrade',
+        targetUpgradepathId:
+          (effect as Partial<UpgradeUnlock>).targetUpgradepathId ??
+          ('' as UpgradePathId),
+      };
   }
-  return {
-    type,
-    targetId: (effect as { targetId?: string }).targetId ?? '',
-  } as UnlockEffect;
 }
 
 function ensureRoom(room: Partial<RoomContent>): RoomContent {

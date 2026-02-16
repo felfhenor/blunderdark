@@ -269,13 +269,13 @@ describe('researchUnlockGetPassiveBonuses', () => {
 
 describe('researchUnlockApplyEffects', () => {
   it('should add room unlock', () => {
-    const effects: UnlockEffect[] = [{ type: 'room', targetId: ROOM_ID_A }];
+    const effects: UnlockEffect[] = [{ type: 'room', targetRoomId: ROOM_ID_A }];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.rooms).toEqual([ROOM_ID_A]);
   });
 
   it('should not duplicate room unlock', () => {
-    const effects: UnlockEffect[] = [{ type: 'room', targetId: ROOM_ID_A }];
+    const effects: UnlockEffect[] = [{ type: 'room', targetRoomId: ROOM_ID_A }];
     const current = makeUnlockedContent({ rooms: [ROOM_ID_A] });
     const result = researchUnlockApplyEffects(effects, current);
     expect(result.rooms).toEqual([ROOM_ID_A]);
@@ -283,7 +283,7 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should add inhabitant unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'inhabitant', targetId: INHABITANT_ID },
+      { type: 'inhabitant', targetInhabitantId: INHABITANT_ID },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.inhabitants).toEqual([INHABITANT_ID]);
@@ -306,9 +306,9 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should handle multiple effects at once', () => {
     const effects: UnlockEffect[] = [
-      { type: 'room', targetId: ROOM_ID_A },
-      { type: 'room', targetId: ROOM_ID_B },
-      { type: 'inhabitant', targetId: INHABITANT_ID },
+      { type: 'room', targetRoomId: ROOM_ID_A },
+      { type: 'room', targetRoomId: ROOM_ID_B },
+      { type: 'inhabitant', targetInhabitantId: INHABITANT_ID },
       {
         type: 'passive_bonus',
         bonusType: 'test',
@@ -324,14 +324,14 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should not mutate the original content', () => {
     const original = makeUnlockedContent();
-    const effects: UnlockEffect[] = [{ type: 'room', targetId: ROOM_ID_A }];
+    const effects: UnlockEffect[] = [{ type: 'room', targetRoomId: ROOM_ID_A }];
     researchUnlockApplyEffects(effects, original);
     expect(original.rooms).toEqual([]);
   });
 
   it('should add ability unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'ability', targetId: 'ability-1' as CombatAbilityId },
+      { type: 'ability', targetCombatabilityId: 'ability-1' as CombatAbilityId },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.abilities).toEqual(['ability-1' as CombatAbilityId]);
@@ -339,7 +339,7 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should add upgrade unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'upgrade', targetId: 'upgrade-1' as UpgradePathId },
+      { type: 'upgrade', targetUpgradepathId: 'upgrade-1' as UpgradePathId },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.upgrades).toEqual(['upgrade-1' as UpgradePathId]);
@@ -349,7 +349,7 @@ describe('researchUnlockApplyEffects', () => {
 describe('researchUnlockIsResearchGated', () => {
   it('should return true when a research node unlocks the content', () => {
     const node = makeResearchNode({
-      unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
+      unlocks: [{ type: 'room', targetRoomId: ROOM_ID_A }],
     });
     mockContent.set(node.id, node);
     expect(researchUnlockIsResearchGated('room', ROOM_ID_A)).toBe(true);
@@ -363,7 +363,7 @@ describe('researchUnlockIsResearchGated', () => {
 
   it('should match content type correctly', () => {
     const node = makeResearchNode({
-      unlocks: [{ type: 'inhabitant', targetId: INHABITANT_ID }],
+      unlocks: [{ type: 'inhabitant', targetInhabitantId: INHABITANT_ID }],
     });
     mockContent.set(node.id, node);
     expect(researchUnlockIsResearchGated('room', INHABITANT_ID)).toBe(false);
@@ -377,7 +377,7 @@ describe('researchUnlockGetRequiredResearchName', () => {
   it('should return research node name for gated content', () => {
     const node = makeResearchNode({
       name: 'Dark Arts',
-      unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
+      unlocks: [{ type: 'room', targetRoomId: ROOM_ID_A }],
     });
     mockContent.set(node.id, node);
     expect(researchUnlockGetRequiredResearchName('room', ROOM_ID_A)).toBe(
@@ -399,7 +399,7 @@ describe('researchUnlockOnComplete', () => {
     const node = makeResearchNode({
       id: NODE_ID,
       name: 'Dark Arts',
-      unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
+      unlocks: [{ type: 'room', targetRoomId: ROOM_ID_A }],
     });
     mockContent.set(NODE_ID, node);
 
@@ -453,7 +453,7 @@ describe('researchUnlockProcessCompletion', () => {
   it('should mutate state in-place with unlock effects', () => {
     const node = makeResearchNode({
       id: NODE_ID,
-      unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
+      unlocks: [{ type: 'room', targetRoomId: ROOM_ID_A }],
     });
     mockContent.set(NODE_ID, node);
 
@@ -485,8 +485,8 @@ describe('researchUnlockProcessCompletion', () => {
     const node = makeResearchNode({
       id: NODE_ID,
       unlocks: [
-        { type: 'room', targetId: ROOM_ID_A },
-        { type: 'inhabitant', targetId: INHABITANT_ID },
+        { type: 'room', targetRoomId: ROOM_ID_A },
+        { type: 'inhabitant', targetInhabitantId: INHABITANT_ID },
         {
           type: 'passive_bonus',
           bonusType: 'test',
@@ -513,7 +513,7 @@ describe('researchUnlockProcessCompletion', () => {
   it('should not call updateGamestate (synchronous in-place mutation)', () => {
     const node = makeResearchNode({
       id: NODE_ID,
-      unlocks: [{ type: 'room', targetId: ROOM_ID_A }],
+      unlocks: [{ type: 'room', targetRoomId: ROOM_ID_A }],
     });
     mockContent.set(NODE_ID, node);
 

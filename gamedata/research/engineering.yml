@@ -29,9 +29,9 @@
     - Basic Engineering
   unlocks:
     - type: room
-      targetId: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
+      targetRoomId: Underground Lake
     - type: room
-      targetId: 827472bd-6bbb-482f-86c8-ad30d5613237
+      targetRoomId: Treasure Vault
   tier: 2
   requiredTicks: 150
 
@@ -46,9 +46,9 @@
     - Basic Engineering
   unlocks:
     - type: room
-      targetId: 6d638daa-6e43-4569-a931-eb4710009da9
+      targetRoomId: Trap Workshop
     - type: room
-      targetId: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
+      targetRoomId: Training Grounds
   tier: 2
   requiredTicks: 150
 
