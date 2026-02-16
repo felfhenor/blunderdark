@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GameState, SaveData } from '@interfaces';
+import type { GameState, SaveData, SaveMigrationResult } from '@interfaces';
 
 // --- Mocks ---
 
@@ -12,12 +12,22 @@ vi.mock('@helpers/migrate', () => ({
   migrateGameState: vi.fn(),
 }));
 
+vi.mock('@helpers/save-migrations', () => ({
+  SAVE_VERSION: 1,
+  saveMigrationRun: vi.fn(),
+}));
+
+vi.mock('@helpers/logging', () => ({
+  warn: vi.fn(),
+}));
+
 // --- Imports after mocks ---
 
 import {
   SAVE_FORMAT_VERSION,
   saveSerialize,
   saveDeserialize,
+  saveDeserializeForceLoad,
   saveComputeChecksum,
   saveVerifyChecksum,
   saveValidate,
@@ -25,6 +35,7 @@ import {
 } from '@helpers/save';
 import { gamestate, gamestateSet } from '@helpers/state-game';
 import { migrateGameState } from '@helpers/migrate';
+import { saveMigrationRun } from '@helpers/save-migrations';
 
 function makeGameState(overrides?: Partial<GameState>): GameState {
   return {
@@ -143,6 +154,32 @@ function makeSaveData(
   return data;
 }
 
+function makeSuccessMigrationResult(saveData: SaveData): SaveMigrationResult {
+  return {
+    success: true,
+    saveData,
+    sourceVersion: 1,
+    targetVersion: 1,
+    migrationsApplied: 0,
+    isNewerVersion: false,
+  };
+}
+
+function makeFailureMigrationResult(
+  saveData: SaveData,
+  opts?: { isNewerVersion?: boolean; error?: string },
+): SaveMigrationResult {
+  return {
+    success: false,
+    saveData,
+    sourceVersion: opts?.isNewerVersion ? 99 : 1,
+    targetVersion: 1,
+    migrationsApplied: 0,
+    error: opts?.error ?? 'Migration failed',
+    isNewerVersion: opts?.isNewerVersion ?? false,
+  };
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -202,16 +239,83 @@ describe('saveSerialize', () => {
     expect(result.checksum).toMatch(/^v1:/);
     expect(saveVerifyChecksum(result)).toBe(true);
   });
+
+  it('should include the current SAVE_VERSION', () => {
+    const gs = makeGameState();
+    vi.mocked(gamestate).mockReturnValue(gs);
+
+    const result = saveSerialize();
+
+    expect(result.formatVersion).toBe(SAVE_FORMAT_VERSION);
+    expect(typeof result.formatVersion).toBe('number');
+  });
 });
 
 // --- saveDeserialize ---
 
 describe('saveDeserialize', () => {
-  it('should set game state and run migration', () => {
+  it('should set game state and run migration on success', () => {
+    const gs = makeGameState();
+    const saveData = makeSaveData(gs);
+    vi.mocked(saveMigrationRun).mockReturnValue(
+      makeSuccessMigrationResult(saveData),
+    );
+
+    const result = saveDeserialize(saveData);
+
+    expect(result.success).toBe(true);
+    expect(gamestateSet).toHaveBeenCalledWith(gs);
+    expect(migrateGameState).toHaveBeenCalled();
+  });
+
+  it('should return migration result', () => {
+    const gs = makeGameState();
+    const saveData = makeSaveData(gs);
+    vi.mocked(saveMigrationRun).mockReturnValue(
+      makeSuccessMigrationResult(saveData),
+    );
+
+    const result = saveDeserialize(saveData);
+
+    expect(result.success).toBe(true);
+    expect(result.migrationsApplied).toBe(0);
+  });
+
+  it('should not set game state when migration fails', () => {
+    const saveData = makeSaveData();
+    vi.mocked(saveMigrationRun).mockReturnValue(
+      makeFailureMigrationResult(saveData, { error: 'bad data' }),
+    );
+
+    const result = saveDeserialize(saveData);
+
+    expect(result.success).toBe(false);
+    expect(gamestateSet).not.toHaveBeenCalled();
+    expect(migrateGameState).not.toHaveBeenCalled();
+  });
+
+  it('should return isNewerVersion when save is from a newer version', () => {
+    const saveData = makeSaveData();
+    vi.mocked(saveMigrationRun).mockReturnValue(
+      makeFailureMigrationResult(saveData, { isNewerVersion: true }),
+    );
+
+    const result = saveDeserialize(saveData);
+
+    expect(result.success).toBe(false);
+    expect(result.isNewerVersion).toBe(true);
+    expect(gamestateSet).not.toHaveBeenCalled();
+  });
+});
+
+// --- saveDeserializeForceLoad ---
+
+describe('saveDeserializeForceLoad', () => {
+  it('should set game state and migrate without version check', () => {
     const gs = makeGameState();
     const saveData = makeSaveData(gs);
 
-    saveDeserialize(saveData);
+    saveDeserializeForceLoad(saveData);
 
     expect(gamestateSet).toHaveBeenCalledWith(gs);
     expect(migrateGameState).toHaveBeenCalled();
@@ -495,6 +599,16 @@ describe('saveValidate', () => {
     const result = saveValidate(saveData);
     expect(result.warnings).toHaveLength(0);
   });
+
+  it('should warn when save version is newer than current', () => {
+    const saveData = makeSaveData(undefined, { formatVersion: 99 });
+
+    const result = saveValidate(saveData);
+    expect(result.valid).toBe(true);
+    expect(result.warnings).toContainEqual(
+      expect.stringContaining('newer version'),
+    );
+  });
 });
 
 // --- saveParseLegacy ---
@@ -515,12 +629,12 @@ describe('saveParseLegacy', () => {
     expect(result).toBe(saveData);
   });
 
-  it('should wrap raw GameState into SaveData', () => {
+  it('should wrap raw GameState into SaveData with version 1', () => {
     const gs = makeGameState();
     const result = saveParseLegacy(gs);
 
     expect(result).toBeDefined();
-    expect(result!.formatVersion).toBe(SAVE_FORMAT_VERSION);
+    expect(result!.formatVersion).toBe(1);
     expect(result!.gameState).toBe(gs);
     expect(result!.playtimeSeconds).toBe(500);
   });

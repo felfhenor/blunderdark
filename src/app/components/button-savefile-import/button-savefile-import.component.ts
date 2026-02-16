@@ -6,9 +6,11 @@ import {
   uiCloseAllMenus,
   notifySuccess,
   notifyError,
+  notifyWarning,
   saveParseLegacy,
   saveValidate,
   saveDeserialize,
+  saveDeserializeForceLoad,
 } from '@helpers';
 
 @Component({
@@ -29,7 +31,7 @@ export class ButtonSavefileImportComponent {
     const file = fileInput.files[0];
 
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const raw = JSON.parse(
           (ev.target as FileReader).result as string,
@@ -58,7 +60,40 @@ export class ButtonSavefileImportComponent {
           }
         }
 
-        saveDeserialize(saveData);
+        const result = saveDeserialize(saveData);
+
+        if (!result.success) {
+          if (result.isNewerVersion) {
+            const { default: Swal } = await import('sweetalert2');
+            const swalResult = await Swal.fire({
+              title: 'Newer Save Version',
+              text: result.error,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Try to Load Anyway',
+              cancelButtonText: 'Cancel',
+            });
+
+            if (swalResult.isConfirmed) {
+              try {
+                saveDeserializeForceLoad(saveData);
+                notifyWarning('Loaded save from newer version — some data may be lost.');
+              } catch {
+                notifyError('Failed to load incompatible save file.');
+                fileInput.value = '';
+                return;
+              }
+            } else {
+              fileInput.value = '';
+              return;
+            }
+          } else {
+            notifyError(result.error ?? 'Save file is incompatible or corrupted.');
+            fileInput.value = '';
+            return;
+          }
+        }
+
         uiCloseAllMenus();
 
         fileInput.value = '';

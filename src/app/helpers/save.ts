@@ -1,10 +1,17 @@
 import { gamestate, gamestateSet } from '@helpers/state-game';
 import { migrateGameState } from '@helpers/migrate';
-import type { GameState, SaveData, SaveValidationResult } from '@interfaces';
+import { SAVE_VERSION, saveMigrationRun } from '@helpers/save-migrations';
+import { warn } from '@helpers/logging';
+import type {
+  GameState,
+  SaveData,
+  SaveMigrationResult,
+  SaveValidationResult,
+} from '@interfaces';
 
 // --- Constants ---
 
-export const SAVE_FORMAT_VERSION = 1;
+export const SAVE_FORMAT_VERSION = SAVE_VERSION;
 
 // --- Serialization ---
 
@@ -15,7 +22,7 @@ export function saveSerialize(state?: GameState): SaveData {
   const playtimeSeconds = cloned.clock.numTicks;
 
   const saveData: SaveData = {
-    formatVersion: SAVE_FORMAT_VERSION,
+    formatVersion: SAVE_VERSION,
     savedAt: Date.now(),
     playtimeSeconds,
     checksum: '',
@@ -29,7 +36,25 @@ export function saveSerialize(state?: GameState): SaveData {
 
 // --- Deserialization ---
 
-export function saveDeserialize(saveData: SaveData): void {
+export function saveDeserialize(saveData: SaveData): SaveMigrationResult {
+  const migrationResult = saveMigrationRun(saveData);
+
+  if (!migrationResult.success) {
+    if (migrationResult.isNewerVersion) {
+      return migrationResult;
+    }
+
+    warn('Save', `Migration failed: ${migrationResult.error}`);
+    return migrationResult;
+  }
+
+  gamestateSet(migrationResult.saveData.gameState);
+  migrateGameState();
+
+  return migrationResult;
+}
+
+export function saveDeserializeForceLoad(saveData: SaveData): void {
   gamestateSet(saveData.gameState);
   migrateGameState();
 }
@@ -197,6 +222,15 @@ export function saveValidate(data: unknown): SaveValidationResult {
     }
   }
 
+  // Version warning for newer saves
+  if (typeof obj['formatVersion'] === 'number') {
+    if (obj['formatVersion'] > SAVE_VERSION) {
+      warnings.push(
+        `Save is from a newer version (v${obj['formatVersion']}) than current (v${SAVE_VERSION})`,
+      );
+    }
+  }
+
   // Checksum warning (not error — allow player to proceed)
   if (errors.length === 0 && typeof obj['checksum'] === 'string') {
     if (!saveVerifyChecksum(data as SaveData)) {
@@ -229,7 +263,7 @@ export function saveParseLegacy(data: unknown): SaveData | undefined {
   ) {
     const gameState = data as GameState;
     return {
-      formatVersion: SAVE_FORMAT_VERSION,
+      formatVersion: 1,
       savedAt: Date.now(),
       playtimeSeconds: (gameState.clock as unknown as Record<string, unknown>)[
         'numTicks'

@@ -10,7 +10,7 @@ export type GameOption =
   | 'gameloopPaused'
   | 'autosaveEnabled';
 
-export type NotificationCategory = 'Error' | 'Success' | 'Invasion' | 'Corruption' | 'Breeding' | 'Summoning' | 'Forging' | 'Alchemy' | 'Torture' | 'Merchant' | 'SeasonalEvent';
+export type NotificationCategory = 'Error' | 'Success' | 'Warning' | 'Invasion' | 'Corruption' | 'Breeding' | 'Summoning' | 'Forging' | 'Alchemy' | 'Torture' | 'Merchant' | 'SeasonalEvent';
 
 export type OptionsTab = 'UI' | 'Savefile' | 'Debug';
 

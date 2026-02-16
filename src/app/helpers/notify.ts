@@ -24,3 +24,8 @@ export function notifySuccess(message: string): void {
   if (!uiIsPageVisible()) return;
   notification.next({ message, type: 'success', category: 'Success' });
 }
+
+export function notifyWarning(message: string): void {
+  if (!uiIsPageVisible()) return;
+  notification.next({ message, type: 'warning', category: 'Warning' });
+}

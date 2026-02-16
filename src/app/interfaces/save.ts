@@ -13,3 +13,13 @@ export type SaveValidationResult = {
   errors: string[];
   warnings: string[];
 };
+
+export type SaveMigrationResult = {
+  success: boolean;
+  saveData: SaveData;
+  sourceVersion: number;
+  targetVersion: number;
+  migrationsApplied: number;
+  error?: string;
+  isNewerVersion: boolean;
+};

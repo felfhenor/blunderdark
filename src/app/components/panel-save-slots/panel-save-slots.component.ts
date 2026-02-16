@@ -17,8 +17,8 @@ import {
   SAVE_SLOT_IDS,
   SAVE_SLOT_MANUAL_IDS,
 } from '@helpers/save-slots';
-import { saveDeserialize } from '@helpers/save';
-import { notifyError, notifySuccess } from '@helpers/notify';
+import { saveDeserialize, saveDeserializeForceLoad } from '@helpers/save';
+import { notifyError, notifySuccess, notifyWarning } from '@helpers/notify';
 import type { SaveSlotId, SaveSlotMeta } from '@interfaces';
 
 async function swalConfirm(opts: {
@@ -128,8 +128,35 @@ export class PanelSaveSlotsComponent implements OnInit {
         return;
       }
 
-      saveDeserialize(saveData);
-      notifySuccess(`Loaded from ${saveSlotDisplayName(slotId)}`);
+      const result = saveDeserialize(saveData);
+
+      if (!result.success) {
+        if (result.isNewerVersion) {
+          const newerConfirmed = await swalConfirm({
+            title: 'Newer Save Version',
+            text: result.error ?? 'This save is from a newer game version.',
+            icon: 'warning',
+            confirmButtonText: 'Try to Load Anyway',
+          });
+
+          if (newerConfirmed) {
+            try {
+              saveDeserializeForceLoad(saveData);
+              notifyWarning('Loaded save from newer version — some data may be lost.');
+            } catch {
+              notifyError('Failed to load incompatible save file.');
+              return;
+            }
+          } else {
+            return;
+          }
+        } else {
+          notifyError(result.error ?? 'Save file is incompatible or corrupted.');
+          return;
+        }
+      } else {
+        notifySuccess(`Loaded from ${saveSlotDisplayName(slotId)}`);
+      }
     } catch {
       notifyError(`Failed to load from ${saveSlotDisplayName(slotId)}`);
     } finally {

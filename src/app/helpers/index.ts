@@ -70,6 +70,7 @@ export * from './room-roles';
 export * from './room-shapes';
 export * from './room-upgrades';
 export * from './save';
+export * from './save-migrations';
 export * from './save-slots';
 export * from './save-slots-storage';
 export * from './scheduler';
