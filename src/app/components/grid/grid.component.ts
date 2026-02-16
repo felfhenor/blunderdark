@@ -58,7 +58,6 @@ import {
   cameraReset,
   cameraInit,
   cameraUpdateViewport,
-  CAMERA_PAN_SPEED,
   CAMERA_ZOOM_STEP,
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
@@ -108,14 +107,6 @@ const CAMERA_DRAG_THRESHOLD = 5;
   host: {
     '(document:keydown.escape)': 'onEscapeKey()',
     '(document:keydown.r)': 'onRotateKey()',
-    '(document:keydown.w)': 'onPanKey($event, 0, 1)',
-    '(document:keydown.a)': 'onPanKey($event, 1, 0)',
-    '(document:keydown.s)': 'onPanKey($event, 0, -1)',
-    '(document:keydown.d)': 'onPanKey($event, -1, 0)',
-    '(document:keydown.ArrowUp)': 'onPanKey($event, 0, 1)',
-    '(document:keydown.ArrowLeft)': 'onPanKey($event, 1, 0)',
-    '(document:keydown.ArrowDown)': 'onPanKey($event, 0, -1)',
-    '(document:keydown.ArrowRight)': 'onPanKey($event, -1, 0)',
     '(document:keydown.Home)': 'onResetCamera($event)',
   },
 })
@@ -205,21 +196,6 @@ export class GridComponent implements AfterViewInit {
 
     const delta = event.deltaY < 0 ? CAMERA_ZOOM_STEP : -CAMERA_ZOOM_STEP;
     cameraZoomAt(delta, cursorX, cursorY);
-  }
-
-  // --- Camera: keyboard panning ---
-
-  public onPanKey(event: KeyboardEvent, dx: number, dy: number): void {
-    const target = event.target as HTMLElement;
-    if (
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA' ||
-      target.isContentEditable
-    ) {
-      return;
-    }
-    if (uiIsAnyModalOpen()) return;
-    cameraPan(dx * CAMERA_PAN_SPEED, dy * CAMERA_PAN_SPEED);
   }
 
   // --- Camera: reset ---
