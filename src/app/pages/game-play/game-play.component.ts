@@ -120,12 +120,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     });
   }
 
-  public currentFloorDepth = computed(() => {
-    const floor = floorCurrent();
-    return floor?.depth ?? 1;
-  });
-
-  public totalFloors = computed(() => floorAll().length);
 
   public navigateFloorUp(event: KeyboardEvent): void {
     event.preventDefault();

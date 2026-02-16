@@ -1,6 +1,9 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
-    <h3 class="card-title text-sm">Floors</h3>
+    <div class="flex items-center justify-between">
+      <h3 class="card-title text-sm">Floors</h3>
+      <span class="text-xs font-mono opacity-70">{{ currentFloorDepth() }} / {{ floors().length }}</span>
+    </div>
 
     <div class="floor-list flex flex-col gap-2">
       @for (floor of floors(); track trackByFloorId($index, floor); let i = $index) {

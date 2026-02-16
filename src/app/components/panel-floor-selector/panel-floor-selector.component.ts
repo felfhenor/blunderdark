@@ -41,6 +41,11 @@ export class PanelFloorSelectorComponent {
   public currentIndex = floorCurrentIndex;
   public selectedFloor = floorCurrent;
 
+  public currentFloorDepth = computed(() => {
+    const floor = this.selectedFloor();
+    return floor?.depth ?? 1;
+  });
+
   public selectedFloorBiome = computed(() => {
     const floor = this.selectedFloor();
     if (!floor) return BIOME_DATA.neutral;
