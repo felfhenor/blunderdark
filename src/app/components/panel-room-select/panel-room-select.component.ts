@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   altarRoomHas,
@@ -31,7 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-room-select',
-  imports: [TippyDirective],
+  imports: [DecimalPipe, TippyDirective],
   templateUrl: './panel-room-select.component.html',
   styleUrl: './panel-room-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

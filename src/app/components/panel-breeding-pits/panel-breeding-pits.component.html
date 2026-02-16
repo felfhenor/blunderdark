@@ -15,7 +15,7 @@
             [value]="bp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ bp.percent }}%</span>
+          <span class="text-xs opacity-40">{{ bp.percent | number:'1.0-2' }}%</span>
         </div>
       }
 
@@ -31,7 +31,7 @@
             [value]="mp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ mp.percent }}%</span>
+          <span class="text-xs opacity-40">{{ mp.percent | number:'1.0-2' }}%</span>
         </div>
       }
 
@@ -62,7 +62,7 @@
               <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold">{{ entry.recipe.resultName }}</span>
-                  <span class="text-xs opacity-50">{{ entry.timeMinutes }} min</span>
+                  <span class="text-xs opacity-50">{{ entry.timeMinutes | number:'1.0-2' }} min</span>
                 </div>
                 <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
                 <button

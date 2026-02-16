@@ -1,7 +1,7 @@
 @if (altarRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">Altar Room (Level {{ level() }})</h3>
+      <h3 class="card-title text-sm">Altar Room (Level {{ level() | number:'1.0-2' }})</h3>
 
       <div class="mt-2">
         <div class="text-xs opacity-70">
@@ -14,7 +14,7 @@
         <h4 class="text-xs font-semibold opacity-70 mb-1">Calming Aura</h4>
         <div class="flex items-center gap-2">
           <span class="text-xs">Fear reduction to adjacent rooms:</span>
-          <span class="font-mono text-success text-xs">-{{ fearReduction() }}</span>
+          <span class="font-mono text-success text-xs">-{{ fearReduction() | number:'1.0-2' }}</span>
         </div>
       </div>
 
@@ -28,7 +28,7 @@
             <div class="cost-row flex gap-2">
               @for (cost of getCostEntries(upgrade); track cost.type) {
                 <span class="text-xs opacity-70">
-                  {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
+                  {{ cost.amount | number:'1.0-2' }} {{ capitalizeFirst(cost.type) }}
                 </span>
               }
             </div>
@@ -55,7 +55,7 @@
         <div>
           <h4 class="text-xs font-semibold opacity-70 mb-1">
             Recruitment
-            <span class="font-mono ml-1">{{ inhabitantCount() }}/{{ maxInhabitants() }}</span>
+            <span class="font-mono ml-1">{{ inhabitantCount() | number:'1.0-2' }}/{{ maxInhabitants() | number:'1.0-2' }}</span>
           </h4>
 
           @if (rosterFull()) {
@@ -69,7 +69,7 @@
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-xs font-semibold">{{ entry.def.name }}</span>
                   <span class="badge badge-sm badge-ghost">
-                    T{{ entry.def.tier }}
+                    T{{ entry.def.tier | number:'1.0-2' }}
                   </span>
                 </div>
 
@@ -78,11 +78,11 @@
 
                 <!-- Stats -->
                 <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1">
-                  <span class="text-xs opacity-70">HP: <span class="font-mono">{{ entry.def.stats.hp }}</span></span>
-                  <span class="text-xs opacity-70">ATK: <span class="font-mono">{{ entry.def.stats.attack }}</span></span>
-                  <span class="text-xs opacity-70">DEF: <span class="font-mono">{{ entry.def.stats.defense }}</span></span>
-                  <span class="text-xs opacity-70">SPD: <span class="font-mono">{{ entry.def.stats.speed }}</span></span>
-                  <span class="text-xs opacity-70">EFF: <span class="font-mono">{{ entry.def.stats.workerEfficiency }}</span></span>
+                  <span class="text-xs opacity-70">HP: <span class="font-mono">{{ entry.def.stats.hp | number:'1.0-2' }}</span></span>
+                  <span class="text-xs opacity-70">ATK: <span class="font-mono">{{ entry.def.stats.attack | number:'1.0-2' }}</span></span>
+                  <span class="text-xs opacity-70">DEF: <span class="font-mono">{{ entry.def.stats.defense | number:'1.0-2' }}</span></span>
+                  <span class="text-xs opacity-70">SPD: <span class="font-mono">{{ entry.def.stats.speed | number:'1.0-2' }}</span></span>
+                  <span class="text-xs opacity-70">EFF: <span class="font-mono">{{ entry.def.stats.workerEfficiency | number:'1.0-2' }}</span></span>
                 </div>
 
                 <!-- Traits -->
@@ -100,7 +100,7 @@
                 <div class="flex flex-wrap gap-2 mb-1">
                   @for (cost of entry.costEntries; track cost.type) {
                     <span class="text-xs" [class.text-error]="!entry.affordable && isResourceShort(entry, cost.type)">
-                      {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
+                      {{ cost.amount | number:'1.0-2' }} {{ capitalizeFirst(cost.type) }}
                     </span>
                   }
                 </div>

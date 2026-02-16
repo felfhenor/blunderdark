@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,7 +36,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [TippyDirective],
+  imports: [DecimalPipe, TippyDirective],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

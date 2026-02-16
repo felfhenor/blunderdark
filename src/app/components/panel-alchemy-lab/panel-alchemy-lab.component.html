@@ -13,7 +13,7 @@
               <span class="badge badge-xs badge-warning">Converting</span>
             </div>
             <span class="text-xs opacity-50">
-              Output: +{{ conv.outputAmount }} {{ conv.outputResource }}
+              Output: +{{ conv.outputAmount | number:'1.0-2' }} {{ conv.outputResource }}
             </span>
             @if (conv.inputConsumed) {
               <progress
@@ -21,7 +21,7 @@
                 [value]="conv.percent"
                 max="100"
               ></progress>
-              <span class="text-xs opacity-40">{{ conv.percent }}%</span>
+              <span class="text-xs opacity-40">{{ conv.percent | number:'1.0-2' }}%</span>
             } @else {
               <span class="text-xs text-error">Waiting for resources...</span>
             }
@@ -63,9 +63,9 @@
                 <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
                 <span class="text-xs opacity-50">Input: {{ formatCost(entry.effectiveCost) }}</span>
                 <span class="text-xs opacity-50">
-                  Output: +{{ entry.recipe.outputAmount }} {{ entry.recipe.outputResource }}
+                  Output: +{{ entry.recipe.outputAmount | number:'1.0-2' }} {{ entry.recipe.outputResource }}
                 </span>
-                <span class="text-xs opacity-50">Cycle: {{ entry.timeMinutes }} min</span>
+                <span class="text-xs opacity-50">Cycle: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
                 <button
                   class="btn btn-xs btn-primary mt-1"
                   [disabled]="!entry.canAfford"

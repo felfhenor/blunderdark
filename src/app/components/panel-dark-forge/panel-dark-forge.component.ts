@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   contentGetEntry,
@@ -30,6 +31,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-dark-forge',
+  imports: [DecimalPipe],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

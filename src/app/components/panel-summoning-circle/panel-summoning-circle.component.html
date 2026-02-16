@@ -15,7 +15,7 @@
             [value]="sp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ sp.percent }}%</span>
+          <span class="text-xs opacity-40">{{ sp.percent | number:'1.0-2' }}%</span>
         </div>
       }
 
@@ -46,14 +46,14 @@
                 </div>
                 <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
                 <span class="text-xs opacity-50">Cost: {{ formatCost(entry.recipe.cost) }}</span>
-                <span class="text-xs opacity-50">Time: {{ entry.timeMinutes }} min</span>
+                <span class="text-xs opacity-50">Time: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
                 @if (formatStatBonuses(entry.statBonuses); as bonusStr) {
                   @if (bonusStr) {
                     <span class="text-xs text-success">Bonuses: {{ bonusStr }}</span>
                   }
                 }
                 @if (entry.duration) {
-                  <span class="text-xs opacity-50">Duration: {{ entry.duration }} ticks</span>
+                  <span class="text-xs opacity-50">Duration: {{ entry.duration | number:'1.0-2' }} ticks</span>
                 }
                 <button
                   class="btn btn-xs btn-primary mt-1"
@@ -80,7 +80,7 @@
             @for (temp of temporaryInhabitants(); track temp.name) {
               <div class="flex items-center justify-between">
                 <span class="text-xs">{{ temp.name }}</span>
-                <span class="text-xs opacity-50">{{ temp.minutesRemaining }} min left</span>
+                <span class="text-xs opacity-50">{{ temp.minutesRemaining | number:'1.0-2' }} min left</span>
               </div>
             }
           </div>

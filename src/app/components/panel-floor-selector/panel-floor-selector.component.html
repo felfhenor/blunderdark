@@ -2,7 +2,7 @@
   <div class="card-body p-4">
     <div class="flex items-center justify-between">
       <h3 class="card-title text-sm">Floors</h3>
-      <span class="text-xs font-mono opacity-70">{{ currentFloorDepth() }} / {{ floors().length }}</span>
+      <span class="text-xs font-mono opacity-70">{{ currentFloorDepth() | number:'1.0-2' }} / {{ floors().length | number:'1.0-2' }}</span>
     </div>
 
     <div class="floor-list flex flex-col gap-2">
@@ -14,10 +14,10 @@
           (click)="selectFloor(i)"
         >
           <span class="biome-indicator"></span>
-          <span class="depth-number text-xs font-mono opacity-60">{{ floor.depth }}</span>
+          <span class="depth-number text-xs font-mono opacity-60">{{ floor.depth | number:'1.0-2' }}</span>
           <span class="biome-icon">{{ getBiomeIcon(floor.biome) }}</span>
           <span class="floor-name flex-1 text-left truncate">{{ floor.name }}</span>
-          <span class="room-count text-xs opacity-50">{{ floor.rooms.length }}rm</span>
+          <span class="room-count text-xs opacity-50">{{ floor.rooms.length | number:'1.0-2' }}rm</span>
         </button>
       }
     </div>
@@ -87,13 +87,13 @@
       </div>
       <div class="text-xs opacity-60 mt-1 text-center">
         @if (isStairModeActive()) {
-          Cost: {{ stairCost }} Crystals
+          Cost: {{ stairCost | number:'1.0-2' }} Crystals
         } @else if (isElevatorModeActive()) {
-          Cost: {{ elevatorCostCrystals }} Crystals + {{ elevatorCostFlux }} Flux
+          Cost: {{ elevatorCostCrystals | number:'1.0-2' }} Crystals + {{ elevatorCostFlux | number:'1.0-2' }} Flux
         } @else if (isPortalModeActive()) {
-          Cost: {{ portalCostFlux }} Flux + {{ portalCostEssence }} Essence
+          Cost: {{ portalCostFlux | number:'1.0-2' }} Flux + {{ portalCostEssence | number:'1.0-2' }} Essence
         } @else {
-          Stairs: {{ stairCost }}C | Elevator: {{ elevatorCostCrystals }}C+{{ elevatorCostFlux }}F | Portal: {{ portalCostFlux }}F+{{ portalCostEssence }}E
+          Stairs: {{ stairCost | number:'1.0-2' }}C | Elevator: {{ elevatorCostCrystals | number:'1.0-2' }}C+{{ elevatorCostFlux | number:'1.0-2' }}F | Portal: {{ portalCostFlux | number:'1.0-2' }}F+{{ portalCostEssence | number:'1.0-2' }}E
         }
       </div>
     }
@@ -109,7 +109,7 @@
           >
             {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome().name }}
           </span>
-          <span class="text-xs opacity-70">Depth {{ floor.depth }}</span>
+          <span class="text-xs opacity-70">Depth {{ floor.depth | number:'1.0-2' }}</span>
         </div>
 
         <p class="text-sm opacity-80 mb-2">{{ selectedFloorBiome().description }}</p>

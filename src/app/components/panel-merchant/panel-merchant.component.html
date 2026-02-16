@@ -3,7 +3,7 @@
     <div class="card-body p-4">
       <div class="flex items-center justify-between">
         <h3 class="card-title text-sm">Traveling Merchant</h3>
-        <span class="badge badge-warning badge-xs">{{ daysRemaining() }} days left</span>
+        <span class="badge badge-warning badge-xs">{{ daysRemaining() | number:'1.0-2' }} days left</span>
       </div>
       <p class="text-xs opacity-50">A merchant has arrived during Harvest season.</p>
       <button class="btn btn-xs btn-secondary" (click)="open()">
@@ -19,7 +19,7 @@
   <div body>
     <div class="flex items-center justify-between mb-3">
       <span class="text-xs opacity-70">
-        Departing in {{ daysRemaining() }} day{{ daysRemaining() === 1 ? '' : 's' }}
+        Departing in {{ daysRemaining() | number:'1.0-2' }} day{{ daysRemaining() === 1 ? '' : 's' }}
       </span>
     </div>
 
@@ -28,22 +28,22 @@
         class="tab"
         [class.tab-active]="activeCategory() === 'all'"
         (click)="setCategory('all')"
-      >All ({{ categoryCounts().all }})</button>
+      >All ({{ categoryCounts().all | number:'1.0-2' }})</button>
       <button
         class="tab"
         [class.tab-active]="activeCategory() === 'buy'"
         (click)="setCategory('buy')"
-      >Buy ({{ categoryCounts().buy }})</button>
+      >Buy ({{ categoryCounts().buy | number:'1.0-2' }})</button>
       <button
         class="tab"
         [class.tab-active]="activeCategory() === 'sell'"
         (click)="setCategory('sell')"
-      >Sell ({{ categoryCounts().sell }})</button>
+      >Sell ({{ categoryCounts().sell | number:'1.0-2' }})</button>
       <button
         class="tab"
         [class.tab-active]="activeCategory() === 'special'"
         (click)="setCategory('special')"
-      >Special ({{ categoryCounts().special }})</button>
+      >Special ({{ categoryCounts().special | number:'1.0-2' }})</button>
     </div>
 
     <div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
@@ -72,7 +72,7 @@
                         class="badge badge-xs"
                         [class.badge-error]="!entry.affordable"
                         [class.badge-outline]="entry.affordable"
-                      >{{ cost.amount }} {{ cost.type }}</span>
+                      >{{ cost.amount | number:'1.0-2' }} {{ cost.type }}</span>
                     }
                   </div>
 
@@ -80,7 +80,7 @@
                     <span class="text-xs opacity-50">Gain:</span>
                     @for (reward of entry.rewardEntries; track reward.type) {
                       <span class="badge badge-xs badge-success badge-outline">
-                        +{{ reward.amount }} {{ reward.type }}
+                        +{{ reward.amount | number:'1.0-2' }} {{ reward.type }}
                       </span>
                     }
                   </div>
@@ -88,7 +88,7 @@
               </div>
 
               <div class="flex flex-col items-end gap-1 flex-shrink-0">
-                <span class="text-xs opacity-50">Stock: {{ entry.stock }}</span>
+                <span class="text-xs opacity-50">Stock: {{ entry.stock | number:'1.0-2' }}</span>
                 <button
                   class="btn btn-xs btn-primary"
                   [disabled]="entry.stock <= 0 || !entry.affordable"

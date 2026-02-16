@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   floorAll,
@@ -31,7 +32,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [SweetAlert2Module],
+  imports: [DecimalPipe, SweetAlert2Module],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

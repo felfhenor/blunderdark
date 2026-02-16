@@ -10,19 +10,19 @@
           [class.btn-primary]="activeFilter() === 'all'"
           [class.btn-ghost]="activeFilter() !== 'all'"
           (click)="setFilter('all')"
-        >All ({{ allCount() }})</button>
+        >All ({{ allCount() | number:'1.0-2' }})</button>
         <button
           class="btn btn-xs"
           [class.btn-primary]="activeFilter() === 'assigned'"
           [class.btn-ghost]="activeFilter() !== 'assigned'"
           (click)="setFilter('assigned')"
-        >Assigned ({{ assignedCount() }})</button>
+        >Assigned ({{ assignedCount() | number:'1.0-2' }})</button>
         <button
           class="btn btn-xs"
           [class.btn-primary]="activeFilter() === 'unassigned'"
           [class.btn-ghost]="activeFilter() !== 'unassigned'"
           (click)="setFilter('unassigned')"
-        >Idle ({{ unassignedCount() }})</button>
+        >Idle ({{ unassignedCount() | number:'1.0-2' }})</button>
       </div>
 
       <!-- Roster list -->
@@ -35,7 +35,7 @@
           >
             <div class="flex items-center justify-between gap-1">
               <div class="flex items-center gap-1 min-w-0">
-                <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier }}</span>
+                <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
                 <span class="text-xs font-semibold truncate">{{ entry.def.name }}</span>
               </div>
               <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
@@ -45,16 +45,16 @@
 
             <div class="flex items-center justify-between mt-0.5">
               <div class="stats-row">
-                <span class="stat-item" [tp]="'HP'">{{ entry.def.stats.hp }}</span>
-                <span class="stat-item" [tp]="'ATK'">{{ entry.def.stats.attack }}</span>
-                <span class="stat-item" [tp]="'DEF'">{{ entry.def.stats.defense }}</span>
-                <span class="stat-item" [tp]="'SPD'">{{ entry.def.stats.speed }}</span>
+                <span class="stat-item" [tp]="'HP'">{{ entry.def.stats.hp | number:'1.0-2' }}</span>
+                <span class="stat-item" [tp]="'ATK'">{{ entry.def.stats.attack | number:'1.0-2' }}</span>
+                <span class="stat-item" [tp]="'DEF'">{{ entry.def.stats.defense | number:'1.0-2' }}</span>
+                <span class="stat-item" [tp]="'SPD'">{{ entry.def.stats.speed | number:'1.0-2' }}</span>
                 <span
                   class="stat-item"
                   [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
                   [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
                   [tp]="'Worker Efficiency'"
-                >{{ entry.def.stats.workerEfficiency.toFixed(1) }}x</span>
+                >{{ entry.def.stats.workerEfficiency | number:'1.0-2' }}x</span>
               </div>
             </div>
 
@@ -86,7 +86,7 @@
           <p class="text-xs opacity-60">{{ entry.def.description }}</p>
           <div class="text-xs mt-1">
             <span class="opacity-70">Type:</span> {{ entry.def.type }}
-            <span class="opacity-70 ml-2">Tier:</span> {{ entry.def.tier }}
+            <span class="opacity-70 ml-2">Tier:</span> {{ entry.def.tier | number:'1.0-2' }}
             <span class="opacity-70 ml-2">State:</span>
             <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
               {{ entry.instance.state }}
@@ -95,16 +95,16 @@
 
           <!-- Full stats -->
           <div class="grid grid-cols-2 gap-x-4 gap-y-0 mt-1 text-xs">
-            <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp }}</div>
-            <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack }}</div>
-            <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense }}</div>
-            <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed }}</div>
+            <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp | number:'1.0-2' }}</div>
+            <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack | number:'1.0-2' }}</div>
+            <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense | number:'1.0-2' }}</div>
+            <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed | number:'1.0-2' }}</div>
             <div class="col-span-2">
               <span class="opacity-50">Efficiency:</span>
               <span
                 [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
                 [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
-              >{{ entry.def.stats.workerEfficiency.toFixed(1) }}x</span>
+              >{{ entry.def.stats.workerEfficiency | number:'1.0-2' }}x</span>
             </div>
           </div>
 

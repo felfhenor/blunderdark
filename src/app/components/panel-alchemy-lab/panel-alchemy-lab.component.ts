@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   alchemyLabCanConvert,
@@ -28,6 +29,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
+  imports: [DecimalPipe],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -45,7 +46,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [ModalComponent, TippyDirective],
+  imports: [DecimalPipe, ModalComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

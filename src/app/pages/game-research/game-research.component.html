@@ -84,7 +84,7 @@
             @for (tierGroup of tierNodes(); track tierGroup.tier) {
               <div class="tier-group">
                 <div class="tier-label text-xs opacity-50 mb-2 text-center">
-                  Tier {{ tierGroup.tier }}
+                  Tier {{ tierGroup.tier | number:'1.0-2' }}
                 </div>
                 <div class="tier-nodes flex gap-4 justify-center flex-wrap">
                   @for (node of tierGroup.nodes; track node.id) {
@@ -165,7 +165,7 @@
                 <!-- Tier & Branch -->
                 <div class="flex gap-2 text-xs">
                   <span class="badge badge-outline badge-xs">
-                    Tier {{ node.tier }}
+                    Tier {{ node.tier | number:'1.0-2' }}
                   </span>
                   <span class="badge badge-outline badge-xs capitalize">
                     {{ node.branch }}
@@ -178,7 +178,7 @@
                   <div class="flex flex-wrap gap-1">
                     @for (cost of formatCost(node.cost); track cost.type) {
                       <span class="badge badge-sm badge-outline capitalize">
-                        {{ cost.amount }} {{ cost.type }}
+                        {{ cost.amount | number:'1.0-2' }} {{ cost.type }}
                       </span>
                     }
                   </div>

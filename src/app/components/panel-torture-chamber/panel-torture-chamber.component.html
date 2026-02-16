@@ -18,7 +18,7 @@
             [value]="tp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ tp.percent }}%</span>
+          <span class="text-xs opacity-40">{{ tp.percent | number:'1.0-2' }}%</span>
         </div>
       }
 
@@ -48,7 +48,7 @@
                   <span class="badge badge-xs badge-ghost">{{ prisoner.invaderClass }}</span>
                 </div>
                 <span class="text-xs opacity-60">
-                  HP {{ prisoner.stats.hp }} / ATK {{ prisoner.stats.attack }} / DEF {{ prisoner.stats.defense }} / SPD {{ prisoner.stats.speed }}
+                  HP {{ prisoner.stats.hp | number:'1.0-2' }} / ATK {{ prisoner.stats.attack | number:'1.0-2' }} / DEF {{ prisoner.stats.defense | number:'1.0-2' }} / SPD {{ prisoner.stats.speed | number:'1.0-2' }}
                 </span>
                 @if (canStartJob()) {
                   <div class="flex gap-1 mt-1">
@@ -56,13 +56,13 @@
                       class="btn btn-xs btn-warning flex-1"
                       (click)="startExtraction(prisoner.id)"
                     >
-                      Extract ({{ getExtractionTime() }}m)
+                      Extract ({{ getExtractionTime() | number:'1.0-2' }}m)
                     </button>
                     <button
                       class="btn btn-xs btn-error flex-1"
                       (click)="startConversion(prisoner.id)"
                     >
-                      Convert ({{ getConversionRate(prisoner.invaderClass) }}%)
+                      Convert ({{ getConversionRate(prisoner.invaderClass) | number:'1.0-2' }}%)
                     </button>
                   </div>
                 }
@@ -86,7 +86,7 @@
         <p class="text-lg font-semibold">{{ result.prisonerName }}</p>
         @if (result.type === 'extraction') {
           <p class="text-warning mt-2">
-            Extracted {{ result.researchGained }} research points.
+            Extracted {{ result.researchGained | number:'1.0-2' }} research points.
           </p>
         } @else {
           @if (result.success) {

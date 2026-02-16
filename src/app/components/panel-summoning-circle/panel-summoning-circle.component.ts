@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
@@ -30,7 +31,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [ModalComponent],
+  imports: [DecimalPipe, ModalComponent],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

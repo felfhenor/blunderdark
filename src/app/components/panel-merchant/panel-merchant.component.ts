@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -34,7 +35,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [ModalComponent],
+  imports: [DecimalPipe, ModalComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

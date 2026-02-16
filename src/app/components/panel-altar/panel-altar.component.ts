@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   altarRoomFearReductionAura,
@@ -38,7 +39,7 @@ type RecruitableEntry = {
 
 @Component({
   selector: 'app-panel-altar',
-  imports: [TippyDirective],
+  imports: [DecimalPipe, TippyDirective],
   templateUrl: './panel-altar.component.html',
   styleUrl: './panel-altar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

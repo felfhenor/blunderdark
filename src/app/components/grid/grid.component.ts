@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   type AfterViewInit,
   ChangeDetectionStrategy,
@@ -100,7 +101,7 @@ const CAMERA_DRAG_THRESHOLD = 5;
 
 @Component({
   selector: 'app-grid',
-  imports: [FearIndicatorComponent, TippyDirective],
+  imports: [DecimalPipe, FearIndicatorComponent, TippyDirective],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

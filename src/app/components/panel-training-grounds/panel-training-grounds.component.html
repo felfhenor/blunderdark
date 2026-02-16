@@ -6,7 +6,7 @@
       <div class="flex flex-col gap-1 mt-1">
         <div class="flex items-center gap-2">
           <span class="text-xs opacity-50">Training Time:</span>
-          <span class="text-xs font-semibold">{{ trainingTimeMinutes() }} min</span>
+          <span class="text-xs font-semibold">{{ trainingTimeMinutes() | number:'1.0-2' }} min</span>
         </div>
 
         @if (expectedBonuses(); as bonuses) {
@@ -14,10 +14,10 @@
             <span class="text-xs opacity-50">Bonuses:</span>
             <span class="text-xs">
               @if (bonuses.defense > 0) {
-                <span class="badge badge-xs badge-info">+{{ bonuses.defense }} DEF</span>
+                <span class="badge badge-xs badge-info">+{{ bonuses.defense | number:'1.0-2' }} DEF</span>
               }
               @if (bonuses.attack > 0) {
-                <span class="badge badge-xs badge-warning">+{{ bonuses.attack }} ATK</span>
+                <span class="badge badge-xs badge-warning">+{{ bonuses.attack | number:'1.0-2' }} ATK</span>
               }
             </span>
           </div>
@@ -44,14 +44,14 @@
                     [value]="trainee.percent"
                     max="100"
                   ></progress>
-                  <span class="text-xs opacity-40">{{ trainee.percent }}%</span>
+                  <span class="text-xs opacity-40">{{ trainee.percent | number:'1.0-2' }}%</span>
                 } @else {
                   <div class="flex gap-1">
                     @if (trainee.bonuses.defense > 0) {
-                      <span class="text-xs text-info">+{{ trainee.bonuses.defense }} DEF</span>
+                      <span class="text-xs text-info">+{{ trainee.bonuses.defense | number:'1.0-2' }} DEF</span>
                     }
                     @if (trainee.bonuses.attack > 0) {
-                      <span class="text-xs text-warning">+{{ trainee.bonuses.attack }} ATK</span>
+                      <span class="text-xs text-warning">+{{ trainee.bonuses.attack | number:'1.0-2' }} ATK</span>
                     }
                   </div>
                 }

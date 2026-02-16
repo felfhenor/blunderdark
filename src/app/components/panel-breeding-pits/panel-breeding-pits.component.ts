@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
@@ -26,7 +27,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-breeding-pits',
-  imports: [ModalComponent],
+  imports: [DecimalPipe, ModalComponent],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -19,7 +19,7 @@
                 </div>
                 <div class="text-xs opacity-70">
                   {{ ruler.definition.type }} - Tier
-                  {{ ruler.definition.tier }}
+                  {{ ruler.definition.tier | number:'1.0-2' }}
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@
               [value]="fearLevel()!"
               max="5"
             ></progress>
-            <span class="text-xs font-mono">{{ fearLevel() }}/5</span>
+            <span class="text-xs font-mono">{{ fearLevel() | number:'1.0-2' }}/5</span>
           </div>
         </div>
       }

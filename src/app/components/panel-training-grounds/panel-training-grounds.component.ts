@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   floorCurrent,
@@ -16,6 +17,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
 @Component({
   selector: 'app-panel-training-grounds',
+  imports: [DecimalPipe],
   templateUrl: './panel-training-grounds.component.html',
   styleUrl: './panel-training-grounds.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

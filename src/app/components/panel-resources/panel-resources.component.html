@@ -11,7 +11,7 @@
         } @else {
           Low food!
           @if (warning.minutesRemaining !== undefined) {
-            ~{{ warning.minutesRemaining }} game-min remaining.
+            ~{{ warning.minutesRemaining | number:'1.0-2' }} game-min remaining.
           }
         }
       </span>
