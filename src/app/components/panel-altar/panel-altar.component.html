@@ -68,7 +68,7 @@
                 <!-- Header: Name + Tier -->
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-xs font-semibold">{{ entry.def.name }}</span>
-                  <span class="badge badge-sm" [class.badge-ghost]="!entry.locked" [class.badge-warning]="entry.locked">
+                  <span class="badge badge-sm badge-ghost">
                     T{{ entry.def.tier }}
                   </span>
                 </div>
@@ -76,50 +76,44 @@
                 <!-- Description -->
                 <div class="text-xs opacity-60 mb-1">{{ entry.def.description }}</div>
 
-                @if (!entry.locked) {
-                  <!-- Stats -->
-                  <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1">
-                    <span class="text-xs opacity-70">HP: <span class="font-mono">{{ entry.def.stats.hp }}</span></span>
-                    <span class="text-xs opacity-70">ATK: <span class="font-mono">{{ entry.def.stats.attack }}</span></span>
-                    <span class="text-xs opacity-70">DEF: <span class="font-mono">{{ entry.def.stats.defense }}</span></span>
-                    <span class="text-xs opacity-70">SPD: <span class="font-mono">{{ entry.def.stats.speed }}</span></span>
-                    <span class="text-xs opacity-70">EFF: <span class="font-mono">{{ entry.def.stats.workerEfficiency }}</span></span>
-                  </div>
+                <!-- Stats -->
+                <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1">
+                  <span class="text-xs opacity-70">HP: <span class="font-mono">{{ entry.def.stats.hp }}</span></span>
+                  <span class="text-xs opacity-70">ATK: <span class="font-mono">{{ entry.def.stats.attack }}</span></span>
+                  <span class="text-xs opacity-70">DEF: <span class="font-mono">{{ entry.def.stats.defense }}</span></span>
+                  <span class="text-xs opacity-70">SPD: <span class="font-mono">{{ entry.def.stats.speed }}</span></span>
+                  <span class="text-xs opacity-70">EFF: <span class="font-mono">{{ entry.def.stats.workerEfficiency }}</span></span>
+                </div>
 
-                  <!-- Traits -->
-                  @if (entry.def.traits.length > 0) {
-                    <div class="flex flex-wrap gap-1 mb-1">
-                      @for (trait of entry.def.traits; track trait.id) {
-                        <span class="badge badge-xs badge-outline" [tp]="trait.description">
-                          {{ trait.name }}
-                        </span>
-                      }
-                    </div>
-                  }
-
-                  <!-- Cost -->
-                  <div class="flex flex-wrap gap-2 mb-1">
-                    @for (cost of entry.costEntries; track cost.type) {
-                      <span class="text-xs" [class.text-error]="!entry.affordable && isResourceShort(entry, cost.type)">
-                        {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
+                <!-- Traits -->
+                @if (entry.def.traits.length > 0) {
+                  <div class="flex flex-wrap gap-1 mb-1">
+                    @for (trait of entry.def.traits; track trait.id) {
+                      <span class="badge badge-xs badge-outline" [tp]="trait.description">
+                        {{ trait.name }}
                       </span>
                     }
                   </div>
-
-                  <!-- Recruit Button -->
-                  <button
-                    class="btn btn-xs btn-primary w-full"
-                    [disabled]="!entry.affordable || rosterFull()"
-                    [tp]="getDisabledReason(entry)"
-                    (click)="onRecruit(entry.def)"
-                  >
-                    Recruit
-                  </button>
-                } @else if (entry.researchLocked) {
-                  <div class="text-xs text-warning opacity-70">Requires: {{ entry.researchRequirement }}</div>
-                } @else {
-                  <div class="text-xs text-warning opacity-70">Requires Tier {{ entry.def.tier }}</div>
                 }
+
+                <!-- Cost -->
+                <div class="flex flex-wrap gap-2 mb-1">
+                  @for (cost of entry.costEntries; track cost.type) {
+                    <span class="text-xs" [class.text-error]="!entry.affordable && isResourceShort(entry, cost.type)">
+                      {{ cost.amount }} {{ capitalizeFirst(cost.type) }}
+                    </span>
+                  }
+                </div>
+
+                <!-- Recruit Button -->
+                <button
+                  class="btn btn-xs btn-primary w-full"
+                  [disabled]="!entry.affordable || rosterFull()"
+                  [tp]="getDisabledReason(entry)"
+                  (click)="onRecruit(entry.def)"
+                >
+                  Recruit
+                </button>
               </div>
             }
           </div>

@@ -21,7 +21,6 @@ import {
   recruitmentUnlockedTier,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
-  researchUnlockGetRequiredResearchName,
 } from '@helpers';
 import type {
   ResourceType,
@@ -33,9 +32,6 @@ import { TippyDirective } from '@ngneat/helipopper';
 type RecruitableEntry = {
   def: InhabitantContent;
   affordable: boolean;
-  locked: boolean;
-  researchLocked: boolean;
-  researchRequirement: string;
   shortfall: { type: ResourceType; needed: number }[];
   costEntries: { type: string; amount: number }[];
 };
@@ -85,24 +81,23 @@ export class PanelAltarComponent {
     const defs = recruitmentGetRecruitable();
     const tier = this.tierUnlocked();
 
-    return defs.map((def) => {
-      const researchGated = researchUnlockIsResearchGated('inhabitant', def.id);
-      const researchLocked = researchGated && !researchUnlockIsUnlocked('inhabitant', def.id);
-      const researchRequirement = researchLocked
-        ? researchUnlockGetRequiredResearchName('inhabitant', def.id) ?? ''
-        : '';
-      const locked = researchLocked || def.tier > tier;
-      const affordable = !locked && resourceCanAfford(def.cost);
-      const shortfall =
-        !locked && !affordable
+    return defs
+      .filter((def) => {
+        if (def.tier > tier) return false;
+        const researchGated = researchUnlockIsResearchGated('inhabitant', def.id);
+        return !researchGated || researchUnlockIsUnlocked('inhabitant', def.id);
+      })
+      .map((def) => {
+        const affordable = resourceCanAfford(def.cost);
+        const shortfall = !affordable
           ? recruitmentGetShortfall(def.cost, state.world.resources)
           : [];
-      const costEntries = Object.entries(def.cost)
-        .filter(([, amount]) => amount && amount > 0)
-        .map(([type, amount]) => ({ type, amount: amount as number }));
+        const costEntries = Object.entries(def.cost)
+          .filter(([, amount]) => amount && amount > 0)
+          .map(([type, amount]) => ({ type, amount: amount as number }));
 
-      return { def, affordable, locked, researchLocked, researchRequirement, shortfall, costEntries };
-    });
+        return { def, affordable, shortfall, costEntries };
+      });
   });
 
   public getCostEntries(
@@ -123,8 +118,6 @@ export class PanelAltarComponent {
 
   public getDisabledReason(entry: RecruitableEntry): string {
     if (this.rosterFull()) return 'Roster full';
-    if (entry.researchLocked) return `Requires: ${entry.researchRequirement}`;
-    if (entry.locked) return `Requires Tier ${entry.def.tier}`;
     if (!entry.affordable) {
       const parts = entry.shortfall.map(
         (s) => `${s.needed} more ${this.capitalizeFirst(s.type)}`,
