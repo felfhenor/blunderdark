@@ -5,8 +5,7 @@
 
       <!-- Active Conversion -->
       @if (activeConversion(); as conv) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Active Conversion:</h4>
+        <div class="divider my-2 text-xs opacity-60">Active Conversion</div>
           <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold">{{ conv.recipeName }}</span>
@@ -30,27 +29,23 @@
               (click)="stopConversion()"
             >Stop</button>
           </div>
-        </div>
       }
 
       <!-- Assigned Workers -->
       @if (assignedWorkers().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Workers:</h4>
+        <div class="divider my-2 text-xs opacity-60">Workers</div>
           <div class="flex flex-wrap gap-1">
             @for (w of assignedWorkers(); track w.instanceId) {
               <span class="badge badge-xs badge-outline">{{ w.defName }}</span>
             }
           </div>
-        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No workers assigned.</p>
       }
 
       <!-- Available Recipes -->
       @if (assignedWorkers().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Recipes:</h4>
+        <div class="divider my-2 text-xs opacity-60">Recipes</div>
           <div class="flex flex-col gap-2">
             @for (entry of availableRecipes(); track entry.recipe.id) {
               <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
@@ -80,7 +75,6 @@
               </div>
             }
           </div>
-        </div>
       }
     </div>
   </div>

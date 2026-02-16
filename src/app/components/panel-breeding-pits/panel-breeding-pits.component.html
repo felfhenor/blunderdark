@@ -37,8 +37,7 @@
 
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Assigned:</h4>
+        <div class="divider my-2 text-xs opacity-60">Assigned</div>
           <div class="flex flex-wrap gap-1">
             @for (inh of assignedInhabitants(); track inh.instanceId) {
               <span class="badge badge-xs badge-outline">
@@ -48,15 +47,13 @@
               </span>
             }
           </div>
-        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No inhabitants assigned.</p>
       }
 
       <!-- Available Recipes -->
       @if (availableRecipes().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Hybrid Recipes:</h4>
+        <div class="divider my-2 text-xs opacity-60">Hybrid Recipes</div>
           <div class="flex flex-col gap-2">
             @for (entry of availableRecipes(); track entry.recipe.id) {
               <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
@@ -74,13 +71,11 @@
               </div>
             }
           </div>
-        </div>
       }
 
       <!-- Mutatable Inhabitants -->
       @if (mutatableInhabitants().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Mutation Candidates:</h4>
+        <div class="divider my-2 text-xs opacity-60">Mutation Candidates</div>
           <div class="flex flex-col gap-1">
             @for (inh of mutatableInhabitants(); track inh.instanceId) {
               <div class="flex items-center justify-between">
@@ -94,7 +89,6 @@
               </div>
             }
           </div>
-        </div>
       }
     </div>
   </div>

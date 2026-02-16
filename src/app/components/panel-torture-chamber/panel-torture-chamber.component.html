@@ -24,22 +24,19 @@
 
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Torturer:</h4>
+        <div class="divider my-2 text-xs opacity-60">Torturer</div>
           <div class="flex flex-wrap gap-1">
             @for (inh of assignedInhabitants(); track inh.instanceId) {
               <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
             }
           </div>
-        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No torturer assigned.</p>
       }
 
       <!-- Prisoner List -->
       @if (availablePrisoners().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Prisoners ({{ availablePrisoners().length }}):</h4>
+        <div class="divider my-2 text-xs opacity-60">Prisoners ({{ availablePrisoners().length }})</div>
           <div class="flex flex-col gap-2">
             @for (prisoner of availablePrisoners(); track prisoner.id) {
               <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
@@ -69,7 +66,6 @@
               </div>
             }
           </div>
-        </div>
       } @else if (!tortureProgress()) {
         <p class="text-xs opacity-50 mt-2">No prisoners available.</p>
       }

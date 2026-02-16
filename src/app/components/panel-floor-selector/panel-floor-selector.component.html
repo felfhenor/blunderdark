@@ -139,7 +139,7 @@
 
         @if (depthModifiers().length > 0) {
           <div class="depth-modifiers mt-2">
-            <p class="text-xs font-semibold opacity-70 mb-1">Depth Modifiers</p>
+            <div class="divider my-2 text-xs opacity-60">Depth Modifiers</div>
             <div class="flex flex-wrap gap-1">
               @for (mod of depthModifiers(); track mod.resourceType) {
                 <span

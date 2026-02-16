@@ -5,7 +5,7 @@
 
       @if (data.active.length > 0) {
         <div class="synergy-section">
-          <div class="text-xs font-semibold text-success mb-1">Active Synergies</div>
+          <div class="divider my-2 text-xs text-success">Active Synergies</div>
           @for (synergy of data.active; track synergy.id) {
             <div class="synergy-item active-synergy">
               <div class="flex items-center gap-1 mb-0.5">
@@ -26,7 +26,7 @@
           <div class="divider my-1 h-0"></div>
         }
         <div class="synergy-section">
-          <div class="text-xs font-semibold text-warning mb-1">Potential Synergies</div>
+          <div class="divider my-2 text-xs text-warning">Potential Synergies</div>
           @for (ps of data.potential; track ps.synergy.id) {
             <div class="synergy-item potential-synergy">
               <div class="flex items-center gap-1 mb-0.5">

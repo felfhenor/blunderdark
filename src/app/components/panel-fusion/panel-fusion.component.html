@@ -154,7 +154,7 @@
                     <p class="text-xs opacity-60">{{ p.hybridDef.description }}</p>
 
                     <!-- Stat Comparison -->
-                    <div class="text-xs font-semibold mt-1">Stats</div>
+                    <div class="divider my-2 text-xs opacity-50">Stats</div>
                     <div class="grid grid-cols-5 gap-1 text-xs">
                       @for (s of statComparison(); track s.stat) {
                         <div class="stat-compare text-center">
@@ -169,7 +169,7 @@
 
                     <!-- Traits -->
                     @if (traitAnalysis().inherited.length > 0 || traitAnalysis().unique.length > 0) {
-                      <div class="text-xs font-semibold mt-1">Traits</div>
+                      <div class="divider my-2 text-xs opacity-50">Traits</div>
                       <div class="flex flex-wrap gap-1">
                         @for (trait of traitAnalysis().inherited; track trait.id) {
                           <span
@@ -187,7 +187,7 @@
                     }
 
                     <!-- Cost -->
-                    <div class="text-xs font-semibold mt-1">Cost</div>
+                    <div class="divider my-2 text-xs opacity-50">Cost</div>
                     <div class="flex flex-wrap gap-1">
                       @for (cost of p.costEntries; track cost.type) {
                         <span

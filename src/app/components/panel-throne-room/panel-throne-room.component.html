@@ -58,8 +58,7 @@
 
       <!-- Fear Level -->
       @if (fearLevel() !== undefined) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Fear Level</h4>
+        <div class="divider my-2 text-xs opacity-60">Fear Level</div>
           <div class="flex items-center gap-2">
             <progress
               class="progress w-full"
@@ -73,15 +72,11 @@
             ></progress>
             <span class="text-xs font-mono">{{ fearLevel() | number:'1.0-2' }}/5</span>
           </div>
-        </div>
       }
 
       <!-- Dungeon-Wide Bonuses -->
       @if (bonusEntries().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">
-            Dungeon-Wide Bonuses
-          </h4>
+        <div class="divider my-2 text-xs opacity-60">Dungeon-Wide Bonuses</div>
           <div class="flex flex-col gap-0.5">
             @for (entry of bonusEntries(); track entry[0]) {
               <div class="flex justify-between text-xs">
@@ -96,15 +91,11 @@
               </div>
             }
           </div>
-        </div>
       }
 
       <!-- Positional Bonuses -->
       @if (positional().vaultAdjacent || positional().central) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">
-            Positional Bonuses
-          </h4>
+        <div class="divider my-2 text-xs opacity-60">Positional Bonuses</div>
           <div class="flex flex-col gap-0.5">
             @if (positional().vaultAdjacent) {
               <div class="flex justify-between text-xs">
@@ -129,7 +120,6 @@
               </div>
             }
           </div>
-        </div>
       }
     </div>
   </div>

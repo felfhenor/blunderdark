@@ -5,8 +5,7 @@
 
       <!-- Active Queue -->
       @if (queueState(); as qs) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Crafting Queue ({{ qs.jobs.length | number:'1.0-2' }}/{{ qs.maxSize | number:'1.0-2' }}):</h4>
+        <div class="divider my-2 text-xs opacity-60">Crafting Queue ({{ qs.jobs.length | number:'1.0-2' }}/{{ qs.maxSize | number:'1.0-2' }})</div>
           <div class="flex flex-col gap-1">
             @for (job of qs.jobs; track job.index) {
               <div class="flex flex-col gap-1 p-1 bg-base-200 rounded">
@@ -35,27 +34,23 @@
               </div>
             }
           </div>
-        </div>
       }
 
       <!-- Assigned Workers -->
       @if (assignedWorkers().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Workers:</h4>
+        <div class="divider my-2 text-xs opacity-60">Workers</div>
           <div class="flex flex-wrap gap-1">
             @for (w of assignedWorkers(); track w.instanceId) {
               <span class="badge badge-xs badge-outline">{{ w.defName }}</span>
             }
           </div>
-        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No workers assigned.</p>
       }
 
       <!-- Available Recipes -->
       @if (availableRecipes().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Recipes:</h4>
+        <div class="divider my-2 text-xs opacity-60">Recipes</div>
           <div class="flex flex-col gap-2">
             @for (entry of availableRecipes(); track entry.recipe.id) {
               <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
@@ -88,13 +83,11 @@
               </div>
             }
           </div>
-        </div>
       }
 
       <!-- Forge Inventory -->
       @if (forgeInventory().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Forge Inventory:</h4>
+        <div class="divider my-2 text-xs opacity-60">Forge Inventory</div>
           <div class="flex flex-col gap-1">
             @for (item of forgeInventory(); track item.recipeId) {
               <div class="flex items-center justify-between">
@@ -103,7 +96,6 @@
               </div>
             }
           </div>
-        </div>
       }
     </div>
   </div>

@@ -88,8 +88,7 @@
 
       <!-- Feature Slots -->
       @if (featureSlots().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Features:</h4>
+        <div class="divider my-2 text-xs opacity-60">Features</div>
           <div class="flex flex-col gap-1">
             @for (slot of featureSlots(); track slot.index) {
               @if (slot.feature) {
@@ -117,13 +116,11 @@
               }
             }
           </div>
-        </div>
       }
 
       <!-- Resource Converter -->
       @if (hasResourceConverter()) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Resource Converter:</h4>
+        <div class="divider my-2 text-xs opacity-60">Resource Converter</div>
           <div class="flex items-center gap-2">
             <select
               class="select select-xs select-bordered flex-1"
@@ -137,17 +134,15 @@
             </select>
             <span class="text-xs opacity-50">{{ converterEfficiency() * 100 | number:'1.0-2' }}% eff.</span>
           </div>
-        </div>
       }
 
       @if (room.maxInhabitants !== 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">
-            Inhabitants:
-            <span class="font-mono">
-              {{ inhabitantCount() | number:'1.0-2' }}/{{ room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants }}
-            </span>
-          </h4>
+        <div class="divider my-2 text-xs opacity-60">
+          Inhabitants
+          <span class="font-mono">
+            {{ inhabitantCount() | number:'1.0-2' }}/{{ room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants }}
+          </span>
+        </div>
 
           @if (assignedInhabitants().length > 0) {
             <div class="flex flex-col gap-1 mb-2">
@@ -185,12 +180,10 @@
               <p class="text-xs opacity-50">No eligible inhabitants available.</p>
             }
           }
-        </div>
       }
 
       @if (adjacentUnconnected().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Connect to:</h4>
+        <div class="divider my-2 text-xs opacity-60">Connect to</div>
           <div class="flex flex-col gap-1">
             @for (adj of adjacentUnconnected(); track adj.id) {
               <button
@@ -201,12 +194,10 @@
               </button>
             }
           </div>
-        </div>
       }
 
       @if (activeConnections().length > 0) {
-        <div class="mt-2">
-          <h4 class="text-xs font-semibold opacity-70 mb-1">Connected:</h4>
+        <div class="divider my-2 text-xs opacity-60">Connected</div>
           <div class="flex flex-col gap-1">
             @for (conn of activeConnections(); track conn.connectionId) {
               <div class="flex items-center justify-between gap-2">
@@ -220,7 +211,6 @@
               </div>
             }
           </div>
-        </div>
       }
 
       @if (adjacentUnconnected().length === 0 && activeConnections().length === 0) {
