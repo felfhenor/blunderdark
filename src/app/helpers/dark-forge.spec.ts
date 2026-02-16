@@ -12,7 +12,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -127,7 +127,7 @@ const infernalBladeRecipe: ForgeRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const forgeDef: RoomDefinition & IsContentItem = {
+const forgeDef: RoomContent & IsContentItem = {
   id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
@@ -148,7 +148,7 @@ const forgeDef: RoomDefinition & IsContentItem = {
   role: 'darkForge',
 };
 
-const crystalMineDef: RoomDefinition & IsContentItem = {
+const crystalMineDef: RoomContent & IsContentItem = {
   id: CRYSTAL_MINE_ID as RoomId,
   name: 'Crystal Mine',
   __type: 'room',
@@ -169,7 +169,7 @@ const crystalMineDef: RoomDefinition & IsContentItem = {
   forgingAdjacencyEffects: { forgingSpeedBonus: 0.30 },
 };
 
-const trainingGroundsDef: RoomDefinition & IsContentItem = {
+const trainingGroundsDef: RoomContent & IsContentItem = {
   id: TRAINING_GROUNDS_ID as RoomId,
   name: 'Training Grounds',
   __type: 'room',

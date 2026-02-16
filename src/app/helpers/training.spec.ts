@@ -8,7 +8,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -74,7 +74,7 @@ vi.mock('@helpers/room-roles', () => ({
   roomRoleResetCache: vi.fn(),
 }));
 
-const trainingGroundsRoom: RoomDefinition & IsContentItem = {
+const trainingGroundsRoom: RoomContent & IsContentItem = {
   id: TRAINING_GROUNDS_ID as RoomId,
   name: 'Training Grounds',
   __type: 'room',
@@ -98,7 +98,7 @@ const trainingGroundsRoom: RoomDefinition & IsContentItem = {
   autoPlace: false,
 };
 
-const barracksRoom: RoomDefinition & IsContentItem = {
+const barracksRoom: RoomContent & IsContentItem = {
   id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',
@@ -119,7 +119,7 @@ const barracksRoom: RoomDefinition & IsContentItem = {
   trainingAdjacencyEffects: { timeReduction: 0.20 },
 };
 
-const altarRoom: RoomDefinition & IsContentItem = {
+const altarRoom: RoomContent & IsContentItem = {
   id: ALTAR_ID as RoomId,
   name: 'Altar Room',
   __type: 'room',

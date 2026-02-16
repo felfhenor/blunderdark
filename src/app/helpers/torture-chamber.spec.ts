@@ -10,7 +10,7 @@ import type {
   PlacedRoom,
   PlacedRoomId,
   PrisonerId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -94,7 +94,7 @@ vi.mock('@helpers/room-shapes', () => ({
 
 // --- Room definitions ---
 
-const tortureChamberDef: RoomDefinition & IsContentItem = {
+const tortureChamberDef: RoomContent & IsContentItem = {
   id: TORTURE_CHAMBER_ID as RoomId,
   name: 'Torture Chamber',
   __type: 'room',
@@ -115,7 +115,7 @@ const tortureChamberDef: RoomDefinition & IsContentItem = {
   role: 'tortureChamber',
 };
 
-const soulWellDef: RoomDefinition & IsContentItem = {
+const soulWellDef: RoomContent & IsContentItem = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
@@ -136,7 +136,7 @@ const soulWellDef: RoomDefinition & IsContentItem = {
   tortureAdjacencyEffects: { tortureSpeedBonus: 0.15 },
 };
 
-const barracksDef: RoomDefinition & IsContentItem = {
+const barracksDef: RoomContent & IsContentItem = {
   id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',

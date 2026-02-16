@@ -231,7 +231,7 @@ export function saveParseLegacy(data: unknown): SaveData | undefined {
     return {
       formatVersion: SAVE_FORMAT_VERSION,
       savedAt: Date.now(),
-      playtimeSeconds: (gameState.clock as Record<string, unknown>)[
+      playtimeSeconds: (gameState.clock as unknown as Record<string, unknown>)[
         'numTicks'
       ] as number,
       checksum: '',

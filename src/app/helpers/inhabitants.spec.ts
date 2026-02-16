@@ -5,7 +5,7 @@ import type {
   InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
 } from '@interfaces';
@@ -33,7 +33,7 @@ vi.mock('@helpers/state-game', () => {
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetEffectiveMaxInhabitants: (
     _placedRoom: PlacedRoom,
-    roomDef: RoomDefinition,
+    roomDef: RoomContent,
   ) => {
     if (mockEffectiveMax !== undefined) return mockEffectiveMax;
     return roomDef.maxInhabitants;
@@ -218,8 +218,8 @@ function createTestInhabitantDef(
 }
 
 function createTestRoomDef(
-  overrides: Partial<RoomDefinition> = {},
-): RoomDefinition {
+  overrides: Partial<RoomContent> = {},
+): RoomContent {
   return {
     id: 'room-barracks' as RoomId,
     name: 'Barracks',
@@ -238,7 +238,7 @@ function createTestRoomDef(
     upgradePaths: [],
     autoPlace: false,
     ...overrides,
-  };
+  } as RoomContent;
 }
 
 describe('inhabitantMeetsRestriction', () => {

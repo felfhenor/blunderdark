@@ -10,7 +10,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -167,7 +167,7 @@ const goblinKoboldRecipe: BreedingRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const breedingPitsDef: RoomDefinition & IsContentItem = {
+const breedingPitsDef: RoomContent & IsContentItem = {
   id: BREEDING_PITS_ID as RoomId,
   name: 'Breeding Pits',
   __type: 'room',
@@ -188,7 +188,7 @@ const breedingPitsDef: RoomDefinition & IsContentItem = {
   role: 'breedingPits',
 };
 
-const spawningPoolDef: RoomDefinition & IsContentItem = {
+const spawningPoolDef: RoomContent & IsContentItem = {
   id: SPAWNING_POOL_ID as RoomId,
   name: 'Spawning Pool',
   __type: 'room',
@@ -209,7 +209,7 @@ const spawningPoolDef: RoomDefinition & IsContentItem = {
   breedingAdjacencyEffects: { hybridTimeReduction: 0.25 },
 };
 
-const soulWellDef: RoomDefinition & IsContentItem = {
+const soulWellDef: RoomContent & IsContentItem = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',

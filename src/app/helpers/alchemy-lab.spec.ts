@@ -11,7 +11,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -249,7 +249,7 @@ describe('alchemy-lab', () => {
     mockContent.set(ESSENCE_RECIPE_ID, essenceRecipe);
     mockContent.set(DARK_TRANSMUTE_ID, darkTransmuteRecipe);
 
-    const labDef: Partial<RoomDefinition> = {
+    const labDef: Partial<RoomContent> = {
       id: ALCHEMY_LAB_ID as RoomId,
       name: 'Alchemy Lab',
       role: 'alchemyLab',
@@ -315,7 +315,7 @@ describe('alchemy-lab', () => {
     });
 
     it('should apply adjacency speed bonus', async () => {
-      const mineDef: Partial<RoomDefinition> = {
+      const mineDef: Partial<RoomContent> = {
         id: CRYSTAL_MINE_ID as RoomId,
         name: 'Crystal Mine',
         alchemyAdjacencyEffects: { alchemySpeedBonus: 0.20 },
@@ -351,7 +351,7 @@ describe('alchemy-lab', () => {
     });
 
     it('should apply adjacency cost reduction', async () => {
-      const groveDef: Partial<RoomDefinition> = {
+      const groveDef: Partial<RoomContent> = {
         id: MUSHROOM_GROVE_ID as RoomId,
         name: 'Mushroom Grove',
         alchemyAdjacencyEffects: { alchemyCostReduction: 0.15 },

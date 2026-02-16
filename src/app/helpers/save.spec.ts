@@ -351,7 +351,7 @@ describe('saveValidate', () => {
 
   it('should report missing gameState.meta', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState as Record<string, unknown>)['meta'];
+    delete (saveData.gameState as unknown as Record<string, unknown>)['meta'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -360,7 +360,7 @@ describe('saveValidate', () => {
 
   it('should report missing gameState.meta.version', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.meta as Record<string, unknown>)['version'];
+    delete (saveData.gameState.meta as unknown as Record<string, unknown>)['version'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -369,7 +369,7 @@ describe('saveValidate', () => {
 
   it('should report missing gameState.gameId', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState as Record<string, unknown>)['gameId'];
+    delete (saveData.gameState as unknown as Record<string, unknown>)['gameId'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -378,7 +378,7 @@ describe('saveValidate', () => {
 
   it('should report missing gameState.clock', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState as Record<string, unknown>)['clock'];
+    delete (saveData.gameState as unknown as Record<string, unknown>)['clock'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -387,7 +387,7 @@ describe('saveValidate', () => {
 
   it('should report missing gameState.world', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState as Record<string, unknown>)['world'];
+    delete (saveData.gameState as unknown as Record<string, unknown>)['world'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -396,7 +396,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.resources', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['resources'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['resources'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -405,7 +405,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.inhabitants', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['inhabitants'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['inhabitants'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -414,7 +414,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.floors', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['floors'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['floors'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -423,7 +423,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.season', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['season'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['season'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -432,7 +432,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.research', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['research'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['research'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -441,7 +441,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.reputation', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)['reputation'];
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)['reputation'];
 
     const result = saveValidate(saveData);
     expect(result.valid).toBe(false);
@@ -450,7 +450,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.invasionSchedule', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)[
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)[
       'invasionSchedule'
     ];
 
@@ -461,7 +461,7 @@ describe('saveValidate', () => {
 
   it('should report missing world.victoryProgress', () => {
     const saveData = makeSaveData();
-    delete (saveData.gameState.world as Record<string, unknown>)[
+    delete (saveData.gameState.world as unknown as Record<string, unknown>)[
       'victoryProgress'
     ];
 

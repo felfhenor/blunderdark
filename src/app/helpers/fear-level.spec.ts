@@ -9,7 +9,7 @@ import type {
   InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradeEffect,
@@ -642,7 +642,7 @@ describe('fearLevelCalculateAllPropagation', () => {
 describe('fearLevelGetForRoom', () => {
   it('should return breakdown with base fear from room definition', () => {
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 2 } as RoomDefinition;
+    const roomDef = { fearLevel: 2 } as RoomContent;
     const floor = makeFloor({ rooms: [room], inhabitants: [] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef);
@@ -658,7 +658,7 @@ describe('fearLevelGetForRoom', () => {
 
   it('should resolve variable fear level using throneRoomFear', () => {
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 'variable' } as RoomDefinition;
+    const roomDef = { fearLevel: 'variable' } as RoomContent;
     const floor = makeFloor({ rooms: [room] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef, 3);
@@ -669,7 +669,7 @@ describe('fearLevelGetForRoom', () => {
 
   it('should default variable fear to 0 when throneRoomFear is undefined', () => {
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 'variable' } as RoomDefinition;
+    const roomDef = { fearLevel: 'variable' } as RoomContent;
     const floor = makeFloor({ rooms: [room] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef);
@@ -680,7 +680,7 @@ describe('fearLevelGetForRoom', () => {
 
   it('should include inhabitant modifier', () => {
     const room = makePlacedRoom({ id: 'room-1' as PlacedRoomId });
-    const roomDef = { fearLevel: 1 } as RoomDefinition;
+    const roomDef = { fearLevel: 1 } as RoomContent;
     const inhabitants = [
       makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-skeleton' as InhabitantId }),
     ];
@@ -697,7 +697,7 @@ describe('fearLevelGetForRoom', () => {
       { type: 'fearReduction', value: 1 },
     ]);
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 3 } as RoomDefinition;
+    const roomDef = { fearLevel: 3 } as RoomContent;
     const floor = makeFloor({ rooms: [room] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef);
@@ -711,7 +711,7 @@ describe('fearLevelGetForRoom', () => {
     vi.mocked(altarRoomGetFearReductionAura).mockReturnValue(2);
 
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 3 } as RoomDefinition;
+    const roomDef = { fearLevel: 3 } as RoomContent;
     const floor = makeFloor({ rooms: [room] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef);
@@ -725,7 +725,7 @@ describe('fearLevelGetForRoom', () => {
     vi.mocked(altarRoomGetFearReductionAura).mockReturnValue(2);
 
     const room = makePlacedRoom();
-    const roomDef = { fearLevel: 3 } as RoomDefinition;
+    const roomDef = { fearLevel: 3 } as RoomContent;
     const floor = makeFloor({ rooms: [room] });
 
     const result = fearLevelGetForRoom(floor, room, roomDef);
@@ -742,7 +742,7 @@ describe('fearLevelGetForRoom', () => {
     vi.mocked(altarRoomGetFearReductionAura).mockReturnValue(1);
 
     const room = makePlacedRoom({ id: 'room-1' as PlacedRoomId });
-    const roomDef = { fearLevel: 2 } as RoomDefinition;
+    const roomDef = { fearLevel: 2 } as RoomContent;
     const inhabitants = [
       makeInhabitant({ assignedRoomId: 'room-1' as PlacedRoomId, definitionId: 'def-myconid' as InhabitantId }),
     ];

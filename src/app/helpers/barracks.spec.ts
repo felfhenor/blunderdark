@@ -7,7 +7,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -58,7 +58,7 @@ vi.mock('@helpers/content', () => ({
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
-const barracksRoom: RoomDefinition & IsContentItem = {
+const barracksRoom: RoomContent & IsContentItem = {
   id: BARRACKS_ID as RoomId,
   name: 'Barracks',
   __type: 'room',
@@ -82,7 +82,7 @@ const barracksRoom: RoomDefinition & IsContentItem = {
   autoPlace: false,
 };
 
-const darkForgeRoom: RoomDefinition & IsContentItem = {
+const darkForgeRoom: RoomContent & IsContentItem = {
   id: DARK_FORGE_ID as RoomId,
   name: 'Dark Forge',
   __type: 'room',
@@ -102,7 +102,7 @@ const darkForgeRoom: RoomDefinition & IsContentItem = {
   autoPlace: false,
 };
 
-const throneRoom: RoomDefinition & IsContentItem = {
+const throneRoom: RoomContent & IsContentItem = {
   id: THRONE_ROOM_ID as RoomId,
   name: 'Throne Room',
   __type: 'room',

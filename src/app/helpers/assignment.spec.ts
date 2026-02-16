@@ -5,7 +5,7 @@ import type {
   InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
 } from '@interfaces';
@@ -45,7 +45,7 @@ vi.mock('@helpers/content', () => ({
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetEffectiveMaxInhabitants: (
     _placedRoom: PlacedRoom,
-    roomDef: RoomDefinition,
+    roomDef: RoomContent,
   ) => {
     if (mockEffectiveMax !== undefined) return mockEffectiveMax;
     return roomDef.maxInhabitants;
@@ -73,8 +73,8 @@ function createTestPlacedRoom(
 }
 
 function createTestRoomDef(
-  overrides: Partial<RoomDefinition> = {},
-): RoomDefinition {
+  overrides: Partial<RoomContent> = {},
+): RoomContent {
   return {
     id: 'room-type-crystal-mine' as RoomId,
     name: 'Crystal Mine',
@@ -93,7 +93,7 @@ function createTestRoomDef(
     upgradePaths: [],
     autoPlace: false,
     ...overrides,
-  };
+  } as RoomContent;
 }
 
 function createTestInhabitant(

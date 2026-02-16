@@ -8,7 +8,7 @@ import type {
   PlacedRoomId,
   ResearchNode,
   ResearchState,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
 } from '@interfaces';
@@ -127,7 +127,7 @@ const shadowMagicNode: ResearchNode & IsContentItem = {
   requiredTicks: 150,
 };
 
-const shadowLibraryRoom: RoomDefinition & IsContentItem = {
+const shadowLibraryRoom: RoomContent & IsContentItem = {
   id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',

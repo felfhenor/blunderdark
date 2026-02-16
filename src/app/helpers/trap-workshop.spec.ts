@@ -8,7 +8,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -111,7 +111,7 @@ const arrowTrapDef: TrapContent = {
 
 // --- Room definitions ---
 
-const workshopDef: RoomDefinition & IsContentItem = {
+const workshopDef: RoomContent & IsContentItem = {
   id: TRAP_WORKSHOP_ID as RoomId,
   name: 'Trap Workshop',
   __type: 'room',

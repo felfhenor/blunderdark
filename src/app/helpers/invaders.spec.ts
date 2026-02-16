@@ -89,55 +89,55 @@ function makeAbility(
 // --- Standard effect definitions ---
 
 const damageEffect = makeEffect({
-  id: 'ae-damage',
+  id: 'ae-damage' as AbilityEffectId,
   name: 'Damage',
   dealsDamage: true,
 });
 
 const healEffect = makeEffect({
-  id: 'ae-heal',
+  id: 'ae-heal' as AbilityEffectId,
   name: 'Heal',
   statusName: 'healing',
 });
 
 const disarmEffect = makeEffect({
-  id: 'ae-disarm',
+  id: 'ae-disarm' as AbilityEffectId,
   name: 'Disarm',
   statusName: 'disarm',
 });
 
 const magicDamageEffect = makeEffect({
-  id: 'ae-magic-damage',
+  id: 'ae-magic-damage' as AbilityEffectId,
   name: 'Magic Damage',
   dealsDamage: true,
 });
 
 const dispelEffect = makeEffect({
-  id: 'ae-dispel',
+  id: 'ae-dispel' as AbilityEffectId,
   name: 'Dispel',
   statusName: 'dispel',
 });
 
 const buffDefenseEffect = makeEffect({
-  id: 'ae-buff-defense',
+  id: 'ae-buff-defense' as AbilityEffectId,
   name: 'Buff Defense',
   statusName: 'shielded',
 });
 
 const fearImmunityEffect = makeEffect({
-  id: 'ae-fear-immunity',
+  id: 'ae-fear-immunity' as AbilityEffectId,
   name: 'Fear Immunity',
   statusName: 'courage',
 });
 
 const scoutEffect = makeEffect({
-  id: 'ae-scout',
+  id: 'ae-scout' as AbilityEffectId,
   name: 'Scout',
   statusName: 'scouting',
 });
 
 const markEffect = makeEffect({
-  id: 'ae-mark',
+  id: 'ae-mark' as AbilityEffectId,
   name: 'Mark',
   statusName: 'marked',
 });

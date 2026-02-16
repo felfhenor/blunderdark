@@ -8,7 +8,7 @@ import type {
   IsContentItem,
   PlacedRoom,
   PlacedRoomId,
-  RoomDefinition,
+  RoomContent,
   RoomId,
   RoomShapeId,
   RoomUpgradePath,
@@ -200,7 +200,7 @@ const advancedRecipe: SummonRecipeContent & IsContentItem = {
 
 // --- Room definitions ---
 
-const summoningCircleDef: RoomDefinition & IsContentItem = {
+const summoningCircleDef: RoomContent & IsContentItem = {
   id: SUMMONING_CIRCLE_ID as RoomId,
   name: 'Summoning Circle',
   __type: 'room',
@@ -221,7 +221,7 @@ const summoningCircleDef: RoomDefinition & IsContentItem = {
   role: 'summoningCircle',
 };
 
-const libraryDef: RoomDefinition & IsContentItem = {
+const libraryDef: RoomContent & IsContentItem = {
   id: LIBRARY_ID as RoomId,
   name: 'Shadow Library',
   __type: 'room',
@@ -242,7 +242,7 @@ const libraryDef: RoomDefinition & IsContentItem = {
   summoningAdjacencyEffects: { summonTimeReduction: 0.25 },
 };
 
-const soulWellDef: RoomDefinition & IsContentItem = {
+const soulWellDef: RoomContent & IsContentItem = {
   id: SOUL_WELL_ID as RoomId,
   name: 'Soul Well',
   __type: 'room',
