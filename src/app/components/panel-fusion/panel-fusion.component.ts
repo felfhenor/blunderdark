@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { contentGetEntry } from '@helpers/content';
 import type { FusionPreview } from '@helpers/fusion';
 import {
@@ -32,7 +33,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 type FusionTab = 'fuse' | 'recipes';
 
 type StatDelta = {
-  stat: string;
+  stat: keyof InhabitantStats;
   hybridValue: number;
   bestParentValue: number;
   delta: number;
@@ -48,7 +49,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent, TippyDirective],
+  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent, StatNameComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -304,9 +305,4 @@ export class PanelFusionComponent {
     return '0';
   }
 
-  public formatStatName(stat: string): string {
-    if (stat === 'workerEfficiency') return 'Efficiency';
-    if (stat === 'hp') return 'HP';
-    return stat.charAt(0).toUpperCase() + stat.slice(1);
-  }
 }

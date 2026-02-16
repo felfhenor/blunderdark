@@ -83,6 +83,7 @@ export * from './sfx';
 export * from './signal';
 export * from './spawning-pool';
 export * from './stairs';
+export * from './stat-icons';
 export * from './state-game';
 export * from './state-modifiers';
 export * from './state-options';

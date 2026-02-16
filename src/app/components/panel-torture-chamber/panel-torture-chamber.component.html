@@ -44,8 +44,11 @@
                   <span class="text-xs font-semibold">{{ prisoner.name }}</span>
                   <span class="badge badge-xs badge-ghost">{{ prisoner.invaderClass }}</span>
                 </div>
-                <span class="text-xs opacity-60">
-                  HP {{ prisoner.stats.hp | number:'1.0-2' }} / ATK {{ prisoner.stats.attack | number:'1.0-2' }} / DEF {{ prisoner.stats.defense | number:'1.0-2' }} / SPD {{ prisoner.stats.speed | number:'1.0-2' }}
+                <span class="text-xs opacity-60 inline-flex items-center gap-1 flex-wrap">
+                  <app-stat-name type="hp" [value]="prisoner.stats.hp" /> /
+                  <app-stat-name type="attack" [value]="prisoner.stats.attack" /> /
+                  <app-stat-name type="defense" [value]="prisoner.stats.defense" /> /
+                  <app-stat-name type="speed" [value]="prisoner.stats.speed" />
                 </span>
                 @if (canStartJob()) {
                   <div class="flex gap-1 mt-1">

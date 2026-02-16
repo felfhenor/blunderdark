@@ -55,10 +55,10 @@
                       }
                     </div>
                     <div class="stats-row">
-                      <span [tp]="'HP'">{{ def.stats.hp | number:'1.0-2' }}</span>
-                      <span [tp]="'ATK'">{{ def.stats.attack | number:'1.0-2' }}</span>
-                      <span [tp]="'DEF'">{{ def.stats.defense | number:'1.0-2' }}</span>
-                      <span [tp]="'SPD'">{{ def.stats.speed | number:'1.0-2' }}</span>
+                      <app-stat-name type="hp" [value]="def.stats.hp" />
+                      <app-stat-name type="attack" [value]="def.stats.attack" />
+                      <app-stat-name type="defense" [value]="def.stats.defense" />
+                      <app-stat-name type="speed" [value]="def.stats.speed" />
                     </div>
                     @if (inst.assignedRoomId) {
                       <div class="text-xs opacity-50">Assigned</div>
@@ -85,10 +85,10 @@
                       <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-x-3 gap-y-0 mt-1 text-xs">
-                      <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed | number:'1.0-2' }}</div>
+                      <div><app-stat-name type="hp" [value]="entry.def.stats.hp" /></div>
+                      <div><app-stat-name type="attack" [value]="entry.def.stats.attack" /></div>
+                      <div><app-stat-name type="defense" [value]="entry.def.stats.defense" /></div>
+                      <div><app-stat-name type="speed" [value]="entry.def.stats.speed" /></div>
                     </div>
                     @if (entry.def.traits.length > 0) {
                       <div class="flex flex-wrap gap-0.5 mt-1">
@@ -117,10 +117,10 @@
                       <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-x-3 gap-y-0 mt-1 text-xs">
-                      <div><span class="opacity-50">HP:</span> {{ entry.def.stats.hp | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">ATK:</span> {{ entry.def.stats.attack | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">DEF:</span> {{ entry.def.stats.defense | number:'1.0-2' }}</div>
-                      <div><span class="opacity-50">SPD:</span> {{ entry.def.stats.speed | number:'1.0-2' }}</div>
+                      <div><app-stat-name type="hp" [value]="entry.def.stats.hp" /></div>
+                      <div><app-stat-name type="attack" [value]="entry.def.stats.attack" /></div>
+                      <div><app-stat-name type="defense" [value]="entry.def.stats.defense" /></div>
+                      <div><app-stat-name type="speed" [value]="entry.def.stats.speed" /></div>
                     </div>
                     @if (entry.def.traits.length > 0) {
                       <div class="flex flex-wrap gap-0.5 mt-1">
@@ -158,7 +158,7 @@
                     <div class="grid grid-cols-5 gap-1 text-xs">
                       @for (s of statComparison(); track s.stat) {
                         <div class="stat-compare text-center">
-                          <div class="opacity-50">{{ formatStatName(s.stat) }}</div>
+                          <div class="opacity-50"><app-stat-name [type]="s.stat" /></div>
                           <div class="font-bold">{{ s.hybridValue | number:'1.0-2' }}</div>
                           <div class="text-xs" [class]="getDeltaClass(s.delta)">
                             {{ formatDelta(s.delta) }}

@@ -5,6 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   inhabitantAssignToRoom,
   assignmentCanAssignToRoom,
@@ -36,7 +37,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, TippyDirective],
+  imports: [DecimalPipe, StatNameComponent, TippyDirective],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

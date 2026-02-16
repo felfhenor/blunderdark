@@ -70,12 +70,12 @@
                 <div class="text-xs opacity-60 mb-1">{{ entry.def.description }}</div>
 
                 <!-- Stats -->
-                <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1">
-                  <span class="text-xs opacity-70">HP: <span class="font-mono">{{ entry.def.stats.hp | number:'1.0-2' }}</span></span>
-                  <span class="text-xs opacity-70">ATK: <span class="font-mono">{{ entry.def.stats.attack | number:'1.0-2' }}</span></span>
-                  <span class="text-xs opacity-70">DEF: <span class="font-mono">{{ entry.def.stats.defense | number:'1.0-2' }}</span></span>
-                  <span class="text-xs opacity-70">SPD: <span class="font-mono">{{ entry.def.stats.speed | number:'1.0-2' }}</span></span>
-                  <span class="text-xs opacity-70">EFF: <span class="font-mono">{{ entry.def.stats.workerEfficiency | number:'1.0-2' }}</span></span>
+                <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1 text-xs">
+                  <app-stat-name type="hp" [value]="entry.def.stats.hp" />
+                  <app-stat-name type="attack" [value]="entry.def.stats.attack" />
+                  <app-stat-name type="defense" [value]="entry.def.stats.defense" />
+                  <app-stat-name type="speed" [value]="entry.def.stats.speed" />
+                  <app-stat-name type="workerEfficiency" [value]="entry.def.stats.workerEfficiency" />
                 </div>
 
                 <!-- Traits -->
