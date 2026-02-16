@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SeasonalEventContent, EventEffect, EventChoice types defined in content-seasonalevent.ts; SeasonalEventState, ActiveSeasonalEffect, PendingSeasonalEvent in seasonal-event.ts"
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 growth events: Verdant Bloom (+40 food, +30% food production 3d), Crystal Seedlings (choice: 60 crystals or +25% crystal prod 5d), Migrating Creatures (choice: 25 essence or trade food for gold). Adapted from PRD spec to fit resource_gain/loss/production_modifier effect types."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 harvest events: Bountiful Harvest (+60 food, +30 gold), Ancient Artifacts (choice: 50 research or 150 gold), Tax Collector (choice: pay 80 gold or refuse for corruption + gold production boost). Adapted from PRD spec to fit available effect types."
     },
     {
       "id": "US-004",
@@ -64,8 +64,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 darkness events: Shadow Rift (+30 essence, +10 corruption), Dark Whispers (choice: research+corruption or seal for crystals), Cursed Offering (choice: gold->essence or flux->reduce corruption production), Corruption Surge (+20 corruption, +40% essence prod 3d). Adapted to use resource effects rather than creature spawns."
     },
     {
       "id": "US-005",
@@ -81,8 +81,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 storms events: Flux Storm (+35 flux, -20% crystal prod 2d), Lightning Strike (choice: crystals+flux or research+research boost), Arcane Convergence (+50% flux prod, +30% essence prod 3d), Tunnel Collapse (choice: food->gold+crystals or +15% food prod 4d). Adapted to use resource effects."
     },
     {
       "id": "US-006",
@@ -98,8 +98,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "seasonalEventProcess called each tick in gameloop. 30% daily trigger chance. Weighted selection, season filtering, cycle reset, no-repeat per cycle. 26 unit tests covering all functions."
     },
     {
       "id": "US-007",
@@ -114,8 +114,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "seasonalEventApplyEffects handles resource_gain (capped at max), resource_loss (flat or percentage, floor 0), production_modifier (adds ActiveSeasonalEffect with duration). Production formula integrates via seasonalEventGetProductionModifier multiplier. Active effects tick down daily and expire."
     },
     {
       "id": "US-008",
@@ -132,8 +132,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PanelSeasonalEventComponent with modal auto-opens on pending event. Shows season badge, name, flavor text, effects with color-coded badges. Choice events show buttons with effect previews. Non-choice events have Acknowledge button. Active effects shown in sidebar card with remaining days."
     }
   ]
 }

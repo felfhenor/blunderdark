@@ -319,6 +319,23 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `merchant.ts` | `merchant` | `MERCHANT` |
 
+## Seasonal Events System
+
+- **Content type**: `seasonalevent` in `gamedata/seasonalevent/`, `SeasonalEventContent` with `SeasonalEventId` branded type
+- **Runtime state**: `SeasonalEventState` on `GameStateWorld.seasonalEvent` — `triggeredEventIds`, `activeEffects`, `pendingEvent`, `lastSeasonCycleForReset`
+- **Effect types**: `resource_gain`, `resource_loss`, `production_modifier` — defined in `EventEffect` type
+- **Choices**: `EventChoice` with label, description, and effects array — events with choices require player interaction
+- **Day tracking**: module-level `seasonalEventLastProcessedDay` var, reset via `seasonalEventResetLastProcessedDay()` in tests
+- **Process**: `seasonalEventProcess(state)` called each tick in gameloop — checks day transition, rolls 30% trigger chance, selects weighted random event
+- **Cycle reset**: triggered event IDs reset when `totalSeasonCycles` advances, preventing repeat events within a season cycle
+- **Production integration**: `seasonalEventGetProductionModifier(activeEffects, resourceType)` returns cumulative multiplier; passed as `activeSeasonalEffects` param to `productionCalculateTotal`/`productionCalculateSingleRoom`/`productionCalculateBreakdowns`
+- **UI**: `PanelSeasonalEventComponent` — shows active effects card + modal when event pending; auto-opens via `effect()` watching `seasonalEventPending()`
+- **Season process**: `seasonProcess(state)` in `season.ts` handles day advancement in gameloop (separate from `seasonAdvanceGameDay` which uses `updateGamestate`)
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `seasonal-event.ts` | `seasonalEvent` | `SEASONAL_EVENT` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
