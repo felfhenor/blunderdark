@@ -45,7 +45,7 @@ export async function resourceAdd(
           ...state.world.resources,
           [type]: {
             ...resource,
-            current: resource.current + actualAdded,
+            current: Math.min(resource.current + actualAdded, resource.max),
           },
         },
       },

@@ -494,6 +494,6 @@ export function productionProcess(state: GameState): void {
     if (!resource) continue;
     const effectiveMax = resourceEffectiveMax(resource.max, resourceType, state.world.floors);
     const available = effectiveMax - resource.current;
-    resource.current += Math.min(amount as number, available);
+    resource.current = Math.min(resource.current + Math.min(amount as number, available), effectiveMax);
   }
 }

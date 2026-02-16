@@ -158,7 +158,7 @@ export function corruptionGenerationProcess(state: GameState): void {
 
   const resource = state.world.resources.corruption;
   const available = resource.max - resource.current;
-  resource.current += Math.min(finalPerTick, available);
+  resource.current = Math.min(resource.current + Math.min(finalPerTick, available), resource.max);
 }
 
 /**
