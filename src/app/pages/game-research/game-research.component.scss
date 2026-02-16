@@ -12,11 +12,11 @@
 // --- Node Cards ---
 
 .node-card {
-  @apply flex flex-col items-center justify-center gap-1;
+  @apply relative flex flex-col items-center justify-center gap-1;
   @apply rounded-lg border-2 p-3 cursor-pointer transition-all;
   min-width: 120px;
   max-width: 160px;
-  border-color: oklch(var(--bc) / 0.2);
+  border-color: color-mix(in oklch, var(--color-base-content) 20%, transparent);
 
   &:hover {
     @apply shadow-md;
@@ -25,33 +25,33 @@
 
   &.node-selected {
     @apply ring-2 ring-offset-1;
-    ring-color: oklch(var(--p));
+    ring-color: var(--color-primary);
   }
 }
 
 .node-completed {
-  border-color: oklch(var(--su));
-  background: oklch(var(--su) / 0.1);
+  border-color: var(--color-success);
+  background: color-mix(in oklch, var(--color-success) 10%, transparent);
 }
 
 .node-active {
-  border-color: oklch(var(--in));
+  border-color: var(--color-info);
   animation: pulse-border 2s ease-in-out infinite;
 }
 
 .node-available {
-  border-color: oklch(var(--wa));
-  background: oklch(var(--wa) / 0.05);
-  box-shadow: 0 0 8px oklch(var(--wa) / 0.3);
+  border-color: var(--color-warning);
+  background: color-mix(in oklch, var(--color-warning) 5%, transparent);
+  box-shadow: 0 0 8px color-mix(in oklch, var(--color-warning) 30%, transparent);
 }
 
 .node-locked {
   @apply opacity-40;
-  border-color: oklch(var(--bc) / 0.1);
+  border-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
 }
 
 .node-icon {
-  @apply text-lg;
+  @apply absolute top-1 right-1 text-xs leading-none;
 }
 
 .node-progress-mini {
@@ -74,7 +74,7 @@
   .connector-line {
     width: 2px;
     height: 16px;
-    background: oklch(var(--bc) / 0.2);
+    background: color-mix(in oklch, var(--color-base-content) 20%, transparent);
   }
 }
 
@@ -83,17 +83,17 @@
 @keyframes pulse-border {
   0%,
   100% {
-    border-color: oklch(var(--in));
-    box-shadow: 0 0 4px oklch(var(--in) / 0.3);
+    border-color: var(--color-info);
+    box-shadow: 0 0 4px color-mix(in oklch, var(--color-info) 30%, transparent);
   }
   50% {
-    border-color: oklch(var(--in) / 0.5);
-    box-shadow: 0 0 12px oklch(var(--in) / 0.5);
+    border-color: color-mix(in oklch, var(--color-info) 50%, transparent);
+    box-shadow: 0 0 12px color-mix(in oklch, var(--color-info) 50%, transparent);
   }
 }
 
 // --- Detail Panel ---
 
 .detail-panel {
-  background: oklch(var(--b2));
+  background: var(--color-base-200);
 }

@@ -8,7 +8,7 @@
   }
 
   &.btn-active {
-    border-color: oklch(var(--p));
+    border-color: var(--color-primary);
   }
 }
 
@@ -23,7 +23,7 @@
 .shape-tile {
   width: 8px;
   height: 8px;
-  background-color: oklch(var(--p));
+  background-color: var(--color-primary);
   border-radius: 1px;
   grid-column: var(--tile-col);
   grid-row: var(--tile-row);

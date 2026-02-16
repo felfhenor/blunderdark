@@ -19,7 +19,13 @@ import {
 } from '@helpers/research-progress';
 import { resourceCanAfford } from '@helpers/resources';
 import { gamestate } from '@helpers/state-game';
-import type { ResearchBranch, ResearchContent, ResourceCost } from '@interfaces';
+import type {
+  ResearchBranch,
+  ResearchContent,
+  ResourceCost,
+  RoomContent,
+  UnlockEffect,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type NodeState = 'completed' | 'active' | 'available' | 'locked';
@@ -130,6 +136,12 @@ export class GameResearchComponent {
       });
   });
 
+  public selectedNodeUnlocks = computed(() => {
+    const node = this.selectedNode();
+    if (!node) return [];
+    return node.unlocks.map((unlock) => this.formatUnlock(unlock));
+  });
+
   public selectedNodeCanAfford = computed(() => {
     const node = this.selectedNode();
     if (!node) return false;
@@ -191,6 +203,39 @@ export class GameResearchComponent {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
       .map(([type, amount]) => ({ type, amount: amount! }));
+  }
+
+  private formatUnlock(unlock: UnlockEffect): {
+    type: string;
+    name: string;
+  } {
+    switch (unlock.type) {
+      case 'room': {
+        const entry = contentGetEntry(unlock.targetRoomId);
+        return { type: 'Room', name: entry?.name ?? 'Unknown' };
+      }
+      case 'inhabitant': {
+        const entry = contentGetEntry(unlock.targetInhabitantId);
+        return { type: 'Inhabitant', name: entry?.name ?? 'Unknown' };
+      }
+      case 'ability': {
+        const entry = contentGetEntry(unlock.targetCombatabilityId);
+        return { type: 'Ability', name: entry?.name ?? 'Unknown' };
+      }
+      case 'upgrade': {
+        const rooms =
+          contentGetEntriesByType<RoomContent>('room');
+        for (const room of rooms) {
+          const path = room.upgradePaths?.find(
+            (p) => p.id === unlock.targetUpgradepathId,
+          );
+          if (path) return { type: 'Upgrade', name: path.name };
+        }
+        return { type: 'Upgrade', name: 'Unknown' };
+      }
+      case 'passive_bonus':
+        return { type: 'Bonus', name: unlock.description };
+    }
   }
 
   public getNodeProgressPercent(nodeId: string): number {

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
+import type { FusionPreview } from '@helpers/fusion';
 import {
   fusionExecute,
   fusionGetAllRecipes,
@@ -24,7 +25,6 @@ import type {
   InhabitantStats,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { FusionPreview } from '@helpers/fusion';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type FusionTab = 'fuse' | 'recipes';
@@ -154,9 +154,7 @@ export class PanelFusionComponent {
     const inherited = p.hybridDef.traits.filter((t) =>
       parentTraitIds.has(t.id),
     );
-    const unique = p.hybridDef.traits.filter(
-      (t) => !parentTraitIds.has(t.id),
-    );
+    const unique = p.hybridDef.traits.filter((t) => !parentTraitIds.has(t.id));
 
     return { inherited, unique };
   });
@@ -299,13 +297,14 @@ export class PanelFusionComponent {
   }
 
   public formatDelta(delta: number): string {
-    if (delta > 0) return `+${delta}`;
-    if (delta < 0) return `${delta}`;
+    if (delta > 0) return `+${delta.toLocaleString()}`;
+    if (delta < 0) return `${delta.toLocaleString()}`;
     return '0';
   }
 
   public formatStatName(stat: string): string {
     if (stat === 'workerEfficiency') return 'Efficiency';
+    if (stat === 'hp') return 'HP';
     return stat.charAt(0).toUpperCase() + stat.slice(1);
   }
 }

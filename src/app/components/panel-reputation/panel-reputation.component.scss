@@ -2,9 +2,9 @@
   .legendary-bar {
     background: linear-gradient(
       90deg,
-      oklch(var(--wa)) 0%,
-      oklch(var(--su)) 50%,
-      oklch(var(--in)) 100%
+      var(--color-warning) 0%,
+      var(--color-success) 50%,
+      var(--color-info) 100%
     );
     animation: legendary-shimmer 2s ease-in-out infinite;
   }
@@ -22,7 +22,7 @@
 
 .active-effect {
   padding: 2px 0;
-  border-bottom: 1px solid oklch(var(--b3) / 0.3);
+  border-bottom: 1px solid color-mix(in oklch, var(--color-base-300) 30%, transparent);
 
   &:last-child {
     border-bottom: none;
