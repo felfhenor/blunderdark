@@ -4,16 +4,11 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import {
   contentAllById,
   contentAllIdsByName,
-  ensureContent,
   contentSetAllById,
   contentSetAllIdsByName,
+  ensureContent,
 } from '@helpers';
-import type {
-  ContentType,
-  InhabitantContent,
-  InhabitantTraitContent,
-  IsContentItem,
-} from '@interfaces';
+import type { ContentType, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { lastValueFrom } from 'rxjs';
@@ -140,44 +135,5 @@ export class ContentService {
 
     contentSetAllIdsByName(allIdsByNameAssets);
     contentSetAllById(allEntriesByIdAssets);
-
-    this.hydrateInhabitantTraits(allEntriesByIdAssets);
-  }
-
-  private hydrateInhabitantTraits(
-    allEntries: Map<string, IsContentItem>,
-  ): void {
-    allEntries.forEach((entry) => {
-      if (entry.__type !== 'inhabitant') return;
-
-      const inhabitant = entry as unknown as InhabitantContent;
-      inhabitant.traits = (inhabitant.inhabitantTraitIds ?? []).map((traitId) => {
-        const trait = allEntries.get(
-          traitId as string,
-        ) as unknown as InhabitantTraitContent;
-        if (!trait) {
-          this.logger.warn(
-            'Content',
-            `Inhabitant "${inhabitant.name}" references unknown trait ID "${traitId}"`,
-          );
-          return {
-            id: traitId as string,
-            name: 'UNKNOWN',
-            description: '',
-            effectType: '',
-            effectValue: 0,
-          };
-        }
-        return {
-          id: trait.id as string,
-          name: trait.name,
-          description: trait.description,
-          effectType: trait.effectType,
-          effectValue: trait.effectValue,
-          targetResourceType: trait.targetResourceType,
-          targetRoomId: trait.targetRoomId,
-        };
-      });
-    });
   }
 }

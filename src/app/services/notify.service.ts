@@ -2,16 +2,16 @@ import { inject, Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import {
-  reputationGetLevelLabel,
-  notifyNotification$,
-  reputationLevelUp$,
-  corruptionEffectEvent$,
-  researchUnlock$,
   contentGetEntry,
+  corruptionEffectEvent$,
+  notifyNotification$,
+  reputationGetLevelLabel,
+  reputationLevelUp$,
+  researchUnlock$,
 } from '@helpers';
+import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
 import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 import type { ReputationLevelUpEvent } from '@interfaces/reputation';
-import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
 import { getUnlockTargetId } from '@interfaces/research';
 import { LoggerService } from '@services/logger.service';
 
@@ -67,7 +67,10 @@ export class NotifyService {
     };
 
     const title = titles[event.type];
-    this.logger.debug('Notify:CorruptionEffect', `${title} - ${event.description}`);
+    this.logger.debug(
+      'Notify:CorruptionEffect',
+      `${title} - ${event.description}`,
+    );
 
     const isWarning = event.type === 'crusade_triggered';
     if (isWarning) {
@@ -93,16 +96,27 @@ export class NotifyService {
     }
     const targetId = getUnlockTargetId(unlock)!;
     const entry = contentGetEntry<IsContentItem>(targetId);
-    const label = unlock.type === 'room' ? 'Room' : unlock.type === 'inhabitant' ? 'Creature' : unlock.type === 'ability' ? 'Ability' : 'Upgrade';
+    const label =
+      unlock.type === 'room'
+        ? 'Room'
+        : unlock.type === 'inhabitant'
+          ? 'Creature'
+          : unlock.type === 'ability'
+            ? 'Ability'
+            : 'Upgrade';
     return `${label}: ${entry?.name ?? targetId}`;
   }
 
-  private showResearchUnlock(event: { nodeName: string; unlocks: UnlockEffect[] }): void {
+  private showResearchUnlock(event: {
+    nodeName: string;
+    unlocks: UnlockEffect[];
+  }): void {
     const title = `Research Complete: ${event.nodeName}`;
     const unlockLines = event.unlocks.map((u) => this.getUnlockDescription(u));
-    const message = unlockLines.length > 0
-      ? `Unlocked: ${unlockLines.join(', ')}`
-      : 'No new content unlocked';
+    const message =
+      unlockLines.length > 0
+        ? `Unlocked: ${unlockLines.join(', ')}`
+        : 'No new content unlocked';
 
     this.logger.debug('Notify:ResearchUnlock', `${title} - ${message}`);
 
