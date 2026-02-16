@@ -17,6 +17,9 @@ export const CAMERA_PAN_SPEED = 40;
 // Zoom step per wheel tick
 export const CAMERA_ZOOM_STEP = 0.15;
 
+// Extra scrollable space beyond grid edges (pixels)
+const CAMERA_EDGE_PADDING = 64;
+
 // State signals
 export const cameraPosition = signal({ x: 0, y: 0 });
 export const cameraZoom = signal(1);
@@ -56,13 +59,19 @@ function cameraClampPosition(
   if (scaledWidth <= vp.width) {
     x = (vp.width - scaledWidth) / 2;
   } else {
-    x = Math.max(vp.width - scaledWidth, Math.min(0, x));
+    x = Math.max(
+      vp.width - scaledWidth - CAMERA_EDGE_PADDING,
+      Math.min(CAMERA_EDGE_PADDING, x),
+    );
   }
 
   if (scaledHeight <= vp.height) {
     y = (vp.height - scaledHeight) / 2;
   } else {
-    y = Math.max(vp.height - scaledHeight, Math.min(0, y));
+    y = Math.max(
+      vp.height - scaledHeight - CAMERA_EDGE_PADDING,
+      Math.min(CAMERA_EDGE_PADDING, y),
+    );
   }
 
   return { x, y };

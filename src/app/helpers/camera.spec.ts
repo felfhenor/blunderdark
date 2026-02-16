@@ -81,8 +81,8 @@ describe('camera', () => {
       cameraPan(9999, 9999);
 
       const pos = cameraPosition();
-      // When grid is larger than viewport, max x is 0
-      expect(pos.x).toBeLessThanOrEqual(0);
+      // When grid is larger than viewport, max x is CAMERA_EDGE_PADDING (64)
+      expect(pos.x).toBeLessThanOrEqual(64);
     });
   });
 
@@ -225,8 +225,9 @@ describe('camera', () => {
       cameraUpdateViewport(500, 500);
 
       const pos = cameraPosition();
-      expect(pos.x).toBeLessThanOrEqual(0);
-      expect(pos.y).toBeLessThanOrEqual(0);
+      // With edge padding of 64, max x is 64
+      expect(pos.x).toBeLessThanOrEqual(64);
+      expect(pos.y).toBeLessThanOrEqual(64);
     });
   });
 
@@ -245,7 +246,7 @@ describe('camera', () => {
       expect(pos.y).toBeCloseTo(expectedY, 1);
     });
 
-    it('should not allow panning past left/top edge', () => {
+    it('should not allow panning far past edges', () => {
       cameraViewportSize.set({ width: 800, height: 600 });
       cameraZoom.set(1);
       cameraPosition.set({ x: 0, y: 0 });
@@ -253,8 +254,9 @@ describe('camera', () => {
       cameraPan(999, 999);
 
       const pos = cameraPosition();
-      expect(pos.x).toBeLessThanOrEqual(0);
-      expect(pos.y).toBeLessThanOrEqual(0);
+      // Edge padding allows up to 64px past the grid edge
+      expect(pos.x).toBeLessThanOrEqual(64);
+      expect(pos.y).toBeLessThanOrEqual(64);
     });
   });
 
