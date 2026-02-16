@@ -107,7 +107,7 @@
                       </div>
 
                       @if (node.nodeState === 'completed') {
-                        <div class="node-icon text-success">&check;</div>
+                        <div class="node-icon text-success"><app-icon name="tablerCheck" /></div>
                       }
 
                       @if (node.nodeState === 'active') {
@@ -179,7 +179,7 @@
 
                 <!-- Cost -->
                 <div>
-                  <div class="text-xs font-semibold mb-1">Cost</div>
+                  <div class="divider my-2 text-xs opacity-60">Cost</div>
                   <div class="flex flex-wrap gap-1">
                     @for (cost of formatCost(node.cost); track cost.type) {
                       <span class="badge badge-sm badge-outline capitalize">
@@ -192,7 +192,7 @@
                 <!-- Unlocks -->
                 @if (selectedNodeUnlocks().length > 0) {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Unlocks</div>
+                    <div class="divider my-2 text-xs opacity-60">Unlocks</div>
                     <div class="flex flex-col gap-1">
                       @for (
                         unlock of selectedNodeUnlocks();
@@ -212,31 +212,33 @@
                 <!-- Prerequisites -->
                 @if (node.prerequisiteResearchIds.length > 0) {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Prerequisites</div>
-                    @if (selectedNodeState() === 'locked') {
-                      <div class="text-xs text-error">
-                        Missing:
-                        @for (
-                          prereq of selectedNodeMissingPrereqs();
-                          track prereq
-                        ) {
-                          <span class="badge badge-error badge-xs ml-1">
-                            {{ prereq }}
-                          </span>
-                        }
-                      </div>
-                    } @else {
-                      <div class="text-xs text-success">
-                        All prerequisites met
-                      </div>
-                    }
+                    <div class="divider my-2 text-xs opacity-60">
+                      Prerequisites
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                      @for (
+                        prereq of selectedNodePrereqs();
+                        track prereq.name
+                      ) {
+                        <span
+                          class="badge badge-xs gap-0.5"
+                          [class.badge-success]="prereq.met"
+                          [class.badge-error]="!prereq.met"
+                        >
+                          <app-icon
+                            [name]="prereq.met ? 'tablerCheck' : 'tablerX'"
+                          />
+                          {{ prereq.name }}
+                        </span>
+                      }
+                    </div>
                   </div>
                 }
 
                 <!-- Active Progress -->
                 @if (selectedNodeState() === 'active') {
                   <div>
-                    <div class="text-xs font-semibold mb-1">Progress</div>
+                    <div class="divider my-2 text-xs opacity-60">Progress</div>
                     <progress
                       class="progress progress-info w-full"
                       [value]="progressPercent()"

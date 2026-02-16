@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -32,7 +33,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
 
 @Component({
   selector: 'app-game-research',
-  imports: [DecimalPipe, ModalComponent, TippyDirective],
+  imports: [DecimalPipe, ModalComponent, TippyDirective, IconComponent],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -124,16 +125,14 @@ export class GameResearchComponent {
     return researchCanStart(node.id, this.researchState());
   });
 
-  public selectedNodeMissingPrereqs = computed(() => {
+  public selectedNodePrereqs = computed(() => {
     const node = this.selectedNode();
     if (!node) return [];
     const completed = this.researchState().completedNodes;
-    return node.prerequisiteResearchIds
-      .filter((id) => !completed.includes(id))
-      .map((id) => {
-        const prereq = contentGetEntry<ResearchContent>(id);
-        return prereq?.name ?? 'Unknown';
-      });
+    return node.prerequisiteResearchIds.map((id) => {
+      const prereq = contentGetEntry<ResearchContent>(id);
+      return { name: prereq?.name ?? 'Unknown', met: completed.includes(id) };
+    });
   });
 
   public selectedNodeUnlocks = computed(() => {
