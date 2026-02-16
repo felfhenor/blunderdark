@@ -384,6 +384,22 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 | `save-slots.ts` | `saveSlot` | `SAVE_SLOT` |
 | `save-slots-storage.ts` | `saveSlotStorage` | `SAVE_SLOT_STORAGE` |
 
+## Save File Versioning
+
+- **Version constant**: `SAVE_VERSION` in `save-migrations.ts` — increment when changing save format. `SAVE_FORMAT_VERSION` in `save.ts` re-exports for backward compat.
+- **Migration pipeline**: `saveMigrationRun(saveData)` returns `SaveMigrationResult` with success/error/isNewerVersion; chains registered migrations sequentially from source version to `SAVE_VERSION`
+- **Migration registry**: `saveMigrations` Map keyed by source version — each function transforms v(N) → v(N+1). Register new migrations with `saveMigrations.set(N, fn)`
+- **Deserialize returns result**: `saveDeserialize()` returns `SaveMigrationResult` (not void) — callers must check `result.success` and `result.isNewerVersion`
+- **Force load**: `saveDeserializeForceLoad(saveData)` bypasses migration for newer-version saves — loads directly via `gamestateSet` + `migrateGameState`
+- **Version detection**: `saveMigrationDetectVersion(saveData)` reads `formatVersion` field; treats missing/invalid as version 1 (legacy)
+- **Newer version handling**: UI shows SweetAlert confirm dialog with "Try to Load Anyway" / "Cancel" options
+- **Test pattern**: mock `@helpers/save-migrations` when testing `save.ts`; mock `@helpers/logging` when testing `save-migrations.ts`; use `as unknown as Record<string, unknown>` for `GameStateWorld` casts in migration tests
+- **NotificationCategory**: `'Warning'` added for `notifyWarning()` function
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `save-migrations.ts` | `saveMigration` | `SAVE_MIGRATION` |
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)

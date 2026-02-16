@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SAVE_VERSION constant in save-migrations.ts, SAVE_FORMAT_VERSION re-exported from save.ts for backward compat"
     },
     {
       "id": "US-002",
@@ -32,8 +32,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveMigrationDetectVersion() reads formatVersion, defaults to 1 for missing/invalid. saveDeserialize() returns SaveMigrationResult."
     },
     {
       "id": "US-003",
@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveMigrations Map in save-migrations.ts, saveMigrationRun() chains sequentially with deep clone"
     },
     {
       "id": "US-004",
@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Test demonstrates adding default fields. Deep clone ensures original data is preserved."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Tests demonstrate remove and rename patterns including array integrity."
     },
     {
       "id": "US-006",
@@ -94,8 +94,8 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Both panel-save-slots and button-savefile-import show SweetAlert2 confirm dialog with Try to Load Anyway / Cancel. saveDeserializeForceLoad() used for force loading."
     },
     {
       "id": "US-007",
@@ -110,8 +110,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Migration errors are caught and returned in SaveMigrationResult. Components show error notification. Save data is never deleted on failure."
     }
   ]
 }
