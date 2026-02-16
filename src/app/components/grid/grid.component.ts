@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import {
+  type AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  type ElementRef,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
 import { TippyDirective } from '@ngneat/helipopper';
 import {
@@ -42,6 +51,15 @@ import {
   roomShapeResolve,
   featureGetSlotCount,
   featureGetForSlot,
+  cameraTransform,
+  cameraIsAnimating,
+  cameraPan,
+  cameraZoomAt,
+  cameraReset,
+  cameraInit,
+  cameraUpdateViewport,
+  CAMERA_PAN_SPEED,
+  CAMERA_ZOOM_STEP,
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
 import { gridCreateEmpty } from '@helpers/grid';
@@ -79,6 +97,8 @@ function getRoomBorderColor(roomId: string): string {
   return ROOM_BORDER_COLORS[roomId];
 }
 
+const CAMERA_DRAG_THRESHOLD = 5;
+
 @Component({
   selector: 'app-grid',
   imports: [FearIndicatorComponent, TippyDirective],
@@ -88,13 +108,136 @@ function getRoomBorderColor(roomId: string): string {
   host: {
     '(document:keydown.escape)': 'onEscapeKey()',
     '(document:keydown.r)': 'onRotateKey()',
+    '(document:keydown.w)': 'onPanKey($event, 0, -1)',
+    '(document:keydown.a)': 'onPanKey($event, -1, 0)',
+    '(document:keydown.s)': 'onPanKey($event, 0, 1)',
+    '(document:keydown.d)': 'onPanKey($event, 1, 0)',
+    '(document:keydown.ArrowUp)': 'onPanKey($event, 0, -1)',
+    '(document:keydown.ArrowLeft)': 'onPanKey($event, -1, 0)',
+    '(document:keydown.ArrowDown)': 'onPanKey($event, 0, 1)',
+    '(document:keydown.ArrowRight)': 'onPanKey($event, 1, 0)',
+    '(document:keydown.Home)': 'onResetCamera($event)',
   },
 })
-export class GridComponent {
+export class GridComponent implements AfterViewInit {
+  private destroyRef = inject(DestroyRef);
+  private viewport = viewChild<ElementRef<HTMLElement>>('viewport');
+
+  // Camera state
+  public cameraTransform = cameraTransform;
+  public cameraIsAnimating = cameraIsAnimating;
+  private dragStart: { x: number; y: number; button: number } | undefined;
+  private isDragging = false;
+  private wasDragging = false;
+  private resizeObserver: ResizeObserver | undefined;
   public grid = computed(() => floorCurrent()?.grid ?? gridCreateEmpty());
   public gridSelectedTile = gridSelectedTile;
   public roomPlacementPreview = roomPlacementPreview;
   public corruptionLevel = corruptionLevel;
+
+  ngAfterViewInit(): void {
+    const el = this.viewport()?.nativeElement;
+    if (!el) return;
+
+    cameraInit(el.clientWidth, el.clientHeight);
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        cameraUpdateViewport(
+          entry.contentRect.width,
+          entry.contentRect.height,
+        );
+      }
+    });
+    this.resizeObserver.observe(el);
+
+    this.destroyRef.onDestroy(() => {
+      this.resizeObserver?.disconnect();
+    });
+  }
+
+  // --- Camera: mouse drag panning ---
+
+  public onCameraMouseDown(event: MouseEvent): void {
+    // Middle mouse (1) or left mouse (0)
+    if (event.button !== 0 && event.button !== 1) return;
+    // Prevent default for middle-click (auto-scroll)
+    if (event.button === 1) event.preventDefault();
+    this.dragStart = { x: event.clientX, y: event.clientY, button: event.button };
+    this.isDragging = false;
+  }
+
+  public onCameraMouseMove(event: MouseEvent): void {
+    if (!this.dragStart) return;
+
+    const dx = event.clientX - this.dragStart.x;
+    const dy = event.clientY - this.dragStart.y;
+
+    if (!this.isDragging) {
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < CAMERA_DRAG_THRESHOLD) return;
+      this.isDragging = true;
+    }
+
+    cameraPan(
+      event.clientX - this.dragStart.x,
+      event.clientY - this.dragStart.y,
+    );
+    this.dragStart = { ...this.dragStart, x: event.clientX, y: event.clientY };
+  }
+
+  public onCameraMouseUp(): void {
+    this.wasDragging = this.isDragging;
+    this.dragStart = undefined;
+    this.isDragging = false;
+  }
+
+  // --- Camera: mouse wheel zoom ---
+
+  public onWheel(event: WheelEvent): void {
+    event.preventDefault();
+    const el = this.viewport()?.nativeElement;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const cursorX = event.clientX - rect.left;
+    const cursorY = event.clientY - rect.top;
+
+    const delta = event.deltaY < 0 ? CAMERA_ZOOM_STEP : -CAMERA_ZOOM_STEP;
+    cameraZoomAt(delta, cursorX, cursorY);
+  }
+
+  // --- Camera: keyboard panning ---
+
+  public onPanKey(event: KeyboardEvent, dx: number, dy: number): void {
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+    if (uiIsAnyModalOpen()) return;
+    cameraPan(dx * CAMERA_PAN_SPEED, dy * CAMERA_PAN_SPEED);
+  }
+
+  // --- Camera: reset ---
+
+  public onResetCamera(event?: KeyboardEvent): void {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      if (uiIsAnyModalOpen()) return;
+    }
+    cameraReset();
+  }
 
   private roomInfoMap = computed(() => {
     const floor = floorCurrent();
@@ -417,6 +560,10 @@ export class GridComponent {
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
+    if (this.wasDragging) {
+      this.wasDragging = false;
+      return;
+    }
     if (portalPlacementActive()) {
       const step = portalPlacementStep();
       if (step === 'selectSource') {

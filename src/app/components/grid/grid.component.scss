@@ -1,6 +1,13 @@
 :host {
-  @apply block;
-  margin: auto;
+  @apply block w-full h-full;
+}
+
+.grid-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: oklch(0.12 0.02 260);
 }
 
 .grid-container {
@@ -9,6 +16,12 @@
   grid-template-rows: repeat(20, 64px);
   gap: 1px;
   position: relative;
+  transform-origin: 0 0;
+  will-change: transform;
+
+  &.camera-animating {
+    transition: transform 0.3s ease-out;
+  }
 
   // --- Corruption visual effects ---
   // Medium (50-99): Subtle dark tinting on dungeon edges
@@ -376,4 +389,17 @@
   color: oklch(0.8 0.15 300);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
   line-height: 1;
+}
+
+.camera-reset-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 10;
+  opacity: 0.7;
+  font-size: 11px;
+
+  &:hover {
+    opacity: 1;
+  }
 }

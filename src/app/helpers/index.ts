@@ -6,6 +6,7 @@ export * from './assignment';
 export * from './autosave';
 export * from './biome-restrictions';
 export * from './breeding-pits';
+export * from './camera';
 export * from './clipboard';
 export * from './combat';
 export * from './combat-abilities';
