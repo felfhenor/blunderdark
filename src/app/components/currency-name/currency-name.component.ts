@@ -4,16 +4,21 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
 import { RESOURCE_COLOR_MAP, RESOURCE_ICON_MAP, RESOURCE_LABEL_MAP } from '@helpers';
 import type { ResourceType } from '@interfaces';
 
 @Component({
   selector: 'app-currency-name',
-  imports: [IconComponent],
+  imports: [IconComponent, DecimalPipe],
   template: `
     <app-icon [name]="icon()" [color]="color()" />
-    <span>{{ label() }}</span>
+    @if (short()) {
+      <span>{{ amount() | number:'1.0-0' }}</span>
+    } @else {
+      <span>{{ label() }}</span>
+    }
   `,
   styles: `
     :host {
@@ -34,6 +39,8 @@ import type { ResourceType } from '@interfaces';
 })
 export class CurrencyNameComponent {
   public type = input.required<ResourceType>();
+  public short = input(false);
+  public amount = input(0);
 
   public icon = computed(() => RESOURCE_ICON_MAP[this.type()]);
   public color = computed(() => RESOURCE_COLOR_MAP[this.type()]);

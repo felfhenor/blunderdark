@@ -58,6 +58,10 @@
           (click)="selectRoom(room)"
         >
           <div class="flex items-center gap-2 w-full">
+            <span class="room-name flex-1 text-left text-xs font-semibold">{{ room.name }}</span>
+            @if (getBiomeLimitLabel(room); as limitLabel) {
+              <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
+            }
             <div
               class="shape-preview"
               [style.--grid-size]="getShapeGridSize(room)"
@@ -70,16 +74,12 @@
                 ></div>
               }
             </div>
-            <span class="room-name flex-1 text-left text-xs font-semibold">{{ room.name }}</span>
-            @if (getBiomeLimitLabel(room); as limitLabel) {
-              <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
-            }
           </div>
 
           <div class="cost-row flex gap-2 w-full">
             @for (cost of getCostEntries(room); track cost.type) {
               <span class="text-xs opacity-70">
-                {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
+                <app-currency-name [type]="cost.type" [short]="true" [amount]="cost.amount" />
               </span>
             }
             @if (getCostEntries(room).length === 0) {
