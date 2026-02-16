@@ -22,8 +22,7 @@
   name: Arcane Basics
   description: Introduction to the fundamental principles of arcane magic and flux manipulation.
   branch: arcane
-  cost:
-    research: 10
+  cost: {}
   prerequisiteResearchIds: []
   unlocks:
     - type: room

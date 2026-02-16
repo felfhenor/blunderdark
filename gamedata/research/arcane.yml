@@ -24,7 +24,6 @@
   branch: arcane
   cost:
     research: 25
-    flux: 5
   prerequisiteResearchIds:
     - Arcane Basics
   unlocks:
