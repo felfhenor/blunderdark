@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SaveData type wraps GameState with formatVersion, savedAt, playtimeSeconds, checksum. SaveValidationResult type for validation results. All types in interfaces/save.ts."
     },
     {
       "id": "US-002",
@@ -30,8 +30,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveSerialize(state?) in helpers/save.ts. Deep clones via structuredClone, computes DJB2 checksum, returns SaveData. 5 tests verify structure, round-trip, deep clone, and checksum."
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveDeserialize(saveData) calls gamestateSet() then migrateGameState() to handle any schema drift. Test verifies both are called."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveValidate(data) checks top-level SaveData fields, then nested gameState.meta/clock/world structure. Returns { valid, errors, warnings }. 20 tests cover null, missing fields, multiple errors, and checksum warning."
     },
     {
       "id": "US-005",
@@ -78,8 +78,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveComputeChecksum() uses DJB2 hash of JSON (with checksum zeroed), outputs 'v1:{base36}'. saveVerifyChecksum() recomputes and compares. Validation warns but doesn't fail on mismatch. 6 tests for determinism, uniqueness, tamper detection."
     },
     {
       "id": "US-006",
@@ -95,8 +95,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Save Now button added to panel-options-savefile. Calls gamestateSave() with try/catch for error handling. Shows loading spinner during save (isSaving signal). notifySuccess/notifyError for feedback."
     },
     {
       "id": "US-007",
@@ -112,8 +112,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Import button updated to use saveParseLegacy (handles both SaveData and raw GameState), saveValidate for structure checking, and saveDeserialize for restoration. Error messages shown via notifyError for unrecognized format, validation failures, and parse errors."
     }
   ]
 }

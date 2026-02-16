@@ -40,6 +40,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 | `research` | `ResearchId` | `ResearchContent` |
 | `room` | `RoomId` | `RoomContent` |
 | `roomshape` | `RoomShapeId` | `RoomShapeContent` |
+| `seasonalevent` | `SeasonalEventId` | `SeasonalEventContent` |
 | `seasonbonus` | `SeasonBonusId` | `SeasonBonusContent` |
 | `summonrecipe` | `SummonRecipeId` | `SummonRecipeContent` |
 | `synergy` | `SynergyId` | `SynergyContent` |
@@ -335,6 +336,22 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 | File | Prefix | SCREAMING |
 |---|---|---|
 | `seasonal-event.ts` | `seasonalEvent` | `SEASONAL_EVENT` |
+
+## Save System
+
+- **SaveData wrapper**: `SaveData` type in `save.ts` (interfaces) wraps `GameState` with `formatVersion`, `savedAt`, `playtimeSeconds`, `checksum`
+- **Serialize**: `saveSerialize(state?)` — deep clones gamestate, computes checksum, returns `SaveData`
+- **Deserialize**: `saveDeserialize(saveData)` — calls `gamestateSet()` then `migrateGameState()`
+- **Validate**: `saveValidate(data)` — checks structure (top-level + nested gameState fields), returns `{ valid, errors, warnings }`
+- **Checksum**: `saveComputeChecksum(saveData)` — DJB2 hash of JSON with checksum field zeroed, returns `v1:{hash36}`; `saveVerifyChecksum(saveData)` to verify
+- **Legacy parse**: `saveParseLegacy(data)` — detects raw `GameState` (no wrapper) vs `SaveData` format, wraps raw into `SaveData` for backward compatibility
+- **Export**: `.grdh` files now contain `SaveData` (not raw `GameState`); import detects both formats via `saveParseLegacy`
+- **Persistence**: auto-save via `signalIndexedDb` (every `debugSaveInterval` ticks); manual save via `gamestateSave()`; `gamestateFormatForSave()` is just `structuredClone`
+- **Migration**: `migrateGameState()` uses `merge(defaultGameState(), state)` — fills in missing fields; explicit handlers for resources and floors
+
+| File | Prefix | SCREAMING |
+|---|---|---|
+| `save.ts` | `save` | `SAVE` |
 
 ## Misc Gotchas
 
