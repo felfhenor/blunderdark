@@ -20,7 +20,9 @@
   border-radius: 6px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: background-color 0.1s ease, border-color 0.1s ease;
+  transition:
+    background-color 0.1s ease,
+    border-color 0.1s ease;
   margin-bottom: 2px;
 
   &:hover {
@@ -81,16 +83,10 @@
 }
 
 .stat-up {
-  color: oklch(var(--su));
+  color: var(--color-success);
   font-weight: 700;
 }
 
 .stat-down {
-  color: oklch(var(--er));
-}
-
-// --- Preview ---
-
-.preview-section {
-  max-width: 500px;
+  color: var(--color-error);
 }
