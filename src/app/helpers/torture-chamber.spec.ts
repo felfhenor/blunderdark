@@ -91,6 +91,27 @@ vi.mock('@helpers/room-shapes', () => ({
   ],
 }));
 
+let mockResourceMap: GameState['world']['resources'];
+
+vi.mock('@helpers/resources', () => ({
+  resourceAdd: vi.fn((type: string, amount: number) => {
+    if (amount <= 0) return 0;
+    const res = mockResourceMap[type as keyof typeof mockResourceMap];
+    const available = res.max - res.current;
+    const actual = Math.min(amount, available);
+    res.current = Math.min(res.current + amount, res.max);
+    return actual;
+  }),
+  resourceSubtract: vi.fn((type: string, amount: number) => {
+    if (amount <= 0) return 0;
+    const res = mockResourceMap[type as keyof typeof mockResourceMap];
+    if (res.current < amount) return 0;
+    const subtracted = Math.min(amount, res.current);
+    res.current = Math.max(0, res.current - amount);
+    return subtracted;
+  }),
+}));
+
 // --- Room definitions ---
 
 const tortureChamberDef: RoomContent = {
@@ -217,7 +238,7 @@ function makeGameState(overrides: {
   floors?: Floor[];
   prisoners?: CapturedPrisoner[];
 }): GameState {
-  return {
+  const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test-game' as GameState['gameId'],
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
@@ -279,6 +300,8 @@ function makeGameState(overrides: {
       merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
     },
   };
+  mockResourceMap = state.world.resources;
+  return state;
 }
 
 // --- Import after mocks ---

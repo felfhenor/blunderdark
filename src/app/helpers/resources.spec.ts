@@ -88,38 +88,38 @@ describe('resourceSubtract', () => {
     mockResources = defaultResources();
   });
 
-  it('should subtract a normal amount and return true', async () => {
+  it('should subtract a normal amount and return the subtracted amount', async () => {
     mockResources.gold.current = 500;
     const result = await resourceSubtract('gold', 100);
-    expect(result).toBe(true);
+    expect(result).toBe(100);
     expect(mockResources.gold.current).toBe(400);
   });
 
-  it('should fail and not change state when subtracting more than available', async () => {
+  it('should return 0 and not change state when subtracting more than available', async () => {
     mockResources.gold.current = 50;
     const result = await resourceSubtract('gold', 100);
-    expect(result).toBe(false);
+    expect(result).toBe(0);
     expect(mockResources.gold.current).toBe(50);
   });
 
-  it('should return true when subtracting zero', async () => {
+  it('should return 0 when subtracting zero', async () => {
     mockResources.gold.current = 500;
     const result = await resourceSubtract('gold', 0);
-    expect(result).toBe(true);
+    expect(result).toBe(0);
     expect(mockResources.gold.current).toBe(500);
   });
 
-  it('should return false when subtracting a negative amount', async () => {
+  it('should return 0 when subtracting a negative amount', async () => {
     mockResources.gold.current = 500;
     const result = await resourceSubtract('gold', -10);
-    expect(result).toBe(false);
+    expect(result).toBe(0);
     expect(mockResources.gold.current).toBe(500);
   });
 
   it('should succeed when subtracting exact current amount', async () => {
     mockResources.crystals.current = 200;
     const result = await resourceSubtract('crystals', 200);
-    expect(result).toBe(true);
+    expect(result).toBe(200);
     expect(mockResources.crystals.current).toBe(0);
   });
 });

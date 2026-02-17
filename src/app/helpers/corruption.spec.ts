@@ -278,7 +278,7 @@ describe('corruptionGenerationProcess', () => {
     hour = 12,
     corruptionCurrent = 0,
   ): GameState {
-    return {
+    const state = {
       clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour, minute: 0 },
       world: {
         resources: {
@@ -288,6 +288,8 @@ describe('corruptionGenerationProcess', () => {
         inhabitants,
       },
     } as unknown as GameState;
+    mockResources = state.world.resources;
+    return state;
   }
 
   function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
@@ -471,6 +473,7 @@ describe('Corruption Seal', () => {
         floors: [floor],
       },
     } as unknown as GameState;
+    mockResources = state.world.resources;
 
     corruptionGenerationProcess(state);
     // Sealed room should not generate corruption — existing value preserved
@@ -500,6 +503,7 @@ describe('Corruption Seal', () => {
         floors: [floor],
       },
     } as unknown as GameState;
+    mockResources = state.world.resources;
 
     corruptionGenerationProcess(state);
     // Only unsealed room generates: 2/min / 1 = 2.0/tick
@@ -527,6 +531,7 @@ describe('Corruption Seal', () => {
         floors: [floor],
       },
     } as unknown as GameState;
+    mockResources = state.world.resources;
 
     corruptionGenerationProcess(state);
     // Existing corruption preserved

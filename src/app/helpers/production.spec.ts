@@ -187,6 +187,27 @@ vi.mock('@helpers/content', () => {
   };
 });
 
+let mockResourceMap: Record<string, { current: number; max: number }>;
+
+vi.mock('@helpers/resources', () => ({
+  resourceAdd: vi.fn((type: string, amount: number) => {
+    if (amount <= 0) return 0;
+    const res = mockResourceMap[type];
+    const available = res.max - res.current;
+    const actual = Math.min(amount, available);
+    res.current = Math.min(res.current + amount, res.max);
+    return actual;
+  }),
+  resourceSubtract: vi.fn((type: string, amount: number) => {
+    if (amount <= 0) return 0;
+    const res = mockResourceMap[type];
+    if (res.current < amount) return 0;
+    const subtracted = Math.min(amount, res.current);
+    res.current = Math.max(0, res.current - amount);
+    return subtracted;
+  }),
+}));
+
 import type {
   Floor,
   FloorId,
@@ -719,7 +740,7 @@ function makeGameState(
   resources?: Partial<GameState['world']['resources']>,
 ): GameState {
   const defaultResource = { current: 0, max: 1000 };
-  return {
+  const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test' as GameState['gameId'],
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
@@ -786,6 +807,8 @@ function makeGameState(
       merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
     },
   };
+  mockResourceMap = state.world.resources;
+  return state;
 }
 
 describe('productionCalculateTotal', () => {
