@@ -12,10 +12,8 @@ import type { Identifiable } from '@interfaces';
 import type { PRNG } from 'seedrandom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock uuid
-vi.mock('uuid', () => ({
-  v4: vi.fn(() => 'mock-uuid'),
-}));
+// Mock crypto.randomUUID
+vi.stubGlobal('crypto', { randomUUID: vi.fn(() => 'mock-uuid') });
 
 // Mock worldGameId
 vi.mock('@helpers/world', () => ({

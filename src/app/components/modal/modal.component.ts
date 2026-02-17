@@ -44,7 +44,7 @@ export class ModalComponent {
     });
   }
 
-  public onEscapeKey(event: KeyboardEvent): void {
+  public onEscapeKey(event: Event): void {
     if (!this.visible() || !this.allowEscToClose()) return;
     event.preventDefault();
     event.stopImmediatePropagation();

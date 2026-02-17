@@ -65,30 +65,36 @@ vi.mock('@angular/platform-browser', () => ({
 }));
 
 // Mock rxjs to prevent observable issues
+// NOTE: Subject/BehaviorSubject must use `function` (not arrow functions)
+// because they are called with `new` and arrow functions cannot be constructors.
 vi.mock('rxjs', () => ({
   interval: vi.fn(() => ({
     subscribe: vi.fn(),
   })),
   Observable: vi.fn(),
-  Subject: vi.fn(() => ({
-    next: vi.fn(),
-    error: vi.fn(),
-    complete: vi.fn(),
-    subscribe: vi.fn(),
-    asObservable: vi.fn(() => ({
+  Subject: vi.fn(function () {
+    return {
+      next: vi.fn(),
+      error: vi.fn(),
+      complete: vi.fn(),
       subscribe: vi.fn(),
-    })),
-  })),
-  BehaviorSubject: vi.fn(() => ({
-    next: vi.fn(),
-    error: vi.fn(),
-    complete: vi.fn(),
-    subscribe: vi.fn(),
-    asObservable: vi.fn(() => ({
+      asObservable: vi.fn(() => ({
+        subscribe: vi.fn(),
+      })),
+    };
+  }),
+  BehaviorSubject: vi.fn(function () {
+    return {
+      next: vi.fn(),
+      error: vi.fn(),
+      complete: vi.fn(),
       subscribe: vi.fn(),
-    })),
-    getValue: vi.fn(),
-  })),
+      asObservable: vi.fn(() => ({
+        subscribe: vi.fn(),
+      })),
+      getValue: vi.fn(),
+    };
+  }),
 }));
 
 // Mock localStorage for tests

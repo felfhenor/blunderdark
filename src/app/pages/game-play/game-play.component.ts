@@ -127,7 +127,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     });
   }
 
-  public navigateFloorUp(event: KeyboardEvent): void {
+  public navigateFloorUp(event: Event): void {
     event.preventDefault();
     const currentIdx = floorCurrentIndex();
     if (currentIdx > 0) {
@@ -135,7 +135,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     }
   }
 
-  public navigateFloorDown(event: KeyboardEvent): void {
+  public navigateFloorDown(event: Event): void {
     event.preventDefault();
     const currentIdx = floorCurrentIndex();
     const total = floorAll().length;

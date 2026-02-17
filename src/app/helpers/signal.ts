@@ -12,7 +12,7 @@ export function signalLocalStorage<T>(
     try {
       initialValue = JSON.parse(storedValueRaw);
       onLoad?.(initialValue);
-    } catch (e) {
+    } catch {
       error(
         'LocalStorageSignal',
         'Failed to parse stored value for key:',
@@ -106,7 +106,7 @@ export function signalIndexedDb<T>(
               const loadedValue = request.result;
               writableSignal.set(loadedValue);
               onLoad?.(loadedValue);
-            } catch (e) {
+            } catch {
               error(
                 'IndexedDbSignal',
                 'Failed to parse stored value for key:',

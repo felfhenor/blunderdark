@@ -1,10 +1,9 @@
 import type { Identifiable } from '@interfaces';
 import { pull } from 'es-toolkit/compat';
 import seedrandom, { type PRNG } from 'seedrandom';
-import { v4 as uuid4 } from 'uuid';
 
 export function rngUuid<T extends string = string>(): T {
-  return uuid4() as T;
+  return crypto.randomUUID() as T;
 }
 
 export function rngRandom(): PRNG {

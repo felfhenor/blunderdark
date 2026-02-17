@@ -10,69 +10,69 @@ import {
   viewChild,
 } from '@angular/core';
 import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
-import { TippyDirective } from '@ngneat/helipopper';
 import {
-  roomPlacementClearPreviewPosition,
-  floorCurrent,
-  gridDeselectTile,
-  roomPlacementExecute,
-  hallwayPlacementExit,
-  roomPlacementExitMode,
-  roomUpgradeGetEffectiveMaxInhabitants,
-  productionGetRoomDefinition,
-  hallwayPlacementPreviewTileSet,
-  hallwayPlacementSourceTile,
-  hallwayPlacementDestTile,
-  hallwayPlacementHandleTileClick,
-  hallwayPlacementIsBuildMode,
-  inhabitantAll,
-  notifyError,
-  roomPlacementPreview,
-  roomPlacementPreviewShape,
-  roomPlacementRotate,
-  gridSelectedTile,
-  gridSelectTile,
-  roomPlacementUpdatePreviewPosition,
+  CAMERA_ZOOM_STEP,
+  cameraInit,
+  cameraIsAnimating,
+  cameraPan,
+  cameraReset,
+  cameraTransform,
+  cameraUpdateViewport,
+  cameraZoomAt,
   corruptionLevel,
-  uiIsAnyModalOpen,
-  stairPlacementActive,
-  stairPlacementExecute,
-  stairPlacementExit,
-  stairGetOnFloor,
+  elevatorGetOnFloor,
   elevatorPlacementActive,
   elevatorPlacementExecute,
   elevatorPlacementExit,
-  elevatorGetOnFloor,
+  featureGetForSlot,
+  featureGetSlotCount,
+  floorCurrent,
+  gridDeselectTile,
+  gridSelectedTile,
+  gridSelectTile,
+  hallwayPlacementDestTile,
+  hallwayPlacementExit,
+  hallwayPlacementHandleTileClick,
+  hallwayPlacementIsBuildMode,
+  hallwayPlacementPreviewTileSet,
+  hallwayPlacementSourceTile,
+  inhabitantAll,
+  notifyError,
+  portalGetOnFloor,
   portalPlacementActive,
-  portalPlacementStep,
   portalPlacementExecute,
   portalPlacementExit,
   portalPlacementSetSource,
-  portalGetOnFloor,
+  portalPlacementStep,
+  productionGetRoomDefinition,
+  roomPlacementClearPreviewPosition,
+  roomPlacementExecute,
+  roomPlacementExitMode,
+  roomPlacementPreview,
+  roomPlacementPreviewShape,
+  roomPlacementRotate,
+  roomPlacementUpdatePreviewPosition,
   roomShapeResolve,
-  featureGetSlotCount,
-  featureGetForSlot,
-  cameraTransform,
-  cameraIsAnimating,
-  cameraPan,
-  cameraZoomAt,
-  cameraReset,
-  cameraInit,
-  cameraUpdateViewport,
-  CAMERA_ZOOM_STEP,
+  roomUpgradeGetEffectiveMaxInhabitants,
+  stairGetOnFloor,
+  stairPlacementActive,
+  stairPlacementExecute,
+  stairPlacementExit,
+  uiIsAnyModalOpen,
 } from '@helpers';
-import { gamestate } from '@helpers/state-game';
 import { gridCreateEmpty } from '@helpers/grid';
+import { gamestate } from '@helpers/state-game';
+import { TippyDirective } from '@ngneat/helipopper';
 
 const ROOM_COLORS: Record<string, string> = {};
 const COLOR_PALETTE = [
   'oklch(0.55 0.15 260)', // blue-violet
-  'oklch(0.55 0.15 30)',  // warm orange
+  'oklch(0.55 0.15 30)', // warm orange
   'oklch(0.55 0.15 145)', // green
   'oklch(0.55 0.15 330)', // magenta
-  'oklch(0.55 0.15 80)',  // yellow-green
+  'oklch(0.55 0.15 80)', // yellow-green
   'oklch(0.55 0.15 200)', // teal
-  'oklch(0.55 0.15 0)',   // red
+  'oklch(0.55 0.15 0)', // red
 ];
 let colorIndex = 0;
 
@@ -135,10 +135,7 @@ export class GridComponent implements AfterViewInit {
 
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        cameraUpdateViewport(
-          entry.contentRect.width,
-          entry.contentRect.height,
-        );
+        cameraUpdateViewport(entry.contentRect.width, entry.contentRect.height);
       }
     });
     this.resizeObserver.observe(el);
@@ -155,7 +152,11 @@ export class GridComponent implements AfterViewInit {
     if (event.button !== 0 && event.button !== 1) return;
     // Prevent default for middle-click (auto-scroll)
     if (event.button === 1) event.preventDefault();
-    this.dragStart = { x: event.clientX, y: event.clientY, button: event.button };
+    this.dragStart = {
+      x: event.clientX,
+      y: event.clientY,
+      button: event.button,
+    };
     this.isDragging = false;
   }
 
@@ -201,7 +202,7 @@ export class GridComponent implements AfterViewInit {
 
   // --- Camera: reset ---
 
-  public onResetCamera(event?: KeyboardEvent): void {
+  public onResetCamera(event?: Event): void {
     if (event) {
       const target = event.target as HTMLElement;
       if (
@@ -274,7 +275,9 @@ export class GridComponent implements AfterViewInit {
 
   public getAssignmentInfo(
     roomId: string | undefined,
-  ): { current: number; max: number; status: 'full' | 'partial' | 'empty' } | undefined {
+  ):
+    | { current: number; max: number; status: 'full' | 'partial' | 'empty' }
+    | undefined {
     if (!roomId) return undefined;
     return this.roomAssignmentMap().get(roomId) ?? undefined;
   }
@@ -291,7 +294,10 @@ export class GridComponent implements AfterViewInit {
 
   private roomLabelTileMap = computed(() => {
     const grid = this.grid();
-    const bounds = new Map<string, { minX: number; maxX: number; minY: number; anchorX: number }>();
+    const bounds = new Map<
+      string,
+      { minX: number; maxX: number; minY: number; anchorX: number }
+    >();
 
     for (let y = 0; y < grid.length; y++) {
       for (let x = 0; x < grid[y]?.length; x++) {
@@ -322,7 +328,11 @@ export class GridComponent implements AfterViewInit {
     return { anchorMap, tilesMap: bounds };
   });
 
-  public isRoomAnchor(x: number, y: number, roomId: string | undefined): boolean {
+  public isRoomAnchor(
+    x: number,
+    y: number,
+    roomId: string | undefined,
+  ): boolean {
     if (!roomId) return false;
     return this.roomLabelTileMap().anchorMap.get(roomId) === `${x},${y}`;
   }
@@ -336,7 +346,6 @@ export class GridComponent implements AfterViewInit {
     // Each tile is 64px + 1px gap
     return `${offsetTiles * 65}px`;
   }
-
 
   private previewTileSet = computed(() => {
     const preview = this.roomPlacementPreview();
@@ -373,11 +382,14 @@ export class GridComponent implements AfterViewInit {
       { dx: -1, dy: 0, dir: 'left', opposite: 'right' },
     ];
 
-    const hallwayIds: Set<string> = new Set(floor.hallways.map((h) => h.id as string));
+    const hallwayIds: Set<string> = new Set(
+      floor.hallways.map((h) => h.id as string),
+    );
 
     for (const conn of floor.connections) {
       // Skip hallway connections — handled by hallwayDoorwayMap
-      if (hallwayIds.has(conn.roomAId) || hallwayIds.has(conn.roomBId)) continue;
+      if (hallwayIds.has(conn.roomAId) || hallwayIds.has(conn.roomBId))
+        continue;
 
       for (const tile of conn.edgeTiles) {
         for (const { dx, dy, dir, opposite } of dirLookup) {
@@ -416,7 +428,12 @@ export class GridComponent implements AfterViewInit {
     const map = new Map<string, Set<string>>();
     const grid = floor.grid;
 
-    const dirLookup: Array<{ dx: number; dy: number; dir: string; opposite: string }> = [
+    const dirLookup: Array<{
+      dx: number;
+      dy: number;
+      dir: string;
+      opposite: string;
+    }> = [
       { dx: 0, dy: -1, dir: 'top', opposite: 'bottom' },
       { dx: 1, dy: 0, dir: 'right', opposite: 'left' },
       { dx: 0, dy: 1, dir: 'bottom', opposite: 'top' },
@@ -427,8 +444,10 @@ export class GridComponent implements AfterViewInit {
       // Build set of entity IDs actually connected to this hallway
       const connectedIds = new Set<string>();
       for (const conn of floor.connections) {
-        if ((conn.roomAId as string) === (hallway.id as string)) connectedIds.add(conn.roomBId);
-        else if ((conn.roomBId as string) === (hallway.id as string)) connectedIds.add(conn.roomAId);
+        if ((conn.roomAId as string) === (hallway.id as string))
+          connectedIds.add(conn.roomBId);
+        else if ((conn.roomBId as string) === (hallway.id as string))
+          connectedIds.add(conn.roomAId);
       }
 
       for (const tile of hallway.tiles) {
@@ -615,21 +634,34 @@ export class GridComponent implements AfterViewInit {
 
   public stairTileMap = computed(() => {
     const floor = floorCurrent();
-    if (!floor) return new Map<string, { direction: 'up' | 'down'; connectsToDepth: number }>();
+    if (!floor)
+      return new Map<
+        string,
+        { direction: 'up' | 'down'; connectsToDepth: number }
+      >();
 
     const stairs = stairGetOnFloor(gamestate().world.stairs, floor.depth);
-    const map = new Map<string, { direction: 'up' | 'down'; connectsToDepth: number }>();
+    const map = new Map<
+      string,
+      { direction: 'up' | 'down'; connectsToDepth: number }
+    >();
 
     for (const stair of stairs) {
       const direction = stair.floorDepthA === floor.depth ? 'down' : 'up';
-      const connectsToDepth = stair.floorDepthA === floor.depth ? stair.floorDepthB : stair.floorDepthA;
+      const connectsToDepth =
+        stair.floorDepthA === floor.depth
+          ? stair.floorDepthB
+          : stair.floorDepthA;
       map.set(`${stair.gridX},${stair.gridY}`, { direction, connectsToDepth });
     }
 
     return map;
   });
 
-  public getStairInfo(x: number, y: number): { direction: 'up' | 'down'; connectsToDepth: number } | undefined {
+  public getStairInfo(
+    x: number,
+    y: number,
+  ): { direction: 'up' | 'down'; connectsToDepth: number } | undefined {
     return this.stairTileMap().get(`${x},${y}`);
   }
 
@@ -637,18 +669,28 @@ export class GridComponent implements AfterViewInit {
     const floor = floorCurrent();
     if (!floor) return new Map<string, { connectsToFloors: number[] }>();
 
-    const elevators = elevatorGetOnFloor(gamestate().world.elevators, floor.depth);
+    const elevators = elevatorGetOnFloor(
+      gamestate().world.elevators,
+      floor.depth,
+    );
     const map = new Map<string, { connectsToFloors: number[] }>();
 
     for (const elevator of elevators) {
-      const otherFloors = elevator.connectedFloors.filter((d) => d !== floor.depth);
-      map.set(`${elevator.gridX},${elevator.gridY}`, { connectsToFloors: otherFloors });
+      const otherFloors = elevator.connectedFloors.filter(
+        (d) => d !== floor.depth,
+      );
+      map.set(`${elevator.gridX},${elevator.gridY}`, {
+        connectsToFloors: otherFloors,
+      });
     }
 
     return map;
   });
 
-  public getElevatorInfo(x: number, y: number): { connectsToFloors: number[] } | undefined {
+  public getElevatorInfo(
+    x: number,
+    y: number,
+  ): { connectsToFloors: number[] } | undefined {
     return this.elevatorTileMap().get(`${x},${y}`);
   }
 
@@ -669,15 +711,25 @@ export class GridComponent implements AfterViewInit {
     return map;
   });
 
-  public getPortalInfo(x: number, y: number): { connectsToDepth: number } | undefined {
+  public getPortalInfo(
+    x: number,
+    y: number,
+  ): { connectsToDepth: number } | undefined {
     return this.portalTileMap().get(`${x},${y}`);
   }
 
   public featureIndicatorMap = computed(() => {
     const floor = floorCurrent();
-    if (!floor) return new Map<string, { occupied: number; total: number; names: string[] }>();
+    if (!floor)
+      return new Map<
+        string,
+        { occupied: number; total: number; names: string[] }
+      >();
 
-    const map = new Map<string, { occupied: number; total: number; names: string[] }>();
+    const map = new Map<
+      string,
+      { occupied: number; total: number; names: string[] }
+    >();
     for (const room of floor.rooms) {
       const shape = roomShapeResolve(room);
       const total = featureGetSlotCount(shape.tiles.length);
@@ -697,7 +749,9 @@ export class GridComponent implements AfterViewInit {
     return map;
   });
 
-  public getFeatureInfo(roomId: string | undefined): { occupied: number; total: number; names: string[] } | undefined {
+  public getFeatureInfo(
+    roomId: string | undefined,
+  ): { occupied: number; total: number; names: string[] } | undefined {
     if (!roomId) return undefined;
     return this.featureIndicatorMap().get(roomId);
   }
