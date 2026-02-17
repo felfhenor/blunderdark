@@ -24,6 +24,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { TippyDirective } from '@ngneat/helipopper';
 
 type RosterFilter = 'all' | 'assigned' | 'unassigned';
 
@@ -32,8 +33,6 @@ type RosterEntry = {
   def: InhabitantContent;
   roomName: string | undefined;
 };
-
-import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-roster',

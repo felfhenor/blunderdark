@@ -14,6 +14,17 @@ import type {
 } from '@interfaces';
 import type { ResearchId } from '@interfaces/content-research';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  RESEARCH_BASE_PROGRESS_PER_TICK,
+  RESEARCH_LIBRARY_BONUS_PER_ROOM,
+  researchArePrerequisitesMet,
+  researchCalculateSpeedModifier,
+  researchCanStart,
+  researchCancel,
+  researchProcess,
+  researchStart,
+} from '@helpers/research-progress';
+import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 
 // --- Constants ---
 
@@ -72,20 +83,6 @@ vi.mock('@helpers/research-unlocks', () => ({
   researchUnlockProcessCompletion: (...args: unknown[]) =>
     mockResearchUnlockProcessCompletion(...args),
 }));
-
-// --- Imports after mocks ---
-
-import {
-  RESEARCH_BASE_PROGRESS_PER_TICK,
-  RESEARCH_LIBRARY_BONUS_PER_ROOM,
-  researchArePrerequisitesMet,
-  researchCalculateSpeedModifier,
-  researchCanStart,
-  researchCancel,
-  researchProcess,
-  researchStart,
-} from '@helpers/research-progress';
-import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 
 // --- Mock data ---
 

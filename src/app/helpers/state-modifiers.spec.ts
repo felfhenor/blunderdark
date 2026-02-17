@@ -7,13 +7,6 @@ import type {
   StateModifier,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-
-const mockEntries = new Map<string, unknown>();
-
-vi.mock('@helpers/content', () => ({
-  contentGetEntry: (id: string) => mockEntries.get(id) ?? undefined,
-}));
-
 import {
   STATE_MODIFIER_FEAR_TOLERANCE_DEFAULT,
   stateModifierCalculatePerCreatureProduction,
@@ -25,6 +18,12 @@ import {
   stateModifierGet,
   stateModifierIsInhabitantScared,
 } from '@helpers/state-modifiers';
+
+const mockEntries = new Map<string, unknown>();
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: (id: string) => mockEntries.get(id) ?? undefined,
+}));
 
 function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
   return {

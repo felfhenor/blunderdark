@@ -1,21 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-// --- Mocks ---
-
-vi.mock('@helpers/state-game', () => ({
-  gamestateSave: vi.fn(),
-}));
-
-vi.mock('@helpers/state-options', () => ({
-  optionsGet: vi.fn(),
-}));
-
-vi.mock('@helpers/logging', () => ({
-  debug: vi.fn(),
-}));
-
-// --- Imports after mocks ---
-
 import {
   AUTOSAVE_MIN_DISPLAY_MS,
   autosavePerform,
@@ -31,6 +14,20 @@ import {
 } from '@helpers/autosave';
 import { gamestateSave } from '@helpers/state-game';
 import { optionsGet } from '@helpers/state-options';
+
+// --- Mocks ---
+
+vi.mock('@helpers/state-game', () => ({
+  gamestateSave: vi.fn(),
+}));
+
+vi.mock('@helpers/state-options', () => ({
+  optionsGet: vi.fn(),
+}));
+
+vi.mock('@helpers/logging', () => ({
+  debug: vi.fn(),
+}));
 
 beforeEach(() => {
   vi.clearAllMocks();

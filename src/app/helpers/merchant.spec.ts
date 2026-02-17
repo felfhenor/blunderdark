@@ -1,15 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { MerchantTradeId } from '@interfaces/content-merchanttrade';
 import type { GameState, MerchantState, MerchantTradeContent } from '@interfaces';
-
-// --- Mocks ---
-
-vi.mock('@helpers/content', () => ({
-  contentGetEntriesByType: vi.fn(),
-}));
-
-// --- Import after mocks ---
-
 import { contentGetEntriesByType } from '@helpers/content';
 import {
   merchantGenerateInventory,
@@ -25,6 +16,12 @@ import {
   MERCHANT_MIN_SPECIAL_TRADES,
 } from '@helpers/merchant';
 import { rngSeeded } from '@helpers/rng';
+
+// --- Mocks ---
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntriesByType: vi.fn(),
+}));
 
 const TEST_BUY_1 = 'buy-1' as MerchantTradeId;
 const TEST_BUY_2 = 'buy-2' as MerchantTradeId;

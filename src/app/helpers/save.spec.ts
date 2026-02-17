@@ -1,5 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { GameState, SaveData, SaveMigrationResult } from '@interfaces';
+import {
+  SAVE_FORMAT_VERSION,
+  saveSerialize,
+  saveDeserialize,
+  saveDeserializeForceLoad,
+  saveComputeChecksum,
+  saveVerifyChecksum,
+  saveValidate,
+  saveParseLegacy,
+} from '@helpers/save';
+import { gamestate, gamestateSet } from '@helpers/state-game';
+import { migrateGameState } from '@helpers/migrate';
+import { saveMigrationRun } from '@helpers/save-migrations';
 
 // --- Mocks ---
 
@@ -20,22 +33,6 @@ vi.mock('@helpers/save-migrations', () => ({
 vi.mock('@helpers/logging', () => ({
   warn: vi.fn(),
 }));
-
-// --- Imports after mocks ---
-
-import {
-  SAVE_FORMAT_VERSION,
-  saveSerialize,
-  saveDeserialize,
-  saveDeserializeForceLoad,
-  saveComputeChecksum,
-  saveVerifyChecksum,
-  saveValidate,
-  saveParseLegacy,
-} from '@helpers/save';
-import { gamestate, gamestateSet } from '@helpers/state-game';
-import { migrateGameState } from '@helpers/migrate';
-import { saveMigrationRun } from '@helpers/save-migrations';
 
 function makeGameState(overrides?: Partial<GameState>): GameState {
   return {

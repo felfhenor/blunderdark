@@ -16,6 +16,31 @@ import type {
   TileOffset,
 } from '@interfaces';
 import type { AdjacencyMap } from '@interfaces/adjacency';
+import {
+  FEAR_LEVEL_HIGH,
+  FEAR_LEVEL_LABELS,
+  FEAR_LEVEL_LOW,
+  FEAR_LEVEL_MAX,
+  FEAR_LEVEL_MEDIUM,
+  FEAR_LEVEL_MIN,
+  FEAR_LEVEL_NONE,
+  FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE,
+  FEAR_LEVEL_VERY_HIGH,
+  fearLevelBuildAdjacencyMap,
+  fearLevelCalculateAllForFloor,
+  fearLevelCalculateAllPropagation,
+  fearLevelCalculateEffective,
+  fearLevelCalculateInhabitantModifier,
+  fearLevelCalculatePropagationAmount,
+  fearLevelCalculateSourceFear,
+  fearLevelCalculateUpgradeAdjustment,
+  fearLevelGetForRoom,
+  fearLevelGetLabel,
+  fearLevelGetMaxPropagationDistance,
+} from '@helpers/fear-level';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { altarRoomIsAdjacent, altarRoomGetFearReductionAura } from '@helpers/altar-room';
+import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 
 // --- Mocks ---
 
@@ -58,34 +83,6 @@ vi.mock('@helpers/room-shapes', () => ({
     ],
   ),
 }));
-
-// --- Import after mocks ---
-
-import {
-  FEAR_LEVEL_HIGH,
-  FEAR_LEVEL_LABELS,
-  FEAR_LEVEL_LOW,
-  FEAR_LEVEL_MAX,
-  FEAR_LEVEL_MEDIUM,
-  FEAR_LEVEL_MIN,
-  FEAR_LEVEL_NONE,
-  FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE,
-  FEAR_LEVEL_VERY_HIGH,
-  fearLevelBuildAdjacencyMap,
-  fearLevelCalculateAllForFloor,
-  fearLevelCalculateAllPropagation,
-  fearLevelCalculateEffective,
-  fearLevelCalculateInhabitantModifier,
-  fearLevelCalculatePropagationAmount,
-  fearLevelCalculateSourceFear,
-  fearLevelCalculateUpgradeAdjustment,
-  fearLevelGetForRoom,
-  fearLevelGetLabel,
-  fearLevelGetMaxPropagationDistance,
-} from '@helpers/fear-level';
-import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
-import { altarRoomIsAdjacent, altarRoomGetFearReductionAura } from '@helpers/altar-room';
-import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 
 // --- Test helpers ---
 

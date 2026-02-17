@@ -1,16 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-
-const SKELETON_DEF_ID = 'aa200001-0001-0001-0001-000000000001';
-const GOBLIN_DEF_ID = 'aa200001-0001-0001-0001-000000000002';
-
-const mockContent = new Map<string, unknown>();
-mockContent.set(SKELETON_DEF_ID, { id: SKELETON_DEF_ID, __type: 'inhabitant', type: 'undead', name: 'Skeleton' });
-mockContent.set(GOBLIN_DEF_ID, { id: GOBLIN_DEF_ID, __type: 'inhabitant', type: 'creature', name: 'Goblin' });
-
-vi.mock('@helpers/content', () => ({
-  contentGetEntry: vi.fn((id: string) => mockContent.get(id) ?? undefined),
-}));
-
 import {
   DAY_NIGHT_DAWN_HOUR,
   DAY_NIGHT_DAY_END,
@@ -28,6 +16,17 @@ import {
   dayNightGetResourceModifier,
 } from '@helpers/day-night-modifiers';
 import type { InhabitantId, InhabitantInstance, InhabitantInstanceId, PlacedRoomId } from '@interfaces';
+
+const SKELETON_DEF_ID = 'aa200001-0001-0001-0001-000000000001';
+const GOBLIN_DEF_ID = 'aa200001-0001-0001-0001-000000000002';
+
+const mockContent = new Map<string, unknown>();
+mockContent.set(SKELETON_DEF_ID, { id: SKELETON_DEF_ID, __type: 'inhabitant', type: 'undead', name: 'Skeleton' });
+mockContent.set(GOBLIN_DEF_ID, { id: GOBLIN_DEF_ID, __type: 'inhabitant', type: 'creature', name: 'Goblin' });
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: vi.fn((id: string) => mockContent.get(id) ?? undefined),
+}));
 
 function makeInhabitant(
   instanceId: string,

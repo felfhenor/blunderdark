@@ -1,11 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { InvaderInstanceId, InvaderId } from '@interfaces';
 import type { InvaderInstance } from '@interfaces/invader';
-
-vi.mock('@helpers/invaders', () => ({
-  invaderGetDefinitionById: vi.fn(),
-}));
-
 import {
   MORALE_INITIAL,
   MORALE_MIN,
@@ -37,6 +32,10 @@ import {
   moraleApplyRoomCapture,
 } from '@helpers/morale';
 import { invaderGetDefinitionById } from '@helpers/invaders';
+
+vi.mock('@helpers/invaders', () => ({
+  invaderGetDefinitionById: vi.fn(),
+}));
 
 const mockInvaderGetDefinitionById = vi.mocked(invaderGetDefinitionById);
 

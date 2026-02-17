@@ -11,6 +11,15 @@ import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomId } from '@interfaces/content-room';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  researchUnlockApplyEffects,
+  researchUnlockGetPassiveBonuses,
+  researchUnlockGetRequiredResearchName,
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+  researchUnlockOnComplete,
+  researchUnlockProcessCompletion,
+} from '@helpers/research-unlocks';
 
 // --- Constants ---
 
@@ -39,18 +48,6 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: () => mockGameState,
   updateGamestate: (...args: unknown[]) => mockUpdateGamestate(...args),
 }));
-
-// --- Imports after mocks ---
-
-import {
-  researchUnlockApplyEffects,
-  researchUnlockGetPassiveBonuses,
-  researchUnlockGetRequiredResearchName,
-  researchUnlockIsResearchGated,
-  researchUnlockIsUnlocked,
-  researchUnlockOnComplete,
-  researchUnlockProcessCompletion,
-} from '@helpers/research-unlocks';
 
 // --- Helpers ---
 

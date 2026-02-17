@@ -1,6 +1,10 @@
 import type { InvasionId } from '@interfaces/content-invasion';
+import type { CombatResult } from '@interfaces/combat';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
+import type { InvaderInstance, InvaderClassType, InvaderStats } from '@interfaces/invader';
+import type { InvasionObjective } from '@interfaces/invasion-objective';
+import type { ResourceType } from '@interfaces/resource';
 
 export type PrisonerId = Branded<string, 'PrisonerId'>;
 export type CombatantId = Branded<string, 'CombatantId'>;
@@ -29,8 +33,6 @@ export type InvasionSchedule = {
 
 // --- Composition types ---
 
-import type { InvaderClassType } from '@interfaces/invader';
-
 export type InvaderClassWeights = Record<InvaderClassType, number>;
 
 export type CompositionWeightConfig = {
@@ -51,9 +53,6 @@ export type DungeonProfile = {
 };
 
 // --- Win/Loss types ---
-
-import type { InvaderInstance } from '@interfaces/invader';
-import type { InvasionObjective } from '@interfaces/invasion-objective';
 
 export type InvasionEndReason =
   | 'all_invaders_eliminated'
@@ -92,9 +91,6 @@ export type DetailedInvasionResult = {
 };
 
 // --- Rewards types ---
-
-import type { InvaderStats } from '@interfaces/invader';
-import type { ResourceType } from '@interfaces/resource';
 
 export type DefenseRewards = {
   reputationGain: number;
@@ -136,8 +132,6 @@ export type PrisonerHandlingResult = {
 };
 
 // --- Turn-based combat types ---
-
-import type { CombatResult } from '@interfaces/combat';
 
 export type CombatantSide = 'defender' | 'invader';
 

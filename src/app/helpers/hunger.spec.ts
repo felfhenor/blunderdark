@@ -1,6 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import type { GameState, InhabitantId, InhabitantInstance, InhabitantInstanceId } from '@interfaces';
+import {
+  HUNGER_RECOVERY_RATE,
+  HUNGER_TICKS_PER_HOUR,
+  HUNGER_TICKS_TO_HUNGRY,
+  HUNGER_TICKS_TO_STARVING,
+  HUNGER_WARNING_MINUTES,
+  hungerCalculateState,
+  hungerCalculateTotalConsumption,
+  hungerGetConsumptionRate,
+  hungerGetPerTickConsumption,
+  hungerIsInappetent,
+  hungerGetWarningLevel,
+  hungerProcess,
+  hungerResetWarnings,
+} from '@helpers/hunger';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 
 // --- Mocks ---
 
@@ -34,25 +49,6 @@ vi.mock('@helpers/resources', () => ({
     return subtracted;
   }),
 }));
-
-// --- Import after mocks ---
-
-import {
-  HUNGER_RECOVERY_RATE,
-  HUNGER_TICKS_PER_HOUR,
-  HUNGER_TICKS_TO_HUNGRY,
-  HUNGER_TICKS_TO_STARVING,
-  HUNGER_WARNING_MINUTES,
-  hungerCalculateState,
-  hungerCalculateTotalConsumption,
-  hungerGetConsumptionRate,
-  hungerGetPerTickConsumption,
-  hungerIsInappetent,
-  hungerGetWarningLevel,
-  hungerProcess,
-  hungerResetWarnings,
-} from '@helpers/hunger';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifiers';
 
 // --- Test helpers ---

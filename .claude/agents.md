@@ -4,6 +4,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 ## Core Policies
 
+- **All imports must be at the top of the file** — never place `import` statements in the middle of a file after non-import code (type definitions, constants, `vi.mock()` calls, etc.). In test files, Vitest hoists `vi.mock()` automatically, so imports can and should come before mock setup.
 - **NEVER hardcode content UUIDs in TypeScript.** Use `roomRoleFindById(role)` for special rooms, data fields on `RoomContent` for behavior, `contentGetEntriesByType()` for querying. In spec files, define test-local UUID constants.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()`.
 - **Always use branded ID types, never plain `string`.** Define via `type MyId = Branded<string, 'MyId'>` in interface files. Cast at creation points: `rngUuid<HallwayId>()`, `'test-id' as PlacedRoomId`.

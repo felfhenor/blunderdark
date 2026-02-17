@@ -1,5 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { GameState, SaveData, SaveSlotId } from '@interfaces';
+import {
+  SAVE_SLOT_IDS,
+  SAVE_SLOT_MANUAL_IDS,
+  saveSlotDefaultMeta,
+  saveSlotDefaultMetaIndex,
+  saveSlotExtractMeta,
+  saveSlotDbKey,
+  saveSlotIsManual,
+  saveSlotDisplayName,
+  saveSlotWrite,
+  saveSlotRead,
+  saveSlotDelete,
+  saveSlotRefreshMeta,
+  saveSlotMetaIndex,
+} from '@helpers/save-slots';
+import { saveSerialize } from '@helpers/save';
+import { gamestate } from '@helpers/state-game';
 
 // --- In-memory storage for mocking IndexedDB ---
 
@@ -26,26 +43,6 @@ vi.mock('@helpers/save', () => ({
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
-
-// --- Imports after mocks ---
-
-import {
-  SAVE_SLOT_IDS,
-  SAVE_SLOT_MANUAL_IDS,
-  saveSlotDefaultMeta,
-  saveSlotDefaultMetaIndex,
-  saveSlotExtractMeta,
-  saveSlotDbKey,
-  saveSlotIsManual,
-  saveSlotDisplayName,
-  saveSlotWrite,
-  saveSlotRead,
-  saveSlotDelete,
-  saveSlotRefreshMeta,
-  saveSlotMetaIndex,
-} from '@helpers/save-slots';
-import { saveSerialize } from '@helpers/save';
-import { gamestate } from '@helpers/state-game';
 
 function makeSaveData(overrides?: Partial<SaveData>): SaveData {
   return {

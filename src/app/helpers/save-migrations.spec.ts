@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { GameState, SaveData } from '@interfaces';
+import {
+  SAVE_VERSION,
+  saveMigrations,
+  saveMigrationDetectVersion,
+  saveMigrationRun,
+} from '@helpers/save-migrations';
 
 // --- Mocks ---
 
@@ -7,15 +13,6 @@ vi.mock('@helpers/logging', () => ({
   debug: vi.fn(),
   warn: vi.fn(),
 }));
-
-// --- Imports after mocks ---
-
-import {
-  SAVE_VERSION,
-  saveMigrations,
-  saveMigrationDetectVersion,
-  saveMigrationRun,
-} from '@helpers/save-migrations';
 
 function makeGameState(overrides?: Partial<GameState>): GameState {
   return {

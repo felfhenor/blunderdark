@@ -22,13 +22,6 @@ const mockRoomDefs = [
   { id: THRONE_ROOM, __type: 'room' },
 ];
 
-vi.mock('@helpers/content', () => ({
-  contentGetEntriesByType: vi.fn((type: string) => {
-    if (type === 'room') return mockRoomDefs;
-    return [];
-  }),
-}));
-
 import {
   productionModifierApply,
   productionModifierCalculate,
@@ -41,6 +34,13 @@ import {
 } from '@helpers/production-modifiers';
 import type { RoomId } from '@interfaces';
 import type { ProductionModifierContext } from '@interfaces/production-modifier';
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntriesByType: vi.fn((type: string) => {
+    if (type === 'room') return mockRoomDefs;
+    return [];
+  }),
+}));
 
 function makeContext(overrides: Partial<ProductionModifierContext> = {}): ProductionModifierContext {
   return {

@@ -1,16 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('@helpers/content', () => ({
-  contentGetEntry: vi.fn(),
-  contentGetEntriesByType: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngChoice: vi.fn(),
-  rngSucceedsChance: vi.fn(),
-  rngUuid: vi.fn(() => 'test-uuid'),
-}));
-
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { rngChoice, rngSucceedsChance } from '@helpers/rng';
 import {
@@ -61,6 +49,17 @@ import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { PhylacteryRespawnEntry } from '@helpers/features';
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: vi.fn(),
+  contentGetEntriesByType: vi.fn(),
+}));
+
+vi.mock('@helpers/rng', () => ({
+  rngChoice: vi.fn(),
+  rngSucceedsChance: vi.fn(),
+  rngUuid: vi.fn(() => 'test-uuid'),
+}));
 
 const COFFINS_ID = 'coffins-test-id' as FeatureId;
 const MOSS_ID = 'moss-test-id' as FeatureId;

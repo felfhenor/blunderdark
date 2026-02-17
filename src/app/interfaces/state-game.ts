@@ -1,7 +1,4 @@
 import type { Branded } from '@interfaces/identifiable';
-
-export type GameId = Branded<string, 'GameId'>;
-
 import type { Floor } from '@interfaces/floor';
 import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
@@ -20,6 +17,8 @@ import type { ElevatorInstance } from '@interfaces/elevator';
 import type { PortalInstance } from '@interfaces/portal';
 import type { MerchantState } from '@interfaces/merchant';
 import type { VictoryProgress } from '@interfaces/victory';
+
+export type GameId = Branded<string, 'GameId'>;
 
 export interface GameStateWorld {
   grid: GridState;

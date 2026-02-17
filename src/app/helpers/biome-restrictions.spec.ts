@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BiomeType, Floor, FloorId, PlacedRoomId, RoomId, RoomShapeId } from '@interfaces';
+import {
+  BIOME_RESTRICTION_MAP,
+  biomeRestrictionCanBuild,
+  biomeRestrictionCountRoomType,
+  biomeRestrictionGetRoomInfo,
+} from '@helpers/biome-restrictions';
 
 // Test-local room type IDs
 const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
@@ -19,13 +25,6 @@ vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn((id: string) => mockContent.get(id)),
   contentGetEntriesByType: vi.fn(() => []),
 }));
-
-import {
-  BIOME_RESTRICTION_MAP,
-  biomeRestrictionCanBuild,
-  biomeRestrictionCountRoomType,
-  biomeRestrictionGetRoomInfo,
-} from '@helpers/biome-restrictions';
 
 function makeFloor(
   biome: BiomeType = 'neutral',
