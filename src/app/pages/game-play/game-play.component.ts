@@ -52,7 +52,7 @@ import {
   autosaveStart,
   autosaveStop,
 } from '@helpers/autosave';
-import { fusionHasAvailableCreatures } from '@helpers/fusion';
+import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
 import { notifyError } from '@helpers/notify';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 
@@ -104,7 +104,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public showResearch = signal(false);
   public showFusion = signal(false);
   public showVictoryMenu = signal(false);
-  public canShowFusion = computed(() => fusionHasAvailableCreatures());
+  public canShowFusion = computed(
+    () => fusionHasAvailableCreatures() && fusionHasRoom(),
+  );
   public isAutosaving = autosaveIsSaving;
 
   ngOnInit(): void {

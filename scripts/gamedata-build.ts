@@ -72,11 +72,18 @@ const rewriteDataIds = () => {
     return res;
   };
 
+  // explicit aliases for keys that don't naturally contain their folder name
+  const keyAliases: Record<string, string> = {
+    shapeId: 'roomshape',
+  };
+
   // magically transform any key that requests an id to that id
   const iterateObject = (entry: any) => {
     Object.keys(entry).forEach((entryKey) => {
       // no match, skip
-      const keyMatch = allIds.find((id) => entryKey.toLowerCase().includes(id));
+      const keyMatch =
+        allIds.find((id) => entryKey.toLowerCase().includes(id)) ??
+        keyAliases[entryKey];
       if (!keyMatch) {
         // check deeper, if it's an array we want to check our sub objects
         if (isArray(entry[entryKey])) {

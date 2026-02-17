@@ -4,8 +4,9 @@
 # Tree structure:
 #   Basic Engineering (T1)
 #   ├── Advanced Construction (T2)
-#   │   └── Master Architecture (T3)
-#   │       └── Siege Works (T4) [+Trap Design]
+#   │   ├── Master Architecture (T3)
+#   │   │   └── Siege Works (T4) [+Trap Design]
+#   │   └── Fusion Core (T3)
 #   ├── Trap Design (T2)
 #   │   └── Automated Defenses (T3)
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
@@ -85,6 +86,21 @@
       bonusType: roomCapacity
       value: 1
       description: +1 max inhabitant capacity for all rooms
+  tier: 3
+  requiredTicks: 300
+
+- id: b8e4a1c3-7d2f-4f9b-8a6e-c5d0e1f2a3b4
+  name: Fusion Core Construction
+  description: Develop the arcane engineering principles needed to construct a Fusion Core, enabling creature fusion.
+  branch: engineering
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Advanced Construction
+  unlocks:
+    - type: room
+      targetRoomId: Fusion Core
   tier: 3
   requiredTicks: 300
 

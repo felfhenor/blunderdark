@@ -1,6 +1,7 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
+import { roomRoleFindById } from '@helpers/room-roles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   FusionRecipeContent,
@@ -324,6 +325,20 @@ export function fusionHasAvailableCreatures(): boolean {
     if (i.travelTicksRemaining && i.travelTicksRemaining > 0) continue;
     count++;
     if (count >= 2) return true;
+  }
+
+  return false;
+}
+
+/**
+ * Check if a Fusion Core room is placed on any floor.
+ */
+export function fusionHasRoom(): boolean {
+  const fusionCoreId = roomRoleFindById('fusionCore');
+  if (!fusionCoreId) return false;
+
+  for (const floor of gamestate().world.floors) {
+    if (floor.rooms.some((r) => r.roomTypeId === fusionCoreId)) return true;
   }
 
   return false;

@@ -1,7 +1,7 @@
 - id: f48589fe-4326-4320-9506-64fe2ff5bcca
   name: Altar Room
   description: The dark heart of your dungeon. This ancient altar is the source of your power, enabling room construction and creature recruitment. Its calming aura reduces fear in adjacent rooms.
-  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
+  shapeId: Square 3x3
   cost: {}
   production:
     essence: 0.2
@@ -55,7 +55,7 @@
 - id: c9a1e8f5-2347-4885-b477-3363f9617077
   name: Throne Room
   description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
-  shapeId: d487da0e-8fa6-4a13-b0bf-da3e87c8d52f
+  shapeId: Square 4x4
   cost:
     gold: 100
     crystals: 50
@@ -71,7 +71,7 @@
 - id: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
   name: Crystal Mine
   description: An L-shaped excavation that extracts crystals from deep rock veins. Requires workers for full output. Benefits from proximity to other mines, forges, and libraries.
-  shapeId: 82f509dd-9ff8-4c99-986d-0b57198a4749
+  shapeId: L-Shape
   cost:
     gold: 50
   production:
@@ -151,7 +151,7 @@
 - id: 7fb314ad-a447-469f-82df-4b8c68f9deff
   name: Mushroom Grove
   description: A T-shaped grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
-  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
+  shapeId: T-Shape
   cost:
     gold: 40
   production:
@@ -222,7 +222,7 @@
 - id: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
   name: Shadow Library
   description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
-  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
+  shapeId: Small L-Shape
   cost:
     gold: 80
     crystals: 30
@@ -314,7 +314,7 @@
 - id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   name: Soul Well
   description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
-  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
+  shapeId: Square 3x3
   cost:
     gold: 100
     crystals: 50
@@ -398,7 +398,7 @@
 - id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge
   description: A blazing 2x2 forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
-  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  shapeId: Square 2x2
   role: darkForge
   cost:
     gold: 60
@@ -442,7 +442,7 @@
 - id: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
   name: Underground Lake
   description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
-  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
+  shapeId: T-Shape
   cost:
     gold: 60
     crystals: 20
@@ -503,7 +503,7 @@
 - id: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
   name: Barracks
   description: A long, narrow hall lined with weapon racks and sleeping quarters. Houses and trains your fighters, providing no resource production but significantly boosting your dungeon's combat readiness. Its military atmosphere can unsettle peaceful creatures.
-  shapeId: ac447f9c-de8c-4b07-8756-b0b570845ace
+  shapeId: I-Shape
   cost:
     gold: 70
   production: {}
@@ -558,7 +558,7 @@
 - id: 827472bd-6bbb-482f-86c8-ad30d5613237
   name: Treasure Vault
   description: A fortified 3x3 chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
-  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
+  shapeId: Square 3x3
   cost:
     gold: 120
     crystals: 40
@@ -630,7 +630,7 @@
 - id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   name: Training Grounds
   description: A T-shaped combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
-  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
+  shapeId: T-Shape
   role: trainingGrounds
   cost:
     gold: 80
@@ -690,7 +690,7 @@
 - id: a7ef7e24-f250-45e7-986d-ad06b3610b52
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
-  shapeId: d422fcc4-ecb1-4be0-8103-a39773440dc9
+  shapeId: T-Shape
   biomeBonuses:
     crystal: 0.10
   invasionProfile:
@@ -758,7 +758,7 @@
 - id: b3a7c1e9-5f82-4d6a-a1c3-9e4b2d7f8a05
   name: Gold Vein
   description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
-  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  shapeId: Square 2x2
   cost: {}
   production:
     gold: 0.4
@@ -774,7 +774,7 @@
 - id: 6d638daa-6e43-4569-a931-eb4710009da9
   name: Trap Workshop
   description: A compact 2x2 crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
-  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  shapeId: Square 2x2
   role: trapWorkshop
   cost:
     gold: 90
@@ -834,7 +834,7 @@
 - id: bf618a8c-5b95-4a63-9168-98da24e061c4
   name: Spawning Pool
   description: A bubbling pool of primordial ooze that periodically spawns basic creatures. The pool generates inhabitants automatically, growing your workforce without manual recruitment. Upgrades can accelerate spawning or produce stronger creatures.
-  shapeId: cedc340b-2f75-4811-89e5-b971659950fc
+  shapeId: Square 2x2
   cost:
     gold: 80
     crystals: 30
@@ -886,7 +886,7 @@
 - id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
   name: Breeding Pits
   description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign two compatible inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
-  shapeId: 36a2e61f-079d-422b-bd6a-1eb5b105e794
+  shapeId: Square 3x3
   cost:
     gold: 120
     crystals: 60
@@ -936,7 +936,7 @@
 - id: 8f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c
   name: Summoning Circle
   description: An L-shaped ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
-  shapeId: 82f509dd-9ff8-4c99-986d-0b57198a4749
+  shapeId: L-Shape
   cost:
     gold: 150
     essence: 80
@@ -990,7 +990,7 @@
 - id: c3b02001-0001-4001-8001-000000000001
   name: Alchemy Lab
   description: An L-shaped laboratory for transmuting raw resources into refined magical materials. Assign an alchemist to begin converting crystals and food into flux, or unlock advanced recipes to produce essence and other exotic substances.
-  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
+  shapeId: Small L-Shape
   cost:
     gold: 80
     crystals: 30
@@ -1039,10 +1039,33 @@
         - type: maxInhabitantBonus
           value: 2
 
+- id: e4b7c9a1-3f5d-4e8b-a2c6-d0f1e3a5b7c9
+  name: Fusion Core
+  description: A chamber of crystallized energy where two creatures are merged into a single, more powerful hybrid. The arcane machinery hums with volatile flux, requiring no workers but demanding significant resources to construct.
+  shapeId: U-Shape
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 0
+  inhabitantRestriction: null
+  fearLevel: 3
+  isUnique: true
+  role: fusionCore
+  adjacencyBonuses:
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Arcane knowledge stabilizes the fusion process.
+    - adjacentRoomId: Soul Well
+      bonus: 0.10
+      description: Soul essence fuels the core's binding rituals.
+
 - id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
   name: Torture Chamber
   description: An L-shaped chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
-  shapeId: 1c224b76-8f8c-4795-a25c-eac11a1acc20
+  shapeId: Small L-Shape
   cost:
     gold: 120
     crystals: 40
