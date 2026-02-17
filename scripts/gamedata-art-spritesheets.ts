@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const spritesmith = require('spritesmith');
 const { Jimp } = require('jimp');
-const { maxBy, uniqBy } = require('lodash');
+const { maxBy, uniqBy } = require('es-toolkit/compat');
 const imagemin = require('imagemin');
 const webp = require('imagemin-webp');
 

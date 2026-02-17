@@ -6,13 +6,6 @@ import type { UpgradePathId } from '@interfaces/room';
 
 export type ResearchBranch = 'dark' | 'arcane' | 'engineering';
 
-export type UnlockEffectType =
-  | 'room'
-  | 'inhabitant'
-  | 'ability'
-  | 'upgrade'
-  | 'passive_bonus';
-
 export type RoomUnlock = {
   type: 'room';
   targetRoomId: RoomId;
@@ -55,9 +48,7 @@ export type UnlockedContent = {
   passiveBonuses: { bonusType: string; value: number; description: string }[];
 };
 
-export function getUnlockTargetId(
-  unlock: UnlockEffect,
-): string | undefined {
+export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
   switch (unlock.type) {
     case 'room':
       return unlock.targetRoomId;
