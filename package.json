@@ -116,8 +116,8 @@
   },
   "overrides": {
     "@sweetalert2/ngx-sweetalert2": {
-      "@angular/common": "20",
-      "@angular/core": "20"
+      "@angular/common": "21",
+      "@angular/core": "21"
     }
   }
 }
