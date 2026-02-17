@@ -1,6 +1,6 @@
 - id: 146777cb-8d19-4b82-85ea-66320063f71e
   name: Coffins
-  description: "Ancient burial chambers that resonate with undead energy. Increases undead capacity and reduces fear for undead inhabitants."
+  description: 'Ancient burial chambers that resonate with undead energy. Increases undead capacity and reduces fear for undead inhabitants.'
   category: environmental
   cost:
     gold: 50
@@ -9,15 +9,15 @@
     - type: capacity_bonus
       value: 1
       targetType: undead
-      description: "+1 undead inhabitant capacity"
+      description: '+1 undead inhabitant capacity'
     - type: fear_reduction
       value: 1
       targetType: undead
-      description: "-1 Fear for undead inhabitants"
+      description: '-1 Fear for undead inhabitants'
 
 - id: 76a7ac92-e1c3-4ca8-b7dd-ffbbc772bf75
   name: Bioluminescent Moss
-  description: "Glowing fungal growth that calms inhabitants and stimulates nearby production through subtle magical emanations."
+  description: 'Glowing fungal growth that calms inhabitants and stimulates nearby production through subtle magical emanations.'
   category: environmental
   cost:
     gold: 40
@@ -25,14 +25,14 @@
   bonuses:
     - type: fear_reduction
       value: 1
-      description: "-1 Fear in the attached room"
+      description: '-1 Fear in the attached room'
     - type: adjacent_production
       value: 0.05
-      description: "+5% production to adjacent connected rooms"
+      description: '+5% production to adjacent connected rooms'
 
 - id: 62afe01d-9e72-4c92-9b99-e01022baf418
   name: Arcane Crystals
-  description: "Pulsing crystal formations that channel raw magical energy, generating flux and amplifying magic-related production."
+  description: 'Pulsing crystal formations that channel raw magical energy, generating flux and amplifying magic-related production.'
   category: environmental
   cost:
     gold: 75
@@ -41,15 +41,15 @@
     - type: flat_production
       value: 1
       targetType: flux
-      description: "+1 Flux per minute"
+      description: '+1 Flux per minute'
     - type: production_bonus
       value: 0.15
       targetType: flux
-      description: "+15% magic efficiency"
+      description: '+15% magic efficiency'
 
 - id: ad40da12-8199-4374-a99f-16165aada452
   name: Blood Altar
-  description: "A dark sacrificial altar that generates corruption passively and allows food sacrifices for temporary power boosts."
+  description: 'A dark sacrificial altar that generates corruption passively and allows food sacrifices for temporary power boosts.'
   category: environmental
   cost:
     gold: 100
@@ -57,11 +57,11 @@
   bonuses:
     - type: corruption_generation
       value: 2
-      description: "+2 Corruption per minute"
+      description: '+2 Corruption per minute'
 
 - id: b7c88ecf-25ad-45d4-a185-b27cc4507517
   name: Geothermal Vents
-  description: "Natural volcanic fissures that supercharge production and imbue defenders with fire damage capabilities."
+  description: 'Natural volcanic fissures that supercharge production and imbue defenders with fire damage capabilities.'
   category: environmental
   cost:
     gold: 80
@@ -69,15 +69,15 @@
   bonuses:
     - type: production_bonus
       value: 0.15
-      description: "+15% production across all resource types"
+      description: '+15% production across all resource types'
     - type: combat_bonus
       value: 5
       targetType: fire
-      description: "Fire damage bonus to inhabitants in combat"
+      description: 'Fire damage bonus to inhabitants in combat'
 
 - id: d0d66f94-caaa-4ca1-8dd2-adf8fe778487
   name: Fungal Network
-  description: "An interconnected mycelium web that enables instant inhabitant transfer between rooms with matching networks."
+  description: 'An interconnected mycelium web that enables instant inhabitant transfer between rooms with matching networks.'
   category: environmental
   cost:
     gold: 60
@@ -86,4 +86,4 @@
   bonuses:
     - type: teleport_link
       value: 1
-      description: "Enables instant transfer between linked Fungal Network rooms"
+      description: 'Enables instant transfer between linked Fungal Network rooms'

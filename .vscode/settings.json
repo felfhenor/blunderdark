@@ -11,24 +11,37 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
-  "eslint.validate": ["typescript", "javascript"],
-  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.validate": [
+    "typescript",
+    "javascript"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
   "yaml.schemas": {
-    "./schemas/armor.schema.json": "gamedata/armor/*.yml",
-    "./schemas/accessory.schema.json": "gamedata/accessory/*.yml",
-    "./schemas/trinket.schema.json": "gamedata/trinket/*.yml",
-    "./schemas/weapon.schema.json": "gamedata/weapon/*.yml",
-    "./schemas/skill.schema.json": "gamedata/skill/*.yml",
-    "./schemas/talent.schema.json": "gamedata/talent/*.yml",
-    "./schemas/statuseffect.schema.json": "gamedata/statuseffect/*.yml",
-    "./schemas/guardian.schema.json": "gamedata/guardian/*.yml",
-    "./schemas/locationupgrade.schema.json": "gamedata/locationupgrade/*.yml",
-    "./schemas/currency.schema.json": "gamedata/currency/*.yml",
-    "./schemas/festival.schema.json": "gamedata/festival/*.yml",
-    "./schemas/talenttree.schema.json": "gamedata/talenttree/*.yml",
-    "./schemas/townupgrade.schema.json": "gamedata/townupgrade/*.yml",
-    "./schemas/traitequipment.schema.json": "gamedata/traitequipment/*.yml",
-    "./schemas/traitlocation.schema.json": "gamedata/traitlocation/*.yml",
-    "./schemas/worldconfig.schema.json": "gamedata/worldconfig/*.yml"
+    "./schemas/abilityeffect.schema.json": "gamedata/abilityeffect/*.yml",
+    "./schemas/alchemyrecipe.schema.json": "gamedata/alchemyrecipe/*.yml",
+    "./schemas/breedingrecipe.schema.json": "gamedata/breedingrecipe/*.yml",
+    "./schemas/combatability.schema.json": "gamedata/combatability/*.yml",
+    "./schemas/feature.schema.json": "gamedata/feature/*.yml",
+    "./schemas/forgerecipe.schema.json": "gamedata/forgerecipe/*.yml",
+    "./schemas/fusionrecipe.schema.json": "gamedata/fusionrecipe/*.yml",
+    "./schemas/inhabitant.schema.json": "gamedata/inhabitant/*.yml",
+    "./schemas/inhabitanttrait.schema.json": "gamedata/inhabitanttrait/*.yml",
+    "./schemas/invader.schema.json": "gamedata/invader/*.yml",
+    "./schemas/invasion.schema.json": "gamedata/invasion/*.yml",
+    "./schemas/merchanttrade.schema.json": "gamedata/merchanttrade/*.yml",
+    "./schemas/reputationaction.schema.json": "gamedata/reputationaction/*.yml",
+    "./schemas/reputationeffect.schema.json": "gamedata/reputationeffect/*.yml",
+    "./schemas/research.schema.json": "gamedata/research/*.yml",
+    "./schemas/room.schema.json": "gamedata/room/*.yml",
+    "./schemas/roomshape.schema.json": "gamedata/roomshape/*.yml",
+    "./schemas/seasonbonus.schema.json": "gamedata/seasonbonus/*.yml",
+    "./schemas/summonrecipe.schema.json": "gamedata/summonrecipe/*.yml",
+    "./schemas/synergy.schema.json": "gamedata/synergy/*.yml",
+    "./schemas/trap.schema.json": "gamedata/trap/*.yml",
+    "./schemas/victorypath.schema.json": "gamedata/victorypath/*.yml"
   }
 }
