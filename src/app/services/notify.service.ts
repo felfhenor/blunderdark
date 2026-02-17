@@ -94,6 +94,11 @@ export class NotifyService {
     if (unlock.type === 'passive_bonus') {
       return unlock.description;
     }
+
+    if (unlock.type === 'feature_flag') {
+      return unlock.featureFlag;
+    }
+
     const targetId = getUnlockTargetId(unlock)!;
     const entry = contentGetEntry<IsContentItem>(targetId);
     const label =
@@ -104,6 +109,7 @@ export class NotifyService {
           : unlock.type === 'ability'
             ? 'Ability'
             : 'Upgrade';
+
     return `${label}: ${entry?.name ?? targetId}`;
   }
 
