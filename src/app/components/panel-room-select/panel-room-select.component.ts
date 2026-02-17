@@ -29,6 +29,7 @@ import {
 import type { ResourceType, RoomId, RoomShapeContent } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-room-select',
@@ -39,8 +40,11 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class PanelRoomSelectComponent {
   public rooms = computed(() =>
-    contentGetEntriesByType<RoomContent>('room').filter(
-      (r) => !r.autoPlace && !this.isResearchLocked(r),
+    sortBy(
+      contentGetEntriesByType<RoomContent>('room').filter(
+        (r) => !r.autoPlace && !this.isResearchLocked(r),
+      ),
+      ['name'],
     ),
   );
 
