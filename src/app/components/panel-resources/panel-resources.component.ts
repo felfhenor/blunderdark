@@ -9,9 +9,6 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import {
   corruptionGetLevel,
   corruptionGetLevelDescription,
-  dayNightFormatMultiplier,
-  dayNightGetAllActiveModifiers,
-  dayNightGetPhaseLabel,
   gamestate,
   hungerCalculateTotalConsumption,
   hungerGetWarningLevel,
@@ -21,7 +18,6 @@ import {
   GAME_TIME_TICKS_PER_MINUTE,
 } from '@helpers';
 import type { CorruptionLevel } from '@interfaces/corruption';
-import type { DayNightCreatureModifier, DayNightResourceModifier } from '@interfaces/day-night';
 import type { ResourceType } from '@interfaces';
 import type { ResourceProductionBreakdown } from '@interfaces/production';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -94,11 +90,6 @@ export class PanelResourcesComponent {
   public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
   public breakdowns = productionBreakdowns;
-
-  public activeTimeModifiers = computed(() => {
-    const hour = gamestate().clock.hour;
-    return dayNightGetAllActiveModifiers(hour);
-  });
 
   public foodWarning = computed(() => {
     const state = gamestate();
@@ -187,18 +178,6 @@ export class PanelResourcesComponent {
     if (perMin > 0) return `+${perMin.toFixed(2)}`;
     if (perMin < 0) return perMin.toFixed(2);
     return '0';
-  }
-
-  public getPhaseLabel(): string {
-    return dayNightGetPhaseLabel(this.activeTimeModifiers().phase);
-  }
-
-  public formatMultiplier(mod: DayNightResourceModifier | DayNightCreatureModifier): string {
-    return dayNightFormatMultiplier(mod.multiplier);
-  }
-
-  public isPositiveModifier(mod: DayNightResourceModifier | DayNightCreatureModifier): boolean {
-    return mod.multiplier > 1.0;
   }
 
   public corruptionInfo = computed(() => {

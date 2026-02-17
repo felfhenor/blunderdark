@@ -24,6 +24,7 @@ import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchan
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PanelPortalInfoComponent } from '@components/panel-portal-info/panel-portal-info.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
+import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
 import { PanelResearchSummaryComponent } from '@components/panel-research-summary/panel-research-summary.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
@@ -83,6 +84,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelRoomSelectComponent,
     PanelRosterComponent,
     PanelThroneRoomComponent,
+    PanelTimeOfDayComponent,
     PanelTrainingGroundsComponent,
     PanelResearchSummaryComponent,
     PanelSummoningCircleComponent,
