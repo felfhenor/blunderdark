@@ -15,7 +15,7 @@ import { breedingPitsProcess } from '@helpers/breeding-pits';
 import { spawningPoolProcess } from '@helpers/spawning-pool';
 import { alchemyLabProcess } from '@helpers/alchemy-lab';
 import { darkForgeProcess } from '@helpers/dark-forge';
-import { stairTravelProcess } from '@helpers/stairs';
+import { verticalTransportTravelProcess } from '@helpers/vertical-transport';
 import { tortureChamberProcess } from '@helpers/torture-chamber';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
@@ -86,7 +86,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     darkForgeProcess(state);
     alchemyLabProcess(state);
     tortureChamberProcess(state);
-    stairTravelProcess(state);
+    verticalTransportTravelProcess(state);
     invasionTriggerProcessSchedule(state);
     legendaryInhabitantUpkeepProcess(state);
     featureTrainingStationProcess(state.world.floors, state.world.inhabitants);

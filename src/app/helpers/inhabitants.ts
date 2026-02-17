@@ -213,9 +213,7 @@ export async function inhabitantAssignToRoom(
   );
   if (roomFloor && roomFloor.depth > 1) {
     const connected = verticalTransportFloorsAreConnected(
-      state.world.stairs,
-      state.world.elevators,
-      state.world.portals,
+      state.world.floors,
       1,
       roomFloor.depth,
     );
@@ -223,9 +221,7 @@ export async function inhabitantAssignToRoom(
       return { success: false, error: 'No vertical connection to that floor' };
     }
     const calculatedTicks = verticalTransportCalculateTravelTicks(
-      state.world.stairs,
-      state.world.elevators,
-      state.world.portals,
+      state.world.floors,
       1,
       roomFloor.depth,
     );

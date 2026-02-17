@@ -16,13 +16,11 @@ import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-al
 import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
 import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
-import { PanelElevatorInfoComponent } from '@components/panel-elevator-info/panel-elevator-info.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
-import { PanelPortalInfoComponent } from '@components/panel-portal-info/panel-portal-info.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
 import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
 import { PanelResearchSummaryComponent } from '@components/panel-research-summary/panel-research-summary.component';
@@ -30,7 +28,6 @@ import { PanelResourcesComponent } from '@components/panel-resources/panel-resou
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
-import { PanelStairInfoComponent } from '@components/panel-stair-info/panel-stair-info.component';
 import { PanelSummoningCircleComponent } from '@components/panel-summoning-circle/panel-summoning-circle.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
@@ -75,9 +72,6 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelMerchantComponent,
     PanelVictoryComponent,
     VictoryMenuComponent,
-    PanelStairInfoComponent,
-    PanelElevatorInfoComponent,
-    PanelPortalInfoComponent,
     PanelReputationComponent,
     PanelResourcesComponent,
     PanelRoomInfoComponent,

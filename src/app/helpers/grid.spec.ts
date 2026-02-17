@@ -63,9 +63,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'empty',
         roomId: undefined,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: undefined,
       });
     });
@@ -86,9 +83,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'room',
         roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: 'door',
       };
 
@@ -105,9 +99,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'room',
         roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: undefined,
       };
 
@@ -123,9 +114,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'room',
         roomId: 'room-1' as PlacedRoomId,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: undefined,
       };
 
@@ -176,9 +164,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'room',
         roomId: 'test-room' as PlacedRoomId,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: 'corridor',
       });
 
@@ -191,9 +176,6 @@ describe('Grid Helpers', () => {
         occupiedBy: 'room',
         roomId: 'test-room' as PlacedRoomId,
         hallwayId: undefined,
-        stairId: undefined,
-        elevatorId: undefined,
-        portalId: undefined,
         connectionType: 'corridor',
       });
     });

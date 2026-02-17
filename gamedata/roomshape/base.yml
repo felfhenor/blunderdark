@@ -1,3 +1,10 @@
+- id: 0234faaa-dddd-475f-a8c6-456a0a447a70
+  name: Square 1x1
+  width: 1
+  height: 1
+  tiles:
+    - { x: 0, y: 0 }
+
 - id: cedc340b-2f75-4811-89e5-b971659950fc
   name: Square 2x2
   width: 2

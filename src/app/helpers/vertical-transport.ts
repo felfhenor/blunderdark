@@ -1,5 +1,6 @@
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import type { ElevatorInstance, PortalInstance, StairInstance } from '@interfaces';
+import type { Floor, PlacedRoom } from '@interfaces';
+import type { TransportGroupId, TransportType } from '@interfaces/room-shape';
 
 export const VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR = GAME_TIME_TICKS_PER_MINUTE;
 export const VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR = Math.round(GAME_TIME_TICKS_PER_MINUTE * 0.5);
@@ -10,45 +11,93 @@ type TransportEdge = {
   travelTicks: number;
 };
 
+type TransportGroup = {
+  type: TransportType;
+  groupId: TransportGroupId;
+  floors: number[];
+};
+
+/**
+ * Collect all transport groups from floor rooms.
+ */
+function collectTransportGroups(floors: Floor[]): TransportGroup[] {
+  const groupMap = new Map<string, TransportGroup>();
+
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (!room.transportType || !room.transportGroupId) continue;
+
+      const existing = groupMap.get(room.transportGroupId);
+      if (existing) {
+        if (!existing.floors.includes(floor.depth)) {
+          existing.floors.push(floor.depth);
+        }
+      } else {
+        groupMap.set(room.transportGroupId, {
+          type: room.transportType,
+          groupId: room.transportGroupId,
+          floors: [floor.depth],
+        });
+      }
+    }
+  }
+
+  return [...groupMap.values()];
+}
+
 /**
  * Build a weighted graph of floor connections from all vertical transport types.
  * Returns adjacency list: Map<floorDepth, TransportEdge[]>
  */
 export function verticalTransportBuildGraph(
-  stairs: StairInstance[],
-  elevators: ElevatorInstance[],
-  portals: PortalInstance[],
+  floors: Floor[],
 ): Map<number, TransportEdge[]> {
   const graph = new Map<number, TransportEdge[]>();
+  const groups = collectTransportGroups(floors);
 
   function addEdge(from: number, to: number, ticks: number): void {
     if (!graph.has(from)) graph.set(from, []);
     graph.get(from)!.push({ toDepth: to, travelTicks: ticks });
   }
 
-  // Stairs: 1 game-minute per floor traversed
-  for (const stair of stairs) {
-    addEdge(stair.floorDepthA, stair.floorDepthB, VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR);
-    addEdge(stair.floorDepthB, stair.floorDepthA, VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR);
-  }
+  for (const group of groups) {
+    const sortedFloors = [...group.floors].sort((a, b) => a - b);
 
-  // Elevators: 0.5 game-minutes per floor traversed, connects all pairs within range
-  for (const elevator of elevators) {
-    const floors = elevator.connectedFloors;
-    for (let i = 0; i < floors.length; i++) {
-      for (let j = i + 1; j < floors.length; j++) {
-        const floorsTraversed = floors[j] - floors[i];
-        const ticks = floorsTraversed * VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR;
-        addEdge(floors[i], floors[j], ticks);
-        addEdge(floors[j], floors[i], ticks);
-      }
+    switch (group.type) {
+      case 'stair':
+        // Stairs connect pairs of floors, 1 game-minute per floor
+        for (let i = 0; i < sortedFloors.length; i++) {
+          for (let j = i + 1; j < sortedFloors.length; j++) {
+            const floorsTraversed = sortedFloors[j] - sortedFloors[i];
+            const ticks = floorsTraversed * VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR;
+            addEdge(sortedFloors[i], sortedFloors[j], ticks);
+            addEdge(sortedFloors[j], sortedFloors[i], ticks);
+          }
+        }
+        break;
+
+      case 'elevator':
+        // Elevators: 0.5 game-minutes per floor, connects all pairs
+        for (let i = 0; i < sortedFloors.length; i++) {
+          for (let j = i + 1; j < sortedFloors.length; j++) {
+            const floorsTraversed = sortedFloors[j] - sortedFloors[i];
+            const ticks = floorsTraversed * VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR;
+            addEdge(sortedFloors[i], sortedFloors[j], ticks);
+            addEdge(sortedFloors[j], sortedFloors[i], ticks);
+          }
+        }
+        break;
+
+      case 'portal':
+        // Portals: instant (0 ticks)
+        for (let i = 0; i < sortedFloors.length; i++) {
+          for (let j = i + 1; j < sortedFloors.length; j++) {
+            addEdge(sortedFloors[i], sortedFloors[j], VERTICAL_TRANSPORT_PORTAL_TICKS);
+            addEdge(sortedFloors[j], sortedFloors[i], VERTICAL_TRANSPORT_PORTAL_TICKS);
+          }
+        }
+        break;
     }
-  }
-
-  // Portals: instant (0 ticks)
-  for (const portal of portals) {
-    addEdge(portal.floorDepthA, portal.floorDepthB, VERTICAL_TRANSPORT_PORTAL_TICKS);
-    addEdge(portal.floorDepthB, portal.floorDepthA, VERTICAL_TRANSPORT_PORTAL_TICKS);
   }
 
   return graph;
@@ -59,15 +108,13 @@ export function verticalTransportBuildGraph(
  * Uses BFS on the combined graph.
  */
 export function verticalTransportFloorsAreConnected(
-  stairs: StairInstance[],
-  elevators: ElevatorInstance[],
-  portals: PortalInstance[],
+  floors: Floor[],
   fromDepth: number,
   toDepth: number,
 ): boolean {
   if (fromDepth === toDepth) return true;
 
-  const graph = verticalTransportBuildGraph(stairs, elevators, portals);
+  const graph = verticalTransportBuildGraph(floors);
   const visited = new Set<number>();
   const queue = [fromDepth];
   visited.add(fromDepth);
@@ -106,18 +153,15 @@ function findClosestUnvisited(
 /**
  * Calculate the minimum travel ticks between two floors using Dijkstra's algorithm.
  * Returns undefined if no path exists. Returns 0 for same floor.
- * Uses weighted edges: stairs = 5 ticks/floor, elevators = 3 ticks/floor, portals = 0.
  */
 export function verticalTransportCalculateTravelTicks(
-  stairs: StairInstance[],
-  elevators: ElevatorInstance[],
-  portals: PortalInstance[],
+  floors: Floor[],
   fromDepth: number,
   toDepth: number,
 ): number | undefined {
   if (fromDepth === toDepth) return 0;
 
-  const graph = verticalTransportBuildGraph(stairs, elevators, portals);
+  const graph = verticalTransportBuildGraph(floors);
 
   // Dijkstra's algorithm
   const dist = new Map<number, number>();
@@ -125,7 +169,6 @@ export function verticalTransportCalculateTravelTicks(
 
   dist.set(fromDepth, 0);
 
-  // Dijkstra: process nodes until we reach toDepth or exhaust reachable nodes
   let current = findClosestUnvisited(dist, visited);
   while (current !== undefined) {
     const currentDist = dist.get(current)!;
@@ -147,4 +190,44 @@ export function verticalTransportCalculateTravelTicks(
   }
 
   return undefined;
+}
+
+/**
+ * Get all transport groups visible on a floor (for display purposes).
+ */
+export function verticalTransportGetGroupsOnFloor(
+  floors: Floor[],
+  floorDepth: number,
+): { room: PlacedRoom; groupFloors: number[] }[] {
+  const groups = collectTransportGroups(floors);
+  const floor = floors.find((f) => f.depth === floorDepth);
+  if (!floor) return [];
+
+  const result: { room: PlacedRoom; groupFloors: number[] }[] = [];
+  for (const room of floor.rooms) {
+    if (!room.transportType || !room.transportGroupId) continue;
+    const group = groups.find((g) => g.groupId === room.transportGroupId);
+    if (group) {
+      result.push({ room, groupFloors: group.floors.sort((a, b) => a - b) });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Process travel ticks for all traveling inhabitants.
+ * Called each game tick.
+ */
+export function verticalTransportTravelProcess(state: {
+  world: { inhabitants: { travelTicksRemaining?: number }[] };
+}): void {
+  for (const inhabitant of state.world.inhabitants) {
+    if (
+      inhabitant.travelTicksRemaining !== undefined &&
+      inhabitant.travelTicksRemaining > 0
+    ) {
+      inhabitant.travelTicksRemaining -= 1;
+    }
+  }
 }

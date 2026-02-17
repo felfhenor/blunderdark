@@ -12,9 +12,6 @@ import type { ForgeCraftingQueue, ForgeInventoryEntry } from '@interfaces/forge'
 import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
 import type { CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
-import type { StairInstance } from '@interfaces/stair';
-import type { ElevatorInstance } from '@interfaces/elevator';
-import type { PortalInstance } from '@interfaces/portal';
 import type { MerchantState } from '@interfaces/merchant';
 import type { VictoryProgress } from '@interfaces/victory';
 
@@ -38,9 +35,6 @@ export interface GameStateWorld {
   prisoners: CapturedPrisoner[];
   invasionSchedule: InvasionSchedule;
   corruptionEffects: CorruptionEffectState;
-  stairs: StairInstance[];
-  elevators: ElevatorInstance[];
-  portals: PortalInstance[];
   victoryProgress: VictoryProgress;
   merchant: MerchantState;
 }

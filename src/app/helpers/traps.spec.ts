@@ -118,9 +118,6 @@ function makeTile(overrides: Partial<GridTile> = {}): GridTile {
     occupiedBy: 'empty',
     roomId: undefined,
     hallwayId: undefined,
-    stairId: undefined,
-    elevatorId: undefined,
-    portalId: undefined,
     connectionType: undefined,
     ...overrides,
   };

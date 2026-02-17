@@ -217,9 +217,66 @@
         <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
       }
 
+      <!-- Transport-specific info -->
+      @if (transportInfo(); as tInfo) {
+        <div class="divider my-2 text-xs opacity-60">Transport</div>
+        @if (tInfo.type === 'stair') {
+          <div class="text-xs">
+            <span class="opacity-50">Connects to:</span>
+            @for (depth of tInfo.connectedFloors; track depth) {
+              <span class="badge badge-sm badge-outline ml-1">Floor {{ depth }}</span>
+            }
+          </div>
+        }
+        @if (tInfo.type === 'elevator') {
+          <div class="text-xs mb-2">
+            <span class="opacity-50">Elevator shaft:</span>
+            @for (depth of tInfo.connectedFloors; track depth) {
+              <span class="badge badge-sm badge-outline ml-1">F{{ depth }}</span>
+            }
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn-xs btn-outline btn-success flex-1" (click)="onExtendElevator('up')">Extend Up</button>
+            <button class="btn btn-xs btn-outline btn-success flex-1" (click)="onExtendElevator('down')">Extend Down</button>
+          </div>
+          @if (tInfo.connectedFloors.length > 2) {
+            <div class="flex gap-1 mt-1">
+              <button class="btn btn-xs btn-outline btn-warning flex-1" (click)="onShrinkElevator(tInfo.connectedFloors[0])">Shrink Top (F{{ tInfo.connectedFloors[0] }})</button>
+              <button class="btn btn-xs btn-outline btn-warning flex-1" (click)="onShrinkElevator(tInfo.connectedFloors[tInfo.connectedFloors.length - 1])">Shrink Bottom (F{{ tInfo.connectedFloors[tInfo.connectedFloors.length - 1] }})</button>
+            </div>
+          }
+        }
+        @if (tInfo.type === 'portal') {
+          <div class="text-xs">
+            <span class="opacity-50">Portal to:</span>
+            @for (depth of tInfo.connectedFloors; track depth) {
+              <span class="badge badge-sm badge-outline ml-1">Floor {{ depth }}</span>
+            }
+          </div>
+        }
+      }
+
       <div class="divider my-1"></div>
 
-      @if (canRemoveRoom()) {
+      @if (transportInfo()) {
+        <button
+          class="btn btn-sm btn-error btn-outline w-full"
+          [swal]="removeSwal"
+        >
+          Remove Transport
+        </button>
+
+        <swal
+          #removeSwal
+          title="Remove Transport?"
+          text="All connected transport rooms in this group will be removed."
+          icon="warning"
+          confirmButtonText="Yes, remove"
+          cancelButtonText="No, cancel"
+          [showCancelButton]="true"
+          (confirm)="onRemoveTransport()"
+        ></swal>
+      } @else if (canRemoveRoom()) {
         <button
           class="btn btn-sm btn-error btn-outline w-full"
           [swal]="removeSwal"

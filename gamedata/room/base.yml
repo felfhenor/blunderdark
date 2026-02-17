@@ -1146,3 +1146,59 @@
       effects:
         - type: fearIncrease
           value: 1
+
+- id: deaaa1f1-07c8-47df-b165-e63b21898e42
+  name: Stairway
+  description: A narrow stone staircase connecting two adjacent floors. Inhabitants traverse it in about one minute per floor.
+  shapeId: Square 1x1
+  cost:
+    crystals: 20
+  production: {}
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: false
+  removable: true
+  autoPlace: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  inhabitantRestriction: null
+  fearLevel: 0
+  role: stair
+
+- id: 02d01c66-0ba4-4b82-8ce8-e801e798e731
+  name: Elevator Shaft
+  description: A mechanical lift system that rapidly transports inhabitants between floors. Faster than stairs and can span multiple floors.
+  shapeId: Square 1x1
+  cost:
+    crystals: 50
+    flux: 20
+  production: {}
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: false
+  removable: true
+  autoPlace: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  inhabitantRestriction: null
+  fearLevel: 0
+  role: elevator
+
+- id: 2c382a21-53f8-4667-a7b9-38e900d84761
+  name: Portal
+  description: A magical gateway that instantly teleports inhabitants between two locations on different floors. Requires flux and essence to construct.
+  shapeId: Square 1x1
+  cost:
+    flux: 100
+    essence: 30
+  production: {}
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: false
+  removable: true
+  autoPlace: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  inhabitantRestriction: null
+  fearLevel: 0
+  role: portal

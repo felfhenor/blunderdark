@@ -20,10 +20,6 @@ import {
   cameraUpdateViewport,
   cameraZoomAt,
   corruptionLevel,
-  elevatorGetOnFloor,
-  elevatorPlacementActive,
-  elevatorPlacementExecute,
-  elevatorPlacementExit,
   featureGetForSlot,
   featureGetSlotCount,
   floorCurrent,
@@ -38,12 +34,6 @@ import {
   hallwayPlacementSourceTile,
   inhabitantAll,
   notifyError,
-  portalGetOnFloor,
-  portalPlacementActive,
-  portalPlacementExecute,
-  portalPlacementExit,
-  portalPlacementSetSource,
-  portalPlacementStep,
   productionGetRoomDefinition,
   roomPlacementClearPreviewPosition,
   roomPlacementExecute,
@@ -53,12 +43,19 @@ import {
   roomPlacementRotate,
   roomPlacementUpdatePreviewPosition,
   roomUpgradeGetEffectiveMaxInhabitants,
-  stairGetOnFloor,
-  stairPlacementActive,
-  stairPlacementExecute,
-  stairPlacementExit,
   uiIsAnyModalOpen,
+  verticalTransportGetGroupsOnFloor,
 } from '@helpers';
+import {
+  transportPlacementActive,
+  transportPlacementType,
+  transportPlacementExit,
+  transportStairExecute,
+  transportElevatorExecute,
+  transportPortalExecute,
+  transportPortalSetSource,
+  transportPortalStep,
+} from '@helpers/transport-placement';
 import { gridCreateEmpty } from '@helpers/grid';
 import { gamestate } from '@helpers/state-game';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -559,37 +556,36 @@ export class GridComponent implements AfterViewInit {
       this.wasDragging = false;
       return;
     }
-    if (portalPlacementActive()) {
-      const step = portalPlacementStep();
-      if (step === 'selectSource') {
-        const floor = floorCurrent();
-        if (floor) {
-          const tile = floor.grid[y]?.[x];
-          if (tile?.occupied) {
-            notifyError('Tile is occupied');
-          } else {
-            portalPlacementSetSource(x, y, floor.depth);
+    if (transportPlacementActive()) {
+      const type = transportPlacementType();
+      if (type === 'portal') {
+        const step = transportPortalStep();
+        if (step === 'selectSource') {
+          const floor = floorCurrent();
+          if (floor) {
+            const tile = floor.grid[y]?.[x];
+            if (tile?.occupied) {
+              notifyError('Tile is occupied');
+            } else {
+              transportPortalSetSource(x, y, floor.depth);
+            }
+          }
+        } else {
+          const result = await transportPortalExecute(x, y);
+          if (!result.success && result.error) {
+            notifyError(result.error);
           }
         }
-      } else {
-        const result = await portalPlacementExecute(x, y);
+      } else if (type === 'elevator') {
+        const result = await transportElevatorExecute(x, y);
         if (!result.success && result.error) {
           notifyError(result.error);
         }
-      }
-      return;
-    }
-    if (elevatorPlacementActive()) {
-      const result = await elevatorPlacementExecute(x, y);
-      if (!result.success && result.error) {
-        notifyError(result.error);
-      }
-      return;
-    }
-    if (stairPlacementActive()) {
-      const result = await stairPlacementExecute(x, y);
-      if (!result.success && result.error) {
-        notifyError(result.error);
+      } else if (type === 'stair') {
+        const result = await transportStairExecute(x, y);
+        if (!result.success && result.error) {
+          notifyError(result.error);
+        }
       }
       return;
     }
@@ -625,60 +621,23 @@ export class GridComponent implements AfterViewInit {
   }
 
   public isHallwayMode = hallwayPlacementIsBuildMode;
-  public isStairMode = stairPlacementActive;
-  public isElevatorMode = elevatorPlacementActive;
-  public isPortalMode = portalPlacementActive;
-  public portalStep = portalPlacementStep;
+  public isTransportMode = transportPlacementActive;
+  public transportType = transportPlacementType;
+  public portalStep = transportPortalStep;
   private hallwayPathSet = hallwayPlacementPreviewTileSet;
 
-  public stairTileMap = computed(() => {
+  public transportTileMap = computed(() => {
     const floor = floorCurrent();
-    if (!floor)
-      return new Map<
-        string,
-        { direction: 'up' | 'down'; connectsToDepth: number }
-      >();
+    if (!floor) return new Map<string, { type: string; connectsToFloors: number[] }>();
 
-    const stairs = stairGetOnFloor(gamestate().world.stairs, floor.depth);
-    const map = new Map<
-      string,
-      { direction: 'up' | 'down'; connectsToDepth: number }
-    >();
+    const state = gamestate();
+    const groups = verticalTransportGetGroupsOnFloor(state.world.floors, floor.depth);
+    const map = new Map<string, { type: string; connectsToFloors: number[] }>();
 
-    for (const stair of stairs) {
-      const direction = stair.floorDepthA === floor.depth ? 'down' : 'up';
-      const connectsToDepth =
-        stair.floorDepthA === floor.depth
-          ? stair.floorDepthB
-          : stair.floorDepthA;
-      map.set(`${stair.gridX},${stair.gridY}`, { direction, connectsToDepth });
-    }
-
-    return map;
-  });
-
-  public getStairInfo(
-    x: number,
-    y: number,
-  ): { direction: 'up' | 'down'; connectsToDepth: number } | undefined {
-    return this.stairTileMap().get(`${x},${y}`);
-  }
-
-  public elevatorTileMap = computed(() => {
-    const floor = floorCurrent();
-    if (!floor) return new Map<string, { connectsToFloors: number[] }>();
-
-    const elevators = elevatorGetOnFloor(
-      gamestate().world.elevators,
-      floor.depth,
-    );
-    const map = new Map<string, { connectsToFloors: number[] }>();
-
-    for (const elevator of elevators) {
-      const otherFloors = elevator.connectedFloors.filter(
-        (d) => d !== floor.depth,
-      );
-      map.set(`${elevator.gridX},${elevator.gridY}`, {
+    for (const { room, groupFloors } of groups) {
+      const otherFloors = groupFloors.filter((d) => d !== floor.depth);
+      map.set(`${room.anchorX},${room.anchorY}`, {
+        type: room.transportType!,
         connectsToFloors: otherFloors,
       });
     }
@@ -686,35 +645,11 @@ export class GridComponent implements AfterViewInit {
     return map;
   });
 
-  public getElevatorInfo(
+  public getTransportInfo(
     x: number,
     y: number,
-  ): { connectsToFloors: number[] } | undefined {
-    return this.elevatorTileMap().get(`${x},${y}`);
-  }
-
-  public portalTileMap = computed(() => {
-    const floor = floorCurrent();
-    if (!floor) return new Map<string, { connectsToDepth: number }>();
-
-    const portals = portalGetOnFloor(gamestate().world.portals, floor.depth);
-    const map = new Map<string, { connectsToDepth: number }>();
-
-    for (const portal of portals) {
-      const isA = portal.floorDepthA === floor.depth;
-      const pos = isA ? portal.positionA : portal.positionB;
-      const connectsToDepth = isA ? portal.floorDepthB : portal.floorDepthA;
-      map.set(`${pos.x},${pos.y}`, { connectsToDepth });
-    }
-
-    return map;
-  });
-
-  public getPortalInfo(
-    x: number,
-    y: number,
-  ): { connectsToDepth: number } | undefined {
-    return this.portalTileMap().get(`${x},${y}`);
+  ): { type: string; connectsToFloors: number[] } | undefined {
+    return this.transportTileMap().get(`${x},${y}`);
   }
 
   public featureIndicatorMap = computed(() => {
@@ -769,15 +704,9 @@ export class GridComponent implements AfterViewInit {
   }
 
   public onRightClick(event: MouseEvent): void {
-    if (portalPlacementActive()) {
+    if (transportPlacementActive()) {
       event.preventDefault();
-      portalPlacementExit();
-    } else if (elevatorPlacementActive()) {
-      event.preventDefault();
-      elevatorPlacementExit();
-    } else if (stairPlacementActive()) {
-      event.preventDefault();
-      stairPlacementExit();
+      transportPlacementExit();
     } else if (hallwayPlacementIsBuildMode()) {
       event.preventDefault();
       hallwayPlacementExit();
@@ -795,12 +724,8 @@ export class GridComponent implements AfterViewInit {
 
   public onEscapeKey(): void {
     if (uiIsAnyModalOpen()) return;
-    if (portalPlacementActive()) {
-      portalPlacementExit();
-    } else if (elevatorPlacementActive()) {
-      elevatorPlacementExit();
-    } else if (stairPlacementActive()) {
-      stairPlacementExit();
+    if (transportPlacementActive()) {
+      transportPlacementExit();
     } else if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {

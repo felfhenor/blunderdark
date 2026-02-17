@@ -40,7 +40,16 @@ import {
   resourcePayCost,
   updateGamestate,
   gamestate,
+  verticalTransportGetGroupsOnFloor,
 } from '@helpers';
+import {
+  transportRemovalGetInfo,
+  transportRemovalExecute,
+} from '@helpers/transport-removal';
+import {
+  transportElevatorExtendExecute,
+  transportElevatorShrinkExecute,
+} from '@helpers/transport-placement';
 import type { PlacedRoomId } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -82,6 +91,65 @@ export class PanelRoomInfoComponent {
       maxInhabitants: effectiveMax,
     };
   });
+
+  public transportInfo = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+    const placedRoom = room.placedRoom;
+    if (!placedRoom.transportType || !placedRoom.transportGroupId) return undefined;
+
+    const state = gamestate();
+    const groups = verticalTransportGetGroupsOnFloor(state.world.floors, floorCurrent()?.depth ?? 0);
+    const group = groups.find((g) => g.room.id === placedRoom.id);
+
+    return {
+      type: placedRoom.transportType,
+      groupId: placedRoom.transportGroupId,
+      connectedFloors: group?.groupFloors ?? [],
+    };
+  });
+
+  public async onRemoveTransport(): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const result = await transportRemovalExecute(room.id);
+    if (result.success) {
+      notifySuccess(`${room.name} removed`);
+    } else {
+      notifyError(result.error ?? 'Failed to remove transport');
+    }
+  }
+
+  public transportRemovalInfo = computed(() => {
+    const room = this.selectedRoom();
+    if (!room?.placedRoom.transportType) return undefined;
+    return transportRemovalGetInfo(room.id);
+  });
+
+  public async onExtendElevator(direction: 'up' | 'down'): Promise<void> {
+    const info = this.transportInfo();
+    if (!info || info.type !== 'elevator') return;
+
+    const result = await transportElevatorExtendExecute(info.groupId, direction);
+    if (result.success) {
+      notifySuccess(`Elevator extended ${direction}`);
+    } else {
+      notifyError(result.error ?? 'Failed to extend elevator');
+    }
+  }
+
+  public async onShrinkElevator(floorDepth: number): Promise<void> {
+    const info = this.transportInfo();
+    if (!info || info.type !== 'elevator') return;
+
+    const result = await transportElevatorShrinkExecute(info.groupId, floorDepth);
+    if (result.success) {
+      notifySuccess(`Elevator floor removed`);
+    } else {
+      notifyError(result.error ?? 'Failed to shrink elevator');
+    }
+  }
 
   public assignedInhabitants = computed(() => {
     const room = this.selectedRoom();

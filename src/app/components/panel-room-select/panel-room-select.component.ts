@@ -27,21 +27,13 @@ import {
   roomPlacementSelectedTypeId,
   roomShapeGet,
   roomShapeGetRotated,
-  stairPlacementActive,
-  stairPlacementEnter,
-  stairPlacementExit,
-  STAIR_PLACEMENT_COST,
-  elevatorPlacementActive,
-  elevatorPlacementEnter,
-  elevatorPlacementExit,
-  ELEVATOR_PLACEMENT_COST_CRYSTALS,
-  ELEVATOR_PLACEMENT_COST_FLUX,
-  portalPlacementActive,
-  portalPlacementEnter,
-  portalPlacementExit,
-  PORTAL_PLACEMENT_COST_FLUX,
-  PORTAL_PLACEMENT_COST_ESSENCE,
 } from '@helpers';
+import {
+  transportPlacementActive,
+  transportPlacementType,
+  transportPlacementEnter,
+  transportPlacementExit,
+} from '@helpers/transport-placement';
 import type { ResourceType, RoomId, RoomShapeContent } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -55,10 +47,11 @@ import { sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelRoomSelectComponent {
+  private readonly TRANSPORT_ROLES = new Set(['stair', 'elevator', 'portal']);
   public rooms = computed(() =>
     sortBy(
       contentGetEntriesByType<RoomContent>('room').filter(
-        (r) => !r.autoPlace && !this.isResearchLocked(r),
+        (r) => !r.autoPlace && !this.isResearchLocked(r) && !this.TRANSPORT_ROLES.has(r.role ?? ''),
       ),
       ['name'],
     ),
@@ -201,50 +194,43 @@ export class PanelRoomSelectComponent {
 
   public hasMultipleFloors = computed(() => floorAll().length >= 2);
 
-  public isStairModeActive = stairPlacementActive;
-  public stairCost = STAIR_PLACEMENT_COST;
+  public isTransportActive = transportPlacementActive;
+  public activeTransportType = transportPlacementType;
 
-  public isElevatorModeActive = elevatorPlacementActive;
   public isElevatorUnlocked = computed(() =>
     researchUnlockIsFeatureUnlocked('elevators'),
   );
-  public elevatorCostCrystals = ELEVATOR_PLACEMENT_COST_CRYSTALS;
-  public elevatorCostFlux = ELEVATOR_PLACEMENT_COST_FLUX;
-
-  public isPortalModeActive = portalPlacementActive;
   public isPortalUnlocked = computed(() =>
     researchUnlockIsFeatureUnlocked('portals'),
   );
-  public portalCostFlux = PORTAL_PLACEMENT_COST_FLUX;
-  public portalCostEssence = PORTAL_PLACEMENT_COST_ESSENCE;
 
-  public toggleStairMode(direction: 'up' | 'down'): void {
-    if (stairPlacementActive()) {
-      stairPlacementExit();
-    } else {
-      elevatorPlacementExit();
-      portalPlacementExit();
-      stairPlacementEnter(direction);
-    }
+  private transportRoomDefs = computed(() => {
+    const allRooms = contentGetEntriesByType<RoomContent>('room');
+    return {
+      stair: allRooms.find((r) => r.role === 'stair'),
+      elevator: allRooms.find((r) => r.role === 'elevator'),
+      portal: allRooms.find((r) => r.role === 'portal'),
+    };
+  });
+
+  public stairCostEntries = computed(() => this.getCostEntriesForRole('stair'));
+  public elevatorCostEntries = computed(() => this.getCostEntriesForRole('elevator'));
+  public portalCostEntries = computed(() => this.getCostEntriesForRole('portal'));
+
+  private getCostEntriesForRole(role: string): { type: ResourceType; amount: number }[] {
+    const defs = this.transportRoomDefs();
+    const def = defs[role as keyof typeof defs];
+    if (!def) return [];
+    return Object.entries(def.cost)
+      .filter(([, amount]) => amount && amount > 0)
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
   }
 
-  public toggleElevatorMode(): void {
-    if (elevatorPlacementActive()) {
-      elevatorPlacementExit();
+  public toggleTransportMode(type: 'stair' | 'elevator' | 'portal'): void {
+    if (transportPlacementActive() && transportPlacementType() === type) {
+      transportPlacementExit();
     } else {
-      stairPlacementExit();
-      portalPlacementExit();
-      elevatorPlacementEnter();
-    }
-  }
-
-  public togglePortalMode(): void {
-    if (portalPlacementActive()) {
-      portalPlacementExit();
-    } else {
-      stairPlacementExit();
-      elevatorPlacementExit();
-      portalPlacementEnter();
+      transportPlacementEnter(type);
     }
   }
 }

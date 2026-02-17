@@ -39,53 +39,53 @@
       <div class="flex flex-col gap-2">
         <button
           class="btn btn-sm h-auto py-2 flex-col items-start gap-1"
-          [class.btn-active]="isStairModeActive()"
-          (click)="toggleStairMode('down')"
+          [class.btn-active]="isTransportActive() && activeTransportType() === 'stair'"
+          (click)="toggleTransportMode('stair')"
         >
           <div class="flex items-center gap-2 w-full">
-            <span class="flex-1 text-left text-xs font-semibold">{{ isStairModeActive() ? 'Cancel Stairs' : 'Stairs' }}</span>
+            <span class="flex-1 text-left text-xs font-semibold">{{ isTransportActive() && activeTransportType() === 'stair' ? 'Cancel Stairs' : 'Stairs' }}</span>
           </div>
           <div class="cost-row flex gap-2 w-full">
-            <span class="text-xs opacity-70">
-              <app-currency-name type="crystals" [short]="true" [amount]="stairCost" />
-            </span>
+            @for (cost of stairCostEntries(); track cost.type) {
+              <span class="text-xs opacity-70">
+                <app-currency-name [type]="cost.type" [short]="true" [amount]="cost.amount" />
+              </span>
+            }
           </div>
         </button>
         @if (isElevatorUnlocked()) {
           <button
             class="btn btn-sm h-auto py-2 flex-col items-start gap-1"
-            [class.btn-active]="isElevatorModeActive()"
-            (click)="toggleElevatorMode()"
+            [class.btn-active]="isTransportActive() && activeTransportType() === 'elevator'"
+            (click)="toggleTransportMode('elevator')"
           >
             <div class="flex items-center gap-2 w-full">
-              <span class="flex-1 text-left text-xs font-semibold">{{ isElevatorModeActive() ? 'Cancel Elevator' : 'Elevator' }}</span>
+              <span class="flex-1 text-left text-xs font-semibold">{{ isTransportActive() && activeTransportType() === 'elevator' ? 'Cancel Elevator' : 'Elevator' }}</span>
             </div>
             <div class="cost-row flex gap-2 w-full">
-              <span class="text-xs opacity-70">
-                <app-currency-name type="crystals" [short]="true" [amount]="elevatorCostCrystals" />
-              </span>
-              <span class="text-xs opacity-70">
-                <app-currency-name type="flux" [short]="true" [amount]="elevatorCostFlux" />
-              </span>
+              @for (cost of elevatorCostEntries(); track cost.type) {
+                <span class="text-xs opacity-70">
+                  <app-currency-name [type]="cost.type" [short]="true" [amount]="cost.amount" />
+                </span>
+              }
             </div>
           </button>
         }
         @if (isPortalUnlocked()) {
           <button
             class="btn btn-sm h-auto py-2 flex-col items-start gap-1"
-            [class.btn-active]="isPortalModeActive()"
-            (click)="togglePortalMode()"
+            [class.btn-active]="isTransportActive() && activeTransportType() === 'portal'"
+            (click)="toggleTransportMode('portal')"
           >
             <div class="flex items-center gap-2 w-full">
-              <span class="flex-1 text-left text-xs font-semibold">{{ isPortalModeActive() ? 'Cancel Portal' : 'Portal' }}</span>
+              <span class="flex-1 text-left text-xs font-semibold">{{ isTransportActive() && activeTransportType() === 'portal' ? 'Cancel Portal' : 'Portal' }}</span>
             </div>
             <div class="cost-row flex gap-2 w-full">
-              <span class="text-xs opacity-70">
-                <app-currency-name type="flux" [short]="true" [amount]="portalCostFlux" />
-              </span>
-              <span class="text-xs opacity-70">
-                <app-currency-name type="essence" [short]="true" [amount]="portalCostEssence" />
-              </span>
+              @for (cost of portalCostEntries(); track cost.type) {
+                <span class="text-xs opacity-70">
+                  <app-currency-name [type]="cost.type" [short]="true" [amount]="cost.amount" />
+                </span>
+              }
             </div>
           </button>
         }

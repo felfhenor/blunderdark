@@ -9,9 +9,6 @@ export function gridCreateEmpty(): GridState {
       occupiedBy: 'empty' as const,
       roomId: undefined,
       hallwayId: undefined,
-      stairId: undefined,
-      elevatorId: undefined,
-      portalId: undefined,
       connectionType: undefined,
     })),
   );

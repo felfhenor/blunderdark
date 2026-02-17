@@ -11,9 +11,7 @@
     class="grid-container"
     [class.camera-animating]="cameraIsAnimating()"
     [class.hallway-mode]="isHallwayMode()"
-    [class.stair-mode]="isStairMode()"
-    [class.elevator-mode]="isElevatorMode()"
-    [class.portal-mode]="isPortalMode()"
+    [class.transport-mode]="isTransportMode()"
     [class]="'corruption-' + corruptionLevel()"
     [style.transform]="cameraTransform()"
     (mouseleave)="onGridLeave()"
@@ -25,11 +23,10 @@
           class="grid-tile"
           [class.occupied]="tile.occupied"
           [class.room-tile]="tile.roomId"
-          [class.stair-tile]="tile.stairId"
-          [class.stair-up]="getStairInfo(colIdx, rowIdx)?.direction === 'up'"
-          [class.stair-down]="getStairInfo(colIdx, rowIdx)?.direction === 'down'"
-          [class.elevator-tile]="tile.elevatorId"
-          [class.portal-tile]="tile.portalId"
+          [class.transport-tile]="getTransportInfo(colIdx, rowIdx)"
+          [class.stair-tile]="getTransportInfo(colIdx, rowIdx)?.type === 'stair'"
+          [class.elevator-tile]="getTransportInfo(colIdx, rowIdx)?.type === 'elevator'"
+          [class.portal-tile]="getTransportInfo(colIdx, rowIdx)?.type === 'portal'"
           [class.selected]="isSelected(colIdx, rowIdx)"
           [class.preview-valid]="isPreviewValid(colIdx, rowIdx)"
           [class.preview-invalid]="isPreviewInvalid(colIdx, rowIdx)"
@@ -42,7 +39,7 @@
           (click)="onTileClick(colIdx, rowIdx)"
           (mouseenter)="onTileHover(colIdx, rowIdx)"
         >
-          @if (isRoomAnchor(colIdx, rowIdx, tile.roomId)) {
+          @if (isRoomAnchor(colIdx, rowIdx, tile.roomId) && !getTransportInfo(colIdx, rowIdx)) {
             <span class="room-label" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)">{{ getRoomName(tile.roomId) }}@if (getAssignmentInfo(tile.roomId); as info) {<span class="assignment-inline" [class.status-full]="info.status === 'full'" [class.status-partial]="info.status === 'partial'" [class.status-empty]="info.status === 'empty'"> ({{ info.current | number:'1.0-2' }}/{{ info.max === -1 ? '\u221E' : info.max }})</span>}</span>
             <app-fear-indicator class="fear-grid-badge" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)" [roomId]="tile.roomId!" />
             @if (getFeatureInfo(tile.roomId); as fInfo) {
@@ -82,23 +79,25 @@
               <div class="doorway doorway-left"></div>
             }
           }
-          @if (getStairInfo(colIdx, rowIdx); as stairInfo) {
-            <div class="stair-indicator">
-              <span class="stair-arrow">{{ stairInfo.direction === 'up' ? '&#9650;' : '&#9660;' }}</span>
-              <span class="stair-label">F{{ stairInfo.connectsToDepth | number:'1.0-2' }}</span>
-            </div>
-          }
-          @if (getElevatorInfo(colIdx, rowIdx); as elevInfo) {
-            <div class="elevator-indicator">
-              <span class="elevator-icon">&#8661;</span>
-              <span class="elevator-label">F{{ elevInfo.connectsToFloors.join(',') }}</span>
-            </div>
-          }
-          @if (getPortalInfo(colIdx, rowIdx); as portalInfo) {
-            <div class="portal-indicator">
-              <span class="portal-icon">&#10022;</span>
-              <span class="portal-label">F{{ portalInfo.connectsToDepth | number:'1.0-2' }}</span>
-            </div>
+          @if (getTransportInfo(colIdx, rowIdx); as tInfo) {
+            @if (tInfo.type === 'stair') {
+              <div class="stair-indicator">
+                <span class="stair-arrow">{{ tInfo.connectsToFloors[0] > 0 ? '&#9660;' : '&#9650;' }}</span>
+                <span class="stair-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+              </div>
+            }
+            @if (tInfo.type === 'elevator') {
+              <div class="elevator-indicator">
+                <span class="elevator-icon">&#8661;</span>
+                <span class="elevator-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+              </div>
+            }
+            @if (tInfo.type === 'portal') {
+              <div class="portal-indicator">
+                <span class="portal-icon">&#10022;</span>
+                <span class="portal-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+              </div>
+            }
           }
         </div>
       }

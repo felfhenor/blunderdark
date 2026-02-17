@@ -862,9 +862,6 @@ function roomTile(roomId: string): GridTile {
     occupiedBy: 'room',
     roomId: roomId as PlacedRoomId,
     hallwayId: undefined,
-    stairId: undefined,
-    elevatorId: undefined,
-    portalId: undefined,
     connectionType: undefined,
   };
 }
@@ -875,9 +872,6 @@ function hallwayTile(hallwayId: string): GridTile {
     occupiedBy: 'hallway',
     roomId: undefined,
     hallwayId: hallwayId as HallwayId,
-    stairId: undefined,
-    elevatorId: undefined,
-    portalId: undefined,
     connectionType: undefined,
   };
 }

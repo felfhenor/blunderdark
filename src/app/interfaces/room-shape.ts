@@ -9,6 +9,8 @@ import type { PrisonerId } from '@interfaces/invasion';
 import type { UpgradePathId } from '@interfaces/room';
 
 export type PlacedRoomId = Branded<string, 'PlacedRoomId'>;
+export type TransportType = 'stair' | 'elevator' | 'portal';
+export type TransportGroupId = Branded<string, 'TransportGroupId'>;
 
 export type TileOffset = {
   x: number;
@@ -69,4 +71,6 @@ export type PlacedRoom = {
   maintenanceActive?: boolean;
   phylacteryCharges?: number;
   voidGateLastSummonDay?: number;
+  transportType?: TransportType;
+  transportGroupId?: TransportGroupId;
 };
