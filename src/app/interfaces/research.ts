@@ -33,12 +33,18 @@ export type PassiveBonusUnlock = {
   description: string;
 };
 
+export type FeatureFlagUnlock = {
+  type: 'feature_flag';
+  featureFlag: string;
+};
+
 export type UnlockEffect =
   | RoomUnlock
   | InhabitantUnlock
   | AbilityUnlock
   | UpgradeUnlock
-  | PassiveBonusUnlock;
+  | PassiveBonusUnlock
+  | FeatureFlagUnlock;
 
 export type UnlockedContent = {
   rooms: RoomId[];
@@ -46,6 +52,7 @@ export type UnlockedContent = {
   abilities: CombatAbilityId[];
   upgrades: UpgradePathId[];
   passiveBonuses: { bonusType: string; value: number; description: string }[];
+  featureFlags: string[];
 };
 
 export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
@@ -59,6 +66,7 @@ export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
     case 'upgrade':
       return unlock.targetUpgradepathId;
     case 'passive_bonus':
+    case 'feature_flag':
       return undefined;
   }
 }

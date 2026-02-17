@@ -10,6 +10,8 @@
 #   ├── Trap Design (T2)
 #   │   └── Automated Defenses (T3)
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
+#   ├── Elevator Action (T2)
+#   ├── Teleporters (T4) [Master Architecture]
 #   └── Advanced Manufacturing (T2)
 #       └── Dark Forge Mastery (T3)
 #           └── Golem Assembly (T4) [+Master Architecture]
@@ -50,6 +52,21 @@
       targetRoomId: Trap Workshop
     - type: room
       targetRoomId: Training Grounds
+  tier: 2
+  requiredTicks: 150
+
+- id: a3f17c82-6d4e-4b91-9a53-2e8f0c7d1b64
+  name: Elevator Action
+  description: Engineer vertical transport systems that move inhabitants between floors far more efficiently than stairs.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Basic Engineering
+  unlocks:
+    - type: feature_flag
+      featureFlag: elevators
   tier: 2
   requiredTicks: 150
 
@@ -139,6 +156,22 @@
   requiredTicks: 300
 
 # --- TIER 4: Advanced combinations ---
+
+- id: d7b42e19-3a8f-4c65-b1d0-9e6f5a2c8d73
+  name: Teleporters
+  description: Master the spatial folding techniques required to create portal gateways that instantly transport inhabitants across vast distances.
+  branch: engineering
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Master Architecture
+  unlocks:
+    - type: feature_flag
+      featureFlag: portals
+  tier: 4
+  requiredTicks: 500
 
 - id: 127df468-753f-47a9-ab98-ab8b212cac69
   name: Siege Works

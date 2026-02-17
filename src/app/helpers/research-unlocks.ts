@@ -61,6 +61,17 @@ export function researchUnlockGetPassiveBonuses(
 }
 
 /**
+ * Check if a feature flag is unlocked via research.
+ */
+export function researchUnlockIsFeatureUnlocked(
+  featureFlag: string,
+  unlockedContent?: UnlockedContent,
+): boolean {
+  const content = unlockedContent ?? gamestate().world.research.unlockedContent;
+  return (content.featureFlags ?? []).includes(featureFlag);
+}
+
+/**
  * Computed signal for unlocked content.
  */
 export const researchUnlockedContent = computed<UnlockedContent>(() => {
@@ -117,6 +128,7 @@ export function researchUnlockApplyEffects(
     abilities: [...current.abilities],
     upgrades: [...current.upgrades],
     passiveBonuses: [...current.passiveBonuses],
+    featureFlags: [...(current.featureFlags ?? [])],
   };
 
   for (const unlock of unlocks) {
@@ -156,6 +168,11 @@ export function researchUnlockApplyEffects(
             description: unlock.description,
           },
         ];
+        break;
+      case 'feature_flag':
+        if (!result.featureFlags.includes(unlock.featureFlag)) {
+          result.featureFlags = [...result.featureFlags, unlock.featureFlag];
+        }
         break;
     }
   }

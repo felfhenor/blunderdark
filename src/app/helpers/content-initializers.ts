@@ -6,6 +6,7 @@ import type {
   BreedingRecipeId,
   CompositionWeightConfig,
   ContentType,
+  FeatureFlagUnlock,
   ForgeRecipeContent,
   ForgeRecipeId,
   FusionRecipeContent,
@@ -258,6 +259,12 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
         targetUpgradepathId:
           (effect as Partial<UpgradeUnlock>).targetUpgradepathId ??
           ('' as UpgradePathId),
+      };
+    case 'feature_flag':
+      return {
+        type: 'feature_flag',
+        featureFlag:
+          (effect as Partial<FeatureFlagUnlock>).featureFlag ?? '',
       };
   }
 }

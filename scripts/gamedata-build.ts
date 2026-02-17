@@ -249,6 +249,12 @@ const validateResearchTree = () => {
         }
         return;
       }
+      if (unlock.type === 'feature_flag') {
+        if (!unlock.featureFlag) {
+          errors.push(`Node "${node.name}" unlock[${idx}] feature_flag is missing "featureFlag"`);
+        }
+        return;
+      }
       const targetFieldMap: Record<string, string> = {
         room: 'targetRoomId',
         inhabitant: 'targetInhabitantId',

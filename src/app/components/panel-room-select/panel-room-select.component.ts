@@ -15,6 +15,7 @@ import {
   hallwayPlacementPreviewCost,
   hallwayPlacementPreviewPath,
   hallwayPlacementStatusMessage,
+  researchUnlockIsFeatureUnlocked,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   resourceCanAfford,
@@ -204,10 +205,16 @@ export class PanelRoomSelectComponent {
   public stairCost = STAIR_PLACEMENT_COST;
 
   public isElevatorModeActive = elevatorPlacementActive;
+  public isElevatorUnlocked = computed(() =>
+    researchUnlockIsFeatureUnlocked('elevators'),
+  );
   public elevatorCostCrystals = ELEVATOR_PLACEMENT_COST_CRYSTALS;
   public elevatorCostFlux = ELEVATOR_PLACEMENT_COST_FLUX;
 
   public isPortalModeActive = portalPlacementActive;
+  public isPortalUnlocked = computed(() =>
+    researchUnlockIsFeatureUnlocked('portals'),
+  );
   public portalCostFlux = PORTAL_PLACEMENT_COST_FLUX;
   public portalCostEssence = PORTAL_PLACEMENT_COST_ESSENCE;
 

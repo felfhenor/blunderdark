@@ -94,6 +94,7 @@ export function defaultUnlockedContent(): UnlockedContent {
     abilities: [],
     upgrades: [],
     passiveBonuses: [],
+    featureFlags: [],
   };
 }
 
