@@ -11,6 +11,7 @@
   removable: false
   autoPlace: true
   maxInhabitants: 0
+  maxFeatures: 1
   inhabitantRestriction: null
   fearLevel: 0
   fearReductionAura: 1
@@ -64,6 +65,7 @@
   adjacencyBonuses: []
   isUnique: true
   maxInhabitants: 1
+  maxFeatures: 4
   inhabitantRestriction: unique
   fearLevel: variable
   role: throne
@@ -78,6 +80,7 @@
     crystals: 1.0
   requiresWorkers: true
   maxInhabitants: 2
+  maxFeatures: 1
   fearLevel: 1
   timeOfDayBonus:
     period: day
@@ -158,6 +161,7 @@
     food: 1.6
   requiresWorkers: true
   maxInhabitants: 3
+  maxFeatures: 1
   fearLevel: 1
   timeOfDayBonus:
     period: day
@@ -231,6 +235,7 @@
     corruption: 0.2
   requiresWorkers: true
   maxInhabitants: 1
+  maxFeatures: 2
   fearLevel: 2
   timeOfDayBonus:
     period: night
@@ -323,6 +328,7 @@
     corruption: 0.4
   requiresWorkers: false
   maxInhabitants: 2
+  maxFeatures: 2
   fearLevel: 3
   timeOfDayBonus:
     period: night
@@ -407,6 +413,7 @@
     gold: 1.2
   requiresWorkers: true
   maxInhabitants: 2
+  maxFeatures: 1
   fearLevel: 2
   biomeBonuses:
     volcanic: 0.50
@@ -450,6 +457,7 @@
     food: 1.0
   requiresWorkers: true
   maxInhabitants: 3
+  maxFeatures: 3
   fearLevel: 0
   biomeBonuses:
     flooded: 0.50
@@ -509,6 +517,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 6
+  maxFeatures: 1
   fearLevel: 1
   role: barracks
   trainingAdjacencyEffects:
@@ -566,6 +575,7 @@
     gold: 0.8
   requiresWorkers: false
   maxInhabitants: 1
+  maxFeatures: 3
   fearLevel: 1
   invasionProfile:
     dimension: wealth
@@ -638,6 +648,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 4
+  maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 1
   forgingAdjacencyEffects:
@@ -691,6 +702,7 @@
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
   shapeId: T-Shape
+  maxFeatures: 1
   biomeBonuses:
     crystal: 0.10
   invasionProfile:
@@ -767,6 +779,7 @@
   isUnique: true
   removable: true
   maxInhabitants: 0
+  maxFeatures: 0
   fearLevel: 0
   adjacencyBonuses: []
   upgradePaths: []
@@ -782,6 +795,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 2
+  maxFeatures: 1
   inhabitantRestriction: null
   fearLevel: 2
   forgingAdjacencyEffects:
@@ -841,6 +855,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 2
+  maxFeatures: 1
   fearLevel: 1
   role: spawningPool
   spawnRate: 25
@@ -894,6 +909,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 4
+  maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 4
   role: breedingPits
@@ -944,6 +960,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 1
+  maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 3
   role: summoningCircle
@@ -997,6 +1014,7 @@
   production: {}
   requiresWorkers: true
   maxInhabitants: 1
+  maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 2
   role: alchemyLab
@@ -1050,6 +1068,7 @@
   production: {}
   requiresWorkers: false
   maxInhabitants: 0
+  maxFeatures: 0
   inhabitantRestriction: null
   fearLevel: 3
   isUnique: true
@@ -1074,6 +1093,7 @@
     corruption: 0.4
   requiresWorkers: true
   maxInhabitants: 1
+  maxFeatures: 1
   inhabitantRestriction: null
   fearLevel: 4
   role: tortureChamber

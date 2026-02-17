@@ -7,6 +7,7 @@ import type {
   FeatureId,
 } from '@interfaces/content-feature';
 import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { Floor } from '@interfaces/floor';
 import type {
   InhabitantInstance,
@@ -15,9 +16,7 @@ import type {
 import type { RoomProduction } from '@interfaces/room';
 import type { PlacedRoom, PlacedRoomId, SacrificeBuff } from '@interfaces/room-shape';
 
-export const FEATURE_SLOT_COUNT_SMALL = 2;
-export const FEATURE_SLOT_COUNT_LARGE = 3;
-export const FEATURE_SLOT_SIZE_THRESHOLD = 3;
+export const FEATURE_SLOT_COUNT_DEFAULT = 2;
 
 /**
  * Check if a unique feature is already placed anywhere in the dungeon.
@@ -39,13 +38,12 @@ export function featureIsUniquePlaced(
 }
 
 /**
- * Get the number of feature slots for a room based on its tile count.
- * Small rooms (1-2 tiles) get 2 slots; large rooms (3+ tiles) get 3 slots.
+ * Get the number of feature slots for a room based on its content definition.
+ * Uses the room's maxFeatures value, falling back to FEATURE_SLOT_COUNT_DEFAULT.
  */
-export function featureGetSlotCount(tileCount: number): number {
-  return tileCount < FEATURE_SLOT_SIZE_THRESHOLD
-    ? FEATURE_SLOT_COUNT_SMALL
-    : FEATURE_SLOT_COUNT_LARGE;
+export function featureGetSlotCount(placedRoom: PlacedRoom): number {
+  const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
+  return roomDef?.maxFeatures ?? FEATURE_SLOT_COUNT_DEFAULT;
 }
 
 /**

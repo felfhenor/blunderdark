@@ -53,8 +53,19 @@ describe('hallwayPlacementFindPointPath', () => {
     expect(path![3]).toEqual({ x: 6, y: 5 });
   });
 
-  it('should return undefined for same tile', () => {
+  it('should return a single-tile path when source and dest are the same empty tile', () => {
     const grid = gridCreateEmpty();
+
+    const path = hallwayPlacementFindPointPath(grid, { x: 3, y: 5 }, { x: 3, y: 5 });
+    expect(path).toBeDefined();
+    expect(path!.length).toBe(1);
+    expect(path![0]).toEqual({ x: 3, y: 5 });
+  });
+
+  it('should return undefined when source and dest are the same occupied tile', () => {
+    const grid = makeGridWithRooms([
+      { id: 'room-a', tiles: [{ x: 3, y: 5 }] },
+    ]);
 
     const path = hallwayPlacementFindPointPath(grid, { x: 3, y: 5 }, { x: 3, y: 5 });
     expect(path).toBeUndefined();

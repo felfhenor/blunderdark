@@ -66,8 +66,6 @@ export function hallwayPlacementHandleTileClick(x: number, y: number): void {
     hallwayPlacementSourceTile.set({ x, y });
     hallwayPlacementBuildStep.set('selectDestination');
   } else if (step === 'selectDestination' || step === 'preview') {
-    const source = hallwayPlacementSourceTile();
-    if (source && source.x === x && source.y === y) return;
     hallwayPlacementDestTile.set({ x, y });
     hallwayPlacementBuildStep.set('preview');
   }
@@ -111,7 +109,11 @@ export function hallwayPlacementFindPointPath(
   source: TileOffset,
   dest: TileOffset,
 ): TileOffset[] | undefined {
-  if (source.x === dest.x && source.y === dest.y) return undefined;
+  // Single-tile hallway: source and dest are the same empty tile
+  if (source.x === dest.x && source.y === dest.y) {
+    if (!grid[source.y]?.[source.x]?.occupied) return [{ x: source.x, y: source.y }];
+    return undefined;
+  }
 
   const sourceOccupied = grid[source.y]?.[source.x]?.occupied;
   const destOccupied = grid[dest.y]?.[dest.x]?.occupied;

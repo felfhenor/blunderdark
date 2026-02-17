@@ -52,7 +52,6 @@ import {
   roomPlacementPreviewShape,
   roomPlacementRotate,
   roomPlacementUpdatePreviewPosition,
-  roomShapeResolve,
   roomUpgradeGetEffectiveMaxInhabitants,
   stairGetOnFloor,
   stairPlacementActive,
@@ -731,8 +730,7 @@ export class GridComponent implements AfterViewInit {
       { occupied: number; total: number; names: string[] }
     >();
     for (const room of floor.rooms) {
-      const shape = roomShapeResolve(room);
-      const total = featureGetSlotCount(shape.tiles.length);
+      const total = featureGetSlotCount(room);
       let occupied = 0;
       const names: string[] = [];
       for (let i = 0; i < total; i++) {

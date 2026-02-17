@@ -31,9 +31,7 @@ import {
   featureSacrificeProcess,
   FEATURE_SACRIFICE_FOOD_COST,
   FEATURE_SACRIFICE_BUFF_TICKS,
-  FEATURE_SLOT_COUNT_SMALL,
-  FEATURE_SLOT_COUNT_LARGE,
-  FEATURE_SLOT_SIZE_THRESHOLD,
+  FEATURE_SLOT_COUNT_DEFAULT,
   featureHasFungalNetwork,
   featureGetFungalNetworkDestinations,
   featureCanFungalTransfer,
@@ -354,28 +352,16 @@ beforeEach(() => {
 });
 
 describe('featureGetSlotCount', () => {
-  it('returns 2 for 1-tile rooms', () => {
-    expect(featureGetSlotCount(1)).toBe(FEATURE_SLOT_COUNT_SMALL);
+  it('returns maxFeatures from room content definition', () => {
+    const room = makeRoom();
+    vi.mocked(contentGetEntry).mockReturnValue({ maxFeatures: 3 });
+    expect(featureGetSlotCount(room)).toBe(3);
   });
 
-  it('returns 2 for 2-tile rooms', () => {
-    expect(featureGetSlotCount(2)).toBe(FEATURE_SLOT_COUNT_SMALL);
-  });
-
-  it('returns 3 for 3-tile rooms', () => {
-    expect(featureGetSlotCount(3)).toBe(FEATURE_SLOT_COUNT_LARGE);
-  });
-
-  it('returns 3 for 4-tile rooms', () => {
-    expect(featureGetSlotCount(4)).toBe(FEATURE_SLOT_COUNT_LARGE);
-  });
-
-  it('returns 3 for 9-tile rooms', () => {
-    expect(featureGetSlotCount(9)).toBe(FEATURE_SLOT_COUNT_LARGE);
-  });
-
-  it('uses correct threshold', () => {
-    expect(FEATURE_SLOT_SIZE_THRESHOLD).toBe(3);
+  it('returns default when room content is not found', () => {
+    const room = makeRoom();
+    vi.mocked(contentGetEntry).mockReturnValue(undefined);
+    expect(featureGetSlotCount(room)).toBe(FEATURE_SLOT_COUNT_DEFAULT);
   });
 });
 

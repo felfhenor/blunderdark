@@ -21,6 +21,7 @@ export type RoomContent = IsContentItem &
     isUnique: boolean;
     removable: boolean;
     maxInhabitants: number;
+    maxFeatures: number;
     inhabitantRestriction: string | undefined;
     fearLevel: number | 'variable';
     fearReductionAura: number;

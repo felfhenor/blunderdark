@@ -30,7 +30,6 @@ import {
   fearLevelBreakdownMap,
   fearLevelGetLabel,
   FEAR_LEVEL_MAX,
-  roomShapeResolve,
   featureGetSlotCount,
   featureGetForSlot,
   featureAttachToSlot,
@@ -214,8 +213,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return [];
 
-    const shape = roomShapeResolve(room.placedRoom);
-    const slotCount = featureGetSlotCount(shape.tiles.length);
+    const slotCount = featureGetSlotCount(room.placedRoom);
 
     const slots: { index: number; feature: FeatureContent | undefined }[] = [];
     for (let i = 0; i < slotCount; i++) {
@@ -443,8 +441,7 @@ export class PanelRoomInfoComponent {
     }
 
     const slotIndex = this.featureSelectSlotIndex();
-    const shape = roomShapeResolve(room.placedRoom);
-    const totalSlots = featureGetSlotCount(shape.tiles.length);
+    const totalSlots = featureGetSlotCount(room.placedRoom);
 
     await updateGamestate((state) => {
       for (const floor of state.world.floors) {

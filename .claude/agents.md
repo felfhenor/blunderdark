@@ -97,7 +97,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 - **Content type**: `feature` → `FeatureContent` with `FeatureId` branded type, stored in `gamedata/feature/base.yml`
 - **Attachment**: `PlacedRoom.featureIds?: FeatureId[]` — multi-slot array where index = slot index
-- **Slot allocation**: `featureGetSlotCount(tileCount)` — rooms with 1-2 tiles get 2 slots, 3+ tiles get 3 slots
+- **Slot allocation**: `featureGetSlotCount(placedRoom)` — reads `maxFeatures` from the room's content definition
 - **Bonus types**: `capacity_bonus`, `fear_reduction`, `production_bonus`, `adjacent_production`, `flat_production`, `corruption_generation`, `combat_bonus`, `teleport_link`
 - **Feature helpers** in `features.ts`: prefix `feature` (e.g., `featureGetAllForRoom`, `featureGetForSlot`, `featureAttachToSlot`, `featureRemoveFromSlot`, `featureCalculateFearReduction`)
 - **Multi-slot aggregation**: all bonus calculation functions aggregate across all attached features via `featureGetAllForRoom()`

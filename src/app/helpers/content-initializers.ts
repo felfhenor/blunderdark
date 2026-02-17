@@ -207,9 +207,7 @@ function ensureReputationEffect(
   };
 }
 
-function ensureResearch(
-  node: Partial<ResearchContent>,
-): ResearchContent {
+function ensureResearch(node: Partial<ResearchContent>): ResearchContent {
   return {
     id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',
@@ -279,6 +277,7 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
       bonus: b.bonus ?? 0,
       description: b.description ?? '',
     })),
+    maxFeatures: room.maxFeatures ?? 0,
     isUnique: room.isUnique ?? false,
     removable: room.removable ?? true,
     maxInhabitants: room.maxInhabitants ?? -1,
