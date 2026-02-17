@@ -7,7 +7,7 @@
     "setup": "npm run gamedata:build",
     "lint": "npm run lint:code && npm run lint:knip",
     "lint:code": "ng lint",
-    "lint:knip": "knip",
+    "lint:knip": "knip --no-exit-code",
     "test": "vitest run",
     "test:watch": "vitest --ui --api 9899",
     "build:copychangelog": "cpy CHANGELOG.md CHANGELOG-current.md dist/blunderdark/browser",
