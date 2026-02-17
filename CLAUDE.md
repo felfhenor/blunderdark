@@ -29,7 +29,7 @@ Angular Signals are the primary state mechanism. Custom persistent signal helper
 
 ### Content Pipeline
 
-`gamedata/` contains YAML definitions for currencies, invaders, inhabitants, decorations, pets, and rooms. Build scripts in `scripts/` compile YAML to JSON, generate TypeScript schemas, and create sprite atlases from individual images in `gameassets/`. The `ContentService` loads compiled JSON and spritesheets at app init. All resources have a unique UUID and name - they cannot overlap with any other data. All content must go in this folder.
+`gamedata/` contains YAML definitions for currencies, invaders, inhabitants, decorations, pets, and rooms. Build scripts in `scripts/` compile YAML to JSON, generate TypeScript schemas, and create sprite atlases from individual images in `gameassets/`. The `ContentService` loads compiled JSON and spritesheets at app init. **Every gamedata entry MUST have a globally unique `id` AND a globally unique `name` — no two entries across ANY gamedata folder may share the same id or the same name. This is enforced by the build script and violations will cause a build failure.** All content must go in this folder.
 
 ### Game Loop
 
