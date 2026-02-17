@@ -188,14 +188,14 @@
 
                     <!-- Cost -->
                     <div class="divider my-2 text-xs opacity-50">Cost</div>
-                    <div class="flex flex-wrap gap-1">
+                    <div class="cost-row flex gap-2">
                       @for (cost of p.costEntries; track cost.type) {
                         <span
-                          class="badge badge-sm badge-outline"
-                          [class.badge-error]="!cost.sufficient"
+                          class="text-xs opacity-70"
+                          [class.text-error]="!cost.sufficient"
                           [tp]="'Have ' + cost.current + ' / Need ' + cost.amount"
                         >
-                          {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="$any(cost.type)" />
+                          <app-currency-name [type]="$any(cost.type)" [short]="true" [amount]="cost.amount" />
                         </span>
                       }
                     </div>
@@ -260,10 +260,10 @@
                     }
                   </div>
                   <p class="text-xs opacity-60">{{ entry.recipe.description }}</p>
-                  <div class="flex flex-wrap gap-1 mt-1">
+                  <div class="cost-row flex gap-2 mt-1">
                     @for (cost of formatCost(entry.recipe.cost); track cost.type) {
-                      <span class="badge badge-xs badge-outline">
-                        {{ cost.amount }} <app-currency-name [type]="cost.type" />
+                      <span class="text-xs opacity-70">
+                        <app-currency-name [type]="cost.type" [short]="true" [amount]="cost.amount" />
                       </span>
                     }
                   </div>
