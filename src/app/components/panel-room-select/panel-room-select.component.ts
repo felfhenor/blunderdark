@@ -5,6 +5,7 @@ import {
   biomeRestrictionCanBuild,
   biomeRestrictionGetRoomInfo,
   contentGetEntriesByType,
+  floorAll,
   floorCurrent,
   hallwayPlacementCanAfford,
   hallwayPlacementConfirm,
@@ -25,6 +26,20 @@ import {
   roomPlacementSelectedTypeId,
   roomShapeGet,
   roomShapeGetRotated,
+  stairPlacementActive,
+  stairPlacementEnter,
+  stairPlacementExit,
+  STAIR_PLACEMENT_COST,
+  elevatorPlacementActive,
+  elevatorPlacementEnter,
+  elevatorPlacementExit,
+  ELEVATOR_PLACEMENT_COST_CRYSTALS,
+  ELEVATOR_PLACEMENT_COST_FLUX,
+  portalPlacementActive,
+  portalPlacementEnter,
+  portalPlacementExit,
+  PORTAL_PLACEMENT_COST_FLUX,
+  PORTAL_PLACEMENT_COST_ESSENCE,
 } from '@helpers';
 import type { ResourceType, RoomId, RoomShapeContent } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
@@ -183,4 +198,46 @@ export class PanelRoomSelectComponent {
     roomPlacementRotate();
   }
 
+  public hasMultipleFloors = computed(() => floorAll().length >= 2);
+
+  public isStairModeActive = stairPlacementActive;
+  public stairCost = STAIR_PLACEMENT_COST;
+
+  public isElevatorModeActive = elevatorPlacementActive;
+  public elevatorCostCrystals = ELEVATOR_PLACEMENT_COST_CRYSTALS;
+  public elevatorCostFlux = ELEVATOR_PLACEMENT_COST_FLUX;
+
+  public isPortalModeActive = portalPlacementActive;
+  public portalCostFlux = PORTAL_PLACEMENT_COST_FLUX;
+  public portalCostEssence = PORTAL_PLACEMENT_COST_ESSENCE;
+
+  public toggleStairMode(direction: 'up' | 'down'): void {
+    if (stairPlacementActive()) {
+      stairPlacementExit();
+    } else {
+      elevatorPlacementExit();
+      portalPlacementExit();
+      stairPlacementEnter(direction);
+    }
+  }
+
+  public toggleElevatorMode(): void {
+    if (elevatorPlacementActive()) {
+      elevatorPlacementExit();
+    } else {
+      stairPlacementExit();
+      portalPlacementExit();
+      elevatorPlacementEnter();
+    }
+  }
+
+  public togglePortalMode(): void {
+    if (portalPlacementActive()) {
+      portalPlacementExit();
+    } else {
+      stairPlacementExit();
+      elevatorPlacementExit();
+      portalPlacementEnter();
+    }
+  }
 }
