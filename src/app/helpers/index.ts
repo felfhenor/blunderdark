@@ -11,6 +11,7 @@ export * from './clipboard';
 export * from './combat';
 export * from './combat-abilities';
 export * from './connections';
+export * from './consumption';
 export * from './content';
 export * from './content-initializers';
 export * from './corruption';

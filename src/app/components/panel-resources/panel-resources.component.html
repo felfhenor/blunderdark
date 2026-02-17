@@ -85,38 +85,60 @@
         <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
       }
 
-      @if (getBreakdown(res.type); as bd) {
+      @if (getResourceBreakdown(res.type); as info) {
         <div class="divider my-1 h-0"></div>
-        <div class="text-xs font-semibold mb-1">Production Breakdown</div>
+        <div class="text-xs font-semibold mb-1">Rate Breakdown</div>
         <div class="flex flex-col gap-0.5 text-xs">
-          <div class="flex justify-between">
-            <span class="opacity-70">Base:</span>
-            <span>{{ formatBreakdownRate(bd.base) }}/min</span>
-          </div>
-          @if (bd.inhabitantBonus !== 0) {
+          @if (info.prod; as bd) {
             <div class="flex justify-between">
-              <span class="opacity-70">Inhabitants:</span>
-              <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
+              <span class="opacity-70">Base:</span>
+              <span>{{ formatBreakdownRate(bd.base) }}/min</span>
             </div>
+            @if (bd.inhabitantBonus !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Workers:</span>
+                <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/min</span>
+              </div>
+            }
+            @if (bd.adjacencyBonus !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Adjacency:</span>
+                <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
+              </div>
+            }
+            @if (bd.modifierEffect !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Modifiers:</span>
+                <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+                  {{ formatBreakdownRate(bd.modifierEffect) }}/min
+                </span>
+              </div>
+            }
           }
-          @if (bd.adjacencyBonus !== 0) {
-            <div class="flex justify-between">
-              <span class="opacity-70">Adjacency:</span>
-              <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/min</span>
-            </div>
-          }
-          @if (bd.modifierEffect !== 0) {
-            <div class="flex justify-between">
-              <span class="opacity-70">Modifiers:</span>
-              <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
-                {{ formatBreakdownRate(bd.modifierEffect) }}/min
-              </span>
-            </div>
+          @if (info.cons; as cd) {
+            @if (cd.inhabitantFood !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Feeding:</span>
+                <span class="text-error">{{ formatBreakdownRate(-cd.inhabitantFood) }}/min</span>
+              </div>
+            }
+            @if (cd.legendaryUpkeep !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Legendary Upkeep:</span>
+                <span class="text-error">{{ formatBreakdownRate(-cd.legendaryUpkeep) }}/min</span>
+              </div>
+            }
+            @if (cd.featureMaintenance !== 0) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Maintenance:</span>
+                <span class="text-error">{{ formatBreakdownRate(-cd.featureMaintenance) }}/min</span>
+              </div>
+            }
           }
           <div class="divider my-0.5 h-0"></div>
           <div class="flex justify-between font-semibold">
-            <span>Total:</span>
-            <span [class]="bd.final > 0 ? 'text-success' : bd.final < 0 ? 'text-error' : ''">{{ formatBreakdownRate(bd.final) }}/min</span>
+            <span>Net:</span>
+            <span [class]="info.net > 0 ? 'text-success' : info.net < 0 ? 'text-error' : ''">{{ formatBreakdownRate(info.net) }}/min</span>
           </div>
         </div>
       }

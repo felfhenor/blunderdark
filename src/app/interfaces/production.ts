@@ -17,3 +17,14 @@ export type ResourceProductionBreakdown = {
   modifierEffect: number;
   final: number;
 };
+
+export type ResourceConsumptionBreakdown = {
+  /** Per-tick food consumption from inhabitants (food resource only) */
+  inhabitantFood: number;
+  /** Per-tick legendary inhabitant upkeep */
+  legendaryUpkeep: number;
+  /** Per-tick feature maintenance cost */
+  featureMaintenance: number;
+  /** Per-tick total consumption */
+  total: number;
+};

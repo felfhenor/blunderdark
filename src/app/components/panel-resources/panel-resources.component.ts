@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
+  consumptionBreakdowns,
   corruptionGetLevel,
   corruptionGetLevelDescription,
   gamestate,
@@ -19,8 +20,17 @@ import {
 } from '@helpers';
 import type { CorruptionLevel } from '@interfaces/corruption';
 import type { ResourceType } from '@interfaces';
-import type { ResourceProductionBreakdown } from '@interfaces/production';
+import type {
+  ResourceConsumptionBreakdown,
+  ResourceProductionBreakdown,
+} from '@interfaces/production';
 import { TippyDirective } from '@ngneat/helipopper';
+
+type ResourceBreakdownInfo = {
+  prod: ResourceProductionBreakdown | undefined;
+  cons: ResourceConsumptionBreakdown | undefined;
+  net: number;
+};
 
 type ResourceDisplay = {
   type: ResourceType;
@@ -90,6 +100,7 @@ export class PanelResourcesComponent {
   public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
   public breakdowns = productionBreakdowns;
+  public consumptions = consumptionBreakdowns;
 
   public foodWarning = computed(() => {
     const state = gamestate();
@@ -169,8 +180,19 @@ export class PanelResourcesComponent {
     return '0/min';
   }
 
-  public getBreakdown(type: ResourceType): ResourceProductionBreakdown | undefined {
-    return this.breakdowns()[type] ?? undefined;
+  public getResourceBreakdown(type: ResourceType): ResourceBreakdownInfo | undefined {
+    const prod = this.breakdowns()[type];
+    const cons = this.consumptions()[type];
+    if (!prod && !cons) return undefined;
+
+    const productionFinal = prod?.final ?? 0;
+    const consumptionTotal = cons?.total ?? 0;
+
+    return {
+      prod: prod ?? undefined,
+      cons: cons ?? undefined,
+      net: productionFinal - consumptionTotal,
+    };
   }
 
   public formatBreakdownRate(perTick: number): string {
