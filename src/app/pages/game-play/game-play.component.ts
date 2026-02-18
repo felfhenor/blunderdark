@@ -121,6 +121,12 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private floorsPanel = viewChild('floorsPanel', {
     read: TemplateRef,
   });
+  private timePanel = viewChild('timePanel', { read: TemplateRef });
+  private buildPanel = viewChild('buildPanel', { read: TemplateRef });
+  private rosterPanel = viewChild('rosterPanel', { read: TemplateRef });
+  private reputationPanel = viewChild('reputationPanel', {
+    read: TemplateRef,
+  });
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
     const placeholder = this.placeholderPanel();
@@ -141,25 +147,25 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'time',
         label: 'Time',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.timePanel() ?? placeholder,
       },
       {
         id: 'build',
         label: 'Build',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.buildPanel() ?? placeholder,
       },
       {
         id: 'roster',
         label: 'Roster',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.rosterPanel() ?? placeholder,
       },
       {
         id: 'reputation',
         label: 'Rep',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.reputationPanel() ?? placeholder,
       },
       { id: 'research', label: 'Research', isModal: true },
       {

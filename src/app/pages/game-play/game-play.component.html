@@ -15,6 +15,30 @@
   </div>
 </ng-template>
 
+<ng-template #timePanel>
+  <div class="p-2">
+    <app-panel-time-of-day />
+  </div>
+</ng-template>
+
+<ng-template #buildPanel>
+  <div class="p-2">
+    <app-panel-room-select />
+  </div>
+</ng-template>
+
+<ng-template #rosterPanel>
+  <div class="p-2">
+    <app-panel-roster />
+  </div>
+</ng-template>
+
+<ng-template #reputationPanel>
+  <div class="p-2">
+    <app-panel-reputation />
+  </div>
+</ng-template>
+
 <app-side-tab-rail
   [tabs]="tabDefinitions()"
   [(activePanel)]="activePanel"
@@ -24,8 +48,6 @@
 <div class="game-container relative flex flex-col">
   <div class="flex gap-4 flex-1 min-h-0">
   <div class="sidebar w-64 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
-    <app-panel-time-of-day />
-    <app-panel-roster />
     <app-panel-merchant />
     @if (canShowFusion()) {
       <div class="card bg-base-100 shadow-xl">
@@ -52,8 +74,6 @@
     <app-panel-altar />
     <app-panel-throne-room />
     <app-panel-research-summary (openResearch)="showResearch.set(true)" />
-    <app-panel-room-select />
-    <app-panel-reputation />
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body p-4">
         <div class="flex items-center justify-between">
