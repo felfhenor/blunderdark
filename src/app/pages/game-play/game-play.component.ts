@@ -53,6 +53,7 @@ import {
   autosaveStop,
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
+import { merchantIsPresent } from '@helpers/merchant';
 import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
 import type { SideTabDefinition } from '@interfaces';
@@ -131,6 +132,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private summoningPanel = viewChild('summoningPanel', { read: TemplateRef });
   private forgePanel = viewChild('forgePanel', { read: TemplateRef });
   private alchemyPanel = viewChild('alchemyPanel', { read: TemplateRef });
+  private torturePanel = viewChild('torturePanel', { read: TemplateRef });
+  private altarPanel = viewChild('altarPanel', { read: TemplateRef });
+  private thronePanel = viewChild('thronePanel', { read: TemplateRef });
+  private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
 
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
@@ -149,6 +154,12 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
   public hasDarkForge = computed(() => this.hasRoomOfRole('darkForge'));
   public hasAlchemyLab = computed(() => this.hasRoomOfRole('alchemyLab'));
+  public hasTortureChamber = computed(() =>
+    this.hasRoomOfRole('tortureChamber'),
+  );
+  public hasAltar = computed(() => this.hasRoomOfRole('altar'));
+  public hasThrone = computed(() => this.hasRoomOfRole('throne'));
+  public isMerchantPresent = merchantIsPresent;
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
     const placeholder = this.placeholderPanel();
@@ -254,25 +265,29 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'torture',
         label: 'Torture',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.torturePanel() ?? placeholder,
+        condition: this.hasTortureChamber,
       },
       {
         id: 'altar',
         label: 'Altar',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.altarPanel() ?? placeholder,
+        condition: this.hasAltar,
       },
       {
         id: 'throne',
         label: 'Throne',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.thronePanel() ?? placeholder,
+        condition: this.hasThrone,
       },
       {
         id: 'merchant',
         label: 'Merchant',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.merchantPanel() ?? placeholder,
+        condition: this.isMerchantPresent,
       },
     ];
   });
