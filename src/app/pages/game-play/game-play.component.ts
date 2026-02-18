@@ -118,6 +118,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private resourcesPanel = viewChild('resourcesPanel', {
     read: TemplateRef,
   });
+  private floorsPanel = viewChild('floorsPanel', {
+    read: TemplateRef,
+  });
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
     const placeholder = this.placeholderPanel();
@@ -132,7 +135,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'floors',
         label: 'Floors',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.floorsPanel() ?? placeholder,
       },
       {
         id: 'time',
