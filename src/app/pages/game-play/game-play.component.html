@@ -1,3 +1,13 @@
+<ng-template #placeholderPanel>
+  <div class="p-4 text-sm opacity-50">Panel content will be migrated here.</div>
+</ng-template>
+
+<app-side-tab-rail
+  [tabs]="tabDefinitions()"
+  [(activePanel)]="activePanel"
+  (modalTabClick)="onModalTabClick($event)"
+/>
+
 <div class="game-container relative flex flex-col">
   <div class="resource-bar-container px-4 pt-2 pb-1 flex-shrink-0">
     <app-panel-resources />

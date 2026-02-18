@@ -5,6 +5,8 @@ import {
   DestroyRef,
   inject,
   signal,
+  TemplateRef,
+  viewChild,
   type OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,6 +35,7 @@ import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-th
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
+import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -52,6 +55,7 @@ import {
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
 import { notifyError } from '@helpers/notify';
+import type { SideTabDefinition } from '@interfaces';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 
 @Component({
@@ -78,6 +82,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelRoomSelectComponent,
     PanelRosterComponent,
     PanelThroneRoomComponent,
+    SideTabRailComponent,
     PanelTimeOfDayComponent,
     PanelTrainingGroundsComponent,
     PanelResearchSummaryComponent,
@@ -104,6 +109,148 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     () => fusionHasAvailableCreatures() && fusionHasRoom(),
   );
   public isAutosaving = autosaveIsSaving;
+
+  public activePanel = signal<string | undefined>(undefined);
+
+  private placeholderPanel = viewChild('placeholderPanel', {
+    read: TemplateRef,
+  });
+
+  public tabDefinitions = computed<SideTabDefinition[]>(() => {
+    const placeholder = this.placeholderPanel();
+    return [
+      {
+        id: 'resources',
+        label: 'Resources',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'floors',
+        label: 'Floors',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'time',
+        label: 'Time',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'build',
+        label: 'Build',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'roster',
+        label: 'Roster',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'reputation',
+        label: 'Rep',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      { id: 'research', label: 'Research', isModal: true },
+      {
+        id: 'fusion',
+        label: 'Fusion',
+        isModal: true,
+        condition: this.canShowFusion,
+      },
+      { id: 'victory', label: 'Victory', isModal: true },
+      {
+        id: 'room-info',
+        label: 'Room',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'hallway-info',
+        label: 'Hallway',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'synergy',
+        label: 'Synergy',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'training',
+        label: 'Training',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'breeding',
+        label: 'Breeding',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'summoning',
+        label: 'Summon',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'forge',
+        label: 'Forge',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'alchemy',
+        label: 'Alchemy',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'torture',
+        label: 'Torture',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'altar',
+        label: 'Altar',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'throne',
+        label: 'Throne',
+        isModal: false,
+        templateRef: placeholder,
+      },
+      {
+        id: 'merchant',
+        label: 'Merchant',
+        isModal: false,
+        templateRef: placeholder,
+      },
+    ];
+  });
+
+  public onModalTabClick(tabId: string): void {
+    switch (tabId) {
+      case 'research':
+        this.showResearch.set(true);
+        break;
+      case 'fusion':
+        this.showFusion.set(true);
+        break;
+      case 'victory':
+        this.showVictoryMenu.set(true);
+        break;
+    }
+  }
 
   ngOnInit(): void {
     autosaveStart();
