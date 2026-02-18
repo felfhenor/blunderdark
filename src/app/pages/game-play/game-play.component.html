@@ -49,19 +49,6 @@
   <div class="flex gap-4 flex-1 min-h-0">
   <div class="sidebar w-64 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
     <app-panel-merchant />
-    @if (canShowFusion()) {
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body p-4 gap-2">
-          <div class="flex items-center justify-between">
-            <h3 class="card-title text-sm">Fusion Chamber</h3>
-            <button class="btn btn-xs btn-outline" (click)="showFusion.set(true)">
-              Open
-            </button>
-          </div>
-          <p class="text-xs opacity-50">Combine two creatures into a hybrid.</p>
-        </div>
-      </div>
-    }
     <app-panel-room-info />
     <app-panel-hallway-info />
     <app-synergy-tooltip />
@@ -73,18 +60,6 @@
     <app-panel-torture-chamber />
     <app-panel-altar />
     <app-panel-throne-room />
-    <app-panel-research-summary (openResearch)="showResearch.set(true)" />
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body p-4">
-        <div class="flex items-center justify-between">
-          <h3 class="card-title text-sm">Victory Paths</h3>
-          <button class="btn btn-xs btn-outline" (click)="showVictoryMenu.set(true)">
-            Open
-          </button>
-        </div>
-        <p class="text-xs opacity-50">Track your progress toward victory.</p>
-      </div>
-    </div>
   </div>
   <div class="flex-1 overflow-hidden">
     <app-grid />
