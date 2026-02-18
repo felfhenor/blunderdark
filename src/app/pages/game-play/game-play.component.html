@@ -39,6 +39,36 @@
   </div>
 </ng-template>
 
+<ng-template #trainingPanel>
+  <div class="p-2">
+    <app-panel-training-grounds />
+  </div>
+</ng-template>
+
+<ng-template #breedingPanel>
+  <div class="p-2">
+    <app-panel-breeding-pits />
+  </div>
+</ng-template>
+
+<ng-template #summoningPanel>
+  <div class="p-2">
+    <app-panel-summoning-circle />
+  </div>
+</ng-template>
+
+<ng-template #forgePanel>
+  <div class="p-2">
+    <app-panel-dark-forge />
+  </div>
+</ng-template>
+
+<ng-template #alchemyPanel>
+  <div class="p-2">
+    <app-panel-alchemy-lab />
+  </div>
+</ng-template>
+
 <app-side-tab-rail
   [tabs]="tabDefinitions()"
   [(activePanel)]="activePanel"
@@ -52,11 +82,6 @@
     <app-panel-room-info />
     <app-panel-hallway-info />
     <app-synergy-tooltip />
-    <app-panel-training-grounds />
-    <app-panel-breeding-pits />
-    <app-panel-summoning-circle />
-    <app-panel-dark-forge />
-    <app-panel-alchemy-lab />
     <app-panel-torture-chamber />
     <app-panel-altar />
     <app-panel-throne-room />

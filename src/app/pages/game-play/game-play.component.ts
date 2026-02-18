@@ -54,6 +54,7 @@ import {
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
 import { notifyError } from '@helpers/notify';
+import { roomRoleFindById } from '@helpers/room-roles';
 import type { SideTabDefinition } from '@interfaces';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 
@@ -125,6 +126,29 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private reputationPanel = viewChild('reputationPanel', {
     read: TemplateRef,
   });
+  private trainingPanel = viewChild('trainingPanel', { read: TemplateRef });
+  private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
+  private summoningPanel = viewChild('summoningPanel', { read: TemplateRef });
+  private forgePanel = viewChild('forgePanel', { read: TemplateRef });
+  private alchemyPanel = viewChild('alchemyPanel', { read: TemplateRef });
+
+  private hasRoomOfRole(role: string): boolean {
+    const roomTypeId = roomRoleFindById(role);
+    if (!roomTypeId) return false;
+    return floorAll().some((floor) =>
+      floor.rooms.some((room) => room.roomTypeId === roomTypeId),
+    );
+  }
+
+  public hasTrainingGrounds = computed(() =>
+    this.hasRoomOfRole('trainingGrounds'),
+  );
+  public hasBreedingPits = computed(() => this.hasRoomOfRole('breedingPits'));
+  public hasSummoningCircle = computed(() =>
+    this.hasRoomOfRole('summoningCircle'),
+  );
+  public hasDarkForge = computed(() => this.hasRoomOfRole('darkForge'));
+  public hasAlchemyLab = computed(() => this.hasRoomOfRole('alchemyLab'));
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
     const placeholder = this.placeholderPanel();
@@ -195,31 +219,36 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'training',
         label: 'Training',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.trainingPanel() ?? placeholder,
+        condition: this.hasTrainingGrounds,
       },
       {
         id: 'breeding',
         label: 'Breeding',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.breedingPanel() ?? placeholder,
+        condition: this.hasBreedingPits,
       },
       {
         id: 'summoning',
         label: 'Summon',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.summoningPanel() ?? placeholder,
+        condition: this.hasSummoningCircle,
       },
       {
         id: 'forge',
         label: 'Forge',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.forgePanel() ?? placeholder,
+        condition: this.hasDarkForge,
       },
       {
         id: 'alchemy',
         label: 'Alchemy',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.alchemyPanel() ?? placeholder,
+        condition: this.hasAlchemyLab,
       },
       {
         id: 'torture',
