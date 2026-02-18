@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  position: fixed;
+  left: 0;
+  top: 40px;
+  height: calc(100vh - 40px);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.side-tab-rail {
+  width: 44px;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.tab-btn {
+  border: none;
+  background: none;
+  min-height: 44px;
+
+  &.active {
+    @apply bg-primary text-primary-content opacity-100;
+  }
+}
+
+.tab-label {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  white-space: nowrap;
+}
+
+.panel-overlay {
+  height: 100%;
+  pointer-events: auto;
+}

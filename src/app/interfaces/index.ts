@@ -68,6 +68,7 @@ export * from './save-slot';
 export * from './season';
 export * from './season-bonus';
 export * from './sfx';
+export * from './side-tab';
 export * from './spawning-pool';
 export * from './state-game';
 export * from './state-options';
