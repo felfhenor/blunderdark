@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
+import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
@@ -64,6 +65,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     GameResearchComponent,
     MoraleBarComponent,
     PanelAlchemyLabComponent,
+    PanelAltarComponent,
     PanelDarkForgeComponent,
     PanelFloorSelectorComponent,
     PanelFusionComponent,
@@ -124,6 +126,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private forgePanel = viewChild('forgePanel', { read: TemplateRef });
   private alchemyPanel = viewChild('alchemyPanel', { read: TemplateRef });
   private torturePanel = viewChild('torturePanel', { read: TemplateRef });
+  private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
 
 
@@ -135,6 +138,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     );
   }
 
+  public hasAltar = computed(() => this.hasRoomOfRole('altar'));
   public hasTrainingGrounds = computed(() =>
     this.hasRoomOfRole('trainingGrounds'),
   );
@@ -194,6 +198,13 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         label: 'Roster',
         isModal: false,
         templateRef: this.rosterPanel() ?? placeholder,
+      },
+      {
+        id: 'altar',
+        label: 'Altar',
+        isModal: false,
+        templateRef: this.altarPanel() ?? placeholder,
+        condition: this.hasAltar,
       },
       {
         id: 'reputation',
