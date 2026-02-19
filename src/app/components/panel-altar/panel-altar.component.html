@@ -54,7 +54,7 @@
             <div class="text-xs text-warning mb-2">Roster full</div>
           }
 
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
             @for (entry of recruitableInhabitants(); track entry.def.id) {
               <div class="recruit-entry bg-base-200 rounded-lg p-2">
                 <!-- Header: Name + Tier -->
