@@ -113,6 +113,10 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => `test-uuid-${uuidCounter++}`),
 }));
 
+vi.mock('@helpers/inhabitant-names', () => ({
+  generateInhabitantName: () => 'Test Fantasy Name',
+}));
+
 // --- Test Data Helpers ---
 
 function makeRecipe(
@@ -434,7 +438,7 @@ describe('fusion', () => {
         INSTANCE_A_ID,
         INSTANCE_B_ID,
       ]);
-      expect(result.hybridInstance!.name).toBe('Hobgoblin');
+      expect(result.hybridInstance!.name).toBe('Test Fantasy Name');
     });
 
     it('should remove parents from inhabitants after fusion', async () => {
@@ -1207,7 +1211,7 @@ describe('fusion', () => {
       );
 
       expect(instance.definitionId).toBe(HOBGOBLIN_ID);
-      expect(instance.name).toBe('Hobgoblin');
+      expect(instance.name).toBe('Test Fantasy Name');
     });
 
     it('should create instance with unique ID', async () => {
@@ -1248,7 +1252,7 @@ describe('fusion', () => {
 
       expect(instance.instanceId).toBeDefined();
       expect(instance.definitionId).toBe(DEATH_KNIGHT_ID);
-      expect(instance.name).toBe('Death Knight');
+      expect(instance.name).toBe('Test Fantasy Name');
       expect(instance.state).toBe('normal');
       expect(instance.isHybrid).toBe(true);
     });

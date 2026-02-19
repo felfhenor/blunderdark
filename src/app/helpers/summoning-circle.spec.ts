@@ -99,6 +99,10 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: () => 'test-uuid-' + Math.random().toString(36).slice(2, 8),
 }));
 
+vi.mock('@helpers/inhabitant-names', () => ({
+  generateInhabitantName: () => 'Test Fantasy Name',
+}));
+
 vi.mock('@helpers/adjacency', () => ({
   adjacencyAreRoomsAdjacent: () => false,
 }));
@@ -543,7 +547,7 @@ describe('Inhabitant Creation', () => {
     expect(inh.isTemporary).toBeUndefined();
     expect(inh.temporaryTicksRemaining).toBeUndefined();
     expect(inh.definitionId).toBe(FIRE_ELEMENTAL_ID);
-    expect(inh.name).toContain('Fire Elemental');
+    expect(inh.name).toBe('Test Fantasy Name');
     expect(inh.mutationBonuses?.attack).toBe(5);
   });
 
@@ -598,7 +602,7 @@ describe('summoningCircleProcess', () => {
     expect(state.world.inhabitants).toHaveLength(2);
     const summoned = state.world.inhabitants[1];
     expect(summoned.isSummoned).toBe(true);
-    expect(summoned.name).toContain('Fire Elemental');
+    expect(summoned.name).toBe('Test Fantasy Name');
     expect(room.summonJob).toBeUndefined();
   });
 

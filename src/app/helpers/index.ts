@@ -39,6 +39,7 @@ export * from './hallway-tile-removal';
 export * from './hallways';
 export * from './hunger';
 export * from './icons';
+export * from './inhabitant-names';
 export * from './inhabitants';
 export * from './invaders';
 export * from './invasion-combat';

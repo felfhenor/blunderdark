@@ -34,7 +34,10 @@
             <div class="flex items-center justify-between gap-1">
               <div class="flex items-center gap-1 min-w-0">
                 <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
-                <span class="text-xs font-semibold truncate">{{ entry.def.name }}</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-semibold truncate">{{ entry.instance.name }}</span>
+                  <span class="text-xs opacity-50 truncate">{{ entry.def.name }}</span>
+                </div>
               </div>
               <span class="badge badge-xs" [ngClass]="getStateClass(entry.instance.state)">
                 {{ entry.instance.state }}
@@ -76,9 +79,16 @@
         <div class="divider my-1"></div>
         <div class="detail-panel">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-bold">{{ entry.def.name }}</h4>
-            <button class="btn btn-xs btn-ghost btn-circle" (click)="closeDetail()">✕</button>
+            <div class="flex items-center gap-1 min-w-0">
+              <h4 class="text-xs font-bold truncate">{{ entry.instance.name }}</h4>
+              <button
+                class="btn btn-xs btn-ghost btn-circle"
+                (click)="onRename(entry.instance.instanceId, entry.instance.name)"
+              >&#9998;</button>
+            </div>
+            <button class="btn btn-xs btn-ghost btn-circle" (click)="closeDetail()">&#10005;</button>
           </div>
+          <p class="text-xs opacity-50">{{ entry.def.name }}</p>
           <p class="text-xs opacity-60">{{ entry.def.description }}</p>
           <div class="text-xs mt-1">
             <span class="opacity-70">Type:</span> {{ entry.def.type }}
@@ -159,3 +169,5 @@
     </div>
   </div>
 }
+
+<swal #renameSwal></swal>

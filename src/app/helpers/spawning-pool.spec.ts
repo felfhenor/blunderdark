@@ -71,6 +71,10 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'mock-uuid-0001'),
 }));
 
+vi.mock('@helpers/inhabitant-names', () => ({
+  generateInhabitantName: () => 'Test Fantasy Name',
+}));
+
 // --- Definitions ---
 
 const goblinDef: InhabitantContent = {
@@ -375,10 +379,10 @@ describe('spawningPoolCreateInhabitant', () => {
     expect(inhabitant.instanceId).toBe('mock-uuid-0001');
   });
 
-  it('should create a name with suffix', () => {
+  it('should create a fantasy name', () => {
     const inhabitant = spawningPoolCreateInhabitant(goblinDef);
     // rngChoice is mocked to return first element: 'the Bold'
-    expect(inhabitant.name).toBe('Goblin the Bold');
+    expect(inhabitant.name).toBe('Test Fantasy Name');
   });
 
   it('should start in normal state with no assignment', () => {
@@ -431,7 +435,7 @@ describe('spawningPoolProcess', () => {
 
     expect(state.world.inhabitants).toHaveLength(1);
     expect(state.world.inhabitants[0].definitionId).toBe(GOBLIN_DEF_ID);
-    expect(state.world.inhabitants[0].name).toBe('Goblin the Bold');
+    expect(state.world.inhabitants[0].name).toBe('Test Fantasy Name');
   });
 
   it('should reset timer after spawning', () => {
@@ -568,7 +572,7 @@ describe('spawningPoolProcess', () => {
 
     expect(state.world.inhabitants).toHaveLength(1);
     expect(state.world.inhabitants[0].definitionId).toBe(SKELETON_DEF_ID);
-    expect(state.world.inhabitants[0].name).toBe('Skeleton the Bold');
+    expect(state.world.inhabitants[0].name).toBe('Test Fantasy Name');
   });
 
   it('should use default rate when room def has no spawnRate', () => {

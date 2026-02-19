@@ -1,7 +1,8 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { rngChoice, rngUuid } from '@helpers/rng';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
   roomShapeGetAbsoluteTiles,
@@ -166,15 +167,6 @@ export function summoningCreateInhabitant(
   isTemporary: boolean,
   duration?: number,
 ): InhabitantInstance {
-  const suffixes = [
-    'the Summoned',
-    'the Bound',
-    'the Called',
-    'the Conjured',
-    'the Invoked',
-  ];
-  const suffix = rngChoice(suffixes);
-
   const mutationBonuses: Partial<InhabitantStats> = {};
   const statKeys = Object.keys(statBonuses) as Array<keyof InhabitantStats>;
   for (const key of statKeys) {
@@ -187,7 +179,7 @@ export function summoningCreateInhabitant(
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
-    name: `${def.name} ${suffix}`,
+    name: generateInhabitantName(def.type),
     state: 'normal',
     assignedRoomId: undefined,
     trained: false,

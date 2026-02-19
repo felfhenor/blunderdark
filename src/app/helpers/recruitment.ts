@@ -3,6 +3,7 @@ import { sortBy } from 'es-toolkit/compat';
 import { altarRoomCanRecruit } from '@helpers/altar-room';
 import { contentGetEntriesByType } from '@helpers/content';
 import { inhabitantAdd } from '@helpers/inhabitants';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
@@ -142,7 +143,7 @@ export async function recruitmentRecruit(
   const instance: InhabitantInstance = {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
-    name: def.name,
+    name: generateInhabitantName(def.type),
     state: 'normal',
     assignedRoomId: undefined,
   };

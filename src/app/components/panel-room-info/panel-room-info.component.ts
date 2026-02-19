@@ -158,12 +158,7 @@ export class PanelRoomInfoComponent {
 
     return this.inhabitants()
       .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(
-          i.definitionId,
-        );
-        return { instance: i, name: def?.name ?? i.name };
-      });
+      .map((i) => ({ instance: i, name: i.name }));
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);
@@ -242,12 +237,7 @@ export class PanelRoomInfoComponent {
           ? inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction)
           : false;
       })
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(
-          i.definitionId,
-        );
-        return { instance: i, name: def?.name ?? i.name };
-      });
+      .map((i) => ({ instance: i, name: i.name }));
   });
 
   public adjacentUnconnected = computed(() => {

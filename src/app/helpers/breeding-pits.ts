@@ -1,7 +1,8 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { rngChoice, rngRandom, rngUuid } from '@helpers/rng';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
   roomShapeGetAbsoluteTiles,
@@ -234,20 +235,11 @@ export function breedingCreateHybrid(
     recipe,
     statBonusMultiplier,
   );
-  const suffixes = [
-    'the Hybrid',
-    'the Crossed',
-    'the Merged',
-    'the Blended',
-    'the Fused',
-  ];
-  const suffix = rngChoice(suffixes);
-
   // Use parentA's definitionId as the base definition for the hybrid
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: parentA.definitionId,
-    name: `${recipe.resultName} ${suffix}`,
+    name: generateInhabitantName(parentADef.type),
     state: 'normal',
     assignedRoomId: undefined,
     trained: false,

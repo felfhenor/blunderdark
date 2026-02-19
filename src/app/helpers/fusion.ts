@@ -1,4 +1,5 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -233,7 +234,7 @@ export function fusionCreateHybridInstance(
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: hybridDef.id,
-    name: hybridDef.name,
+    name: generateInhabitantName(hybridDef.type),
     state: 'normal',
     assignedRoomId: undefined,
     isHybrid: true,

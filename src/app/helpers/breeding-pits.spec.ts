@@ -94,6 +94,10 @@ vi.mock('@helpers/rng', () => ({
   rngRandom: () => seedrandom('test-seed'),
 }));
 
+vi.mock('@helpers/inhabitant-names', () => ({
+  generateInhabitantName: () => 'Test Fantasy Name',
+}));
+
 vi.mock('@helpers/adjacency', () => ({
   adjacencyAreRoomsAdjacent: () => false,
 }));
@@ -661,7 +665,7 @@ describe('breedingPitsProcess', () => {
     // Parents removed, hybrid added
     expect(state.world.inhabitants).toHaveLength(1);
     expect(state.world.inhabitants[0].isHybrid).toBe(true);
-    expect(state.world.inhabitants[0].name).toContain('Goblin Trapper');
+    expect(state.world.inhabitants[0].name).toBe('Test Fantasy Name');
     expect(room.breedingJob).toBeUndefined();
   });
 
@@ -815,7 +819,7 @@ describe('Hybrid Creation', () => {
 
     expect(hybrid.isHybrid).toBe(true);
     expect(hybrid.hybridParentIds).toEqual([GOBLIN_ID, KOBOLD_ID]);
-    expect(hybrid.name).toContain('Goblin Trapper');
+    expect(hybrid.name).toBe('Test Fantasy Name');
     expect(hybrid.assignedRoomId).toBeUndefined();
     expect(hybrid.state).toBe('normal');
     expect(hybrid.definitionId).toBe(GOBLIN_ID);

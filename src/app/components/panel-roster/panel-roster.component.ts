@@ -4,10 +4,12 @@ import {
   Component,
   computed,
   signal,
+  viewChild,
 } from '@angular/core';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   inhabitantAssignToRoom,
+  inhabitantRename,
   assignmentCanAssignToRoom,
   contentGetEntry,
   productionGetRoomDefinition,
@@ -25,6 +27,8 @@ import type {
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 type RosterFilter = 'all' | 'assigned' | 'unassigned';
 
@@ -36,12 +40,14 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, NgClass, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, StatNameComponent, SweetAlert2Module, TippyDirective],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelRosterComponent {
+  private renameSwal = viewChild<SwalComponent>('renameSwal');
+
   public activeFilter = signal<RosterFilter>('all');
   public selectedInhabitantId = signal<string | undefined>(undefined);
 
@@ -180,6 +186,35 @@ export class PanelRosterComponent {
       notifySuccess('Inhabitant unassigned');
     } else {
       notifyError('Failed to unassign inhabitant');
+    }
+  }
+
+  public async onRename(instanceId: string, currentName: string): Promise<void> {
+    const swal = this.renameSwal();
+    if (!swal) return;
+
+    swal.swalOptions = {
+      title: 'Rename Creature',
+      input: 'text',
+      inputValue: currentName,
+      inputValidator: (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Name cannot be empty';
+        if (trimmed.length > 30) return 'Name must be 30 characters or fewer';
+        return null;
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Rename',
+    };
+
+    const result = await swal.fire();
+    if (result.isConfirmed && result.value) {
+      const renamed = await inhabitantRename(instanceId, result.value as string);
+      if (renamed) {
+        notifySuccess('Creature renamed');
+      } else {
+        notifyError('Failed to rename creature');
+      }
     }
   }
 

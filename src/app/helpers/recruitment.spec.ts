@@ -65,6 +65,10 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => `test-uuid-${uuidCounter++}`),
 }));
 
+vi.mock('@helpers/inhabitant-names', () => ({
+  generateInhabitantName: () => 'Test Fantasy Name',
+}));
+
 // --- Mock content entries ---
 
 let mockContentEntries: InhabitantContent[];
@@ -212,7 +216,7 @@ describe('recruitment helper', () => {
       expect(result.success).toBe(true);
       expect(mockInhabitants).toHaveLength(1);
       expect(mockInhabitants[0].definitionId).toBe('goblin-001');
-      expect(mockInhabitants[0].name).toBe('Goblin');
+      expect(mockInhabitants[0].name).toBe('Test Fantasy Name');
       expect(mockInhabitants[0].state).toBe('normal');
       expect(mockInhabitants[0].assignedRoomId).toBeUndefined();
     });

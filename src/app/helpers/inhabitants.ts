@@ -1,5 +1,6 @@
 import { computed, type Signal } from '@angular/core';
-import { contentGetEntry } from '@helpers/content';
+import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import {
   verticalTransportCalculateTravelTicks,
@@ -77,10 +78,23 @@ export function inhabitantSerialize(
 export function inhabitantDeserialize(
   data: InhabitantInstance[],
 ): InhabitantInstance[] {
-  return data.map((i) => ({
+  const nameToId = contentAllIdsByName();
+
+  return data.map((i) => {
+    // Migrate old-style names: if the instance name matches a known content definition name exactly,
+    // it's a bare type name from before fantasy names were added — generate a new one.
+    let name = i.name;
+    if (nameToId.has(name)) {
+      const def = contentGetEntry<InhabitantContent>(i.definitionId);
+      if (def) {
+        name = generateInhabitantName(def.type);
+      }
+    }
+
+    return {
     instanceId: i.instanceId,
     definitionId: i.definitionId,
-    name: i.name,
+    name,
     state: i.state ?? 'normal',
     assignedRoomId: i.assignedRoomId ?? undefined,
     trained: i.trained ?? false,
@@ -96,7 +110,8 @@ export function inhabitantDeserialize(
     temporaryTicksRemaining: i.temporaryTicksRemaining ?? undefined,
     travelTicksRemaining: i.travelTicksRemaining ?? undefined,
     discontentedTicks: i.discontentedTicks ?? undefined,
-  }));
+  };
+  });
 }
 
 // --- Inhabitant restriction validation ---
@@ -262,6 +277,36 @@ export async function inhabitantUnassignFromRoom(
       ...s.world,
       inhabitants: s.world.inhabitants.map((i) =>
         i.instanceId === instanceId ? { ...i, assignedRoomId: undefined } : i,
+      ),
+    };
+    return { ...s, world: syncFloorInhabitants(world) };
+  });
+
+  return true;
+}
+
+/**
+ * Rename an inhabitant instance.
+ * Validates name length (1-30 chars after trimming).
+ */
+export async function inhabitantRename(
+  instanceId: string,
+  newName: string,
+): Promise<boolean> {
+  const trimmed = newName.trim();
+  if (trimmed.length < 1 || trimmed.length > 30) return false;
+
+  const state = gamestate();
+  const instance = state.world.inhabitants.find(
+    (i) => i.instanceId === instanceId,
+  );
+  if (!instance) return false;
+
+  await updateGamestate((s) => {
+    const world = {
+      ...s.world,
+      inhabitants: s.world.inhabitants.map((i) =>
+        i.instanceId === instanceId ? { ...i, name: trimmed } : i,
       ),
     };
     return { ...s, world: syncFloorInhabitants(world) };

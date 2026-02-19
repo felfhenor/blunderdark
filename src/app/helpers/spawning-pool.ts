@@ -1,6 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { rngChoice, rngUuid } from '@helpers/rng';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
@@ -92,19 +93,10 @@ export function spawningPoolCountUnassigned(
 export function spawningPoolCreateInhabitant(
   def: InhabitantContent,
 ): InhabitantInstance {
-  const suffixes = [
-    'the Bold',
-    'the Meek',
-    'the Swift',
-    'the Cunning',
-    'the Lucky',
-    'the Brave',
-  ];
-  const suffix = rngChoice(suffixes);
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
-    name: `${def.name} ${suffix}`,
+    name: generateInhabitantName(def.type),
     state: 'normal',
     assignedRoomId: undefined,
     trained: false,
