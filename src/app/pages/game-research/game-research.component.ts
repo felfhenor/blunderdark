@@ -31,6 +31,7 @@ import type {
   RoomContent,
   UnlockEffect,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type NodeState = 'completed' | 'active' | 'available' | 'locked';
@@ -110,9 +111,11 @@ export class GameResearchComponent {
       tiers.get(tier)!.push({ ...node, nodeState });
     }
 
-    return [...tiers.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([tier, tierNodes]) => ({ tier, nodes: tierNodes }));
+    const tierGroups = [...tiers.entries()].map(([tier, tierNodes]) => ({
+      tier,
+      nodes: tierNodes,
+    }));
+    return sortBy(tierGroups, [(g) => g.tier]);
   });
 
   public selectedNode = computed(() => {
