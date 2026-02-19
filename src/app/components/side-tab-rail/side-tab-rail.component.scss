@@ -1,14 +1,7 @@
-:host {
-  display: flex;
-  align-items: flex-start;
-  flex-shrink: 0;
-  height: 100%;
-}
-
 .side-tab-rail {
-  width: 44px;
+  width: 100px;
   overflow-y: auto;
-  height: 100%;
+  max-height: calc(100vh - 40px);
   opacity: 0.5;
   transition: opacity 0.2s ease;
 
@@ -22,21 +15,15 @@
   border: none;
   background: none;
   min-height: 44px;
-
-  &.active {
-    @apply bg-primary text-primary-content opacity-100;
-  }
 }
 
 .tab-label {
-  writing-mode: vertical-lr;
-  text-orientation: mixed;
   white-space: nowrap;
 }
 
 .panel-overlay {
-  width: 256px;
-  height: 100%;
+  width: 384px;
+  max-height: calc(100vh - 40px);
   overflow-y: auto;
   opacity: 0.7;
   max-width: 0;
@@ -46,7 +33,7 @@
     max-width 0.2s ease;
 
   &.panel-visible {
-    max-width: 256px;
+    max-width: 384px;
   }
 
   &:hover {
