@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import {
   inhabitantAssignToRoom,
   inhabitantAll,
@@ -59,7 +60,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent],
+  imports: [DecimalPipe, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

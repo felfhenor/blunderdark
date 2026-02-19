@@ -24,12 +24,13 @@
     </div>
   }
 }
-<div class="resource-bar flex flex-wrap gap-2">
+<div class="resource-bar flex flex-col gap-2">
   @for (res of resources; track res.type) {
     <div
-      class="resource-item flex-1 min-w-[120px]"
+      class="resource-item"
       [class]="getWarningClass(res.type)"
       [tp]="resourceTip"
+      tpPlacement="right"
       [tpDelay]="250"
     >
       <div class="flex items-center justify-between mb-0.5">
