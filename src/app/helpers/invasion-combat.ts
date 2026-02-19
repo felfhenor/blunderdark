@@ -1,3 +1,4 @@
+import { sortBy } from 'es-toolkit/compat';
 import { combatResolve } from '@helpers/combat';
 import type {
   ActionResult,
@@ -42,13 +43,10 @@ export function invasionCombatCreateCombatant(
  * Ties broken by defenders first.
  */
 export function invasionCombatBuildTurnQueue(combatants: Combatant[]): TurnQueue {
-  const sorted = [...combatants].sort((a, b) => {
-    if (b.speed !== a.speed) return b.speed - a.speed;
-    // Defenders go first on ties
-    if (a.side === 'defender' && b.side === 'invader') return -1;
-    if (a.side === 'invader' && b.side === 'defender') return 1;
-    return 0;
-  });
+  const sorted = sortBy(combatants, [
+    (c) => -c.speed,
+    (c) => (c.side === 'defender' ? 0 : 1),
+  ]);
 
   return {
     combatants: sorted,
@@ -113,12 +111,10 @@ export function invasionCombatStartNewRound(queue: TurnQueue): TurnQueue {
     .filter((c) => c.hp > 0)
     .map((c) => ({ ...c, hasActed: false }));
 
-  const sorted = [...aliveCombatants].sort((a, b) => {
-    if (b.speed !== a.speed) return b.speed - a.speed;
-    if (a.side === 'defender' && b.side === 'invader') return -1;
-    if (a.side === 'invader' && b.side === 'defender') return 1;
-    return 0;
-  });
+  const sorted = sortBy(aliveCombatants, [
+    (c) => -c.speed,
+    (c) => (c.side === 'defender' ? 0 : 1),
+  ]);
 
   return {
     combatants: sorted,

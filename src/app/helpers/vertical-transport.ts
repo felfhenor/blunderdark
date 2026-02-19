@@ -1,3 +1,4 @@
+import { sortBy } from 'es-toolkit/compat';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type { Floor, PlacedRoom } from '@interfaces';
 import type { TransportGroupId, TransportType } from '@interfaces/room-shape';
@@ -61,7 +62,7 @@ export function verticalTransportBuildGraph(
   }
 
   for (const group of groups) {
-    const sortedFloors = [...group.floors].sort((a, b) => a - b);
+    const sortedFloors = sortBy(group.floors, [(f) => f]);
 
     switch (group.type) {
       case 'stair':
@@ -208,7 +209,7 @@ export function verticalTransportGetGroupsOnFloor(
     if (!room.transportType || !room.transportGroupId) continue;
     const group = groups.find((g) => g.groupId === room.transportGroupId);
     if (group) {
-      result.push({ room, groupFloors: group.floors.sort((a, b) => a - b) });
+      result.push({ room, groupFloors: sortBy(group.floors, [(f) => f]) });
     }
   }
 

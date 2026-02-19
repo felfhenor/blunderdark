@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { sortBy } from 'es-toolkit/compat';
 import { contentGetEntriesByType } from '@helpers/content';
 import { floorCurrent } from '@helpers/floor';
 import { hallwayPlacementExit } from '@helpers/hallway-placement';
@@ -234,7 +235,7 @@ export async function transportElevatorExtendExecute(
 
   if (groupRooms.length === 0) return { success: false, error: 'Elevator group not found' };
 
-  const depths = groupRooms.map((r) => r.floorDepth).sort((a, b) => a - b);
+  const depths = sortBy(groupRooms.map((r) => r.floorDepth), [(d) => d]);
   const targetDepth = direction === 'down' ? depths[depths.length - 1] + 1 : depths[0] - 1;
 
   const targetFloor = state.world.floors.find((f) => f.depth === targetDepth);
@@ -298,7 +299,7 @@ export async function transportElevatorShrinkExecute(
     return { success: false, error: 'Elevator must connect at least 2 floors. Remove the elevator instead.' };
   }
 
-  const depths = groupRooms.map((r) => r.floorDepth).sort((a, b) => a - b);
+  const depths = sortBy(groupRooms.map((r) => r.floorDepth), [(d) => d]);
   if (floorDepth !== depths[0] && floorDepth !== depths[depths.length - 1]) {
     return { success: false, error: 'Can only remove floors from the top or bottom of the elevator' };
   }

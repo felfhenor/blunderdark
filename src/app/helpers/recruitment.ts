@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { sortBy } from 'es-toolkit/compat';
 import { altarRoomCanRecruit } from '@helpers/altar-room';
 import { contentGetEntriesByType } from '@helpers/content';
 import { inhabitantAdd } from '@helpers/inhabitants';
@@ -56,12 +57,10 @@ export function recruitmentGetRecruitable(): InhabitantContent[] {
     'inhabitant',
   );
 
-  return allDefs
-    .filter((def) => !def.restrictionTags.includes('unique'))
-    .sort((a, b) => {
-      if (a.tier !== b.tier) return a.tier - b.tier;
-      return a.name.localeCompare(b.name);
-    });
+  return sortBy(
+    allDefs.filter((def) => !def.restrictionTags.includes('unique')),
+    [(d) => d.tier, (d) => d.name],
+  );
 }
 
 /**
