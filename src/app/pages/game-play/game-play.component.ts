@@ -11,8 +11,6 @@ import {
   type OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterModule } from '@angular/router';
-
 import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
@@ -65,7 +63,6 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
 @Component({
   selector: 'app-game-play',
   imports: [
-    RouterModule,
     TeleportOutletDirective,
     GridComponent,
     GameResearchComponent,

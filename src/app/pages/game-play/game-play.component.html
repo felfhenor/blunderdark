@@ -117,14 +117,8 @@
   (modalTabClick)="onModalTabClick($event)"
 />
 
-<div class="game-container relative flex flex-col">
-  <div class="flex gap-4 flex-1 min-h-0">
-  <div class="sidebar w-64 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
-  </div>
-  <div class="flex-1 overflow-hidden">
-    <app-grid />
-  </div>
-  </div>
+<div class="game-container relative">
+  <app-grid />
 </div>
 
 <app-game-research [(visible)]="showResearch" />
