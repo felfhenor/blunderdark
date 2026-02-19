@@ -99,4 +99,40 @@
       }
     </div>
   }
+
+  <swal
+    #overwriteSwal
+    [title]="'Overwrite ' + pendingSlotName() + '?'"
+    text="This will replace the existing save data. This cannot be undone."
+    icon="warning"
+    confirmButtonText="Overwrite"
+    cancelButtonText="Cancel"
+  ></swal>
+
+  <swal
+    #loadSwal
+    [title]="'Load ' + pendingSlotName() + '?'"
+    text="Your current unsaved progress will be lost."
+    icon="warning"
+    confirmButtonText="Load"
+    cancelButtonText="Cancel"
+  ></swal>
+
+  <swal
+    #newerVersionSwal
+    title="Newer Save Version"
+    [text]="newerVersionText()"
+    icon="warning"
+    confirmButtonText="Try to Load Anyway"
+    cancelButtonText="Cancel"
+  ></swal>
+
+  <swal
+    #deleteSwal
+    [title]="'Delete ' + pendingSlotName() + '?'"
+    text="This save data will be permanently deleted."
+    icon="error"
+    confirmButtonText="Delete"
+    cancelButtonText="Cancel"
+  ></swal>
 </div>

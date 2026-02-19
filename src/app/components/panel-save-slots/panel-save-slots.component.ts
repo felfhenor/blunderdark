@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   signal,
+  viewChild,
   type OnInit,
 } from '@angular/core';
 import {
@@ -20,25 +21,12 @@ import {
 import { saveDeserialize, saveDeserializeForceLoad } from '@helpers/save';
 import { notifyError, notifySuccess, notifyWarning } from '@helpers/notify';
 import type { SaveSlotId, SaveSlotMeta } from '@interfaces';
-
-async function swalConfirm(opts: {
-  title: string;
-  text: string;
-  icon: 'warning' | 'error';
-  confirmButtonText: string;
-}): Promise<boolean> {
-  const { default: Swal } = await import('sweetalert2');
-  const result = await Swal.fire({
-    ...opts,
-    showCancelButton: true,
-    cancelButtonText: 'Cancel',
-  });
-  return result.isConfirmed;
-}
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-save-slots',
-  imports: [DatePipe],
+  imports: [DatePipe, SweetAlert2Module],
   templateUrl: './panel-save-slots.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -49,6 +37,14 @@ export class PanelSaveSlotsComponent implements OnInit {
   public storageUsed = signal(0);
   public storageQuota = signal(0);
   public isBusy = signal(false);
+
+  private overwriteSwal = viewChild<SwalComponent>('overwriteSwal');
+  private loadSwal = viewChild<SwalComponent>('loadSwal');
+  private newerVersionSwal = viewChild<SwalComponent>('newerVersionSwal');
+  private deleteSwal = viewChild<SwalComponent>('deleteSwal');
+
+  public pendingSlotName = signal('');
+  public newerVersionText = signal('');
 
   public storagePercent = computed(() => {
     const quota = this.storageQuota();
@@ -90,13 +86,9 @@ export class PanelSaveSlotsComponent implements OnInit {
     const meta = this.metaIndex()[slotId];
 
     if (!meta.isEmpty) {
-      const confirmed = await swalConfirm({
-        title: `Overwrite ${saveSlotDisplayName(slotId)}?`,
-        text: 'This will replace the existing save data. This cannot be undone.',
-        icon: 'warning',
-        confirmButtonText: 'Overwrite',
-      });
-      if (!confirmed) return;
+      this.pendingSlotName.set(saveSlotDisplayName(slotId));
+      const result = await this.overwriteSwal()?.fire();
+      if (!result?.isConfirmed) return;
     }
 
     try {
@@ -112,13 +104,9 @@ export class PanelSaveSlotsComponent implements OnInit {
   }
 
   public async loadFromSlot(slotId: SaveSlotId): Promise<void> {
-    const confirmed = await swalConfirm({
-      title: `Load ${saveSlotDisplayName(slotId)}?`,
-      text: 'Your current unsaved progress will be lost.',
-      icon: 'warning',
-      confirmButtonText: 'Load',
-    });
-    if (!confirmed) return;
+    this.pendingSlotName.set(saveSlotDisplayName(slotId));
+    const loadResult = await this.loadSwal()?.fire();
+    if (!loadResult?.isConfirmed) return;
 
     try {
       this.isBusy.set(true);
@@ -132,14 +120,12 @@ export class PanelSaveSlotsComponent implements OnInit {
 
       if (!result.success) {
         if (result.isNewerVersion) {
-          const newerConfirmed = await swalConfirm({
-            title: 'Newer Save Version',
-            text: result.error ?? 'This save is from a newer game version.',
-            icon: 'warning',
-            confirmButtonText: 'Try to Load Anyway',
-          });
+          this.newerVersionText.set(
+            result.error ?? 'This save is from a newer game version.',
+          );
+          const newerResult = await this.newerVersionSwal()?.fire();
 
-          if (newerConfirmed) {
+          if (newerResult?.isConfirmed) {
             try {
               saveDeserializeForceLoad(saveData);
               notifyWarning('Loaded save from newer version — some data may be lost.');
@@ -167,13 +153,9 @@ export class PanelSaveSlotsComponent implements OnInit {
   public async deleteSlot(slotId: SaveSlotId): Promise<void> {
     if (slotId === 'autosave') return;
 
-    const confirmed = await swalConfirm({
-      title: `Delete ${saveSlotDisplayName(slotId)}?`,
-      text: 'This save data will be permanently deleted.',
-      icon: 'error',
-      confirmButtonText: 'Delete',
-    });
-    if (!confirmed) return;
+    this.pendingSlotName.set(saveSlotDisplayName(slotId));
+    const deleteResult = await this.deleteSwal()?.fire();
+    if (!deleteResult?.isConfirmed) return;
 
     try {
       this.isBusy.set(true);

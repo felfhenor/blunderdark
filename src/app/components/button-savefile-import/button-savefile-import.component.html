@@ -14,3 +14,11 @@
   accept=".grdh"
   (change)="importSavefile($event)"
 />
+<swal
+  #newerVersionSwal
+  title="Newer Save Version"
+  [text]="newerVersionText()"
+  icon="warning"
+  confirmButtonText="Try to Load Anyway"
+  cancelButtonText="Cancel"
+></swal>

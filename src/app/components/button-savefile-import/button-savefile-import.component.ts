@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -12,15 +12,19 @@ import {
   saveDeserialize,
   saveDeserializeForceLoad,
 } from '@helpers';
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-button-savefile-import',
-  imports: [AnalyticsClickDirective, SFXDirective],
+  imports: [AnalyticsClickDirective, SFXDirective, SweetAlert2Module],
   templateUrl: './button-savefile-import.component.html',
   styleUrl: './button-savefile-import.component.scss',
 })
 export class ButtonSavefileImportComponent {
   private router = inject(Router);
+  private newerVersionSwal = viewChild<SwalComponent>('newerVersionSwal');
+  public newerVersionText = signal('');
 
   importSavefile(e: Event) {
     const fileInput = e.target as HTMLInputElement;
@@ -64,17 +68,12 @@ export class ButtonSavefileImportComponent {
 
         if (!result.success) {
           if (result.isNewerVersion) {
-            const { default: Swal } = await import('sweetalert2');
-            const swalResult = await Swal.fire({
-              title: 'Newer Save Version',
-              text: result.error,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Try to Load Anyway',
-              cancelButtonText: 'Cancel',
-            });
+            this.newerVersionText.set(
+              result.error ?? 'This save is from a newer game version.',
+            );
+            const swalResult = await this.newerVersionSwal()?.fire();
 
-            if (swalResult.isConfirmed) {
+            if (swalResult?.isConfirmed) {
               try {
                 saveDeserializeForceLoad(saveData);
                 notifyWarning('Loaded save from newer version — some data may be lost.');
