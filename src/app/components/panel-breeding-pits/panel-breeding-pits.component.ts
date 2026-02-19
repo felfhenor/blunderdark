@@ -24,6 +24,7 @@ import type {
   InhabitantInstanceId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-breeding-pits',
@@ -59,6 +60,12 @@ export class PanelBreedingPitsComponent {
     if (!room || room.roomTypeId !== roomRoleFindById('breedingPits')) return undefined;
 
     return room;
+  });
+
+  public roomDef = computed(() => {
+    const room = this.breedingRoom();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
   });
 
   public assignedInhabitants = computed(() => {

@@ -125,7 +125,7 @@ export class PanelAltarComponent {
   public async onRecruit(def: InhabitantContent): Promise<void> {
     const result = await recruitmentRecruit(def);
     if (result.success) {
-      notifySuccess(`Recruited ${def.name}!`);
+      notifySuccess(`Recruited ${result.instance!.name} the ${def.name}!`);
     } else if (result.error) {
       notifyError(result.error);
     }

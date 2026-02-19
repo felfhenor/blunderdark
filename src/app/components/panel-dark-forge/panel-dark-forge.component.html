@@ -1,6 +1,11 @@
 @if (forgeRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
+      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Dark Forge' }}</h3>
+      <div class="mt-2">
+        <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
+      </div>
+
       <!-- Active Queue -->
       @if (queueState(); as qs) {
         <div class="divider my-2 text-xs opacity-60">Crafting Queue ({{ qs.jobs.length | number:'1.0-2' }}/{{ qs.maxSize | number:'1.0-2' }})</div>

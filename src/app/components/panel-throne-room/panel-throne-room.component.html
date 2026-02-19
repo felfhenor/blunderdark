@@ -1,7 +1,10 @@
 @if (throneRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">Throne Room</h3>
+      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Throne Room' }}</h3>
+      <div class="mt-2">
+        <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
+      </div>
 
       <!-- Ruler Section -->
       <div class="mt-2">

@@ -17,6 +17,7 @@ import {
   inhabitantUnassignFromRoom,
 } from '@helpers';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-throne-room',
@@ -39,6 +40,12 @@ export class PanelThroneRoomComponent {
       return undefined;
 
     return room;
+  });
+
+  public roomDef = computed(() => {
+    const room = this.throneRoom();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
   });
 
   public rulerInfo = computed(() => {

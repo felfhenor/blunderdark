@@ -29,6 +29,7 @@ import type {
   SummonRecipeId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-summoning-circle',
@@ -61,6 +62,12 @@ export class PanelSummoningCircleComponent {
       if (room) return room;
     }
     return undefined;
+  });
+
+  public roomDef = computed(() => {
+    const room = this.summoningRoom();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
   });
 
   public assignedInhabitants = computed(() => {

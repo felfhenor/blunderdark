@@ -1,6 +1,11 @@
 @if (summoningRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
+      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Summoning Circle' }}</h3>
+      <div class="mt-2">
+        <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
+      </div>
+
       <!-- Active Summoning Job -->
       @if (summoningProgress(); as sp) {
         <div class="mt-2">

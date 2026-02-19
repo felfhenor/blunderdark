@@ -23,6 +23,7 @@ import type {
   PrisonerId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-torture-chamber',
@@ -75,6 +76,12 @@ export class PanelTortureChamberComponent {
     }
 
     return undefined;
+  });
+
+  public roomDef = computed(() => {
+    const room = this.tortureRoom();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
   });
 
   public assignedInhabitants = computed(() => {

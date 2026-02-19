@@ -110,7 +110,7 @@ export function recruitmentGetAdjustedCost(
  */
 export async function recruitmentRecruit(
   def: InhabitantContent,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; instance?: InhabitantInstance }> {
   if (!altarRoomCanRecruit()) {
     return { success: false, error: 'Altar required for recruitment' };
   }
@@ -150,5 +150,5 @@ export async function recruitmentRecruit(
 
   await inhabitantAdd(instance);
 
-  return { success: true };
+  return { success: true, instance };
 }

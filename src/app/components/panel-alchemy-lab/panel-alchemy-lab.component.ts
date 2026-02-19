@@ -27,6 +27,7 @@ import type {
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
@@ -49,6 +50,12 @@ export class PanelAlchemyLabComponent {
       if (room) return room;
     }
     return undefined;
+  });
+
+  public roomDef = computed(() => {
+    const room = this.labRoom();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
   });
 
   public assignedWorkers = computed(() => {

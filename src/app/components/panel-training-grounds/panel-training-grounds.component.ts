@@ -14,6 +14,7 @@ import type {
   TrainingBonuses,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-training-grounds',
@@ -32,6 +33,12 @@ export class PanelTrainingGroundsComponent {
       if (room) return trainingGetRoomInfo(room.id);
     }
     return undefined;
+  });
+
+  public roomDef = computed(() => {
+    const info = this.trainingRoom();
+    if (!info) return undefined;
+    return contentGetEntry<RoomContent>(info.placedRoom.roomTypeId);
   });
 
   public trainees = computed(() => {
