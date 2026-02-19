@@ -437,6 +437,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 
 ## Workflow Requirements
 
+- **Verification**: Always run `npm run lint`, `npm run test`, then `npm run build:app` (NOT `npm run build`). `build:app` only runs the Angular production build, which catches type errors that lint/vitest don't. The full `build` command includes gamedata/spritesheet/changelog steps that are slow and unnecessary for verification.
 - **Prettier on save**: After editing any `.html` or `.ts` file, run `npx prettier --write <file>` on it before committing to ensure it conforms to codebase formatting standards.
 - **Verify UI changes in browser**: After making UI changes, use the `dev-browser` skill to double-check the result visually in the browser.
 - **Check for running dev server**: Before starting a local server with `npm start`, check if one is already running on `localhost:9766` (the default game port/host).
