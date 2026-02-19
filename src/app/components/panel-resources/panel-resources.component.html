@@ -28,7 +28,7 @@
   @for (res of resources; track res.type) {
     <div
       class="resource-item"
-      [class]="getWarningClass(res.type)"
+      [ngClass]="getWarningClass(res.type)"
       [tp]="resourceTip"
       tpPlacement="right"
       [tpDelay]="250"
@@ -36,7 +36,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <span class="text-sm font-semibold truncate"><app-currency-name [type]="res.type" /></span>
         @if (res.type === 'corruption') {
-          <span class="badge badge-xs" [class]="getCorruptionBadgeClass(corruptionInfo().level)">
+          <span class="badge badge-xs" [ngClass]="getCorruptionBadgeClass(corruptionInfo().level)">
             {{ corruptionInfo().level | uppercase }}
           </span>
         }
@@ -58,7 +58,7 @@
 
       <progress
         class="progress w-full h-2 mb-2"
-        [class]="res.type === 'corruption' ? 'corruption-progress-' + corruptionInfo().level : res.color"
+        [ngClass]="res.type === 'corruption' ? 'corruption-progress-' + corruptionInfo().level : res.color"
         [value]="getPercent(res.type)"
         max="100"
       ></progress>
@@ -75,7 +75,7 @@
       @if (res.type === 'corruption') {
         <div class="flex justify-between text-xs mb-1">
           <span class="opacity-70">Level:</span>
-          <span class="font-semibold" [class]="getCorruptionColorClass(corruptionInfo().level)">
+          <span class="font-semibold" [ngClass]="getCorruptionColorClass(corruptionInfo().level)">
             {{ corruptionInfo().level | uppercase }}
           </span>
         </div>
@@ -110,7 +110,7 @@
             @if (bd.modifierEffect !== 0) {
               <div class="flex justify-between">
                 <span class="opacity-70">Modifiers:</span>
-                <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+                <span [class.text-success]="bd.modifierEffect > 0" [class.text-error]="bd.modifierEffect <= 0">
                   {{ formatBreakdownRate(bd.modifierEffect) }}/sec
                 </span>
               </div>
@@ -139,7 +139,7 @@
           <div class="divider my-0.5 h-0"></div>
           <div class="flex justify-between font-semibold">
             <span>Net:</span>
-            <span [class]="info.net > 0 ? 'text-success' : info.net < 0 ? 'text-error' : ''">{{ formatBreakdownRate(info.net) }}/sec</span>
+            <span [class.text-success]="info.net > 0" [class.text-error]="info.net < 0">{{ formatBreakdownRate(info.net) }}/sec</span>
           </div>
         </div>
       }

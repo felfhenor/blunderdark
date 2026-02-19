@@ -1,4 +1,4 @@
-import { DecimalPipe, UpperCasePipe } from '@angular/common';
+import { DecimalPipe, NgClass, UpperCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -82,7 +82,7 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-resource-bar-top',
-  imports: [DecimalPipe, UpperCasePipe, CurrencyNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyNameComponent, TippyDirective],
   templateUrl: './resource-bar-top.component.html',
   styleUrl: './resource-bar-top.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

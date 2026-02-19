@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
@@ -14,12 +15,12 @@ import type {
 
 @Component({
   selector: 'app-panel-time-of-day',
-  imports: [CurrencyNameComponent],
+  imports: [NgClass, CurrencyNameComponent],
   template: `
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body p-4 gap-2">
         <div class="flex items-center justify-between">
-          <span class="badge badge-sm" [class]="phaseBadgeClass()">
+          <span class="badge badge-sm" [ngClass]="phaseBadgeClass()">
             {{ phaseLabel() }}
           </span>
           <span class="text-xs opacity-70 font-mono">{{ time() }}</span>

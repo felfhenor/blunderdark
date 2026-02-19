@@ -58,7 +58,7 @@
                   <span class="font-semibold text-sm">{{ entry.trade.name }}</span>
                   <span
                     class="badge badge-xs"
-                    [class]="getCategoryBadgeClass(entry.trade.type)"
+                    [ngClass]="getCategoryBadgeClass(entry.trade.type)"
                   >{{ getCategoryLabel(entry.trade.type) }}</span>
                 </div>
                 <p class="text-xs opacity-60 mt-0.5">{{ entry.trade.description }}</p>

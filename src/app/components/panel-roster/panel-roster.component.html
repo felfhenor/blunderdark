@@ -36,7 +36,7 @@
                 <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
                 <span class="text-xs font-semibold truncate">{{ entry.def.name }}</span>
               </div>
-              <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
+              <span class="badge badge-xs" [ngClass]="getStateClass(entry.instance.state)">
                 {{ entry.instance.state }}
               </span>
             </div>
@@ -84,7 +84,7 @@
             <span class="opacity-70">Type:</span> {{ entry.def.type }}
             <span class="opacity-70 ml-2">Tier:</span> {{ entry.def.tier | number:'1.0-2' }}
             <span class="opacity-70 ml-2">State:</span>
-            <span class="badge badge-xs" [class]="getStateClass(entry.instance.state)">
+            <span class="badge badge-xs" [ngClass]="getStateClass(entry.instance.state)">
               {{ entry.instance.state }}
             </span>
           </div>

@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
@@ -60,7 +60,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
+  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

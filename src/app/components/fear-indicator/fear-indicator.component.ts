@@ -33,7 +33,8 @@ import { TippyDirective } from '@ngneat/helipopper';
           @if (b.inhabitantModifier !== 0) {
             <div
               class="text-xs"
-              [class]="b.inhabitantModifier > 0 ? 'text-error' : 'text-success'"
+              [class.text-error]="b.inhabitantModifier > 0"
+              [class.text-success]="b.inhabitantModifier <= 0"
             >
               Inhabitants: {{ b.inhabitantModifier > 0 ? '+' : ''
               }}{{ b.inhabitantModifier }}
@@ -42,7 +43,8 @@ import { TippyDirective } from '@ngneat/helipopper';
           @if (b.upgradeAdjustment !== 0) {
             <div
               class="text-xs"
-              [class]="b.upgradeAdjustment > 0 ? 'text-error' : 'text-success'"
+              [class.text-error]="b.upgradeAdjustment > 0"
+              [class.text-success]="b.upgradeAdjustment <= 0"
             >
               Upgrades: {{ b.upgradeAdjustment > 0 ? '+' : ''
               }}{{ b.upgradeAdjustment }}

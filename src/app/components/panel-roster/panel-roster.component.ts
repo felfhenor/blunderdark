@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -36,7 +36,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, StatNameComponent, TippyDirective],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

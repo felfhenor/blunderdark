@@ -16,7 +16,7 @@
 
           <progress
             class="progress w-full h-2"
-            [class]="category.color"
+            [ngClass]="category.color"
             [class.legendary-bar]="isLegendary(category.type)"
             [value]="getProgressPercent(category.type)"
             max="100"
@@ -31,7 +31,7 @@
         @for (effect of activeEffects(); track effect.id) {
           <div class="active-effect">
             <div class="flex items-center gap-1">
-              <span class="badge badge-xs" [class]="getEffectBadgeClass(effect)">
+              <span class="badge badge-xs" [ngClass]="getEffectBadgeClass(effect)">
                 {{ getEffectIcon(effect) }}
               </span>
               <span class="text-xs font-medium">{{ effect.name }}</span>

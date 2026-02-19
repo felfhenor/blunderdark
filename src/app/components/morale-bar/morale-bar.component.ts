@@ -4,6 +4,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import {
   moraleCurrent,
   moraleEventLog,
@@ -14,13 +15,13 @@ import type { MoraleEvent } from '@interfaces/morale';
 
 @Component({
   selector: 'app-morale-bar',
-  imports: [],
+  imports: [NgClass],
   template: `
     @if (isVisible()) {
       <div class="morale-container">
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
-          <span class="text-xs font-mono" [class]="valueLabelClass()">
+          <span class="text-xs font-mono" [ngClass]="valueLabelClass()">
             {{ moraleCurrent() }}/{{ moraleMax }}
           </span>
         </div>
@@ -32,7 +33,7 @@ import type { MoraleEvent } from '@interfaces/morale';
         >
           <progress
             class="progress w-full h-3"
-            [class]="progressClass()"
+            [ngClass]="progressClass()"
             [value]="moraleCurrent()"
             [max]="moraleMax"
           ></progress>
@@ -45,7 +46,7 @@ import type { MoraleEvent } from '@interfaces/morale';
         </div>
 
         @if (latestEvent(); as evt) {
-          <div class="morale-float-text text-xs font-semibold mt-0.5" [class]="floatTextClass()">
+          <div class="morale-float-text text-xs font-semibold mt-0.5" [ngClass]="floatTextClass()">
             {{ evt.delta > 0 ? '+' : '' }}{{ evt.delta }} {{ evt.description }}
           </div>
         }

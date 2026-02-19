@@ -160,7 +160,7 @@
                         <div class="stat-compare text-center">
                           <div class="opacity-50"><app-stat-name [type]="s.stat" /></div>
                           <div class="font-bold">{{ s.hybridValue | number:'1.0-2' }}</div>
-                          <div class="text-xs" [class]="getDeltaClass(s.delta)">
+                          <div class="text-xs" [ngClass]="getDeltaClass(s.delta)">
                             {{ formatDelta(s.delta) }}
                           </div>
                         </div>

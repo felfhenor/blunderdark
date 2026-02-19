@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   gamestate,
@@ -30,7 +30,7 @@ const REPUTATION_CATEGORIES: ReputationCategory[] = [
 
 @Component({
   selector: 'app-panel-reputation',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, NgClass],
   templateUrl: './panel-reputation.component.html',
   styleUrl: './panel-reputation.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,6 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import {
   gamestate,
   contentGetEntry,
@@ -15,13 +16,13 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-hunger-indicator',
-  imports: [TippyDirective],
+  imports: [NgClass, TippyDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (shouldShow()) {
       <span
         class="hunger-badge"
-        [class]="hungerClass()"
+        [ngClass]="hungerClass()"
         [tp]="hungerTip"
         [tpDelay]="250"
       >
