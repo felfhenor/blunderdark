@@ -435,6 +435,13 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Modal tabs**: `isModal: true` tabs emit `modalTabClick` output instead of opening overlay (Research, Fusion, Victory)
 - **Z-index**: rail at z-index 30 (above PIXI canvas, below modals)
 
+## Workflow Requirements
+
+- **Prettier on save**: After editing any `.html` or `.ts` file, run `npx prettier --write <file>` on it before committing to ensure it conforms to codebase formatting standards.
+- **Verify UI changes in browser**: After making UI changes, use the `dev-browser` skill to double-check the result visually in the browser.
+- **Check for running dev server**: Before starting a local server with `npm start`, check if one is already running on `localhost:9766` (the default game port/host).
+- **Window API access**: Every exported function in `src/app/helpers/` is available at runtime on the `window.api` object (e.g., `window.api.someHelperFunction()`).
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
