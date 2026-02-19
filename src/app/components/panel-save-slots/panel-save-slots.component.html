@@ -81,25 +81,6 @@
     }
   </div>
 
-  @if (storageQuota() > 0) {
-    <div class="mt-1">
-      <div class="flex items-center justify-between text-xs opacity-60 mb-1">
-        <span>Storage: {{ formatBytes(storageUsed()) }} / {{ formatBytes(storageQuota()) }}</span>
-        <span>{{ storagePercent() }}%</span>
-      </div>
-      <progress
-        class="progress w-full"
-        [class.progress-warning]="storageWarning()"
-        [class.progress-info]="!storageWarning()"
-        [value]="storagePercent()"
-        max="100"
-      ></progress>
-      @if (storageWarning()) {
-        <p class="text-xs text-warning mt-1">Storage is running low. Consider deleting old saves.</p>
-      }
-    </div>
-  }
-
   <swal
     #overwriteSwal
     [title]="'Overwrite ' + pendingSlotName() + '?'"

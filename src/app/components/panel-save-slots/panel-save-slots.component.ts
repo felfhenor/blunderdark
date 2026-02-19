@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   signal,
   viewChild,
   type OnInit,
@@ -10,7 +9,6 @@ import {
 import {
   saveSlotDelete,
   saveSlotDisplayName,
-  saveSlotEstimateStorage,
   saveSlotMetaIndex,
   saveSlotRead,
   saveSlotRefreshMeta,
@@ -34,8 +32,6 @@ export class PanelSaveSlotsComponent implements OnInit {
   public slotIds = SAVE_SLOT_IDS;
   public manualSlotIds = SAVE_SLOT_MANUAL_IDS;
   public metaIndex = saveSlotMetaIndex;
-  public storageUsed = signal(0);
-  public storageQuota = signal(0);
   public isBusy = signal(false);
 
   private overwriteSwal = viewChild<SwalComponent>('overwriteSwal');
@@ -46,17 +42,8 @@ export class PanelSaveSlotsComponent implements OnInit {
   public pendingSlotName = signal('');
   public newerVersionText = signal('');
 
-  public storagePercent = computed(() => {
-    const quota = this.storageQuota();
-    if (quota <= 0) return 0;
-    return Math.round((this.storageUsed() / quota) * 100);
-  });
-
-  public storageWarning = computed(() => this.storagePercent() > 80);
-
   async ngOnInit(): Promise<void> {
     await saveSlotRefreshMeta();
-    await this.refreshStorage();
   }
 
   public slotDisplayName(slotId: SaveSlotId): string {
@@ -74,14 +61,6 @@ export class PanelSaveSlotsComponent implements OnInit {
     return `${m}m`;
   }
 
-  public formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const value = bytes / Math.pow(1024, i);
-    return `${value.toFixed(1)} ${units[i]}`;
-  }
-
   public async saveToSlot(slotId: SaveSlotId): Promise<void> {
     const meta = this.metaIndex()[slotId];
 
@@ -95,7 +74,6 @@ export class PanelSaveSlotsComponent implements OnInit {
       this.isBusy.set(true);
       await saveSlotWrite(slotId);
       notifySuccess(`Saved to ${saveSlotDisplayName(slotId)}`);
-      await this.refreshStorage();
     } catch {
       notifyError(`Failed to save to ${saveSlotDisplayName(slotId)}`);
     } finally {
@@ -161,7 +139,6 @@ export class PanelSaveSlotsComponent implements OnInit {
       this.isBusy.set(true);
       await saveSlotDelete(slotId);
       notifySuccess(`Deleted ${saveSlotDisplayName(slotId)}`);
-      await this.refreshStorage();
     } catch {
       notifyError(`Failed to delete ${saveSlotDisplayName(slotId)}`);
     } finally {
@@ -173,9 +150,4 @@ export class PanelSaveSlotsComponent implements OnInit {
     return this.metaIndex()[slotId];
   }
 
-  private async refreshStorage(): Promise<void> {
-    const storage = await saveSlotEstimateStorage();
-    this.storageUsed.set(storage.usedBytes);
-    this.storageQuota.set(storage.quotaBytes);
-  }
 }
