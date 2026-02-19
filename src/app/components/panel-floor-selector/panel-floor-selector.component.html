@@ -22,7 +22,7 @@
         <button
           class="btn btn-sm btn-primary btn-block"
           [disabled]="!canCreate().canCreate"
-          [swal]="createFloorSwal"
+          (click)="openCreateModal()"
         >
           + Create New Floor
         </button>
@@ -41,16 +41,51 @@
       </div>
     }
 
-    <swal
-      #createFloorSwal
-      title="Create New Floor?"
-      [text]="'This will cost ' + nextFloorCostLabel() + '.'"
-      icon="question"
-      confirmButtonText="Yes, create floor"
-      cancelButtonText="Cancel"
-      [showCancelButton]="true"
-      (confirm)="onConfirmCreateFloor()"
-    ></swal>
+    <app-modal [(visible)]="showCreateModal">
+      <div title>Create New Floor</div>
+
+      <div body>
+        <div class="flex flex-row flex-wrap justify-center gap-2 mb-3">
+          @for (option of biomeOptions; track option.value) {
+            <button
+              class="btn btn-sm biome-btn"
+              [class.btn-active]="selectedBiome() === option.value"
+              [style.--btn-color]="option.color"
+              (click)="selectedBiome.set(option.value)"
+            >
+              <span class="biome-dot w-3 h-3 rounded-full mr-1"></span>
+              {{ option.name }}
+            </button>
+          }
+        </div>
+
+        @for (option of biomeOptions; track option.value) {
+          @if (option.value === selectedBiome()) {
+            <div
+              class="text-sm text-center p-2 rounded bg-base-200 biome-description mb-3"
+              [style.--btn-color]="option.color"
+            >
+              {{ option.description }}
+            </div>
+          }
+        }
+
+        <div class="text-xs opacity-60 text-center">
+          Cost: {{ nextFloorCostLabel() }}
+        </div>
+      </div>
+
+      <div actions>
+        <button class="btn btn-sm" (click)="showCreateModal.set(false)">Cancel</button>
+        <button
+          class="btn btn-sm btn-primary"
+          [disabled]="!canCreate().canCreate"
+          (click)="onConfirmCreateFloor()"
+        >
+          Create Floor
+        </button>
+      </div>
+    </app-modal>
 
     @if (selectedFloor(); as floor) {
       <div class="divider my-2"></div>
