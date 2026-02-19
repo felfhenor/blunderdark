@@ -11,6 +11,8 @@ import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   uiCloseAllMenus,
+  floorAll,
+  floorCurrent,
   GAME_TIME_SPEEDS,
   gameTimeSpeed,
   optionsGet,
@@ -61,6 +63,8 @@ export class NavbarComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public gameTimeSpeed = gameTimeSpeed;
   public gameSpeeds = GAME_TIME_SPEEDS;
+  public currentFloorDepth = computed(() => floorCurrent()?.depth ?? 1);
+  public totalFloors = computed(() => floorAll().length);
 
   public readonly panelConfigs: Array<{
     name: string;

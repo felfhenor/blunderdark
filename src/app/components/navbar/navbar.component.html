@@ -1,7 +1,10 @@
 <div class="navbar bg-base-100 relative flex py-0">
   <div class="navbar-start flex-1">
-    <div class="px-2" appRequireSetup>
+    <div class="px-2 flex items-center gap-2" appRequireSetup>
       <app-display-game-time />
+      <span class="text-xs font-mono opacity-70" tp="Current Floor / Total Floors">
+        F{{ currentFloorDepth() }}/{{ totalFloors() }}
+      </span>
     </div>
   </div>
 
