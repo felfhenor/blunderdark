@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { biomeIsUnlocked } from '@helpers/biome';
 import { rngChoice, rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { BiomeType, GameId, GameStateWorld } from '@interfaces';
@@ -31,12 +32,14 @@ export function worldGetStartingBiome(): BiomeType | 'random' {
 }
 
 /**
- * Resolve the starting biome - if 'random', pick one from the random pool.
+ * Resolve the starting biome - if 'random', pick one from the unlocked random pool.
  */
 export function worldResolveStartingBiome(): BiomeType {
   const selection = _startingBiome();
   if (selection === 'random') {
-    return rngChoice(RANDOM_BIOMES);
+    const unlocked = RANDOM_BIOMES.filter((b) => biomeIsUnlocked(b));
+    if (unlocked.length === 0) return 'neutral';
+    return rngChoice(unlocked);
   }
   return selection;
 }

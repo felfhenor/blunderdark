@@ -24,7 +24,7 @@
         </div>
 
         <div class="flex flex-row flex-wrap justify-center gap-2 pt-2 w-full">
-          @for (option of biomeOptions; track option.value) {
+          @for (option of biomeOptions(); track option.value) {
             <button
               class="btn btn-sm biome-btn"
               [class.btn-active]="selectedBiome() === option.value"
@@ -42,7 +42,7 @@
         </div>
 
         @if (selectedBiome(); as biome) {
-          @for (option of biomeOptions; track option.value) {
+          @for (option of biomeOptions(); track option.value) {
             @if (option.value === biome) {
               <div
                 class="text-sm text-center mt-2 p-2 rounded bg-base-200 biome-description"

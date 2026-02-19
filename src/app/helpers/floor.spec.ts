@@ -1,19 +1,29 @@
 import {
+  floorCanChangeBiome,
   floorCanCreate,
+  floorCanRemove,
+  floorChangeBiome,
   floorCreate,
   floorGet,
   floorGetBiome,
   floorGetByDepth,
   floorGetCreationCost,
+  floorGetRemovalRefund,
   floorMigrate,
+  floorRemove,
 } from '@helpers/floor';
 import type { Floor, FloorId } from '@interfaces';
+import type { RoomId } from '@interfaces/content-room';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGamestate = vi.fn();
 const mockUpdateGamestate = vi.fn();
 const mockCanAfford = vi.fn();
 const mockPayCost = vi.fn();
+const mockResourceAdd = vi.fn();
+const mockBiomeIsUnlocked = vi.fn();
+const mockBiomeRestrictionCanBuild = vi.fn();
+const mockContentGetEntry = vi.fn();
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: (...args: unknown[]) => mockGamestate(...args),
@@ -23,6 +33,19 @@ vi.mock('@helpers/state-game', () => ({
 vi.mock('@helpers/resources', () => ({
   resourceCanAfford: (...args: unknown[]) => mockCanAfford(...args),
   resourcePayCost: (...args: unknown[]) => mockPayCost(...args),
+  resourceAdd: (...args: unknown[]) => mockResourceAdd(...args),
+}));
+
+vi.mock('@helpers/biome', () => ({
+  biomeIsUnlocked: (...args: unknown[]) => mockBiomeIsUnlocked(...args),
+}));
+
+vi.mock('@helpers/biome-restrictions', () => ({
+  biomeRestrictionCanBuild: (...args: unknown[]) => mockBiomeRestrictionCanBuild(...args),
+}));
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: (...args: unknown[]) => mockContentGetEntry(...args),
 }));
 
 vi.mock('@helpers/defaults', () => ({
@@ -75,6 +98,9 @@ beforeEach(() => {
   mockUpdateGamestate.mockResolvedValue(undefined);
   mockCanAfford.mockReturnValue(true);
   mockPayCost.mockResolvedValue(true);
+  mockBiomeIsUnlocked.mockReturnValue(true);
+  mockBiomeRestrictionCanBuild.mockReturnValue({ allowed: true });
+  mockContentGetEntry.mockReturnValue(undefined);
 });
 
 describe('floorGet', () => {
@@ -342,5 +368,226 @@ describe('floorMigrate', () => {
 
     floorMigrate(original);
     expect(original).toEqual(floorsCopy);
+  });
+});
+
+describe('floorCanChangeBiome', () => {
+  it('should return canChange true for compatible change', () => {
+    const result = floorCanChangeBiome('floor-1', 'volcanic');
+    expect(result.canChange).toBe(true);
+  });
+
+  it('should return false when biome is same as current', () => {
+    const result = floorCanChangeBiome('floor-1', 'neutral');
+    expect(result.canChange).toBe(false);
+    expect(result.reason).toBe('Floor already has this biome');
+  });
+
+  it('should return false when floor not found', () => {
+    const result = floorCanChangeBiome('nonexistent', 'volcanic');
+    expect(result.canChange).toBe(false);
+    expect(result.reason).toBe('Floor not found');
+  });
+
+  it('should return false when biome is not unlocked', () => {
+    mockBiomeIsUnlocked.mockReturnValue(false);
+    const result = floorCanChangeBiome('floor-1', 'corrupted');
+    expect(result.canChange).toBe(false);
+    expect(result.reason).toBe('This biome has not been unlocked yet');
+  });
+
+  it('should return false when rooms are incompatible', () => {
+    const floorWithRooms = makeFloor({
+      id: 'floor-1' as FloorId,
+      biome: 'neutral',
+      rooms: [
+        { roomTypeId: 'room-lake' as RoomId } as Floor['rooms'][0],
+      ],
+    });
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [floorWithRooms],
+        currentFloorIndex: 0,
+      },
+    });
+    mockBiomeRestrictionCanBuild.mockReturnValue({ allowed: false, reason: 'blocked' });
+    mockContentGetEntry.mockReturnValue({ name: 'Underground Lake' });
+
+    const result = floorCanChangeBiome('floor-1', 'volcanic');
+    expect(result.canChange).toBe(false);
+    expect(result.incompatibleRooms).toContain('Underground Lake');
+  });
+});
+
+describe('floorChangeBiome', () => {
+  it('should update floor biome in state', async () => {
+    const result = await floorChangeBiome('floor-1', 'volcanic');
+    expect(result).toBe(true);
+    expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
+
+    const updaterFn = mockUpdateGamestate.mock.calls[0][0];
+    const state = threeFloorState();
+    const newState = updaterFn(state);
+    expect(newState.world.floors[0].biome).toBe('volcanic');
+    expect(newState.world.floors[1].biome).toBe('volcanic');
+    expect(newState.world.floors[2].biome).toBe('crystal');
+  });
+
+  it('should return false when validation fails', async () => {
+    const result = await floorChangeBiome('floor-1', 'neutral');
+    expect(result).toBe(false);
+    expect(mockUpdateGamestate).not.toHaveBeenCalled();
+  });
+});
+
+describe('floorCanRemove', () => {
+  it('should return canRemove true when >1 floor and last is empty', () => {
+    const result = floorCanRemove();
+    expect(result.canRemove).toBe(true);
+    expect(result.reason).toBeUndefined();
+  });
+
+  it('should return false when only 1 floor exists', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [makeFloor({ id: 'floor-1' as FloorId, depth: 1 })],
+        currentFloorIndex: 0,
+      },
+    });
+
+    const result = floorCanRemove();
+    expect(result.canRemove).toBe(false);
+    expect(result.reason).toBe('Cannot remove the only floor');
+  });
+
+  it('should return false when last floor has rooms', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [
+          makeFloor({ id: 'floor-1' as FloorId, depth: 1 }),
+          makeFloor({
+            id: 'floor-2' as FloorId,
+            depth: 2,
+            rooms: [{ roomTypeId: 'room-1' } as Floor['rooms'][0]],
+          }),
+        ],
+        currentFloorIndex: 0,
+      },
+    });
+
+    const result = floorCanRemove();
+    expect(result.canRemove).toBe(false);
+    expect(result.reason).toBe('Floor must be empty before removal');
+  });
+});
+
+describe('floorGetRemovalRefund', () => {
+  it('should return 50% of creation cost for last floor', () => {
+    // Last floor is depth 3: cost is 150 crystals, 90 gold → refund 75, 45
+    const refund = floorGetRemovalRefund();
+    expect(refund).toEqual({ crystals: 75, gold: 45 });
+  });
+
+  it('should floor odd values down', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [
+          makeFloor({ id: 'floor-1' as FloorId, depth: 1 }),
+        ],
+        currentFloorIndex: 0,
+      },
+    });
+
+    // Depth 1: cost is 50 crystals, 30 gold → refund 25, 15
+    const refund = floorGetRemovalRefund();
+    expect(refund).toEqual({ crystals: 25, gold: 15 });
+  });
+
+  it('should return correct refund for depth 5', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: Array.from({ length: 5 }, (_, i) =>
+          makeFloor({ id: `floor-${i + 1}` as FloorId, depth: i + 1 }),
+        ),
+        currentFloorIndex: 0,
+      },
+    });
+
+    // Depth 5: cost is 250 crystals, 150 gold → refund 125, 75
+    const refund = floorGetRemovalRefund();
+    expect(refund).toEqual({ crystals: 125, gold: 75 });
+  });
+});
+
+describe('floorRemove', () => {
+  it('should remove last floor and refund resources', async () => {
+    const result = await floorRemove();
+    expect(result).toBe(true);
+
+    // Refund for depth 3: 75 crystals, 45 gold
+    expect(mockResourceAdd).toHaveBeenCalledWith('crystals', 75);
+    expect(mockResourceAdd).toHaveBeenCalledWith('gold', 45);
+    expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
+  });
+
+  it('should remove the last floor from state', async () => {
+    await floorRemove();
+
+    const updaterFn = mockUpdateGamestate.mock.calls[0][0];
+    const state = threeFloorState();
+    const newState = updaterFn(state);
+    expect(newState.world.floors).toHaveLength(2);
+    expect(newState.world.floors[0].id).toBe('floor-1');
+    expect(newState.world.floors[1].id).toBe('floor-2');
+  });
+
+  it('should clamp currentFloorIndex when pointing at removed floor', async () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [
+          makeFloor({ id: 'floor-1' as FloorId, depth: 1 }),
+          makeFloor({ id: 'floor-2' as FloorId, depth: 2 }),
+        ],
+        currentFloorIndex: 1,
+      },
+    });
+
+    await floorRemove();
+
+    const updaterFn = mockUpdateGamestate.mock.calls[0][0];
+    const state = {
+      world: {
+        floors: [
+          makeFloor({ id: 'floor-1' as FloorId, depth: 1 }),
+          makeFloor({ id: 'floor-2' as FloorId, depth: 2 }),
+        ],
+        currentFloorIndex: 1,
+      },
+    };
+    const newState = updaterFn(state);
+    expect(newState.world.currentFloorIndex).toBe(0);
+  });
+
+  it('should not change currentFloorIndex when not pointing at last floor', async () => {
+    await floorRemove();
+
+    const updaterFn = mockUpdateGamestate.mock.calls[0][0];
+    const state = threeFloorState(); // currentFloorIndex is 0
+    const newState = updaterFn(state);
+    expect(newState.world.currentFloorIndex).toBe(0);
+  });
+
+  it('should return false when only 1 floor exists', async () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [makeFloor({ id: 'floor-1' as FloorId, depth: 1 })],
+        currentFloorIndex: 0,
+      },
+    });
+
+    const result = await floorRemove();
+    expect(result).toBe(false);
+    expect(mockResourceAdd).not.toHaveBeenCalled();
+    expect(mockUpdateGamestate).not.toHaveBeenCalled();
   });
 });

@@ -11,6 +11,7 @@ export type Biome = {
   name: string;
   description: string;
   color: string;
+  featureFlag?: string;
 };
 
 export const BIOME_DATA: Record<BiomeType, Biome> = {
@@ -31,12 +32,14 @@ export const BIOME_DATA: Record<BiomeType, Biome> = {
     name: 'Crystal',
     description: 'Glittering caverns lined with luminous crystal growths.',
     color: '#a8dadc',
+    featureFlag: 'biome_crystal',
   },
   corrupted: {
     type: 'corrupted',
     name: 'Corrupted',
     description: 'Dark passages pulsing with malevolent energy and twisted stone.',
     color: '#6a0572',
+    featureFlag: 'biome_corrupted',
   },
   fungal: {
     type: 'fungal',

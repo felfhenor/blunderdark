@@ -1,9 +1,13 @@
 import { computed } from '@angular/core';
+import { biomeIsUnlocked } from '@helpers/biome';
+import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
+import { contentGetEntry } from '@helpers/content';
 import { defaultFloor } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
-import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { resourceAdd, resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { MAX_FLOORS } from '@interfaces/floor';
 
 const CRYSTALS_PER_DEPTH = 50;
@@ -162,6 +166,140 @@ export async function floorCreate(
   }));
 
   return newFloor;
+}
+
+/**
+ * Check whether a floor's biome can be changed to the target biome.
+ * Validates: biome is unlocked, not same as current, all existing rooms compatible.
+ */
+export function floorCanChangeBiome(
+  floorId: string,
+  targetBiome: BiomeType,
+): { canChange: boolean; reason?: string; incompatibleRooms?: string[] } {
+  const floor = floorGet(floorId);
+  if (!floor) {
+    return { canChange: false, reason: 'Floor not found' };
+  }
+
+  if (floor.biome === targetBiome) {
+    return { canChange: false, reason: 'Floor already has this biome' };
+  }
+
+  if (!biomeIsUnlocked(targetBiome)) {
+    return { canChange: false, reason: 'This biome has not been unlocked yet' };
+  }
+
+  const incompatibleRooms: string[] = [];
+  for (const room of floor.rooms) {
+    const result = biomeRestrictionCanBuild(room.roomTypeId, targetBiome, floor);
+    if (!result.allowed) {
+      const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
+      incompatibleRooms.push(roomDef?.name ?? room.roomTypeId);
+    }
+  }
+
+  if (incompatibleRooms.length > 0) {
+    const unique = [...new Set(incompatibleRooms)];
+    return {
+      canChange: false,
+      reason: `Incompatible rooms: ${unique.join(', ')}`,
+      incompatibleRooms: unique,
+    };
+  }
+
+  return { canChange: true };
+}
+
+/**
+ * Change a floor's biome. Validates compatibility first.
+ * Returns true on success, false on failure.
+ */
+export async function floorChangeBiome(
+  floorId: string,
+  targetBiome: BiomeType,
+): Promise<boolean> {
+  const { canChange } = floorCanChangeBiome(floorId, targetBiome);
+  if (!canChange) return false;
+
+  await updateGamestate((state) => ({
+    ...state,
+    world: {
+      ...state.world,
+      floors: state.world.floors.map((f) =>
+        f.id === floorId ? { ...f, biome: targetBiome } : f,
+      ),
+    },
+  }));
+
+  return true;
+}
+
+/**
+ * Check whether the last floor can be removed.
+ * Only the deepest floor can be removed, it must be empty, and at least 1 floor must remain.
+ */
+export function floorCanRemove(): { canRemove: boolean; reason?: string } {
+  const floors = gamestate().world.floors;
+
+  if (floors.length <= 1) {
+    return { canRemove: false, reason: 'Cannot remove the only floor' };
+  }
+
+  const lastFloor = floors[floors.length - 1];
+  if (lastFloor.rooms.length > 0) {
+    return {
+      canRemove: false,
+      reason: 'Floor must be empty before removal',
+    };
+  }
+
+  return { canRemove: true };
+}
+
+/**
+ * Calculate the 50% refund for removing the last floor.
+ */
+export function floorGetRemovalRefund(): ResourceCost {
+  const floors = gamestate().world.floors;
+  const lastFloor = floors[floors.length - 1];
+  const cost = floorGetCreationCost(lastFloor.depth);
+  return {
+    crystals: Math.floor((cost.crystals ?? 0) / 2),
+    gold: Math.floor((cost.gold ?? 0) / 2),
+  };
+}
+
+/**
+ * Remove the last (deepest) floor.
+ * Refunds 50% of its creation cost. Adjusts currentFloorIndex if needed.
+ * Returns true on success, false on failure.
+ */
+export async function floorRemove(): Promise<boolean> {
+  const { canRemove } = floorCanRemove();
+  if (!canRemove) return false;
+
+  const refund = floorGetRemovalRefund();
+
+  if (refund.crystals) resourceAdd('crystals', refund.crystals);
+  if (refund.gold) resourceAdd('gold', refund.gold);
+
+  await updateGamestate((state) => {
+    const newFloors = state.world.floors.slice(0, -1);
+    const newIndex = Math.min(
+      state.world.currentFloorIndex,
+      newFloors.length - 1,
+    );
+    return {
+      ...state,
+      world: {
+        ...state.world,
+        floors: newFloors,
+        currentFloorIndex: newIndex,
+      },
+    };
+  });
+
+  return true;
 }
 
 /**

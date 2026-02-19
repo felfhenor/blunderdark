@@ -3,14 +3,20 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
+  biomeIsUnlocked,
   floorAll,
+  floorCanChangeBiome,
   floorCanCreate,
+  floorCanRemove,
+  floorChangeBiome,
   floorCreate,
   floorCurrent,
   floorCurrentIndex,
   floorGetCreationCost,
+  floorGetRemovalRefund,
   floorModifierFormatPercentage,
   floorModifierGet,
+  floorRemove,
   floorSetCurrentByIndex,
 } from '@helpers';
 import type { FloorDepthResourceModifier } from '@interfaces/floor-modifier';
@@ -39,44 +45,36 @@ export class PanelFloorSelectorComponent {
   public showCreateModal = signal(false);
   public selectedBiome = signal<BiomeType>('neutral');
 
-  public readonly biomeOptions: BiomeOption[] = [
-    {
-      value: 'neutral',
-      name: BIOME_DATA.neutral.name,
-      description: BIOME_DATA.neutral.description,
-      color: BIOME_DATA.neutral.color,
-    },
-    {
-      value: 'volcanic',
-      name: BIOME_DATA.volcanic.name,
-      description: BIOME_DATA.volcanic.description,
-      color: BIOME_DATA.volcanic.color,
-    },
-    {
-      value: 'flooded',
-      name: BIOME_DATA.flooded.name,
-      description: BIOME_DATA.flooded.description,
-      color: BIOME_DATA.flooded.color,
-    },
-    {
-      value: 'crystal',
-      name: BIOME_DATA.crystal.name,
-      description: BIOME_DATA.crystal.description,
-      color: BIOME_DATA.crystal.color,
-    },
-    {
-      value: 'corrupted',
-      name: BIOME_DATA.corrupted.name,
-      description: BIOME_DATA.corrupted.description,
-      color: BIOME_DATA.corrupted.color,
-    },
-    {
-      value: 'fungal',
-      name: BIOME_DATA.fungal.name,
-      description: BIOME_DATA.fungal.description,
-      color: BIOME_DATA.fungal.color,
-    },
+  public showChangeBiomeModal = signal(false);
+  public changeBiomeTarget = signal<BiomeType>('neutral');
+
+  public showRemoveModal = signal(false);
+
+  private static readonly ALL_BIOME_TYPES: BiomeType[] = [
+    'neutral',
+    'volcanic',
+    'flooded',
+    'crystal',
+    'corrupted',
+    'fungal',
   ];
+
+  public biomeOptions = computed<BiomeOption[]>(() => {
+    return PanelFloorSelectorComponent.ALL_BIOME_TYPES
+      .filter((type) => biomeIsUnlocked(type))
+      .map((type) => ({
+        value: type,
+        name: BIOME_DATA[type].name,
+        description: BIOME_DATA[type].description,
+        color: BIOME_DATA[type].color,
+      }));
+  });
+
+  public changeBiomeValidation = computed(() => {
+    const floor = this.selectedFloor();
+    if (!floor) return { canChange: false, reason: 'No floor selected' };
+    return floorCanChangeBiome(floor.id, this.changeBiomeTarget());
+  });
 
   public currentFloorDepth = computed(() => {
     const floor = this.selectedFloor();
@@ -116,6 +114,27 @@ export class PanelFloorSelectorComponent {
     return parts.join(' + ');
   });
 
+  public canRemove = computed(() => {
+    return floorCanRemove();
+  });
+
+  public isLastFloor = computed(() => {
+    const floors = this.floors();
+    return this.currentIndex() === floors.length - 1 && floors.length > 1;
+  });
+
+  public removalRefund = computed(() => {
+    return floorGetRemovalRefund();
+  });
+
+  public removalRefundLabel = computed(() => {
+    const refund = this.removalRefund();
+    const parts: string[] = [];
+    if (refund.crystals) parts.push(`${refund.crystals} Crystals`);
+    if (refund.gold) parts.push(`${refund.gold} Gold`);
+    return parts.join(' + ');
+  });
+
   public getBiomeData(biome: BiomeType) {
     return BIOME_DATA[biome];
   }
@@ -148,6 +167,29 @@ export class PanelFloorSelectorComponent {
   public async onConfirmCreateFloor(): Promise<void> {
     await floorCreate(this.selectedBiome());
     this.showCreateModal.set(false);
+  }
+
+  public openChangeBiomeModal(): void {
+    const floor = this.selectedFloor();
+    if (!floor) return;
+    this.changeBiomeTarget.set(floor.biome);
+    this.showChangeBiomeModal.set(true);
+  }
+
+  public async onConfirmChangeBiome(): Promise<void> {
+    const floor = this.selectedFloor();
+    if (!floor) return;
+    await floorChangeBiome(floor.id, this.changeBiomeTarget());
+    this.showChangeBiomeModal.set(false);
+  }
+
+  public openRemoveModal(): void {
+    this.showRemoveModal.set(true);
+  }
+
+  public async onConfirmRemoveFloor(): Promise<void> {
+    await floorRemove();
+    this.showRemoveModal.set(false);
   }
 
   public formatModifier(percentage: number): string {
