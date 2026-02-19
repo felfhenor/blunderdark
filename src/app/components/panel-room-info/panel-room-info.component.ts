@@ -259,7 +259,10 @@ export class PanelRoomInfoComponent {
     if (!room || !floor) return [];
 
     const ids = connectionGetAdjacentUnconnected(floor, room.id);
-    return ids.map((id) => ({ id, name: getEntityName(floor, id) }));
+    return sortBy(
+      ids.map((id) => ({ id, name: getEntityName(floor, id) })),
+      [(e) => e.name],
+    );
   });
 
   public activeConnections = computed(() => {
@@ -268,7 +271,7 @@ export class PanelRoomInfoComponent {
     if (!room || !floor) return [];
 
     const connections = connectionGetRoomConnections(floor, room.id);
-    return connections.map((conn) => {
+    const entries = connections.map((conn) => {
       const otherId =
         conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
       return {
@@ -277,6 +280,7 @@ export class PanelRoomInfoComponent {
         otherRoomName: getEntityName(floor, otherId),
       };
     });
+    return sortBy(entries, [(e) => e.otherRoomName]);
   });
 
   // --- Feature slots ---
@@ -305,7 +309,7 @@ export class PanelRoomInfoComponent {
     const allFeatures = contentGetEntriesByType<FeatureContent>('feature');
     const resources = gamestate().world.resources;
 
-    return allFeatures.map((f) => {
+    const entries = allFeatures.map((f) => {
       const affordable = resourceCanAfford(f.cost);
       const shortfall: { type: string; needed: number; have: number }[] = [];
       if (!affordable) {
@@ -321,6 +325,7 @@ export class PanelRoomInfoComponent {
         .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
       return { feature: f, affordable, shortfall, costEntries };
     });
+    return sortBy(entries, [(e) => e.feature.name]);
   });
 
   // --- Resource Converter ---

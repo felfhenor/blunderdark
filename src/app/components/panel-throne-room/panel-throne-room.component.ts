@@ -18,6 +18,7 @@ import {
 } from '@helpers';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-throne-room',
@@ -71,7 +72,7 @@ export class PanelThroneRoomComponent {
     const floor = floorCurrent();
     if (!floor) return [];
 
-    return floor.inhabitants
+    const entries = floor.inhabitants
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
         const def = contentGetEntry<InhabitantContent>(
@@ -85,6 +86,7 @@ export class PanelThroneRoomComponent {
         );
         return { instance: i, name: def?.name ?? i.name };
       });
+    return sortBy(entries, [(e) => e.name]);
   });
 
   public async onAssignRuler(instanceId: string): Promise<void> {

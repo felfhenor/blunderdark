@@ -96,7 +96,7 @@ export class PanelSummoningCircleComponent {
       ? summoningGetAdjacentRoomTypeIds(room, floor)
       : new Set<string>();
 
-    return recipes.map((recipe) => {
+    const entries = recipes.map((recipe) => {
       const ticks = summoningGetEffectiveTicks(room, adjacentTypes, recipe.timeMultiplier);
       const statBonuses = summoningGetStatBonuses(room, adjacentTypes, recipe);
       const durationTicks = recipe.summonType === 'temporary' && recipe.duration
@@ -114,6 +114,7 @@ export class PanelSummoningCircleComponent {
         canAfford,
       };
     });
+    return sortBy(entries, [(e) => e.recipe.name]);
   });
 
   public summoningProgress = computed(() => {

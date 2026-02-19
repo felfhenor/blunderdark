@@ -88,7 +88,7 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room || room.breedingJob || room.mutationJob) return [];
 
-    return breedingGetAvailableRecipes(assigned).map((r) => {
+    const entries = breedingGetAvailableRecipes(assigned).map((r) => {
       const floor = floorCurrent();
       const adjacentTypes = floor
         ? breedingGetAdjacentRoomTypeIds(room, floor)
@@ -100,6 +100,7 @@ export class PanelBreedingPitsComponent {
         timeSeconds: ticksToRealSeconds(ticks),
       };
     });
+    return sortBy(entries, [(e) => e.recipe.resultName]);
   });
 
   public mutatableInhabitants = computed(() => {

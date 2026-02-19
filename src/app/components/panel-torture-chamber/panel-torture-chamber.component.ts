@@ -105,7 +105,7 @@ export class PanelTortureChamberComponent {
     const room = this.tortureRoom();
     if (!room || room.tortureJob) return [];
 
-    return gamestate().world.prisoners;
+    return sortBy(gamestate().world.prisoners, [(p) => p.name]);
   });
 
   public tortureProgress = computed(() => {

@@ -169,7 +169,7 @@ export class PanelFusionComponent {
     const recipes = fusionGetAllRecipes();
     const inhabitants = gamestate().world.inhabitants;
 
-    return recipes.map((recipe) => {
+    const entries = recipes.map((recipe) => {
       const parentADef = contentGetEntry<InhabitantContent>(
         recipe.firstInhabitantId,
       );
@@ -202,6 +202,7 @@ export class PanelFusionComponent {
         canPerform: hasParentA && hasParentB && canAfford,
       };
     });
+    return sortBy(entries, [(e) => e.recipe.name]);
   });
 
   public filteredRecipes = computed(() => {

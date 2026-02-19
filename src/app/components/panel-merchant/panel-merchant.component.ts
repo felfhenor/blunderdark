@@ -24,6 +24,7 @@ import type {
   ResourceCost,
   ResourceType,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 type TradeCategory = 'all' | MerchantTradeType;
 
@@ -51,7 +52,7 @@ export class PanelMerchantComponent {
 
   public tradeEntries = computed((): TradeEntry[] => {
     const inventory = merchantInventory();
-    return inventory.map((offer) => {
+    const entries = inventory.map((offer) => {
       const trade = contentGetEntry<MerchantTradeContent>(offer.tradeId);
       if (!trade) {
         return {
@@ -80,6 +81,7 @@ export class PanelMerchantComponent {
         rewardEntries: this.formatCost(trade.reward),
       };
     });
+    return sortBy(entries, [(e) => e.trade.name]);
   });
 
   public filteredTrades = computed((): TradeEntry[] => {

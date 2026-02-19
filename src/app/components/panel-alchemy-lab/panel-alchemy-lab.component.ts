@@ -85,7 +85,7 @@ export class PanelAlchemyLabComponent {
 
     const workerCount = this.assignedWorkers().length;
 
-    return recipes.map((recipe) => {
+    const entries = recipes.map((recipe) => {
       const ticks = alchemyLabGetConversionTicks(room, workerCount, recipe.baseTicks, adjacentTypes);
       const effectiveCost = alchemyLabGetEffectiveCost(room, recipe.inputCost, adjacentTypes);
       const canAfford = resourceCanAfford(effectiveCost);
@@ -98,6 +98,7 @@ export class PanelAlchemyLabComponent {
         canAfford,
       };
     });
+    return sortBy(entries, [(e) => e.recipe.name]);
   });
 
   public activeConversion = computed(() => {

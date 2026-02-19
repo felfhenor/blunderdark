@@ -91,7 +91,7 @@ export class PanelDarkForgeComponent {
 
     const workerCount = this.assignedWorkers().length;
 
-    return recipes.map((recipe) => {
+    const entries = recipes.map((recipe) => {
       const ticks = darkForgeGetCraftingTicks(room, workerCount, recipe.timeMultiplier, adjacentTypes);
       const statBonuses = darkForgeGetStatBonuses(room, recipe, adjacentTypes);
       const canAfford = resourceCanAfford(recipe.cost);
@@ -104,6 +104,7 @@ export class PanelDarkForgeComponent {
         canAfford,
       };
     });
+    return sortBy(entries, [(e) => e.recipe.name]);
   });
 
   public queueState = computed(() => {
@@ -130,7 +131,7 @@ export class PanelDarkForgeComponent {
 
   public forgeInventory = computed(() => {
     const state = gamestate();
-    return state.world.forgeInventory.map((entry) => {
+    const entries = state.world.forgeInventory.map((entry) => {
       const recipe = contentGetEntry<ForgeRecipeContent>(entry.recipeId);
       return {
         recipeId: entry.recipeId,
@@ -139,6 +140,7 @@ export class PanelDarkForgeComponent {
         category: recipe?.category ?? 'equipment',
       };
     });
+    return sortBy(entries, [(e) => e.name]);
   });
 
   public formatCost(cost: Partial<Record<ResourceType, number>>): { type: ResourceType; amount: number }[] {
