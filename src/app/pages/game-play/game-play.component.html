@@ -111,14 +111,15 @@
   </div>
 </ng-template>
 
-<app-side-tab-rail
-  [tabs]="tabDefinitions()"
-  [(activePanel)]="activePanel"
-  (modalTabClick)="onModalTabClick($event)"
-/>
-
-<div class="game-container relative">
-  <app-grid />
+<div class="game-container flex">
+  <app-side-tab-rail
+    [tabs]="tabDefinitions()"
+    [(activePanel)]="activePanel"
+    (modalTabClick)="onModalTabClick($event)"
+  />
+  <div class="flex-1 overflow-hidden">
+    <app-grid />
+  </div>
 </div>
 
 <app-game-research [(visible)]="showResearch" />
