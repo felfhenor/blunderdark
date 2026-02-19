@@ -23,7 +23,6 @@ import type { PlacedRoomId } from '@interfaces';
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4">
           <h3 class="card-title text-sm">Corridor</h3>
-
           @if (info.startRoomName && info.endRoomName) {
             <div class="text-xs opacity-50">
               <span>{{ info.startRoomName }}</span>
