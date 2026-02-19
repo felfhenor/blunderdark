@@ -19,7 +19,10 @@ import { verticalTransportTravelProcess } from '@helpers/vertical-transport';
 import { tortureChamberProcess } from '@helpers/torture-chamber';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
-import { featureSacrificeProcess, featureTrainingStationProcess } from '@helpers/features';
+import {
+  featureSacrificeProcess,
+  featureTrainingStationProcess,
+} from '@helpers/features';
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { merchantProcess } from '@helpers/merchant';
 import { seasonProcess } from '@helpers/season';
@@ -77,7 +80,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     corruptionGenerationProcess(state);
     corruptionEffectProcess(state);
     corruptionThresholdProcess(state);
-    researchProcess(state);
+    researchProcess(state, numTicks);
     trainingProcess(state);
     trapWorkshopProcess(state);
     spawningPoolProcess(state);

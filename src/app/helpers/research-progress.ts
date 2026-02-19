@@ -181,7 +181,7 @@ export const researchSpeedModifier = computed(() => {
  * Process research progress each tick. Called inside updateGamestate.
  * Mutates state in-place (same pattern as productionProcess, trainingProcess).
  */
-export function researchProcess(state: GameState): void {
+export function researchProcess(state: GameState, numTicks = 1): void {
   const research = state.world.research;
   if (!research.activeResearch) return;
 
@@ -191,7 +191,7 @@ export function researchProcess(state: GameState): void {
   const speedModifier = researchCalculateSpeedModifier(state.world.floors);
   const progressPerTick = RESEARCH_BASE_PROGRESS_PER_TICK * speedModifier;
 
-  research.activeResearchProgress += progressPerTick;
+  research.activeResearchProgress += progressPerTick * numTicks;
 
   if (research.activeResearchProgress >= node.requiredTicks) {
     research.completedNodes = [

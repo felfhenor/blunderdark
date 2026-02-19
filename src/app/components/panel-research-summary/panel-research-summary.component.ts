@@ -12,6 +12,7 @@ import {
   researchSpeedModifier,
 } from '@helpers/research-progress';
 import { gamestate } from '@helpers/state-game';
+import { optionsGet } from '@helpers/state-options';
 import type { ResearchContent } from '@interfaces';
 
 @Component({
@@ -69,8 +70,9 @@ export class PanelResearchSummaryComponent {
     const remaining = active.requiredTicks - progress;
     if (remaining <= 0) return 'Complete';
     const speed = researchSpeedModifier();
-    const ticksRemaining =
-      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
-    return formatDurationSeconds(ticksRemaining);
+    const gameSpeed = optionsGet('gameSpeed');
+    const realSeconds =
+      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed * gameSpeed);
+    return formatDurationSeconds(realSeconds);
   });
 }

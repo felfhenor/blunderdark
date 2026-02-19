@@ -11,6 +11,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { formatDurationSeconds } from '@helpers/game-time';
+import { optionsGet } from '@helpers/state-options';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
   researchArePrerequisitesMet,
@@ -83,10 +84,11 @@ export class GameResearchComponent {
     const remaining = active.requiredTicks - progress;
     if (remaining <= 0) return 'Complete';
     const speed = researchSpeedModifier();
-    const ticksRemaining =
-      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
+    const gameSpeed = optionsGet('gameSpeed');
+    const realSeconds =
+      remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed * gameSpeed);
 
-    return formatDurationSeconds(ticksRemaining);
+    return formatDurationSeconds(realSeconds);
   });
 
   public speedModifier = researchSpeedModifier;
@@ -149,8 +151,10 @@ export class GameResearchComponent {
     const node = this.selectedNode();
     if (!node) return '';
     const speed = researchSpeedModifier();
+    const gameSpeed = optionsGet('gameSpeed');
     const totalSeconds =
-      node.requiredTicks / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
+      node.requiredTicks /
+      (RESEARCH_BASE_PROGRESS_PER_TICK * speed * gameSpeed);
     return formatDurationSeconds(totalSeconds);
   });
 
