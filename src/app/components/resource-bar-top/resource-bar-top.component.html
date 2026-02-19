@@ -7,24 +7,43 @@
       tpPlacement="bottom"
       [tpDelay]="250"
     >
-      <app-currency-name [type]="res.type" [short]="true" [amount]="getCurrent(res.type)" />
+      <app-currency-name
+        [type]="res.type"
+        [short]="true"
+        [amount]="getCurrent(res.type)"
+      />
       @if (res.type === 'corruption') {
-        <span class="badge badge-xs ml-1" [class]="getCorruptionBadgeClass(corruptionInfo().level)">
+        <span
+          class="badge badge-xs ml-1"
+          [class]="getCorruptionBadgeClass(corruptionInfo().level)"
+        >
           {{ corruptionInfo().level | uppercase }}
         </span>
       } @else {
-        <span class="resource-max" [class.text-success]="isFull(res.type)" [class.opacity-50]="!isFull(res.type)">/{{ getMax(res.type) | number: '1.0-0' }}</span>
+        <span
+          class="resource-max"
+          [class.text-success]="isFull(res.type)"
+          [class.opacity-50]="!isFull(res.type)"
+        >
+          /{{ getMax(res.type) | number: '1.0-0' }}
+        </span>
       }
     </div>
 
     <ng-template #resourceTip>
       <div class="w-[300px]">
-        <div class="font-semibold text-sm mb-1"><app-currency-name [type]="res.type" /></div>
+        <div class="font-semibold text-sm mb-1">
+          <app-currency-name [type]="res.type" />
+        </div>
         <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
 
         <progress
           class="progress w-full h-2 mb-2"
-          [class]="res.type === 'corruption' ? 'corruption-progress-' + corruptionInfo().level : res.color"
+          [class]="
+            res.type === 'corruption'
+              ? 'corruption-progress-' + corruptionInfo().level
+              : res.color
+          "
           [value]="getPercent(res.type)"
           max="100"
         ></progress>
@@ -34,19 +53,27 @@
           @if (res.type === 'corruption') {
             <span>{{ getCurrent(res.type) | number: '1.0-0' }}</span>
           } @else {
-            <span>{{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}</span>
+            <span>
+              {{ getCurrent(res.type) | number: '1.0-1' }} /
+              {{ getMax(res.type) | number: '1.0-0' }}
+            </span>
           }
         </div>
 
         @if (res.type === 'corruption') {
           <div class="flex justify-between text-xs mb-1">
             <span class="opacity-70">Level:</span>
-            <span class="font-semibold" [class]="getCorruptionColorClass(corruptionInfo().level)">
+            <span
+              class="font-semibold"
+              [class]="getCorruptionColorClass(corruptionInfo().level)"
+            >
               {{ corruptionInfo().level | uppercase }}
             </span>
           </div>
           <div class="divider my-1 h-0"></div>
-          <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
+          <div class="text-xs opacity-80">
+            {{ corruptionInfo().description }}
+          </div>
         }
 
         @if (getResourceBreakdown(res.type); as info) {
@@ -61,19 +88,27 @@
               @if (bd.inhabitantBonus !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Workers:</span>
-                  <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/sec</span>
+                  <span class="text-success">
+                    {{ formatBreakdownRate(bd.inhabitantBonus) }}/sec
+                  </span>
                 </div>
               }
               @if (bd.adjacencyBonus !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Adjacency:</span>
-                  <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/sec</span>
+                  <span class="text-success">
+                    {{ formatBreakdownRate(bd.adjacencyBonus) }}/sec
+                  </span>
                 </div>
               }
               @if (bd.modifierEffect !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Modifiers:</span>
-                  <span [class]="bd.modifierEffect > 0 ? 'text-success' : 'text-error'">
+                  <span
+                    [class]="
+                      bd.modifierEffect > 0 ? 'text-success' : 'text-error'
+                    "
+                  >
                     {{ formatBreakdownRate(bd.modifierEffect) }}/sec
                   </span>
                 </div>
@@ -83,26 +118,42 @@
               @if (cd.inhabitantFood !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Feeding:</span>
-                  <span class="text-error">{{ formatBreakdownRate(-cd.inhabitantFood) }}/sec</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.inhabitantFood) }}/sec
+                  </span>
                 </div>
               }
               @if (cd.legendaryUpkeep !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Legendary Upkeep:</span>
-                  <span class="text-error">{{ formatBreakdownRate(-cd.legendaryUpkeep) }}/sec</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.legendaryUpkeep) }}/sec
+                  </span>
                 </div>
               }
               @if (cd.featureMaintenance !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Maintenance:</span>
-                  <span class="text-error">{{ formatBreakdownRate(-cd.featureMaintenance) }}/sec</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.featureMaintenance) }}/sec
+                  </span>
                 </div>
               }
             }
             <div class="divider my-0.5 h-0"></div>
             <div class="flex justify-between font-semibold">
               <span>Net:</span>
-              <span [class]="info.net > 0 ? 'text-success' : info.net < 0 ? 'text-error' : ''">{{ formatBreakdownRate(info.net) }}/sec</span>
+              <span
+                [class]="
+                  info.net > 0
+                    ? 'text-success'
+                    : info.net < 0
+                      ? 'text-error'
+                      : ''
+                "
+              >
+                {{ formatBreakdownRate(info.net) }}/sec
+              </span>
             </div>
           </div>
         }
