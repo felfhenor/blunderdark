@@ -1,7 +1,9 @@
 @if (tortureRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Torture Chamber' }}</h3>
+      <h3 class="card-title text-sm">
+        {{ roomDef()?.name ?? 'Torture Chamber' }}
+      </h3>
       <div class="mt-2">
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
@@ -11,7 +13,11 @@
         <div class="mt-2">
           <div class="flex items-center justify-between">
             <span class="text-xs">
-              @if (tp.action === 'extract') { Extracting: } @else { Converting: }
+              @if (tp.action === 'extract') {
+                Extracting:
+              } @else {
+                Converting:
+              }
               {{ tp.prisonerName }}
             </span>
             <span class="badge badge-xs badge-error">In Progress</span>
@@ -21,57 +27,74 @@
             [value]="tp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ tp.percent | number:'1.0-2' }}%</span>
+          <span class="text-xs opacity-40">
+            {{ tp.percent | number: '1.0-2' }}%
+          </span>
         </div>
       }
 
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Torturer</div>
-          <div class="flex flex-wrap gap-1">
-            @for (inh of assignedInhabitants(); track inh.instanceId) {
-              <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
-            }
-          </div>
+        <div class="flex flex-wrap gap-2">
+          @for (inh of assignedInhabitants(); track inh.instanceId) {
+            <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
+          }
+        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No torturer assigned.</p>
       }
 
       <!-- Prisoner List -->
       @if (availablePrisoners().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Prisoners ({{ availablePrisoners().length }})</div>
-          <div class="flex flex-col gap-2">
-            @for (prisoner of availablePrisoners(); track prisoner.id) {
-              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold">{{ prisoner.name }}</span>
-                  <span class="badge badge-xs badge-ghost">{{ prisoner.invaderClass }}</span>
-                </div>
-                <span class="text-xs opacity-60 inline-flex items-center gap-1 flex-wrap">
-                  <app-stat-name type="hp" [value]="prisoner.stats.hp" /> /
-                  <app-stat-name type="attack" [value]="prisoner.stats.attack" /> /
-                  <app-stat-name type="defense" [value]="prisoner.stats.defense" /> /
-                  <app-stat-name type="speed" [value]="prisoner.stats.speed" />
+        <div class="divider my-2 text-xs opacity-60">
+          Prisoners ({{ availablePrisoners().length }})
+        </div>
+        <div class="flex flex-col gap-2">
+          @for (prisoner of availablePrisoners(); track prisoner.id) {
+            <div class="flex flex-col gap-2 p-2 bg-base-200 rounded">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold">{{ prisoner.name }}</span>
+                <span class="badge badge-xs badge-ghost">
+                  {{ prisoner.invaderClass }}
                 </span>
-                @if (canStartJob()) {
-                  <div class="flex gap-1 mt-1">
-                    <button
-                      class="btn btn-xs btn-warning flex-1"
-                      (click)="startExtraction(prisoner.id)"
-                    >
-                      Extract ({{ getExtractionTime() | number:'1.0-0' }} sec)
-                    </button>
-                    <button
-                      class="btn btn-xs btn-error flex-1"
-                      (click)="startConversion(prisoner.id)"
-                    >
-                      Convert ({{ getConversionRate(prisoner.invaderClass) | number:'1.0-2' }}%)
-                    </button>
-                  </div>
-                }
               </div>
-            }
-          </div>
+              <span
+                class="text-xs opacity-60 inline-flex items-center gap-2 flex-wrap"
+              >
+                <app-stat-name type="hp" [value]="prisoner.stats.hp" />
+                /
+                <app-stat-name type="attack" [value]="prisoner.stats.attack" />
+                /
+                <app-stat-name
+                  type="defense"
+                  [value]="prisoner.stats.defense"
+                />
+                /
+                <app-stat-name type="speed" [value]="prisoner.stats.speed" />
+              </span>
+              @if (canStartJob()) {
+                <div class="flex gap-2 mt-1">
+                  <button
+                    class="btn btn-xs btn-warning flex-1"
+                    (click)="startExtraction(prisoner.id)"
+                  >
+                    Extract ({{ getExtractionTime() | number: '1.0-0' }} sec)
+                  </button>
+                  <button
+                    class="btn btn-xs btn-error flex-1"
+                    (click)="startConversion(prisoner.id)"
+                  >
+                    Convert ({{
+                      getConversionRate(prisoner.invaderClass)
+                        | number: '1.0-2'
+                    }}%)
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
       } @else if (!tortureProgress()) {
         <p class="text-xs opacity-50 mt-2">No prisoners available.</p>
       }
@@ -88,12 +111,14 @@
         <p class="text-lg font-semibold">{{ result.prisonerName }}</p>
         @if (result.type === 'extraction') {
           <p class="text-warning mt-2">
-            Extracted {{ result.researchGained | number:'1.0-2' }} research points.
+            Extracted {{ result.researchGained | number: '1.0-2' }} research
+            points.
           </p>
         } @else {
           @if (result.success) {
             <p class="text-success mt-2">
-              Conversion successful! {{ result.inhabitantName }} has joined your dungeon.
+              Conversion successful! {{ result.inhabitantName }} has joined your
+              dungeon.
             </p>
           } @else {
             <p class="text-error mt-2">

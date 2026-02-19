@@ -152,7 +152,7 @@
 
                     <!-- Stat Comparison -->
                     <div class="divider my-2 text-xs opacity-50">Stats</div>
-                    <div class="grid grid-cols-5 gap-1 text-xs">
+                    <div class="grid grid-cols-5 gap-2 text-xs">
                       @for (s of statComparison(); track s.stat) {
                         <div class="stat-compare text-center">
                           <div class="opacity-50">
@@ -177,7 +177,7 @@
                       traitAnalysis().unique.length > 0
                     ) {
                       <div class="divider my-2 text-xs opacity-50">Traits</div>
-                      <div class="flex flex-wrap gap-1">
+                      <div class="flex flex-wrap gap-2">
                         @for (
                           trait of traitAnalysis().inherited;
                           track trait.id

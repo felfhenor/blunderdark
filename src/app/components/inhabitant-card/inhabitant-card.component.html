@@ -45,8 +45,8 @@
   <!-- Full mode -->
   <div class="full-card">
     <!-- Row 1: Tier + Names + State + Synergy -->
-    <div class="flex items-center justify-between gap-1">
-      <div class="flex items-center gap-1 min-w-0">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
         <span class="badge badge-xs badge-outline font-mono">
           T{{ definition().tier | number: '1.0-2' }}
         </span>
@@ -66,7 +66,7 @@
           <span class="badge badge-xs badge-secondary">Hybrid</span>
         }
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-2">
         @if (synergyInfo(); as reasons) {
           <span class="text-success" [tp]="synergyFullTip">
             <app-icon name="tablerStar" size="14px" />

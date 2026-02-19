@@ -23,7 +23,9 @@
               <span class="badge badge-primary badge-xs">Auto</span>
             }
             @if (!meta.isEmpty) {
-              <span class="badge badge-ghost badge-xs">Day {{ meta.dayNumber }}</span>
+              <span class="badge badge-ghost badge-xs">
+                Day {{ meta.dayNumber }}
+              </span>
             }
           </div>
 
@@ -43,12 +45,14 @@
           } @else {
             <div class="text-xs opacity-60 flex flex-col gap-0.5 my-1">
               <span>{{ meta.dungeonName }}</span>
-              <span>{{ meta.floorCount }} floors, {{ meta.roomCount }} rooms</span>
+              <span>
+                {{ meta.floorCount }} floors, {{ meta.roomCount }} rooms
+              </span>
               <span>{{ meta.timestamp | date: 'short' }}</span>
               <span>Playtime: {{ formatPlaytime(meta.playtimeSeconds) }}</span>
             </div>
 
-            <div class="card-actions mt-1 flex flex-wrap gap-1">
+            <div class="card-actions mt-1 flex flex-wrap gap-2">
               @if (isManualSlot(slotId)) {
                 <button
                   class="btn btn-xs btn-warning"

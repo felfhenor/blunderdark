@@ -1,15 +1,19 @@
 @if (trainingRoom(); as info) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Training Grounds' }}</h3>
+      <h3 class="card-title text-sm">
+        {{ roomDef()?.name ?? 'Training Grounds' }}
+      </h3>
       <div class="mt-2">
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
           <span class="text-xs opacity-50">Training Time:</span>
-          <span class="text-xs font-semibold">{{ trainingTimeSeconds() | number:'1.0-0' }} sec</span>
+          <span class="text-xs font-semibold">
+            {{ trainingTimeSeconds() | number: '1.0-0' }} sec
+          </span>
         </div>
 
         @if (expectedBonuses(); as bonuses) {
@@ -17,10 +21,22 @@
             <span class="text-xs opacity-50">Bonuses:</span>
             <span class="text-xs">
               @if (bonuses.defense > 0) {
-                <span class="badge badge-xs badge-info"><app-stat-name type="defense" [value]="bonuses.defense" prefix="+" /></span>
+                <span class="badge badge-xs badge-info">
+                  <app-stat-name
+                    type="defense"
+                    [value]="bonuses.defense"
+                    prefix="+"
+                  />
+                </span>
               }
               @if (bonuses.attack > 0) {
-                <span class="badge badge-xs badge-warning"><app-stat-name type="attack" [value]="bonuses.attack" prefix="+" /></span>
+                <span class="badge badge-xs badge-warning">
+                  <app-stat-name
+                    type="attack"
+                    [value]="bonuses.attack"
+                    prefix="+"
+                  />
+                </span>
               }
             </span>
           </div>
@@ -29,39 +45,55 @@
 
       @if (trainees().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Trainees</div>
-          <div class="flex flex-col gap-2">
-            @for (trainee of trainees(); track trainee.instanceId) {
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs">{{ trainee.name }}</span>
-                  @if (trainee.trained) {
-                    <span class="badge badge-xs badge-success">Trained</span>
-                  } @else {
-                    <span class="badge badge-xs badge-warning">Training</span>
-                  }
-                </div>
-                @if (!trainee.trained) {
-                  <progress
-                    class="progress progress-info w-full"
-                    [value]="trainee.percent"
-                    max="100"
-                  ></progress>
-                  <span class="text-xs opacity-40">{{ trainee.percent | number:'1.0-2' }}%</span>
+        <div class="flex flex-col gap-2">
+          @for (trainee of trainees(); track trainee.instanceId) {
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs">{{ trainee.name }}</span>
+                @if (trainee.trained) {
+                  <span class="badge badge-xs badge-success">Trained</span>
                 } @else {
-                  <div class="flex gap-1">
-                    @if (trainee.bonuses.defense > 0) {
-                      <span class="text-xs"><app-stat-name type="defense" [value]="trainee.bonuses.defense" prefix="+" /></span>
-                    }
-                    @if (trainee.bonuses.attack > 0) {
-                      <span class="text-xs"><app-stat-name type="attack" [value]="trainee.bonuses.attack" prefix="+" /></span>
-                    }
-                  </div>
+                  <span class="badge badge-xs badge-warning">Training</span>
                 }
               </div>
-            }
-          </div>
+              @if (!trainee.trained) {
+                <progress
+                  class="progress progress-info w-full"
+                  [value]="trainee.percent"
+                  max="100"
+                ></progress>
+                <span class="text-xs opacity-40">
+                  {{ trainee.percent | number: '1.0-2' }}%
+                </span>
+              } @else {
+                <div class="flex gap-2">
+                  @if (trainee.bonuses.defense > 0) {
+                    <span class="text-xs">
+                      <app-stat-name
+                        type="defense"
+                        [value]="trainee.bonuses.defense"
+                        prefix="+"
+                      />
+                    </span>
+                  }
+                  @if (trainee.bonuses.attack > 0) {
+                    <span class="text-xs">
+                      <app-stat-name
+                        type="attack"
+                        [value]="trainee.bonuses.attack"
+                        prefix="+"
+                      />
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
       } @else {
-        <p class="text-xs opacity-50 mt-2">No inhabitants assigned for training.</p>
+        <p class="text-xs opacity-50 mt-2">
+          No inhabitants assigned for training.
+        </p>
       }
     </div>
   </div>

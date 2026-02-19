@@ -35,10 +35,7 @@
             {{ progressPercent() | number: '1.0-0' }}% &middot;
             {{ estimatedTimeRemaining() }}
           </span>
-          <button
-            class="btn btn-xs btn-error btn-outline"
-            [swal]="cancelSwal"
-          >
+          <button class="btn btn-xs btn-error btn-outline" [swal]="cancelSwal">
             Cancel
           </button>
         </div>
@@ -181,7 +178,7 @@
                 <!-- Cost -->
                 <div>
                   <div class="divider my-2 text-xs opacity-60">Cost</div>
-                  <div class="flex flex-wrap gap-1">
+                  <div class="flex flex-wrap gap-2">
                     @for (cost of formatCost(node.cost); track cost.type) {
                       <span class="badge badge-sm badge-outline">
                         {{ cost.amount | number: '1.0-2' }}
@@ -195,7 +192,7 @@
                 @if (selectedNodeUnlocks().length > 0) {
                   <div>
                     <div class="divider my-2 text-xs opacity-60">Unlocks</div>
-                    <div class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-2">
                       @for (
                         unlock of selectedNodeUnlocks();
                         track unlock.name
@@ -217,7 +214,7 @@
                     <div class="divider my-2 text-xs opacity-60">
                       Prerequisites
                     </div>
-                    <div class="flex flex-wrap gap-1">
+                    <div class="flex flex-wrap gap-2">
                       @for (
                         prereq of selectedNodePrereqs();
                         track prereq.name
@@ -265,7 +262,6 @@
                     <div class="text-xs text-error">Insufficient resources</div>
                   }
                 }
-
               </div>
             </div>
           } @else {
@@ -279,13 +275,13 @@
       </div>
     </div>
   </div>
-<swal
-  #cancelSwal
-  title="Cancel Research?"
-  text="Are you sure you want to cancel this research? You will not be refunded any spent time or resources."
-  icon="warning"
-  confirmButtonText="Cancel Research"
-  cancelButtonText="Keep Researching"
-  (confirm)="onConfirmCancel()"
-></swal>
+  <swal
+    #cancelSwal
+    title="Cancel Research?"
+    text="Are you sure you want to cancel this research? You will not be refunded any spent time or resources."
+    icon="warning"
+    confirmButtonText="Cancel Research"
+    cancelButtonText="Keep Researching"
+    (confirm)="onConfirmCancel()"
+  ></swal>
 </app-modal>

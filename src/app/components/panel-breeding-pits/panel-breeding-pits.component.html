@@ -1,7 +1,9 @@
 @if (breedingRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Breeding Pits' }}</h3>
+      <h3 class="card-title text-sm">
+        {{ roomDef()?.name ?? 'Breeding Pits' }}
+      </h3>
       <div class="mt-2">
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
@@ -18,7 +20,9 @@
             [value]="bp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ bp.percent | number:'1.0-2' }}%</span>
+          <span class="text-xs opacity-40">
+            {{ bp.percent | number: '1.0-2' }}%
+          </span>
         </div>
       }
 
@@ -34,22 +38,28 @@
             [value]="mp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ mp.percent | number:'1.0-2' }}%</span>
+          <span class="text-xs opacity-40">
+            {{ mp.percent | number: '1.0-2' }}%
+          </span>
         </div>
       }
 
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Assigned</div>
-          <div class="flex flex-wrap gap-1">
-            @for (inh of assignedInhabitants(); track inh.instanceId) {
-              <span class="badge badge-xs badge-outline">
-                {{ inh.defName }}
-                @if (inh.isHybrid) { (H) }
-                @if (inh.mutated) { (M) }
-              </span>
-            }
-          </div>
+        <div class="flex flex-wrap gap-2">
+          @for (inh of assignedInhabitants(); track inh.instanceId) {
+            <span class="badge badge-xs badge-outline">
+              {{ inh.defName }}
+              @if (inh.isHybrid) {
+                (H)
+              }
+              @if (inh.mutated) {
+                (M)
+              }
+            </span>
+          }
+        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No inhabitants assigned.</p>
       }
@@ -57,41 +67,54 @@
       <!-- Available Recipes -->
       @if (availableRecipes().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Hybrid Recipes</div>
-          <div class="flex flex-col gap-2">
-            @for (entry of availableRecipes(); track entry.recipe.id) {
-              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold">{{ entry.recipe.resultName }}</span>
-                  <span class="text-xs opacity-50">{{ entry.timeSeconds | number:'1.0-0' }} sec</span>
-                </div>
-                <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
-                <button
-                  class="btn btn-xs btn-accent mt-1"
-                  (click)="startBreeding(entry.parentA.instanceId, entry.parentB.instanceId, entry.recipe.id, entry.ticks)"
-                >
-                  Start Breeding
-                </button>
+        <div class="flex flex-col gap-2">
+          @for (entry of availableRecipes(); track entry.recipe.id) {
+            <div class="flex flex-col gap-2 p-2 bg-base-200 rounded">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold">
+                  {{ entry.recipe.resultName }}
+                </span>
+                <span class="text-xs opacity-50">
+                  {{ entry.timeSeconds | number: '1.0-0' }} sec
+                </span>
               </div>
-            }
-          </div>
+              <span class="text-xs opacity-60">
+                {{ entry.recipe.description }}
+              </span>
+              <button
+                class="btn btn-xs btn-accent mt-1"
+                (click)="
+                  startBreeding(
+                    entry.parentA.instanceId,
+                    entry.parentB.instanceId,
+                    entry.recipe.id,
+                    entry.ticks
+                  )
+                "
+              >
+                Start Breeding
+              </button>
+            </div>
+          }
+        </div>
       }
 
       <!-- Mutatable Inhabitants -->
       @if (mutatableInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Mutation Candidates</div>
-          <div class="flex flex-col gap-1">
-            @for (inh of mutatableInhabitants(); track inh.instanceId) {
-              <div class="flex items-center justify-between">
-                <span class="text-xs">{{ inh.name }}</span>
-                <button
-                  class="btn btn-xs btn-secondary"
-                  (click)="startMutation(inh.instanceId)"
-                >
-                  Mutate
-                </button>
-              </div>
-            }
-          </div>
+        <div class="flex flex-col gap-2">
+          @for (inh of mutatableInhabitants(); track inh.instanceId) {
+            <div class="flex items-center justify-between">
+              <span class="text-xs">{{ inh.name }}</span>
+              <button
+                class="btn btn-xs btn-secondary"
+                (click)="startMutation(inh.instanceId)"
+              >
+                Mutate
+              </button>
+            </div>
+          }
+        </div>
       }
     </div>
   </div>
@@ -109,7 +132,9 @@
             <p class="text-success mt-2">Positive mutation! Stats improved.</p>
           }
           @case ('neutral') {
-            <p class="text-warning mt-2">Neutral mutation. No significant change.</p>
+            <p class="text-warning mt-2">
+              Neutral mutation. No significant change.
+            </p>
           }
           @case ('negative') {
             <p class="text-error mt-2">Negative mutation. Stats decreased.</p>
@@ -119,6 +144,8 @@
     }
   </div>
   <div actions>
-    <button class="btn btn-sm" (click)="showMutationResult.set(false)">Close</button>
+    <button class="btn btn-sm" (click)="showMutationResult.set(false)">
+      Close
+    </button>
   </div>
 </app-modal>

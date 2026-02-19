@@ -2,25 +2,31 @@
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
       <!-- Filter tabs -->
-      <div class="flex gap-1 mt-1">
+      <div class="flex gap-2 mt-1">
         <button
           class="btn btn-xs"
           [class.btn-primary]="activeFilter() === 'all'"
           [class.btn-ghost]="activeFilter() !== 'all'"
           (click)="setFilter('all')"
-        >All ({{ allCount() | number:'1.0-2' }})</button>
+        >
+          All ({{ allCount() | number: '1.0-2' }})
+        </button>
         <button
           class="btn btn-xs"
           [class.btn-primary]="activeFilter() === 'assigned'"
           [class.btn-ghost]="activeFilter() !== 'assigned'"
           (click)="setFilter('assigned')"
-        >Assigned ({{ assignedCount() | number:'1.0-2' }})</button>
+        >
+          Assigned ({{ assignedCount() | number: '1.0-2' }})
+        </button>
         <button
           class="btn btn-xs"
           [class.btn-primary]="activeFilter() === 'unassigned'"
           [class.btn-ghost]="activeFilter() !== 'unassigned'"
           (click)="setFilter('unassigned')"
-        >Idle ({{ unassignedCount() | number:'1.0-2' }})</button>
+        >
+          Idle ({{ unassignedCount() | number: '1.0-2' }})
+        </button>
       </div>
 
       <!-- Roster list -->
@@ -28,7 +34,9 @@
         @for (entry of filteredEntries(); track entry.instance.instanceId) {
           <div
             class="roster-entry"
-            [class.selected]="selectedInhabitantId() === entry.instance.instanceId"
+            [class.selected]="
+              selectedInhabitantId() === entry.instance.instanceId
+            "
             (click)="selectInhabitant(entry.instance.instanceId)"
           >
             <app-inhabitant-card
@@ -44,22 +52,38 @@
         <div class="divider my-1"></div>
         <div class="detail-panel">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1 min-w-0">
-              <h4 class="text-xs font-bold truncate">{{ entry.instance.name }}</h4>
+            <div class="flex items-center gap-2 min-w-0">
+              <h4 class="text-xs font-bold truncate">
+                {{ entry.instance.name }}
+              </h4>
               <button
                 class="btn btn-xs btn-ghost btn-circle"
-                (click)="onRename(entry.instance.instanceId, entry.instance.name)"
-              >&#9998;</button>
+                (click)="
+                  onRename(entry.instance.instanceId, entry.instance.name)
+                "
+              >
+                &#9998;
+              </button>
             </div>
-            <button class="btn btn-xs btn-ghost btn-circle" (click)="closeDetail()">&#10005;</button>
+            <button
+              class="btn btn-xs btn-ghost btn-circle"
+              (click)="closeDetail()"
+            >
+              &#10005;
+            </button>
           </div>
           <p class="text-xs opacity-50">{{ entry.def.name }}</p>
           <p class="text-xs opacity-60">{{ entry.def.description }}</p>
           <div class="text-xs mt-1">
-            <span class="opacity-70">Type:</span> {{ entry.def.type }}
-            <span class="opacity-70 ml-2">Tier:</span> {{ entry.def.tier | number:'1.0-2' }}
+            <span class="opacity-70">Type:</span>
+            {{ entry.def.type }}
+            <span class="opacity-70 ml-2">Tier:</span>
+            {{ entry.def.tier | number: '1.0-2' }}
             <span class="opacity-70 ml-2">State:</span>
-            <span class="badge badge-xs" [ngClass]="getStateClass(entry.instance.state)">
+            <span
+              class="badge badge-xs"
+              [ngClass]="getStateClass(entry.instance.state)"
+            >
               {{ entry.instance.state }}
             </span>
           </div>
@@ -67,14 +91,26 @@
           <!-- Full stats -->
           <div class="grid grid-cols-2 gap-x-4 gap-y-0 mt-1 text-xs">
             <div><app-stat-name type="hp" [value]="entry.def.stats.hp" /></div>
-            <div><app-stat-name type="attack" [value]="entry.def.stats.attack" /></div>
-            <div><app-stat-name type="defense" [value]="entry.def.stats.defense" /></div>
-            <div><app-stat-name type="speed" [value]="entry.def.stats.speed" /></div>
+            <div>
+              <app-stat-name type="attack" [value]="entry.def.stats.attack" />
+            </div>
+            <div>
+              <app-stat-name type="defense" [value]="entry.def.stats.defense" />
+            </div>
+            <div>
+              <app-stat-name type="speed" [value]="entry.def.stats.speed" />
+            </div>
             <div class="col-span-2">
               <span
                 [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
                 [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
-              ><app-stat-name type="workerEfficiency" [value]="entry.def.stats.workerEfficiency" suffix="x" /></span>
+              >
+                <app-stat-name
+                  type="workerEfficiency"
+                  [value]="entry.def.stats.workerEfficiency"
+                  suffix="x"
+                />
+              </span>
             </div>
           </div>
 
@@ -84,7 +120,8 @@
               <span class="text-xs opacity-50">Traits:</span>
               @for (trait of entry.def.traits; track trait.id) {
                 <div class="text-xs ml-1">
-                  <span class="font-semibold">{{ trait.name }}</span> — {{ trait.description }}
+                  <span class="font-semibold">{{ trait.name }}</span>
+                  — {{ trait.description }}
                 </div>
               }
             </div>
@@ -101,7 +138,9 @@
             <button
               class="btn btn-xs btn-outline btn-error w-full mt-1"
               (click)="onUnassign(entry.instance.instanceId)"
-            >Unassign</button>
+            >
+              Unassign
+            </button>
           }
 
           <!-- Reassign list -->
@@ -115,8 +154,16 @@
                   [class.btn-success]="r.canAssign"
                   [class.btn-disabled]="!r.canAssign"
                   [disabled]="!r.canAssign"
-                  (click)="onAssignToRoom(entry.instance.instanceId, r.room.id, r.room.roomTypeId)"
-                >{{ r.roomDef.name }}</button>
+                  (click)="
+                    onAssignToRoom(
+                      entry.instance.instanceId,
+                      r.room.id,
+                      r.room.roomTypeId
+                    )
+                  "
+                >
+                  {{ r.roomDef.name }}
+                </button>
               }
               @if (availableRooms().length === 0) {
                 <p class="text-xs opacity-50">No rooms available.</p>
@@ -130,7 +177,9 @@
 } @else {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <p class="text-xs opacity-50">No inhabitants yet. Visit the altar to recruit.</p>
+      <p class="text-xs opacity-50">
+        No inhabitants yet. Visit the altar to recruit.
+      </p>
     </div>
   </div>
 }

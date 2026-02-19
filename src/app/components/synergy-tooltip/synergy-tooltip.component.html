@@ -6,11 +6,13 @@
           <div class="divider my-2 text-xs text-success">Active Synergies</div>
           @for (synergy of data.active; track synergy.id) {
             <div class="synergy-item active-synergy">
-              <div class="flex items-center gap-1 mb-0.5">
+              <div class="flex items-center gap-2 mb-0.5">
                 <span class="synergy-dot bg-success"></span>
                 <span class="text-xs font-semibold">{{ synergy.name }}</span>
               </div>
-              <div class="text-xs opacity-70 ml-4">{{ synergy.description }}</div>
+              <div class="text-xs opacity-70 ml-4">
+                {{ synergy.description }}
+              </div>
               <div class="text-xs text-success ml-4 font-medium">
                 {{ formatEffect(synergy) }}
               </div>
@@ -24,19 +26,27 @@
           <div class="divider my-1 h-0"></div>
         }
         <div class="synergy-section">
-          <div class="divider my-2 text-xs text-warning">Potential Synergies</div>
+          <div class="divider my-2 text-xs text-warning">
+            Potential Synergies
+          </div>
           @for (ps of data.potential; track ps.synergy.id) {
             <div class="synergy-item potential-synergy">
-              <div class="flex items-center gap-1 mb-0.5">
+              <div class="flex items-center gap-2 mb-0.5">
                 <span class="synergy-dot bg-warning"></span>
                 <span class="text-xs font-semibold">{{ ps.synergy.name }}</span>
               </div>
-              <div class="text-xs opacity-70 ml-4">{{ getPotentialEffect(ps) }}</div>
+              <div class="text-xs opacity-70 ml-4">
+                {{ getPotentialEffect(ps) }}
+              </div>
               <div class="text-xs text-warning ml-4">
-                @for (cond of ps.missingConditions; track cond; let last = $last) {
+                @for (
+                  cond of ps.missingConditions;
+                  track cond;
+                  let last = $last
+                ) {
                   <span>{{ cond }}</span>
                   @if (!last) {
-                    <span>, </span>
+                    <span>,</span>
                   }
                 }
               </div>

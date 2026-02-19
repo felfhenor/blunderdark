@@ -23,29 +23,29 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 ### Content Type Reference
 
-| ContentType | Branded ID | Content Type |
-|---|---|---|
-| `abilityeffect` | `AbilityEffectId` | `AbilityEffectContent` |
-| `alchemyrecipe` | `AlchemyRecipeId` | `AlchemyRecipeContent` |
-| `breedingrecipe` | `BreedingRecipeId` | `BreedingRecipeContent` |
-| `combatability` | `CombatAbilityId` | `CombatAbilityContent` |
-| `feature` | `FeatureId` | `FeatureContent` |
-| `forgerecipe` | `ForgeRecipeId` | `ForgeRecipeContent` |
-| `fusionrecipe` | `FusionRecipeId` | `FusionRecipeContent` |
-| `inhabitant` | `InhabitantId` | `InhabitantContent` |
-| `invader` | `InvaderId` | `InvaderContent` |
-| `invasion` | `InvasionId` | `InvasionContent` |
-| `merchanttrade` | `MerchantTradeId` | `MerchantTradeContent` |
+| ContentType        | Branded ID           | Content Type              |
+| ------------------ | -------------------- | ------------------------- |
+| `abilityeffect`    | `AbilityEffectId`    | `AbilityEffectContent`    |
+| `alchemyrecipe`    | `AlchemyRecipeId`    | `AlchemyRecipeContent`    |
+| `breedingrecipe`   | `BreedingRecipeId`   | `BreedingRecipeContent`   |
+| `combatability`    | `CombatAbilityId`    | `CombatAbilityContent`    |
+| `feature`          | `FeatureId`          | `FeatureContent`          |
+| `forgerecipe`      | `ForgeRecipeId`      | `ForgeRecipeContent`      |
+| `fusionrecipe`     | `FusionRecipeId`     | `FusionRecipeContent`     |
+| `inhabitant`       | `InhabitantId`       | `InhabitantContent`       |
+| `invader`          | `InvaderId`          | `InvaderContent`          |
+| `invasion`         | `InvasionId`         | `InvasionContent`         |
+| `merchanttrade`    | `MerchantTradeId`    | `MerchantTradeContent`    |
 | `reputationaction` | `ReputationActionId` | `ReputationActionContent` |
 | `reputationeffect` | `ReputationEffectId` | `ReputationEffectContent` |
-| `research` | `ResearchId` | `ResearchContent` |
-| `room` | `RoomId` | `RoomContent` |
-| `roomshape` | `RoomShapeId` | `RoomShapeContent` |
-| `seasonalevent` | `SeasonalEventId` | `SeasonalEventContent` |
-| `seasonbonus` | `SeasonBonusId` | `SeasonBonusContent` |
-| `summonrecipe` | `SummonRecipeId` | `SummonRecipeContent` |
-| `synergy` | `SynergyId` | `SynergyContent` |
-| `trap` | `TrapId` | `TrapContent` |
+| `research`         | `ResearchId`         | `ResearchContent`         |
+| `room`             | `RoomId`             | `RoomContent`             |
+| `roomshape`        | `RoomShapeId`        | `RoomShapeContent`        |
+| `seasonalevent`    | `SeasonalEventId`    | `SeasonalEventContent`    |
+| `seasonbonus`      | `SeasonBonusId`      | `SeasonBonusContent`      |
+| `summonrecipe`     | `SummonRecipeId`     | `SummonRecipeContent`     |
+| `synergy`          | `SynergyId`          | `SynergyContent`          |
+| `trap`             | `TrapId`             | `TrapContent`             |
 
 ## State Management
 
@@ -138,6 +138,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 ## Room-Specific Systems
 
 All room-specific systems follow the same pattern:
+
 - Room found via `roomRoleFindById('roleName')`
 - Process function runs each tick in `updateGamestate`, mutates state in-place
 - Jobs/queues stored on `PlacedRoom` or `GameStateWorld`
@@ -146,16 +147,16 @@ All room-specific systems follow the same pattern:
 - RxJS Subject (`*Completed$`) for cross-cutting notifications
 - Mock pattern: `@helpers/content`, `@helpers/room-roles`, `@helpers/room-upgrades`, `@helpers/rng`
 
-| System | File | Role | Base Ticks |
-|---|---|---|---|
-| Training | `training.ts` | `trainingGrounds` | 25 (5 min) |
-| Spawning Pool | `spawning-pool.ts` | `spawningPool` | 25 (5 min) |
-| Breeding Pits | `breeding-pits.ts` | `breedingPits` | 25/15 (5/3 min) |
-| Summoning Circle | `summoning-circle.ts` | `summoningCircle` | 20 (4 min) |
-| Dark Forge | `dark-forge.ts` | `darkForge` | 20 (4 min) |
-| Alchemy Lab | `alchemy-lab.ts` | `alchemyLab` | 15 (3 min) |
-| Trap Workshop | `trap-workshop.ts` | `trapWorkshop` | 15 (3 min) |
-| Torture Chamber | `torture-chamber.ts` | `tortureChamber` | varies |
+| System           | File                  | Role              | Base Ticks      |
+| ---------------- | --------------------- | ----------------- | --------------- |
+| Training         | `training.ts`         | `trainingGrounds` | 25 (5 min)      |
+| Spawning Pool    | `spawning-pool.ts`    | `spawningPool`    | 25 (5 min)      |
+| Breeding Pits    | `breeding-pits.ts`    | `breedingPits`    | 25/15 (5/3 min) |
+| Summoning Circle | `summoning-circle.ts` | `summoningCircle` | 20 (4 min)      |
+| Dark Forge       | `dark-forge.ts`       | `darkForge`       | 20 (4 min)      |
+| Alchemy Lab      | `alchemy-lab.ts`      | `alchemyLab`      | 15 (3 min)      |
+| Trap Workshop    | `trap-workshop.ts`    | `trapWorkshop`    | 15 (3 min)      |
+| Torture Chamber  | `torture-chamber.ts`  | `tortureChamber`  | varies          |
 
 ## Invasion System
 
@@ -228,68 +229,68 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 
 ### File-to-Prefix Table
 
-| File | Prefix | SCREAMING |
-|---|---|---|
-| `adjacency.ts` | `adjacency` | `ADJACENCY` |
-| `altar-room.ts` | `altarRoom` | `ALTAR_ROOM` |
-| `assignment.ts` | `assignment` | `ASSIGNMENT` |
-| `biome-restrictions.ts` | `biomeRestriction` | `BIOME_RESTRICTION` |
-| `breeding-pits.ts` | `breeding` | `BREEDING` |
-| `combat.ts` | `combat` | `COMBAT` |
-| `combat-abilities.ts` | `combatAbility` | `COMBAT_ABILITY` |
-| `connections.ts` | `connection` | `CONNECTION` |
-| `content.ts` | `content` | `CONTENT` |
-| `corruption.ts` | `corruption` | `CORRUPTION` |
+| File                       | Prefix                | SCREAMING              |
+| -------------------------- | --------------------- | ---------------------- |
+| `adjacency.ts`             | `adjacency`           | `ADJACENCY`            |
+| `altar-room.ts`            | `altarRoom`           | `ALTAR_ROOM`           |
+| `assignment.ts`            | `assignment`          | `ASSIGNMENT`           |
+| `biome-restrictions.ts`    | `biomeRestriction`    | `BIOME_RESTRICTION`    |
+| `breeding-pits.ts`         | `breeding`            | `BREEDING`             |
+| `combat.ts`                | `combat`              | `COMBAT`               |
+| `combat-abilities.ts`      | `combatAbility`       | `COMBAT_ABILITY`       |
+| `connections.ts`           | `connection`          | `CONNECTION`           |
+| `content.ts`               | `content`             | `CONTENT`              |
+| `corruption.ts`            | `corruption`          | `CORRUPTION`           |
 | `corruption-thresholds.ts` | `corruptionThreshold` | `CORRUPTION_THRESHOLD` |
-| `dark-forge.ts` | `darkForge` | `DARK_FORGE` |
-| `day-night-modifiers.ts` | `dayNight` | `DAY_NIGHT` |
-| `defaults.ts` | `default` | `DEFAULT` |
-| `efficiency.ts` | `efficiency` | `EFFICIENCY` |
-| `fear-level.ts` | `fearLevel` | `FEAR_LEVEL` |
-| `features.ts` | `feature` | `FEATURE` |
-| `floor.ts` | `floor` | `FLOOR` |
-| `fusion.ts` | `fusion` | `FUSION` |
-| `floor-modifiers.ts` | `floorModifier` | `FLOOR_MODIFIER` |
-| `game-events.ts` | `gameEvent` | `GAME_EVENT` |
-| `game-time.ts` | `gameTime` | `GAME_TIME` |
-| `gameloop.ts` | `gameloop` | `GAMELOOP` |
-| `grid.ts` | `grid` | `GRID` |
-| `hallway-placement.ts` | `hallwayPlacement` | `HALLWAY_PLACEMENT` |
-| `hallways.ts` | `hallway` | `HALLWAY` |
-| `hunger.ts` | `hunger` | `HUNGER` |
-| `inhabitants.ts` | `inhabitant` | `INHABITANT` |
-| `invaders.ts` | `invader` | `INVADER` |
-| `invasion-combat.ts` | `invasionCombat` | `INVASION_COMBAT` |
-| `invasion-composition.ts` | `invasionComposition` | `INVASION_COMPOSITION` |
-| `invasion-objectives.ts` | `invasionObjective` | `INVASION_OBJECTIVE` |
-| `invasion-rewards.ts` | `invasionReward` | `INVASION_REWARD` |
-| `invasion-triggers.ts` | `invasionTrigger` | `INVASION_TRIGGER` |
-| `invasion-win-loss.ts` | `invasionWinLoss` | `INVASION_WIN_LOSS` |
-| `morale.ts` | `morale` | `MORALE` |
-| `pathfinding.ts` | `pathfinding` | `PATHFINDING` |
-| `production.ts` | `production` | `PRODUCTION` |
-| `production-modifiers.ts` | `productionModifier` | `PRODUCTION_MODIFIER` |
-| `recruitment.ts` | `recruitment` | `RECRUITMENT` |
-| `reputation.ts` | `reputation` | `REPUTATION` |
-| `reputation-effects.ts` | `reputationEffect` | `REPUTATION_EFFECT` |
-| `resources.ts` | `resource` | `RESOURCE` |
-| `rng.ts` | `rng` | `RNG` |
-| `room-placement.ts` | `roomPlacement` | `ROOM_PLACEMENT` |
-| `room-removal.ts` | `roomRemoval` | `ROOM_REMOVAL` |
-| `room-roles.ts` | `roomRole` | `ROOM_ROLE` |
-| `room-shapes.ts` | `roomShape` | `ROOM_SHAPE` |
-| `room-upgrades.ts` | `roomUpgrade` | `ROOM_UPGRADE` |
-| `season.ts` | `season` | `SEASON` |
-| `season-bonuses.ts` | `seasonBonus` | `SEASON_BONUS` |
-| `spawning-pool.ts` | `spawningPool` | `SPAWNING_POOL` |
-| `state-game.ts` | `gamestate` | `GAMESTATE` |
-| `state-modifiers.ts` | `stateModifier` | `STATE_MODIFIER` |
-| `summoning-circle.ts` | `summoning` | `SUMMONING` |
-| `synergy.ts` | `synergy` | `SYNERGY` |
-| `throne-room.ts` | `throneRoom` | `THRONE_ROOM` |
-| `training.ts` | `training` | `TRAINING` |
-| `trap-workshop.ts` | `trapWorkshop` | `TRAP_WORKSHOP` |
-| `traps.ts` | `trap` | `TRAP` |
+| `dark-forge.ts`            | `darkForge`           | `DARK_FORGE`           |
+| `day-night-modifiers.ts`   | `dayNight`            | `DAY_NIGHT`            |
+| `defaults.ts`              | `default`             | `DEFAULT`              |
+| `efficiency.ts`            | `efficiency`          | `EFFICIENCY`           |
+| `fear-level.ts`            | `fearLevel`           | `FEAR_LEVEL`           |
+| `features.ts`              | `feature`             | `FEATURE`              |
+| `floor.ts`                 | `floor`               | `FLOOR`                |
+| `fusion.ts`                | `fusion`              | `FUSION`               |
+| `floor-modifiers.ts`       | `floorModifier`       | `FLOOR_MODIFIER`       |
+| `game-events.ts`           | `gameEvent`           | `GAME_EVENT`           |
+| `game-time.ts`             | `gameTime`            | `GAME_TIME`            |
+| `gameloop.ts`              | `gameloop`            | `GAMELOOP`             |
+| `grid.ts`                  | `grid`                | `GRID`                 |
+| `hallway-placement.ts`     | `hallwayPlacement`    | `HALLWAY_PLACEMENT`    |
+| `hallways.ts`              | `hallway`             | `HALLWAY`              |
+| `hunger.ts`                | `hunger`              | `HUNGER`               |
+| `inhabitants.ts`           | `inhabitant`          | `INHABITANT`           |
+| `invaders.ts`              | `invader`             | `INVADER`              |
+| `invasion-combat.ts`       | `invasionCombat`      | `INVASION_COMBAT`      |
+| `invasion-composition.ts`  | `invasionComposition` | `INVASION_COMPOSITION` |
+| `invasion-objectives.ts`   | `invasionObjective`   | `INVASION_OBJECTIVE`   |
+| `invasion-rewards.ts`      | `invasionReward`      | `INVASION_REWARD`      |
+| `invasion-triggers.ts`     | `invasionTrigger`     | `INVASION_TRIGGER`     |
+| `invasion-win-loss.ts`     | `invasionWinLoss`     | `INVASION_WIN_LOSS`    |
+| `morale.ts`                | `morale`              | `MORALE`               |
+| `pathfinding.ts`           | `pathfinding`         | `PATHFINDING`          |
+| `production.ts`            | `production`          | `PRODUCTION`           |
+| `production-modifiers.ts`  | `productionModifier`  | `PRODUCTION_MODIFIER`  |
+| `recruitment.ts`           | `recruitment`         | `RECRUITMENT`          |
+| `reputation.ts`            | `reputation`          | `REPUTATION`           |
+| `reputation-effects.ts`    | `reputationEffect`    | `REPUTATION_EFFECT`    |
+| `resources.ts`             | `resource`            | `RESOURCE`             |
+| `rng.ts`                   | `rng`                 | `RNG`                  |
+| `room-placement.ts`        | `roomPlacement`       | `ROOM_PLACEMENT`       |
+| `room-removal.ts`          | `roomRemoval`         | `ROOM_REMOVAL`         |
+| `room-roles.ts`            | `roomRole`            | `ROOM_ROLE`            |
+| `room-shapes.ts`           | `roomShape`           | `ROOM_SHAPE`           |
+| `room-upgrades.ts`         | `roomUpgrade`         | `ROOM_UPGRADE`         |
+| `season.ts`                | `season`              | `SEASON`               |
+| `season-bonuses.ts`        | `seasonBonus`         | `SEASON_BONUS`         |
+| `spawning-pool.ts`         | `spawningPool`        | `SPAWNING_POOL`        |
+| `state-game.ts`            | `gamestate`           | `GAMESTATE`            |
+| `state-modifiers.ts`       | `stateModifier`       | `STATE_MODIFIER`       |
+| `summoning-circle.ts`      | `summoning`           | `SUMMONING`            |
+| `synergy.ts`               | `synergy`             | `SYNERGY`              |
+| `throne-room.ts`           | `throneRoom`          | `THRONE_ROOM`          |
+| `training.ts`              | `training`            | `TRAINING`             |
+| `trap-workshop.ts`         | `trapWorkshop`        | `TRAP_WORKSHOP`        |
+| `traps.ts`                 | `trap`                | `TRAP`                 |
 
 ## Victory System
 
@@ -303,9 +304,9 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Victory screen**: `PanelVictoryComponent` modal on game-play page — auto-shows via `effect()` watching `victoryIsAchieved()`, pauses game, shows path info + conditions with progress + stats, allows Continue Playing or Return to Menu
 - **Victory progress UI**: `VictoryMenuComponent` → `VictoryPathCardComponent` → `VictoryConditionRowComponent` composable hierarchy; `victoryCalculatePathCompletionPercent()` pure function for weighted % (tested); closest path highlighted via max completion %; DaisyUI `radial-progress` for per-path %; `progress` element for per-condition bars; Helipopper tooltips on condition rows with checkType-specific hints
 
-| File | Prefix | SCREAMING |
-|---|---|---|
-| `victory.ts` | `victory` | `VICTORY` |
+| File                    | Prefix             | SCREAMING           |
+| ----------------------- | ------------------ | ------------------- |
+| `victory.ts`            | `victory`          | `VICTORY`           |
 | `victory-conditions.ts` | `victoryCondition` | `VICTORY_CONDITION` |
 
 ## Merchant System
@@ -320,8 +321,8 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Events**: `merchantEvent$` Subject emits `{ type: 'arrival' | 'departure' }` — subscribe in components for notifications
 - **UI**: `PanelMerchantComponent` in sidebar — shows card when merchant present, opens modal with trade interface; tabs for All/Buy/Sell/Special categories
 
-| File | Prefix | SCREAMING |
-|---|---|---|
+| File          | Prefix     | SCREAMING  |
+| ------------- | ---------- | ---------- |
 | `merchant.ts` | `merchant` | `MERCHANT` |
 
 ## Seasonal Events System
@@ -337,8 +338,8 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **UI**: `PanelSeasonalEventComponent` — shows active effects card + modal when event pending; auto-opens via `effect()` watching `seasonalEventPending()`
 - **Season process**: `seasonProcess(state)` in `season.ts` handles day advancement in gameloop (separate from `seasonAdvanceGameDay` which uses `updateGamestate`)
 
-| File | Prefix | SCREAMING |
-|---|---|---|
+| File                | Prefix          | SCREAMING        |
+| ------------------- | --------------- | ---------------- |
 | `seasonal-event.ts` | `seasonalEvent` | `SEASONAL_EVENT` |
 
 ## Save System
@@ -353,9 +354,9 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Persistence**: auto-save via `signalIndexedDb` (every `debugSaveInterval` ticks); manual save via `gamestateSave()`; `gamestateFormatForSave()` is just `structuredClone`
 - **Migration**: `migrateGameState()` uses `merge(defaultGameState(), state)` — fills in missing fields; explicit handlers for resources and floors
 
-| File | Prefix | SCREAMING |
-|---|---|---|
-| `save.ts` | `save` | `SAVE` |
+| File      | Prefix | SCREAMING |
+| --------- | ------ | --------- |
+| `save.ts` | `save` | `SAVE`    |
 
 ## Autosave System
 
@@ -368,8 +369,8 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Integration**: game-play component starts timer + installs beforeunload in `ngOnInit`; cleans up via `DestroyRef.onDestroy()`; subscribes to `autosaveEvent$` with `takeUntilDestroyed`
 - **Testing**: mock `@helpers/state-game`, `@helpers/state-options`, `@helpers/logging`; use `vi.useFakeTimers()` for interval tests; use `mockImplementationOnce` (not `mockImplementation`) to avoid state leaking between tests; cast mock implementations as `typeof optionsGet` to satisfy generic type
 
-| File | Prefix | SCREAMING |
-|---|---|---|
+| File          | Prefix     | SCREAMING  |
+| ------------- | ---------- | ---------- |
 | `autosave.ts` | `autosave` | `AUTOSAVE` |
 
 ## Save Slots System
@@ -383,9 +384,9 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **UI**: `PanelSaveSlotsComponent` — standalone, OnPush, uses `swalConfirm()` helper for confirmation dialogs via dynamic `import('sweetalert2')`
 - **Testing**: mock `@helpers/save-slots-storage` with in-memory `Map<string, unknown>` for IndexedDB simulation; mock `@helpers/save`, `@helpers/state-game`, `@helpers/logging`
 
-| File | Prefix | SCREAMING |
-|---|---|---|
-| `save-slots.ts` | `saveSlot` | `SAVE_SLOT` |
+| File                    | Prefix            | SCREAMING           |
+| ----------------------- | ----------------- | ------------------- |
+| `save-slots.ts`         | `saveSlot`        | `SAVE_SLOT`         |
 | `save-slots-storage.ts` | `saveSlotStorage` | `SAVE_SLOT_STORAGE` |
 
 ## Save File Versioning
@@ -400,8 +401,8 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Test pattern**: mock `@helpers/save-migrations` when testing `save.ts`; mock `@helpers/logging` when testing `save-migrations.ts`; use `as unknown as Record<string, unknown>` for `GameStateWorld` casts in migration tests
 - **NotificationCategory**: `'Warning'` added for `notifyWarning()` function
 
-| File | Prefix | SCREAMING |
-|---|---|---|
+| File                 | Prefix          | SCREAMING        |
+| -------------------- | --------------- | ---------------- |
 | `save-migrations.ts` | `saveMigration` | `SAVE_MIGRATION` |
 
 ## Camera System
@@ -419,9 +420,9 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Game-play layout**: parent div uses `overflow-hidden` (not `overflow-auto`) since camera manages scrolling
 - **Lint**: `AfterViewInit` and `ElementRef` from Angular core must use `type` imports when only used as type constraints
 
-| File | Prefix | SCREAMING |
-|---|---|---|
-| `camera.ts` | `camera` | `CAMERA` |
+| File        | Prefix   | SCREAMING |
+| ----------- | -------- | --------- |
+| `camera.ts` | `camera` | `CAMERA`  |
 
 ## Side Tab Rail System
 
@@ -454,5 +455,5 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - Research YAML uses `prerequisiteResearchIds` key (auto-resolved by `rewriteDataIds`)
 - Generic rooms only need YAML changes — placement/production/adjacency/upgrades are fully data-driven
 - Vertical transport: stairs (5 ticks/floor), elevators (3), portals (0) — BFS connectivity, Dijkstra travel time
-- Pathfinding uses Dijkstra (not A*) — Manhattan heuristic is inadmissible for hallway-connected rooms
+- Pathfinding uses Dijkstra (not A\*) — Manhattan heuristic is inadmissible for hallway-connected rooms
 - `findLastIndex` unavailable — use manual reverse loop

@@ -12,7 +12,7 @@
 // --- Node Cards ---
 
 .node-card {
-  @apply relative flex flex-col items-center justify-center gap-1;
+  @apply relative flex flex-col items-center justify-center gap-2;
   @apply rounded-lg border-2 p-3 cursor-pointer transition-all;
   border-color: color-mix(in oklch, var(--color-base-content) 20%, transparent);
 

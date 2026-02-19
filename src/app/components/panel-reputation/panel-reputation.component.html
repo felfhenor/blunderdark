@@ -4,7 +4,7 @@
       @for (category of categories; track category.type) {
         <div class="reputation-row">
           <div class="flex items-center justify-between mb-1">
-            <span class="flex items-center gap-1 text-sm">
+            <span class="flex items-center gap-2 text-sm">
               <span>{{ category.icon }}</span>
               <span>{{ category.label }}</span>
             </span>
@@ -27,11 +27,14 @@
 
     @if (hasActiveEffects()) {
       <div class="divider my-2 text-xs opacity-60">Active Effects</div>
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-2">
         @for (effect of activeEffects(); track effect.id) {
           <div class="active-effect">
-            <div class="flex items-center gap-1">
-              <span class="badge badge-xs" [ngClass]="getEffectBadgeClass(effect)">
+            <div class="flex items-center gap-2">
+              <span
+                class="badge badge-xs"
+                [ngClass]="getEffectBadgeClass(effect)"
+              >
                 {{ getEffectIcon(effect) }}
               </span>
               <span class="text-xs font-medium">{{ effect.name }}</span>

@@ -1,7 +1,11 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
     <div class="floor-list flex flex-col gap-2">
-      @for (floor of floors(); track trackByFloorId($index, floor); let i = $index) {
+      @for (
+        floor of floors();
+        track trackByFloorId($index, floor);
+        let i = $index
+      ) {
         <button
           class="floor-entry btn btn-sm justify-start gap-2"
           [class.btn-active]="isSelected(i)"
@@ -10,8 +14,12 @@
         >
           <span class="biome-indicator"></span>
           <span class="biome-icon">{{ getBiomeIcon(floor.biome) }}</span>
-          <span class="floor-name flex-1 text-left truncate">{{ floor.name }}</span>
-          <span class="room-count text-xs opacity-50">{{ floor.rooms.length | number:'1.0-2' }}rm</span>
+          <span class="floor-name flex-1 text-left truncate">
+            {{ floor.name }}
+          </span>
+          <span class="room-count text-xs opacity-50">
+            {{ floor.rooms.length | number: '1.0-2' }}rm
+          </span>
         </button>
       }
     </div>
@@ -75,7 +83,9 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" (click)="showCreateModal.set(false)">Cancel</button>
+        <button class="btn btn-sm" (click)="showCreateModal.set(false)">
+          Cancel
+        </button>
         <button
           class="btn btn-sm btn-primary"
           [disabled]="!canCreate().canCreate"
@@ -115,7 +125,9 @@
           }
         }
 
-        @if (!changeBiomeValidation().canChange && changeBiomeValidation().reason) {
+        @if (
+          !changeBiomeValidation().canChange && changeBiomeValidation().reason
+        ) {
           <div class="text-xs text-error text-center mt-1">
             {{ changeBiomeValidation().reason }}
           </div>
@@ -123,7 +135,9 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" (click)="showChangeBiomeModal.set(false)">Cancel</button>
+        <button class="btn btn-sm" (click)="showChangeBiomeModal.set(false)">
+          Cancel
+        </button>
         <button
           class="btn btn-sm btn-primary"
           [disabled]="!changeBiomeValidation().canChange"
@@ -140,7 +154,9 @@
       <div body>
         @if (selectedFloor(); as floor) {
           <p class="text-sm mb-2">
-            Are you sure you want to remove <strong>{{ floor.name }}</strong>?
+            Are you sure you want to remove
+            <strong>{{ floor.name }}</strong>
+            ?
           </p>
           <p class="text-xs opacity-60 mb-2">
             Refund: {{ removalRefundLabel() }}
@@ -154,7 +170,9 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" (click)="showRemoveModal.set(false)">Cancel</button>
+        <button class="btn btn-sm" (click)="showRemoveModal.set(false)">
+          Cancel
+        </button>
         <button
           class="btn btn-sm btn-error"
           [disabled]="!canRemove().canRemove"
@@ -183,10 +201,14 @@
             Change
           </button>
           <span class="flex-1"></span>
-          <span class="text-xs opacity-70">Depth {{ floor.depth | number:'1.0-2' }}</span>
+          <span class="text-xs opacity-70">
+            Depth {{ floor.depth | number: '1.0-2' }}
+          </span>
         </div>
 
-        <p class="text-sm opacity-80 mb-2">{{ selectedFloorBiome().description }}</p>
+        <p class="text-sm opacity-80 mb-2">
+          {{ selectedFloorBiome().description }}
+        </p>
 
         <div class="effects-summary text-xs opacity-60">
           @switch (floor.biome) {
@@ -214,14 +236,15 @@
         @if (depthModifiers().length > 0) {
           <div class="depth-modifiers mt-2">
             <div class="divider my-2 text-xs opacity-60">Depth Modifiers</div>
-            <div class="flex flex-wrap gap-1">
+            <div class="flex flex-wrap gap-2">
               @for (mod of depthModifiers(); track mod.resourceType) {
                 <span
                   class="badge badge-sm"
                   [class.badge-success]="mod.percentage > 0"
                   [class.badge-error]="mod.percentage < 0"
                 >
-                  {{ formatModifier(mod.percentage) }} <app-currency-name [type]="$any(mod.resourceType)" />
+                  {{ formatModifier(mod.percentage) }}
+                  <app-currency-name [type]="$any(mod.resourceType)" />
                 </span>
               }
             </div>

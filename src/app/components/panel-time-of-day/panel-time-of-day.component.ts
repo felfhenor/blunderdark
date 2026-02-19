@@ -27,10 +27,15 @@ import type {
         </div>
 
         @if (hasModifiers()) {
-          <div class="flex flex-col gap-1 mt-1">
-            @for (mod of modifiers().resourceModifiers; track mod.resourceType + mod.phase) {
+          <div class="flex flex-col gap-2 mt-1">
+            @for (
+              mod of modifiers().resourceModifiers;
+              track mod.resourceType + mod.phase
+            ) {
               <div class="flex items-center justify-between text-xs">
-                <span class="opacity-70"><app-currency-name [type]="$any(mod.resourceType)" /></span>
+                <span class="opacity-70">
+                  <app-currency-name [type]="$any(mod.resourceType)" />
+                </span>
                 <span
                   class="font-semibold"
                   [class.text-success]="isPositive(mod)"
@@ -40,9 +45,14 @@ import type {
                 </span>
               </div>
             }
-            @for (mod of modifiers().creatureModifiers; track mod.creatureType + mod.phase) {
+            @for (
+              mod of modifiers().creatureModifiers;
+              track mod.creatureType + mod.phase
+            ) {
               <div class="flex items-center justify-between text-xs">
-                <span class="opacity-70 capitalize">{{ mod.creatureType }}</span>
+                <span class="opacity-70 capitalize">
+                  {{ mod.creatureType }}
+                </span>
                 <span
                   class="font-semibold"
                   [class.text-success]="isPositive(mod)"
@@ -67,7 +77,9 @@ export class PanelTimeOfDayComponent {
     return dayNightGetAllActiveModifiers(hour);
   });
 
-  public phaseLabel = computed(() => dayNightGetPhaseLabel(this.modifiers().phase));
+  public phaseLabel = computed(() =>
+    dayNightGetPhaseLabel(this.modifiers().phase),
+  );
 
   public phaseBadgeClass = computed(() => {
     switch (this.modifiers().phase) {
@@ -88,11 +100,15 @@ export class PanelTimeOfDayComponent {
       this.modifiers().creatureModifiers.length > 0,
   );
 
-  public format(mod: DayNightResourceModifier | DayNightCreatureModifier): string {
+  public format(
+    mod: DayNightResourceModifier | DayNightCreatureModifier,
+  ): string {
     return dayNightFormatMultiplier(mod.multiplier);
   }
 
-  public isPositive(mod: DayNightResourceModifier | DayNightCreatureModifier): boolean {
+  public isPositive(
+    mod: DayNightResourceModifier | DayNightCreatureModifier,
+  ): boolean {
     return mod.multiplier > 1.0;
   }
 }

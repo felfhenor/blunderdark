@@ -1,7 +1,9 @@
 @if (summoningRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">{{ roomDef()?.name ?? 'Summoning Circle' }}</h3>
+      <h3 class="card-title text-sm">
+        {{ roomDef()?.name ?? 'Summoning Circle' }}
+      </h3>
       <div class="mt-2">
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
@@ -18,18 +20,20 @@
             [value]="sp.percent"
             max="100"
           ></progress>
-          <span class="text-xs opacity-40">{{ sp.percent | number:'1.0-2' }}%</span>
+          <span class="text-xs opacity-40">
+            {{ sp.percent | number: '1.0-2' }}%
+          </span>
         </div>
       }
 
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Summoners</div>
-          <div class="flex flex-wrap gap-1">
-            @for (inh of assignedInhabitants(); track inh.instanceId) {
-              <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
-            }
-          </div>
+        <div class="flex flex-wrap gap-2">
+          @for (inh of assignedInhabitants(); track inh.instanceId) {
+            <span class="badge badge-xs badge-outline">{{ inh.defName }}</span>
+          }
+        </div>
       } @else {
         <p class="text-xs opacity-50 mt-2">No summoner assigned.</p>
       }
@@ -37,55 +41,88 @@
       <!-- Available Recipes -->
       @if (availableRecipes().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Summon Recipes</div>
-          <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
-            @for (entry of availableRecipes(); track entry.recipe.id) {
-              <div class="flex flex-col gap-1 p-2 bg-base-200 rounded">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold">{{ entry.recipe.name }}</span>
-                  <span class="badge badge-xs" [class.badge-info]="entry.recipe.summonType === 'permanent'" [class.badge-warning]="entry.recipe.summonType === 'temporary'">{{ entry.recipe.summonType }}</span>
-                </div>
-                <span class="text-xs opacity-60">{{ entry.recipe.description }}</span>
-                <span class="text-xs opacity-50">Cost:
-                  @for (cost of formatCost(entry.recipe.cost); track cost.type) {
-                    {{ cost.amount }} <app-currency-name [type]="cost.type" />@if (!$last) {, }
-                  }
+        <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
+          @for (entry of availableRecipes(); track entry.recipe.id) {
+            <div class="flex flex-col gap-2 p-2 bg-base-200 rounded">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold">
+                  {{ entry.recipe.name }}
                 </span>
-                <span class="text-xs opacity-50">Time: {{ entry.timeSeconds | number:'1.0-0' }} sec</span>
-                @if (formatStatBonuses(entry.statBonuses); as bonusStr) {
-                  @if (bonusStr) {
-                    <span class="text-xs text-success">Bonuses: {{ bonusStr }}</span>
-                  }
-                }
-                @if (entry.duration) {
-                  <span class="text-xs opacity-50">Duration: {{ entry.duration | number:'1.0-0' }} sec</span>
-                }
-                <button
-                  class="btn btn-xs btn-primary mt-1"
-                  [disabled]="!entry.canAfford"
-                  (click)="startSummoning(entry.recipe.id, entry.ticks, entry.recipe.cost)"
+                <span
+                  class="badge badge-xs"
+                  [class.badge-info]="entry.recipe.summonType === 'permanent'"
+                  [class.badge-warning]="
+                    entry.recipe.summonType === 'temporary'
+                  "
                 >
-                  @if (entry.canAfford) {
-                    Start Summoning
-                  } @else {
-                    Not enough resources
-                  }
-                </button>
+                  {{ entry.recipe.summonType }}
+                </span>
               </div>
-            }
-          </div>
+              <span class="text-xs opacity-60">
+                {{ entry.recipe.description }}
+              </span>
+              <span class="text-xs opacity-50">
+                Cost:
+                @for (cost of formatCost(entry.recipe.cost); track cost.type) {
+                  {{ cost.amount }}
+                  <app-currency-name [type]="cost.type" />
+                  @if (!$last) {
+                    ,
+                  }
+                }
+              </span>
+              <span class="text-xs opacity-50">
+                Time: {{ entry.timeSeconds | number: '1.0-0' }} sec
+              </span>
+              @if (formatStatBonuses(entry.statBonuses); as bonusStr) {
+                @if (bonusStr) {
+                  <span class="text-xs text-success">
+                    Bonuses: {{ bonusStr }}
+                  </span>
+                }
+              }
+              @if (entry.duration) {
+                <span class="text-xs opacity-50">
+                  Duration: {{ entry.duration | number: '1.0-0' }} sec
+                </span>
+              }
+              <button
+                class="btn btn-xs btn-primary mt-1"
+                [disabled]="!entry.canAfford"
+                (click)="
+                  startSummoning(
+                    entry.recipe.id,
+                    entry.ticks,
+                    entry.recipe.cost
+                  )
+                "
+              >
+                @if (entry.canAfford) {
+                  Start Summoning
+                } @else {
+                  Not enough resources
+                }
+              </button>
+            </div>
+          }
+        </div>
       }
 
       <!-- Active Temporary Summons -->
       @if (temporaryInhabitants().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Active Temporary Summons</div>
-          <div class="flex flex-col gap-1">
-            @for (temp of temporaryInhabitants(); track temp.name) {
-              <div class="flex items-center justify-between">
-                <span class="text-xs">{{ temp.name }}</span>
-                <span class="text-xs opacity-50">{{ temp.secondsRemaining | number:'1.0-0' }} sec left</span>
-              </div>
-            }
-          </div>
+        <div class="divider my-2 text-xs opacity-60">
+          Active Temporary Summons
+        </div>
+        <div class="flex flex-col gap-2">
+          @for (temp of temporaryInhabitants(); track temp.name) {
+            <div class="flex items-center justify-between">
+              <span class="text-xs">{{ temp.name }}</span>
+              <span class="text-xs opacity-50">
+                {{ temp.secondsRemaining | number: '1.0-0' }} sec left
+              </span>
+            </div>
+          }
+        </div>
       }
     </div>
   </div>
@@ -99,14 +136,20 @@
       <div class="text-center">
         <p class="text-lg font-semibold">{{ result.name }}</p>
         @if (result.summonType === 'permanent') {
-          <p class="text-success mt-2">A permanent creature has joined your dungeon!</p>
+          <p class="text-success mt-2">
+            A permanent creature has joined your dungeon!
+          </p>
         } @else {
-          <p class="text-warning mt-2">A temporary helper has been summoned. It will fade over time.</p>
+          <p class="text-warning mt-2">
+            A temporary helper has been summoned. It will fade over time.
+          </p>
         }
       </div>
     }
   </div>
   <div actions>
-    <button class="btn btn-sm" (click)="showSummonResult.set(false)">Close</button>
+    <button class="btn btn-sm" (click)="showSummonResult.set(false)">
+      Close
+    </button>
   </div>
 </app-modal>

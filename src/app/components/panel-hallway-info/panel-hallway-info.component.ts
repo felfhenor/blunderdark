@@ -34,7 +34,7 @@ import type { PlacedRoomId } from '@interfaces';
           @if (adjacentUnconnected().length > 0) {
             <div class="mt-2">
               <h4 class="text-xs font-semibold opacity-70 mb-1">Connect to:</h4>
-              <div class="flex flex-col gap-1">
+              <div class="flex flex-col gap-2">
                 @for (adj of adjacentUnconnected(); track adj.id) {
                   <button
                     class="btn btn-xs btn-outline btn-success"
@@ -50,7 +50,7 @@ import type { PlacedRoomId } from '@interfaces';
           @if (activeConnections().length > 0) {
             <div class="mt-2">
               <h4 class="text-xs font-semibold opacity-70 mb-1">Connected:</h4>
-              <div class="flex flex-col gap-1">
+              <div class="flex flex-col gap-2">
                 @for (conn of activeConnections(); track conn.connectionId) {
                   <div class="flex items-center justify-between gap-2">
                     <span class="text-xs">{{ conn.otherName }}</span>

@@ -1,115 +1,141 @@
 <div class="card bg-base-100 shadow-xl">
-    <div class="card-body p-4">
-      <h3 class="card-title text-sm">Altar Room (Level {{ level() | number:'1.0-2' }})</h3>
+  <div class="card-body p-4">
+    <h3 class="card-title text-sm">
+      Altar Room (Level {{ level() | number: '1.0-2' }})
+    </h3>
 
-      <div class="mt-2">
-        <div class="text-xs opacity-70">
-          The dark heart of your dungeon. This ancient altar enables room construction and creature recruitment.
-        </div>
+    <div class="mt-2">
+      <div class="text-xs opacity-70">
+        The dark heart of your dungeon. This ancient altar enables room
+        construction and creature recruitment.
       </div>
+    </div>
 
-      <!-- Fear Reduction Aura -->
-      <div class="divider my-2 text-xs opacity-60">Calming Aura</div>
-      <div class="flex items-center gap-2">
-        <span class="text-xs">Fear reduction to adjacent rooms:</span>
-        <span class="font-mono text-success text-xs">-{{ fearReduction() | number:'1.0-2' }}</span>
-      </div>
+    <!-- Fear Reduction Aura -->
+    <div class="divider my-2 text-xs opacity-60">Calming Aura</div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs">Fear reduction to adjacent rooms:</span>
+      <span class="font-mono text-success text-xs">
+        -{{ fearReduction() | number: '1.0-2' }}
+      </span>
+    </div>
 
-      <!-- Upgrade Section -->
-      @if (nextUpgrade(); as upgrade) {
-        <div class="divider my-2 text-xs opacity-60">Upgrade Available</div>
-          <div class="flex flex-col gap-1">
-            <div class="text-xs font-semibold">{{ upgrade.name }}</div>
-            <div class="text-xs opacity-70">{{ upgrade.description }}</div>
-            <div class="cost-row flex gap-2">
-              @for (cost of getCostEntries(upgrade); track cost.type) {
-                <span class="text-xs opacity-70">
-                  {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
-                </span>
-              }
-            </div>
-            <button
-              class="btn btn-sm btn-primary mt-1"
-              [disabled]="!canAffordUpgrade()"
-              [tp]="canAffordUpgrade() ? 'Apply upgrade' : 'Insufficient resources'"
-              (click)="onUpgrade()"
-            >
-              Upgrade to {{ upgrade.name }}
-            </button>
-          </div>
-      } @else if (level() === 3) {
-        <div class="text-xs text-success">Fully upgraded</div>
-      }
-
-      <!-- Recruitment Section -->
-      @if (recruitmentAvailable()) {
-        <div class="divider my-2 text-xs opacity-60">
-          Recruitment
-          <span class="font-mono ml-1">{{ inhabitantCount() | number:'1.0-2' }}/{{ maxInhabitants() | number:'1.0-2' }}</span>
-        </div>
-
-        <div>
-
-          @if (rosterFull()) {
-            <div class="text-xs text-warning mb-2">Roster full</div>
+    <!-- Upgrade Section -->
+    @if (nextUpgrade(); as upgrade) {
+      <div class="divider my-2 text-xs opacity-60">Upgrade Available</div>
+      <div class="flex flex-col gap-2">
+        <div class="text-xs font-semibold">{{ upgrade.name }}</div>
+        <div class="text-xs opacity-70">{{ upgrade.description }}</div>
+        <div class="cost-row flex gap-2">
+          @for (cost of getCostEntries(upgrade); track cost.type) {
+            <span class="text-xs opacity-70">
+              {{ cost.amount | number: '1.0-2' }}
+              <app-currency-name [type]="cost.type" />
+            </span>
           }
+        </div>
+        <button
+          class="btn btn-sm btn-primary mt-1"
+          [disabled]="!canAffordUpgrade()"
+          [tp]="canAffordUpgrade() ? 'Apply upgrade' : 'Insufficient resources'"
+          (click)="onUpgrade()"
+        >
+          Upgrade to {{ upgrade.name }}
+        </button>
+      </div>
+    } @else if (level() === 3) {
+      <div class="text-xs text-success">Fully upgraded</div>
+    }
 
-          <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
-            @for (entry of recruitableInhabitants(); track entry.def.id) {
-              <div class="recruit-entry bg-base-200 rounded-lg p-2">
-                <!-- Header: Name + Tier -->
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold">{{ entry.def.name }}</span>
-                  <span class="badge badge-sm badge-ghost">
-                    T{{ entry.def.tier | number:'1.0-2' }}
-                  </span>
-                </div>
+    <!-- Recruitment Section -->
+    @if (recruitmentAvailable()) {
+      <div class="divider my-2 text-xs opacity-60">
+        Recruitment
+        <span class="font-mono ml-1">
+          {{ inhabitantCount() | number: '1.0-2' }}/{{
+            maxInhabitants() | number: '1.0-2'
+          }}
+        </span>
+      </div>
 
-                <!-- Description -->
-                <div class="text-xs opacity-60 mb-1">{{ entry.def.description }}</div>
+      <div>
+        @if (rosterFull()) {
+          <div class="text-xs text-warning mb-2">Roster full</div>
+        }
 
-                <!-- Stats -->
-                <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1 text-xs">
-                  <app-stat-name type="hp" [value]="entry.def.stats.hp" />
-                  <app-stat-name type="attack" [value]="entry.def.stats.attack" />
-                  <app-stat-name type="defense" [value]="entry.def.stats.defense" />
-                  <app-stat-name type="speed" [value]="entry.def.stats.speed" />
-                  <app-stat-name type="workerEfficiency" [value]="entry.def.stats.workerEfficiency" />
-                </div>
+        <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
+          @for (entry of recruitableInhabitants(); track entry.def.id) {
+            <div class="recruit-entry bg-base-200 rounded-lg p-2">
+              <!-- Header: Name + Tier -->
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-semibold">{{ entry.def.name }}</span>
+                <span class="badge badge-sm badge-ghost">
+                  T{{ entry.def.tier | number: '1.0-2' }}
+                </span>
+              </div>
 
-                <!-- Traits -->
-                @if (entry.def.traits.length > 0) {
-                  <div class="flex flex-wrap gap-1 mb-1">
-                    @for (trait of entry.def.traits; track trait.id) {
-                      <span class="badge badge-xs badge-outline" [tp]="trait.description">
-                        {{ trait.name }}
-                      </span>
-                    }
-                  </div>
-                }
+              <!-- Description -->
+              <div class="text-xs opacity-60 mb-1">
+                {{ entry.def.description }}
+              </div>
 
-                <!-- Cost -->
+              <!-- Stats -->
+              <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1 text-xs">
+                <app-stat-name type="hp" [value]="entry.def.stats.hp" />
+                <app-stat-name type="attack" [value]="entry.def.stats.attack" />
+                <app-stat-name
+                  type="defense"
+                  [value]="entry.def.stats.defense"
+                />
+                <app-stat-name type="speed" [value]="entry.def.stats.speed" />
+                <app-stat-name
+                  type="workerEfficiency"
+                  [value]="entry.def.stats.workerEfficiency"
+                />
+              </div>
+
+              <!-- Traits -->
+              @if (entry.def.traits.length > 0) {
                 <div class="flex flex-wrap gap-2 mb-1">
-                  @for (cost of entry.costEntries; track cost.type) {
-                    <span class="text-xs" [class.text-error]="!entry.affordable && isResourceShort(entry, cost.type)">
-                      {{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" />
+                  @for (trait of entry.def.traits; track trait.id) {
+                    <span
+                      class="badge badge-xs badge-outline"
+                      [tp]="trait.description"
+                    >
+                      {{ trait.name }}
                     </span>
                   }
                 </div>
+              }
 
-                <!-- Recruit Button -->
-                <button
-                  class="btn btn-xs btn-primary w-full"
-                  [disabled]="!entry.affordable || rosterFull()"
-                  [tp]="getDisabledReason(entry)"
-                  (click)="onRecruit(entry.def)"
-                >
-                  Recruit
-                </button>
+              <!-- Cost -->
+              <div class="flex flex-wrap gap-2 mb-1">
+                @for (cost of entry.costEntries; track cost.type) {
+                  <span
+                    class="text-xs"
+                    [class.text-error]="
+                      !entry.affordable && isResourceShort(entry, cost.type)
+                    "
+                  >
+                    {{ cost.amount | number: '1.0-2' }}
+                    <app-currency-name [type]="cost.type" />
+                  </span>
+                }
               </div>
-            }
-          </div>
+
+              <!-- Recruit Button -->
+              <button
+                class="btn btn-xs btn-primary w-full"
+                [disabled]="!entry.affordable || rosterFull()"
+                [tp]="getDisabledReason(entry)"
+                (click)="onRecruit(entry.def)"
+              >
+                Recruit
+              </button>
+            </div>
+          }
         </div>
-      }
-    </div>
+      </div>
+    }
   </div>
+</div>
