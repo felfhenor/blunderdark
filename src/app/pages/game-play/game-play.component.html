@@ -93,6 +93,24 @@
   </div>
 </ng-template>
 
+<ng-template #roomInfoPanel>
+  <div class="p-2">
+    <app-panel-room-info />
+  </div>
+</ng-template>
+
+<ng-template #hallwayInfoPanel>
+  <div class="p-2">
+    <app-panel-hallway-info />
+  </div>
+</ng-template>
+
+<ng-template #synergyPanel>
+  <div class="p-2">
+    <app-synergy-tooltip />
+  </div>
+</ng-template>
+
 <app-side-tab-rail
   [tabs]="tabDefinitions()"
   [(activePanel)]="activePanel"
@@ -102,9 +120,6 @@
 <div class="game-container relative flex flex-col">
   <div class="flex gap-4 flex-1 min-h-0">
   <div class="sidebar w-64 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
-    <app-panel-room-info />
-    <app-panel-hallway-info />
-    <app-synergy-tooltip />
   </div>
   <div class="flex-1 overflow-hidden">
     <app-grid />

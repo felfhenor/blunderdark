@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   signal,
   TemplateRef,
@@ -40,8 +41,10 @@ import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.comp
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import {
   floorAll,
+  floorCurrent,
   floorCurrentIndex,
   floorSetCurrentByIndex,
+  gridSelectedTile,
   optionsGet,
 } from '@helpers';
 import {
@@ -136,6 +139,11 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private thronePanel = viewChild('thronePanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
+  private roomInfoPanel = viewChild('roomInfoPanel', { read: TemplateRef });
+  private hallwayInfoPanel = viewChild('hallwayInfoPanel', {
+    read: TemplateRef,
+  });
+  private synergyPanel = viewChild('synergyPanel', { read: TemplateRef });
 
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
@@ -160,6 +168,35 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public hasAltar = computed(() => this.hasRoomOfRole('altar'));
   public hasThrone = computed(() => this.hasRoomOfRole('throne'));
   public isMerchantPresent = merchantIsPresent;
+
+  public hasSelectedRoom = computed(() => {
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return false;
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    return !!gridTile?.roomId;
+  });
+
+  public hasSelectedHallway = computed(() => {
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return false;
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    return gridTile?.occupiedBy === 'hallway' && !!gridTile?.hallwayId;
+  });
+
+  constructor() {
+    super();
+    effect(() => {
+      const hasRoom = this.hasSelectedRoom();
+      const hasHallway = this.hasSelectedHallway();
+      if (hasRoom) {
+        this.activePanel.set('room-info');
+      } else if (hasHallway) {
+        this.activePanel.set('hallway-info');
+      }
+    });
+  }
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
     const placeholder = this.placeholderPanel();
@@ -212,19 +249,22 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'room-info',
         label: 'Room',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.roomInfoPanel() ?? placeholder,
+        condition: this.hasSelectedRoom,
       },
       {
         id: 'hallway-info',
         label: 'Hallway',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.hallwayInfoPanel() ?? placeholder,
+        condition: this.hasSelectedHallway,
       },
       {
         id: 'synergy',
         label: 'Synergy',
         isModal: false,
-        templateRef: placeholder,
+        templateRef: this.synergyPanel() ?? placeholder,
+        condition: this.hasSelectedRoom,
       },
       {
         id: 'training',
