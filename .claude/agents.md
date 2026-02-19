@@ -423,6 +423,18 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 |---|---|---|
 | `camera.ts` | `camera` | `CAMERA` |
 
+## Side Tab Rail System
+
+- **Component**: `SideTabRailComponent` in `src/app/components/side-tab-rail/` — fixed-position rail on left edge with overlay panel
+- **Type**: `SideTabDefinition` in `src/app/interfaces/side-tab.ts` — id, label, condition (Signal<boolean>), isModal, templateRef
+- **State**: `activePanel` signal in `GamePlayComponent` persisted via `signalLocalStorage`
+- **Pattern**: each panel uses an `<ng-template #name>` in game-play.component.html, referenced via `viewChild('name', { read: TemplateRef })`
+- **Conditions**: `hasRoomOfRole(role)` method checks all floors for room type existence; `merchantIsPresent` signal for merchant; `hasSelectedRoom`/`hasSelectedHallway` for contextual panels
+- **Auto-open**: `effect()` in constructor watches tile selection and sets activePanel to 'room-info' or 'hallway-info'
+- **Auto-close**: `effect()` in SideTabRailComponent clears activePanel when condition becomes false
+- **Modal tabs**: `isModal: true` tabs emit `modalTabClick` output instead of opening overlay (Research, Fusion, Victory)
+- **Z-index**: rail at z-index 30 (above PIXI canvas, below modals)
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)
