@@ -145,6 +145,15 @@ export class GameResearchComponent {
     return node.unlocks.map((unlock) => this.formatUnlock(unlock));
   });
 
+  public selectedNodeResearchTime = computed(() => {
+    const node = this.selectedNode();
+    if (!node) return '';
+    const speed = researchSpeedModifier();
+    const totalSeconds =
+      node.requiredTicks / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
+    return formatDurationSeconds(totalSeconds);
+  });
+
   public selectedNodeCanAfford = computed(() => {
     const node = this.selectedNode();
     if (!node) return false;

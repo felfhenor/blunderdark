@@ -107,7 +107,9 @@
                       </div>
 
                       @if (node.nodeState === 'completed') {
-                        <div class="node-icon text-success"><app-icon name="tablerCheck" /></div>
+                        <div class="node-icon text-success">
+                          <app-icon name="tablerCheck" />
+                        </div>
                       }
 
                       @if (node.nodeState === 'active') {
@@ -183,7 +185,8 @@
                   <div class="flex flex-wrap gap-1">
                     @for (cost of formatCost(node.cost); track cost.type) {
                       <span class="badge badge-sm badge-outline">
-                        {{ cost.amount | number: '1.0-2' }} <app-currency-name [type]="cost.type" />
+                        {{ cost.amount | number: '1.0-2' }}
+                        <app-currency-name [type]="cost.type" />
                       </span>
                     }
                   </div>
@@ -235,21 +238,15 @@
                   </div>
                 }
 
-                <!-- Active Progress -->
-                @if (selectedNodeState() === 'active') {
-                  <div>
-                    <div class="divider my-2 text-xs opacity-60">Progress</div>
-                    <progress
-                      class="progress progress-info w-full"
-                      [value]="progressPercent()"
-                      max="100"
-                    ></progress>
-                    <div class="text-xs opacity-70 mt-1">
-                      {{ progressPercent() | number: '1.0-0' }}% &middot;
-                      {{ estimatedTimeRemaining() }}
-                    </div>
+                <!-- Research Time -->
+                <div>
+                  <div class="divider my-2 text-xs opacity-60">
+                    Research Time
                   </div>
-                }
+                  <div class="text-xs">
+                    {{ selectedNodeResearchTime() }}
+                  </div>
+                </div>
 
                 <!-- Actions -->
                 @if (selectedNodeState() === 'available') {
