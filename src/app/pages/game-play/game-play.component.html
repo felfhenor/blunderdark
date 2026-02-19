@@ -2,9 +2,8 @@
   <div class="p-4 text-sm opacity-50">Panel content will be migrated here.</div>
 </ng-template>
 
-<ng-template #resourcesPanel>
-  <div class="p-2 flex flex-col gap-2">
-    <app-panel-resources />
+<ng-template #moralePanel>
+  <div class="p-2">
     <app-morale-bar />
   </div>
 </ng-template>
@@ -76,6 +75,9 @@
 </ng-template>
 
 <div class="game-container">
+  <div class="resource-bar-wrapper">
+    <app-resource-bar-top />
+  </div>
   <app-side-tab-rail
     [tabs]="tabDefinitions()"
     [(activePanel)]="activePanel"

@@ -21,7 +21,7 @@ import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
-import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
+import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
@@ -73,7 +73,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelVictoryComponent,
     VictoryMenuComponent,
     PanelReputationComponent,
-    PanelResourcesComponent,
+    ResourceBarTopComponent,
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
     PanelRosterComponent,
@@ -111,7 +111,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private placeholderPanel = viewChild('placeholderPanel', {
     read: TemplateRef,
   });
-  private resourcesPanel = viewChild('resourcesPanel', {
+  private moralePanel = viewChild('moralePanel', {
     read: TemplateRef,
   });
   private floorsPanel = viewChild('floorsPanel', {
@@ -176,10 +176,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     const placeholder = this.placeholderPanel();
     return [
       {
-        id: 'resources',
-        label: 'Resources',
+        id: 'morale',
+        label: 'Morale',
         isModal: false,
-        templateRef: this.resourcesPanel() ?? placeholder,
+        templateRef: this.moralePanel() ?? placeholder,
       },
       {
         id: 'floors',
