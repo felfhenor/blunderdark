@@ -96,7 +96,7 @@ export class NotifyService {
     }
 
     if (unlock.type === 'feature_flag') {
-      return unlock.featureFlag;
+      return unlock.description;
     }
 
     const targetId = getUnlockTargetId(unlock)!;

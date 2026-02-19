@@ -242,7 +242,7 @@ export class GameResearchComponent {
       case 'passive_bonus':
         return { type: 'Bonus', name: unlock.description };
       case 'feature_flag':
-        return { type: 'Feature', name: unlock.featureFlag };
+        return { type: 'Feature', name: unlock.description };
     }
   }
 

@@ -9,9 +9,10 @@
 #   ├── Shadow Magic (T2)
 #   │   └── Corruption Control (T3)
 #   │       └── Shadow Weaving (T4) [+Shadow Magic]
-#   └── Necromancy (T2)
-#       └── Undead Mastery (T3)
-#           └── Dark Rituals (T4) [+Soul Well Mastery]
+#   ├── Necromancy (T2)
+#   │   └── Undead Mastery (T3)
+#   │       └── Dark Rituals (T4) [+Soul Well Mastery]
+#   └── Corrupted Biome (T2)
 #               ├── Abyssal Gateway (T5) [+Shadow Weaving]
 #               └── Soul Forge (T5) [+Soul Well Mastery→ already via Dark Rituals]
 #   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
@@ -64,6 +65,22 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Skeleton
+  tier: 2
+  requiredTicks: 150
+
+- id: 8d3e5a72-1f4c-49b8-b6d2-c7a0e9f31d58
+  name: Corrupted Biome
+  description: Harness shadow energy to twist stone and earth, enabling the creation of floors pulsing with malevolent corruption.
+  branch: dark
+  cost:
+    research: 25
+    essence: 5
+  prerequisiteResearchIds:
+    - Dark Arts Fundamentals
+  unlocks:
+    - type: feature_flag
+      featureFlag: biome_corrupted
+      description: Corrupted Biome
   tier: 2
   requiredTicks: 150
 

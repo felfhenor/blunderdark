@@ -253,6 +253,9 @@ const validateResearchTree = () => {
         if (!unlock.featureFlag) {
           errors.push(`Node "${node.name}" unlock[${idx}] feature_flag is missing "featureFlag"`);
         }
+        if (!unlock.description) {
+          errors.push(`Node "${node.name}" unlock[${idx}] feature_flag is missing "description"`);
+        }
         return;
       }
       const targetFieldMap: Record<string, string> = {

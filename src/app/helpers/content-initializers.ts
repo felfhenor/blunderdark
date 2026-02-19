@@ -265,6 +265,8 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
         type: 'feature_flag',
         featureFlag:
           (effect as Partial<FeatureFlagUnlock>).featureFlag ?? '',
+        description:
+          (effect as Partial<FeatureFlagUnlock>).description ?? '',
       };
   }
 }

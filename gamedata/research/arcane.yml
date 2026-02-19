@@ -9,9 +9,10 @@
 #   ├── Ley Line Tapping (T2)
 #   │   └── Elemental Binding (T3)
 #   │       └── Ley Line Mastery (T4) [+Ley Line Tapping]
-#   └── Enchantment (T2)
-#       └── Warding (T3)
-#           └── Spellweave Lattice (T4) [+Arcane Amplification]
+#   ├── Enchantment (T2)
+#   │   └── Warding (T3)
+#   │       └── Spellweave Lattice (T4) [+Arcane Amplification]
+#   └── Crystal Biome (T2)
 #   Arcane Convergence (T5) [Dimensional Studies + Ley Line Mastery]
 #   Planar Nexus (T5) [Spellweave Lattice + Dimensional Studies]
 #   Grand Arcanum (T6) [Arcane Convergence + Planar Nexus]
@@ -63,6 +64,22 @@
       bonusType: researchSpeed
       value: 0.05
       description: +5% research speed
+  tier: 2
+  requiredTicks: 150
+
+- id: f4a91c23-8e67-4d3b-a5f0-7c2b9d1e6a84
+  name: Crystal Biome
+  description: Unlock the secrets of crystalline cavern formations, allowing the creation of floors infused with luminous crystal growths.
+  branch: arcane
+  cost:
+    research: 25
+    flux: 5
+  prerequisiteResearchIds:
+    - Arcane Basics
+  unlocks:
+    - type: feature_flag
+      featureFlag: biome_crystal
+      description: Crystal Biome
   tier: 2
   requiredTicks: 150
 

@@ -67,6 +67,7 @@
   unlocks:
     - type: feature_flag
       featureFlag: elevators
+      description: Elevators
   tier: 2
   requiredTicks: 150
 
@@ -170,6 +171,7 @@
   unlocks:
     - type: feature_flag
       featureFlag: portals
+      description: Teleporters
   tier: 4
   requiredTicks: 500
 

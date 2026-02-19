@@ -36,6 +36,7 @@ export type PassiveBonusUnlock = {
 export type FeatureFlagUnlock = {
   type: 'feature_flag';
   featureFlag: string;
+  description: string;
 };
 
 export type UnlockEffect =
