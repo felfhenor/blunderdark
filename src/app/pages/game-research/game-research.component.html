@@ -37,8 +37,7 @@
           </span>
           <button
             class="btn btn-xs btn-error btn-outline"
-            (click)="cancelResearch()"
-            [tp]="'Cancel research (progress lost, no refund)'"
+            [swal]="cancelSwal"
           >
             Cancel
           </button>
@@ -267,17 +266,6 @@
                   }
                 }
 
-                @if (selectedNodeState() === 'active') {
-                  <button
-                    class="btn btn-sm btn-error btn-outline w-full"
-                    (click)="cancelResearch()"
-                  >
-                    Cancel Research
-                  </button>
-                  <div class="text-xs opacity-50">
-                    Progress will be lost. No refund.
-                  </div>
-                }
               </div>
             </div>
           } @else {
@@ -291,4 +279,13 @@
       </div>
     </div>
   </div>
+<swal
+  #cancelSwal
+  title="Cancel Research?"
+  text="Are you sure you want to cancel this research? You will not be refunded any spent time or resources."
+  icon="warning"
+  confirmButtonText="Cancel Research"
+  cancelButtonText="Keep Researching"
+  (confirm)="onConfirmCancel()"
+></swal>
 </app-modal>

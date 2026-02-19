@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -42,6 +43,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
     ModalComponent,
     TippyDirective,
     IconComponent,
+    SweetAlert2Module,
   ],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',
@@ -207,7 +209,7 @@ export class GameResearchComponent {
     await researchStart(node.id);
   }
 
-  public async cancelResearch(): Promise<void> {
+  public async onConfirmCancel(): Promise<void> {
     await researchCancel();
   }
 
