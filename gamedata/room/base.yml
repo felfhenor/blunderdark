@@ -415,6 +415,7 @@
   maxInhabitants: 2
   maxFeatures: 1
   fearLevel: 2
+  isUnique: true
   biomeBonuses:
     volcanic: 0.50
   adjacencyBonuses:
@@ -651,6 +652,7 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 1
+  isUnique: true
   forgingAdjacencyEffects:
     forgingStatBonus: 1
   adjacencyBonuses:
@@ -963,6 +965,7 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 3
+  isUnique: true
   role: summoningCircle
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
@@ -1017,6 +1020,7 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 2
+  isUnique: true
   role: alchemyLab
   biomeBonuses:
     crystal: 0.20
@@ -1096,6 +1100,7 @@
   maxFeatures: 1
   inhabitantRestriction: null
   fearLevel: 4
+  isUnique: true
   role: tortureChamber
   timeOfDayBonus:
     period: night
