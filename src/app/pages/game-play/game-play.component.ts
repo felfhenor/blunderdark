@@ -44,6 +44,7 @@ import {
   floorSetCurrentByIndex,
   gridSelectedTile,
   optionsGet,
+  signalLocalStorage,
 } from '@helpers';
 import {
   autosaveEvent$,
@@ -110,7 +111,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
   public isAutosaving = autosaveIsSaving;
 
-  public activePanel = signal<string | undefined>(undefined);
+  public activePanel = signalLocalStorage<string | undefined>(
+    'blunderdark-active-panel',
+    undefined,
+  );
 
   private placeholderPanel = viewChild('placeholderPanel', {
     read: TemplateRef,
