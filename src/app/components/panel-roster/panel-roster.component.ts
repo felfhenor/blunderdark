@@ -6,6 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   inhabitantAssignToRoom,
@@ -26,7 +27,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
-import { TippyDirective } from '@ngneat/helipopper';
+
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
@@ -40,7 +41,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, NgClass, StatNameComponent, SweetAlert2Module, TippyDirective],
+  imports: [DecimalPipe, NgClass, InhabitantCardComponent, StatNameComponent, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

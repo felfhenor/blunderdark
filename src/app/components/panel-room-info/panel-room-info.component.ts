@@ -2,12 +2,14 @@ import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import {
   inhabitantAssignToRoom,
   inhabitantAll,
   efficiencyCalculateRoom,
+  efficiencyDoesTraitApply,
   connectionCreate,
   floorCurrent,
   roomRemovalExecute,
@@ -42,6 +44,7 @@ import {
   updateGamestate,
   gamestate,
   verticalTransportGetGroupsOnFloor,
+  synergyGetDefinitions,
 } from '@helpers';
 import {
   transportRemovalGetInfo,
@@ -51,7 +54,7 @@ import {
   transportElevatorExtendExecute,
   transportElevatorShrinkExecute,
 } from '@helpers/transport-placement';
-import type { PlacedRoomId } from '@interfaces';
+import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { ResourceType } from '@interfaces/resource';
@@ -60,7 +63,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
+  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyNameComponent, HungerIndicatorComponent, IconComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -158,7 +161,11 @@ export class PanelRoomInfoComponent {
 
     return this.inhabitants()
       .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => ({ instance: i, name: i.name }));
+      .map((i) => {
+        const def = contentGetEntry<InhabitantContent>(i.definitionId);
+        return { instance: i, name: i.name, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);
@@ -237,7 +244,10 @@ export class PanelRoomInfoComponent {
           ? inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction)
           : false;
       })
-      .map((i) => ({ instance: i, name: i.name }));
+      .map((i) => {
+        const def = contentGetEntry<InhabitantContent>(i.definitionId)!;
+        return { instance: i, name: i.name, def };
+      });
   });
 
   public adjacentUnconnected = computed(() => {
@@ -536,5 +546,53 @@ export class PanelRoomInfoComponent {
     });
 
     notifySuccess(`Removed ${featureName} (destroyed)`);
+  }
+
+  // --- Synergy match for eligible unassigned ---
+
+  public synergyMatch(
+    instance: InhabitantInstance,
+    def: InhabitantContent,
+  ): string[] | undefined {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+
+    const roomDef = productionGetRoomDefinition(room.roomTypeId);
+    if (!roomDef) return undefined;
+
+    const reasons: string[] = [];
+
+    for (const trait of def.traits) {
+      if (trait.effectType !== 'production_bonus') continue;
+
+      if (trait.targetRoomId && trait.targetRoomId === roomDef.id) {
+        const pct = Math.round(trait.effectValue * 100);
+        reasons.push(`Production bonus: +${pct}% (${trait.name})`);
+        continue;
+      }
+
+      if (efficiencyDoesTraitApply(trait, roomDef.production)) {
+        const pct = Math.round(trait.effectValue * 100);
+        const resource = trait.targetResourceType ?? 'all';
+        reasons.push(`Production bonus: +${pct}% ${resource} (${trait.name})`);
+      }
+    }
+
+    const synergies = synergyGetDefinitions();
+    for (const synergy of synergies) {
+      const hasRoomTypeCondition = synergy.conditions.some(
+        (c) => c.type === 'roomType' && c.roomTypeId === roomDef.id,
+      );
+      if (!hasRoomTypeCondition) continue;
+
+      const hasInhabitantTypeCondition = synergy.conditions.some(
+        (c) => c.type === 'inhabitantType' && c.inhabitantType === def.type,
+      );
+      if (hasInhabitantTypeCondition) {
+        reasons.push(`Activates synergy: ${synergy.name}`);
+      }
+    }
+
+    return reasons.length > 0 ? reasons : undefined;
   }
 }

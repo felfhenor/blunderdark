@@ -1,6 +1,7 @@
 import { computed, type Signal } from '@angular/core';
 import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { productionGetRoomDefinition } from '@helpers/production';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import {
   verticalTransportCalculateTravelTicks,
@@ -112,6 +113,29 @@ export function inhabitantDeserialize(
     discontentedTicks: i.discontentedTicks ?? undefined,
   };
   });
+}
+
+// --- Assignment label ---
+
+/**
+ * Get a display label for an inhabitant's room assignment.
+ * Returns "RoomName (F{depth})" or "Unassigned".
+ */
+export function inhabitantGetAssignmentLabel(
+  assignedRoomId: PlacedRoomId | undefined,
+): string {
+  if (!assignedRoomId) return 'Unassigned';
+
+  const floors = gamestate().world.floors;
+  for (const floor of floors) {
+    const room = floor.rooms.find((r) => r.id === assignedRoomId);
+    if (room) {
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
+      return `${roomDef?.name ?? 'Unknown Room'} (F${floor.depth})`;
+    }
+  }
+
+  return 'Unassigned';
 }
 
 // --- Inhabitant restriction validation ---

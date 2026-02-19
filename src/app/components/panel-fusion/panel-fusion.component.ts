@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { contentGetEntry } from '@helpers/content';
@@ -49,7 +50,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, NgClass, CurrencyNameComponent, ModalComponent, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, CurrencyNameComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

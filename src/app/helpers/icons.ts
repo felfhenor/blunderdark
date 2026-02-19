@@ -20,6 +20,7 @@ import {
   tablerExclamationCircle,
   tablerPlus,
   tablerSettings,
+  tablerStar,
   tablerX,
 } from '@ng-icons/tabler-icons';
 
@@ -41,6 +42,7 @@ export const ICON_ALL = {
   gameWarPick,
   tablerPlus,
   tablerSettings,
+  tablerStar,
   tablerX,
   tablerCheck,
   tablerExclamationCircle,

@@ -31,45 +31,10 @@
             [class.selected]="selectedInhabitantId() === entry.instance.instanceId"
             (click)="selectInhabitant(entry.instance.instanceId)"
           >
-            <div class="flex items-center justify-between gap-1">
-              <div class="flex items-center gap-1 min-w-0">
-                <span class="badge badge-xs badge-outline font-mono">T{{ entry.def.tier | number:'1.0-2' }}</span>
-                <div class="flex flex-col min-w-0">
-                  <span class="text-xs font-semibold truncate">{{ entry.instance.name }}</span>
-                  <span class="text-xs opacity-50 truncate">{{ entry.def.name }}</span>
-                </div>
-              </div>
-              <span class="badge badge-xs" [ngClass]="getStateClass(entry.instance.state)">
-                {{ entry.instance.state }}
-              </span>
-            </div>
-
-            <div class="flex items-center justify-between mt-0.5">
-              <div class="stats-row text-sm">
-                <app-stat-name type="hp" [value]="entry.def.stats.hp" />
-                <app-stat-name type="attack" [value]="entry.def.stats.attack" />
-                <app-stat-name type="defense" [value]="entry.def.stats.defense" />
-                <app-stat-name type="speed" [value]="entry.def.stats.speed" />
-                <span
-                  [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
-                  [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
-                ><app-stat-name type="workerEfficiency" [value]="entry.def.stats.workerEfficiency" suffix="x" /></span>
-              </div>
-            </div>
-
-            @if (entry.def.traits.length > 0) {
-              <div class="flex flex-wrap gap-0.5 mt-0.5">
-                @for (trait of entry.def.traits; track trait.id) {
-                  <span class="badge badge-xs badge-outline opacity-70" [tp]="trait.description">
-                    {{ trait.name }}
-                  </span>
-                }
-              </div>
-            }
-
-            <div class="text-xs mt-0.5" [class.opacity-50]="!entry.roomName">
-              {{ entry.roomName ?? 'Unassigned' }}
-            </div>
+            <app-inhabitant-card
+              [instance]="entry.instance"
+              [definition]="entry.def"
+            />
           </div>
         }
       </div>

@@ -1,0 +1,140 @@
+@if (compact()) {
+  <!-- Compact mode -->
+  <div class="compact-card flex items-center gap-2">
+    <span class="badge badge-xs badge-outline font-mono">
+      T{{ definition().tier | number: '1.0-2' }}
+    </span>
+    <div class="flex flex-col min-w-0">
+      @if (showInstanceName()) {
+        <span class="text-xs font-semibold truncate">
+          {{ instance().name }}
+        </span>
+      }
+      @if (showDefinitionName()) {
+        <span class="text-xs truncate" [class.opacity-50]="showInstanceName()">
+          {{ definition().name }}
+        </span>
+      }
+    </div>
+    @if (showHybridBadge() && instance().isHybrid) {
+      <span class="badge badge-xs badge-secondary">Hybrid</span>
+    }
+    @if (showAssignment() && instance().assignedRoomId) {
+      <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
+    }
+    @if (showState() && instance().state !== 'normal') {
+      <span class="badge badge-xs" [ngClass]="stateClass()">
+        {{ instance().state }}
+      </span>
+    }
+    @if (showHunger()) {
+      <app-hunger-indicator [inhabitantId]="instance().instanceId" />
+    }
+    @if (synergyInfo(); as reasons) {
+      <span class="ml-auto text-success" [tp]="synergyTip">
+        <app-icon name="tablerStar" size="14px" />
+      </span>
+      <ng-template #synergyTip>
+        @for (reason of reasons; track reason) {
+          <div class="text-xs">{{ reason }}</div>
+        }
+      </ng-template>
+    }
+  </div>
+} @else {
+  <!-- Full mode -->
+  <div class="full-card">
+    <!-- Row 1: Tier + Names + State + Synergy -->
+    <div class="flex items-center justify-between gap-1">
+      <div class="flex items-center gap-1 min-w-0">
+        <span class="badge badge-xs badge-outline font-mono">
+          T{{ definition().tier | number: '1.0-2' }}
+        </span>
+        <div class="flex flex-col min-w-0">
+          @if (showInstanceName()) {
+            <span class="text-xs font-semibold truncate">
+              {{ instance().name }}
+            </span>
+          }
+          @if (showDefinitionName()) {
+            <span class="text-xs opacity-50 truncate">
+              {{ definition().name }}
+            </span>
+          }
+        </div>
+        @if (showHybridBadge() && instance().isHybrid) {
+          <span class="badge badge-xs badge-secondary">Hybrid</span>
+        }
+      </div>
+      <div class="flex items-center gap-1">
+        @if (synergyInfo(); as reasons) {
+          <span class="text-success" [tp]="synergyFullTip">
+            <app-icon name="tablerStar" size="14px" />
+          </span>
+          <ng-template #synergyFullTip>
+            @for (reason of reasons; track reason) {
+              <div class="text-xs">{{ reason }}</div>
+            }
+          </ng-template>
+        }
+        @if (showState()) {
+          <span class="badge badge-xs" [ngClass]="stateClass()">
+            {{ instance().state }}
+          </span>
+        }
+      </div>
+    </div>
+
+    @if (showType()) {
+      <div class="text-xs opacity-60 mt-0.5">{{ definition().type }}</div>
+    }
+
+    <!-- Stats row -->
+    @if (showStats()) {
+      <div class="flex items-center justify-between mt-0.5">
+        <div class="stats-row text-sm">
+          <app-stat-name type="hp" [value]="definition().stats.hp" />
+          <app-stat-name type="attack" [value]="definition().stats.attack" />
+          <app-stat-name type="defense" [value]="definition().stats.defense" />
+          <app-stat-name type="speed" [value]="definition().stats.speed" />
+          @if (showWorkerEfficiency()) {
+            <span
+              [class.stat-high]="definition().stats.workerEfficiency > 1.0"
+              [class.stat-low]="definition().stats.workerEfficiency < 1.0"
+            >
+              <app-stat-name
+                type="workerEfficiency"
+                [value]="definition().stats.workerEfficiency"
+                suffix="x"
+              />
+            </span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Traits -->
+    @if (showTraits() && definition().traits.length > 0) {
+      <div class="flex flex-wrap gap-0.5 mt-0.5">
+        @for (trait of definition().traits; track trait.id) {
+          <span
+            class="badge badge-xs badge-outline opacity-70"
+            [tp]="trait.description"
+          >
+            {{ trait.name }}
+          </span>
+        }
+      </div>
+    }
+
+    <!-- Assignment -->
+    @if (showAssignment()) {
+      <div
+        class="text-xs mt-0.5"
+        [class.opacity-50]="!instance().assignedRoomId"
+      >
+        {{ assignmentLabel() }}
+      </div>
+    }
+  </div>
+}

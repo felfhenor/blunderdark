@@ -185,18 +185,19 @@
           <div class="flex flex-col gap-1">
             @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
               <div class="flex items-center justify-between gap-2">
-                <span class="text-xs flex items-center gap-1">
-                  {{ inh.name }}
-                  <app-hunger-indicator
-                    [inhabitantId]="inh.instance.instanceId"
-                  />
-                </span>
-                <button
-                  class="btn btn-xs btn-outline btn-error"
-                  (click)="onUnassignInhabitant(inh.instance.instanceId)"
-                >
-                  Remove
-                </button>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-semibold truncate">{{ inh.instance.name }}</span>
+                  <span class="text-xs opacity-50 truncate">{{ inh.def.name }}</span>
+                </div>
+                <div class="flex items-center gap-1 flex-shrink-0">
+                  <app-hunger-indicator [inhabitantId]="inh.instance.instanceId" />
+                  <button
+                    class="btn btn-xs btn-outline btn-error"
+                    (click)="onUnassignInhabitant(inh.instance.instanceId)"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             }
           </div>
@@ -207,16 +208,29 @@
         ) {
           <div class="divider my-1 text-xs opacity-60">Possible Inhabitants</div>
           @if (eligibleUnassigned().length > 0) {
-            <div class="flex flex-col gap-1 max-h-[5.25rem] overflow-y-auto">
+            <div class="flex flex-col gap-1 max-h-[7.5rem] overflow-y-auto">
               @for (
                 inh of eligibleUnassigned();
                 track inh.instance.instanceId
               ) {
                 <button
-                  class="btn btn-xs btn-outline btn-success"
+                  class="btn btn-sm btn-outline btn-success w-full h-auto py-1 justify-between"
                   (click)="onAssignInhabitant(inh.instance.instanceId)"
                 >
-                  {{ inh.name }}
+                  <div class="flex flex-col items-start min-w-0">
+                    <span class="text-xs font-semibold truncate">{{ inh.instance.name }}</span>
+                    <span class="text-xs opacity-50 truncate">{{ inh.def.name }}</span>
+                  </div>
+                  @if (synergyMatch(inh.instance, inh.def); as reasons) {
+                    <span class="text-success flex-shrink-0" [tp]="synergyTipTpl">
+                      <app-icon name="tablerStar" size="16px" />
+                    </span>
+                    <ng-template #synergyTipTpl>
+                      @for (reason of reasons; track reason) {
+                        <div class="text-xs">{{ reason }}</div>
+                      }
+                    </ng-template>
+                  }
                 </button>
               }
             </div>
