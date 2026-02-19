@@ -17,7 +17,7 @@ import {
   tortureGetExtractionTicks,
   updateGamestate,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   InvaderClassType,
   PrisonerId,
@@ -140,7 +140,7 @@ export class PanelTortureChamberComponent {
       ? tortureGetAdjacentRoomTypeIds(room, floor)
       : new Set<string>();
     const ticks = tortureGetExtractionTicks(room, adjacentTypes);
-    return ticks / GAME_TIME_TICKS_PER_MINUTE;
+    return ticksToRealSeconds(ticks);
   }
 
   public getConversionTime(): number {
@@ -151,7 +151,7 @@ export class PanelTortureChamberComponent {
       ? tortureGetAdjacentRoomTypeIds(room, floor)
       : new Set<string>();
     const ticks = tortureGetConversionTicks(room, adjacentTypes);
-    return ticks / GAME_TIME_TICKS_PER_MINUTE;
+    return ticksToRealSeconds(ticks);
   }
 
   public async startExtraction(prisonerId: PrisonerId): Promise<void> {

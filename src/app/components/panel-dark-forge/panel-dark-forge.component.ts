@@ -21,7 +21,7 @@ import {
   roomRoleFindById,
   updateGamestate,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   ForgeRecipeContent,
   ForgeRecipeId,
@@ -90,7 +90,7 @@ export class PanelDarkForgeComponent {
       return {
         recipe,
         ticks,
-        timeMinutes: ticks / GAME_TIME_TICKS_PER_MINUTE,
+        timeSeconds: ticksToRealSeconds(ticks),
         statBonuses,
         canAfford,
       };

@@ -20,7 +20,7 @@ import {
   roomRoleFindById,
   updateGamestate,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   AlchemyRecipeContent,
   AlchemyRecipeId,
@@ -84,7 +84,7 @@ export class PanelAlchemyLabComponent {
       return {
         recipe,
         ticks,
-        timeMinutes: ticks / GAME_TIME_TICKS_PER_MINUTE,
+        timeSeconds: ticksToRealSeconds(ticks),
         effectiveCost,
         canAfford,
       };

@@ -17,7 +17,7 @@ import {
   updateGamestate,
   MUTATION_BASE_TICKS,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   BreedingRecipeContent,
   BreedingRecipeId,
@@ -88,7 +88,7 @@ export class PanelBreedingPitsComponent {
       return {
         ...r,
         ticks,
-        timeMinutes: ticks / GAME_TIME_TICKS_PER_MINUTE,
+        timeSeconds: ticksToRealSeconds(ticks),
       };
     });
   });

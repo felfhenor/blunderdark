@@ -21,7 +21,7 @@ import {
   summoningGetStatBonuses,
   updateGamestate,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   InhabitantStats,
   ResourceType,
@@ -90,15 +90,16 @@ export class PanelSummoningCircleComponent {
     return recipes.map((recipe) => {
       const ticks = summoningGetEffectiveTicks(room, adjacentTypes, recipe.timeMultiplier);
       const statBonuses = summoningGetStatBonuses(room, adjacentTypes, recipe);
-      const duration = recipe.summonType === 'temporary' && recipe.duration
+      const durationTicks = recipe.summonType === 'temporary' && recipe.duration
         ? summoningGetEffectiveDuration(room, recipe.duration)
         : undefined;
+      const duration = durationTicks !== undefined ? ticksToRealSeconds(durationTicks) : undefined;
       const canAfford = resourceCanAfford(recipe.cost);
 
       return {
         recipe,
         ticks,
-        timeMinutes: ticks / GAME_TIME_TICKS_PER_MINUTE,
+        timeSeconds: ticksToRealSeconds(ticks),
         statBonuses,
         duration,
         canAfford,
@@ -123,7 +124,7 @@ export class PanelSummoningCircleComponent {
       .map((i) => ({
         name: i.name,
         ticksRemaining: i.temporaryTicksRemaining!,
-        minutesRemaining: Math.ceil(i.temporaryTicksRemaining! / GAME_TIME_TICKS_PER_MINUTE),
+        secondsRemaining: Math.ceil(ticksToRealSeconds(i.temporaryTicksRemaining!)),
       }));
   });
 

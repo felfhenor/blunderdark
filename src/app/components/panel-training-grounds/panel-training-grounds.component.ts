@@ -9,7 +9,7 @@ import {
   trainingGetProgressPercent,
   trainingGetRoomInfo,
 } from '@helpers';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   TrainingBonuses,
 } from '@interfaces';
@@ -61,10 +61,10 @@ export class PanelTrainingGroundsComponent {
       });
   });
 
-  public trainingTimeMinutes = computed(() => {
+  public trainingTimeSeconds = computed(() => {
     const info = this.trainingRoom();
     if (!info) return 0;
-    return info.targetTicks / GAME_TIME_TICKS_PER_MINUTE;
+    return ticksToRealSeconds(info.targetTicks);
   });
 
   public expectedBonuses = computed<TrainingBonuses | undefined>(() => {

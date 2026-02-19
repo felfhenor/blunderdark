@@ -62,7 +62,7 @@
                     {{ cost.amount }} <app-currency-name [type]="cost.type" />@if (!$last) {, }
                   }
                 </span>
-                <span class="text-xs opacity-50">Time: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
+                <span class="text-xs opacity-50">Time: {{ entry.timeSeconds | number:'1.0-0' }} sec</span>
                 @if (entry.recipe.tier === 'advanced') {
                   <span class="badge badge-xs badge-accent">Advanced</span>
                 }

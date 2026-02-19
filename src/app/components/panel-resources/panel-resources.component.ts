@@ -16,8 +16,8 @@ import {
   productionBreakdowns,
   productionPerMinute,
   productionRates,
-  GAME_TIME_TICKS_PER_MINUTE,
 } from '@helpers';
+import { ticksToRealSeconds } from '@helpers/game-time';
 import type { CorruptionLevel } from '@interfaces/corruption';
 import type { ResourceType } from '@interfaces';
 import type {
@@ -111,13 +111,13 @@ export class PanelResourcesComponent {
     const level = hungerGetWarningLevel(food, totalConsumption);
     if (!level) return undefined;
 
-    let minutesRemaining: number | undefined;
+    let secondsRemaining: number | undefined;
     if (totalConsumption > 0 && food > 0) {
       const ticksRemaining = food / totalConsumption;
-      minutesRemaining = Math.floor(ticksRemaining / GAME_TIME_TICKS_PER_MINUTE);
+      secondsRemaining = Math.floor(ticksToRealSeconds(ticksRemaining));
     }
 
-    return { level, minutesRemaining };
+    return { level, secondsRemaining };
   });
 
   public foodWarningDismissed = signal(false);

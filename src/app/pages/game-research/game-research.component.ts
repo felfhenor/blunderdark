@@ -10,7 +10,7 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
-import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { formatRealDuration } from '@helpers/game-time';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
   researchArePrerequisitesMet,
@@ -79,17 +79,7 @@ export class GameResearchComponent {
     const speed = researchSpeedModifier();
     const ticksRemaining =
       remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
-    const gameMinutes = ticksRemaining / GAME_TIME_TICKS_PER_MINUTE;
-    if (gameMinutes < 1) return '< 1 min';
-    if (gameMinutes < 60) return `${Math.ceil(gameMinutes)} min`;
-    let hours = Math.floor(gameMinutes / 60);
-    let mins = Math.ceil(gameMinutes % 60);
-    if (mins === 60) {
-      hours++;
-      mins = 0;
-    }
-    if (mins === 0) return `${hours}h`;
-    return `${hours}h ${mins}m`;
+    return formatRealDuration(ticksRemaining);
   });
 
   public speedModifier = researchSpeedModifier;

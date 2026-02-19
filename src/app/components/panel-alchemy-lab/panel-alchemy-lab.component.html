@@ -62,7 +62,7 @@
                 <span class="text-xs opacity-50">
                   Output: +{{ entry.recipe.outputAmount | number:'1.0-2' }} <app-currency-name [type]="entry.recipe.outputResource" />
                 </span>
-                <span class="text-xs opacity-50">Cycle: {{ entry.timeMinutes | number:'1.0-2' }} min</span>
+                <span class="text-xs opacity-50">Cycle: {{ entry.timeSeconds | number:'1.0-0' }} sec</span>
                 <button
                   class="btn btn-xs btn-primary mt-1"
                   [disabled]="!entry.canAfford"
