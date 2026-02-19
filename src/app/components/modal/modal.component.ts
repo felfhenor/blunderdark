@@ -44,6 +44,12 @@ export class ModalComponent {
     });
   }
 
+  public onBackdropClick(event: MouseEvent): void {
+    if (event.target !== this.modal()?.nativeElement) return;
+    if (!this.allowEscToClose()) return;
+    this.closeModal();
+  }
+
   public onEscapeKey(event: Event): void {
     if (!this.visible() || !this.allowEscToClose()) return;
     event.preventDefault();
