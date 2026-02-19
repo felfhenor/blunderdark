@@ -1,7 +1,5 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
-    <h3 class="card-title text-sm">Build</h3>
-
     <div class="divider my-1 text-xs opacity-60">Corridors</div>
 
     <button
@@ -108,7 +106,7 @@
       <p class="text-xs opacity-70">Build an Altar to unlock room construction.</p>
     }
 
-    <div class="room-list flex flex-col gap-2" [class.opacity-40]="isHallwayMode() || !hasAltar()" [class.pointer-events-none]="isHallwayMode() || !hasAltar()">
+    <div class="room-list flex flex-col gap-2 max-h-60 overflow-y-auto" [class.opacity-40]="isHallwayMode() || !hasAltar()" [class.pointer-events-none]="isHallwayMode() || !hasAltar()">
       @for (room of rooms(); track room.id) {
         <button
           class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-1"

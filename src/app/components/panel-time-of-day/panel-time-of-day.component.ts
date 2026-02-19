@@ -19,13 +19,11 @@ import type {
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body p-4 gap-2">
         <div class="flex items-center justify-between">
-          <h3 class="card-title text-sm">Time of Day</h3>
           <span class="badge badge-sm" [class]="phaseBadgeClass()">
             {{ phaseLabel() }}
           </span>
+          <span class="text-xs opacity-70 font-mono">{{ time() }}</span>
         </div>
-
-        <div class="text-xs opacity-70 font-mono">{{ time() }}</div>
 
         @if (hasModifiers()) {
           <div class="flex flex-col gap-1 mt-1">
