@@ -21,7 +21,6 @@ import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
-import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
@@ -30,6 +29,7 @@ import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-tim
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
+import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -129,7 +129,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
 
-
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
     if (!roomTypeId) return false;
@@ -138,7 +137,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     );
   }
 
-  public hasAltar = computed(() => this.hasRoomOfRole('altar'));
   public hasTrainingGrounds = computed(() =>
     this.hasRoomOfRole('trainingGrounds'),
   );
@@ -200,17 +198,16 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         templateRef: this.rosterPanel() ?? placeholder,
       },
       {
-        id: 'altar',
-        label: 'Altar',
-        isModal: false,
-        templateRef: this.altarPanel() ?? placeholder,
-        condition: this.hasAltar,
-      },
-      {
         id: 'reputation',
         label: 'Reputation',
         isModal: false,
         templateRef: this.reputationPanel() ?? placeholder,
+      },
+      {
+        id: 'altar',
+        label: 'Altar',
+        isModal: false,
+        templateRef: this.altarPanel() ?? placeholder,
       },
       {
         id: 'training',

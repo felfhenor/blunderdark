@@ -8,10 +8,8 @@ import {
   altarRoomApplyUpgrade,
   resourceCanAfford,
   altarRoomCanRecruit,
-  floorCurrent,
   recruitmentCurrentInhabitantCount,
   RESOURCE_LABEL_MAP,
-  roomRoleFindById,
   gamestate,
   altarRoomGetNextUpgrade,
   recruitmentGetRecruitable,
@@ -21,7 +19,6 @@ import {
   notifyError,
   notifySuccess,
   recruitmentRecruit,
-  gridSelectedTile,
   recruitmentUnlockedTier,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
@@ -48,20 +45,6 @@ type RecruitableEntry = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelAltarComponent {
-  public altarRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
-
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
-
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('altar')) return undefined;
-
-    return room;
-  });
-
   public fearReduction = altarRoomFearReductionAura;
   public recruitmentAvailable = altarRoomCanRecruit;
   public level = altarRoomLevel;
