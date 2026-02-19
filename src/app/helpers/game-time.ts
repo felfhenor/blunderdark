@@ -59,18 +59,24 @@ export function ticksToRealSeconds(ticks: number): number {
 }
 
 /**
+ * Format a duration given in seconds as a human-readable string.
+ */
+export function formatDurationSeconds(seconds: number): string {
+  if (seconds < 1) return '< 1 sec';
+  if (seconds < 60) return `${Math.ceil(seconds)} sec`;
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.ceil(seconds % 60);
+  if (secs === 60) return `${minutes + 1} min`;
+  if (secs === 0) return `${minutes} min`;
+  return `${minutes} min ${secs} sec`;
+}
+
+/**
  * Format a tick-based duration as real wall-clock time.
  * Accounts for current game speed.
  */
 export function formatRealDuration(ticks: number): string {
-  const realSeconds = ticksToRealSeconds(ticks);
-  if (realSeconds < 1) return '< 1 sec';
-  if (realSeconds < 60) return `${Math.ceil(realSeconds)} sec`;
-  const minutes = Math.floor(realSeconds / 60);
-  let secs = Math.ceil(realSeconds % 60);
-  if (secs === 60) return `${minutes + 1} min`;
-  if (secs === 0) return `${minutes} min`;
-  return `${minutes} min ${secs} sec`;
+  return formatDurationSeconds(ticksToRealSeconds(ticks));
 }
 
 export const GAME_TIME_SPEEDS: GameSpeed[] = [1, 2, 4];

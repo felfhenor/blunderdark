@@ -91,7 +91,7 @@ export function gamestateTickStart(): void {
 
 export function gamestateTickEnd(): void {
   if (tickGamestate) {
-    _liveGameState.set(tickGamestate);
+    _liveGameState.set(structuredClone(tickGamestate));
   }
 
   tickGamestate = undefined;

@@ -6,7 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
-import { formatRealDuration } from '@helpers/game-time';
+import { formatDurationSeconds } from '@helpers/game-time';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
   researchSpeedModifier,
@@ -71,6 +71,6 @@ export class PanelResearchSummaryComponent {
     const speed = researchSpeedModifier();
     const ticksRemaining =
       remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
-    return formatRealDuration(ticksRemaining);
+    return formatDurationSeconds(ticksRemaining);
   });
 }

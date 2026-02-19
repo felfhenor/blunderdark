@@ -10,7 +10,7 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
-import { formatRealDuration } from '@helpers/game-time';
+import { formatDurationSeconds } from '@helpers/game-time';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
   researchArePrerequisitesMet,
@@ -35,7 +35,13 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
 
 @Component({
   selector: 'app-game-research',
-  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent, TippyDirective, IconComponent],
+  imports: [
+    DecimalPipe,
+    CurrencyNameComponent,
+    ModalComponent,
+    TippyDirective,
+    IconComponent,
+  ],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,7 +85,8 @@ export class GameResearchComponent {
     const speed = researchSpeedModifier();
     const ticksRemaining =
       remaining / (RESEARCH_BASE_PROGRESS_PER_TICK * speed);
-    return formatRealDuration(ticksRemaining);
+
+    return formatDurationSeconds(ticksRemaining);
   });
 
   public speedModifier = researchSpeedModifier;
@@ -195,10 +202,15 @@ export class GameResearchComponent {
     this.visible.set(false);
   }
 
-  public formatCost(cost: ResourceCost): { type: ResourceType; amount: number }[] {
+  public formatCost(
+    cost: ResourceCost,
+  ): { type: ResourceType; amount: number }[] {
     return Object.entries(cost)
       .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
+      .map(([type, amount]) => ({
+        type: type as ResourceType,
+        amount: amount!,
+      }));
   }
 
   private formatUnlock(unlock: UnlockEffect): {
@@ -219,8 +231,7 @@ export class GameResearchComponent {
         return { type: 'Ability', name: entry?.name ?? 'Unknown' };
       }
       case 'upgrade': {
-        const rooms =
-          contentGetEntriesByType<RoomContent>('room');
+        const rooms = contentGetEntriesByType<RoomContent>('room');
         for (const room of rooms) {
           const path = room.upgradePaths?.find(
             (p) => p.id === unlock.targetUpgradepathId,
