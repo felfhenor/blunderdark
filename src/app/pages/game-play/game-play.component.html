@@ -45,12 +45,6 @@
   </div>
 </ng-template>
 
-<ng-template #breedingPanel>
-  <div class="p-2">
-    <app-panel-breeding-pits />
-  </div>
-</ng-template>
-
 <ng-template #summoningPanel>
   <div class="p-2">
     <app-panel-summoning-circle />
@@ -75,51 +69,36 @@
   </div>
 </ng-template>
 
-<ng-template #altarPanel>
-  <div class="p-2">
-    <app-panel-altar />
-  </div>
-</ng-template>
-
-<ng-template #thronePanel>
-  <div class="p-2">
-    <app-panel-throne-room />
-  </div>
-</ng-template>
-
 <ng-template #merchantPanel>
   <div class="p-2">
     <app-panel-merchant />
   </div>
 </ng-template>
 
-<ng-template #roomInfoPanel>
-  <div class="p-2">
-    <app-panel-room-info />
-  </div>
-</ng-template>
-
-<ng-template #hallwayInfoPanel>
-  <div class="p-2">
-    <app-panel-hallway-info />
-  </div>
-</ng-template>
-
-<ng-template #synergyPanel>
-  <div class="p-2">
-    <app-synergy-tooltip />
-  </div>
-</ng-template>
-
-<div class="game-container flex">
+<div class="game-container">
   <app-side-tab-rail
     [tabs]="tabDefinitions()"
     [(activePanel)]="activePanel"
+  />
+  <app-side-tab-rail
+    class="!top-auto !bottom-0 !items-end"
+    [tabs]="modalTabDefinitions()"
+    position="bottom"
     (modalTabClick)="onModalTabClick($event)"
   />
-  <div class="flex-1 overflow-hidden">
-    <app-grid />
-  </div>
+  <app-grid />
+
+  @if (hasSelectedRoom()) {
+    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity">
+      <app-panel-room-info />
+    </div>
+  }
+
+  @if (hasSelectedHallway()) {
+    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity">
+      <app-panel-hallway-info />
+    </div>
+  }
 </div>
 
 <app-game-research [(visible)]="showResearch" />

@@ -4,9 +4,9 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   contentGetEntry,
+  floorAll,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
   notify,
   roomRoleFindById,
   tortureConversionComplete$,
@@ -66,18 +66,15 @@ export class PanelTortureChamberComponent {
   ];
 
   public tortureRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+    const roleId = roomRoleFindById('tortureChamber');
+    if (!roleId) return undefined;
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
+    for (const floor of floorAll()) {
+      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
+      if (room) return room;
+    }
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('tortureChamber'))
-      return undefined;
-
-    return room;
+    return undefined;
   });
 
   public assignedInhabitants = computed(() => {

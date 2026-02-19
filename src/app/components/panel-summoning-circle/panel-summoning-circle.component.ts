@@ -4,9 +4,9 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   contentGetEntry,
+  floorAll,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
   notify,
   resourceCanAfford,
   resourcePayCost,
@@ -53,17 +53,14 @@ export class PanelSummoningCircleComponent {
   ];
 
   public summoningRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+    const roleId = roomRoleFindById('summoningCircle');
+    if (!roleId) return undefined;
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
-
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('summoningCircle')) return undefined;
-
-    return room;
+    for (const floor of floorAll()) {
+      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
+      if (room) return room;
+    }
+    return undefined;
   });
 
   public assignedInhabitants = computed(() => {

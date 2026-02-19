@@ -1,11 +1,16 @@
 <div
-  class="side-tab-rail flex flex-col bg-base-200 border-r border-base-300 rounded-br-lg"
+  class="side-tab-rail flex flex-col bg-base-200 border-r border-base-300"
   [class.has-active-panel]="!!activePanel()"
+  [class.rounded-br-lg]="position() === 'top'"
+  [class.rounded-tr-lg]="position() === 'bottom'"
 >
   @for (tab of visibleTabs(); track tab.id) {
     <button
-      class="tab-btn flex items-center justify-center w-full py-4 text-xs opacity-70 hover:opacity-100 hover:bg-base-300 transition-colors cursor-pointer"
-      [class.active]="activePanel() === tab.id && !tab.isModal"
+      class="tab-btn flex items-center justify-start w-full py-2 px-3 text-xs transition-colors cursor-pointer"
+      [class.bg-primary]="activePanel() === tab.id && !tab.isModal"
+      [class.text-primary-content]="activePanel() === tab.id && !tab.isModal"
+      [class.font-bold]="activePanel() === tab.id && !tab.isModal"
+      [style.opacity]="activePanel() === tab.id && !tab.isModal ? 1 : 0.7"
       (click)="onTabClick(tab)"
     >
       <span class="tab-label">{{ tab.label }}</span>

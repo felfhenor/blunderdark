@@ -12,9 +12,9 @@ import {
   alchemyLabStartConversion,
   alchemyLabStopConversion,
   contentGetEntry,
+  floorAll,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
   notify,
   resourceCanAfford,
   roomRoleFindById,
@@ -41,17 +41,14 @@ export class PanelAlchemyLabComponent {
   });
 
   public labRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+    const roleId = roomRoleFindById('alchemyLab');
+    if (!roleId) return undefined;
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
-
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('alchemyLab')) return undefined;
-
-    return room;
+    for (const floor of floorAll()) {
+      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
+      if (room) return room;
+    }
+    return undefined;
   });
 
   public assignedWorkers = computed(() => {

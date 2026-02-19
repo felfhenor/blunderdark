@@ -14,8 +14,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
-import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
-import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
@@ -23,18 +21,16 @@ import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PanelReputationComponent } from '@components/panel-reputation/panel-reputation.component';
-import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
 import { PanelResourcesComponent } from '@components/panel-resources/panel-resources.component';
 import { PanelRoomInfoComponent } from '@components/panel-room-info/panel-room-info.component';
 import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-room-select.component';
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelSummoningCircleComponent } from '@components/panel-summoning-circle/panel-summoning-circle.component';
-import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
+import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
-import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import {
@@ -69,8 +65,6 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     GameResearchComponent,
     MoraleBarComponent,
     PanelAlchemyLabComponent,
-    PanelAltarComponent,
-    PanelBreedingPitsComponent,
     PanelDarkForgeComponent,
     PanelFloorSelectorComponent,
     PanelFusionComponent,
@@ -83,13 +77,11 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
     PanelRosterComponent,
-    PanelThroneRoomComponent,
     SideTabRailComponent,
     PanelTimeOfDayComponent,
     PanelTrainingGroundsComponent,
     PanelSummoningCircleComponent,
     PanelTortureChamberComponent,
-    SynergyTooltipComponent,
   ],
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',
@@ -132,19 +124,12 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     read: TemplateRef,
   });
   private trainingPanel = viewChild('trainingPanel', { read: TemplateRef });
-  private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
   private summoningPanel = viewChild('summoningPanel', { read: TemplateRef });
   private forgePanel = viewChild('forgePanel', { read: TemplateRef });
   private alchemyPanel = viewChild('alchemyPanel', { read: TemplateRef });
   private torturePanel = viewChild('torturePanel', { read: TemplateRef });
-  private altarPanel = viewChild('altarPanel', { read: TemplateRef });
-  private thronePanel = viewChild('thronePanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
-  private roomInfoPanel = viewChild('roomInfoPanel', { read: TemplateRef });
-  private hallwayInfoPanel = viewChild('hallwayInfoPanel', {
-    read: TemplateRef,
-  });
-  private synergyPanel = viewChild('synergyPanel', { read: TemplateRef });
+
 
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
@@ -157,7 +142,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public hasTrainingGrounds = computed(() =>
     this.hasRoomOfRole('trainingGrounds'),
   );
-  public hasBreedingPits = computed(() => this.hasRoomOfRole('breedingPits'));
   public hasSummoningCircle = computed(() =>
     this.hasRoomOfRole('summoningCircle'),
   );
@@ -166,8 +150,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public hasTortureChamber = computed(() =>
     this.hasRoomOfRole('tortureChamber'),
   );
-  public hasAltar = computed(() => this.hasRoomOfRole('altar'));
-  public hasThrone = computed(() => this.hasRoomOfRole('throne'));
   public isMerchantPresent = merchantIsPresent;
 
   public hasSelectedRoom = computed(() => {
@@ -188,15 +170,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
 
   constructor() {
     super();
-    effect(() => {
-      const hasRoom = this.hasSelectedRoom();
-      const hasHallway = this.hasSelectedHallway();
-      if (hasRoom) {
-        this.activePanel.set('room-info');
-      } else if (hasHallway) {
-        this.activePanel.set('hallway-info');
-      }
-    });
   }
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {
@@ -234,38 +207,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       },
       {
         id: 'reputation',
-        label: 'Rep',
+        label: 'Reputation',
         isModal: false,
         templateRef: this.reputationPanel() ?? placeholder,
-      },
-      { id: 'research', label: 'Research', isModal: true },
-      {
-        id: 'fusion',
-        label: 'Fusion',
-        isModal: true,
-        condition: this.canShowFusion,
-      },
-      { id: 'victory', label: 'Victory', isModal: true },
-      {
-        id: 'room-info',
-        label: 'Room',
-        isModal: false,
-        templateRef: this.roomInfoPanel() ?? placeholder,
-        condition: this.hasSelectedRoom,
-      },
-      {
-        id: 'hallway-info',
-        label: 'Hallway',
-        isModal: false,
-        templateRef: this.hallwayInfoPanel() ?? placeholder,
-        condition: this.hasSelectedHallway,
-      },
-      {
-        id: 'synergy',
-        label: 'Synergy',
-        isModal: false,
-        templateRef: this.synergyPanel() ?? placeholder,
-        condition: this.hasSelectedRoom,
       },
       {
         id: 'training',
@@ -273,13 +217,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         isModal: false,
         templateRef: this.trainingPanel() ?? placeholder,
         condition: this.hasTrainingGrounds,
-      },
-      {
-        id: 'breeding',
-        label: 'Breeding',
-        isModal: false,
-        templateRef: this.breedingPanel() ?? placeholder,
-        condition: this.hasBreedingPits,
       },
       {
         id: 'summoning',
@@ -310,20 +247,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         condition: this.hasTortureChamber,
       },
       {
-        id: 'altar',
-        label: 'Altar',
-        isModal: false,
-        templateRef: this.altarPanel() ?? placeholder,
-        condition: this.hasAltar,
-      },
-      {
-        id: 'throne',
-        label: 'Throne',
-        isModal: false,
-        templateRef: this.thronePanel() ?? placeholder,
-        condition: this.hasThrone,
-      },
-      {
         id: 'merchant',
         label: 'Merchant',
         isModal: false,
@@ -332,6 +255,17 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       },
     ];
   });
+
+  public modalTabDefinitions = computed<SideTabDefinition[]>(() => [
+    { id: 'research', label: 'Research', isModal: true },
+    {
+      id: 'fusion',
+      label: 'Fusion',
+      isModal: true,
+      condition: this.canShowFusion,
+    },
+    { id: 'victory', label: 'Victory', isModal: true },
+  ]);
 
   public onModalTabClick(tabId: string): void {
     switch (tabId) {

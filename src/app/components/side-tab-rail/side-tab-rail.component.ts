@@ -3,6 +3,8 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
+  inject,
   input,
   model,
   output,
@@ -17,9 +19,16 @@ import type { SideTabDefinition } from '@interfaces';
   templateUrl: './side-tab-rail.component.html',
   styleUrl: './side-tab-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'absolute left-0 top-0 z-30 flex items-start',
+    '(document:click)': 'onDocumentClick($event)',
+  },
 })
 export class SideTabRailComponent {
+  private el = inject(ElementRef);
+
   public tabs = input.required<SideTabDefinition[]>();
+  public position = input<'top' | 'bottom'>('top');
   public activePanel = model<string | undefined>(undefined);
   public modalTabClick = output<string>();
 
@@ -44,6 +53,12 @@ export class SideTabRailComponent {
         this.activePanel.set(undefined);
       }
     });
+  }
+
+  public onDocumentClick(event: MouseEvent): void {
+    if (this.activePanel() && !this.el.nativeElement.contains(event.target)) {
+      this.activePanel.set(undefined);
+    }
   }
 
   public onTabClick(tab: SideTabDefinition): void {

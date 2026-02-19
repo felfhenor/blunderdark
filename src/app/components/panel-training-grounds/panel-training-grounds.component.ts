@@ -2,13 +2,12 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
-  floorCurrent,
+  floorAll,
   roomRoleFindById,
   gamestate,
   contentGetEntry,
   trainingGetProgressPercent,
   trainingGetRoomInfo,
-  gridSelectedTile,
 } from '@helpers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import type {
@@ -25,17 +24,14 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 })
 export class PanelTrainingGroundsComponent {
   public trainingRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+    const roleId = roomRoleFindById('trainingGrounds');
+    if (!roleId) return undefined;
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
-
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('trainingGrounds')) return undefined;
-
-    return trainingGetRoomInfo(room.id);
+    for (const floor of floorAll()) {
+      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
+      if (room) return trainingGetRoomInfo(room.id);
+    }
+    return undefined;
   });
 
   public trainees = computed(() => {

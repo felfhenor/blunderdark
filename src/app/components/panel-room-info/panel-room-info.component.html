@@ -7,7 +7,9 @@
         <div class="flex flex-wrap gap-2 mt-1">
           @for (prod of roomProduction(); track prod.type) {
             <span class="badge badge-sm badge-outline">
-              +{{ prod.perMinute | number:'1.0-2' }} <app-currency-name [type]="prod.type" />/min
+              +{{ prod.perMinute | number: '1.0-2' }}
+              <app-currency-name [type]="prod.type" />
+              /min
             </span>
           }
         </div>
@@ -21,9 +23,13 @@
               class="text-xs font-semibold"
               [class.text-success]="eff.totalMultiplier > 1.0"
               [class.text-error]="eff.totalMultiplier < 1.0"
-            >{{ eff.totalMultiplier * 100 | number:'1.0-2' }}%</span>
+            >
+              {{ eff.totalMultiplier * 100 | number: '1.0-2' }}%
+            </span>
           </div>
-          <div class="text-xs opacity-40 ml-2">Base: {{ eff.baseEfficiency * 100 | number:'1.0-2' }}%</div>
+          <div class="text-xs opacity-40 ml-2">
+            Base: {{ eff.baseEfficiency * 100 | number: '1.0-2' }}%
+          </div>
           @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
             <div class="text-xs ml-2">
               <span>{{ contrib.name }}:</span>
@@ -31,7 +37,8 @@
                 [class.text-success]="contrib.totalBonus > 0"
                 [class.text-error]="contrib.totalBonus < 0"
               >
-                {{ contrib.totalBonus >= 0 ? '+' : '' }}{{ contrib.totalBonus * 100 | number:'1.0-2' }}%
+                {{ contrib.totalBonus >= 0 ? '+' : ''
+                }}{{ contrib.totalBonus * 100 | number: '1.0-2' }}%
               </span>
               @for (tb of contrib.traitBonuses; track tb.traitName) {
                 @if (tb.applies) {
@@ -47,7 +54,9 @@
         <div class="mt-2">
           <div class="flex items-center gap-2">
             <span class="text-xs opacity-50">Fear:</span>
-            <span class="text-xs font-semibold" [class]="fearLabelClass()">{{ fearLabel() }}</span>
+            <span class="text-xs font-semibold" [class]="fearLabelClass()">
+              {{ fearLabel() }}
+            </span>
           </div>
           <progress
             class="progress w-full"
@@ -55,30 +64,51 @@
             [value]="fear.effectiveFear"
             [max]="fearMax"
           ></progress>
-          @if (fear.inhabitantModifier !== 0 || fear.upgradeAdjustment !== 0 || fear.altarAuraReduction !== 0 || fear.propagatedFear !== 0) {
-            <div class="text-xs opacity-40 ml-2">Base: {{ fear.baseFear | number:'1.0-2' }}</div>
+          @if (
+            fear.inhabitantModifier !== 0 ||
+            fear.upgradeAdjustment !== 0 ||
+            fear.altarAuraReduction !== 0 ||
+            fear.propagatedFear !== 0
+          ) {
+            <div class="text-xs opacity-40 ml-2">
+              Base: {{ fear.baseFear | number: '1.0-2' }}
+            </div>
             @if (fear.inhabitantModifier !== 0) {
-              <div class="text-xs ml-2" [class.text-error]="fear.inhabitantModifier > 0" [class.text-success]="fear.inhabitantModifier < 0">
-                Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : '' }}{{ fear.inhabitantModifier | number:'1.0-2' }}
+              <div
+                class="text-xs ml-2"
+                [class.text-error]="fear.inhabitantModifier > 0"
+                [class.text-success]="fear.inhabitantModifier < 0"
+              >
+                Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
+                }}{{ fear.inhabitantModifier | number: '1.0-2' }}
               </div>
             }
             @if (fear.upgradeAdjustment !== 0) {
-              <div class="text-xs ml-2" [class.text-error]="fear.upgradeAdjustment > 0" [class.text-success]="fear.upgradeAdjustment < 0">
-                Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : '' }}{{ fear.upgradeAdjustment | number:'1.0-2' }}
+              <div
+                class="text-xs ml-2"
+                [class.text-error]="fear.upgradeAdjustment > 0"
+                [class.text-success]="fear.upgradeAdjustment < 0"
+              >
+                Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
+                }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
               </div>
             }
             @if (fear.altarAuraReduction !== 0) {
               <div class="text-xs ml-2 text-success">
-                Altar Aura: -{{ fear.altarAuraReduction | number:'1.0-2' }}
+                Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
               </div>
             }
             @if (fear.propagatedFear !== 0) {
               <div class="text-xs ml-2 text-error">
-                Adjacent: +{{ fear.propagatedFear | number:'1.0-2' }}
+                Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
               </div>
-              @for (source of fear.propagationSources; track source.sourceRoomId) {
+              @for (
+                source of fear.propagationSources;
+                track source.sourceRoomId
+              ) {
                 <div class="text-xs ml-4 opacity-50">
-                  +{{ source.amount | number:'1.0-2' }} from {{ source.sourceRoomName }}
+                  +{{ source.amount | number: '1.0-2' }} from
+                  {{ source.sourceRoomName }}
                 </div>
               }
             }
@@ -89,131 +119,147 @@
       <!-- Feature Slots -->
       @if (featureSlots().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Features</div>
-          <div class="flex flex-col gap-1">
-            @for (slot of featureSlots(); track slot.index) {
-              @if (slot.feature) {
-                <div class="flex items-center justify-between gap-2">
-                  <span
-                    class="text-xs truncate"
-                    [tp]="slot.feature.description"
-                    [tpDelay]="250"
-                  >{{ slot.feature.name }}</span>
-                  <button
-                    class="btn btn-xs btn-outline btn-error"
-                    [swal]="featureRemoveSwal"
-                    (click)="featureRemoveSlotIndex = slot.index"
-                  >
-                    Remove
-                  </button>
-                </div>
-              } @else {
-                <button
-                  class="btn btn-xs btn-outline btn-accent w-full"
-                  (click)="onOpenFeatureSelect(slot.index)"
+        <div class="flex flex-col gap-1">
+          @for (slot of featureSlots(); track slot.index) {
+            @if (slot.feature) {
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="text-xs truncate"
+                  [tp]="slot.feature.description"
+                  [tpDelay]="250"
                 >
-                  + Add Feature
+                  {{ slot.feature.name }}
+                </span>
+                <button
+                  class="btn btn-xs btn-outline btn-error"
+                  [swal]="featureRemoveSwal"
+                  (click)="featureRemoveSlotIndex = slot.index"
+                >
+                  Remove
                 </button>
-              }
+              </div>
+            } @else {
+              <button
+                class="btn btn-xs btn-outline btn-accent w-full"
+                (click)="onOpenFeatureSelect(slot.index)"
+              >
+                + Add Feature
+              </button>
             }
-          </div>
+          }
+        </div>
       }
 
       <!-- Resource Converter -->
       @if (hasResourceConverter()) {
         <div class="divider my-2 text-xs opacity-60">Resource Converter</div>
-          <div class="flex items-center gap-2">
-            <select
-              class="select select-xs select-bordered flex-1"
-              [value]="convertedOutputResource() ?? ''"
-              (change)="onSetConvertedResource($any($event.target).value)"
-            >
-              <option value="">No conversion</option>
-              @for (res of availableConversionResources(); track res) {
-                <option [value]="res">{{ res }}</option>
-              }
-            </select>
-            <span class="text-xs opacity-50">{{ converterEfficiency() * 100 | number:'1.0-2' }}% eff.</span>
-          </div>
+        <div class="flex items-center gap-2">
+          <select
+            class="select select-xs select-bordered flex-1"
+            [value]="convertedOutputResource() ?? ''"
+            (change)="onSetConvertedResource($any($event.target).value)"
+          >
+            <option value="">No conversion</option>
+            @for (res of availableConversionResources(); track res) {
+              <option [value]="res">{{ res }}</option>
+            }
+          </select>
+          <span class="text-xs opacity-50">
+            {{ converterEfficiency() * 100 | number: '1.0-2' }}% eff.
+          </span>
+        </div>
       }
 
       @if (room.maxInhabitants !== 0) {
         <div class="divider my-2 text-xs opacity-60">
           Inhabitants
           <span class="font-mono">
-            {{ inhabitantCount() | number:'1.0-2' }}/{{ room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants }}
+            {{ inhabitantCount() | number: '1.0-2' }}/{{
+              room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants
+            }}
           </span>
         </div>
 
-          @if (assignedInhabitants().length > 0) {
-            <div class="flex flex-col gap-1 mb-2">
-              @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs flex items-center gap-1">
-                    {{ inh.name }}
-                    <app-hunger-indicator [inhabitantId]="inh.instance.instanceId" />
-                  </span>
-                  <button
-                    class="btn btn-xs btn-outline btn-error"
-                    (click)="onUnassignInhabitant(inh.instance.instanceId)"
-                  >
-                    Remove
-                  </button>
-                </div>
-              }
-            </div>
-          }
-
-          @if (room.maxInhabitants === -1 || inhabitantCount() < room.maxInhabitants) {
-            @if (eligibleUnassigned().length > 0) {
-              <div class="flex flex-col gap-1">
-                <span class="text-xs opacity-50">Assign:</span>
-                @for (inh of eligibleUnassigned(); track inh.instance.instanceId) {
-                  <button
-                    class="btn btn-xs btn-outline btn-success"
-                    (click)="onAssignInhabitant(inh.instance.instanceId)"
-                  >
-                    {{ inh.name }}
-                  </button>
-                }
-              </div>
-            } @else if (assignedInhabitants().length === 0) {
-              <p class="text-xs opacity-50">No eligible inhabitants available.</p>
-            }
-          }
-      }
-
-      @if (adjacentUnconnected().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Connect to</div>
+        @if (assignedInhabitants().length > 0) {
+          <div class="divider my-1 text-xs opacity-60">Assigned Inhabitants</div>
           <div class="flex flex-col gap-1">
-            @for (adj of adjacentUnconnected(); track adj.id) {
-              <button
-                class="btn btn-xs btn-outline btn-success"
-                (click)="onConnect(adj.id)"
-              >
-                {{ adj.name }}
-              </button>
-            }
-          </div>
-      }
-
-      @if (activeConnections().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Connected</div>
-          <div class="flex flex-col gap-1">
-            @for (conn of activeConnections(); track conn.connectionId) {
+            @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
               <div class="flex items-center justify-between gap-2">
-                <span class="text-xs">{{ conn.otherRoomName }}</span>
+                <span class="text-xs flex items-center gap-1">
+                  {{ inh.name }}
+                  <app-hunger-indicator
+                    [inhabitantId]="inh.instance.instanceId"
+                  />
+                </span>
                 <button
                   class="btn btn-xs btn-outline btn-error"
-                  (click)="onDisconnect(conn.connectionId)"
+                  (click)="onUnassignInhabitant(inh.instance.instanceId)"
                 >
-                  Disconnect
+                  Remove
                 </button>
               </div>
             }
           </div>
+        }
+
+        @if (
+          room.maxInhabitants === -1 || inhabitantCount() < room.maxInhabitants
+        ) {
+          <div class="divider my-1 text-xs opacity-60">Possible Inhabitants</div>
+          @if (eligibleUnassigned().length > 0) {
+            <div class="flex flex-col gap-1 max-h-[5.25rem] overflow-y-auto">
+              @for (
+                inh of eligibleUnassigned();
+                track inh.instance.instanceId
+              ) {
+                <button
+                  class="btn btn-xs btn-outline btn-success"
+                  (click)="onAssignInhabitant(inh.instance.instanceId)"
+                >
+                  {{ inh.name }}
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="text-xs opacity-50">No eligible inhabitants available.</p>
+          }
+        }
       }
 
-      @if (adjacentUnconnected().length === 0 && activeConnections().length === 0) {
+      @if (adjacentUnconnected().length > 0) {
+        <div class="divider my-2 text-xs opacity-60">Connect to</div>
+        <div class="flex flex-col gap-1">
+          @for (adj of adjacentUnconnected(); track adj.id) {
+            <button
+              class="btn btn-xs btn-outline btn-success"
+              (click)="onConnect(adj.id)"
+            >
+              {{ adj.name }}
+            </button>
+          }
+        </div>
+      }
+
+      @if (activeConnections().length > 0) {
+        <div class="divider my-2 text-xs opacity-60">Connected</div>
+        <div class="flex flex-col gap-1">
+          @for (conn of activeConnections(); track conn.connectionId) {
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs">{{ conn.otherRoomName }}</span>
+              <button
+                class="btn btn-xs btn-outline btn-error"
+                (click)="onDisconnect(conn.connectionId)"
+              >
+                Disconnect
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      @if (
+        adjacentUnconnected().length === 0 && activeConnections().length === 0
+      ) {
         <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
       }
 
@@ -224,7 +270,9 @@
           <div class="text-xs">
             <span class="opacity-50">Connects to:</span>
             @for (depth of tInfo.connectedFloors; track depth) {
-              <span class="badge badge-sm badge-outline ml-1">Floor {{ depth }}</span>
+              <span class="badge badge-sm badge-outline ml-1">
+                Floor {{ depth }}
+              </span>
             }
           </div>
         }
@@ -232,17 +280,45 @@
           <div class="text-xs mb-2">
             <span class="opacity-50">Elevator shaft:</span>
             @for (depth of tInfo.connectedFloors; track depth) {
-              <span class="badge badge-sm badge-outline ml-1">F{{ depth }}</span>
+              <span class="badge badge-sm badge-outline ml-1">
+                F{{ depth }}
+              </span>
             }
           </div>
           <div class="flex gap-1">
-            <button class="btn btn-xs btn-outline btn-success flex-1" (click)="onExtendElevator('up')">Extend Up</button>
-            <button class="btn btn-xs btn-outline btn-success flex-1" (click)="onExtendElevator('down')">Extend Down</button>
+            <button
+              class="btn btn-xs btn-outline btn-success flex-1"
+              (click)="onExtendElevator('up')"
+            >
+              Extend Up
+            </button>
+            <button
+              class="btn btn-xs btn-outline btn-success flex-1"
+              (click)="onExtendElevator('down')"
+            >
+              Extend Down
+            </button>
           </div>
           @if (tInfo.connectedFloors.length > 2) {
             <div class="flex gap-1 mt-1">
-              <button class="btn btn-xs btn-outline btn-warning flex-1" (click)="onShrinkElevator(tInfo.connectedFloors[0])">Shrink Top (F{{ tInfo.connectedFloors[0] }})</button>
-              <button class="btn btn-xs btn-outline btn-warning flex-1" (click)="onShrinkElevator(tInfo.connectedFloors[tInfo.connectedFloors.length - 1])">Shrink Bottom (F{{ tInfo.connectedFloors[tInfo.connectedFloors.length - 1] }})</button>
+              <button
+                class="btn btn-xs btn-outline btn-warning flex-1"
+                (click)="onShrinkElevator(tInfo.connectedFloors[0])"
+              >
+                Shrink Top (F{{ tInfo.connectedFloors[0] }})
+              </button>
+              <button
+                class="btn btn-xs btn-outline btn-warning flex-1"
+                (click)="
+                  onShrinkElevator(
+                    tInfo.connectedFloors[tInfo.connectedFloors.length - 1]
+                  )
+                "
+              >
+                Shrink Bottom (F{{
+                  tInfo.connectedFloors[tInfo.connectedFloors.length - 1]
+                }})
+              </button>
             </div>
           }
         }
@@ -250,11 +326,15 @@
           <div class="text-xs">
             <span class="opacity-50">Portal to:</span>
             @for (depth of tInfo.connectedFloors; track depth) {
-              <span class="badge badge-sm badge-outline ml-1">Floor {{ depth }}</span>
+              <span class="badge badge-sm badge-outline ml-1">
+                Floor {{ depth }}
+              </span>
             }
           </div>
         }
       }
+
+      <app-synergy-tooltip />
 
       <div class="divider my-1"></div>
 
@@ -334,11 +414,22 @@
               <div class="card-body p-3">
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1 min-w-0">
-                    <h5 class="text-sm font-semibold">{{ entry.feature.name }}</h5>
-                    <p class="text-xs opacity-70">{{ entry.feature.description }}</p>
+                    <h5 class="text-sm font-semibold">
+                      {{ entry.feature.name }}
+                    </h5>
+                    <p class="text-xs opacity-70">
+                      {{ entry.feature.description }}
+                    </p>
                     <div class="flex flex-wrap gap-1 mt-1">
-                      @for (bonus of entry.feature.bonuses; track bonus.description) {
-                        <span class="badge badge-xs badge-success badge-outline">{{ bonus.description }}</span>
+                      @for (
+                        bonus of entry.feature.bonuses;
+                        track bonus.description
+                      ) {
+                        <span
+                          class="badge badge-xs badge-success badge-outline"
+                        >
+                          {{ bonus.description }}
+                        </span>
                       }
                     </div>
                     <div class="flex flex-wrap gap-1 mt-1">
@@ -347,7 +438,10 @@
                           class="badge badge-xs"
                           [class.badge-error]="!entry.affordable"
                           [class.badge-outline]="entry.affordable"
-                        >{{ cost.amount | number:'1.0-2' }} <app-currency-name [type]="cost.type" /></span>
+                        >
+                          {{ cost.amount | number: '1.0-2' }}
+                          <app-currency-name [type]="cost.type" />
+                        </span>
                       }
                     </div>
                   </div>
@@ -366,7 +460,9 @@
       }
     </div>
     <div actions>
-      <button class="btn btn-sm" (click)="showFeatureSelect.set(false)">Cancel</button>
+      <button class="btn btn-sm" (click)="showFeatureSelect.set(false)">
+        Cancel
+      </button>
     </div>
   </app-modal>
 }
