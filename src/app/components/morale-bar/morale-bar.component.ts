@@ -75,12 +75,21 @@ import type { MoraleEvent } from '@interfaces/morale';
   styles: `
     :host {
       display: block;
+      pointer-events: auto;
     }
 
     .morale-container {
-      padding: 0.5rem;
-      background: oklch(var(--b2));
+      width: 280px;
+      padding: 0.375rem 0.5rem;
+      background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
+      backdrop-filter: blur(4px);
       border-radius: 0.5rem;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
     }
 
     .morale-bar-wrapper {
@@ -94,13 +103,15 @@ import type { MoraleEvent } from '@interfaces/morale';
 
     .morale-log {
       position: absolute;
+      bottom: 100%;
+      left: 0;
       z-index: 100;
       min-width: 220px;
       max-width: 300px;
       max-height: 200px;
       overflow-y: auto;
       padding: 0.75rem;
-      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
       background: oklch(var(--b3));
       border: 1px solid oklch(var(--bc) / 0.15);
       border-radius: 0.5rem;

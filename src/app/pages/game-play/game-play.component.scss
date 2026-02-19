@@ -18,3 +18,12 @@
   z-index: 30;
   pointer-events: none;
 }
+
+.morale-bar-wrapper {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+}

@@ -2,12 +2,6 @@
   <div class="p-4 text-sm opacity-50">Panel content will be migrated here.</div>
 </ng-template>
 
-<ng-template #moralePanel>
-  <div class="p-2">
-    <app-morale-bar />
-  </div>
-</ng-template>
-
 <ng-template #floorsPanel>
   <div class="p-2">
     <app-panel-floor-selector />
@@ -89,6 +83,10 @@
     (modalTabClick)="onModalTabClick($event)"
   />
   <app-grid />
+
+  <div class="morale-bar-wrapper">
+    <app-morale-bar />
+  </div>
 
   @if (hasSelectedRoom()) {
     <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity">
