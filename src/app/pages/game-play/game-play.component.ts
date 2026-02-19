@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   signal,
   TemplateRef,
@@ -34,6 +35,7 @@ import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.co
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import {
+  contentGetEntry,
   floorAll,
   floorCurrent,
   floorCurrentIndex,
@@ -42,6 +44,7 @@ import {
   optionsGet,
   signalLocalStorage,
 } from '@helpers';
+import type { RoomContent } from '@interfaces/content-room';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -150,6 +153,32 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
   public isMerchantPresent = merchantIsPresent;
 
+  private readonly roleToTabId: Record<string, string> = {
+    altar: 'altar',
+    trainingGrounds: 'training',
+    summoningCircle: 'summoning',
+    darkForge: 'forge',
+    alchemyLab: 'alchemy',
+    tortureChamber: 'torture',
+  };
+
+  private selectedRoomTabId = computed(() => {
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return undefined;
+
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    if (!gridTile?.roomId) return undefined;
+
+    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    if (!room) return undefined;
+
+    const def = contentGetEntry<RoomContent>(room.roomTypeId);
+    if (!def?.role) return undefined;
+
+    return this.roleToTabId[def.role];
+  });
+
   public hasSelectedRoom = computed(() => {
     const tile = gridSelectedTile();
     const floor = floorCurrent();
@@ -168,6 +197,13 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
 
   constructor() {
     super();
+
+    effect(() => {
+      const tabId = this.selectedRoomTabId();
+      if (tabId) {
+        this.activePanel.set(tabId);
+      }
+    });
   }
 
   public tabDefinitions = computed<SideTabDefinition[]>(() => {

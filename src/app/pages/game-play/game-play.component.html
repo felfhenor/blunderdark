@@ -95,13 +95,13 @@
   </div>
 
   @if (hasSelectedRoom()) {
-    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity">
+    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
       <app-panel-room-info />
     </div>
   }
 
   @if (hasSelectedHallway()) {
-    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity">
+    <div class="absolute right-0 top-0 z-30 w-96 max-h-full overflow-y-auto bg-base-100 shadow-xl border-l border-base-300 rounded-l-lg p-2 opacity-80 hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
       <app-panel-hallway-info />
     </div>
   }
