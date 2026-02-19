@@ -29,6 +29,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
+import { sortBy } from 'es-toolkit/compat';
 
 type RecruitableEntry = {
   def: InhabitantContent;
@@ -68,7 +69,7 @@ export class PanelAltarComponent {
     const defs = recruitmentGetRecruitable();
     const tier = this.tierUnlocked();
 
-    return defs
+    const entries = defs
       .filter((def) => {
         if (def.tier > tier) return false;
         const researchGated = researchUnlockIsResearchGated('inhabitant', def.id);
@@ -85,6 +86,7 @@ export class PanelAltarComponent {
 
         return { def, affordable, shortfall, costEntries };
       });
+    return sortBy(entries, [(e) => e.def.name]);
   });
 
   public getCostEntries(

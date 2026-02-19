@@ -60,6 +60,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { ResourceType } from '@interfaces/resource';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-room-info',
@@ -159,13 +160,14 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return [];
 
-    return this.inhabitants()
+    const entries = this.inhabitants()
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return { instance: i, name: i.name, def };
       })
       .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(entries, [(e) => e.def.name]);
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);
@@ -234,7 +236,7 @@ export class PanelRoomInfoComponent {
     const roomDef = productionGetRoomDefinition(room.roomTypeId);
     if (!roomDef) return [];
 
-    return this.inhabitants()
+    const entries = this.inhabitants()
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
         const def = contentGetEntry<InhabitantContent>(
@@ -248,6 +250,7 @@ export class PanelRoomInfoComponent {
         const def = contentGetEntry<InhabitantContent>(i.definitionId)!;
         return { instance: i, name: i.name, def };
       });
+    return sortBy(entries, [(e) => e.def.name]);
   });
 
   public adjacentUnconnected = computed(() => {

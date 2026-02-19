@@ -30,6 +30,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
+import { sortBy } from 'es-toolkit/compat';
 
 type FusionTab = 'fuse' | 'recipes';
 
@@ -67,11 +68,12 @@ export class PanelFusionComponent {
 
   public availableInhabitants = computed(() => {
     const inhabitants = gamestate().world.inhabitants;
-    return inhabitants.filter((i) => {
+    const filtered = inhabitants.filter((i) => {
       if (i.isTemporary) return false;
       if (i.travelTicksRemaining && i.travelTicksRemaining > 0) return false;
       return true;
     });
+    return sortBy(filtered, [(i) => contentGetEntry<InhabitantContent>(i.definitionId)?.name ?? '']);
   });
 
   public filteredInhabitants = computed(() => {

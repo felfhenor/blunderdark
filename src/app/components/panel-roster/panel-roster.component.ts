@@ -29,6 +29,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { sortBy } from 'es-toolkit/compat';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 type RosterFilter = 'all' | 'assigned' | 'unassigned';
@@ -57,7 +58,7 @@ export class PanelRosterComponent {
     const inhabitants = state.world.inhabitants;
     const floors = state.world.floors;
 
-    return inhabitants
+    const entries = inhabitants
       .map((inst) => {
         const def = contentGetEntry<InhabitantContent>(
           inst.definitionId,
@@ -81,6 +82,7 @@ export class PanelRosterComponent {
         return { instance: inst, def, roomName } as RosterEntry;
       })
       .filter((e): e is RosterEntry => e !== undefined);
+    return sortBy(entries, [(e) => e.def.name]);
   });
 
   public allCount = computed(() => this.allEntries().length);

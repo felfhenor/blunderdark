@@ -15,6 +15,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-training-grounds',
@@ -46,7 +47,7 @@ export class PanelTrainingGroundsComponent {
     if (!info) return [];
 
     const state = gamestate();
-    return state.world.inhabitants
+    const mapped = state.world.inhabitants
       .filter((i) => i.assignedRoomId === info.placedRoom.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(
@@ -66,6 +67,7 @@ export class PanelTrainingGroundsComponent {
           bonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
         };
       });
+    return sortBy(mapped, [(e) => e.name]);
   });
 
   public trainingTimeSeconds = computed(() => {

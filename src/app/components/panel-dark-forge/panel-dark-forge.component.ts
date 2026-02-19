@@ -30,6 +30,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
@@ -65,12 +66,13 @@ export class PanelDarkForgeComponent {
     if (!room) return [];
 
     const state = gamestate();
-    return state.world.inhabitants
+    const mapped = state.world.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return { ...i, defName: def?.name ?? i.name };
       });
+    return sortBy(mapped, [(e) => e.defName]);
   });
 
   public availableRecipes = computed(() => {
