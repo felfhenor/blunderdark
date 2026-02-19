@@ -1,4 +1,7 @@
-<div class="side-tab-rail flex flex-col bg-base-200 border-r border-base-300">
+<div
+  class="side-tab-rail flex flex-col bg-base-200 border-r border-base-300 rounded-br-lg"
+  [class.has-active-panel]="!!activePanel()"
+>
   @for (tab of visibleTabs(); track tab.id) {
     <button
       class="tab-btn flex items-center justify-center w-full py-4 text-xs opacity-70 hover:opacity-100 hover:bg-base-300 transition-colors cursor-pointer"
@@ -11,7 +14,9 @@
 </div>
 
 @if (activePanelTemplate(); as tmpl) {
-  <div class="panel-overlay w-64 bg-base-100 shadow-xl border-r border-base-300 overflow-y-auto">
+  <div
+    class="panel-overlay panel-visible w-64 bg-base-100 shadow-xl border-r border-base-300 rounded-r-lg"
+  >
     <ng-container [ngTemplateOutlet]="tmpl" />
   </div>
 }
