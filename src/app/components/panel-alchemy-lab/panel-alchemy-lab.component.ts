@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import {
   alchemyLabCanConvert,
   alchemyLabCompleted$,
@@ -21,18 +22,14 @@ import {
   updateGamestate,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
-import type {
-  AlchemyRecipeContent,
-  AlchemyRecipeId,
-  ResourceType,
-} from '@interfaces';
+import type { AlchemyRecipeContent, AlchemyRecipeId } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyCostComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,12 +117,6 @@ export class PanelAlchemyLabComponent {
       inputConsumed: conversion.inputConsumed,
     };
   });
-
-  public formatCost(cost: Partial<Record<ResourceType, number>>): { type: ResourceType; amount: number }[] {
-    return Object.entries(cost)
-      .filter(([, v]) => v && v > 0)
-      .map(([type, v]) => ({ type: type as ResourceType, amount: v! }));
-  }
 
   public async selectRecipe(recipeId: AlchemyRecipeId, targetTicks: number): Promise<void> {
     const room = this.labRoom();

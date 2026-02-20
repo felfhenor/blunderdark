@@ -67,15 +67,7 @@
               </span>
               <span class="text-xs opacity-50">
                 Input:
-                @for (
-                  cost of formatCost(entry.effectiveCost);
-                  track cost.type
-                ) {
-                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
-                  @if (!$last) {
-                    ,
-                  }
-                }
+                <app-currency-cost-list [cost]="entry.effectiveCost" />
               </span>
               <span class="text-xs opacity-50">
                 Output:

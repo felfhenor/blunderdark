@@ -294,18 +294,8 @@
                   <p class="text-xs opacity-60">
                     {{ entry.recipe.description }}
                   </p>
-                  <div class="cost-row flex gap-2 mt-1">
-                    @for (
-                      cost of formatCost(entry.recipe.cost);
-                      track cost.type
-                    ) {
-                      <span class="text-xs opacity-70">
-                        <app-currency-cost
-                          [type]="cost.type"
-                          [amount]="cost.amount"
-                        />
-                      </span>
-                    }
+                  <div class="cost-row flex gap-2 mt-1 text-xs opacity-70">
+                    <app-currency-cost-list [cost]="entry.recipe.cost" />
                   </div>
                 </div>
               </div>

@@ -179,11 +179,7 @@
                 <div>
                   <div class="divider my-2 text-xs opacity-60">Cost</div>
                   <div class="flex flex-wrap gap-2">
-                    @for (cost of formatCost(node.cost); track cost.type) {
-                      <span class="badge badge-sm badge-outline">
-                        <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
-                      </span>
-                    }
+                    <app-currency-cost-list [cost]="node.cost" />
                   </div>
                 </div>
 

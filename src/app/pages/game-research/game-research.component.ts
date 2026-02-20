@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
@@ -26,8 +26,6 @@ import { gamestate } from '@helpers/state-game';
 import type {
   ResearchBranch,
   ResearchContent,
-  ResourceCost,
-  ResourceType,
   RoomContent,
   UnlockEffect,
 } from '@interfaces';
@@ -40,7 +38,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
   selector: 'app-game-research',
   imports: [
     DecimalPipe,
-    CurrencyCostComponent,
+    CurrencyCostListComponent,
     ModalComponent,
     TippyDirective,
     IconComponent,
@@ -218,17 +216,6 @@ export class GameResearchComponent {
 
   public close(): void {
     this.visible.set(false);
-  }
-
-  public formatCost(
-    cost: ResourceCost,
-  ): { type: ResourceType; amount: number }[] {
-    return Object.entries(cost)
-      .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({
-        type: type as ResourceType,
-        amount: amount!,
-      }));
   }
 
   private formatUnlock(unlock: UnlockEffect): {

@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import {
   contentGetEntry,
   darkForgeAddJob,
@@ -34,7 +34,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -142,12 +142,6 @@ export class PanelDarkForgeComponent {
     });
     return sortBy(entries, [(e) => e.name]);
   });
-
-  public formatCost(cost: Partial<Record<ResourceType, number>>): { type: ResourceType; amount: number }[] {
-    return Object.entries(cost)
-      .filter(([, v]) => v && v > 0)
-      .map(([type, v]) => ({ type: type as ResourceType, amount: v! }));
-  }
 
   public formatStatBonuses(bonuses: Partial<InhabitantStats>): string {
     return Object.entries(bonuses)

@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
@@ -26,7 +27,6 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
-  ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -51,7 +51,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, NgClass, CurrencyCostComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -287,14 +287,6 @@ export class PanelFusionComponent {
     this.searchQuery.set('');
     this.recipeSearchQuery.set('');
     this.activeTab.set('fuse');
-  }
-
-  public formatCost(
-    cost: Partial<Record<string, number>>,
-  ): { type: ResourceType; amount: number }[] {
-    return Object.entries(cost)
-      .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
   }
 
   public getDeltaClass(delta: number): string {
