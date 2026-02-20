@@ -6,14 +6,20 @@ import {
   input,
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
-import { STAT_COLOR_MAP, STAT_ICON_MAP, STAT_LABEL_MAP } from '@helpers';
+import {
+  STAT_COLOR_MAP,
+  STAT_DESCRIPTION_MAP,
+  STAT_ICON_MAP,
+  STAT_LABEL_MAP,
+} from '@helpers';
 import type { StatType } from '@helpers/stat-icons';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-stat-name',
-  imports: [IconComponent, DecimalPipe],
+  imports: [IconComponent, DecimalPipe, TippyDirective],
   template: `
-    <app-icon [name]="icon()" [color]="color()" />
+    <app-icon [name]="icon()" [color]="color()" [tp]="description()" [tpDelay]="250" tpClassName="game-tooltip" />
     @if (value() !== undefined) {
       <span>{{ prefix() }}{{ value() | number:'1.0-2' }}{{ suffix() }}</span>
     } @else {
@@ -47,4 +53,5 @@ export class StatNameComponent {
   public icon = computed(() => STAT_ICON_MAP[this.type()]);
   public color = computed(() => STAT_COLOR_MAP[this.type()]);
   public label = computed(() => STAT_LABEL_MAP[this.type()]);
+  public description = computed(() => STAT_DESCRIPTION_MAP[this.type()]);
 }

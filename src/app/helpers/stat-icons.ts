@@ -26,3 +26,11 @@ export const STAT_LABEL_MAP: Record<StatType, string> = {
   speed: 'SPD',
   workerEfficiency: 'EFF',
 };
+
+export const STAT_DESCRIPTION_MAP: Record<StatType, string> = {
+  hp: 'Hit Points — how much damage this inhabitant can take before being defeated',
+  attack: 'Attack — damage dealt to invaders in combat',
+  defense: 'Defense — reduces incoming damage from invaders',
+  speed: 'Speed — determines turn order in combat',
+  workerEfficiency: 'Efficiency — multiplier for resource production when assigned to a room',
+};
