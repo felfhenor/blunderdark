@@ -13,7 +13,9 @@
 
 .node-card {
   @apply relative flex flex-col items-center justify-center gap-2;
-  @apply rounded-lg border-2 p-3 cursor-pointer transition-all;
+  @apply rounded-lg border-2 p-3 cursor-pointer;
+  transition: border-color 150ms, background-color 150ms, box-shadow 150ms,
+    transform 150ms, opacity 150ms;
   border-color: color-mix(in oklch, var(--color-base-content) 20%, transparent);
 
   &:hover {

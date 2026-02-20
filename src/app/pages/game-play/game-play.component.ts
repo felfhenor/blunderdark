@@ -43,6 +43,7 @@ import {
   gridSelectedTile,
   optionsGet,
 } from '@helpers';
+import { gameloopIsPaused } from '@helpers/gameloop';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -203,6 +204,22 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       if (tabId) {
         this.activePanel.set(tabId);
       }
+    });
+
+    // Fix 1: Pause CSS animations when game is paused to avoid idle CPU usage
+    effect(() => {
+      document.body.classList.toggle('game-paused', gameloopIsPaused());
+    });
+
+    // Fix 4: Pause CSS animations when tab is not visible
+    const onVisibilityChange = () => {
+      document.body.classList.toggle('tab-hidden', document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    this.destroyRef.onDestroy(() => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.body.classList.remove('game-paused', 'tab-hidden');
     });
   }
 
