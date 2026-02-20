@@ -5,6 +5,7 @@ export type SideTabDefinition = {
   id: string;
   label: string;
   icon?: Icon;
+  iconGlow?: Signal<boolean>;
   condition?: Signal<boolean>;
   isModal: boolean;
   templateRef?: TemplateRef<unknown>;

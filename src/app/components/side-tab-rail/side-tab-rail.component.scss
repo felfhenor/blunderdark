@@ -1,14 +1,8 @@
 .side-tab-rail {
   z-index: 1;
   max-height: calc(100vh - 40px);
+  overflow-x: hidden;
   overflow-y: auto;
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
-
-  &:hover,
-  &.has-active-panel {
-    opacity: 1;
-  }
 }
 
 .tab-btn {
@@ -16,16 +10,29 @@
   background: none;
   width: 40px;
   min-height: 40px;
+  opacity: 0.5;
   transition:
     width 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    opacity 0.2s ease;
 
   &:hover {
     width: 130px;
+    overflow: hidden;
+    opacity: 1;
 
     .tab-label {
       opacity: 1;
     }
+  }
+
+  &:has(.icon-glow) {
+    opacity: 1;
+  }
+
+  .has-active-panel &,
+  .side-tab-rail:hover & {
+    opacity: 1;
   }
 }
 
@@ -33,6 +40,43 @@
   opacity: 0;
   transition: opacity 0.15s ease;
   white-space: nowrap;
+}
+
+@keyframes icon-glow {
+  0%,
+  100% {
+    filter: brightness(1.5);
+    color: #ff4444;
+  }
+
+  16% {
+    filter: brightness(1.5);
+    color: #ff8800;
+  }
+
+  33% {
+    filter: brightness(1.8);
+    color: #ffdd00;
+  }
+
+  50% {
+    filter: brightness(1.5);
+    color: #44dd44;
+  }
+
+  66% {
+    filter: brightness(1.5);
+    color: #4488ff;
+  }
+
+  83% {
+    filter: brightness(1.5);
+    color: #cc44ff;
+  }
+}
+
+.icon-glow {
+  animation: icon-glow 4s linear infinite;
 }
 
 .panel-overlay {

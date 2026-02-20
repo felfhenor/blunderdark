@@ -4,7 +4,7 @@
 >
   @for (tab of visibleTabs(); track tab.id) {
     <button
-      class="tab-btn flex items-center bg-base-200 rounded-lg overflow-hidden whitespace-nowrap py-2 px-2 text-xs transition-colors cursor-pointer"
+      class="tab-btn flex items-center bg-base-200 rounded-lg whitespace-nowrap py-2 px-2 text-xs transition-colors cursor-pointer"
       [class.bg-primary]="activePanel() === tab.id && !tab.isModal"
       [class.text-primary-content]="activePanel() === tab.id && !tab.isModal"
       [class.font-bold]="activePanel() === tab.id && !tab.isModal"
@@ -12,7 +12,12 @@
       (click)="onTabClick(tab)"
     >
       @if (tab.icon) {
-        <app-icon [name]="tab.icon" size="32px" class="shrink-0" />
+        <app-icon
+          [name]="tab.icon"
+          size="32px"
+          class="shrink-0"
+          [class.icon-glow]="tab.iconGlow?.()"
+        />
       }
       <span class="tab-label ml-2">{{ tab.label }}</span>
     </button>

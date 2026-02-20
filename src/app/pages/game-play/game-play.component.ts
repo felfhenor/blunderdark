@@ -54,6 +54,7 @@ import {
   autosaveStop,
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
+import { gamestate } from '@helpers/state-game';
 import { merchantIsPresent } from '@helpers/merchant';
 import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -152,6 +153,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     this.hasRoomOfRole('tortureChamber'),
   );
   public isMerchantPresent = merchantIsPresent;
+  public hasNoActiveResearch = computed(
+    () => !gamestate().world.research.activeResearch,
+  );
 
   private readonly roleToTabId: Record<string, string> = {
     altar: 'altar',
@@ -303,7 +307,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   });
 
   public modalTabDefinitions = computed<SideTabDefinition[]>(() => [
-    { id: 'research', label: 'Research', icon: 'gameMaterialsScience', isModal: true },
+    { id: 'research', label: 'Research', icon: 'gameMaterialsScience', iconGlow: this.hasNoActiveResearch, isModal: true },
     {
       id: 'fusion',
       label: 'Fusion',
