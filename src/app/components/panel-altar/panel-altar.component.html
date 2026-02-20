@@ -29,8 +29,11 @@
         <div class="cost-row flex gap-2">
           @for (cost of getCostEntries(upgrade); track cost.type) {
             <span class="text-xs opacity-70">
-              {{ cost.amount | number: '1.0-2' }}
-              <app-currency-name [type]="cost.type" />
+              <app-currency-name
+                [type]="cost.type"
+                [short]="true"
+                [amount]="cost.amount"
+              />
             </span>
           }
         </div>
@@ -116,15 +119,17 @@
                 (click)="onRecruit(entry.def)"
               >
                 Recruit
-                <span class="ml-1">—</span>
                 @for (cost of entry.costEntries; track cost.type) {
                   <span
                     [class.text-error]="
                       !entry.affordable && isResourceShort(entry, cost.type)
                     "
                   >
-                    {{ cost.amount | number: '1.0-2' }}
-                    <app-currency-name [type]="cost.type" />
+                    <app-currency-name
+                      [type]="cost.type"
+                      [short]="true"
+                      [amount]="cost.amount"
+                    />
                   </span>
                 }
               </button>
