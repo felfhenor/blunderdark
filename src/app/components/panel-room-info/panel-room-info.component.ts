@@ -4,6 +4,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.c
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import {
   inhabitantAssignToRoom,
@@ -65,7 +66,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyCostComponent, HungerIndicatorComponent, IconComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
+  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyCostComponent, HungerIndicatorComponent, IconComponent, StatNameComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

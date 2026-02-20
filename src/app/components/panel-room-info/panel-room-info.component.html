@@ -17,17 +17,20 @@
       @if (efficiencyBreakdown(); as eff) {
         <div class="mt-1">
           <div class="flex items-center gap-2">
-            <span class="text-xs opacity-50">Efficiency:</span>
             <span
               class="text-xs font-semibold"
               [class.text-success]="eff.totalMultiplier > 1.0"
               [class.text-error]="eff.totalMultiplier < 1.0"
             >
-              {{ eff.totalMultiplier * 100 | number: '1.0-2' }}%
+              <app-stat-name
+                type="workerEfficiency"
+                [value]="eff.totalMultiplier"
+                suffix="x"
+              />
             </span>
           </div>
           <div class="text-xs opacity-40 ml-2">
-            Base: {{ eff.baseEfficiency * 100 | number: '1.0-2' }}%
+            Base: {{ eff.baseEfficiency | number: '1.0-2' }}x
           </div>
           @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
             <div class="text-xs ml-2">
@@ -37,7 +40,7 @@
                 [class.text-error]="contrib.totalBonus < 0"
               >
                 {{ contrib.totalBonus >= 0 ? '+' : ''
-                }}{{ contrib.totalBonus * 100 | number: '1.0-2' }}%
+                }}{{ contrib.totalBonus | number: '1.0-2' }}x
               </span>
               @for (tb of contrib.traitBonuses; track tb.traitName) {
                 @if (tb.applies) {
@@ -164,7 +167,11 @@
             }
           </select>
           <span class="text-xs opacity-50">
-            {{ converterEfficiency() * 100 | number: '1.0-2' }}% eff.
+            <app-stat-name
+              type="workerEfficiency"
+              [value]="converterEfficiency()"
+              suffix="x"
+            />
           </span>
         </div>
       }
