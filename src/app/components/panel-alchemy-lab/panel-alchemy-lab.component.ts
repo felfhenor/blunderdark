@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import {
   alchemyLabCanConvert,
   alchemyLabCompleted$,
@@ -32,7 +32,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyNameComponent],
+  imports: [DecimalPipe, CurrencyCostComponent],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

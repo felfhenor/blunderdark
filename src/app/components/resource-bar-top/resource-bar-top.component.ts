@@ -4,6 +4,7 @@ import {
   Component,
   computed,
 } from '@angular/core';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   consumptionBreakdowns,
@@ -82,7 +83,7 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 
 @Component({
   selector: 'app-resource-bar-top',
-  imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyCostComponent, CurrencyNameComponent, TippyDirective],
   templateUrl: './resource-bar-top.component.html',
   styleUrl: './resource-bar-top.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

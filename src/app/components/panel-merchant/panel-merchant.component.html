@@ -96,8 +96,7 @@
                         [class.badge-error]="!entry.affordable"
                         [class.badge-outline]="entry.affordable"
                       >
-                        {{ cost.amount | number: '1.0-2' }}
-                        <app-currency-name [type]="cost.type" />
+                        <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
                       </span>
                     }
                   </div>
@@ -106,8 +105,7 @@
                     <span class="text-xs opacity-50">Gain:</span>
                     @for (reward of entry.rewardEntries; track reward.type) {
                       <span class="badge badge-xs badge-success badge-outline">
-                        +{{ reward.amount | number: '1.0-2' }}
-                        <app-currency-name [type]="reward.type" />
+                        <app-currency-cost [type]="reward.type" [amount]="reward.amount" />
                       </span>
                     }
                   </div>

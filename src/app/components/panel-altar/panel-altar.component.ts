@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   altarRoomFearReductionAura,
@@ -40,7 +40,7 @@ type RecruitableEntry = {
 
 @Component({
   selector: 'app-panel-altar',
-  imports: [DecimalPipe, CurrencyNameComponent, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, CurrencyCostComponent, StatNameComponent, TippyDirective],
   templateUrl: './panel-altar.component.html',
   styleUrl: './panel-altar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

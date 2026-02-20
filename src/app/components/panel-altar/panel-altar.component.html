@@ -29,11 +29,7 @@
         <div class="cost-row flex gap-2">
           @for (cost of getCostEntries(upgrade); track cost.type) {
             <span class="text-xs opacity-70">
-              <app-currency-name
-                [type]="cost.type"
-                [short]="true"
-                [amount]="cost.amount"
-              />
+              <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
             </span>
           }
         </div>
@@ -125,9 +121,8 @@
                       !entry.affordable && isResourceShort(entry, cost.type)
                     "
                   >
-                    <app-currency-name
+                    <app-currency-cost
                       [type]="cost.type"
-                      [short]="true"
                       [amount]="cost.amount"
                     />
                   </span>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import {
   altarRoomHas,
   biomeRestrictionCanBuild,
@@ -41,7 +41,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-room-select',
-  imports: [CurrencyNameComponent, TippyDirective],
+  imports: [CurrencyCostComponent, TippyDirective],
   templateUrl: './panel-room-select.component.html',
   styleUrl: './panel-room-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

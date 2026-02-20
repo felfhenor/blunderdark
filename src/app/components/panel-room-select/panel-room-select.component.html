@@ -64,11 +64,7 @@
           <div class="cost-row flex gap-2 w-full">
             @for (cost of stairCostEntries(); track cost.type) {
               <span class="text-xs opacity-70">
-                <app-currency-name
-                  [type]="cost.type"
-                  [short]="true"
-                  [amount]="cost.amount"
-                />
+                <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
               </span>
             }
           </div>
@@ -93,11 +89,7 @@
             <div class="cost-row flex gap-2 w-full">
               @for (cost of elevatorCostEntries(); track cost.type) {
                 <span class="text-xs opacity-70">
-                  <app-currency-name
-                    [type]="cost.type"
-                    [short]="true"
-                    [amount]="cost.amount"
-                  />
+                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
                 </span>
               }
             </div>
@@ -123,11 +115,7 @@
             <div class="cost-row flex gap-2 w-full">
               @for (cost of portalCostEntries(); track cost.type) {
                 <span class="text-xs opacity-70">
-                  <app-currency-name
-                    [type]="cost.type"
-                    [short]="true"
-                    [amount]="cost.amount"
-                  />
+                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
                 </span>
               }
             </div>
@@ -206,11 +194,7 @@
           <div class="cost-row flex gap-2 w-full">
             @for (cost of getCostEntries(room); track cost.type) {
               <span class="text-xs opacity-70">
-                <app-currency-name
-                  [type]="cost.type"
-                  [short]="true"
-                  [amount]="cost.amount"
-                />
+                <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
               </span>
             }
             @if (getCostEntries(room).length === 0) {

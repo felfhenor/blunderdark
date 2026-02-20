@@ -7,8 +7,7 @@
         <div class="flex flex-wrap gap-2 mt-1">
           @for (prod of roomProduction(); track prod.type) {
             <span class="badge badge-sm badge-outline">
-              +{{ prod.perMinute | number: '1.0-2' }}
-              <app-currency-name [type]="prod.type" />
+              <app-currency-cost [type]="prod.type" [amount]="prod.perMinute" />
               /sec
             </span>
           }
@@ -479,8 +478,7 @@
                           [class.badge-error]="!entry.affordable"
                           [class.badge-outline]="entry.affordable"
                         >
-                          {{ cost.amount | number: '1.0-2' }}
-                          <app-currency-name [type]="cost.type" />
+                          <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
                         </span>
                       }
                     </div>

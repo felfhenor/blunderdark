@@ -6,7 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import {
@@ -38,7 +38,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [DecimalPipe, NgClass, CurrencyNameComponent, ModalComponent],
+  imports: [DecimalPipe, NgClass, CurrencyCostComponent, ModalComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

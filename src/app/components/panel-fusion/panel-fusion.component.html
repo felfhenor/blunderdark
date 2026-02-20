@@ -198,30 +198,6 @@
                       </div>
                     }
 
-                    <!-- Cost -->
-                    <div class="divider my-2 text-xs opacity-50">Cost</div>
-                    <div class="cost-row flex gap-2">
-                      @for (cost of p.costEntries; track cost.type) {
-                        <span
-                          class="text-xs opacity-70"
-                          [class.text-error]="!cost.sufficient"
-                          [tp]="
-                            'Have ' + cost.current + ' / Need ' + cost.amount
-                          "
-                        >
-                          <app-currency-name
-                            [type]="$any(cost.type)"
-                            [short]="true"
-                            [amount]="cost.amount"
-                          />
-                        </span>
-                      }
-                    </div>
-                    @if (!p.canAfford) {
-                      <div class="text-xs text-error">
-                        Insufficient resources
-                      </div>
-                    }
                   </div>
                 </div>
 
@@ -238,6 +214,19 @@
                     "
                   >
                     Fuse
+                    @for (cost of p.costEntries; track cost.type) {
+                      <span
+                        [class.text-error]="!cost.sufficient"
+                        [tp]="
+                          'Have ' + cost.current + ' / Need ' + cost.amount
+                        "
+                      >
+                        <app-currency-cost
+                          [type]="$any(cost.type)"
+                          [amount]="cost.amount"
+                        />
+                      </span>
+                    }
                   </button>
                   <button class="btn btn-sm btn-ghost" (click)="resetSlots()">
                     Reset
@@ -311,9 +300,8 @@
                       track cost.type
                     ) {
                       <span class="text-xs opacity-70">
-                        <app-currency-name
+                        <app-currency-cost
                           [type]="cost.type"
-                          [short]="true"
                           [amount]="cost.amount"
                         />
                       </span>

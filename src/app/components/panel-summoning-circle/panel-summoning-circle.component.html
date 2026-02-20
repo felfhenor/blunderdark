@@ -64,8 +64,7 @@
               <span class="text-xs opacity-50">
                 Cost:
                 @for (cost of formatCost(entry.recipe.cost); track cost.type) {
-                  {{ cost.amount }}
-                  <app-currency-name [type]="cost.type" />
+                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
                   @if (!$last) {
                     ,
                   }

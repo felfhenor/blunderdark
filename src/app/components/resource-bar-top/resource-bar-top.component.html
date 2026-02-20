@@ -7,9 +7,8 @@
       tpPlacement="bottom"
       [tpDelay]="250"
     >
-      <app-currency-name
+      <app-currency-cost
         [type]="res.type"
-        [short]="true"
         [amount]="getCurrent(res.type)"
       />
       @if (res.type === 'corruption') {

@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
@@ -40,7 +40,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
   selector: 'app-game-research',
   imports: [
     DecimalPipe,
-    CurrencyNameComponent,
+    CurrencyCostComponent,
     ModalComponent,
     TippyDirective,
     IconComponent,
