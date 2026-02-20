@@ -157,13 +157,15 @@
                             <app-stat-name [type]="s.stat" />
                           </div>
                           <div class="font-bold">
-                            {{ s.hybridValue | number: '1.0-2' }}
+                            {{ s.hybridValue | number: '1.0-2'
+                            }}{{ s.stat === 'workerEfficiency' ? 'x' : '' }}
                           </div>
                           <div
                             class="text-xs"
                             [ngClass]="getDeltaClass(s.delta)"
                           >
-                            {{ formatDelta(s.delta) }}
+                            {{ formatDelta(s.delta)
+                            }}{{ s.stat === 'workerEfficiency' ? 'x' : '' }}
                           </div>
                         </div>
                       }
