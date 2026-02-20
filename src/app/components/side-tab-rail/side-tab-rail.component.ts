@@ -10,12 +10,13 @@ import {
   output,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { IconComponent } from '@components/icon/icon.component';
 
 import type { SideTabDefinition } from '@interfaces';
 
 @Component({
   selector: 'app-side-tab-rail',
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, IconComponent],
   templateUrl: './side-tab-rail.component.html',
   styleUrl: './side-tab-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

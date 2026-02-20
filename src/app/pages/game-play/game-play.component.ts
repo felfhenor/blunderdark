@@ -212,42 +212,49 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'floors',
         label: 'Floors',
+        icon: 'game3dStairs',
         isModal: false,
         templateRef: this.floorsPanel() ?? placeholder,
       },
       {
         id: 'time',
         label: 'Time',
+        icon: 'gameAlarmClock',
         isModal: false,
         templateRef: this.timePanel() ?? placeholder,
       },
       {
         id: 'build',
         label: 'Build',
+        icon: 'gameGearHammer',
         isModal: false,
         templateRef: this.buildPanel() ?? placeholder,
       },
       {
         id: 'roster',
         label: 'Roster',
+        icon: 'gameMinions',
         isModal: false,
         templateRef: this.rosterPanel() ?? placeholder,
       },
       {
         id: 'reputation',
         label: 'Reputation',
+        icon: 'gameCondorEmblem',
         isModal: false,
         templateRef: this.reputationPanel() ?? placeholder,
       },
       {
         id: 'altar',
         label: 'Altar',
+        icon: 'gameStarAltar',
         isModal: false,
         templateRef: this.altarPanel() ?? placeholder,
       },
       {
         id: 'training',
         label: 'Training',
+        icon: 'gameSwordClash',
         isModal: false,
         templateRef: this.trainingPanel() ?? placeholder,
         condition: this.hasTrainingGrounds,
@@ -255,6 +262,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'summoning',
         label: 'Summon',
+        icon: 'gameMagicGate',
         isModal: false,
         templateRef: this.summoningPanel() ?? placeholder,
         condition: this.hasSummoningCircle,
@@ -262,6 +270,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'forge',
         label: 'Forge',
+        icon: 'gameAnvilImpact',
         isModal: false,
         templateRef: this.forgePanel() ?? placeholder,
         condition: this.hasDarkForge,
@@ -269,6 +278,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'alchemy',
         label: 'Alchemy',
+        icon: 'gameChemicalDrop',
         isModal: false,
         templateRef: this.alchemyPanel() ?? placeholder,
         condition: this.hasAlchemyLab,
@@ -276,6 +286,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'torture',
         label: 'Torture',
+        icon: 'gameChoppedSkull',
         isModal: false,
         templateRef: this.torturePanel() ?? placeholder,
         condition: this.hasTortureChamber,
@@ -283,6 +294,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'merchant',
         label: 'Merchant',
+        icon: 'gamePouchWithBeads',
         isModal: false,
         templateRef: this.merchantPanel() ?? placeholder,
         condition: this.isMerchantPresent,
@@ -291,14 +303,15 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   });
 
   public modalTabDefinitions = computed<SideTabDefinition[]>(() => [
-    { id: 'research', label: 'Research', isModal: true },
+    { id: 'research', label: 'Research', icon: 'gameMaterialsScience', isModal: true },
     {
       id: 'fusion',
       label: 'Fusion',
+      icon: 'gameDuality',
       isModal: true,
       condition: this.canShowFusion,
     },
-    { id: 'victory', label: 'Victory', isModal: true },
+    { id: 'victory', label: 'Victory', icon: 'gameChampions', isModal: true },
   ]);
 
   public onModalTabClick(tabId: string): void {
