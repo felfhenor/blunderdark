@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -187,6 +188,8 @@ export function invasionTriggerProcessSchedule(
     schedule.invasionHistory.push({ day: currentDay, type: 'scheduled' });
     schedule.warningActive = false;
     schedule.warningDismissed = false;
+
+    reputationAwardInPlace(state, 'Defeat Invader');
 
     // Reschedule next invasion
     const result = invasionTriggerCalculateNextDay(

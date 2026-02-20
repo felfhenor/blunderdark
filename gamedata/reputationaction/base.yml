@@ -56,13 +56,6 @@
     knowledge: 12
     harmony: 3
 
-- id: e06d3394-3f9d-4dec-99f1-2566b61d0239
-  name: Discover Ancient Artifact
-  description: Unearthing a relic from ages past reveals forgotten secrets.
-  reputationRewards:
-    knowledge: 10
-    chaos: 2
-
 # --- HARMONY actions (balance, coexistence, stability) ---
 - id: 48ea4e0e-ca49-4d2b-83d1-b8110a4097ad
   name: Build Mushroom Grove

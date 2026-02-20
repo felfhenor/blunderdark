@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -193,6 +194,8 @@ export async function merchantExecuteTrade(
       },
     };
   });
+
+  reputationAwardForAction('Complete Trade Deal');
 
   return { success: true };
 }

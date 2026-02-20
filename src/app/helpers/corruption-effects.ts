@@ -1,4 +1,5 @@
 import { invasionTriggerAddSpecial } from '@helpers/invasion-triggers';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngChoice, rngNumberRange, rngRandom } from '@helpers/rng';
 import type {
   CorruptionEffectMutation,
@@ -91,6 +92,7 @@ export function corruptionEffectProcess(
       effects.lastMutationCorruption === undefined ||
       effects.lastMutationCorruption < CORRUPTION_EFFECT_THRESHOLD_MUTATION
     ) {
+      reputationAwardInPlace(state, 'Embrace Corruption');
       const target = corruptionEffectSelectMutationTarget(
         state.world.inhabitants,
         effectiveRng,

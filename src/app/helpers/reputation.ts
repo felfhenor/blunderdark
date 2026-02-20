@@ -1,6 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  GameState,
   ReputationActionContent,
   ReputationLevel,
   ReputationState,
@@ -138,6 +139,67 @@ export async function reputationAwardForAction(
   });
 
   // Emit level-up events
+  for (const event of levelUpEvents) {
+    reputationLevelUp.next(event);
+  }
+
+  return true;
+}
+
+/**
+ * Awards reputation for a game action by mutating state in-place.
+ * For use inside updateGamestate callbacks (gameloop process functions).
+ * Emits reputationAward$ and reputationLevelUp$ events.
+ *
+ * @param state - The game state to mutate
+ * @param actionIdOrName - The ID or name of the reputation action from gamedata
+ * @returns true if the action was found and reputation was awarded
+ */
+export function reputationAwardInPlace(
+  state: GameState,
+  actionIdOrName: string,
+): boolean {
+  const action = contentGetEntry<ReputationActionContent>(actionIdOrName);
+  if (!action) return false;
+
+  const rewards = action.reputationRewards;
+  if (!rewards || Object.keys(rewards).length === 0) return false;
+
+  const levelUpEvents: ReputationLevelUpEvent[] = [];
+
+  // Check for level-ups before applying rewards
+  for (const [type, points] of Object.entries(rewards) as [
+    ReputationType,
+    number,
+  ][]) {
+    const previousPoints = state.world.reputation[type];
+    const newPoints = Math.max(0, previousPoints + points);
+    const previousLevel = reputationGetLevel(previousPoints);
+    const newLevel = reputationGetLevel(newPoints);
+
+    if (newLevel !== previousLevel) {
+      levelUpEvents.push({ type, previousLevel, newLevel, points: newPoints });
+    }
+  }
+
+  // Apply changes in-place
+  for (const [type, points] of Object.entries(rewards) as [
+    ReputationType,
+    number,
+  ][]) {
+    state.world.reputation[type] = Math.max(
+      0,
+      state.world.reputation[type] + points,
+    );
+  }
+
+  // Emit events
+  reputationAward.next({
+    actionId: action.id,
+    actionName: action.name,
+    rewards,
+  });
+
   for (const event of levelUpEvents) {
     reputationLevelUp.next(event);
   }

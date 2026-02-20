@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockProcessCompletion } from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -207,6 +208,8 @@ export function researchProcess(state: GameState, numTicks = 1): void {
     research.activeResearchStartTick = 0;
 
     researchUnlockProcessCompletion(completedNodeId, state);
+
+    reputationAwardInPlace(state, 'Complete Research');
 
     researchCompletedSubject.next({
       nodeId: completedNodeId,

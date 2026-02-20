@@ -1,6 +1,7 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
@@ -305,6 +306,8 @@ export function darkForgeProcess(state: GameState): void {
         }
 
         if (recipe) {
+          reputationAwardInPlace(state, 'Summon Demon');
+
           darkForgeCompletedSubject.next({
             roomId: room.id,
             recipeName: recipe.name,

@@ -3,6 +3,7 @@ import { altarRoomFind } from '@helpers/altar-room';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
 import { floorCurrent } from '@helpers/floor';
+import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import {
@@ -224,6 +225,17 @@ export function roomPlacementClearPreview(): void {
   roomPlacementPreviewPosition.set(undefined);
 }
 
+// --- Room reputation action mapping ---
+
+const ROOM_REPUTATION_ACTIONS: Record<string, string> = {
+  '97dd4e28-045a-4765-8a3c-ece77dd4b7f2': 'Place Torture Chamber',
+  '827472bd-6bbb-482f-86c8-ad30d5613237': 'Build Treasure Vault',
+  '89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26': 'Build Library',
+  '7fb314ad-a447-469f-82df-4b8c68f9deff': 'Build Mushroom Grove',
+  'b3a7c1e9-5f82-4d6a-a1c3-9e4b2d7f8a05': 'Mine Gold Vein',
+  'a7ef7e24-f250-45e7-986d-ad06b3610b52': 'Activate Ley Line Nexus',
+};
+
 // --- Placement error messages ---
 
 const PLAYER_FRIENDLY_ERRORS: Record<string, string> = {
@@ -321,6 +333,12 @@ export async function roomPlacementExecute(
     roomPlacementRotation(),
   );
   if (!placed) return { success: false, error: 'Failed to place room' };
+
+  // Award reputation for placing specific room types
+  const reputationAction = ROOM_REPUTATION_ACTIONS[roomTypeId];
+  if (reputationAction) {
+    reputationAwardForAction(reputationAction);
+  }
 
   return { success: true };
 }

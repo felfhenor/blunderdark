@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameState, Season, SeasonState } from '@interfaces';
 import { DAYS_PER_SEASON, SEASON_ORDER } from '@interfaces/season';
@@ -82,6 +83,19 @@ export function seasonProcess(state: GameState): void {
   const newSeason = state.world.season.currentSeason;
 
   if (newSeason !== oldSeason) {
+    reputationAwardInPlace(state, 'Peaceful Season Transition');
+
+    // Award "Feed All Inhabitants" if no one is hungry at season change
+    const inhabitants = state.world.inhabitants;
+    if (
+      inhabitants.length > 0 &&
+      inhabitants.every(
+        (i) => i.state !== 'hungry' && i.state !== 'starving',
+      )
+    ) {
+      reputationAwardInPlace(state, 'Feed All Inhabitants');
+    }
+
     seasonTransition.next({ previousSeason: oldSeason, newSeason });
   }
 }

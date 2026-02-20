@@ -2,6 +2,7 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -282,6 +283,8 @@ export function summoningCircleProcess(state: GameState): void {
               if (isTemporary) {
                 newTemporaryIds.add(summoned.instanceId);
               }
+
+              reputationAwardInPlace(state, 'Summon Wraith');
 
               summoningCompletedSubject.next({
                 roomId: room.id,
