@@ -37,7 +37,7 @@
 # --- Invader ability effects ---
 
 - id: 3781eca2-c547-4bf9-9273-9bcc1e882d41
-  name: Heal
+  name: Heal Effect
   dealsDamage: false
   statusName: healing
   overrideTargetsHit: null
@@ -55,7 +55,7 @@
   overrideTargetsHit: null
 
 - id: a1fd656d-5dda-4353-8c11-0621bd86125c
-  name: Dispel
+  name: Dispel Effect
   dealsDamage: false
   statusName: dispel
   overrideTargetsHit: null
@@ -67,7 +67,7 @@
   overrideTargetsHit: null
 
 - id: 633a1325-2d98-4e39-a068-956b7884be66
-  name: Scout
+  name: Scout Effect
   dealsDamage: false
   statusName: scouting
   overrideTargetsHit: null

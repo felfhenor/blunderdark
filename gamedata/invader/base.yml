@@ -1,6 +1,6 @@
 # Warrior - High HP/Attack, defensive tank
 - id: fce64c3f-f9bc-4a8e-bfa6-2760d8d6d14e
-  name: Warrior
+  name: Warrior Invader
   description: A heavily armored fighter with high HP and strong attacks. Uses Shield Wall to reduce incoming damage.
   invaderClass: warrior
   baseStats:
