@@ -6,11 +6,12 @@ import {
   input,
 } from '@angular/core';
 import { TippyDirective } from '@ngneat/helipopper';
+import { IconComponent } from '@components/icon/icon.component';
 import type { VictoryCheckType } from '@interfaces';
 
 @Component({
   selector: 'app-victory-condition-row',
-  imports: [DecimalPipe, TippyDirective],
+  imports: [DecimalPipe, TippyDirective, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -43,7 +44,11 @@ import type { VictoryCheckType } from '@interfaces';
 
       <span class="text-xs font-mono opacity-60 flex-shrink-0 whitespace-nowrap">
         @if (checkType() === 'flag') {
-          {{ met() ? 'Yes' : 'No' }}
+          @if (met()) {
+            <app-icon name="tablerCheck" class="text-success" />
+          } @else {
+            <app-icon name="tablerX" class="text-error" />
+          }
         } @else {
           {{ currentValue() | number: '1.0-0' }} / {{ target() | number: '1.0-0' }}
         }
