@@ -293,7 +293,7 @@ describe('floorMigrate', () => {
     expect(result.floors).toHaveLength(1);
     expect(result.floors[0].depth).toBe(1);
     expect(result.floors[0].grid).toEqual([['saved-grid']]);
-    expect(result.floors[0].hallways).toEqual([{ id: 'h1' }]);
+    expect(result.floors[0].hallways).toEqual([{ id: 'h1', suffix: 'A' }]);
     expect(result.floors[0].inhabitants).toEqual([{ instanceId: 'i1' }]);
     expect(result.currentFloorIndex).toBe(0);
   });

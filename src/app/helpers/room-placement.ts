@@ -11,6 +11,7 @@ import {
   roomShapeGetRotated,
 } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { generateRoomSuffix } from '@helpers/suffix';
 import type {
   Floor,
   GridState,
@@ -420,6 +421,7 @@ export async function roomPlacementPlace(
     shapeId,
     anchorX,
     anchorY,
+    suffix: generateRoomSuffix(floor, roomTypeId),
     rotation: rotation || undefined,
   };
 

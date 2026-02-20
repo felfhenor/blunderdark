@@ -51,11 +51,13 @@ function getEntityTiles(
  */
 export function getEntityName(floor: Floor, entityId: string): string {
   const room = floor.rooms.find((r) => r.id === entityId);
-  if (room)
-    return productionGetRoomDefinition(room.roomTypeId)?.name ?? 'Unknown';
+  if (room) {
+    const name = productionGetRoomDefinition(room.roomTypeId)?.name ?? 'Unknown';
+    return room.suffix ? `${name} ${room.suffix}` : name;
+  }
 
   const hallway = floor.hallways.find((h) => h.id === entityId);
-  if (hallway) return 'Corridor';
+  if (hallway) return hallway.suffix ? `Corridor ${hallway.suffix}` : 'Corridor';
 
   return 'Unknown';
 }

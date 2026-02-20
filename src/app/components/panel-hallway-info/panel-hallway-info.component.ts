@@ -22,7 +22,7 @@ import type { PlacedRoomId } from '@interfaces';
     @if (selectedHallwayTile(); as info) {
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4">
-          <h3 class="card-title text-sm">Corridor</h3>
+          <h3 class="card-title text-sm">Corridor{{ info.suffix ? ' ' + info.suffix : '' }}</h3>
           @if (info.startRoomName && info.endRoomName) {
             <div class="text-xs opacity-50">
               <span>{{ info.startRoomName }}</span>
@@ -116,12 +116,16 @@ export class PanelHallwayInfoComponent {
       ? productionGetRoomDefinition(endRoom.roomTypeId)
       : undefined;
 
+    const startSuffix = startRoom?.suffix;
+    const endSuffix = endRoom?.suffix;
+
     return {
       x: tile.x,
       y: tile.y,
       hallwayId: gridTile.hallwayId,
-      startRoomName: startDef?.name,
-      endRoomName: endDef?.name,
+      suffix: hallway.suffix,
+      startRoomName: startDef ? (startSuffix ? `${startDef.name} ${startSuffix}` : startDef.name) : undefined,
+      endRoomName: endDef ? (endSuffix ? `${endDef.name} ${endSuffix}` : endDef.name) : undefined,
     };
   });
 

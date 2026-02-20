@@ -6,6 +6,7 @@ import { defaultFloor } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
 import { resourceAdd, resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { ensureFloorSuffixes } from '@helpers/suffix';
 import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { MAX_FLOORS } from '@interfaces/floor';
@@ -345,6 +346,9 @@ export function floorMigrate(world: Partial<GameStateWorld>): {
       };
     });
   }
+
+  // Ensure all rooms and hallways have suffix labels (backward compat)
+  floors = floors.map(ensureFloorSuffixes);
 
   // Clamp currentFloorIndex to valid range
   const savedIndex = world.currentFloorIndex ?? 0;

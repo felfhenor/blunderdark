@@ -223,9 +223,10 @@ export class GridComponent implements AfterViewInit {
     const map = new Map<string, { color: string; name: string }>();
     for (const room of floor.rooms) {
       const def = productionGetRoomDefinition(room.roomTypeId);
+      const baseName = def?.name ?? 'Room';
       map.set(room.id, {
         color: getRoomColor(room.roomTypeId),
-        name: def?.name ?? 'Room',
+        name: room.suffix ? `${baseName} ${room.suffix}` : baseName,
       });
     }
     return map;

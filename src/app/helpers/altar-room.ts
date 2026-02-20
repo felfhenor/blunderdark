@@ -5,6 +5,7 @@ import { hallwayPlacementFindPointPath } from '@helpers/hallway-placement';
 import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
+import { generateHallwaySuffix, generateRoomSuffix } from '@helpers/suffix';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
@@ -89,6 +90,7 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
         shapeId: roomDef.shapeId,
         anchorX,
         anchorY,
+        suffix: generateRoomSuffix(floorCurrent, roomDef.id as RoomId),
       };
 
       const updated = roomPlacementPlaceOnFloor(
@@ -120,6 +122,7 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
 
       const hallway: Hallway = {
         id: rngUuid<HallwayId>(),
+        suffix: generateHallwaySuffix(floorCurrent),
         tiles: path,
         upgrades: [],
       };

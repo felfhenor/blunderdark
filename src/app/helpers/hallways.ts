@@ -219,6 +219,7 @@ export function hallwayDeserialize(data: unknown[]): Hallway[] {
     const h = item as Record<string, unknown>;
     return {
       id: ((h['id'] as string) ?? '') as HallwayId,
+      suffix: (h['suffix'] as string) ?? '',
       startRoomId: ((h['startRoomId'] as string) || undefined) as PlacedRoomId | undefined,
       endRoomId: ((h['endRoomId'] as string) || undefined) as PlacedRoomId | undefined,
       tiles: (h['tiles'] as TileOffset[]) ?? [],

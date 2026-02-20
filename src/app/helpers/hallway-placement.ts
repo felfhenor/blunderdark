@@ -9,6 +9,7 @@ import {
 } from '@helpers/hallways';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
+import { generateHallwaySuffix } from '@helpers/suffix';
 import { roomPlacementExitMode } from '@helpers/room-placement';
 import { updateGamestate } from '@helpers/state-game';
 import type {
@@ -250,8 +251,12 @@ export async function hallwayPlacementConfirm(): Promise<boolean> {
   const paid = await resourcePayCost({ crystals: cost });
   if (!paid) return false;
 
+  const floor = floorCurrent();
+  if (!floor) return false;
+
   const hallway: Hallway = {
     id: rngUuid<HallwayId>(),
+    suffix: generateHallwaySuffix(floor),
     tiles: [...path],
     upgrades: [],
   };

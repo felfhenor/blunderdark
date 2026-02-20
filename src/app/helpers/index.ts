@@ -88,6 +88,7 @@ export * from './stat-icons';
 export * from './state-game';
 export * from './state-modifiers';
 export * from './state-options';
+export * from './suffix';
 export * from './summoning-circle';
 export * from './synergy';
 export * from './throne-room';

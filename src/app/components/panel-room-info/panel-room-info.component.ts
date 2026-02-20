@@ -91,7 +91,7 @@ export class PanelRoomInfoComponent {
 
     return {
       id: room.id,
-      name: def.name,
+      name: room.suffix ? `${def.name} ${room.suffix}` : def.name,
       roomTypeId: room.roomTypeId,
       placedRoom: room,
       maxInhabitants: effectiveMax,

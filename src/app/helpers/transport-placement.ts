@@ -9,6 +9,7 @@ import { roomPlacementExitMode } from '@helpers/room-placement';
 import { roomShapeGet } from '@helpers/room-shapes';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { generateRoomSuffix } from '@helpers/suffix';
 import type {
   Floor,
   PlacedRoom,
@@ -73,6 +74,7 @@ function getTransportRoomDef(type: TransportType): RoomContent | undefined {
 }
 
 function createTransportRoom(
+  floor: Floor,
   roomDef: RoomContent,
   x: number,
   y: number,
@@ -85,6 +87,7 @@ function createTransportRoom(
     shapeId: roomDef.shapeId,
     anchorX: x,
     anchorY: y,
+    suffix: generateRoomSuffix(floor, roomDef.id),
     transportType,
     transportGroupId,
   };
@@ -134,8 +137,8 @@ export async function transportStairExecute(
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   const groupId = rngUuid<TransportGroupId>();
-  const roomA = createTransportRoom(roomDef, x, y, 'stair', groupId);
-  const roomB = createTransportRoom(roomDef, x, y, 'stair', groupId);
+  const roomA = createTransportRoom(currentFloor, roomDef, x, y, 'stair', groupId);
+  const roomB = createTransportRoom(targetFloor, roomDef, x, y, 'stair', groupId);
 
   await updateGamestate((s) => {
     const newFloors = s.world.floors.map((floor) => {
@@ -193,8 +196,8 @@ export async function transportElevatorExecute(
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   const groupId = rngUuid<TransportGroupId>();
-  const roomA = createTransportRoom(roomDef, x, y, 'elevator', groupId);
-  const roomB = createTransportRoom(roomDef, x, y, 'elevator', groupId);
+  const roomA = createTransportRoom(currentFloor, roomDef, x, y, 'elevator', groupId);
+  const roomB = createTransportRoom(targetFloor, roomDef, x, y, 'elevator', groupId);
 
   await updateGamestate((s) => {
     const newFloors = s.world.floors.map((floor) => {
@@ -262,7 +265,7 @@ export async function transportElevatorExtendExecute(
   const paid = await resourcePayCost(extensionCost);
   if (!paid) return { success: false, error: 'Not enough resources' };
 
-  const newRoom = createTransportRoom(roomDef, x, y, 'elevator', groupId);
+  const newRoom = createTransportRoom(targetFloor, roomDef, x, y, 'elevator', groupId);
 
   await updateGamestate((s) => {
     const newFloors = s.world.floors.map((floor) => {
@@ -398,8 +401,8 @@ export async function transportPortalExecute(
   if (!paid) return { success: false, error: 'Not enough resources' };
 
   const groupId = rngUuid<TransportGroupId>();
-  const roomA = createTransportRoom(roomDef, sourcePos.x, sourcePos.y, 'portal', groupId);
-  const roomB = createTransportRoom(roomDef, destX, destY, 'portal', groupId);
+  const roomA = createTransportRoom(sourceFloor, roomDef, sourcePos.x, sourcePos.y, 'portal', groupId);
+  const roomB = createTransportRoom(destFloor, roomDef, destX, destY, 'portal', groupId);
 
   await updateGamestate((s) => {
     const newFloors = s.world.floors.map((floor) => {

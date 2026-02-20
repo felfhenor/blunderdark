@@ -58,6 +58,7 @@ export type PlacedRoom = {
   shapeId: RoomShapeId;
   anchorX: number;
   anchorY: number;
+  suffix: string;
   rotation?: Rotation;
   appliedUpgradePathId?: UpgradePathId;
   spawnTicksRemaining?: number;
