@@ -22,6 +22,7 @@ import {
   getEntityName,
   productionGetRoomDefinition,
   productionGetRoomRates,
+  roomMoveEnter,
   roomPlacementIsRemovable,
   inhabitantMeetsRestriction,
   notifyError,
@@ -427,6 +428,20 @@ export class PanelRoomInfoComponent {
     } else {
       notifyError('Failed to unassign inhabitant');
     }
+  }
+
+  public canMoveRoom = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    if (!roomPlacementIsRemovable(room.roomTypeId)) return false;
+    if (room.placedRoom.transportType) return false;
+    return true;
+  });
+
+  public async onMoveRoom(): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+    await roomMoveEnter(room.id);
   }
 
   public canRemoveRoom = computed(() => {

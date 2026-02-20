@@ -35,6 +35,9 @@ import {
   inhabitantAll,
   notifyError,
   productionGetRoomDefinition,
+  roomMoveActive,
+  roomMoveCancel,
+  roomMoveExecute,
   roomPlacementClearPreviewPosition,
   roomPlacementExecute,
   roomPlacementExitMode,
@@ -594,9 +597,16 @@ export class GridComponent implements AfterViewInit {
       return;
     }
     if (roomPlacementPreviewShape()) {
-      const result = await roomPlacementExecute(x, y);
-      if (!result.success && result.error) {
-        notifyError(result.error);
+      if (roomMoveActive()) {
+        const result = await roomMoveExecute(x, y);
+        if (!result.success && result.error) {
+          notifyError(result.error);
+        }
+      } else {
+        const result = await roomPlacementExecute(x, y);
+        if (!result.success && result.error) {
+          notifyError(result.error);
+        }
       }
       return;
     }
@@ -703,7 +713,7 @@ export class GridComponent implements AfterViewInit {
     return dest !== undefined && dest.x === x && dest.y === y;
   }
 
-  public onRightClick(event: MouseEvent): void {
+  public async onRightClick(event: MouseEvent): Promise<void> {
     if (transportPlacementActive()) {
       event.preventDefault();
       transportPlacementExit();
@@ -712,6 +722,9 @@ export class GridComponent implements AfterViewInit {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {
       event.preventDefault();
+      if (roomMoveActive()) {
+        await roomMoveCancel();
+      }
       roomPlacementExitMode();
     }
   }
@@ -722,13 +735,16 @@ export class GridComponent implements AfterViewInit {
     }
   }
 
-  public onEscapeKey(): void {
+  public async onEscapeKey(): Promise<void> {
     if (uiIsAnyModalOpen()) return;
     if (transportPlacementActive()) {
       transportPlacementExit();
     } else if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementExit();
     } else if (roomPlacementPreviewShape()) {
+      if (roomMoveActive()) {
+        await roomMoveCancel();
+      }
       roomPlacementExitMode();
     } else {
       gridDeselectTile();

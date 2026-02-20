@@ -369,6 +369,15 @@
 
       <div class="divider my-1"></div>
 
+      @if (canMoveRoom()) {
+        <button
+          class="btn btn-sm btn-outline w-full mb-2"
+          (click)="onMoveRoom()"
+        >
+          Move Room
+        </button>
+      }
+
       @if (transportInfo()) {
         <button
           class="btn btn-sm btn-error btn-outline w-full"

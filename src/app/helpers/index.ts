@@ -67,6 +67,7 @@ export * from './research-unlocks';
 export * from './resource-icons';
 export * from './resources';
 export * from './rng';
+export * from './room-move';
 export * from './room-placement';
 export * from './room-removal';
 export * from './room-roles';
