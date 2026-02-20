@@ -1,4 +1,5 @@
 import { DecimalPipe, NgClass } from '@angular/common';
+import { sortBy } from 'es-toolkit/compat';
 import {
   type AfterViewInit,
   ChangeDetectionStrategy,
@@ -296,7 +297,7 @@ export class GridComponent implements AfterViewInit {
     const grid = this.grid();
     const bounds = new Map<
       string,
-      { minX: number; maxX: number; minY: number; anchorX: number }
+      { minX: number; maxX: number; minY: number; maxY: number; anchorX: number }
     >();
 
     for (let y = 0; y < grid.length; y++) {
@@ -306,10 +307,11 @@ export class GridComponent implements AfterViewInit {
 
         const entry = bounds.get(roomId);
         if (!entry) {
-          bounds.set(roomId, { minX: x, maxX: x, minY: y, anchorX: x });
+          bounds.set(roomId, { minX: x, maxX: x, minY: y, maxY: y, anchorX: x });
         } else {
           if (x < entry.minX) entry.minX = x;
           if (x > entry.maxX) entry.maxX = x;
+          if (y > entry.maxY) entry.maxY = y;
           if (y < entry.minY) {
             entry.minY = y;
             entry.anchorX = x;
@@ -325,7 +327,53 @@ export class GridComponent implements AfterViewInit {
       anchorMap.set(roomId, `${entry.anchorX},${entry.minY}`);
     }
 
-    return { anchorMap, tilesMap: bounds };
+    // Collision detection: group rooms by anchor row, assign vertical levels
+    const levelMap = new Map<string, number>();
+    const rowGroups = new Map<number, string[]>();
+    for (const [roomId, entry] of bounds) {
+      const group = rowGroups.get(entry.minY);
+      if (group) {
+        group.push(roomId);
+      } else {
+        rowGroups.set(entry.minY, [roomId]);
+      }
+    }
+
+    for (const roomIds of rowGroups.values()) {
+      if (roomIds.length < 2) {
+        for (const id of roomIds) levelMap.set(id, 0);
+        continue;
+      }
+
+      // Sort by bounding box area descending (wider/larger rooms get level 0)
+      const sorted = sortBy(roomIds, [
+        (id) => {
+          const b = bounds.get(id)!;
+          return -((b.maxX - b.minX + 1) * (b.maxY - b.minY + 1));
+        },
+      ]);
+
+      // Greedily assign levels
+      const assigned: Array<{ roomId: string; centerX: number; level: number }> = [];
+      for (const roomId of sorted) {
+        const b = bounds.get(roomId)!;
+        const centerX = (b.minX + b.maxX) / 2;
+
+        let level = 0;
+        while (
+          assigned.some(
+            (a) => a.level === level && Math.abs(a.centerX - centerX) < 2.0,
+          )
+        ) {
+          level++;
+        }
+
+        levelMap.set(roomId, level);
+        assigned.push({ roomId, centerX, level });
+      }
+    }
+
+    return { anchorMap, tilesMap: bounds, levelMap };
   });
 
   public isRoomAnchor(
@@ -345,6 +393,11 @@ export class GridComponent implements AfterViewInit {
     const offsetTiles = centerX - entry.anchorX;
     // Each tile is 64px + 1px gap
     return `${offsetTiles * 65}px`;
+  }
+
+  public getRoomLabelLevel(roomId: string | undefined): number {
+    if (!roomId) return 0;
+    return this.roomLabelTileMap().levelMap.get(roomId) ?? 0;
   }
 
   private previewTileSet = computed(() => {

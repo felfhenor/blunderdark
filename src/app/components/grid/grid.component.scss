@@ -258,7 +258,7 @@
 
 .room-label {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + var(--room-label-level, 0) * 18px);
   left: calc(50% + var(--room-center-offset, 0px));
   transform: translateX(-50%);
   font-size: 11px;
