@@ -126,6 +126,36 @@ const dragonDef: InhabitantContent = {
   __type: 'inhabitant',
 };
 
+const familiarDef: InhabitantContent = {
+  id: 'familiar-001' as InhabitantId,
+  name: 'Arcane Familiar',
+  type: 'creature',
+  tier: 1,
+  description: 'A summoned creature.',
+  cost: {},
+  stats: { hp: 20, attack: 8, defense: 5, speed: 14, workerEfficiency: 0.8 },
+  traits: [],
+  restrictionTags: ['summoned'],
+  rulerBonuses: {},
+  rulerFearLevel: 0,
+  __type: 'inhabitant',
+};
+
+const convertedDef: InhabitantContent = {
+  id: 'converted-001' as InhabitantId,
+  name: 'Converted Prisoner',
+  type: 'creature',
+  tier: 1,
+  description: 'A converted prisoner.',
+  cost: {},
+  stats: { hp: 25, attack: 10, defense: 10, speed: 10, workerEfficiency: 1.0 },
+  traits: [],
+  restrictionTags: ['converted'],
+  rulerBonuses: {},
+  rulerFearLevel: 0,
+  __type: 'inhabitant',
+};
+
 const tier2Def: InhabitantContent = {
   id: 'tier2-001' as InhabitantId,
   name: 'Dark Elf',
@@ -157,17 +187,20 @@ describe('recruitment helper', () => {
     mockInhabitants = [];
     mockResources = createResources();
     mockHasAltar = true;
-    mockContentEntries = [goblinDef, skeletonDef, dragonDef, tier2Def];
+    mockContentEntries = [goblinDef, skeletonDef, dragonDef, familiarDef, convertedDef, tier2Def];
     uuidCounter = 0;
   });
 
   describe('recruitmentGetRecruitable', () => {
-    it('should exclude unique/ruler inhabitants', () => {
+    it('should exclude inhabitants with restriction tags', () => {
       const result = recruitmentGetRecruitable();
-      expect(result.map((d) => d.name)).not.toContain('Dragon');
+      const names = result.map((d) => d.name);
+      expect(names).not.toContain('Dragon');
+      expect(names).not.toContain('Arcane Familiar');
+      expect(names).not.toContain('Converted Prisoner');
     });
 
-    it('should include non-unique inhabitants', () => {
+    it('should include inhabitants with no restriction tags', () => {
       const result = recruitmentGetRecruitable();
       expect(result.map((d) => d.name)).toContain('Goblin');
       expect(result.map((d) => d.name)).toContain('Skeleton');

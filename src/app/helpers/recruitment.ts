@@ -51,7 +51,8 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
 
 /**
  * Get all inhabitant definitions available for display in the recruitment panel.
- * Filters out unique/ruler inhabitants and sorts by tier then name.
+ * Filters out inhabitants with any restriction tags (unique, summoned, converted,
+ * hybrid) and sorts by tier then name.
  */
 export function recruitmentGetRecruitable(): InhabitantContent[] {
   const allDefs = contentGetEntriesByType<InhabitantContent>(
@@ -59,7 +60,7 @@ export function recruitmentGetRecruitable(): InhabitantContent[] {
   );
 
   return sortBy(
-    allDefs.filter((def) => !def.restrictionTags.includes('unique')),
+    allDefs.filter((def) => def.restrictionTags.length === 0),
     [(d) => d.tier, (d) => d.name],
   );
 }
