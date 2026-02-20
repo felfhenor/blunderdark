@@ -42,9 +42,7 @@ import {
   floorSetCurrentByIndex,
   gridSelectedTile,
   optionsGet,
-  signalLocalStorage,
 } from '@helpers';
-import type { RoomContent } from '@interfaces/content-room';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -54,11 +52,12 @@ import {
   autosaveStop,
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
-import { gamestate } from '@helpers/state-game';
 import { merchantIsPresent } from '@helpers/merchant';
 import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
+import { gamestate } from '@helpers/state-game';
 import type { SideTabDefinition } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 
 @Component({
@@ -108,10 +107,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
   public isAutosaving = autosaveIsSaving;
 
-  public activePanel = signalLocalStorage<string | undefined>(
-    'blunderdark-active-panel',
-    undefined,
-  );
+  public activePanel = signal<string | undefined>(undefined);
 
   private placeholderPanel = viewChild('placeholderPanel', {
     read: TemplateRef,
@@ -307,7 +303,13 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   });
 
   public modalTabDefinitions = computed<SideTabDefinition[]>(() => [
-    { id: 'research', label: 'Research', icon: 'gameMaterialsScience', iconGlow: this.hasNoActiveResearch, isModal: true },
+    {
+      id: 'research',
+      label: 'Research',
+      icon: 'gameMaterialsScience',
+      iconGlow: this.hasNoActiveResearch,
+      isModal: true,
+    },
     {
       id: 'fusion',
       label: 'Fusion',
