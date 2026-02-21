@@ -438,6 +438,7 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 
 ## Workflow Requirements
 
+- **NEVER kill all Chrome instances** — when restarting a dev server, browser, or any process, NEVER use commands that kill all Chrome/Chromium processes (e.g., `taskkill /IM chrome.exe`, `pkill chrome`, `killall chrome`). The user has other Chrome windows and tabs open. Instead, close only the specific tab or process you opened.
 - **Verification**: Always run `npm run lint`, `npm run test`, then `npm run build:app` (NOT `npm run build`). `build:app` only runs the Angular production build, which catches type errors that lint/vitest don't. The full `build` command includes gamedata/spritesheet/changelog steps that are slow and unnecessary for verification.
 - **Prettier on save**: After editing any `.html` or `.ts` file, run `npx prettier --write <file>` on it before committing to ensure it conforms to codebase formatting standards.
 - **Verify UI changes in browser**: After making UI changes, use the `dev-browser` skill to double-check the result visually in the browser.
