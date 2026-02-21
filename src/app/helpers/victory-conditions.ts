@@ -9,7 +9,7 @@ import type {
   VictoryPathContent,
   VictoryPathProgress,
 } from '@interfaces';
-import { REPUTATION_THRESHOLDS } from '@interfaces/reputation';
+
 
 // --- Terror Lord ---
 
@@ -166,20 +166,15 @@ export function victoryConditionCheckRoomCountByName(
   return { conditionId, currentValue: count, met: count >= target };
 }
 
-export function victoryConditionCheckPerfectCreature(
+export function victoryConditionCheckMutatedCreatures(
   state: GameState,
+  target: number,
 ): VictoryConditionProgress {
-  const content = contentGetEntry<InhabitantContent>('Perfect Creature');
-  if (!content) {
-    return { conditionId: 'scientist_perfect', currentValue: 0, met: false };
-  }
-  const found = state.world.inhabitants.some(
-    (i) => i.definitionId === content.id,
-  );
+  const count = state.world.inhabitants.filter((i) => i.mutated).length;
   return {
-    conditionId: 'scientist_perfect',
-    currentValue: found ? 1 : 0,
-    met: found,
+    conditionId: 'scientist_mutants',
+    currentValue: count,
+    met: count >= target,
   };
 }
 
@@ -220,13 +215,13 @@ export function victoryConditionCheckFloorCount(
 
 export function victoryConditionCheckLegendaryHarmony(
   state: GameState,
+  target: number,
 ): VictoryConditionProgress {
   const harmonyPoints = state.world.reputation.harmony;
-  const isLegendary = harmonyPoints >= REPUTATION_THRESHOLDS.legendary;
   return {
     conditionId: 'harmony_reputation',
     currentValue: harmonyPoints,
-    met: isLegendary,
+    met: harmonyPoints >= target,
   };
 }
 
@@ -246,6 +241,7 @@ export function victoryConditionCheckDayReached(
 
 export function victoryConditionCheckAllResourcesPositive(
   state: GameState,
+  target: number,
 ): VictoryConditionProgress {
   const resources = state.world.resources;
   const resourceTypes: ResourceType[] = [
@@ -256,11 +252,13 @@ export function victoryConditionCheckAllResourcesPositive(
     'research',
     'essence',
   ];
-  const allPositive = resourceTypes.every((t) => resources[t].current > 0);
+  const positiveCount = resourceTypes.filter(
+    (t) => resources[t].current > 0,
+  ).length;
   return {
     conditionId: 'empire_resources',
-    currentValue: allPositive ? 1 : 0,
-    met: allPositive,
+    currentValue: positiveCount,
+    met: positiveCount >= target,
   };
 }
 
@@ -368,7 +366,7 @@ function victoryConditionEvaluateSingle(
     case 'hoard_rooms':
       return victoryConditionCheckRoomsBuilt(
         state,
-        ['Throne Room', 'Dragon Lair'],
+        ['Throne Room', "Dragon's Hoard"],
         conditionId,
       );
     case 'hoard_dragon':
@@ -392,8 +390,8 @@ function victoryConditionEvaluateSingle(
         target,
         conditionId,
       );
-    case 'scientist_perfect':
-      return victoryConditionCheckPerfectCreature(state);
+    case 'scientist_mutants':
+      return victoryConditionCheckMutatedCreatures(state, target);
 
     // Harmonious Kingdom
     case 'harmony_corruption':
@@ -403,13 +401,13 @@ function victoryConditionEvaluateSingle(
     case 'harmony_floors':
       return victoryConditionCheckFloorCount(state, target);
     case 'harmony_reputation':
-      return victoryConditionCheckLegendaryHarmony(state);
+      return victoryConditionCheckLegendaryHarmony(state, target);
 
     // Eternal Empire
     case 'empire_time':
       return victoryConditionCheckDayReached(state, target);
     case 'empire_resources':
-      return victoryConditionCheckAllResourcesPositive(state);
+      return victoryConditionCheckAllResourcesPositive(state, target);
     case 'empire_unique':
       return victoryConditionCheckUniqueInhabitants(state, target);
     case 'empire_rooms':

@@ -28,9 +28,9 @@
       checkType: resource_threshold
       target: 10000
     - id: hoard_rooms
-      description: "Build both a Throne Room and Dragon Lair"
-      checkType: flag
-      target: 1
+      description: "Build both a Throne Room and Dragon's Hoard"
+      checkType: count
+      target: 2
     - id: hoard_dragon
       description: "Have a Dragon inhabitant"
       checkType: flag
@@ -42,7 +42,7 @@
 
 - id: 545c819a-d55f-4445-96a7-e5ab4dd1e723
   name: Mad Scientist
-  description: "Push the boundaries of forbidden knowledge. Complete all research, breed hybrid creatures, and create the ultimate Perfect Creature through fusion."
+  description: "Push the boundaries of forbidden knowledge. Complete all research, breed hybrid creatures, build breeding pits, and mutate your minions into powerful abominations."
   conditions:
     - id: scientist_research
       description: "Complete all research"
@@ -56,10 +56,10 @@
       description: "Build 3+ Breeding Pit rooms"
       checkType: count
       target: 3
-    - id: scientist_perfect
-      description: "Create a Perfect Creature"
-      checkType: flag
-      target: 1
+    - id: scientist_mutants
+      description: "Mutate 5+ creatures"
+      checkType: count
+      target: 5
 
 - id: 1c9dd17c-04df-478b-ad3a-ec1bd3dcc8d9
   name: Harmonious Kingdom
@@ -78,9 +78,9 @@
       checkType: count
       target: 7
     - id: harmony_reputation
-      description: "Reach Legendary Harmony reputation"
-      checkType: flag
-      target: 1
+      description: "Reach Legendary Harmony reputation (700 points)"
+      checkType: resource_threshold
+      target: 700
 
 - id: a1351de2-f672-4820-9a7c-504eaaa83716
   name: Eternal Empire
@@ -91,9 +91,9 @@
       checkType: count
       target: 365
     - id: empire_resources
-      description: "Have all resource types above 0"
-      checkType: flag
-      target: 1
+      description: "Have all 6 resource types above 0"
+      checkType: count
+      target: 6
     - id: empire_unique
       description: "Have 3+ Unique inhabitants"
       checkType: count

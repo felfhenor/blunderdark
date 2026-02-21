@@ -4,6 +4,7 @@ import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
+import { victoryRecordDefenseWin } from '@helpers/victory';
 import { gamestate } from '@helpers/state-game';
 import type {
   GameState,
@@ -190,6 +191,7 @@ export function invasionTriggerProcessSchedule(
     schedule.warningDismissed = false;
 
     reputationAwardInPlace(state, 'Defeat Invader');
+    victoryRecordDefenseWin(state);
 
     // Reschedule next invasion
     const result = invasionTriggerCalculateNextDay(

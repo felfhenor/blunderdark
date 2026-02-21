@@ -29,7 +29,7 @@ import type { VictoryCheckType } from '@interfaces';
       </span>
 
       <div class="flex-1 min-w-0">
-        <div class="text-xs truncate">{{ description() }}</div>
+        <div class="text-xs">{{ description() }}</div>
 
         @if (checkType() !== 'flag') {
           <progress

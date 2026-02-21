@@ -33,6 +33,7 @@ const { contentGetEntriesByType } = await import('@helpers/content');
 
 const {
   victoryProcess,
+  victoryEvaluateImmediate,
   victoryIsPathComplete,
   victoryGetProgress,
   victoryRecordDefenseWin,
@@ -134,6 +135,7 @@ function makeState(overrides: {
         consecutiveZeroCorruptionDays: 0,
         lastZeroCorruptionCheckDay: 0,
         totalInvasionDefenseWins: overrides.defenseWins ?? 0,
+        lastEvaluationTick: 0,
         achievedVictoryPathId: overrides.achievedPathId,
         achievedVictoryDay: overrides.achievedDay,
       },
@@ -176,7 +178,7 @@ describe('victoryProcess', () => {
     expect(mockEvaluatePath).toHaveBeenCalledWith(pathB, state);
   });
 
-  it('evaluates on tick 0', () => {
+  it('skips evaluation at tick 0 (first eval at tick 60)', () => {
     const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
     vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
     mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, false));
@@ -184,7 +186,7 @@ describe('victoryProcess', () => {
     const state = makeState({ numTicks: 0 });
     victoryProcess(state);
 
-    expect(mockEvaluatePath).toHaveBeenCalledTimes(1);
+    expect(mockEvaluatePath).not.toHaveBeenCalled();
   });
 
   it('sets victoryAchievedPathId when a path is complete', () => {
@@ -302,7 +304,7 @@ describe('victoryGetProgress', () => {
     const expected = makeProgress(TEST_PATH_A_ID, false);
     mockEvaluatePath.mockReturnValue(expected);
 
-    const state = makeState({ numTicks: 0 });
+    const state = makeState({ numTicks: 60 });
     victoryProcess(state);
 
     expect(victoryGetProgress(TEST_PATH_A_ID)).toEqual(expected);
@@ -329,7 +331,7 @@ describe('victoryReset', () => {
     vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
     mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
 
-    const state = makeState({ numTicks: 0 });
+    const state = makeState({ numTicks: 60 });
     victoryProcess(state);
 
     expect(victoryIsAchieved()).toBe(true);
@@ -340,6 +342,48 @@ describe('victoryReset', () => {
     expect(victoryAchievedPathId()).toBeUndefined();
     expect(victoryIsAchieved()).toBe(false);
     expect(victoryProgressMap().size).toBe(0);
+  });
+});
+
+describe('victoryEvaluateImmediate', () => {
+  it('populates progress map immediately without tick gate', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, false));
+
+    victoryReset();
+
+    // numTicks is 0, which would fail the tick gate in victoryProcess
+    const state = makeState({ numTicks: 0 });
+    victoryEvaluateImmediate(state);
+
+    expect(victoryProgressMap().size).toBe(1);
+    expect(victoryProgressMap().get(TEST_PATH_A_ID)).toBeDefined();
+  });
+
+  it('restores achievedVictoryPathId from state', () => {
+    victoryReset();
+
+    const state = makeState({ numTicks: 0 });
+    state.world.victoryProgress.achievedVictoryPathId = TEST_PATH_A_ID;
+
+    victoryEvaluateImmediate(state);
+
+    expect(victoryAchievedPathId()).toBe(TEST_PATH_A_ID);
+  });
+
+  it('does not modify game state', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    victoryReset();
+
+    const state = makeState({ numTicks: 500 });
+    victoryEvaluateImmediate(state);
+
+    // Should not set achievedVictoryPathId on the state (read-only evaluation)
+    expect(state.world.victoryProgress.achievedVictoryPathId).toBeUndefined();
   });
 });
 

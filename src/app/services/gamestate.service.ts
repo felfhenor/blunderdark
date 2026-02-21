@@ -8,6 +8,7 @@ import {
   uiIsPageVisible,
   migrateGameState,
   migrateOptionsState,
+  victoryEvaluateImmediate,
 } from '@helpers';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
@@ -38,6 +39,8 @@ export class GamestateService {
       this.logger.info('GameState', 'Gamestate migrated & loaded.');
       this.hasLoaded.set(true);
       gamestateIsReady.set(true);
+
+      victoryEvaluateImmediate(gamestate());
     });
 
     effect(() => {

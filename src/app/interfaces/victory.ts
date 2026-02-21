@@ -18,6 +18,7 @@ export type VictoryProgress = {
   consecutiveZeroCorruptionDays: number;
   lastZeroCorruptionCheckDay: number;
   totalInvasionDefenseWins: number;
+  lastEvaluationTick: number;
   achievedVictoryPathId?: VictoryPathId;
   achievedVictoryDay?: number;
 };

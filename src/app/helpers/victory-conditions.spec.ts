@@ -7,6 +7,7 @@ import type {
   PlacedRoom,
   PlacedRoomId,
   RoomId,
+  VictoryConditionProgress,
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces';
@@ -14,10 +15,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 const TEST_DEMON_LORD_ID = 'demon-lord-id' as InhabitantId;
 const TEST_DRAGON_ID = 'dragon-id' as InhabitantId;
-const TEST_PERFECT_CREATURE_ID = 'perfect-creature-id' as InhabitantId;
 const TEST_UNIQUE_INHABITANT_ID = 'unique-inh-id' as InhabitantId;
 const TEST_THRONE_ROOM_ID = 'throne-room-id' as RoomId;
-const TEST_DRAGON_LAIR_ID = 'dragon-lair-id' as RoomId;
+const TEST_DRAGONS_HOARD_ID = 'dragons-hoard-id' as RoomId;
 const TEST_BREEDING_PITS_ID = 'breeding-pits-id' as RoomId;
 const TEST_RESEARCH_A = 'research-a';
 const TEST_RESEARCH_B = 'research-b';
@@ -37,12 +37,6 @@ vi.mock('@helpers/content', () => ({
           name: 'Dragon',
           __type: 'inhabitant',
         };
-      case 'Perfect Creature':
-        return {
-          id: TEST_PERFECT_CREATURE_ID,
-          name: 'Perfect Creature',
-          __type: 'inhabitant',
-        };
       case TEST_UNIQUE_INHABITANT_ID:
         return {
           id: TEST_UNIQUE_INHABITANT_ID,
@@ -52,8 +46,8 @@ vi.mock('@helpers/content', () => ({
         } as InhabitantContent;
       case TEST_THRONE_ROOM_ID:
         return { name: 'Throne Room', __type: 'room' };
-      case TEST_DRAGON_LAIR_ID:
-        return { name: 'Dragon Lair', __type: 'room' };
+      case TEST_DRAGONS_HOARD_ID:
+        return { name: "Dragon's Hoard", __type: 'room' };
       case TEST_BREEDING_PITS_ID:
         return { name: 'Breeding Pits', __type: 'room' };
       default:
@@ -82,7 +76,7 @@ const {
   victoryConditionCheckAllResearchComplete,
   victoryConditionCheckHybridCount,
   victoryConditionCheckRoomCountByName,
-  victoryConditionCheckPerfectCreature,
+  victoryConditionCheckMutatedCreatures,
   victoryConditionCheckConsecutiveZeroCorruptionDays,
   victoryConditionCheckInhabitantCount,
   victoryConditionCheckFloorCount,
@@ -216,6 +210,7 @@ function makeState(overrides: Partial<{
         consecutiveZeroCorruptionDays: overrides.zeroCorruptionDays ?? 0,
         lastZeroCorruptionCheckDay: overrides.lastZeroCorruptionDay ?? 0,
         totalInvasionDefenseWins: overrides.defenseWins ?? 0,
+        lastEvaluationTick: 0,
       },
     },
   } as unknown as GameState;
@@ -336,14 +331,14 @@ describe("Dragon's Hoard conditions", () => {
           id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
           rooms: [
             makeRoom(TEST_THRONE_ROOM_ID),
-            makeRoom(TEST_DRAGON_LAIR_ID),
+            makeRoom(TEST_DRAGONS_HOARD_ID),
           ],
           hallways: [], inhabitants: [], connections: [], traps: [],
         }] as unknown as GameState['world']['floors'],
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
-        ['Throne Room', 'Dragon Lair'],
+        ['Throne Room', "Dragon's Hoard"],
         'hoard_rooms',
       );
       expect(result.met).toBe(true);
@@ -360,7 +355,7 @@ describe("Dragon's Hoard conditions", () => {
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
-        ['Throne Room', 'Dragon Lair'],
+        ['Throne Room', "Dragon's Hoard"],
         'hoard_rooms',
       );
       expect(result.met).toBe(false);
@@ -516,19 +511,44 @@ describe('Mad Scientist conditions', () => {
     });
   });
 
-  describe('victoryConditionCheckPerfectCreature', () => {
-    it('returns met when Perfect Creature exists', () => {
-      const state = makeState({
-        inhabitants: [makeInhabitant(TEST_PERFECT_CREATURE_ID)],
-      });
-      const result = victoryConditionCheckPerfectCreature(state);
+  describe('victoryConditionCheckMutatedCreatures', () => {
+    it('returns met with 5 mutated creatures', () => {
+      const inhabitants = Array.from({ length: 5 }, (_, i) =>
+        makeInhabitant('inh-1' as InhabitantId, {
+          instanceId: `inst-${i}` as InhabitantInstanceId,
+          mutated: true,
+        }),
+      );
+      const state = makeState({ inhabitants });
+      const result = victoryConditionCheckMutatedCreatures(state, 5);
       expect(result.met).toBe(true);
+      expect(result.currentValue).toBe(5);
     });
 
-    it('returns not met when absent', () => {
-      const state = makeState({});
-      const result = victoryConditionCheckPerfectCreature(state);
+    it('returns not met with fewer mutated creatures', () => {
+      const inhabitants = [
+        makeInhabitant('inh-1' as InhabitantId, {
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          mutated: true,
+        }),
+        makeInhabitant('inh-2' as InhabitantId, {
+          instanceId: 'inst-2' as InhabitantInstanceId,
+          mutated: false,
+        }),
+      ];
+      const state = makeState({ inhabitants });
+      const result = victoryConditionCheckMutatedCreatures(state, 5);
       expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(1);
+    });
+
+    it('ignores non-mutated creatures', () => {
+      const state = makeState({
+        inhabitants: [makeInhabitant('inh-1' as InhabitantId)],
+      });
+      const result = victoryConditionCheckMutatedCreatures(state, 5);
+      expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(0);
     });
   });
 });
@@ -597,20 +617,31 @@ describe('Harmonious Kingdom conditions', () => {
   });
 
   describe('victoryConditionCheckLegendaryHarmony', () => {
-    it('returns met at 700 harmony (legendary threshold)', () => {
+    it('returns met at 700 harmony', () => {
       const state = makeState({
         reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 700, chaos: 0 },
       });
-      const result = victoryConditionCheckLegendaryHarmony(state);
+      const result = victoryConditionCheckLegendaryHarmony(state, 700);
       expect(result.met).toBe(true);
+      expect(result.currentValue).toBe(700);
     });
 
-    it('returns not met at 699 harmony', () => {
+    it('returns not met at 699 harmony with partial progress', () => {
       const state = makeState({
         reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 699, chaos: 0 },
       });
-      const result = victoryConditionCheckLegendaryHarmony(state);
+      const result = victoryConditionCheckLegendaryHarmony(state, 700);
       expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(699);
+    });
+
+    it('tracks partial progress from 0', () => {
+      const state = makeState({
+        reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 350, chaos: 0 },
+      });
+      const result = victoryConditionCheckLegendaryHarmony(state, 700);
+      expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(350);
     });
   });
 });
@@ -633,7 +664,7 @@ describe('Eternal Empire conditions', () => {
   });
 
   describe('victoryConditionCheckAllResourcesPositive', () => {
-    it('returns met when all resources are > 0', () => {
+    it('returns met when all 6 resources are > 0', () => {
       const state = makeState({
         gold: 1,
         crystals: 1,
@@ -642,11 +673,12 @@ describe('Eternal Empire conditions', () => {
         research: 1,
         essence: 1,
       });
-      const result = victoryConditionCheckAllResourcesPositive(state);
+      const result = victoryConditionCheckAllResourcesPositive(state, 6);
       expect(result.met).toBe(true);
+      expect(result.currentValue).toBe(6);
     });
 
-    it('returns not met when any resource is 0', () => {
+    it('returns not met and tracks partial count when some are 0', () => {
       const state = makeState({
         gold: 1,
         crystals: 0,
@@ -655,8 +687,16 @@ describe('Eternal Empire conditions', () => {
         research: 1,
         essence: 1,
       });
-      const result = victoryConditionCheckAllResourcesPositive(state);
+      const result = victoryConditionCheckAllResourcesPositive(state, 6);
       expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(5);
+    });
+
+    it('returns 0 when no resources are positive', () => {
+      const state = makeState({});
+      const result = victoryConditionCheckAllResourcesPositive(state, 6);
+      expect(result.met).toBe(false);
+      expect(result.currentValue).toBe(1); // food defaults to 50
     });
   });
 
@@ -817,5 +857,202 @@ describe('victoryConditionEvaluatePath', () => {
     };
     const result = victoryConditionEvaluatePath(path, state);
     expect(result.complete).toBe(false);
+  });
+});
+
+// === Comprehensive partial progress tracking ===
+
+describe('All conditions track partial progress via victoryConditionEvaluateSingle', () => {
+  const richState = makeState({
+    corruption: 250,
+    gold: 5000,
+    day: 180,
+    defenseWins: 6,
+    peacefulDays: 15,
+    zeroCorruptionDays: 10,
+    food: 100,
+    crystals: 50,
+    flux: 0,
+    research: 30,
+    essence: 20,
+    inhabitants: [
+      makeInhabitant(TEST_DEMON_LORD_ID, { instanceId: 'i-dl' as InhabitantInstanceId }),
+      makeInhabitant(TEST_DRAGON_ID, { instanceId: 'i-dr' as InhabitantInstanceId }),
+      makeInhabitant(TEST_UNIQUE_INHABITANT_ID, { instanceId: 'i-u1' as InhabitantInstanceId }),
+      makeInhabitant('normal-1' as InhabitantId, {
+        instanceId: 'i-n1' as InhabitantInstanceId,
+        isHybrid: true,
+        definitionId: 'hybrid-a' as InhabitantId,
+      }),
+      makeInhabitant('normal-2' as InhabitantId, {
+        instanceId: 'i-n2' as InhabitantInstanceId,
+        mutated: true,
+      }),
+      makeInhabitant('normal-3' as InhabitantId, {
+        instanceId: 'i-n3' as InhabitantInstanceId,
+        mutated: true,
+      }),
+    ],
+    floors: [
+      {
+        id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
+        rooms: [
+          makeRoom(TEST_THRONE_ROOM_ID, { id: 'r1' as PlacedRoomId }),
+          makeRoom(TEST_BREEDING_PITS_ID, { id: 'r2' as PlacedRoomId }),
+          makeRoom(TEST_BREEDING_PITS_ID, { id: 'r3' as PlacedRoomId }),
+        ],
+        hallways: [], inhabitants: [], connections: [], traps: [],
+      },
+      {
+        id: 'f2', name: 'Floor 2', depth: 2, biome: 'neutral', grid: [],
+        rooms: [
+          makeRoom(TEST_BREEDING_PITS_ID, { id: 'r4' as PlacedRoomId }),
+        ],
+        hallways: [], inhabitants: [], connections: [], traps: [],
+      },
+      {
+        id: 'f3', name: 'Floor 3', depth: 3, biome: 'neutral', grid: [],
+        rooms: [],
+        hallways: [], inhabitants: [], connections: [], traps: [],
+      },
+    ] as unknown as GameState['world']['floors'],
+    completedResearch: [TEST_RESEARCH_A],
+    reputation: { terror: 100, wealth: 200, knowledge: 150, harmony: 350, chaos: 50 },
+  });
+
+  function evalSingle(conditionId: string, target: number): VictoryConditionProgress {
+    const path: VictoryPathContent = {
+      id: 'test' as VictoryPathId,
+      name: 'Test',
+      __type: 'victorypath',
+      description: '',
+      conditions: [{ id: conditionId, description: '', checkType: 'count', target }],
+    };
+    return victoryConditionEvaluatePath(path, richState).conditions[0];
+  }
+
+  // Terror Lord
+  it('terror_corruption: tracks partial corruption', () => {
+    const result = evalSingle('terror_corruption', 500);
+    expect(result.currentValue).toBe(250);
+    expect(result.met).toBe(false);
+  });
+
+  it('terror_defenses: tracks defense wins', () => {
+    const result = evalSingle('terror_defenses', 10);
+    expect(result.currentValue).toBe(6);
+    expect(result.met).toBe(false);
+  });
+
+  it('terror_depth: tracks max floor depth', () => {
+    const result = evalSingle('terror_depth', 10);
+    expect(result.currentValue).toBe(3);
+    expect(result.met).toBe(false);
+  });
+
+  it('terror_demon_lord: tracks inhabitant presence', () => {
+    const result = evalSingle('terror_demon_lord', 1);
+    expect(result.currentValue).toBe(1);
+    expect(result.met).toBe(true);
+  });
+
+  // Dragon's Hoard
+  it('hoard_gold: tracks gold amount', () => {
+    const result = evalSingle('hoard_gold', 10000);
+    expect(result.currentValue).toBe(5000);
+    expect(result.met).toBe(false);
+  });
+
+  it('hoard_rooms: tracks rooms built count', () => {
+    const result = evalSingle('hoard_rooms', 2);
+    expect(result.currentValue).toBe(1); // Throne Room only
+    expect(result.met).toBe(false);
+  });
+
+  it('hoard_dragon: tracks dragon presence', () => {
+    const result = evalSingle('hoard_dragon', 1);
+    expect(result.currentValue).toBe(1);
+    expect(result.met).toBe(true);
+  });
+
+  it('hoard_peace: tracks peaceful day streak', () => {
+    const result = evalSingle('hoard_peace', 30);
+    expect(result.currentValue).toBe(15);
+    expect(result.met).toBe(false);
+  });
+
+  // Mad Scientist
+  it('scientist_research: tracks research completion', () => {
+    const result = evalSingle('scientist_research', 1);
+    expect(result.currentValue).toBe(0); // not all done
+    expect(result.met).toBe(false);
+  });
+
+  it('scientist_hybrids: tracks unique hybrid count', () => {
+    const result = evalSingle('scientist_hybrids', 5);
+    expect(result.currentValue).toBe(1);
+    expect(result.met).toBe(false);
+  });
+
+  it('scientist_pits: tracks Breeding Pits count', () => {
+    const result = evalSingle('scientist_pits', 3);
+    expect(result.currentValue).toBe(3);
+    expect(result.met).toBe(true);
+  });
+
+  it('scientist_mutants: tracks mutated creature count', () => {
+    const result = evalSingle('scientist_mutants', 5);
+    expect(result.currentValue).toBe(2);
+    expect(result.met).toBe(false);
+  });
+
+  // Harmonious Kingdom
+  it('harmony_corruption: tracks zero-corruption day streak', () => {
+    const result = evalSingle('harmony_corruption', 30);
+    expect(result.currentValue).toBe(10);
+    expect(result.met).toBe(false);
+  });
+
+  it('harmony_population: tracks inhabitant count', () => {
+    const result = evalSingle('harmony_population', 50);
+    expect(result.currentValue).toBe(6);
+    expect(result.met).toBe(false);
+  });
+
+  it('harmony_floors: tracks floor count', () => {
+    const result = evalSingle('harmony_floors', 7);
+    expect(result.currentValue).toBe(3);
+    expect(result.met).toBe(false);
+  });
+
+  it('harmony_reputation: tracks harmony points toward target', () => {
+    const result = evalSingle('harmony_reputation', 700);
+    expect(result.currentValue).toBe(350);
+    expect(result.met).toBe(false);
+  });
+
+  // Eternal Empire
+  it('empire_time: tracks current day', () => {
+    const result = evalSingle('empire_time', 365);
+    expect(result.currentValue).toBe(180);
+    expect(result.met).toBe(false);
+  });
+
+  it('empire_resources: tracks count of positive resources', () => {
+    const result = evalSingle('empire_resources', 6);
+    expect(result.currentValue).toBe(5); // flux is 0
+    expect(result.met).toBe(false);
+  });
+
+  it('empire_unique: tracks unique inhabitant count', () => {
+    const result = evalSingle('empire_unique', 3);
+    expect(result.currentValue).toBe(1); // only Beholder has unique tag in mock
+    expect(result.met).toBe(false);
+  });
+
+  it('empire_rooms: tracks total room count across floors', () => {
+    const result = evalSingle('empire_rooms', 100);
+    expect(result.currentValue).toBe(4);
+    expect(result.met).toBe(false);
   });
 });

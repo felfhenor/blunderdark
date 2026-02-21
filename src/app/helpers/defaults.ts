@@ -147,6 +147,7 @@ export function defaultVictoryProgress(): VictoryProgress {
     consecutiveZeroCorruptionDays: 0,
     lastZeroCorruptionCheckDay: 0,
     totalInvasionDefenseWins: 0,
+    lastEvaluationTick: 0,
   };
 }
 

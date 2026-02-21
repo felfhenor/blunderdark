@@ -43,10 +43,14 @@ export function victoryProcess(state: GameState): void {
   victoryConditionProcessDayTracking(state);
 
   // Only evaluate full victory conditions every N ticks
-  if (state.clock.numTicks % VICTORY_CHECK_INTERVAL !== 0) return;
+  const ticksSinceLastEval =
+    state.clock.numTicks - (state.world.victoryProgress.lastEvaluationTick ?? 0);
+  if (ticksSinceLastEval < VICTORY_CHECK_INTERVAL) return;
 
   // Don't re-evaluate if already won
   if (state.world.victoryProgress.achievedVictoryPathId) return;
+
+  state.world.victoryProgress.lastEvaluationTick = state.clock.numTicks;
 
   const paths =
     contentGetEntriesByType<VictoryPathContent>('victorypath');
@@ -83,15 +87,37 @@ export function victoryCalculatePathCompletionPercent(
     if (!condProgress) continue;
 
     const fraction =
-      cond.target > 0
-        ? Math.min(1, condProgress.currentValue / cond.target)
-        : condProgress.met
+      cond.checkType === 'flag'
+        ? condProgress.met
           ? 1
+          : 0
+        : cond.target > 0
+          ? Math.min(1, condProgress.currentValue / cond.target)
           : 0;
     totalWeight += fraction;
   }
 
   return (totalWeight / path.conditions.length) * 100;
+}
+
+export function victoryEvaluateImmediate(state: GameState): void {
+  if (state.world.victoryProgress.achievedVictoryPathId) {
+    _victoryAchievedPathId.set(state.world.victoryProgress.achievedVictoryPathId);
+    return;
+  }
+
+  const paths =
+    contentGetEntriesByType<VictoryPathContent>('victorypath');
+  if (paths.length === 0) return;
+
+  const newMap = new Map<VictoryPathId, VictoryPathProgress>();
+
+  for (const path of paths) {
+    const progress = victoryConditionEvaluatePath(path, state);
+    newMap.set(path.id, progress);
+  }
+
+  _victoryProgressMap.set(newMap);
 }
 
 export function victoryRecordDefenseWin(state: GameState): void {

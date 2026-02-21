@@ -38,7 +38,7 @@ export type PathCardCondition = VictoryCondition & {
                 <span class="badge badge-accent badge-xs">Victory Available</span>
               }
             </div>
-            <p class="text-xs opacity-60 truncate">{{ description() }}</p>
+            <p class="text-xs opacity-60">{{ description() }}</p>
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
