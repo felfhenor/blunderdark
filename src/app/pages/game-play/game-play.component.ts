@@ -43,7 +43,6 @@ import {
   gridSelectedTile,
   optionsGet,
 } from '@helpers';
-import { gameloopIsPaused } from '@helpers/gameloop';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -53,6 +52,7 @@ import {
   autosaveStop,
 } from '@helpers/autosave';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
+import { gameloopIsPaused } from '@helpers/gameloop';
 import { merchantIsPresent } from '@helpers/merchant';
 import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -94,6 +94,10 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
   host: {
     '(document:keydown.PageUp)': 'navigateFloorUp($event)',
     '(document:keydown.PageDown)': 'navigateFloorDown($event)',
+    '(document:keydown.ArrowUp)': 'navigateFloorUp($event)',
+    '(document:keydown.ArrowDown)': 'navigateFloorDown($event)',
+    '(document:keydown.-)': 'navigateFloorUp($event)',
+    '(document:keydown.=)': 'navigateFloorDown($event)',
   },
 })
 export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
@@ -230,6 +234,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'floors',
         label: 'Floors',
         icon: 'game3dStairs',
+        hotkey: 'f',
         isModal: false,
         templateRef: this.floorsPanel() ?? placeholder,
       },
@@ -237,6 +242,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'time',
         label: 'Time',
         icon: 'gameAlarmClock',
+        hotkey: 't',
         isModal: false,
         templateRef: this.timePanel() ?? placeholder,
       },
@@ -244,6 +250,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'build',
         label: 'Build',
         icon: 'gameGearHammer',
+        hotkey: 'b',
         isModal: false,
         templateRef: this.buildPanel() ?? placeholder,
       },
@@ -251,6 +258,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'roster',
         label: 'Roster',
         icon: 'gameMinions',
+        hotkey: 'r',
         isModal: false,
         templateRef: this.rosterPanel() ?? placeholder,
       },
@@ -258,6 +266,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'reputation',
         label: 'Reputation',
         icon: 'gameCondorEmblem',
+        hotkey: 'p',
         isModal: false,
         templateRef: this.reputationPanel() ?? placeholder,
       },
@@ -265,6 +274,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'altar',
         label: 'Altar',
         icon: 'gameStarAltar',
+        hotkey: 'a',
         isModal: false,
         templateRef: this.altarPanel() ?? placeholder,
       },
@@ -272,6 +282,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'training',
         label: 'Training',
         icon: 'gameSwordClash',
+        hotkey: 'g',
         isModal: false,
         templateRef: this.trainingPanel() ?? placeholder,
         condition: this.hasTrainingGrounds,
@@ -280,6 +291,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'summoning',
         label: 'Summon',
         icon: 'gameMagicGate',
+        hotkey: 's',
         isModal: false,
         templateRef: this.summoningPanel() ?? placeholder,
         condition: this.hasSummoningCircle,
@@ -288,6 +300,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'forge',
         label: 'Forge',
         icon: 'gameAnvilImpact',
+        hotkey: 'd',
         isModal: false,
         templateRef: this.forgePanel() ?? placeholder,
         condition: this.hasDarkForge,
@@ -296,6 +309,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'alchemy',
         label: 'Alchemy',
         icon: 'gameChemicalDrop',
+        hotkey: 'l',
         isModal: false,
         templateRef: this.alchemyPanel() ?? placeholder,
         condition: this.hasAlchemyLab,
@@ -304,6 +318,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'torture',
         label: 'Torture',
         icon: 'gameChoppedSkull',
+        hotkey: 'x',
         isModal: false,
         templateRef: this.torturePanel() ?? placeholder,
         condition: this.hasTortureChamber,
@@ -312,6 +327,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         id: 'merchant',
         label: 'Merchant',
         icon: 'gamePouchWithBeads',
+        hotkey: 'm',
         isModal: false,
         templateRef: this.merchantPanel() ?? placeholder,
         condition: this.isMerchantPresent,
@@ -324,6 +340,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       id: 'research',
       label: 'Research',
       icon: 'gameMaterialsScience',
+      hotkey: 'e',
       iconGlow: this.hasNoActiveResearch,
       isModal: true,
     },
@@ -331,10 +348,17 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       id: 'fusion',
       label: 'Fusion',
       icon: 'gameDuality',
+      hotkey: 'u',
       isModal: true,
       condition: this.canShowFusion,
     },
-    { id: 'victory', label: 'Victory', icon: 'gameChampions', isModal: true },
+    {
+      id: 'victory',
+      label: 'Victory',
+      icon: 'gameChampions',
+      hotkey: 'v',
+      isModal: true,
+    },
   ]);
 
   public onModalTabClick(tabId: string): void {
@@ -369,16 +393,16 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     });
   }
 
-  public navigateFloorUp(event: Event): void {
-    event.preventDefault();
+  public navigateFloorUp(event?: Event): void {
+    event?.preventDefault();
     const currentIdx = floorCurrentIndex();
     if (currentIdx > 0) {
       floorSetCurrentByIndex(currentIdx - 1);
     }
   }
 
-  public navigateFloorDown(event: Event): void {
-    event.preventDefault();
+  public navigateFloorDown(event?: Event): void {
+    event?.preventDefault();
     const currentIdx = floorCurrentIndex();
     const total = floorAll().length;
     if (currentIdx < total - 1) {

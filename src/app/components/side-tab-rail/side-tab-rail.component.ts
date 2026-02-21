@@ -23,6 +23,7 @@ import type { SideTabDefinition } from '@interfaces';
   host: {
     class: 'absolute left-0 top-0 z-30 flex items-start',
     '(document:click)': 'onDocumentClick($event)',
+    '(document:keydown)': 'onKeydown($event)',
   },
 })
 export class SideTabRailComponent {
@@ -62,7 +63,30 @@ export class SideTabRailComponent {
     }
   }
 
+  public onKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+    const tab = this.visibleTabs().find((t) => t.hotkey === key);
+    if (tab) {
+      event.preventDefault();
+      this.onTabClick(tab);
+    }
+  }
+
   public onTabClick(tab: SideTabDefinition): void {
+    if (tab.action) {
+      tab.action();
+      return;
+    }
+
     if (tab.isModal) {
       this.modalTabClick.emit(tab.id);
       return;

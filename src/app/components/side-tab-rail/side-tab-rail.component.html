@@ -5,10 +5,10 @@
   @for (tab of visibleTabs(); track tab.id) {
     <button
       class="tab-btn flex items-center bg-base-200 rounded-lg whitespace-nowrap py-2 px-2 text-xs transition-colors cursor-pointer"
-      [class.bg-primary]="activePanel() === tab.id && !tab.isModal"
-      [class.text-primary-content]="activePanel() === tab.id && !tab.isModal"
-      [class.font-bold]="activePanel() === tab.id && !tab.isModal"
-      [style.opacity]="activePanel() === tab.id && !tab.isModal ? 1 : 0.7"
+      [class.bg-primary]="activePanel() === tab.id && !tab.isModal && !tab.action"
+      [class.text-primary-content]="activePanel() === tab.id && !tab.isModal && !tab.action"
+      [class.font-bold]="activePanel() === tab.id && !tab.isModal && !tab.action"
+      [style.opacity]="activePanel() === tab.id && !tab.isModal && !tab.action ? 1 : 0.7"
       (click)="onTabClick(tab)"
     >
       @if (tab.icon) {
@@ -19,7 +19,12 @@
           [class.icon-glow]="tab.iconGlow?.()"
         />
       }
-      <span class="tab-label ml-2">{{ tab.label }}</span>
+      <span class="tab-label ml-2">
+        {{ tab.label }}
+        @if (tab.hotkey) {
+          <span class="opacity-50">[{{ tab.hotkey.toUpperCase() }}]</span>
+        }
+      </span>
     </button>
   }
 </div>

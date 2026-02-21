@@ -9,4 +9,6 @@ export type SideTabDefinition = {
   condition?: Signal<boolean>;
   isModal: boolean;
   templateRef?: TemplateRef<unknown>;
+  hotkey?: string;
+  action?: () => void;
 };
