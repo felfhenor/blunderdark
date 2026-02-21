@@ -1,23 +1,28 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   model,
+  signal,
 } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
-import {
-  VictoryPathCardComponent,
-  type PathCardCondition,
-} from '@components/victory-path-card/victory-path-card.component';
+import { VictoryConditionRowComponent } from '@components/victory-condition-row/victory-condition-row.component';
 import { contentGetEntriesByType } from '@helpers/content';
 import {
   victoryCalculatePathCompletionPercent,
   victoryProgressMap,
 } from '@helpers/victory';
 import type {
+  VictoryCondition,
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces';
+
+type PathCardCondition = VictoryCondition & {
+  currentValue: number;
+  met: boolean;
+};
 
 type PathViewModel = {
   id: VictoryPathId;
@@ -31,7 +36,7 @@ type PathViewModel = {
 
 @Component({
   selector: 'app-victory-menu',
-  imports: [ModalComponent, VictoryPathCardComponent],
+  imports: [DecimalPipe, ModalComponent, VictoryConditionRowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal
@@ -43,22 +48,72 @@ type PathViewModel = {
       <div title class="text-lg">Victory Paths</div>
 
       <div body>
-        <p class="text-xs opacity-60 mb-3">
-          Pursue any of these paths to achieve victory. Expand a path to see detailed conditions.
-        </p>
-
-        <div class="space-y-2">
+        <div role="tablist" class="tabs tabs-bordered tabs-sm mb-3">
           @for (path of paths(); track path.id) {
-            <app-victory-path-card
-              [name]="path.name"
-              [description]="path.description"
-              [conditions]="path.conditions"
-              [completionPercent]="path.completionPercent"
-              [isClosest]="path.isClosest"
-              [isComplete]="path.isComplete"
-            />
+            <button
+              role="tab"
+              class="tab gap-1.5"
+              [class.tab-active]="selectedPath()?.id === path.id"
+              (click)="selectedPathId.set(path.id)"
+            >
+              <span class="truncate text-xs">{{ path.name }}</span>
+              <div
+                class="radial-progress"
+                [style.--value]="path.completionPercent"
+                [style.--size]="'1.25rem'"
+                [style.--thickness]="'2px'"
+                [class.text-success]="path.isComplete"
+                [class.text-primary]="!path.isComplete"
+                role="progressbar"
+              >
+                <span class="text-[0.45rem]">
+                  {{ path.completionPercent | number: '1.0-0' }}%
+                </span>
+              </div>
+            </button>
           }
         </div>
+
+        @if (selectedPath(); as path) {
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <h4 class="font-bold text-sm">{{ path.name }}</h4>
+              @if (path.isClosest) {
+                <span class="badge badge-success badge-xs">Closest</span>
+              }
+              @if (path.isComplete) {
+                <span class="badge badge-accent badge-xs">
+                  Victory Available
+                </span>
+              }
+              <div
+                class="radial-progress text-xs ml-auto"
+                [style.--value]="path.completionPercent"
+                [style.--size]="'2.5rem'"
+                [style.--thickness]="'3px'"
+                [class.text-success]="path.isComplete"
+                [class.text-primary]="!path.isComplete"
+                role="progressbar"
+              >
+                <span class="text-[0.6rem]">
+                  {{ path.completionPercent | number: '1.0-0' }}%
+                </span>
+              </div>
+            </div>
+            <p class="text-xs opacity-60 mb-3">{{ path.description }}</p>
+
+            @for (cond of path.conditions; track cond.id) {
+              <app-victory-condition-row
+                [description]="cond.description"
+                [currentValue]="cond.currentValue"
+                [target]="cond.target"
+                [met]="cond.met"
+                [checkType]="cond.checkType"
+                [hint]="conditionHint(cond)"
+              />
+            }
+          </div>
+        }
       </div>
 
       <div actions>
@@ -71,12 +126,10 @@ type PathViewModel = {
 })
 export class VictoryMenuComponent {
   public visible = model<boolean>(false);
+  public selectedPathId = signal<VictoryPathId | null>(null);
 
   public paths = computed<PathViewModel[]>(() => {
-    const allPaths =
-      contentGetEntriesByType<VictoryPathContent>(
-        'victorypath',
-      );
+    const allPaths = contentGetEntriesByType<VictoryPathContent>('victorypath');
     const progressMap = victoryProgressMap();
 
     const viewModels: PathViewModel[] = allPaths.map((path) => {
@@ -108,7 +161,6 @@ export class VictoryMenuComponent {
       };
     });
 
-    // Find the max completion percent and mark closest paths
     const maxPercent = Math.max(
       0,
       ...viewModels.map((p) => p.completionPercent),
@@ -123,4 +175,28 @@ export class VictoryMenuComponent {
 
     return viewModels;
   });
+
+  public selectedPath = computed(() => {
+    const id = this.selectedPathId();
+    const allPaths = this.paths();
+    if (id !== null) {
+      return allPaths.find((p) => p.id === id) ?? null;
+    }
+    return allPaths.find((p) => p.isClosest) ?? allPaths[0] ?? null;
+  });
+
+  public conditionHint(cond: PathCardCondition): string {
+    if (cond.met) return 'Condition complete!';
+
+    switch (cond.checkType) {
+      case 'resource_threshold':
+        return `Accumulate resources to reach ${cond.target}. Current: ${cond.currentValue}.`;
+      case 'count':
+        return `Reach a count of ${cond.target}. Current: ${cond.currentValue}.`;
+      case 'duration':
+        return `Maintain for ${cond.target} consecutive days. Current streak: ${cond.currentValue}.`;
+      case 'flag':
+        return 'Complete this objective to check it off.';
+    }
+  }
 }
