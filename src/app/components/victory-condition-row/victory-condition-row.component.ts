@@ -5,9 +5,9 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { TippyDirective } from '@ngneat/helipopper';
 import { IconComponent } from '@components/icon/icon.component';
 import type { VictoryCheckType } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-victory-condition-row',
@@ -21,11 +21,8 @@ import type { VictoryCheckType } from '@interfaces';
       [tpDelay]="250"
       tpClassName="game-tooltip"
     >
-      <span
-        class="text-base flex-shrink-0"
-        [class.text-success]="met()"
-      >
-        {{ met() ? '\u2714' : '\u2610' }}
+      <span class="text-base flex-shrink-0" [class.text-success]="met()">
+        {{ met() ? '✔' : '☐' }}
       </span>
 
       <div class="flex-1 min-w-0">
@@ -42,7 +39,9 @@ import type { VictoryCheckType } from '@interfaces';
         }
       </div>
 
-      <span class="text-xs font-mono opacity-60 flex-shrink-0 whitespace-nowrap">
+      <span
+        class="text-xs font-mono opacity-60 flex-shrink-0 whitespace-nowrap w-[150px] text-right"
+      >
         @if (checkType() === 'flag') {
           @if (met()) {
             <app-icon name="tablerCheck" class="text-success" />
@@ -50,7 +49,8 @@ import type { VictoryCheckType } from '@interfaces';
             <app-icon name="tablerX" class="text-error" />
           }
         } @else {
-          {{ currentValue() | number: '1.0-0' }} / {{ target() | number: '1.0-0' }}
+          {{ currentValue() | number: '1.0-0' }} /
+          {{ target() | number: '1.0-0' }}
         }
       </span>
     </div>

@@ -57,19 +57,13 @@ type PathViewModel = {
               (click)="selectedPathId.set(path.id)"
             >
               <span class="truncate text-xs">{{ path.name }}</span>
-              <div
-                class="radial-progress"
-                [style.--value]="path.completionPercent"
-                [style.--size]="'1.25rem'"
-                [style.--thickness]="'2px'"
+              <span
+                class="text-xs opacity-70"
                 [class.text-success]="path.isComplete"
                 [class.text-primary]="!path.isComplete"
-                role="progressbar"
               >
-                <span class="text-[0.45rem]">
-                  {{ path.completionPercent | number: '1.0-0' }}%
-                </span>
-              </div>
+                {{ path.completionPercent | number: '1.0-0' }}%
+              </span>
             </button>
           }
         </div>
