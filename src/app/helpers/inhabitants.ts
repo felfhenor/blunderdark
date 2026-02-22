@@ -1,5 +1,4 @@
 import { computed, type Signal } from '@angular/core';
-import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { productionGetRoomDefinition } from '@helpers/production';
@@ -239,11 +238,6 @@ export async function inhabitantAssignToRoom(
       roomFloor = floor;
       break;
     }
-  }
-
-  // Check connectivity — room must be reachable from the Altar Room
-  if (roomFloor && !connectivityIsRoomConnected(roomId, roomFloor, state.world.floors)) {
-    return { success: false, error: 'Room is not connected to the Altar Room' };
   }
 
   const check = inhabitantCanAssignToRoom(
