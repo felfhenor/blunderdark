@@ -32,6 +32,25 @@ import type {
   ValidationResult,
 } from '@interfaces/room-placement';
 
+/** Maximum number of a single room type that can be built across the entire dungeon. */
+export const MAX_ROOMS_PER_TYPE = 20;
+
+/**
+ * Count how many rooms of a given type exist across all floors in the dungeon.
+ */
+export function roomPlacementCountTypeAllFloors(
+  floors: Floor[],
+  roomTypeId: RoomId,
+): number {
+  let count = 0;
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (room.roomTypeId === roomTypeId) count++;
+    }
+  }
+  return count;
+}
+
 export function roomPlacementValidateBounds(
   shape: RoomShapeContent,
   anchorX: number,
@@ -316,6 +335,18 @@ export async function roomPlacementExecute(
   const biomeCheck = biomeRestrictionCanBuild(roomTypeId, floor.biome, floor);
   if (!biomeCheck.allowed) {
     return { success: false, error: biomeCheck.reason };
+  }
+
+  // Check global per-type limit
+  if (!roomDef.isUnique) {
+    const allFloors = gamestate().world.floors;
+    const totalCount = roomPlacementCountTypeAllFloors(allFloors, roomTypeId);
+    if (totalCount >= MAX_ROOMS_PER_TYPE) {
+      return {
+        success: false,
+        error: `${roomDef.name} is limited to ${MAX_ROOMS_PER_TYPE} across the dungeon (${totalCount}/${MAX_ROOMS_PER_TYPE})`,
+      };
+    }
   }
 
   if (!resourceCanAfford(roomDef.cost)) {

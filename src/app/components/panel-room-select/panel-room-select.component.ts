@@ -7,6 +7,7 @@ import {
   contentGetEntriesByType,
   floorAll,
   floorCurrent,
+  gamestate,
   hallwayPlacementCanAfford,
   hallwayPlacementConfirm,
   hallwayPlacementEnter,
@@ -19,6 +20,7 @@ import {
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   resourceCanAfford,
+  roomPlacementCountTypeAllFloors,
   roomPlacementEnterMode,
   roomPlacementExitMode,
   roomPlacementPlacedTypeIds,
@@ -27,6 +29,7 @@ import {
   roomPlacementSelectedTypeId,
   roomShapeGet,
   roomShapeGetRotated,
+  MAX_ROOMS_PER_TYPE,
 } from '@helpers';
 import {
   transportPlacementActive,
@@ -121,6 +124,23 @@ export class PanelRoomSelectComponent {
       return `${info.currentCount}/${info.maxCount}`;
     }
     return undefined;
+  }
+
+  public isAtGlobalLimit(room: RoomContent): boolean {
+    if (room.isUnique) return false;
+    const floors = gamestate().world.floors;
+    const count = roomPlacementCountTypeAllFloors(floors, room.id as RoomId);
+    return count >= MAX_ROOMS_PER_TYPE;
+  }
+
+  public getGlobalLimitLabel(room: RoomContent): string | undefined {
+    if (room.isUnique) return undefined;
+    // Skip if this room already has a biome limit label (avoid double badge)
+    if (this.getBiomeLimitLabel(room)) return undefined;
+    const floors = gamestate().world.floors;
+    const count = roomPlacementCountTypeAllFloors(floors, room.id as RoomId);
+    if (count === 0) return undefined;
+    return `${count}/${MAX_ROOMS_PER_TYPE}`;
   }
 
   public getRoomShapeForPreview(

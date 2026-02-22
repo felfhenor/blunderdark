@@ -157,6 +157,7 @@
             isHallwayMode() ||
             isUniqueAndPlaced(room) ||
             isBiomeRestricted(room) ||
+            isAtGlobalLimit(room) ||
             !hasAltar()
           "
           [tp]="
@@ -164,9 +165,11 @@
               ? getBiomeRestrictionTooltip(room)
               : isUniqueAndPlaced(room)
                 ? 'Already built (unique room)'
-                : !hasAltar()
-                  ? 'Requires Altar'
-                  : ''
+                : isAtGlobalLimit(room)
+                  ? 'Maximum built across dungeon'
+                  : !hasAltar()
+                    ? 'Requires Altar'
+                    : ''
           "
           (click)="selectRoom(room)"
         >
@@ -176,6 +179,9 @@
             </span>
             @if (getBiomeLimitLabel(room); as limitLabel) {
               <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
+            }
+            @if (getGlobalLimitLabel(room); as globalLabel) {
+              <span class="badge badge-sm badge-outline">{{ globalLabel }}</span>
             }
             <div
               class="shape-preview"
