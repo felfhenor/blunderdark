@@ -84,6 +84,9 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 @Component({
   selector: 'app-resource-bar-top',
   imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyCostComponent, CurrencyNameComponent, TippyDirective],
+  host: {
+    class: 'block pointer-events-auto',
+  },
   templateUrl: './resource-bar-top.component.html',
   styleUrl: './resource-bar-top.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

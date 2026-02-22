@@ -12,6 +12,9 @@ import type { ResourceType } from '@interfaces';
 @Component({
   selector: 'app-currency-name',
   imports: [IconComponent, DecimalPipe],
+  host: {
+    class: 'inline-flex items-center gap-1 align-baseline',
+  },
   template: `
     <app-icon [name]="icon()" [color]="color()" />
     @if (short()) {
@@ -21,13 +24,6 @@ import type { ResourceType } from '@interfaces';
     }
   `,
   styles: `
-    :host {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      vertical-align: baseline;
-    }
-
     :host ::ng-deep svg {
       paint-order: stroke fill;
       stroke: black;

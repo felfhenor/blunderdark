@@ -16,9 +16,12 @@ import type { MoraleEvent } from '@interfaces/morale';
 @Component({
   selector: 'app-morale-bar',
   imports: [NgClass],
+  host: {
+    class: 'block pointer-events-auto',
+  },
   template: `
     @if (isVisible()) {
-      <div class="morale-container">
+      <div class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200">
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
           <span class="text-xs font-mono" [ngClass]="valueLabelClass()">
@@ -27,7 +30,7 @@ import type { MoraleEvent } from '@interfaces/morale';
         </div>
 
         <div
-          class="morale-bar-wrapper"
+          class="relative cursor-default"
           (mouseenter)="showLog.set(true)"
           (mouseleave)="showLog.set(false)"
         >
@@ -52,7 +55,7 @@ import type { MoraleEvent } from '@interfaces/morale';
         }
 
         @if (showLog() && eventLog().length > 0) {
-          <div class="morale-log">
+          <div class="morale-log absolute bottom-full left-0 z-100 min-w-[220px] max-w-[300px] max-h-[200px] overflow-y-auto p-3 mb-1 rounded-lg">
             <div class="text-xs font-semibold mb-1">Morale Log</div>
             @for (evt of eventLog(); track $index) {
               <div class="flex justify-between text-xs gap-2">
@@ -74,28 +77,8 @@ import type { MoraleEvent } from '@interfaces/morale';
     }
   `,
   styles: `
-    :host {
-      display: block;
-      pointer-events: auto;
-    }
-
     .morale-container {
-      width: 280px;
-      padding: 0.375rem 0.5rem;
       background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
-      backdrop-filter: blur(4px);
-      border-radius: 0.5rem;
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-
-    .morale-bar-wrapper {
-      position: relative;
-      cursor: default;
     }
 
     .morale-float-text {
@@ -103,19 +86,8 @@ import type { MoraleEvent } from '@interfaces/morale';
     }
 
     .morale-log {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      z-index: 100;
-      min-width: 220px;
-      max-width: 300px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 0.75rem;
-      margin-bottom: 0.25rem;
       background: oklch(var(--b3));
       border: 1px solid oklch(var(--bc) / 0.15);
-      border-radius: 0.5rem;
       box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);
     }
 

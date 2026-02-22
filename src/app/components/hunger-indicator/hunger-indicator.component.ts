@@ -18,10 +18,13 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-hunger-indicator',
   imports: [NgClass, TippyDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'inline-block relative',
+  },
   template: `
     @if (shouldShow()) {
       <span
-        class="hunger-badge text-xs font-bold"
+        class="inline-flex items-center px-1 rounded leading-3.5 whitespace-nowrap cursor-default text-xs font-bold"
         [ngClass]="hungerClass()"
         [tp]="hungerTip"
         [tpDelay]="250"
@@ -45,25 +48,6 @@ import { TippyDirective } from '@ngneat/helipopper';
   `,
   styles: [
     `
-      :host {
-        display: inline-block;
-        position: relative;
-      }
-
-      .hunger-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0 3px;
-        border-radius: 3px;
-        line-height: 14px;
-        white-space: nowrap;
-        cursor: default;
-      }
-
-      .hunger-normal {
-        display: none;
-      }
-
       .hunger-hungry {
         background-color: oklch(var(--wa));
         color: oklch(var(--wac, 0.9 0.05 80));

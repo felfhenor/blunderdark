@@ -19,7 +19,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-stat-name',
   imports: [IconComponent, DecimalPipe, TippyDirective],
   host: {
-    class: 'text-base',
+    class: 'inline-flex items-center gap-1 align-baseline text-base',
   },
   template: `
     <app-icon [name]="icon()" [color]="color()" [tp]="description()" [tpDelay]="250" tpClassName="game-tooltip" />
@@ -30,13 +30,6 @@ import { TippyDirective } from '@ngneat/helipopper';
     }
   `,
   styles: `
-    :host {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      vertical-align: baseline;
-    }
-
     :host ::ng-deep svg {
       paint-order: stroke fill;
       stroke: black;

@@ -14,10 +14,14 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-fear-indicator',
   imports: [TippyDirective, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'inline-block relative',
+  },
   template: `
     @if (fearLevel() > 0) {
       <span
-        [ngClass]="['fear-badge', 'text-xs', 'font-bold', fearClass()]"
+        class="inline-flex items-center px-1 rounded leading-3.5 whitespace-nowrap cursor-default text-xs font-bold"
+        [ngClass]="fearClass()"
         [tp]="fearTip"
         [tpDelay]="250"
       >
@@ -65,7 +69,7 @@ import { TippyDirective } from '@ngneat/helipopper';
               </div>
             }
           }
-          <hr class="fear-divider" />
+          <hr class="my-1 border-base-content/20" />
           <div class="text-xs opacity-60">{{ fearEffect() }}</div>
         }
       </ng-template>
@@ -73,21 +77,6 @@ import { TippyDirective } from '@ngneat/helipopper';
   `,
   styles: [
     `
-      :host {
-        display: inline-block;
-        position: relative;
-      }
-
-      .fear-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0 3px;
-        border-radius: 3px;
-        line-height: 14px;
-        white-space: nowrap;
-        cursor: default;
-      }
-
       .fear-low {
         background-color: var(--color-success);
         color: var(--color-success-content);
@@ -106,11 +95,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       .fear-very-high {
         background-color: var(--color-error);
         color: var(--color-error-content);
-      }
-
-      .fear-divider {
-        border-color: var(--color-base-content / 0.2);
-        margin: 4px 0;
       }
     `,
   ],

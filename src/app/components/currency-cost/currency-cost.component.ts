@@ -7,7 +7,7 @@ import type { ResourceType } from '@interfaces';
   imports: [CurrencyNameComponent],
   template: `<app-currency-name [type]="type()" [short]="true" [amount]="amount()" />`,
   host: {
-    style: 'display: inline-flex; align-items: center;',
+    class: 'inline-flex items-center',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -11,7 +11,7 @@ import type { ResourceCost, ResourceType } from '@interfaces';
     }
   `,
   host: {
-    style: 'display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap;',
+    class: 'inline-flex items-center gap-1 flex-wrap',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

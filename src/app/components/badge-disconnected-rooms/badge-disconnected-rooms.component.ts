@@ -12,7 +12,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     '[class.hidden]': 'disconnectedInfo().totalCount === 0',
   },
   template: `
-    <span class="disconnected-badge text-xs font-semibold" [tp]="tooltipTpl" tpPlacement="bottom">
+    <span class="disconnected-badge px-1.5 rounded whitespace-nowrap text-error text-xs font-semibold" [tp]="tooltipTpl" tpPlacement="bottom">
       {{ disconnectedInfo().totalCount }} room{{
         disconnectedInfo().totalCount > 1 ? 's' : ''
       }}
@@ -33,21 +33,9 @@ import { TippyDirective } from '@ngneat/helipopper';
     </ng-template>
   `,
   styles: `
-    :host {
-      display: inline;
-    }
-
-    :host.hidden {
-      display: none;
-    }
-
     .disconnected-badge {
-      padding: 0 0.375rem;
-      border-radius: 0.25rem;
-      color: var(--color-error);
       background: color-mix(in oklch, var(--color-error) 15%, transparent);
       border: 1px solid color-mix(in oklch, var(--color-error) 40%, transparent);
-      white-space: nowrap;
       animation: disconnected-flash 1.5s ease-in-out infinite;
     }
 
