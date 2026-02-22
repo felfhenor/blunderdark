@@ -646,10 +646,16 @@ export class GridComponent implements AfterViewInit {
         if (!result.success && result.error) {
           notifyError(result.error);
         }
+        if (result.success) {
+          transportPlacementExit();
+        }
       } else if (type === 'stair') {
         const result = await transportStairExecute(x, y);
         if (!result.success && result.error) {
           notifyError(result.error);
+        }
+        if (result.success) {
+          transportPlacementExit();
         }
       }
       return;
@@ -668,6 +674,9 @@ export class GridComponent implements AfterViewInit {
         const result = await roomPlacementExecute(x, y);
         if (!result.success && result.error) {
           notifyError(result.error);
+        }
+        if (result.success) {
+          roomPlacementExitMode();
         }
       }
       return;

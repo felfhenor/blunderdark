@@ -7,6 +7,7 @@ import {
   inject,
   signal,
   TemplateRef,
+  untracked,
   viewChild,
   type OnInit,
 } from '@angular/core';
@@ -42,6 +43,7 @@ import {
   floorSetCurrentByIndex,
   gridSelectedTile,
   optionsGet,
+  roomPlacementSelectedTypeId,
 } from '@helpers';
 import {
   autosaveEvent$,
@@ -57,6 +59,7 @@ import { merchantIsPresent } from '@helpers/merchant';
 import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { gamestate } from '@helpers/state-game';
+import { transportPlacementActive } from '@helpers/transport-placement';
 import type { SideTabDefinition } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
@@ -113,6 +116,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public isAutosaving = autosaveIsSaving;
 
   public activePanel = signal<string | undefined>(undefined);
+  private buildPanelClosedForPlacement = false;
 
   private placeholderPanel = viewChild('placeholderPanel', {
     read: TemplateRef,
@@ -207,6 +211,23 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       const tabId = this.selectedRoomTabId();
       if (tabId) {
         this.activePanel.set(tabId);
+      }
+    });
+
+    // Close build panel when entering placement mode; reopen when exiting
+    effect(() => {
+      const roomActive = !!roomPlacementSelectedTypeId();
+      const transportActive = transportPlacementActive();
+      const anyPlacementActive = roomActive || transportActive;
+
+      if (anyPlacementActive) {
+        if (untracked(() => this.activePanel()) === 'build') {
+          this.buildPanelClosedForPlacement = true;
+        }
+        this.activePanel.set(undefined);
+      } else if (this.buildPanelClosedForPlacement) {
+        this.buildPanelClosedForPlacement = false;
+        this.activePanel.set('build');
       }
     });
 
