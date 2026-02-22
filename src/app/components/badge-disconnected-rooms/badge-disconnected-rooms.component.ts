@@ -12,7 +12,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     '[class.hidden]': 'disconnectedInfo().totalCount === 0',
   },
   template: `
-    <span class="disconnected-badge" [tp]="tooltipTpl" tpPlacement="bottom">
+    <span class="disconnected-badge text-xs font-semibold" [tp]="tooltipTpl" tpPlacement="bottom">
       {{ disconnectedInfo().totalCount }} room{{
         disconnectedInfo().totalCount > 1 ? 's' : ''
       }}
@@ -42,8 +42,6 @@ import { TippyDirective } from '@ngneat/helipopper';
     }
 
     .disconnected-badge {
-      font-size: 0.65rem;
-      font-weight: 600;
       padding: 0 0.375rem;
       border-radius: 0.25rem;
       color: var(--color-error);

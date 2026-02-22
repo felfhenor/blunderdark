@@ -21,7 +21,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   template: `
     @if (shouldShow()) {
       <span
-        class="hunger-badge"
+        class="hunger-badge text-xs font-bold"
         [ngClass]="hungerClass()"
         [tp]="hungerTip"
         [tpDelay]="250"
@@ -53,8 +53,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       .hunger-badge {
         display: inline-flex;
         align-items: center;
-        font-size: 9px;
-        font-weight: 700;
         padding: 0 3px;
         border-radius: 3px;
         line-height: 14px;

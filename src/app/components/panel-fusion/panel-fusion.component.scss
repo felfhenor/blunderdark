@@ -47,7 +47,6 @@
 .stats-row {
   display: flex;
   gap: 6px;
-  font-size: 10px;
   font-family: monospace;
   opacity: 0.7;
 }
@@ -84,7 +83,6 @@
 
 .stat-up {
   color: var(--color-success);
-  font-weight: 700;
 }
 
 .stat-down {

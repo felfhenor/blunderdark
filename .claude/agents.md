@@ -212,6 +212,7 @@ All room-specific systems follow the same pattern:
 - **Keyboard shortcuts**: `@ngneat/hotkeys` with `[hotkeys]`, `isGlobal`, `(hotkey)`
 - **Build mode mutual exclusion**: each mode has enter/exit signals; `enterX()` calls `exitY()` (one-way imports to avoid circular deps)
 - **Gap values must be multiples of 2** — use `gap-2`, `gap-4`, `gap-6`, etc. Never use odd values like `gap-1`, `gap-3`, `gap-5`
+- **Use Tailwind font sizes and weights on DOM elements** — never use arbitrary `font-size` or `font-weight` in CSS/SCSS. Instead, apply Tailwind utility classes (`text-xs`, `text-sm`, `text-base`, `text-lg`, `font-normal`, `font-semibold`, `font-bold`, etc.) directly on the HTML element. This keeps typography trackable in templates rather than buried in stylesheets. Exception: responsive media queries in global SCSS may use the rem equivalents (e.g. `font-size: 0.875rem`) with a `/* text-sm */` comment. Icon sizes are also exempt.
 - **Section dividers** — section headers within cards/panels use the daisyUI divider pattern: `<div class="divider my-2 text-xs opacity-60">Label</div>`. Remove trailing colons from labels. Do NOT use `<h4>` with `font-semibold opacity-70 mb-1` for section dividers.
 - **Icons over entities/emoji** — use `<app-icon name="tablerXxx" />` (`IconComponent`) instead of HTML entities (`&check;`, `&times;`, etc.) or emoji. Available icons are registered in `ICON_ALL` (`src/app/helpers/icons.ts`). If unsure which icon to use, ask the user.
 

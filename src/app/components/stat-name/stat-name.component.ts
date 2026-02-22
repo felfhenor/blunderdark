@@ -18,6 +18,9 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-stat-name',
   imports: [IconComponent, DecimalPipe, TippyDirective],
+  host: {
+    class: 'text-base',
+  },
   template: `
     <app-icon [name]="icon()" [color]="color()" [tp]="description()" [tpDelay]="250" tpClassName="game-tooltip" />
     @if (value() !== undefined) {
@@ -32,7 +35,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       align-items: center;
       gap: 4px;
       vertical-align: baseline;
-      font-size: 1rem;
     }
 
     :host ::ng-deep svg {

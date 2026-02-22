@@ -92,7 +92,7 @@
     <!-- Stats row -->
     @if (showStats()) {
       <div class="flex items-center justify-between mt-0.5">
-        <div class="stats-row text-sm">
+        <div class="stats-row text-xs">
           <app-stat-name type="hp" [value]="definition().stats.hp" />
           <app-stat-name type="attack" [value]="definition().stats.attack" />
           <app-stat-name type="defense" [value]="definition().stats.defense" />
@@ -101,6 +101,7 @@
             <span
               [class.stat-high]="definition().stats.workerEfficiency > 1.0"
               [class.stat-low]="definition().stats.workerEfficiency < 1.0"
+              [class.font-bold]="definition().stats.workerEfficiency > 1.0"
             >
               <app-stat-name
                 type="workerEfficiency"

@@ -41,11 +41,11 @@
           (mouseenter)="onTileHover(colIdx, rowIdx)"
         >
           @if (isRoomAnchor(colIdx, rowIdx, tile.roomId) && !getTransportInfo(colIdx, rowIdx)) {
-            <span class="room-label" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)" [style.--room-label-level]="getRoomLabelLevel(tile.roomId)">{{ getRoomName(tile.roomId) }}@if (getAssignmentInfo(tile.roomId); as info) {<span class="assignment-inline" [class.status-full]="info.status === 'full'" [class.status-partial]="info.status === 'partial'" [class.status-empty]="info.status === 'empty'"> ({{ info.current | number:'1.0-2' }}/{{ info.max === -1 ? '\u221E' : info.max }})</span>}</span>
+            <span class="room-label text-xs font-bold" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)" [style.--room-label-level]="getRoomLabelLevel(tile.roomId)">{{ getRoomName(tile.roomId) }}@if (getAssignmentInfo(tile.roomId); as info) {<span class="assignment-inline font-normal" [class.status-full]="info.status === 'full'" [class.status-partial]="info.status === 'partial'" [class.status-empty]="info.status === 'empty'"> ({{ info.current | number:'1.0-2' }}/{{ info.max === -1 ? '\u221E' : info.max }})</span>}</span>
             <app-fear-indicator class="fear-grid-badge" [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)" [roomId]="tile.roomId!" />
             @if (getFeatureInfo(tile.roomId); as fInfo) {
               <span
-                class="feature-indicator"
+                class="feature-indicator text-xs font-bold"
                 [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)"
                 [tp]="fInfo.names.join(', ')"
                 [tpDelay]="250"
@@ -84,19 +84,19 @@
             @if (tInfo.type === 'stair') {
               <div class="stair-indicator">
                 <span class="stair-arrow">{{ tInfo.connectsToFloors[0] > 0 ? '&#9660;' : '&#9650;' }}</span>
-                <span class="stair-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+                <span class="stair-label text-xs font-bold">F{{ tInfo.connectsToFloors.join(',') }}</span>
               </div>
             }
             @if (tInfo.type === 'elevator') {
               <div class="elevator-indicator">
                 <span class="elevator-icon">&#8661;</span>
-                <span class="elevator-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+                <span class="elevator-label text-xs font-bold">F{{ tInfo.connectsToFloors.join(',') }}</span>
               </div>
             }
             @if (tInfo.type === 'portal') {
               <div class="portal-indicator">
                 <span class="portal-icon">&#10022;</span>
-                <span class="portal-label">F{{ tInfo.connectsToFloors.join(',') }}</span>
+                <span class="portal-label text-xs font-bold">F{{ tInfo.connectsToFloors.join(',') }}</span>
               </div>
             }
           }
@@ -106,7 +106,7 @@
   </div>
 
   <button
-    class="camera-reset-btn btn btn-xs btn-ghost"
+    class="camera-reset-btn text-xs btn btn-xs btn-ghost"
     (click)="onResetCamera()"
     title="Reset Camera (Home)"
   >

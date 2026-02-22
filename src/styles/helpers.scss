@@ -53,13 +53,7 @@
 
 @media (max-width: 1365px) {
   .card-page-container {
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 1199px) {
-  .card-page-container {
-    font-size: 0.9rem;
+    font-size: 0.875rem; /* text-sm */
   }
 }
 

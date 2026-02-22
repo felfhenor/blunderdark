@@ -290,7 +290,7 @@ export class PanelFusionComponent {
   }
 
   public getDeltaClass(delta: number): string {
-    if (delta > 0) return 'stat-up';
+    if (delta > 0) return 'stat-up font-bold';
     if (delta < 0) return 'stat-down';
     return '';
   }

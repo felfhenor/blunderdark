@@ -17,7 +17,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   template: `
     @if (fearLevel() > 0) {
       <span
-        [ngClass]="['fear-badge', fearClass()]"
+        [ngClass]="['fear-badge', 'text-xs', 'font-bold', fearClass()]"
         [tp]="fearTip"
         [tpDelay]="250"
       >
@@ -81,8 +81,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       .fear-badge {
         display: inline-flex;
         align-items: center;
-        font-size: 9px;
-        font-weight: 700;
         padding: 0 3px;
         border-radius: 3px;
         line-height: 14px;

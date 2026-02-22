@@ -104,6 +104,7 @@
               <span
                 [class.stat-high]="entry.def.stats.workerEfficiency > 1.0"
                 [class.stat-low]="entry.def.stats.workerEfficiency < 1.0"
+                [class.font-bold]="entry.def.stats.workerEfficiency > 1.0"
               >
                 <app-stat-name
                   type="workerEfficiency"

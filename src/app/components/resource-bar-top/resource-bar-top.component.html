@@ -1,7 +1,7 @@
 <div class="resource-bar-top">
   @for (res of resources; track res.type) {
     <div
-      class="resource-chip"
+      class="resource-chip text-xs"
       [class.text-success]="res.type !== 'corruption' && isFull(res.type)"
       [tp]="resourceTip"
       tpPlacement="bottom"
