@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
 import { contentGetEntriesByType } from '@helpers/content';
 import { floorCurrent } from '@helpers/floor';
@@ -17,6 +17,7 @@ import type {
 } from '@interfaces';
 import type { TransportGroupId, TransportType } from '@interfaces/room-shape';
 import type { RoomContent } from '@interfaces/content-room';
+import { GRID_SIZE } from '@interfaces/grid';
 
 // --- Placement mode state ---
 
@@ -29,11 +30,62 @@ export const transportPortalSourceFloorDepth = signal<number | undefined>(undefi
 export const transportPortalSourcePosition = signal<{ x: number; y: number } | undefined>(undefined);
 export const transportPortalTargetFloorDepth = signal<number | undefined>(undefined);
 
+// --- Preview state ---
+
+export const transportPlacementPreviewPosition = signal<{ x: number; y: number } | undefined>(undefined);
+
+export function transportPlacementUpdatePreviewPosition(x: number, y: number): void {
+  if (!transportPlacementActive()) return;
+  transportPlacementPreviewPosition.set({ x, y });
+}
+
+export function transportPlacementClearPreviewPosition(): void {
+  transportPlacementPreviewPosition.set(undefined);
+}
+
+export const transportPlacementPreview = computed(() => {
+  const active = transportPlacementActive();
+  const position = transportPlacementPreviewPosition();
+  if (!active || !position) return undefined;
+
+  const { x, y } = position;
+  const inBounds = x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+  if (!inBounds) return undefined;
+
+  const floor = floorCurrent();
+  if (!floor) return undefined;
+
+  const tile = floor.grid[y]?.[x];
+  if (!tile) return undefined;
+
+  const type = transportPlacementType();
+  const state = gamestate();
+  let valid = !tile.occupied;
+
+  if (valid && (type === 'stair' || type === 'elevator')) {
+    // Must also have an adjacent floor with the same tile unoccupied
+    const belowFloor = state.world.floors.find((f) => f.depth === floor.depth + 1);
+    const aboveFloor = state.world.floors.find((f) => f.depth === floor.depth - 1);
+    const targetFloor = belowFloor ?? aboveFloor;
+    if (!targetFloor) {
+      valid = false;
+    } else {
+      const targetTile = targetFloor.grid[y]?.[x];
+      if (!targetTile || targetTile.occupied) {
+        valid = false;
+      }
+    }
+  }
+
+  return { x, y, valid };
+});
+
 export function transportPlacementEnter(type: TransportType): void {
   roomPlacementExitMode();
   hallwayPlacementExit();
   transportPlacementActive.set(true);
   transportPlacementType.set(type);
+  transportPlacementPreviewPosition.set(undefined);
   if (type === 'portal') {
     transportPortalStep.set('selectSource');
     transportPortalSourceFloorDepth.set(undefined);
@@ -45,6 +97,7 @@ export function transportPlacementEnter(type: TransportType): void {
 export function transportPlacementExit(): void {
   transportPlacementActive.set(false);
   transportPlacementType.set(undefined);
+  transportPlacementPreviewPosition.set(undefined);
   transportPortalStep.set('selectSource');
   transportPortalSourceFloorDepth.set(undefined);
   transportPortalSourcePosition.set(undefined);

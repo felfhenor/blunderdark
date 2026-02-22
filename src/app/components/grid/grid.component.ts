@@ -55,6 +55,9 @@ import {
   transportPlacementActive,
   transportPlacementType,
   transportPlacementExit,
+  transportPlacementUpdatePreviewPosition,
+  transportPlacementClearPreviewPosition,
+  transportPlacementPreview,
   transportStairExecute,
   transportElevatorExecute,
   transportPortalExecute,
@@ -608,12 +611,16 @@ export class GridComponent implements AfterViewInit {
 
   public isPreviewValid(x: number, y: number): boolean {
     const data = this.previewTileSet();
-    return data !== undefined && data.valid && data.set.has(`${x},${y}`);
+    if (data !== undefined && data.valid && data.set.has(`${x},${y}`)) return true;
+    const tp = this.transportPreview();
+    return tp !== undefined && tp.valid && tp.x === x && tp.y === y;
   }
 
   public isPreviewInvalid(x: number, y: number): boolean {
     const data = this.previewTileSet();
-    return data !== undefined && !data.valid && data.set.has(`${x},${y}`);
+    if (data !== undefined && !data.valid && data.set.has(`${x},${y}`)) return true;
+    const tp = this.transportPreview();
+    return tp !== undefined && !tp.valid && tp.x === x && tp.y === y;
   }
 
   public async onTileClick(x: number, y: number): Promise<void> {
@@ -692,18 +699,23 @@ export class GridComponent implements AfterViewInit {
   public onTileHover(x: number, y: number): void {
     if (roomPlacementPreviewShape()) {
       roomPlacementUpdatePreviewPosition(x, y);
+    } else if (transportPlacementActive()) {
+      transportPlacementUpdatePreviewPosition(x, y);
     }
   }
 
   public onGridLeave(): void {
     if (roomPlacementPreviewShape()) {
       roomPlacementClearPreviewPosition();
+    } else if (transportPlacementActive()) {
+      transportPlacementClearPreviewPosition();
     }
   }
 
   public isHallwayMode = hallwayPlacementIsBuildMode;
   public isTransportMode = transportPlacementActive;
   public transportType = transportPlacementType;
+  public transportPreview = transportPlacementPreview;
   public portalStep = transportPortalStep;
   private hallwayPathSet = hallwayPlacementPreviewTileSet;
 
