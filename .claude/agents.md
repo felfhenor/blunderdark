@@ -8,6 +8,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **NEVER hardcode content UUIDs in TypeScript.** Use `roomRoleFindById(role)` for special rooms, data fields on `RoomContent` for behavior, `contentGetEntriesByType()` for querying. In spec files, define test-local UUID constants.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()`.
 - **Always use branded ID types, never plain `string`.** Define via `type MyId = Branded<string, 'MyId'>` in interface files. Cast at creation points: `rngUuid<HallwayId>()`, `'test-id' as PlacedRoomId`.
+- **Use named types instead of bracket notation.** Never use indexed access types like `GameState['world']['floors']` or `Floor['grid']` when a named type exists. Use the real type directly: `Floor[]`, `GridState`, `GameId`, `BiomeType`, `ResourceMap`, `PlacedRoom`, etc. The generic `GameOptions[T]` pattern is acceptable since `T` is a type parameter.
 - **NEVER export types from `src/app/helpers/`** — all types live in `src/app/interfaces/`, exported from the barrel (`index.ts`). Interface files may import other interfaces but NEVER from `@helpers/`.
 - **Content types use `Content` suffix** — gamedata-backed types in `content-*.ts` are named `XContent` (e.g., `RoomContent`, `InhabitantContent`). The old `XDefinition` suffix is no longer used. Runtime types (instances, state) remain without `Content` suffix.
 - **Do NOT import `@helpers/notify` in testable helpers** — causes circular deps through barrel exports. Return data and let components call notify.
