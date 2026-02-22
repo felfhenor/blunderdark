@@ -1,6 +1,7 @@
 import type {
   Floor,
   FloorId,
+  GridState,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -213,7 +214,7 @@ function makeFloor(
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
-    grid: { tiles: [] } as unknown as Floor['grid'],
+    grid: { tiles: [] } as unknown as GridState,
     rooms,
     hallways: [],
     inhabitants,

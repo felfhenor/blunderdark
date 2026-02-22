@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GameState, SaveData, SaveSlotId } from '@interfaces';
+import type { Floor, GameId, GameState, ResourceMap, SaveData, SaveSlotId } from '@interfaces';
 import {
   SAVE_SLOT_IDS,
   SAVE_SLOT_MANUAL_IDS,
@@ -52,7 +52,7 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
     checksum: 'v1:abc',
     gameState: {
       meta: { version: 1, isSetup: true, isPaused: false, createdAt: 1000000 },
-      gameId: 'test-dungeon' as GameState['gameId'],
+      gameId: 'test-dungeon' as GameId,
       clock: {
         numTicks: 500,
         lastSaveTick: 490,
@@ -62,7 +62,7 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
       },
       world: {
         grid: { tiles: [], width: 0, height: 0 },
-        resources: {} as GameState['world']['resources'],
+        resources: {} as ResourceMap,
         inhabitants: [],
         hallways: [],
         season: {
@@ -113,7 +113,7 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
             connections: [],
             traps: [],
           },
-        ] as unknown as GameState['world']['floors'],
+        ] as unknown as Floor[],
         currentFloorIndex: 0,
         trapInventory: [],
         trapCraftingQueues: [],

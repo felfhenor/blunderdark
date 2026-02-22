@@ -1,7 +1,9 @@
 import type {
   Floor,
   FloorId,
+  GameId,
   GameState,
+  GridState,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
@@ -171,7 +173,7 @@ function makeFloor(
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
-    grid: { tiles: [] } as unknown as Floor['grid'],
+    grid: { tiles: [] } as unknown as GridState,
     rooms,
     hallways: [],
     inhabitants,
@@ -187,10 +189,10 @@ function makeGameState(overrides: {
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
     world: {
-      grid: [] as unknown as GameState['world']['grid'],
+      grid: [] as unknown as GridState,
       resources: {
         crystals: { current: 100, max: 500 },
         food: { current: 100, max: 500 },

@@ -1,11 +1,15 @@
 import type {
+  Floor,
+  GameId,
   GameState,
   InhabitantContent,
+  InvasionHistoryEntry,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
+  ReputationState,
   RoomId,
   VictoryConditionProgress,
   VictoryPathContent,
@@ -126,7 +130,7 @@ function makeState(overrides: Partial<{
   research: number;
   essence: number;
   inhabitants: InhabitantInstance[];
-  floors: GameState['world']['floors'];
+  floors: Floor[];
   day: number;
   defenseWins: number;
   peacefulDays: number;
@@ -134,12 +138,12 @@ function makeState(overrides: Partial<{
   zeroCorruptionDays: number;
   lastZeroCorruptionDay: number;
   completedResearch: string[];
-  invasionHistory: GameState['world']['invasionSchedule']['invasionHistory'];
-  reputation: GameState['world']['reputation'];
+  invasionHistory: InvasionHistoryEntry[];
+  reputation: ReputationState;
 }>): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test' as GameState['gameId'],
+    gameId: 'test' as GameId,
     clock: {
       numTicks: 0,
       lastSaveTick: 0,
@@ -262,7 +266,7 @@ describe('Terror Lord conditions', () => {
         floors: [
           { id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
           { id: 'f10', name: 'Floor 10', depth: 10, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-        ] as unknown as GameState['world']['floors'],
+        ] as unknown as Floor[],
       });
       const result = victoryConditionCheckFloorDepth(state, 10);
       expect(result.met).toBe(true);
@@ -273,7 +277,7 @@ describe('Terror Lord conditions', () => {
       const state = makeState({
         floors: [
           { id: 'f1', name: 'Floor 1', depth: 5, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-        ] as unknown as GameState['world']['floors'],
+        ] as unknown as Floor[],
       });
       const result = victoryConditionCheckFloorDepth(state, 10);
       expect(result.met).toBe(false);
@@ -334,7 +338,7 @@ describe("Dragon's Hoard conditions", () => {
             makeRoom(TEST_DRAGONS_HOARD_ID),
           ],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as unknown as GameState['world']['floors'],
+        }] as unknown as Floor[],
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
@@ -351,7 +355,7 @@ describe("Dragon's Hoard conditions", () => {
           id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
           rooms: [makeRoom(TEST_THRONE_ROOM_ID)],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as unknown as GameState['world']['floors'],
+        }] as unknown as Floor[],
       });
       const result = victoryConditionCheckRoomsBuilt(
         state,
@@ -480,7 +484,7 @@ describe('Mad Scientist conditions', () => {
             makeRoom(TEST_BREEDING_PITS_ID, { id: 'r3' as PlacedRoomId }),
           ],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as unknown as GameState['world']['floors'],
+        }] as unknown as Floor[],
       });
       const result = victoryConditionCheckRoomCountByName(
         state,
@@ -498,7 +502,7 @@ describe('Mad Scientist conditions', () => {
           id: 'f1', name: 'Floor 1', depth: 1, biome: 'neutral', grid: [],
           rooms: [makeRoom(TEST_BREEDING_PITS_ID)],
           hallways: [], inhabitants: [], connections: [], traps: [],
-        }] as unknown as GameState['world']['floors'],
+        }] as unknown as Floor[],
       });
       const result = victoryConditionCheckRoomCountByName(
         state,
@@ -608,7 +612,7 @@ describe('Harmonious Kingdom conditions', () => {
       const floors = Array.from({ length: 7 }, (_, i) => ({
         id: `f${i}`, name: `Floor ${i + 1}`, depth: i + 1, biome: 'neutral',
         grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [],
-      })) as unknown as GameState['world']['floors'];
+      })) as unknown as Floor[];
       const state = makeState({ floors });
       const result = victoryConditionCheckFloorCount(state, 7);
       expect(result.met).toBe(true);
@@ -739,7 +743,7 @@ describe('Eternal Empire conditions', () => {
           ),
           hallways: [], inhabitants: [], connections: [], traps: [],
         },
-      ] as unknown as GameState['world']['floors'];
+      ] as unknown as Floor[];
       const state = makeState({ floors });
       const result = victoryConditionCheckTotalRoomCount(state, 100);
       expect(result.met).toBe(true);
@@ -823,7 +827,7 @@ describe('victoryConditionEvaluatePath', () => {
       defenseWins: 10,
       floors: [
         { id: 'f10', name: 'Floor 10', depth: 10, biome: 'neutral', grid: [], rooms: [], hallways: [], inhabitants: [], connections: [], traps: [] },
-      ] as unknown as GameState['world']['floors'],
+      ] as unknown as Floor[],
       inhabitants: [makeInhabitant(TEST_DEMON_LORD_ID)],
     });
     const path: VictoryPathContent = {
@@ -915,7 +919,7 @@ describe('All conditions track partial progress via victoryConditionEvaluateSing
         rooms: [],
         hallways: [], inhabitants: [], connections: [], traps: [],
       },
-    ] as unknown as GameState['world']['floors'],
+    ] as unknown as Floor[],
     completedResearch: [TEST_RESEARCH_A],
     reputation: { terror: 100, wealth: 200, knowledge: 150, harmony: 350, chaos: 50 },
   });

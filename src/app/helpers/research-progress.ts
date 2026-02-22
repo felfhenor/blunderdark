@@ -6,6 +6,7 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import type {
+  Floor,
   GameState,
   ResearchId,
   ResearchContent,
@@ -143,7 +144,7 @@ export async function researchCancel(): Promise<boolean> {
  * Returns the total multiplier: base * (1 + sum of bonuses).
  */
 export function researchCalculateSpeedModifier(
-  floors: GameState['world']['floors'],
+  floors: Floor[],
 ): number {
   let bonus = 0;
 

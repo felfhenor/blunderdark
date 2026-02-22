@@ -1,7 +1,10 @@
 import type {
   Floor,
   FloorId,
+  GameId,
   GameState,
+  GameStateWorld,
+  GridState,
   InhabitantInstance,
   IsContentItem,
   PlacedRoom,
@@ -156,7 +159,7 @@ function makeFloor(
     name: 'Floor 1',
     depth: 1,
     biome: 'neutral',
-    grid: { tiles: [] } as unknown as Floor['grid'],
+    grid: { tiles: [] } as unknown as GridState,
     rooms,
     hallways: [],
     inhabitants,
@@ -184,7 +187,7 @@ function makeResearchState(
   };
 }
 
-function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
+function makeGameState(overrides: Partial<GameStateWorld> = {}): GameState {
   return {
     meta: {
       version: 1,
@@ -192,7 +195,7 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
       isPaused: false,
       createdAt: Date.now(),
     },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 100,
       lastSaveTick: 0,
@@ -201,7 +204,7 @@ function makeGameState(overrides: Partial<GameState['world']> = {}): GameState {
       minute: 0,
     },
     world: {
-      grid: { tiles: [] } as unknown as GameState['world']['grid'],
+      grid: { tiles: [] } as unknown as GridState,
       resources: {
         crystals: { current: 100, max: 500 },
         food: { current: 50, max: 500 },

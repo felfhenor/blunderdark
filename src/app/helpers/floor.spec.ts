@@ -12,7 +12,7 @@ import {
   floorMigrate,
   floorRemove,
 } from '@helpers/floor';
-import type { Floor, FloorId } from '@interfaces';
+import type { Floor, FloorId, GridState, Hallway, InhabitantInstance, PlacedRoom } from '@interfaces';
 import type { RoomId } from '@interfaces/content-room';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -284,9 +284,9 @@ describe('floorCreate', () => {
 describe('floorMigrate', () => {
   it('should create floor from top-level world data when floors is missing', () => {
     const world = {
-      grid: [['saved-grid']] as unknown as Floor['grid'],
-      hallways: [{ id: 'h1' }] as unknown as Floor['hallways'],
-      inhabitants: [{ instanceId: 'i1' }] as unknown as Floor['inhabitants'],
+      grid: [['saved-grid']] as unknown as GridState,
+      hallways: [{ id: 'h1' }] as unknown as Hallway[],
+      inhabitants: [{ instanceId: 'i1' }] as unknown as InhabitantInstance[],
     };
 
     const result = floorMigrate(world);
@@ -401,7 +401,7 @@ describe('floorCanChangeBiome', () => {
       id: 'floor-1' as FloorId,
       biome: 'neutral',
       rooms: [
-        { roomTypeId: 'room-lake' as RoomId } as Floor['rooms'][0],
+        { roomTypeId: 'room-lake' as RoomId } as PlacedRoom,
       ],
     });
     mockGamestate.mockReturnValue({
@@ -468,7 +468,7 @@ describe('floorCanRemove', () => {
           makeFloor({
             id: 'floor-2' as FloorId,
             depth: 2,
-            rooms: [{ roomTypeId: 'room-1' } as Floor['rooms'][0]],
+            rooms: [{ roomTypeId: 'room-1' } as PlacedRoom],
           }),
         ],
         currentFloorIndex: 0,

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GameState, InhabitantId, InhabitantInstance, InhabitantInstanceId } from '@interfaces';
+import type { GameId, GameState, InhabitantId, InhabitantInstance, InhabitantInstanceId, ResourceMap } from '@interfaces';
 import {
   HUNGER_RECOVERY_RATE,
   HUNGER_TICKS_PER_HOUR,
@@ -29,7 +29,7 @@ vi.mock('@helpers/state-modifiers', () => ({
   stateModifierGetFoodConsumptionMultiplier: vi.fn(() => 1.0),
 }));
 
-let mockResourceMap: GameState['world']['resources'];
+let mockResourceMap: ResourceMap;
 
 vi.mock('@helpers/resources', () => ({
   resourceAdd: vi.fn((type: string, amount: number) => {
@@ -75,7 +75,7 @@ function makeGameState(overrides: {
 
   const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
     world: {
       grid: { tiles: [], width: 0, height: 0 },

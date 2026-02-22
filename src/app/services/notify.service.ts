@@ -10,7 +10,10 @@ import {
   researchUnlock$,
 } from '@helpers';
 import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
-import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
+import type {
+  CorruptionEffectEvent,
+  CorruptionEffectEventType,
+} from '@interfaces/corruption-effect';
 import type { ReputationLevelUpEvent } from '@interfaces/reputation';
 import { getUnlockTargetId } from '@interfaces/research';
 import { LoggerService } from '@services/logger.service';
@@ -60,7 +63,7 @@ export class NotifyService {
   }
 
   private showCorruptionEffect(event: CorruptionEffectEvent): void {
-    const titles: Record<CorruptionEffectEvent['type'], string> = {
+    const titles: Record<CorruptionEffectEventType, string> = {
       dark_upgrade_unlocked: 'Dark Upgrades Unlocked',
       mutation_applied: 'Corruption Mutation',
       crusade_triggered: 'Crusade Triggered',

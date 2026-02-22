@@ -4,6 +4,7 @@ import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { trapAddToInventory } from '@helpers/traps';
 import type {
+  Floor,
   GameState,
   PlacedRoom,
   PlacedRoomId,
@@ -115,7 +116,7 @@ export function trapWorkshopRemoveJob(
 
 export function trapWorkshopCanQueue(
   roomId: PlacedRoomId,
-  floors: GameState['world']['floors'],
+  floors: Floor[],
 ): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);

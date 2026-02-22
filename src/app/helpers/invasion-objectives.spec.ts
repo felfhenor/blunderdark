@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import type { GameState, InvasionObjectiveId } from '@interfaces';
+import type { GameId, GameState, InvasionObjectiveId } from '@interfaces';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
   invasionObjectiveAssign,
@@ -98,7 +98,7 @@ function makeGameState(overrides: {
 
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: { numTicks: 0, lastSaveTick: 0, day: 50, hour: 0, minute: 0 },
     world: {
       grid: { tiles: [], width: 0, height: 0 },

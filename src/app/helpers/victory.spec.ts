@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type {
+  GameId,
   GameState,
   VictoryConditionProgress,
   VictoryPathContent,
@@ -86,7 +87,7 @@ function makeState(overrides: {
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test' as GameState['gameId'],
+    gameId: 'test' as GameId,
     clock: {
       numTicks: overrides.numTicks ?? 0,
       lastSaveTick: 0,

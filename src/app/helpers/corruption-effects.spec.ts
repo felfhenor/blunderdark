@@ -1,6 +1,7 @@
 import { defaultCorruptionEffectState, defaultInvasionSchedule, defaultResources } from '@helpers/defaults';
 import type {
   CorruptionEffectState,
+  GameId,
   GameState,
   InhabitantId,
   InhabitantInstance,
@@ -67,7 +68,7 @@ function makeGameState(overrides: {
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 0,
       lastSaveTick: 0,

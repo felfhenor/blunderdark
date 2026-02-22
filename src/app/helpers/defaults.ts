@@ -2,6 +2,7 @@ import { gridCreateEmpty } from '@helpers/grid';
 import { rngUuid } from '@helpers/rng';
 import type {
   CorruptionEffectState,
+  BiomeType,
   Floor,
   FloorId,
   GameId,
@@ -103,7 +104,7 @@ export function defaultUnlockedContent(): UnlockedContent {
  */
 export function defaultFloor(
   depth = 1,
-  biome: Floor['biome'] = 'neutral',
+  biome: BiomeType = 'neutral',
 ): Floor {
   return {
     id: rngUuid<FloorId>(),

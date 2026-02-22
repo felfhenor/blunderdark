@@ -12,6 +12,7 @@ import type {
   AlchemyConversion,
   AlchemyRecipeContent,
   AlchemyRecipeId,
+  Floor,
   GameState,
   PlacedRoom,
   PlacedRoomId,
@@ -160,7 +161,7 @@ export function alchemyLabStopConversion(
 
 export function alchemyLabCanConvert(
   roomId: PlacedRoomId,
-  floors: GameState['world']['floors'],
+  floors: Floor[],
 ): { canConvert: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);

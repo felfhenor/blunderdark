@@ -6,6 +6,7 @@ import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
+  Floor,
   ForgeCraftingJob,
   ForgeCraftingQueue,
   ForgeInventoryEntry,
@@ -194,7 +195,7 @@ export function darkForgeAddToInventory(
 
 export function darkForgeCanQueue(
   roomId: PlacedRoomId,
-  floors: GameState['world']['floors'],
+  floors: Floor[],
   queues: ForgeCraftingQueue[],
 ): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {

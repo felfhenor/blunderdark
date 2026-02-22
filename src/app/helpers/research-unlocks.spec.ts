@@ -1,8 +1,11 @@
 import type {
   CombatAbilityId,
+  GameId,
   GameState,
+  GridState,
   IsContentItem,
   ResearchContent,
+  ResourceMap,
   UnlockEffect,
   UnlockedContent,
   UpgradePathId,
@@ -87,11 +90,11 @@ function makeGameState(
 ): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
     world: {
-      grid: [] as unknown as GameState['world']['grid'],
-      resources: {} as GameState['world']['resources'],
+      grid: [] as unknown as GridState,
+      resources: {} as ResourceMap,
       inhabitants: [],
       hallways: [],
       season: { currentSeason: 'growth', dayInSeason: 1, totalSeasonCycles: 0 },

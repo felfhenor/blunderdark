@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { MerchantTradeId } from '@interfaces/content-merchanttrade';
-import type { GameState, MerchantState, MerchantTradeContent } from '@interfaces';
+import type { GameId, GameState, MerchantState, MerchantTradeContent } from '@interfaces';
 import { contentGetEntriesByType } from '@helpers/content';
 import {
   merchantGenerateInventory,
@@ -78,7 +78,7 @@ function makeGameState(overrides: {
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 0,
       lastSaveTick: 0,

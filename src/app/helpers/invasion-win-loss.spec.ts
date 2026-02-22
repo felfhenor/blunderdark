@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { InvasionId, InvasionObjectiveId, InvaderInstanceId, InvaderId } from '@interfaces';
+import type { InvasionId, InvasionObjectiveId, InvaderInstanceId, InvaderId, ObjectiveType } from '@interfaces';
 import type { InvasionState } from '@interfaces/invasion';
 import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
@@ -81,7 +81,7 @@ function makePrimaryObjective(completed = false): InvasionObjective {
 }
 
 function makeSecondaryObjective(
-  type: InvasionObjective['type'],
+  type: ObjectiveType,
   completed = false,
 ): InvasionObjective {
   return {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import seedrandom from 'seedrandom';
-import type { GameState, InvasionSchedule } from '@interfaces';
+import type { GameId, GameState, InvasionSchedule, ResourceMap } from '@interfaces';
 import type { GameTime } from '@interfaces/game-time';
 import {
   invasionTriggerGetInterval,
@@ -42,7 +42,7 @@ function makeGameState(overrides: {
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 0,
       lastSaveTick: 0,
@@ -52,7 +52,7 @@ function makeGameState(overrides: {
     },
     world: {
       grid: { tiles: [], width: 0, height: 0 },
-      resources: {} as GameState['world']['resources'],
+      resources: {} as ResourceMap,
       inhabitants: [],
       hallways: [],
       season: {

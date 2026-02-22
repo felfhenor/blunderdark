@@ -4,6 +4,7 @@ import type {
   AlchemyRecipeId,
   Floor,
   FloorId,
+  GameId,
   GameState,
   InhabitantId,
   InhabitantInstance,
@@ -199,7 +200,7 @@ function makeGameState(overrides?: {
 }): GameState {
   const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: { numTicks: 100, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
     world: {
       grid: [],

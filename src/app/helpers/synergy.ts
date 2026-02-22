@@ -15,7 +15,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { SynergyContent } from '@interfaces/content-synergy';
-import type { PotentialSynergy } from '@interfaces/synergy';
+import type { PotentialSynergy, SynergyEffect } from '@interfaces/synergy';
 
 export function synergyGetDefinitions(): SynergyContent[] {
   return contentGetEntriesByType<SynergyContent>('synergy');
@@ -227,7 +227,7 @@ export function synergyGetPotentialForRoom(
 }
 
 export function synergyFormatEffect(
-  effect: SynergyContent['effects'][0],
+  effect: SynergyEffect,
 ): string {
   if (effect.type === 'productionBonus') {
     const pct = Math.round(effect.value * 100);

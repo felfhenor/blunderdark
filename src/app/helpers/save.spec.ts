@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { GameState, SaveData, SaveMigrationResult } from '@interfaces';
+import type { GameId, GameState, SaveData, SaveMigrationResult } from '@interfaces';
 import {
   SAVE_FORMAT_VERSION,
   saveSerialize,
@@ -37,7 +37,7 @@ vi.mock('@helpers/logging', () => ({
 function makeGameState(overrides?: Partial<GameState>): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 1000000 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 500,
       lastSaveTick: 490,
@@ -192,7 +192,7 @@ describe('saveSerialize', () => {
   });
 
   it('should serialize provided state instead of signal', () => {
-    const gs = makeGameState({ gameId: 'custom' as GameState['gameId'] });
+    const gs = makeGameState({ gameId: 'custom' as GameId });
 
     const result = saveSerialize(gs);
 
@@ -332,7 +332,7 @@ describe('saveComputeChecksum', () => {
 
     const saveData2 = makeSaveData(
       makeGameState({
-        gameId: 'different-game' as GameState['gameId'],
+        gameId: 'different-game' as GameId,
       }),
     );
     saveData2.checksum = '';

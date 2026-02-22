@@ -222,13 +222,16 @@ vi.mock('@helpers/resources', () => ({
 import type {
   Floor,
   FloorId,
+  GameId,
   GameState,
+  GridState,
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
+  ResourceMap,
   RoomShapeId,
 } from '@interfaces';
 import {
@@ -737,7 +740,7 @@ function makeFloor(
     name: 'Floor 1',
     depth: 0,
     biome: 'neutral',
-    grid: { tiles: [] } as unknown as Floor['grid'],
+    grid: { tiles: [] } as unknown as GridState,
     rooms,
     hallways: [],
     inhabitants,
@@ -748,15 +751,15 @@ function makeFloor(
 
 function makeGameState(
   floors: Floor[],
-  resources?: Partial<GameState['world']['resources']>,
+  resources?: Partial<ResourceMap>,
 ): GameState {
   const defaultResource = { current: 0, max: 1000 };
   const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test' as GameState['gameId'],
+    gameId: 'test' as GameId,
     clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
     world: {
-      grid: { tiles: [] } as unknown as GameState['world']['grid'],
+      grid: { tiles: [] } as unknown as GridState,
       resources: {
         crystals: { ...defaultResource },
         food: { ...defaultResource },

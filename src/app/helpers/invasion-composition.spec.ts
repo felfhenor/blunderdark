@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type {
   CompositionWeightConfig,
   DungeonProfile,
+  GameId,
   GameState,
   InvasionId,
   InvaderId,
@@ -149,7 +150,7 @@ function makeGameState(overrides: {
 
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
-    gameId: 'test-game' as GameState['gameId'],
+    gameId: 'test-game' as GameId,
     clock: {
       numTicks: 0,
       lastSaveTick: 0,
