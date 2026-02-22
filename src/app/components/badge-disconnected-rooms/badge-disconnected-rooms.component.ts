@@ -1,8 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { altarRoomFind } from '@helpers/altar-room';
 import { connectivityGetDisconnectedRoomIds, gamestate } from '@helpers';
 import { contentGetEntry } from '@helpers/content';
+import { verticalTransportFloorsAreConnected } from '@helpers/vertical-transport';
 import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
+
+type DisconnectedFloorEntry = {
+  floorName: string;
+  entireFloor: boolean;
+  roomCount: number;
+  roomNames: string[];
+};
 
 @Component({
   selector: 'app-badge-disconnected-rooms',
@@ -21,12 +30,16 @@ import { TippyDirective } from '@ngneat/helipopper';
 
     <ng-template #tooltipTpl>
       @for (entry of disconnectedInfo().perFloor; track entry.floorName) {
-        <strong>{{ entry.floorName }}</strong>
-        <ul>
-          @for (name of entry.roomNames; track name) {
-            <li>{{ name }}</li>
-          }
-        </ul>
+        @if (entry.entireFloor) {
+          <strong>{{ entry.floorName }}</strong> disconnected ({{ entry.roomCount }} room{{ entry.roomCount > 1 ? 's' : '' }})
+        } @else {
+          <strong>{{ entry.floorName }}</strong>
+          <ul>
+            @for (name of entry.roomNames; track name) {
+              <li>{{ name }}</li>
+            }
+          </ul>
+        }
 
         <br />
       }
@@ -50,24 +63,46 @@ export class BadgeDisconnectedRoomsComponent {
   public disconnectedInfo = computed(() => {
     const state = gamestate();
     const floors = state.world.floors;
+    const altar = altarRoomFind(floors);
+    const altarDepth = altar?.floor.depth;
     let totalCount = 0;
-    const perFloor: Array<{ floorName: string; roomNames: string[] }> = [];
+    const perFloor: DisconnectedFloorEntry[] = [];
 
     for (const floor of floors) {
       const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
       if (disconnected.size === 0) continue;
       totalCount += disconnected.size;
 
-      const roomNames: string[] = [];
-      for (const room of floor.rooms) {
-        if (disconnected.has(room.id)) {
-          const def = contentGetEntry<RoomContent>(room.roomTypeId);
-          const baseName = def?.name ?? 'Unknown Room';
-          roomNames.push(room.suffix ? `${baseName} ${room.suffix}` : baseName);
-        }
-      }
+      const noTransport =
+        altarDepth === undefined ||
+        !verticalTransportFloorsAreConnected(floors, altarDepth, floor.depth);
 
-      perFloor.push({ floorName: floor.name, roomNames });
+      if (noTransport) {
+        perFloor.push({
+          floorName: floor.name,
+          entireFloor: true,
+          roomCount: disconnected.size,
+          roomNames: [],
+        });
+      } else {
+        const roomNames: string[] = [];
+        for (const room of floor.rooms) {
+          if (disconnected.has(room.id)) {
+            const def = contentGetEntry<RoomContent>(room.roomTypeId);
+            const baseName = def?.name ?? 'Unknown Room';
+            roomNames.push(
+              room.suffix ? `${baseName} ${room.suffix}` : baseName,
+            );
+          }
+        }
+
+        perFloor.push({
+          floorName: floor.name,
+          entireFloor: false,
+          roomCount: disconnected.size,
+          roomNames,
+        });
+      }
     }
 
     return { totalCount, perFloor };
