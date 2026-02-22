@@ -203,6 +203,21 @@
     background: radial-gradient(circle, oklch(0.4 0.2 300), oklch(0.25 0.15 280)) !important;
   }
 
+  &.disconnected::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      oklch(0.4 0.18 25 / 0.45),
+      oklch(0.4 0.18 25 / 0.45) 3px,
+      transparent 3px,
+      transparent 9px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
   &.border-edge-top {
     border-top: 2px solid var(--room-border-color);
   }
