@@ -67,7 +67,6 @@ app-game {
   --border: 0;
 }
 
-// Fix 3: Respect users who prefer reduced motion
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -78,16 +77,16 @@ app-game {
   }
 }
 
-// Fix 1: Pause all CSS animations when game is paused
-body.game-paused *,
-body.game-paused *::before,
-body.game-paused *::after {
+// Scoped to app-root so the ngx-toastr overlay (a sibling of app-root
+// appended directly to <body>) is not affected.
+body.game-paused app-root *,
+body.game-paused app-root *::before,
+body.game-paused app-root *::after {
   animation-play-state: paused !important;
 }
 
-// Fix 4: Pause animations when tab is not visible
-body.tab-hidden *,
-body.tab-hidden *::before,
-body.tab-hidden *::after {
+body.tab-hidden app-root *,
+body.tab-hidden app-root *::before,
+body.tab-hidden app-root *::after {
   animation-play-state: paused !important;
 }

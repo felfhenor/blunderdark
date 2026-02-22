@@ -210,12 +210,12 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       }
     });
 
-    // Fix 1: Pause CSS animations when game is paused to avoid idle CPU usage
+    // Pause CSS animations when game is paused to reduce idle CPU
     effect(() => {
       document.body.classList.toggle('game-paused', gameloopIsPaused());
     });
 
-    // Fix 4: Pause CSS animations when tab is not visible
+    // Pause CSS animations when tab is not visible
     const onVisibilityChange = () => {
       document.body.classList.toggle('tab-hidden', document.hidden);
     };
