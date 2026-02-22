@@ -7,6 +7,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import {
+  connectivityDisconnectedRoomIds,
   inhabitantAssignToRoom,
   inhabitantAll,
   efficiencyCalculateRoom,
@@ -97,6 +98,12 @@ export class PanelRoomInfoComponent {
       placedRoom: room,
       maxInhabitants: effectiveMax,
     };
+  });
+
+  public isDisconnected = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    return connectivityDisconnectedRoomIds().has(room.id);
   });
 
   public transportInfo = computed(() => {

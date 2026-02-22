@@ -1,7 +1,9 @@
+import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
+  Floor,
   PlacedRoom,
   PlacedRoomId,
 } from '@interfaces';
@@ -16,13 +18,21 @@ export function assignmentCanAssignToRoom(roomId: PlacedRoomId): AssignmentValid
   const state = gamestate();
 
   let placedRoom: PlacedRoom | undefined;
+  let roomFloor: Floor | undefined;
   for (const floor of state.world.floors) {
     placedRoom = floor.rooms.find((r) => r.id === roomId);
-    if (placedRoom) break;
+    if (placedRoom) {
+      roomFloor = floor;
+      break;
+    }
   }
 
-  if (!placedRoom) {
+  if (!placedRoom || !roomFloor) {
     return { allowed: false, reason: 'Room not found', currentCount: 0, maxCapacity: 0 };
+  }
+
+  if (!connectivityIsRoomConnected(roomId, roomFloor, state.world.floors)) {
+    return { allowed: false, reason: 'Room is not connected to the Altar Room', currentCount: 0, maxCapacity: 0 };
   }
 
   const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);

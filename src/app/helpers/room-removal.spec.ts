@@ -34,6 +34,17 @@ vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetPaths: () => [],
 }));
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+    const ids = new Set<string>();
+    for (const room of floor.rooms) { ids.add(room.id); }
+    return ids;
+  },
+  connectivityGetDisconnectedRoomIds: () => new Set<string>(),
+  connectivityIsRoomConnected: () => true,
+  connectivityUnassignDisconnectedInhabitants: vi.fn(async () => {}),
+}));
+
 // --- Test shapes ---
 
 const square2x2: RoomShapeContent = {

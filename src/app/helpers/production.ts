@@ -1,5 +1,9 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import {
+  connectivityGetConnectedRoomIds,
+  connectivityGetDisconnectedRoomIds,
+} from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import {
   dayNightCalculateCreatureProductionModifier,
@@ -137,12 +141,17 @@ export function productionCalculateAdjacencyBonus(
 export function productionGetActiveAdjacencyBonuses(
   placedRoom: PlacedRoom,
   floor: Floor,
+  floors?: Floor[],
 ): ActiveAdjacencyBonus[] {
   const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   if (!roomDef) return [];
 
   const bonusRules = roomDef.adjacencyBonuses;
   if (bonusRules.length === 0) return [];
+
+  const connectedIds = floors
+    ? connectivityGetConnectedRoomIds(floor, floors)
+    : undefined;
 
   const roomTiles = new Map<string, TileOffset[]>();
   for (const room of floor.rooms) {
@@ -158,6 +167,7 @@ export function productionGetActiveAdjacencyBonuses(
 
   for (const other of floor.rooms) {
     if (other.id === placedRoom.id) continue;
+    if (connectedIds && !connectedIds.has(other.id)) continue;
     const otherTiles = roomTiles.get(other.id) ?? [];
     if (!adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) continue;
 
@@ -198,6 +208,8 @@ export function productionCalculateTotal(
   const totalProduction: RoomProduction = {};
 
   for (const floor of floors) {
+    const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
+
     const roomTiles = new Map<string, TileOffset[]>();
     for (const room of floor.rooms) {
       const shape = roomShapeResolve(room);
@@ -208,6 +220,8 @@ export function productionCalculateTotal(
     }
 
     for (const room of floor.rooms) {
+      if (!connectedIds.has(room.id)) continue;
+
       const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef) continue;
 
@@ -223,6 +237,7 @@ export function productionCalculateTotal(
       const adjacentRoomIds: string[] = [];
       for (const other of floor.rooms) {
         if (other.id === room.id) continue;
+        if (!connectedIds.has(other.id)) continue;
         const otherTiles = roomTiles.get(other.id) ?? [];
         if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
           adjacentRoomIds.push(other.id);
@@ -326,7 +341,14 @@ export function productionCalculateSingleRoom(
   floor: Floor,
   hour?: number,
   season?: Season,
+  floors?: Floor[],
 ): RoomProduction {
+  // If floors provided, check connectivity
+  if (floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
+    if (disconnected.has(room.id)) return {};
+  }
+
   const roomDef = productionGetRoomDefinition(room.roomTypeId);
   if (!roomDef) return {};
 
@@ -344,10 +366,15 @@ export function productionCalculateSingleRoom(
     roomTiles.set(r.id, roomShapeGetAbsoluteTiles(shape, r.anchorX, r.anchorY));
   }
 
+  const connectedIds = floors
+    ? connectivityGetConnectedRoomIds(floor, floors)
+    : undefined;
+
   const thisTiles = roomTiles.get(room.id) ?? [];
   const adjacentRoomIds: string[] = [];
   for (const other of floor.rooms) {
     if (other.id === room.id) continue;
+    if (connectedIds && !connectedIds.has(other.id)) continue;
     const otherTiles = roomTiles.get(other.id) ?? [];
     if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
       adjacentRoomIds.push(other.id);
@@ -455,6 +482,7 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
         floor,
         state.clock.hour,
         state.world.season.currentSeason,
+        state.world.floors,
       );
     }
   }
@@ -469,6 +497,8 @@ export function productionCalculateBreakdowns(
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
 
   for (const floor of floors) {
+    const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
+
     const roomTiles = new Map<string, TileOffset[]>();
     for (const room of floor.rooms) {
       const shape = roomShapeResolve(room);
@@ -479,6 +509,8 @@ export function productionCalculateBreakdowns(
     }
 
     for (const room of floor.rooms) {
+      if (!connectedIds.has(room.id)) continue;
+
       const roomDef = productionGetRoomDefinition(room.roomTypeId);
       if (!roomDef) continue;
 
@@ -494,6 +526,7 @@ export function productionCalculateBreakdowns(
       const adjacentRoomIds: string[] = [];
       for (const other of floor.rooms) {
         if (other.id === room.id) continue;
+        if (!connectedIds.has(other.id)) continue;
         const otherTiles = roomTiles.get(other.id) ?? [];
         if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
           adjacentRoomIds.push(other.id);

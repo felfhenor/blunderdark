@@ -2,6 +2,7 @@ import {
   adjacencyAreRoomsAdjacent,
   adjacencyGetSharedEdges,
 } from '@helpers/adjacency';
+import { connectivityUnassignDisconnectedInhabitants } from '@helpers/connectivity';
 import { floorCurrent } from '@helpers/floor';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { rngUuid } from '@helpers/rng';
@@ -339,6 +340,16 @@ export async function connectionRemove(connectionId: string): Promise<boolean> {
       },
     };
   });
+
+  // Auto-unassign inhabitants from rooms that became disconnected
+  const updatedState = gamestate();
+  const updatedCurrentFloor = updatedState.world.floors[floorIndex];
+  if (updatedCurrentFloor) {
+    await connectivityUnassignDisconnectedInhabitants(
+      updatedCurrentFloor,
+      updatedState.world.floors,
+    );
+  }
 
   return true;
 }

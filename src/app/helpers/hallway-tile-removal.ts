@@ -1,8 +1,9 @@
 import { connectionRemoveRoomFromFloor } from '@helpers/connections';
+import { connectivityUnassignDisconnectedInhabitants } from '@helpers/connectivity';
 import { floorCurrent } from '@helpers/floor';
 import { gridGetTile } from '@helpers/grid';
 import { hallwayRemove, hallwayRemoveFromGrid } from '@helpers/hallways';
-import { updateGamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
 
 /**
@@ -54,6 +55,17 @@ export async function hallwayTileRemove(
       },
     };
   });
+
+  // Auto-unassign inhabitants from rooms that became disconnected
+  const updatedState = gamestate();
+  const floorIndex = updatedState.world.currentFloorIndex;
+  const updatedFloor = updatedState.world.floors[floorIndex];
+  if (updatedFloor) {
+    await connectivityUnassignDisconnectedInhabitants(
+      updatedFloor,
+      updatedState.world.floors,
+    );
+  }
 
   return { success: true };
 }

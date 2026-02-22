@@ -63,6 +63,17 @@ vi.mock('@helpers/content', () => ({
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+    const ids = new Set<string>();
+    for (const room of floor.rooms) { ids.add(room.id); }
+    return ids;
+  },
+  connectivityGetDisconnectedRoomIds: () => new Set<string>(),
+  connectivityIsRoomConnected: () => true,
+  connectivityUnassignDisconnectedInhabitants: vi.fn(async () => {}),
+}));
+
 const shadowLibraryRoom: RoomContent = {
   id: SHADOW_LIBRARY_ID as RoomId,
   name: 'Shadow Library',

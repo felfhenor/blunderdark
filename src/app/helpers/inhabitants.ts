@@ -1,4 +1,5 @@
 import { computed, type Signal } from '@angular/core';
+import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { productionGetRoomDefinition } from '@helpers/production';
@@ -9,6 +10,7 @@ import {
 } from '@helpers/vertical-transport';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  Floor,
   GameStateWorld,
   InhabitantInstance,
   PlacedRoom,
@@ -228,11 +230,20 @@ export async function inhabitantAssignToRoom(
     (i) => i.assignedRoomId === roomId,
   ).length;
 
-  // Find the PlacedRoom to account for upgrade bonuses in capacity check
+  // Find the PlacedRoom and its floor to account for upgrade bonuses and connectivity
   let placedRoom: PlacedRoom | undefined;
+  let roomFloor: Floor | undefined;
   for (const floor of state.world.floors) {
     placedRoom = floor.rooms.find((r) => r.id === roomId);
-    if (placedRoom) break;
+    if (placedRoom) {
+      roomFloor = floor;
+      break;
+    }
+  }
+
+  // Check connectivity — room must be reachable from the Altar Room
+  if (roomFloor && !connectivityIsRoomConnected(roomId, roomFloor, state.world.floors)) {
+    return { success: false, error: 'Room is not connected to the Altar Room' };
   }
 
   const check = inhabitantCanAssignToRoom(
@@ -247,9 +258,6 @@ export async function inhabitantAssignToRoom(
 
   // Calculate travel time for cross-floor assignments
   let travelTicks: number | undefined;
-  const roomFloor = state.world.floors.find((f) =>
-    f.rooms.some((r) => r.id === roomId),
-  );
   if (roomFloor && roomFloor.depth > 1) {
     const connected = verticalTransportFloorsAreConnected(
       state.world.floors,

@@ -12,6 +12,7 @@ export * from './clipboard';
 export * from './combat';
 export * from './combat-abilities';
 export * from './connections';
+export * from './connectivity';
 export * from './consumption';
 export * from './content';
 export * from './content-initializers';

@@ -3,6 +3,12 @@
     <div class="card-body p-4">
       <h3 class="card-title text-sm">{{ room.name }}</h3>
 
+      @if (isDisconnected()) {
+        <div class="alert alert-error py-2 px-3 text-xs animate-pulse">
+          <span>Disconnected — not connected to the Altar Room. Production, inhabitants, and bonuses are disabled.</span>
+        </div>
+      }
+
       @if (roomProduction().length > 0) {
         <div class="flex flex-wrap gap-2 mt-1">
           @for (prod of roomProduction(); track prod.type) {

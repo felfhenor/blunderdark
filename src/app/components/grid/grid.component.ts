@@ -20,6 +20,7 @@ import {
   cameraTransform,
   cameraUpdateViewport,
   cameraZoomAt,
+  connectivityDisconnectedRoomIds,
   corruptionLevel,
   featureGetForSlot,
   featureGetSlotCount,
@@ -62,6 +63,7 @@ import {
 } from '@helpers/transport-placement';
 import { gridCreateEmpty } from '@helpers/grid';
 import { gamestate } from '@helpers/state-game';
+import type { PlacedRoomId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 const ROOM_COLORS: Record<string, string> = {};
@@ -126,6 +128,7 @@ export class GridComponent implements AfterViewInit {
   public gridSelectedTile = gridSelectedTile;
   public roomPlacementPreview = roomPlacementPreview;
   public corruptionLevel = corruptionLevel;
+  public disconnectedRoomIds = connectivityDisconnectedRoomIds;
 
   ngAfterViewInit(): void {
     const el = this.viewport()?.nativeElement;
@@ -580,6 +583,11 @@ export class GridComponent implements AfterViewInit {
     if (!sel) return undefined;
     return this.grid()[sel.y]?.[sel.x]?.hallwayId;
   });
+
+  public isRoomDisconnected(roomId: string | undefined): boolean {
+    if (!roomId) return false;
+    return this.disconnectedRoomIds().has(roomId as PlacedRoomId);
+  }
 
   public isSelected(x: number, y: number): boolean {
     const sel = this.gridSelectedTile();

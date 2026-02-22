@@ -1,3 +1,4 @@
+import { connectivityUnassignDisconnectedInhabitants } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import {
   roomPlacementIsRemovable,
@@ -145,6 +146,17 @@ export async function roomRemovalExecute(
     if (amount > 0) {
       await resourceAdd(type as ResourceType, amount);
     }
+  }
+
+  // Auto-unassign inhabitants from rooms that became disconnected
+  // (removing a bridge room may disconnect other rooms)
+  const postRemovalState = gamestate();
+  const postRemovalFloor = postRemovalState.world.floors[floorIndex];
+  if (postRemovalFloor) {
+    await connectivityUnassignDisconnectedInhabitants(
+      postRemovalFloor,
+      postRemovalState.world.floors,
+    );
   }
 
   return { success: true, displacedNames };

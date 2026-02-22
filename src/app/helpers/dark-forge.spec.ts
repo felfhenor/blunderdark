@@ -86,6 +86,17 @@ vi.mock('@helpers/adjacency', () => ({
   adjacencyAreRoomsAdjacent: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+    const ids = new Set<string>();
+    for (const room of floor.rooms) { ids.add(room.id); }
+    return ids;
+  },
+  connectivityGetDisconnectedRoomIds: () => new Set<string>(),
+  connectivityIsRoomConnected: () => true,
+  connectivityUnassignDisconnectedInhabitants: vi.fn(async () => {}),
+}));
+
 // --- Recipe definitions ---
 
 const ironSwordRecipe: ForgeRecipeContent = {

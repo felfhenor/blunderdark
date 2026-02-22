@@ -23,6 +23,7 @@
           class="grid-tile"
           [class.occupied]="tile.occupied"
           [class.room-tile]="tile.roomId"
+          [class.animate-pulse]="isRoomDisconnected(tile.roomId)"
           [class.transport-tile]="getTransportInfo(colIdx, rowIdx)"
           [class.stair-tile]="getTransportInfo(colIdx, rowIdx)?.type === 'stair'"
           [class.elevator-tile]="getTransportInfo(colIdx, rowIdx)?.type === 'elevator'"

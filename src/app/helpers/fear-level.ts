@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import type { AdjacencyMap } from '@interfaces/adjacency';
 import { altarRoomGetFearReductionAura, altarRoomIsAdjacent } from '@helpers/altar-room';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { featureCalculateFearReduction } from '@helpers/features';
 import { productionGetRoomDefinition } from '@helpers/production';
@@ -287,14 +288,21 @@ export function fearLevelGetForRoom(
 export function fearLevelCalculateAllForFloor(
   floor: Floor,
   throneRoomFear?: number,
+  floors?: Floor[],
 ): Map<PlacedRoomId, FearLevelBreakdown> {
   const result = new Map<PlacedRoomId, FearLevelBreakdown>();
   const roomSourceFears = new Map<PlacedRoomId, number>();
   const roomPropagationDistances = new Map<PlacedRoomId, number>();
   const roomNames = new Map<PlacedRoomId, string>();
 
+  // Disconnected rooms don't participate in fear calculations
+  const disconnectedIds = floors
+    ? connectivityGetDisconnectedRoomIds(floor, floors)
+    : new Set<PlacedRoomId>();
+
   // First pass: compute individual breakdowns without propagation
   for (const placedRoom of floor.rooms) {
+    if (disconnectedIds.has(placedRoom.id)) continue;
     const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
     if (!roomDef) continue;
 
@@ -363,7 +371,7 @@ export const fearLevelBreakdownMap = computed<Map<PlacedRoomId, FearLevelBreakdo
     const combined = new Map<PlacedRoomId, FearLevelBreakdown>();
 
     for (const floor of floors) {
-      const floorMap = fearLevelCalculateAllForFloor(floor, throneRoomFear);
+      const floorMap = fearLevelCalculateAllForFloor(floor, throneRoomFear, floors);
       for (const [roomId, breakdown] of floorMap) {
         combined.set(roomId, breakdown);
       }

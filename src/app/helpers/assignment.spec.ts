@@ -42,6 +42,10 @@ vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
 }));
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityIsRoomConnected: () => true,
+}));
+
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetEffectiveMaxInhabitants: (
     _placedRoom: PlacedRoom,

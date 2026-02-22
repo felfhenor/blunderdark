@@ -189,6 +189,17 @@ vi.mock('@helpers/content', () => {
 
 let mockResourceMap: Record<string, { current: number; max: number }>;
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+    const ids = new Set<string>();
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
+    return ids;
+  },
+  connectivityGetDisconnectedRoomIds: () => new Set<string>(),
+}));
+
 vi.mock('@helpers/resources', () => ({
   resourceAdd: vi.fn((type: string, amount: number) => {
     if (amount <= 0) return 0;
