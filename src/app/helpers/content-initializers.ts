@@ -360,9 +360,28 @@ function ensureInhabitantTrait(
   };
 }
 
+function defaultFusionPassChance(
+  rarity: string,
+  isNegative?: boolean,
+): number {
+  switch (rarity) {
+    case 'common':
+      return isNegative ? 60 : 50;
+    case 'uncommon':
+      return isNegative ? 50 : 40;
+    case 'rare':
+      return 25;
+    case 'epic':
+      return 15;
+    default:
+      return 50;
+  }
+}
+
 function ensureMutationTrait(
   trait: Partial<MutationTraitContent>,
 ): MutationTraitContent {
+  const rarity = trait.rarity ?? 'common';
   return {
     id: (trait.id ?? 'UNKNOWN') as MutationTraitId,
     name: trait.name ?? 'UNKNOWN',
@@ -372,8 +391,10 @@ function ensureMutationTrait(
       stat: m.stat ?? 'hp',
       bonus: m.bonus ?? 0,
     })),
-    rarity: trait.rarity ?? 'common',
+    rarity,
     isNegative: trait.isNegative ?? undefined,
+    fusionPassChance:
+      trait.fusionPassChance ?? defaultFusionPassChance(rarity, trait.isNegative),
   };
 }
 

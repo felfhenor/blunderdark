@@ -12,10 +12,11 @@ import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { contentGetEntry } from '@helpers/content';
-import type { FusionPreview } from '@helpers/fusion';
+import type { FusionPreview, MutationTraitPreviewEntry } from '@helpers/fusion';
 import {
   fusionExecute,
   fusionGetAllRecipes,
+  fusionGetMutationTraitPreview,
   fusionGetPreview,
   fusionValidate,
 } from '@helpers/fusion';
@@ -163,6 +164,13 @@ export class PanelFusionComponent {
     const unique = p.hybridDef.traits.filter((t) => !parentTraitIds.has(t.id));
 
     return { inherited, unique };
+  });
+
+  public mutationTraitPreview = computed((): MutationTraitPreviewEntry[] => {
+    const a = this.slotAEntry();
+    const b = this.slotBEntry();
+    if (!a || !b) return [];
+    return fusionGetMutationTraitPreview(a.instance, b.instance);
   });
 
   public allRecipes = computed((): RecipeEntry[] => {

@@ -9,6 +9,7 @@ import type {
   ResourceMap,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { MutationTraitContent, MutationTraitId } from '@interfaces/content-mutationtrait';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // --- Test Constants ---
@@ -109,8 +110,10 @@ vi.mock('@helpers/resources', () => ({
 }));
 
 let uuidCounter = 0;
+let mockRngSucceedsChance = true;
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => `test-uuid-${uuidCounter++}`),
+  rngSucceedsChance: vi.fn(() => mockRngSucceedsChance),
 }));
 
 vi.mock('@helpers/inhabitant-names', () => ({
@@ -220,6 +223,7 @@ describe('fusion', () => {
     mockResources = createResources();
     mockInhabitants = [];
     uuidCounter = 0;
+    mockRngSucceedsChance = true;
 
     const recipe1 = makeRecipe();
     mockContent.set(recipe1.id, recipe1);
@@ -1269,6 +1273,255 @@ describe('fusion', () => {
       // not calculated from parents (Skeleton tier 1 + Wraith tier 2)
       expect(instance.definitionId).toBe(DEATH_KNIGHT_ID);
       // Tier comes from the definition, accessed via definitionId
+    });
+
+    it('should set mutated and mutationTraitIds when inherited traits are provided', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+        ['trait-mt-1', 'trait-mt-2'],
+      );
+
+      expect(instance.mutated).toBe(true);
+      expect(instance.mutationTraitIds).toEqual(['trait-mt-1', 'trait-mt-2']);
+    });
+
+    it('should not set mutated when inherited traits array is empty', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+        [],
+      );
+
+      expect(instance.mutated).toBeUndefined();
+      expect(instance.mutationTraitIds).toBeUndefined();
+    });
+
+    it('should not set mutated when inherited traits param is omitted', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+      );
+
+      expect(instance.mutated).toBeUndefined();
+      expect(instance.mutationTraitIds).toBeUndefined();
+    });
+  });
+
+  // --- Mutation Trait Test Data ---
+
+  const MUTATION_TRAIT_COMMON_ID = 'mt-common-001' as MutationTraitId;
+  const MUTATION_TRAIT_NEG_COMMON_ID = 'mt-neg-common-001' as MutationTraitId;
+  const MUTATION_TRAIT_RARE_ID = 'mt-rare-001' as MutationTraitId;
+
+  const mutationTraitCommon: MutationTraitContent = {
+    id: MUTATION_TRAIT_COMMON_ID,
+    name: 'Iron Muscles',
+    __type: 'mutationtrait',
+    description: '+2 ATK',
+    modifiers: [{ stat: 'attack', bonus: 2 }],
+    rarity: 'common',
+    fusionPassChance: 50,
+  };
+
+  const mutationTraitNegCommon: MutationTraitContent = {
+    id: MUTATION_TRAIT_NEG_COMMON_ID,
+    name: 'Weak Bones',
+    __type: 'mutationtrait',
+    description: '-1 DEF',
+    modifiers: [{ stat: 'defense', bonus: -1 }],
+    rarity: 'common',
+    isNegative: true,
+    fusionPassChance: 60,
+  };
+
+  const mutationTraitRare: MutationTraitContent = {
+    id: MUTATION_TRAIT_RARE_ID,
+    name: 'Ethereal Strength',
+    __type: 'mutationtrait',
+    description: '+5 ATK',
+    modifiers: [{ stat: 'attack', bonus: 5 }],
+    rarity: 'rare',
+    fusionPassChance: 25,
+  };
+
+  describe('fusionGetMutationTraitPreview', () => {
+    it('should return empty array when parents have no mutation traits', async () => {
+      const { fusionGetMutationTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A');
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const preview = fusionGetMutationTraitPreview(parentA, parentB);
+      expect(preview).toEqual([]);
+    });
+
+    it('should return trait data with pass chances from one parent', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+
+      const { fusionGetMutationTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const preview = fusionGetMutationTraitPreview(parentA, parentB);
+      expect(preview).toHaveLength(1);
+      expect(preview[0].trait.name).toBe('Iron Muscles');
+      expect(preview[0].passChance).toBe(50);
+    });
+
+    it('should return traits from both parents', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+      mockContent.set(MUTATION_TRAIT_RARE_ID, mutationTraitRare);
+
+      const { fusionGetMutationTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_RARE_ID],
+      });
+
+      const preview = fusionGetMutationTraitPreview(parentA, parentB);
+      expect(preview).toHaveLength(2);
+
+      const names = preview.map((e) => e.trait.name);
+      expect(names).toContain('Iron Muscles');
+      expect(names).toContain('Ethereal Strength');
+    });
+
+    it('should deduplicate shared traits', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+
+      const { fusionGetMutationTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+
+      const preview = fusionGetMutationTraitPreview(parentA, parentB);
+      expect(preview).toHaveLength(1);
+    });
+
+    it('should skip unknown trait IDs', async () => {
+      const { fusionGetMutationTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: ['nonexistent-trait-id'],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const preview = fusionGetMutationTraitPreview(parentA, parentB);
+      expect(preview).toEqual([]);
+    });
+  });
+
+  describe('fusionRollMutationTraits', () => {
+    it('should return empty array when parents have no mutation traits', async () => {
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A');
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toEqual([]);
+    });
+
+    it('should return trait IDs when roll succeeds', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+      mockRngSucceedsChance = true;
+
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toEqual([MUTATION_TRAIT_COMMON_ID]);
+    });
+
+    it('should return empty when roll fails', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+      mockRngSucceedsChance = false;
+
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toEqual([]);
+    });
+
+    it('should deduplicate traits shared by both parents', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+      mockRngSucceedsChance = true;
+
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID],
+      });
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toEqual([MUTATION_TRAIT_COMMON_ID]);
+    });
+
+    it('should skip unknown trait IDs', async () => {
+      mockRngSucceedsChance = true;
+
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: ['nonexistent-trait-id'],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toEqual([]);
+    });
+
+    it('should roll multiple traits from both parents independently', async () => {
+      mockContent.set(MUTATION_TRAIT_COMMON_ID, mutationTraitCommon);
+      mockContent.set(MUTATION_TRAIT_NEG_COMMON_ID, mutationTraitNegCommon);
+      mockContent.set(MUTATION_TRAIT_RARE_ID, mutationTraitRare);
+      mockRngSucceedsChance = true;
+
+      const { fusionRollMutationTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_COMMON_ID, MUTATION_TRAIT_NEG_COMMON_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        mutated: true,
+        mutationTraitIds: [MUTATION_TRAIT_RARE_ID],
+      });
+
+      const result = fusionRollMutationTraits(parentA, parentB);
+      expect(result).toHaveLength(3);
+      expect(result).toContain(MUTATION_TRAIT_COMMON_ID);
+      expect(result).toContain(MUTATION_TRAIT_NEG_COMMON_ID);
+      expect(result).toContain(MUTATION_TRAIT_RARE_ID);
     });
   });
 });

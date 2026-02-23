@@ -15,4 +15,5 @@ export type MutationTraitContent = IsContentItem &
     id: MutationTraitId;
     modifiers: MutationTraitModifier[];
     isNegative?: boolean;
+    fusionPassChance?: number;
   };

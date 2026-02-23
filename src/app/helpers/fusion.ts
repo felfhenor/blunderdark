@@ -1,7 +1,7 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
-import { rngUuid } from '@helpers/rng';
+import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -13,6 +13,7 @@ import type {
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { MutationTraitContent } from '@interfaces/content-mutationtrait';
 
 export type FusionValidation = { valid: boolean; error?: string };
 
@@ -36,6 +37,16 @@ export type FusionPreview = {
   parentBDef: InhabitantContent;
   canAfford: boolean;
   costEntries: FusionCostEntry[];
+};
+
+export type MutationTraitPreviewEntry = {
+  trait: MutationTraitContent;
+  passChance: number;
+};
+
+export type MutationTraitRollResult = {
+  traitId: string;
+  passed: boolean;
 };
 
 /**
@@ -224,14 +235,62 @@ export function fusionMergeTraits(
 }
 
 /**
+ * Collect unique mutation trait IDs from both parents and return preview entries
+ * with their pass chances for UI display (no random roll).
+ */
+export function fusionGetMutationTraitPreview(
+  parentA: InhabitantInstance,
+  parentB: InhabitantInstance,
+): MutationTraitPreviewEntry[] {
+  const traitIds = new Set<string>();
+  for (const id of parentA.mutationTraitIds ?? []) traitIds.add(id);
+  for (const id of parentB.mutationTraitIds ?? []) traitIds.add(id);
+
+  const entries: MutationTraitPreviewEntry[] = [];
+  for (const id of traitIds) {
+    const trait = contentGetEntry<MutationTraitContent>(id);
+    if (!trait) continue;
+    entries.push({ trait, passChance: trait.fusionPassChance ?? 0 });
+  }
+
+  return entries;
+}
+
+/**
+ * Roll each unique parent mutation trait against its fusionPassChance.
+ * Returns the IDs of traits that passed.
+ */
+export function fusionRollMutationTraits(
+  parentA: InhabitantInstance,
+  parentB: InhabitantInstance,
+): string[] {
+  const traitIds = new Set<string>();
+  for (const id of parentA.mutationTraitIds ?? []) traitIds.add(id);
+  for (const id of parentB.mutationTraitIds ?? []) traitIds.add(id);
+
+  const passed: string[] = [];
+  for (const id of traitIds) {
+    const trait = contentGetEntry<MutationTraitContent>(id);
+    if (!trait) continue;
+    const chance = trait.fusionPassChance ?? 0;
+    if (chance > 0 && rngSucceedsChance(chance)) {
+      passed.push(id);
+    }
+  }
+
+  return passed;
+}
+
+/**
  * Create a hybrid inhabitant instance with all required fields.
  */
 export function fusionCreateHybridInstance(
   parentAInstanceId: InhabitantInstanceId,
   parentBInstanceId: InhabitantInstanceId,
   hybridDef: InhabitantContent,
+  inheritedMutationTraitIds?: string[],
 ): InhabitantInstance {
-  return {
+  const instance: InhabitantInstance = {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: hybridDef.id,
     name: generateInhabitantName(hybridDef.type),
@@ -240,6 +299,13 @@ export function fusionCreateHybridInstance(
     isHybrid: true,
     hybridParentIds: [parentAInstanceId, parentBInstanceId],
   };
+
+  if (inheritedMutationTraitIds && inheritedMutationTraitIds.length > 0) {
+    instance.mutated = true;
+    instance.mutationTraitIds = inheritedMutationTraitIds;
+  }
+
+  return instance;
 }
 
 /**
@@ -277,10 +343,13 @@ export async function fusionExecute(
     return { success: false, error: 'Hybrid definition not found' };
   }
 
+  const inheritedMutationTraitIds = fusionRollMutationTraits(parentA, parentB);
+
   const hybridInstance = fusionCreateHybridInstance(
     parentAInstanceId,
     parentBInstanceId,
     hybridDef,
+    inheritedMutationTraitIds,
   );
 
   await updateGamestate((state) => {
