@@ -111,9 +111,7 @@ const CAMERA_DRAG_THRESHOLD = 5;
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '(document:keydown.escape)': 'onEscapeKey()',
-    '(document:keydown.r)': 'onRotateKey()',
-    '(document:keydown.Home)': 'onResetCamera($event)',
+    '(document:keydown)': 'onKeydown($event)',
   },
 })
 export class GridComponent implements AfterViewInit {
@@ -204,23 +202,6 @@ export class GridComponent implements AfterViewInit {
 
     const delta = event.deltaY < 0 ? CAMERA_ZOOM_STEP : -CAMERA_ZOOM_STEP;
     cameraZoomAt(delta, cursorX, cursorY);
-  }
-
-  // --- Camera: reset ---
-
-  public onResetCamera(event?: Event): void {
-    if (event) {
-      const target = event.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
-        return;
-      }
-      if (uiIsAnyModalOpen()) return;
-    }
-    cameraReset();
   }
 
   private roomInfoMap = computed(() => {
@@ -812,13 +793,38 @@ export class GridComponent implements AfterViewInit {
     }
   }
 
-  public onRotateKey(): void {
-    if (roomPlacementPreviewShape()) {
-      roomPlacementRotate();
+  public async onKeydown(event: KeyboardEvent): Promise<void> {
+    switch (event.key) {
+      case 'r':
+        if (roomPlacementPreviewShape()) {
+          roomPlacementRotate();
+        }
+        break;
+      case 'Escape':
+        await this.onEscapeKey();
+        break;
+      case 'Home': {
+        const target = event.target as HTMLElement;
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable
+        ) {
+          break;
+        }
+        if (uiIsAnyModalOpen()) break;
+        event.preventDefault();
+        cameraReset();
+        break;
+      }
     }
   }
 
-  public async onEscapeKey(): Promise<void> {
+  public onResetCamera(): void {
+    cameraReset();
+  }
+
+  private async onEscapeKey(): Promise<void> {
     if (uiIsAnyModalOpen()) return;
     if (transportPlacementActive()) {
       transportPlacementExit();

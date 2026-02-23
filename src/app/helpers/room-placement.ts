@@ -193,6 +193,7 @@ export function roomPlacementRotate(): void {
   roomPlacementPreviewShape.set(roomShapeGetRotated(base, next));
 }
 
+
 export const roomPlacementPreviewShape = signal<RoomShapeContent | undefined>(
   undefined,
 );

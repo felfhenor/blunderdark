@@ -12,6 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
 
+import { roomPlacementPreviewShape } from '@helpers/room-placement';
 import type { SideTabDefinition } from '@interfaces';
 
 @Component({
@@ -72,6 +73,9 @@ export class SideTabRailComponent {
     ) {
       return;
     }
+
+    // Skip panel hotkeys during room placement so R can rotate
+    if (roomPlacementPreviewShape()) return;
 
     const key = event.key.toLowerCase();
     const tab = this.visibleTabs().find((t) => t.hotkey === key);
