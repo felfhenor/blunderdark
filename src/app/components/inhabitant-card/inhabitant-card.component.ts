@@ -15,13 +15,25 @@ import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import { synergyGetDefinitions } from '@helpers/synergy';
-import type { InhabitantInstance, MutationTraitContent, PlacedRoomId, RoomId } from '@interfaces';
+import type {
+  InhabitantInstance,
+  MutationTraitContent,
+  PlacedRoomId,
+  RoomId,
+} from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-inhabitant-card',
-  imports: [DecimalPipe, NgClass, HungerIndicatorComponent, IconComponent, StatRowComponent, TippyDirective],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    HungerIndicatorComponent,
+    IconComponent,
+    StatRowComponent,
+    TippyDirective,
+  ],
   templateUrl: './inhabitant-card.component.html',
   styleUrl: './inhabitant-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +50,7 @@ export class InhabitantCardComponent {
   public showInstanceName = input(true);
   public showDefinitionName = input(true);
   public showHybridBadge = input(false);
-  public showHunger = input(true);
+  public showHunger = input(false);
   public synergyRoomId = input<PlacedRoomId | undefined>(undefined);
   public compact = input(false);
 

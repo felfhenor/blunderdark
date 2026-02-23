@@ -42,6 +42,7 @@
             <app-inhabitant-card
               [instance]="entry.instance"
               [definition]="entry.def"
+              [showHunger]="true"
             />
           </div>
         }
@@ -89,7 +90,10 @@
           </div>
 
           <!-- Full stats -->
-          <app-stat-row class="flex-wrap mt-1 text-xs" [stats]="entry.def.stats" />
+          <app-stat-row
+            class="flex-wrap mt-1 text-xs"
+            [stats]="entry.def.stats"
+          />
 
           <!-- Traits -->
           @if (entry.def.traits.length > 0) {
@@ -144,7 +148,11 @@
                     )
                   "
                 >
-                  {{ r.room.suffix ? r.roomDef.name + ' ' + r.room.suffix : r.roomDef.name }}
+                  {{
+                    r.room.suffix
+                      ? r.roomDef.name + ' ' + r.room.suffix
+                      : r.roomDef.name
+                  }}
                   <span class="opacity-50">({{ r.floorName }})</span>
                 </button>
               }
