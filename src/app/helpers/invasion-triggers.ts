@@ -18,7 +18,7 @@ import type { PRNG } from 'seedrandom';
 
 // --- Constants ---
 
-export const INVASION_TRIGGER_DEFAULT_GRACE_PERIOD = 30;
+export const INVASION_TRIGGER_DEFAULT_GRACE_PERIOD = 10;
 export const INVASION_TRIGGER_MIN_INTERVAL = 5;
 export const INVASION_TRIGGER_MAX_VARIANCE = 2;
 export const INVASION_TRIGGER_MIN_DAYS_BETWEEN = 3;

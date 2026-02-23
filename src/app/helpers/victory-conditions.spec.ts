@@ -202,7 +202,7 @@ function makeState(overrides: Partial<{
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
-        gracePeriodEnd: 30,
+        gracePeriodEnd: 10,
         invasionHistory: overrides.invasionHistory ?? [],
         pendingSpecialInvasions: [],
         warningActive: false,

@@ -74,7 +74,7 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
-        gracePeriodEnd: 30,
+        gracePeriodEnd: 10,
         invasionHistory: [],
         pendingSpecialInvasions: [],
         warningActive: false,
