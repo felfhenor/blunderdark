@@ -18,6 +18,7 @@ import {
   notifySuccess,
   inhabitantUnassignFromRoom,
 } from '@helpers';
+import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
@@ -117,6 +118,12 @@ export class PanelRosterComponent {
     const id = this.selectedInhabitantId();
     if (!id) return undefined;
     return this.allEntries().find((e) => e.instance.instanceId === id) ?? undefined;
+  });
+
+  public selectedEffectiveStats = computed(() => {
+    const entry = this.selectedEntry();
+    if (!entry) return undefined;
+    return effectiveStatsCalculate(entry.def, entry.instance);
   });
 
   public availableRooms = computed(() => {

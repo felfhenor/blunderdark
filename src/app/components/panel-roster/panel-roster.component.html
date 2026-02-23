@@ -92,7 +92,8 @@
           <!-- Full stats -->
           <app-stat-row
             class="flex-wrap mt-1 text-xs"
-            [stats]="entry.def.stats"
+            [stats]="selectedEffectiveStats()!"
+            [baseStats]="entry.def.stats"
           />
 
           <!-- Traits -->
