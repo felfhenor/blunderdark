@@ -314,14 +314,14 @@ export async function inhabitantUnassignFromRoom(
 
 /**
  * Rename an inhabitant instance.
- * Validates name length (1-30 chars after trimming).
+ * Validates name length (1-20 chars after trimming).
  */
 export async function inhabitantRename(
   instanceId: string,
   newName: string,
 ): Promise<boolean> {
-  const trimmed = newName.trim();
-  if (trimmed.length < 1 || trimmed.length > 30) return false;
+  const trimmed = newName.trim().slice(0, 20);
+  if (trimmed.length < 1) return false;
 
   const state = gamestate();
   const instance = state.world.inhabitants.find(

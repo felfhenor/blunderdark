@@ -225,10 +225,11 @@ export class PanelRosterComponent {
       title: 'Rename Creature',
       input: 'text',
       inputValue: currentName,
+      inputAttributes: { maxlength: '20' },
       inputValidator: (value: string) => {
         const trimmed = value.trim();
         if (!trimmed) return 'Name cannot be empty';
-        if (trimmed.length > 30) return 'Name must be 30 characters or fewer';
+        if (trimmed.length > 20) return 'Name must be 20 characters or fewer';
         return null;
       },
       showCancelButton: true,
