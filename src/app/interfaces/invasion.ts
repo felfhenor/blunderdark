@@ -3,6 +3,7 @@ import type { CombatResult } from '@interfaces/combat';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { InvaderInstance, InvaderClassType, InvaderStats } from '@interfaces/invader';
+import type { PlacedRoomId } from '@interfaces/room-shape';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import type { ResourceType } from '@interfaces/resource';
 
@@ -167,4 +168,87 @@ export type TurnQueue = {
   combatants: Combatant[];
   currentIndex: number;
   round: number;
+};
+
+// --- Battle log types ---
+
+export type BattleLogEntryType =
+  | 'room_enter'
+  | 'trap_trigger'
+  | 'trap_disarm'
+  | 'trap_miss'
+  | 'combat_attack'
+  | 'combat_miss'
+  | 'combat_kill'
+  | 'defender_killed'
+  | 'morale_change'
+  | 'objective_progress'
+  | 'objective_complete'
+  | 'room_cleared'
+  | 'altar_damage'
+  | 'invasion_end'
+  | 'retreat';
+
+export type BattleLogEntry = {
+  turn: number;
+  type: BattleLogEntryType;
+  roomId?: string;
+  message: string;
+  details?: Record<string, unknown>;
+};
+
+// --- Orchestrator result ---
+
+export type InvasionOrchestratorResult = {
+  detailedResult: DetailedInvasionResult;
+  rewards?: DefenseRewards;
+  penalties?: DefensePenalties;
+  battleLog: BattleLogEntry[];
+  capturedPrisoners: CapturedPrisoner[];
+  killedDefenderIds: InhabitantInstanceId[];
+  survivingInvaders: InvaderInstance[];
+};
+
+// --- Active invasion (tick-based) ---
+
+export type ActiveInvasion = {
+  seed: string;
+  invasionType: 'scheduled' | SpecialInvasionType;
+  day: number;
+
+  // Path state
+  path: PlacedRoomId[];
+  entryRoomId: PlacedRoomId;
+  currentRoomIndex: number;
+  currentRoomTicksElapsed: number;
+  currentRoomTicksTotal: number;
+
+  // Multi-floor tracking
+  roomFloorMap: Record<string, number>;
+
+  // Altar looping (when invaders reach end of path and keep attacking altar)
+  isAltarLooping: boolean;
+
+  // Invader state (Record not Map for serialization)
+  invaderHpMap: Record<string, number>;
+  killedDefenderIds: InhabitantInstanceId[];
+  killedInvaderClasses: InvaderClassType[];
+
+  // Win/loss tracking
+  invasionState: InvasionState;
+
+  // Combat state for current room
+  currentRoomTurnQueue?: TurnQueue;
+  currentRoomDefenderIds: InhabitantInstanceId[];
+
+  // Battle log (grows each tick)
+  battleLog: BattleLogEntry[];
+  currentTurn: number;
+
+  // Fear levels per room (captured at start for determinism)
+  roomFearLevels: Record<string, number>;
+
+  // Completion
+  completed: boolean;
+  result?: InvasionOrchestratorResult;
 };

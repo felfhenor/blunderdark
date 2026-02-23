@@ -24,13 +24,18 @@ import type { MoraleEvent } from '@interfaces/morale';
       <div class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200">
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
-          <span class="text-xs" [ngClass]="valueLabelClass()">
-            {{ moraleCurrent() }}/{{ moraleMax }}
+          <span class="flex items-center gap-1">
+            @if (moraleIsRetreating()) {
+              <span class="badge badge-error badge-xs">RETREATING</span>
+            }
+            <span class="text-xs" [ngClass]="valueLabelClass()">
+              {{ moraleCurrent() }}/{{ moraleMax }}
+            </span>
           </span>
         </div>
 
         <div
-          class="relative cursor-default"
+          class="cursor-default"
           (mouseenter)="showLog.set(true)"
           (mouseleave)="showLog.set(false)"
         >
@@ -40,12 +45,6 @@ import type { MoraleEvent } from '@interfaces/morale';
             [value]="moraleCurrent()"
             [max]="moraleMax"
           ></progress>
-
-          @if (moraleIsRetreating()) {
-            <div class="badge badge-error badge-xs absolute -top-2 right-0">
-              RETREATING
-            </div>
-          }
         </div>
 
         @if (latestEvent(); as evt) {

@@ -1,0 +1,11 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.battle-container {
+  height: 70vh;
+  max-height: 700px;
+}
+

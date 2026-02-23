@@ -11,7 +11,7 @@ import type { TrapCraftingQueue, TrapInventoryEntry } from '@interfaces/trap';
 import type { ForgeCraftingQueue, ForgeInventoryEntry } from '@interfaces/forge';
 import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
-import type { CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
+import type { ActiveInvasion, CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
 import type { MerchantState } from '@interfaces/merchant';
 import type { VictoryProgress } from '@interfaces/victory';
 
@@ -34,6 +34,7 @@ export interface GameStateWorld {
   alchemyConversions: AlchemyConversion[];
   prisoners: CapturedPrisoner[];
   invasionSchedule: InvasionSchedule;
+  activeInvasion?: ActiveInvasion;
   corruptionEffects: CorruptionEffectState;
   victoryProgress: VictoryProgress;
   merchant: MerchantState;

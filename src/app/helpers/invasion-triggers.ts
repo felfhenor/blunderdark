@@ -1,13 +1,13 @@
 import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
+import { invasionStart } from '@helpers/invasion-process';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
-import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
-import { victoryRecordDefenseWin } from '@helpers/victory';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
+  InvasionHistoryEntry,
   InvasionSchedule,
   SpecialInvasionType,
 } from '@interfaces';
@@ -175,34 +175,60 @@ export function invasionTriggerProcessSchedule(
     schedule.warningDismissed = false;
   }
 
+  // Guard: skip trigger if an active invasion already exists
+  if (state.world.activeInvasion && !state.world.activeInvasion.completed) return;
+
   // Check special invasions
   for (let i = schedule.pendingSpecialInvasions.length - 1; i >= 0; i--) {
     const special = schedule.pendingSpecialInvasions[i];
     if (currentDay >= special.triggerDay) {
-      schedule.invasionHistory.push({ day: currentDay, type: special.type });
       schedule.pendingSpecialInvasions.splice(i, 1);
+      schedule.nextInvasionDay = undefined;
+      invasionStart(state, `invasion-${currentDay}-${special.type}`, special.type);
+      return;
     }
   }
 
   // Check if scheduled invasion triggers
   if (invasionTriggerShouldTrigger(schedule, currentDay)) {
-    schedule.invasionHistory.push({ day: currentDay, type: 'scheduled' });
     schedule.warningActive = false;
     schedule.warningDismissed = false;
-
-    reputationAwardInPlace(state, 'Defeat Invader');
-    victoryRecordDefenseWin(state);
-
-    // Reschedule next invasion
-    const result = invasionTriggerCalculateNextDay(
-      currentDay,
-      currentDay,
-      schedule.gracePeriodEnd,
-      effectiveRng,
-    );
-    schedule.nextInvasionDay = result.day;
-    schedule.nextInvasionVariance = result.variance;
+    schedule.nextInvasionDay = undefined;
+    invasionStart(state, `invasion-${currentDay}-scheduled`, 'scheduled');
   }
+}
+
+/**
+ * Record the invasion result in history and reschedule the next invasion.
+ * Called after the battle completes (from the UI).
+ */
+export function invasionTriggerRecordAndReschedule(
+  state: GameState,
+  historyEntry: InvasionHistoryEntry,
+  rng?: PRNG,
+): void {
+  const schedule = state.world.invasionSchedule;
+  const effectiveRng = rng ?? rngRandom();
+
+  schedule.invasionHistory.push(historyEntry);
+
+  const result = invasionTriggerCalculateNextDay(
+    historyEntry.day,
+    historyEntry.day,
+    schedule.gracePeriodEnd,
+    effectiveRng,
+  );
+  schedule.nextInvasionDay = result.day;
+  schedule.nextInvasionVariance = result.variance;
+}
+
+// --- Debug ---
+
+export function debugTriggerInvasion(): void {
+  updateGamestate((state) => {
+    invasionStart(state, `invasion-${state.clock.day}-debug`, 'scheduled');
+    return state;
+  });
 }
 
 // --- Computed signals ---

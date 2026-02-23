@@ -1,4 +1,5 @@
 import {
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -9,9 +10,11 @@ import {
   TemplateRef,
   untracked,
   viewChild,
+  type ElementRef,
   type OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgClass } from '@angular/common';
 import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
@@ -19,6 +22,7 @@ import { PanelAltarComponent } from '@components/panel-altar/panel-altar.compone
 import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
+import { PanelInvasionBattleComponent } from '@components/panel-invasion-battle/panel-invasion-battle.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
@@ -55,6 +59,11 @@ import {
   autosaveStart,
   autosaveStop,
 } from '@helpers/autosave';
+import {
+  invasionBattleLog,
+  invasionIsActive,
+  invasionIsCompleted,
+} from '@helpers/invasion-process';
 import { fusionHasAvailableCreatures, fusionHasRoom } from '@helpers/fusion';
 import { gameloopIsPaused } from '@helpers/gameloop';
 import { merchantIsPresent } from '@helpers/merchant';
@@ -69,6 +78,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
 @Component({
   selector: 'app-game-play',
   imports: [
+    NgClass,
     TeleportOutletDirective,
     GridComponent,
     GameResearchComponent,
@@ -79,6 +89,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelDarkForgeComponent,
     PanelFloorSelectorComponent,
     PanelFusionComponent,
+    PanelInvasionBattleComponent,
     PanelHallwayInfoComponent,
     PanelMerchantComponent,
     PanelVictoryComponent,
@@ -117,6 +128,11 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     () => fusionHasAvailableCreatures() && fusionHasRoom(),
   );
   public isAutosaving = autosaveIsSaving;
+  public invasionIsActive = invasionIsActive;
+  public invasionRecentLog = computed(() => invasionBattleLog().slice(-15));
+
+  private invasionBattle = viewChild(PanelInvasionBattleComponent);
+  private invasionLogContainer = viewChild<ElementRef<HTMLElement>>('invasionLogContainer');
 
   public activePanel = signal<string | undefined>(undefined);
   private buildPanelClosedForPlacement = false;
@@ -285,6 +301,30 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       } else if (this.buildPanelClosedForPlacement) {
         this.buildPanelClosedForPlacement = false;
         this.activePanel.set('build');
+      }
+    });
+
+    // When invasion completes, open the results modal
+    effect(() => {
+      if (invasionIsCompleted()) {
+        untracked(() => {
+          const state = gamestate();
+          const invasion = state.world.activeInvasion;
+          if (invasion?.completed && invasion.result) {
+            this.invasionBattle()?.showResults(invasion);
+          }
+        });
+      }
+    });
+
+    // Auto-scroll invasion log to bottom on new entries
+    afterRenderEffect(() => {
+      const log = this.invasionRecentLog();
+      if (log.length > 0) {
+        const el = this.invasionLogContainer()?.nativeElement;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
       }
     });
 
@@ -494,6 +534,31 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     const total = floorAll().length;
     if (currentIdx < total - 1) {
       floorSetCurrentByIndex(currentIdx + 1);
+    }
+  }
+
+  public getLogEntryClass(type: string): string {
+    switch (type) {
+      case 'combat_kill':
+        return 'text-success';
+      case 'defender_killed':
+        return 'text-error font-bold';
+      case 'trap_trigger':
+      case 'morale_change':
+      case 'retreat':
+        return 'text-warning';
+      case 'trap_disarm':
+        return 'text-info';
+      case 'altar_damage':
+        return 'text-error';
+      case 'room_enter':
+        return 'text-primary font-semibold';
+      case 'room_cleared':
+        return 'text-accent';
+      case 'invasion_end':
+        return 'font-bold';
+      default:
+        return '';
     }
   }
 }

@@ -113,8 +113,21 @@
   }
 </div>
 
+@if (invasionIsActive()) {
+  <div #invasionLogContainer class="absolute right-0 bottom-12 z-30 w-80 max-h-64 overflow-y-auto bg-base-100/90 border border-base-300 rounded-tl-lg p-2 shadow-lg">
+    <div class="text-sm font-bold mb-1 text-warning">Invasion in Progress</div>
+    @for (entry of invasionRecentLog(); track $index) {
+      <div class="text-xs py-0.5" [ngClass]="getLogEntryClass(entry.type)">
+        <span class="opacity-40 mr-1">T{{ entry.turn }}</span>
+        <span>{{ entry.message }}</span>
+      </div>
+    }
+  </div>
+}
+
 <app-game-research [(visible)]="showResearch" />
 <app-panel-fusion [(visible)]="showFusion" />
+<app-panel-invasion-battle />
 <app-panel-victory />
 <app-victory-menu [(visible)]="showVictoryMenu" />
 

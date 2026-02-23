@@ -52,6 +52,11 @@ import {
   verticalTransportGetGroupsOnFloor,
 } from '@helpers';
 import {
+  invasionCurrentRoomId,
+  invasionEntryRoomId,
+  invasionPathRoomIds,
+} from '@helpers/invasion-process';
+import {
   transportPlacementActive,
   transportPlacementType,
   transportPlacementExit,
@@ -130,6 +135,24 @@ export class GridComponent implements AfterViewInit {
   public roomPlacementPreview = roomPlacementPreview;
   public corruptionLevel = corruptionLevel;
   public disconnectedRoomIds = connectivityDisconnectedRoomIds;
+  public invasionEntryRoomId = invasionEntryRoomId;
+  public invasionCurrentRoomId = invasionCurrentRoomId;
+  public invasionPathRoomIds = invasionPathRoomIds;
+
+  public isInvasionEntry(roomId: string | undefined): boolean {
+    if (!roomId) return false;
+    return this.invasionEntryRoomId() === roomId;
+  }
+
+  public isInvasionCurrent(roomId: string | undefined): boolean {
+    if (!roomId) return false;
+    return this.invasionCurrentRoomId() === roomId;
+  }
+
+  public isInvasionPath(roomId: string | undefined): boolean {
+    if (!roomId) return false;
+    return this.invasionPathRoomIds().has(roomId as PlacedRoomId);
+  }
 
   ngAfterViewInit(): void {
     const el = this.viewport()?.nativeElement;

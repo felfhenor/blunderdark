@@ -11,6 +11,7 @@ import {
   invasionTriggerShouldShowWarning,
   invasionTriggerAddSpecial,
   invasionTriggerProcessSchedule,
+  invasionTriggerRecordAndReschedule,
   INVASION_TRIGGER_DEFAULT_GRACE_PERIOD,
   INVASION_TRIGGER_MIN_INTERVAL,
   INVASION_TRIGGER_MAX_VARIANCE,
@@ -26,6 +27,11 @@ vi.mock('@helpers/state-game', () => ({
 
 vi.mock('@helpers/notify', () => ({
   notify: vi.fn(),
+}));
+
+const mockInvasionStart = vi.fn();
+vi.mock('@helpers/invasion-process', () => ({
+  invasionStart: (...args: unknown[]) => mockInvasionStart(...args),
 }));
 
 function makeSchedule(
@@ -332,34 +338,55 @@ describe('invasion-triggers', () => {
       expect(state.world.invasionSchedule.nextInvasionDay).toBe(45);
     });
 
-    it('should trigger invasion on scheduled day and reschedule', () => {
+    it('should call invasionStart on scheduled day and clear nextInvasionDay', () => {
       const state = makeGameState({
         day: 45,
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('trigger');
       invasionTriggerProcessSchedule(state, rng);
-      // Should have recorded the invasion
-      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
-      expect(state.world.invasionSchedule.invasionHistory[0]).toEqual({
-        day: 45,
-        type: 'scheduled',
-      });
-      // Should have rescheduled
-      expect(
-        state.world.invasionSchedule.nextInvasionDay!,
-      ).toBeGreaterThan(45);
+
+      // nextInvasionDay should be cleared (rescheduling happens after battle)
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
+      // invasionStart should have been called
+      expect(mockInvasionStart).toHaveBeenCalledWith(
+        state,
+        'invasion-45-scheduled',
+        'scheduled',
+      );
+      // History should NOT be recorded yet (happens after battle via recordAndReschedule)
+      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(0);
     });
 
-    it('should trigger past-due invasion on load', () => {
+    it('should call invasionStart for past-due invasion', () => {
       const state = makeGameState({
         day: 50,
         schedule: { nextInvasionDay: 45 },
       });
       const rng = seedrandom('past-due');
       invasionTriggerProcessSchedule(state, rng);
-      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
-      expect(state.world.invasionSchedule.invasionHistory[0].day).toBe(50);
+
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
+      expect(mockInvasionStart).toHaveBeenCalledWith(
+        state,
+        'invasion-50-scheduled',
+        'scheduled',
+      );
+    });
+
+    it('should not trigger if activeInvasion already exists', () => {
+      const state = makeGameState({
+        day: 45,
+        schedule: { nextInvasionDay: 45 },
+      });
+      (state.world as Record<string, unknown>).activeInvasion = { completed: false };
+      const rng = seedrandom('active-guard');
+      invasionTriggerProcessSchedule(state, rng);
+
+      // Should not have called invasionStart
+      expect(mockInvasionStart).not.toHaveBeenCalled();
+      // nextInvasionDay should still be set since the trigger was skipped
+      expect(state.world.invasionSchedule.nextInvasionDay).toBe(45);
     });
 
     it('should activate warning before invasion', () => {
@@ -387,7 +414,7 @@ describe('invasion-triggers', () => {
       expect(state.world.invasionSchedule.warningActive).toBe(false);
     });
 
-    it('should trigger special invasions on their trigger day', () => {
+    it('should call invasionStart for triggered special invasion', () => {
       const state = makeGameState({
         day: 50,
         schedule: {
@@ -397,14 +424,18 @@ describe('invasion-triggers', () => {
       });
       const rng = seedrandom('special');
       invasionTriggerProcessSchedule(state, rng);
-      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
-      expect(state.world.invasionSchedule.invasionHistory[0]).toEqual({
-        day: 50,
-        type: 'crusade',
-      });
+
       expect(
         state.world.invasionSchedule.pendingSpecialInvasions,
       ).toHaveLength(0);
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
+      expect(mockInvasionStart).toHaveBeenCalledWith(
+        state,
+        'invasion-50-crusade',
+        'crusade',
+      );
+      // History NOT recorded yet (happens after battle via recordAndReschedule)
+      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(0);
     });
 
     it('should not trigger special invasions before their trigger day', () => {
@@ -421,9 +452,10 @@ describe('invasion-triggers', () => {
       expect(
         state.world.invasionSchedule.pendingSpecialInvasions,
       ).toHaveLength(1);
+      expect(mockInvasionStart).not.toHaveBeenCalled();
     });
 
-    it('should maintain escalating frequency across multiple invasions', () => {
+    it('should maintain escalating frequency via recordAndReschedule', () => {
       const rng = seedrandom('escalation');
       const state = makeGameState({ day: 30 });
 
@@ -433,14 +465,16 @@ describe('invasion-triggers', () => {
       expect(firstDay).toBeGreaterThanOrEqual(30 + 15 - INVASION_TRIGGER_MAX_VARIANCE);
       expect(firstDay).toBeLessThanOrEqual(30 + 15 + INVASION_TRIGGER_MAX_VARIANCE);
 
-      // Advance to first invasion day
+      // Simulate battle completion: record and reschedule
       state.clock.day = firstDay;
       const rng2 = seedrandom('escalation-2');
-      invasionTriggerProcessSchedule(state, rng2);
+      invasionTriggerRecordAndReschedule(state, { day: firstDay, type: 'scheduled' }, rng2);
 
       // Next invasion should be scheduled from a higher day
       const secondDay = state.world.invasionSchedule.nextInvasionDay!;
       expect(secondDay).toBeGreaterThan(firstDay);
+      // History should have one entry
+      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
     });
 
     it('should clear warning state after invasion triggers', () => {
@@ -464,6 +498,32 @@ describe('invasion-triggers', () => {
       expect(INVASION_TRIGGER_MAX_VARIANCE).toBe(2);
       expect(INVASION_TRIGGER_MIN_DAYS_BETWEEN).toBe(3);
       expect(INVASION_TRIGGER_WARNING_MINUTES).toBe(2);
+    });
+  });
+
+  // --- invasionTriggerRecordAndReschedule ---
+
+  describe('invasionTriggerRecordAndReschedule', () => {
+    it('should record history entry and schedule next invasion', () => {
+      const state = makeGameState({ day: 45 });
+      const rng = seedrandom('record');
+      invasionTriggerRecordAndReschedule(state, { day: 45, type: 'scheduled' }, rng);
+
+      expect(state.world.invasionSchedule.invasionHistory).toHaveLength(1);
+      expect(state.world.invasionSchedule.invasionHistory[0]).toEqual({
+        day: 45,
+        type: 'scheduled',
+      });
+      expect(state.world.invasionSchedule.nextInvasionDay).toBeDefined();
+      expect(state.world.invasionSchedule.nextInvasionDay!).toBeGreaterThan(45);
+    });
+
+    it('should record special invasion types', () => {
+      const state = makeGameState({ day: 50 });
+      const rng = seedrandom('special-record');
+      invasionTriggerRecordAndReschedule(state, { day: 50, type: 'crusade' }, rng);
+
+      expect(state.world.invasionSchedule.invasionHistory[0].type).toBe('crusade');
     });
   });
 
