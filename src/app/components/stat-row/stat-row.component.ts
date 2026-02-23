@@ -22,7 +22,7 @@ function statHighlight(
   selector: 'app-stat-row',
   imports: [StatNameComponent],
   host: {
-    class: 'inline-flex gap-1.5 font-mono',
+    class: 'inline-flex gap-1.5',
   },
   template: `
     <app-stat-name type="hp" [value]="stats().hp" [prefix]="prefix()" [highlight]="highlights().hp" />

@@ -40,7 +40,7 @@ import { TippyDirective } from '@ngneat/helipopper';
       </div>
 
       <span
-        class="text-xs font-mono opacity-60 flex-shrink-0 whitespace-nowrap w-[150px] text-right"
+        class="text-xs opacity-60 flex-shrink-0 whitespace-nowrap w-[150px] text-right"
       >
         @if (checkType() === 'flag') {
           @if (met()) {

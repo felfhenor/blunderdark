@@ -23,7 +23,7 @@ import type {
           <span class="badge badge-sm" [ngClass]="phaseBadgeClass()">
             {{ phaseLabel() }}
           </span>
-          <span class="text-xs opacity-70 font-mono">{{ time() }}</span>
+          <span class="text-xs opacity-70">{{ time() }}</span>
         </div>
 
         @if (hasModifiers()) {

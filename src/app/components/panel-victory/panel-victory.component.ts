@@ -54,7 +54,7 @@ import type {
                   {{ cond.met ? '\u2714' : '\u2610' }}
                 </span>
                 <span class="flex-1 text-sm">{{ cond.description }}</span>
-                <span class="text-xs font-mono opacity-60">
+                <span class="text-xs opacity-60">
                   {{ cond.currentValue | number: '1.0-0' }} / {{ cond.target | number: '1.0-0' }}
                 </span>
               </li>
@@ -66,27 +66,27 @@ import type {
           <div class="grid grid-cols-2 gap-2 text-sm">
             <div class="flex justify-between">
               <span class="opacity-70">Days Survived</span>
-              <span class="font-mono">{{ stats().day }}</span>
+              <span>{{ stats().day }}</span>
             </div>
             <div class="flex justify-between">
               <span class="opacity-70">Total Floors</span>
-              <span class="font-mono">{{ stats().floors }}</span>
+              <span>{{ stats().floors }}</span>
             </div>
             <div class="flex justify-between">
               <span class="opacity-70">Total Inhabitants</span>
-              <span class="font-mono">{{ stats().inhabitants }}</span>
+              <span>{{ stats().inhabitants }}</span>
             </div>
             <div class="flex justify-between">
               <span class="opacity-70">Total Rooms</span>
-              <span class="font-mono">{{ stats().rooms }}</span>
+              <span>{{ stats().rooms }}</span>
             </div>
             <div class="flex justify-between">
               <span class="opacity-70">Invasions Repelled</span>
-              <span class="font-mono">{{ stats().invasionsRepelled }}</span>
+              <span>{{ stats().invasionsRepelled }}</span>
             </div>
             <div class="flex justify-between">
               <span class="opacity-70">Research Completed</span>
-              <span class="font-mono">{{ stats().researchCompleted }}</span>
+              <span>{{ stats().researchCompleted }}</span>
             </div>
           </div>
         }

@@ -205,6 +205,7 @@ All room-specific systems follow the same pattern:
 
 ## UI Patterns
 
+- **No special font classes** — never use `font-mono`, `font-serif`, or any Tailwind font-family utility. All text must use the default 'OtherText' font defined globally. Do not override font-family anywhere.
 - **No inline styles** — use Tailwind classes or CSS custom properties (`[style.--my-var]` + `var(--my-var)`)
 - **CSS variables** for DaisyUI 5 theme colors: `var(--color-primary)`, `var(--color-secondary)`, `var(--color-accent)`, `var(--color-info)`, `var(--color-success)`, `var(--color-warning)`, `var(--color-error)`, `var(--color-neutral)`. These resolve to full `oklch(...)` values and work directly as CSS colors. Do NOT use the old daisyUI 4 format (`oklch(var(--p))`, `oklch(var(--su))`, etc.) — those variables no longer exist.
 - **Tooltips**: `@ngneat/helipopper` (`[tp]="templateRef"` or `[tp]="'text'"`, `[tpDelay]="250"`, `[tpClassName]="'game-tooltip'"`)

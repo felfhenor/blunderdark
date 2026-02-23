@@ -1,7 +1,7 @@
 @if (compact()) {
   <!-- Compact mode -->
   <div class="compact-card flex items-center gap-2">
-    <span class="badge badge-xs badge-outline font-mono">
+    <span class="badge badge-xs badge-outline">
       T{{ definition().tier | number: '1.0-2' }}
     </span>
     <div class="flex flex-col min-w-0">
@@ -47,7 +47,7 @@
     <!-- Row 1: Tier + Names + State + Synergy -->
     <div class="flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
-        <span class="badge badge-xs badge-outline font-mono">
+        <span class="badge badge-xs badge-outline">
           T{{ definition().tier | number: '1.0-2' }}
         </span>
         <div class="flex flex-col min-w-0">
@@ -92,7 +92,12 @@
     <!-- Stats row -->
     @if (showStats()) {
       <div class="flex items-center justify-between mt-0.5">
-        <app-stat-row class="text-xs opacity-70" [stats]="effectiveStats()" [baseStats]="definition().stats" [showWorkerEfficiency]="showWorkerEfficiency()" />
+        <app-stat-row
+          class="text-xs opacity-70"
+          [stats]="effectiveStats()"
+          [baseStats]="definition().stats"
+          [showWorkerEfficiency]="showWorkerEfficiency()"
+        />
       </div>
     }
 

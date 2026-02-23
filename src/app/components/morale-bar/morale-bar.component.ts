@@ -24,7 +24,7 @@ import type { MoraleEvent } from '@interfaces/morale';
       <div class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200">
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
-          <span class="text-xs font-mono" [ngClass]="valueLabelClass()">
+          <span class="text-xs" [ngClass]="valueLabelClass()">
             {{ moraleCurrent() }}/{{ moraleMax }}
           </span>
         </div>
@@ -62,13 +62,12 @@ import type { MoraleEvent } from '@interfaces/morale';
                 <span class="opacity-60">Turn {{ evt.turn }}</span>
                 <span class="flex-1 truncate">{{ evt.description }}</span>
                 <span
-                  class="font-mono"
                   [class.text-error]="evt.delta < 0"
                   [class.text-success]="evt.delta > 0"
                 >
                   {{ evt.delta > 0 ? '+' : '' }}{{ evt.delta }}
                 </span>
-                <span class="opacity-40 font-mono">{{ evt.newValue }}</span>
+                <span class="opacity-40">{{ evt.newValue }}</span>
               </div>
             }
           </div>

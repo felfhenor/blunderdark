@@ -71,7 +71,7 @@
             [value]="fearLevel()!"
             max="5"
           ></progress>
-          <span class="text-xs font-mono">
+          <span class="text-xs">
             {{ fearLevel() | number: '1.0-2' }}/5
           </span>
         </div>
@@ -85,7 +85,6 @@
             <div class="flex justify-between text-xs">
               <span>{{ entry[0] }}</span>
               <span
-                class="font-mono"
                 [class.text-success]="entry[1] > 0"
                 [class.text-error]="entry[1] < 0"
               >
@@ -103,7 +102,7 @@
           @if (positional().vaultAdjacent) {
             <div class="flex justify-between text-xs">
               <span>Vault Adjacent</span>
-              <span class="font-mono text-success">
+              <span class="text-success">
                 +{{ positional().goldProductionBonus | number: '1.0-2' }} gold
               </span>
             </div>
@@ -111,7 +110,7 @@
           @if (positional().central) {
             <div class="flex justify-between text-xs">
               <span>Central Placement</span>
-              <span class="font-mono text-success">
+              <span class="text-success">
                 +{{ positional().rulerBonusMultiplier | number: '1.0-2' }} ruler
                 bonuses
               </span>

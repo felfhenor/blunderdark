@@ -5,7 +5,7 @@ import { gameTimeFormatted, gameTimeSpeed, gameloopIsPaused } from '@helpers';
   selector: 'app-display-game-time',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span class="font-mono text-sm">
+    <span class="text-sm">
       {{ gameTimeFormatted() }}
       @if (isPaused()) {
         <span class="text-warning ml-1">[Paused]</span>

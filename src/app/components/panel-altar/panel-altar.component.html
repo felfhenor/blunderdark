@@ -15,7 +15,7 @@
     <div class="divider my-2 text-xs opacity-60">Calming Aura</div>
     <div class="flex items-center gap-2">
       <span class="text-xs">Fear reduction to adjacent rooms:</span>
-      <span class="font-mono text-success text-xs">
+      <span class="text-success text-xs">
         -{{ fearReduction() | number: '1.0-2' }}
       </span>
     </div>
@@ -50,7 +50,7 @@
     @if (recruitmentAvailable()) {
       <div class="divider my-2 text-xs opacity-60">
         Recruitment
-        <span class="font-mono ml-1">
+        <span class="ml-1">
           {{ inhabitantCount() | number: '1.0-2' }}/{{
             maxInhabitants() | number: '1.0-2'
           }}
