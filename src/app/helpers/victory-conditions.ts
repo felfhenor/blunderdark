@@ -1,4 +1,5 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { roomUpgradeGetApplied } from '@helpers/room-upgrades';
 import type {
   GameState,
   InhabitantContent,
@@ -92,6 +93,11 @@ export function victoryConditionCheckRoomsBuilt(
       const roomContent = contentGetEntry<RoomContent>(room.roomTypeId);
       if (roomContent) {
         builtRoomNames.add(roomContent.name);
+      }
+
+      const upgrade = roomUpgradeGetApplied(room);
+      if (upgrade) {
+        builtRoomNames.add(upgrade.name);
       }
     }
   }
