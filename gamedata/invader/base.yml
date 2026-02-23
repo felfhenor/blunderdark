@@ -14,7 +14,7 @@
 
 # Rogue - High Speed, trap specialist
 - id: 3290cd7b-9c5d-4671-8848-91626bd5bc05
-  name: Rogue
+  name: Rogue Invader
   description: A swift and cunning infiltrator. Can disarm traps and deal devastating backstab damage.
   invaderClass: rogue
   baseStats:
@@ -29,7 +29,7 @@
 
 # Mage - High magic Attack, spell-focused
 - id: d3bc3506-4c94-44ea-9974-7a4edb444b17
-  name: Mage
+  name: Mage Invader
   description: A powerful spellcaster whose arcane bolts ignore physical defenses. Can dispel magical protections.
   invaderClass: mage
   baseStats:
@@ -44,7 +44,7 @@
 
 # Cleric - High Defense, healer and anti-undead
 - id: 6b6210c0-f924-4d79-87fd-17af1517e298
-  name: Cleric
+  name: Cleric Invader
   description: A holy warrior who heals allies and deals devastating damage to undead creatures.
   invaderClass: cleric
   baseStats:
@@ -59,7 +59,7 @@
 
 # Paladin - High HP/Defense, anti-corruption champion
 - id: 3d860aec-eda7-4170-b62f-364e6144ce0b
-  name: Paladin
+  name: Paladin Invader
   description: A righteous champion who smites corrupted foes and inspires courage in allies against fear.
   invaderClass: paladin
   baseStats:
@@ -74,7 +74,7 @@
 
 # Ranger - High Speed, scout and marker
 - id: b1b8c630-39fb-4b2f-bf3c-990c657fc96c
-  name: Ranger
+  name: Ranger Invader
   description: A skilled tracker who scouts ahead and marks targets, increasing all damage against them.
   invaderClass: ranger
   baseStats:
