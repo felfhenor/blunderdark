@@ -95,10 +95,14 @@ export class PanelRoomInfoComponent {
     if (!def) return undefined;
 
     const effectiveMax = roomUpgradeGetEffectiveMaxInhabitants(room, def);
+    const upgrade = roomUpgradeGetApplied(room);
+    const baseName = upgrade?.name ?? def.name;
+    const displayName = room.suffix ? `${baseName} ${room.suffix}` : baseName;
 
     return {
       id: room.id,
-      name: room.suffix ? `${def.name} ${room.suffix}` : def.name,
+      name: displayName,
+      baseRoomName: upgrade ? def.name : undefined,
       roomTypeId: room.roomTypeId,
       placedRoom: room,
       maxInhabitants: effectiveMax,

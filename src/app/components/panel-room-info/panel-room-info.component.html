@@ -2,6 +2,9 @@
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
       <h3 class="card-title text-sm">{{ room.name }}</h3>
+      @if (room.baseRoomName) {
+        <p class="text-xs italic opacity-60 -mt-1">{{ room.baseRoomName }}</p>
+      }
 
       @if (isDisconnected()) {
         <div class="alert alert-error py-2 px-3 text-xs animate-pulse">
