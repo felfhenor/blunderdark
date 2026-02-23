@@ -7,6 +7,8 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InvasionSchedule,
+  MutationTraitContent,
+  MutationTraitId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
@@ -28,15 +30,36 @@ vi.mock('@helpers/invasion-triggers', () => ({
   ),
 }));
 
+const mockTraits: MutationTraitContent[] = [
+  {
+    id: 'mt-test-atk' as MutationTraitId,
+    name: 'Iron Muscles',
+    __type: 'mutationtrait',
+    description: '',
+    modifiers: [{ stat: 'attack', bonus: 2 }],
+    rarity: 'common',
+  },
+  {
+    id: 'mt-test-neg' as MutationTraitId,
+    name: 'Withered Limbs',
+    __type: 'mutationtrait',
+    description: '',
+    modifiers: [{ stat: 'attack', bonus: -2 }],
+    rarity: 'common',
+    isNegative: true,
+  },
+];
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntriesByType: vi.fn(() => mockTraits),
+  contentGetEntry: vi.fn(() => undefined),
+}));
+
 const {
-  corruptionEffectRollMutation,
-  corruptionEffectApplyMutation,
   corruptionEffectSelectMutationTarget,
+  corruptionEffectApplyMutationTrait,
   corruptionEffectProcess,
   corruptionEffectEvent$,
-  CORRUPTION_EFFECT_MUTATION_STATS,
-  CORRUPTION_EFFECT_MUTATION_MIN_DELTA,
-  CORRUPTION_EFFECT_MUTATION_MAX_DELTA,
   CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE,
   CORRUPTION_EFFECT_THRESHOLD_MUTATION,
   CORRUPTION_EFFECT_THRESHOLD_CRUSADE,
@@ -120,70 +143,6 @@ function makeGameState(overrides: {
   } as unknown as GameState;
 }
 
-describe('corruptionEffectRollMutation', () => {
-  it('should return a valid stat key', () => {
-    const rng = seedrandom('stat-key');
-    const mutation = corruptionEffectRollMutation(rng);
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain(mutation.stat);
-  });
-
-  it('should return a non-zero delta', () => {
-    for (let i = 0; i < 50; i++) {
-      const rng = seedrandom(`non-zero-${i}`);
-      const mutation = corruptionEffectRollMutation(rng);
-      expect(mutation.delta).not.toBe(0);
-    }
-  });
-
-  it('should return delta within range [-3, 5]', () => {
-    for (let i = 0; i < 100; i++) {
-      const rng = seedrandom(`range-${i}`);
-      const mutation = corruptionEffectRollMutation(rng);
-      expect(mutation.delta).toBeGreaterThanOrEqual(
-        CORRUPTION_EFFECT_MUTATION_MIN_DELTA,
-      );
-      expect(mutation.delta).toBeLessThanOrEqual(
-        CORRUPTION_EFFECT_MUTATION_MAX_DELTA,
-      );
-    }
-  });
-
-  it('should be deterministic with the same seed', () => {
-    const rng1 = seedrandom('deterministic');
-    const rng2 = seedrandom('deterministic');
-    expect(corruptionEffectRollMutation(rng1)).toEqual(
-      corruptionEffectRollMutation(rng2),
-    );
-  });
-});
-
-describe('corruptionEffectApplyMutation', () => {
-  it('should create mutationBonuses if undefined', () => {
-    const inhabitant = makeInhabitant();
-    expect(inhabitant.mutationBonuses).toBeUndefined();
-    corruptionEffectApplyMutation(inhabitant, { stat: 'attack', delta: 3 });
-    expect(inhabitant.mutationBonuses).toEqual({ attack: 3 });
-  });
-
-  it('should accumulate bonuses on the same stat', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: { attack: 2 } });
-    corruptionEffectApplyMutation(inhabitant, { stat: 'attack', delta: 3 });
-    expect(inhabitant.mutationBonuses!.attack).toBe(5);
-  });
-
-  it('should handle negative deltas', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: { defense: 1 } });
-    corruptionEffectApplyMutation(inhabitant, { stat: 'defense', delta: -3 });
-    expect(inhabitant.mutationBonuses!.defense).toBe(-2);
-  });
-
-  it('should add a new stat key without affecting existing ones', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: { hp: 5 } });
-    corruptionEffectApplyMutation(inhabitant, { stat: 'speed', delta: 2 });
-    expect(inhabitant.mutationBonuses).toEqual({ hp: 5, speed: 2 });
-  });
-});
-
 describe('corruptionEffectSelectMutationTarget', () => {
   it('should return undefined for empty array', () => {
     const rng = seedrandom('empty');
@@ -207,6 +166,27 @@ describe('corruptionEffectSelectMutationTarget', () => {
     expect(
       corruptionEffectSelectMutationTarget([inhabitant], rng),
     ).toBe(inhabitant);
+  });
+});
+
+describe('corruptionEffectApplyMutationTrait', () => {
+  it('should add a mutation trait to the target', () => {
+    const inhabitants = [makeInhabitant()];
+    const rng = seedrandom('apply-trait');
+    const result = corruptionEffectApplyMutationTrait(inhabitants, 0, rng);
+    expect(result).toBeDefined();
+    expect(result!.traitName).toBeTruthy();
+    expect(inhabitants[0].mutationTraitIds).toBeDefined();
+    expect(inhabitants[0].mutationTraitIds!.length).toBeGreaterThan(0);
+    expect(inhabitants[0].mutated).toBe(true);
+  });
+
+  it('should append trait to existing mutationTraitIds', () => {
+    const inhabitants = [makeInhabitant({ mutationTraitIds: ['mt-existing'] })];
+    const rng = seedrandom('append');
+    corruptionEffectApplyMutationTrait(inhabitants, 0, rng);
+    expect(inhabitants[0].mutationTraitIds!.length).toBeGreaterThanOrEqual(2);
+    expect(inhabitants[0].mutationTraitIds).toContain('mt-existing');
   });
 });
 
@@ -279,7 +259,7 @@ describe('corruptionEffectProcess — mutations', () => {
     const rng = seedrandom('mutation-100');
     corruptionEffectProcess(state, rng);
     expect(state.world.corruptionEffects.lastMutationCorruption).toBe(100);
-    expect(inhabitants[0].mutationBonuses).toBeDefined();
+    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
   });
 
   it('should not fire when already above 100 and tracked', () => {
@@ -291,7 +271,7 @@ describe('corruptionEffectProcess — mutations', () => {
     });
     const rng = seedrandom('no-refire');
     corruptionEffectProcess(state, rng);
-    expect(inhabitants[0].mutationBonuses).toBeUndefined();
+    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
   });
 
   it('should re-fire on re-crossing (drop below then back above)', () => {
@@ -323,7 +303,7 @@ describe('corruptionEffectProcess — mutations', () => {
     expect(state.world.corruptionEffects.lastMutationCorruption).toBe(100);
   });
 
-  it('should emit mutation_applied event', () => {
+  it('should emit mutation_applied event with trait name', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const inhabitants = [makeInhabitant()];
@@ -331,9 +311,12 @@ describe('corruptionEffectProcess — mutations', () => {
     const rng = seedrandom('mutation-event');
     corruptionEffectProcess(state, rng);
 
-    expect(nextSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'mutation_applied' }),
+    const mutationCalls = nextSpy.mock.calls.filter(
+      ([e]) => e.type === 'mutation_applied',
     );
+    expect(mutationCalls).toHaveLength(1);
+    expect(mutationCalls[0][0].description).toContain('gained');
+
     nextSpy.mockRestore();
   });
 });
@@ -428,7 +411,7 @@ describe('corruptionEffectProcess — combined thresholds', () => {
     expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(true);
     expect(state.world.corruptionEffects.lastMutationCorruption).toBe(250);
     expect(state.world.corruptionEffects.lastCrusadeCorruption).toBe(250);
-    expect(inhabitants[0].mutationBonuses).toBeDefined();
+    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledWith(
       expect.anything(),
       'crusade',
@@ -458,19 +441,5 @@ describe('constants', () => {
     expect(CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE).toBe(50);
     expect(CORRUPTION_EFFECT_THRESHOLD_MUTATION).toBe(100);
     expect(CORRUPTION_EFFECT_THRESHOLD_CRUSADE).toBe(200);
-  });
-
-  it('should have correct mutation range', () => {
-    expect(CORRUPTION_EFFECT_MUTATION_MIN_DELTA).toBe(-3);
-    expect(CORRUPTION_EFFECT_MUTATION_MAX_DELTA).toBe(5);
-  });
-
-  it('should have all 5 inhabitant stats', () => {
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toHaveLength(5);
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain('hp');
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain('attack');
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain('defense');
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain('speed');
-    expect(CORRUPTION_EFFECT_MUTATION_STATS).toContain('workerEfficiency');
   });
 });

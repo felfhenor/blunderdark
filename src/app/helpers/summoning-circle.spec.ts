@@ -550,7 +550,7 @@ describe('Inhabitant Creation', () => {
     expect(inh.temporaryTicksRemaining).toBeUndefined();
     expect(inh.definitionId).toBe(FIRE_ELEMENTAL_ID);
     expect(inh.name).toBe('Test Fantasy Name');
-    expect(inh.mutationBonuses?.attack).toBe(5);
+    expect(inh.instanceStatBonuses?.attack).toBe(5);
   });
 
   it('should create a temporary summoned inhabitant', () => {
@@ -560,9 +560,9 @@ describe('Inhabitant Creation', () => {
     expect(inh.temporaryTicksRemaining).toBe(50);
   });
 
-  it('should not set mutationBonuses when empty', () => {
+  it('should not set instanceStatBonuses when empty', () => {
     const inh = summoningCreateInhabitant(spectralServantDef, spectralRecipe, {}, true, 50);
-    expect(inh.mutationBonuses).toBeUndefined();
+    expect(inh.instanceStatBonuses).toBeUndefined();
   });
 });
 

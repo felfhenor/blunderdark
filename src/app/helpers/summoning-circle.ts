@@ -168,12 +168,12 @@ export function summoningCreateInhabitant(
   isTemporary: boolean,
   duration?: number,
 ): InhabitantInstance {
-  const mutationBonuses: Partial<InhabitantStats> = {};
+  const instanceStatBonuses: Partial<InhabitantStats> = {};
   const statKeys = Object.keys(statBonuses) as Array<keyof InhabitantStats>;
   for (const key of statKeys) {
     const bonus = statBonuses[key];
     if (bonus !== undefined && bonus !== 0) {
-      mutationBonuses[key] = bonus;
+      instanceStatBonuses[key] = bonus;
     }
   }
 
@@ -187,8 +187,8 @@ export function summoningCreateInhabitant(
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
-    mutationBonuses:
-      Object.keys(mutationBonuses).length > 0 ? mutationBonuses : undefined,
+    instanceStatBonuses:
+      Object.keys(instanceStatBonuses).length > 0 ? instanceStatBonuses : undefined,
     isSummoned: true,
     isTemporary: isTemporary || undefined,
     temporaryTicksRemaining: isTemporary ? duration : undefined,

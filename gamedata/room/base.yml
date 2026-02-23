@@ -914,6 +914,7 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 4
+  isUnique: true
   role: breedingPits
   adjacencyBonuses:
     - adjacentRoomId: Spawning Pool

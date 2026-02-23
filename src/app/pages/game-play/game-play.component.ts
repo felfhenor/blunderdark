@@ -16,6 +16,7 @@ import { GridComponent } from '@components/grid/grid.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
 import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
+import { PanelBreedingPitsComponent } from '@components/panel-breeding-pits/panel-breeding-pits.component';
 import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark-forge.component';
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
@@ -45,6 +46,7 @@ import {
   optionsGet,
   roomPlacementSelectedTypeId,
 } from '@helpers';
+import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -73,6 +75,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     MoraleBarComponent,
     PanelAlchemyLabComponent,
     PanelAltarComponent,
+    PanelBreedingPitsComponent,
     PanelDarkForgeComponent,
     PanelFloorSelectorComponent,
     PanelFusionComponent,
@@ -135,6 +138,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private forgePanel = viewChild('forgePanel', { read: TemplateRef });
   private alchemyPanel = viewChild('alchemyPanel', { read: TemplateRef });
   private torturePanel = viewChild('torturePanel', { read: TemplateRef });
+  private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
 
@@ -157,6 +161,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public hasTortureChamber = computed(() =>
     this.hasRoomOfRole('tortureChamber'),
   );
+  public hasBreedingPits = computed(() =>
+    this.hasRoomOfRole('breedingPits'),
+  );
   public isMerchantPresent = merchantIsPresent;
   public hasNoActiveResearch = computed(
     () => !gamestate().world.research.activeResearch,
@@ -169,6 +176,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     darkForge: 'forge',
     alchemyLab: 'alchemy',
     tortureChamber: 'torture',
+    breedingPits: 'breeding',
   };
 
   private selectedRoomTabId = computed(() => {
@@ -211,6 +219,55 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       const tabId = this.selectedRoomTabId();
       if (tabId) {
         this.activePanel.set(tabId);
+      }
+    });
+
+    // When a role-based tab is opened (e.g. via hotkey), select its room on the grid
+    // so the right-side room info panel also appears.
+    effect(() => {
+      const panel = this.activePanel();
+      if (!panel) return;
+
+      // Only act for role-based tabs
+      const roleForTab = Object.entries(this.roleToTabId).find(
+        ([, tabId]) => tabId === panel,
+      );
+      if (!roleForTab) return;
+
+      // If the grid already has the right room selected, skip
+      const currentTile = untracked(() => gridSelectedTile());
+      if (currentTile) {
+        const currentFloor = untracked(floorCurrent);
+        const gridCell = currentFloor?.grid[currentTile.y]?.[currentTile.x];
+        if (gridCell?.roomId) {
+          const selectedRoom = currentFloor?.rooms.find(
+            (r) => r.id === gridCell.roomId,
+          );
+          const selectedDef = selectedRoom
+            ? contentGetEntry<RoomContent>(selectedRoom.roomTypeId)
+            : undefined;
+          if (selectedDef?.role === roleForTab[0]) return;
+        }
+      }
+
+      // Find the room and select one of its tiles
+      const roomTypeId = roomRoleFindById(roleForTab[0]);
+      if (!roomTypeId) return;
+
+      for (const floor of floorAll()) {
+        const room = floor.rooms.find((r) => r.roomTypeId === roomTypeId);
+        if (room) {
+          const shape = roomShapeResolve(room);
+          const tiles = roomShapeGetAbsoluteTiles(
+            shape,
+            room.anchorX,
+            room.anchorY,
+          );
+          if (tiles.length > 0) {
+            gridSelectedTile.set({ x: tiles[0].x, y: tiles[0].y });
+          }
+          break;
+        }
       }
     });
 
@@ -343,6 +400,15 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         isModal: false,
         templateRef: this.torturePanel() ?? placeholder,
         condition: this.hasTortureChamber,
+      },
+      {
+        id: 'breeding',
+        label: 'Breeding',
+        icon: 'gameCharm',
+        hotkey: 'h',
+        isModal: false,
+        templateRef: this.breedingPanel() ?? placeholder,
+        condition: this.hasBreedingPits,
       },
       {
         id: 'merchant',

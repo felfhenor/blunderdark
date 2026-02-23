@@ -1,28 +1,16 @@
 import { invasionTriggerAddSpecial } from '@helpers/invasion-triggers';
+import {
+  mutationTraitApply,
+  mutationTraitRoll,
+} from '@helpers/mutation-traits';
 import { reputationAwardInPlace } from '@helpers/reputation';
-import { rngChoice, rngNumberRange, rngRandom } from '@helpers/rng';
-import type {
-  CorruptionEffectMutation,
-  GameState,
-  InhabitantInstance,
-  InhabitantStats,
-} from '@interfaces';
+import { rngChoice, rngRandom } from '@helpers/rng';
+import type { GameState, InhabitantInstance } from '@interfaces';
 import { Subject } from 'rxjs';
 import type { PRNG } from 'seedrandom';
 import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 
 // --- Constants ---
-
-export const CORRUPTION_EFFECT_MUTATION_STATS: (keyof InhabitantStats)[] = [
-  'hp',
-  'attack',
-  'defense',
-  'speed',
-  'workerEfficiency',
-];
-
-export const CORRUPTION_EFFECT_MUTATION_MIN_DELTA = -3;
-export const CORRUPTION_EFFECT_MUTATION_MAX_DELTA = 5;
 
 export const CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE = 50;
 export const CORRUPTION_EFFECT_THRESHOLD_MUTATION = 100;
@@ -32,36 +20,34 @@ export const corruptionEffectEvent$ = new Subject<CorruptionEffectEvent>();
 
 // --- Pure functions ---
 
-export function corruptionEffectRollMutation(
-  rng: PRNG,
-): CorruptionEffectMutation {
-  const stat = rngChoice(CORRUPTION_EFFECT_MUTATION_STATS, rng);
-  let delta = rngNumberRange(
-    CORRUPTION_EFFECT_MUTATION_MIN_DELTA,
-    CORRUPTION_EFFECT_MUTATION_MAX_DELTA + 1,
-    rng,
-  );
-  if (delta === 0) delta = 1;
-  return { stat, delta };
-}
-
-export function corruptionEffectApplyMutation(
-  inhabitant: InhabitantInstance,
-  mutation: CorruptionEffectMutation,
-): void {
-  if (!inhabitant.mutationBonuses) {
-    inhabitant.mutationBonuses = {};
-  }
-  const current = inhabitant.mutationBonuses[mutation.stat] ?? 0;
-  inhabitant.mutationBonuses[mutation.stat] = current + mutation.delta;
-}
-
 export function corruptionEffectSelectMutationTarget(
   inhabitants: InhabitantInstance[],
   rng: PRNG,
 ): InhabitantInstance | undefined {
   if (inhabitants.length === 0) return undefined;
   return rngChoice(inhabitants, rng);
+}
+
+/**
+ * Roll and apply a mutation trait to a target inhabitant.
+ * Corruption mutations include negative traits (corruption is chaotic).
+ * Mutates the inhabitants array in-place by replacing the target entry.
+ */
+export function corruptionEffectApplyMutationTrait(
+  inhabitants: InhabitantInstance[],
+  targetIndex: number,
+  rng: PRNG,
+): { traitName: string } | undefined {
+  const target = inhabitants[targetIndex];
+  const trait = mutationTraitRoll(
+    true,
+    target.mutationTraitIds ?? [],
+    rng,
+  );
+  if (!trait) return undefined;
+
+  inhabitants[targetIndex] = mutationTraitApply(target, trait);
+  return { traitName: trait.name };
 }
 
 // --- Process function ---
@@ -98,12 +84,18 @@ export function corruptionEffectProcess(
         effectiveRng,
       );
       if (target) {
-        const mutation = corruptionEffectRollMutation(effectiveRng);
-        corruptionEffectApplyMutation(target, mutation);
-        corruptionEffectEvent$.next({
-          type: 'mutation_applied',
-          description: `${target.name} mutated: ${mutation.stat} ${mutation.delta > 0 ? '+' : ''}${mutation.delta}`,
-        });
+        const targetIndex = state.world.inhabitants.indexOf(target);
+        const result = corruptionEffectApplyMutationTrait(
+          state.world.inhabitants,
+          targetIndex,
+          effectiveRng,
+        );
+        if (result) {
+          corruptionEffectEvent$.next({
+            type: 'mutation_applied',
+            description: `${target.name} mutated: gained ${result.traitName}`,
+          });
+        }
       }
       effects.lastMutationCorruption = corruption;
     }
@@ -124,7 +116,8 @@ export function corruptionEffectProcess(
       );
       corruptionEffectEvent$.next({
         type: 'crusade_triggered',
-        description: 'A holy crusade has been triggered by overwhelming corruption!',
+        description:
+          'A holy crusade has been triggered by overwhelming corruption!',
       });
       effects.lastCrusadeCorruption = corruption;
     }

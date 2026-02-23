@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -56,7 +57,8 @@ export function efficiencyCalculateInhabitantContribution(
   );
   if (!def) return undefined;
 
-  const workerEfficiencyBonus = def.stats.workerEfficiency - 1.0;
+  const stats = effectiveStatsCalculate(def, instance);
+  const workerEfficiencyBonus = stats.workerEfficiency - 1.0;
 
   const traitBonuses = def.traits
     .filter((t) => t.effectType === 'production_bonus')
@@ -143,7 +145,8 @@ export function efficiencyCalculateMatchedInhabitantBonus(
     );
     if (!def) continue;
 
-    totalBonus += def.stats.workerEfficiency - 1.0;
+    const stats = effectiveStatsCalculate(def, inst);
+    totalBonus += stats.workerEfficiency - 1.0;
 
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {

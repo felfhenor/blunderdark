@@ -8,12 +8,14 @@ import {
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
+import { contentGetEntry } from '@helpers/content';
+import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { efficiencyDoesTraitApply } from '@helpers/efficiency';
 import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import { synergyGetDefinitions } from '@helpers/synergy';
-import type { InhabitantInstance, PlacedRoomId, RoomId } from '@interfaces';
+import type { InhabitantInstance, MutationTraitContent, PlacedRoomId, RoomId } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -39,6 +41,21 @@ export class InhabitantCardComponent {
   public showHunger = input(true);
   public synergyRoomId = input<PlacedRoomId | undefined>(undefined);
   public compact = input(false);
+
+  public effectiveStats = computed(() =>
+    effectiveStatsCalculate(this.definition(), this.instance()),
+  );
+
+  public mutationTraits = computed(() => {
+    const ids = this.instance().mutationTraitIds;
+    if (!ids || ids.length === 0) return [];
+    const traits: MutationTraitContent[] = [];
+    for (const id of ids) {
+      const trait = contentGetEntry<MutationTraitContent>(id);
+      if (trait) traits.push(trait);
+    }
+    return traits;
+  });
 
   public assignmentLabel = computed(() =>
     inhabitantGetAssignmentLabel(this.instance().assignedRoomId),

@@ -19,6 +19,7 @@ export * from './content-inhabitanttrait';
 export * from './content-invader';
 export * from './content-invasion';
 export * from './content-merchanttrade';
+export * from './content-mutationtrait';
 export * from './content-reputationaction';
 export * from './content-reputationeffect';
 export * from './content-research';

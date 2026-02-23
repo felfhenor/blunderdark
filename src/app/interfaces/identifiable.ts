@@ -11,6 +11,7 @@ export type ContentType =
   | 'invader'
   | 'invasion'
   | 'merchanttrade'
+  | 'mutationtrait'
   | 'reputationaction'
   | 'reputationeffect'
   | 'research'

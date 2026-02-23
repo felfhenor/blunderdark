@@ -8,9 +8,8 @@ import {
   breedingGetHybridTicks,
   breedingGetMutatableInhabitants,
   contentGetEntry,
-  floorCurrent,
+  floorAll,
   gamestate,
-  gridSelectedTile,
   mutationCompleted$,
   notify,
   roomRoleFindById,
@@ -21,6 +20,7 @@ import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   BreedingRecipeContent,
   BreedingRecipeId,
+  Floor,
   InhabitantInstanceId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -50,17 +50,24 @@ export class PanelBreedingPitsComponent {
   ];
 
   public breedingRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+    const roleId = roomRoleFindById('breedingPits');
+    if (!roleId) return undefined;
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
+    for (const floor of floorAll()) {
+      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
+      if (room) return room;
+    }
+    return undefined;
+  });
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room || room.roomTypeId !== roomRoleFindById('breedingPits')) return undefined;
+  public breedingFloor = computed<Floor | undefined>(() => {
+    const roleId = roomRoleFindById('breedingPits');
+    if (!roleId) return undefined;
 
-    return room;
+    for (const floor of floorAll()) {
+      if (floor.rooms.some((r) => r.roomTypeId === roleId)) return floor;
+    }
+    return undefined;
   });
 
   public roomDef = computed(() => {
@@ -88,8 +95,8 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room || room.breedingJob || room.mutationJob) return [];
 
+    const floor = this.breedingFloor();
     const entries = breedingGetAvailableRecipes(assigned).map((r) => {
-      const floor = floorCurrent();
       const adjacentTypes = floor
         ? breedingGetAdjacentRoomTypeIds(room, floor)
         : new Set<string>();

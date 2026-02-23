@@ -24,6 +24,8 @@ import type {
   SummonRecipeContent,
   SummonRecipeId,
   UnlockEffect,
+  MutationTraitContent,
+  MutationTraitId,
   UpgradeUnlock,
 } from '@interfaces';
 import type {
@@ -77,6 +79,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   fusionrecipe: ensureFusionRecipe,
   inhabitant: ensureInhabitant,
   inhabitanttrait: ensureInhabitantTrait,
+  mutationtrait: ensureMutationTrait,
   invader: ensureInvader,
   invasion: ensureInvasion,
   merchanttrade: ensureMerchantTrade,
@@ -354,6 +357,23 @@ function ensureInhabitantTrait(
     effectValue: trait.effectValue ?? 0,
     targetResourceType: trait.targetResourceType ?? undefined,
     targetRoomId: trait.targetRoomId ?? undefined,
+  };
+}
+
+function ensureMutationTrait(
+  trait: Partial<MutationTraitContent>,
+): MutationTraitContent {
+  return {
+    id: (trait.id ?? 'UNKNOWN') as MutationTraitId,
+    name: trait.name ?? 'UNKNOWN',
+    __type: 'mutationtrait',
+    description: trait.description ?? '',
+    modifiers: (trait.modifiers ?? []).map((m) => ({
+      stat: m.stat ?? 'hp',
+      bonus: m.bonus ?? 0,
+    })),
+    rarity: trait.rarity ?? 'common',
+    isNegative: trait.isNegative ?? undefined,
   };
 }
 

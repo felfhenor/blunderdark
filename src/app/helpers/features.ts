@@ -709,7 +709,7 @@ export function featurePhylacteryProcess(
         state: 'normal',
         assignedRoomId: undefined,
         isSummoned: true,
-        mutationBonuses: stats ? {
+        instanceStatBonuses: stats ? {
           hp: Math.floor((stats.hp ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
           attack: Math.floor((stats.attack ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),
           defense: Math.floor((stats.defense ?? 0) * (FEATURE_PHYLACTERY_STAT_MULTIPLIER - 1)),

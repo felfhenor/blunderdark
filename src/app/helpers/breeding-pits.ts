@@ -2,6 +2,11 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import {
+  mutationTraitApply,
+  mutationTraitRoll,
+  mutationTraitRollNegative,
+} from '@helpers/mutation-traits';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -36,8 +41,6 @@ export const MUTATION_POSITIVE_CHANCE = 0.6;
 export const MUTATION_NEUTRAL_CHANCE = 0.25;
 export const MUTATION_NEGATIVE_CHANCE = 0.15;
 
-export const MUTATION_POSITIVE_BONUS = 0.2;
-export const MUTATION_NEGATIVE_PENALTY = 0.15;
 
 const breedingCompletedSubject = new Subject<BreedingCompletedEvent>();
 export const breedingCompleted$ = breedingCompletedSubject.asObservable();
@@ -246,7 +249,7 @@ export function breedingCreateHybrid(
     trainingProgress: 0,
     trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
-    mutationBonuses: {
+    instanceStatBonuses: {
       hp: stats.hp - parentADef.stats.hp,
       attack: stats.attack - parentADef.stats.attack,
       defense: stats.defense - parentADef.stats.defense,
@@ -267,45 +270,24 @@ export function breedingCreateHybrid(
 /**
  * Apply a mutation to an inhabitant based on outcome.
  * Returns the mutated inhabitant (new object).
+ * Positive → roll positive trait; Negative → roll negative trait; Neutral → set mutated only.
  */
 export function breedingApplyMutation(
   inhabitant: InhabitantInstance,
   outcome: MutationOutcome,
   rng: PRNG,
 ): InhabitantInstance {
-  const def = contentGetEntry<InhabitantContent>(
-    inhabitant.definitionId,
-  );
-  if (!def) return { ...inhabitant, mutated: true };
+  const existingTraitIds = inhabitant.mutationTraitIds ?? [];
 
-  const statKeys: Array<keyof InhabitantStats> = [
-    'hp',
-    'attack',
-    'defense',
-    'speed',
-    'workerEfficiency',
-  ];
-  const targetStat = statKeys[Math.floor(rng() * statKeys.length)];
-  const baseStat = def.stats[targetStat];
-
-  let change = 0;
   if (outcome === 'positive') {
-    change = Math.round(baseStat * MUTATION_POSITIVE_BONUS * 100) / 100;
+    const trait = mutationTraitRoll(false, existingTraitIds, rng);
+    if (trait) return mutationTraitApply(inhabitant, trait);
   } else if (outcome === 'negative') {
-    change = -Math.round(baseStat * MUTATION_NEGATIVE_PENALTY * 100) / 100;
+    const trait = mutationTraitRollNegative(existingTraitIds, rng);
+    if (trait) return mutationTraitApply(inhabitant, trait);
   }
 
-  const existing = inhabitant.mutationBonuses ?? {};
-  const currentBonus = existing[targetStat] ?? 0;
-
-  return {
-    ...inhabitant,
-    mutated: true,
-    mutationBonuses: {
-      ...existing,
-      [targetStat]: Math.round((currentBonus + change) * 100) / 100,
-    },
-  };
+  return { ...inhabitant, mutated: true };
 }
 
 /**

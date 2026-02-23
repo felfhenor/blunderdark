@@ -9,6 +9,8 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
+  MutationTraitContent,
+  MutationTraitId,
   PlacedRoom,
   PlacedRoomId,
   RoomContent,
@@ -62,12 +64,9 @@ const mockContent = new Map<string, unknown>();
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
   contentGetEntriesByType: vi.fn((type: string) => {
-    if (type === 'breedingrecipe') {
-      return [...mockContent.values()].filter(
-        (v) => (v as { __type?: string }).__type === 'breedingrecipe',
-      );
-    }
-    return [];
+    return [...mockContent.values()].filter(
+      (v) => (v as { __type?: string }).__type === type,
+    );
   }),
 }));
 
@@ -92,6 +91,7 @@ vi.mock('@helpers/room-upgrades', async () => {
 
 vi.mock('@helpers/rng', () => ({
   rngChoice: (choices: unknown[]) => choices[0],
+  rngChoiceWeightedByRarity: (choices: unknown[]) => choices.length > 0 ? choices[0] : undefined,
   rngUuid: () => 'test-uuid-' + Math.random().toString(36).slice(2, 8),
   rngRandom: () => seedrandom('test-seed'),
 }));
@@ -357,6 +357,30 @@ import {
   breedingRollMutationOutcome,
 } from '@helpers/breeding-pits';
 
+// --- Mock mutation traits ---
+
+const MT_POS_ID = 'mt-test-pos';
+const MT_NEG_ID = 'mt-test-neg';
+
+const mockPosTrait: MutationTraitContent = {
+  id: MT_POS_ID as MutationTraitId,
+  name: 'Iron Muscles',
+  __type: 'mutationtrait',
+  description: '',
+  modifiers: [{ stat: 'attack', bonus: 2 }],
+  rarity: 'common',
+};
+
+const mockNegTrait: MutationTraitContent = {
+  id: MT_NEG_ID as MutationTraitId,
+  name: 'Withered Limbs',
+  __type: 'mutationtrait',
+  description: '',
+  modifiers: [{ stat: 'attack', bonus: -2 }],
+  rarity: 'common',
+  isNegative: true,
+};
+
 // --- Setup ---
 
 beforeEach(() => {
@@ -368,6 +392,8 @@ beforeEach(() => {
   mockContent.set(KOBOLD_ID, koboldDef);
   mockContent.set(SKELETON_ID, skeletonDef);
   mockContent.set(RECIPE_GOBLIN_KOBOLD_ID, goblinKoboldRecipe);
+  mockContent.set(MT_POS_ID, mockPosTrait);
+  mockContent.set(MT_NEG_ID, mockNegTrait);
 });
 
 // --- Tests ---
@@ -566,32 +592,29 @@ describe('Mutation Application', () => {
     expect(result.mutated).toBe(true);
   });
 
-  it('should add positive bonus for positive outcome', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: {} });
+  it('should add a positive mutation trait for positive outcome', () => {
+    const inhabitant = makeInhabitant();
     const rng = seedrandom('fixed-seed');
     const result = breedingApplyMutation(inhabitant, 'positive', rng);
-    const bonuses = result.mutationBonuses ?? {};
-    const hasPositive = Object.values(bonuses).some((v) => v !== undefined && v > 0);
-    expect(hasPositive).toBe(true);
+    expect(result.mutationTraitIds).toBeDefined();
+    expect(result.mutationTraitIds!.length).toBeGreaterThan(0);
+    // Should not contain a negative trait
+    expect(result.mutationTraitIds).not.toContain(MT_NEG_ID);
   });
 
-  it('should add negative bonus for negative outcome', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: {} });
+  it('should add a negative mutation trait for negative outcome', () => {
+    const inhabitant = makeInhabitant();
     const rng = seedrandom('fixed-seed');
     const result = breedingApplyMutation(inhabitant, 'negative', rng);
-    const bonuses = result.mutationBonuses ?? {};
-    const hasNegative = Object.values(bonuses).some((v) => v !== undefined && v < 0);
-    expect(hasNegative).toBe(true);
+    expect(result.mutationTraitIds).toBeDefined();
+    expect(result.mutationTraitIds).toContain(MT_NEG_ID);
   });
 
-  it('should not change stats for neutral outcome', () => {
-    const inhabitant = makeInhabitant({ mutationBonuses: {} });
+  it('should not add traits for neutral outcome', () => {
+    const inhabitant = makeInhabitant();
     const rng = seedrandom('fixed-seed');
     const result = breedingApplyMutation(inhabitant, 'neutral', rng);
-    const bonuses = result.mutationBonuses ?? {};
-    // Neutral adds 0 to the targeted stat
-    const allZero = Object.values(bonuses).every((v) => v === undefined || v === 0);
-    expect(allZero).toBe(true);
+    expect(result.mutationTraitIds).toBeUndefined();
   });
 });
 
@@ -827,14 +850,14 @@ describe('Hybrid Creation', () => {
     expect(hybrid.definitionId).toBe(GOBLIN_ID);
   });
 
-  it('should store stat differences in mutationBonuses', () => {
+  it('should store stat differences in instanceStatBonuses', () => {
     const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
     const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
 
     const hybrid = breedingCreateHybrid(goblin, kobold, goblinKoboldRecipe);
 
-    // mutationBonuses stores the diff from parentA's base stats
-    expect(hybrid.mutationBonuses).toBeDefined();
+    // instanceStatBonuses stores the diff from parentA's base stats
+    expect(hybrid.instanceStatBonuses).toBeDefined();
   });
 });
 

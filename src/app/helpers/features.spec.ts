@@ -1558,7 +1558,7 @@ describe('featurePhylacteryProcess', () => {
     expect(queue).toHaveLength(0);
   });
 
-  it('respawned inhabitant has reduced stats via mutationBonuses', () => {
+  it('respawned inhabitant has reduced stats via instanceStatBonuses', () => {
     vi.mocked(contentGetEntry).mockReturnValue(mockInhabitantContent);
     const queue: PhylacteryRespawnEntry[] = [{
       definitionId: mockInhabitantContent.id,
@@ -1568,13 +1568,13 @@ describe('featurePhylacteryProcess', () => {
     }];
     const result = featurePhylacteryProcess(queue);
     expect(result).toHaveLength(1);
-    // Stats are 75% of base, so mutationBonuses = -25% of base
+    // Stats are 75% of base, so instanceStatBonuses = -25% of base
     // hp: 10 → floor(10 * -0.25) = floor(-2.5) = -3
-    expect(result[0].mutationBonuses?.hp).toBe(-3);
+    expect(result[0].instanceStatBonuses?.hp).toBe(-3);
     // attack: 4 → floor(4 * -0.25) = floor(-1) = -1
-    expect(result[0].mutationBonuses?.attack).toBe(-1);
+    expect(result[0].instanceStatBonuses?.attack).toBe(-1);
     // workerEfficiency: 1.0 → 1.0 * -0.25 = -0.25
-    expect(result[0].mutationBonuses?.workerEfficiency).toBeCloseTo(-0.25);
+    expect(result[0].instanceStatBonuses?.workerEfficiency).toBeCloseTo(-0.25);
   });
 
   it('processes multiple entries independently', () => {

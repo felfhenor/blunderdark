@@ -93,19 +93,19 @@
     @if (showStats()) {
       <div class="flex items-center justify-between mt-0.5">
         <div class="stats-row text-xs">
-          <app-stat-name type="hp" [value]="definition().stats.hp" />
-          <app-stat-name type="attack" [value]="definition().stats.attack" />
-          <app-stat-name type="defense" [value]="definition().stats.defense" />
-          <app-stat-name type="speed" [value]="definition().stats.speed" />
+          <app-stat-name type="hp" [value]="effectiveStats().hp" />
+          <app-stat-name type="attack" [value]="effectiveStats().attack" />
+          <app-stat-name type="defense" [value]="effectiveStats().defense" />
+          <app-stat-name type="speed" [value]="effectiveStats().speed" />
           @if (showWorkerEfficiency()) {
             <span
-              [class.stat-high]="definition().stats.workerEfficiency > 1.0"
-              [class.stat-low]="definition().stats.workerEfficiency < 1.0"
-              [class.font-bold]="definition().stats.workerEfficiency > 1.0"
+              [class.stat-high]="effectiveStats().workerEfficiency > 1.0"
+              [class.stat-low]="effectiveStats().workerEfficiency < 1.0"
+              [class.font-bold]="effectiveStats().workerEfficiency > 1.0"
             >
               <app-stat-name
                 type="workerEfficiency"
-                [value]="definition().stats.workerEfficiency"
+                [value]="effectiveStats().workerEfficiency"
                 suffix="x"
               />
             </span>
@@ -123,6 +123,22 @@
             [tp]="trait.description"
           >
             {{ trait.name }}
+          </span>
+        }
+      </div>
+    }
+
+    <!-- Mutation Traits -->
+    @if (showTraits() && mutationTraits().length > 0) {
+      <div class="flex flex-wrap gap-0.5 mt-0.5">
+        @for (mt of mutationTraits(); track mt.id) {
+          <span
+            class="badge badge-xs"
+            [class.badge-accent]="!mt.isNegative"
+            [class.badge-error]="!!mt.isNegative"
+            [tp]="mt.description"
+          >
+            {{ mt.name }}
           </span>
         }
       </div>
