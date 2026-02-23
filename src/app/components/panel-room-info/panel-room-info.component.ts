@@ -19,6 +19,10 @@ import {
   contentGetEntry,
   contentGetEntriesByType,
   roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetVisible,
+  roomUpgradeGetApplied,
+  roomUpgradeCanApply,
+  roomUpgradeApply,
   roomRemovalGetInfo,
   connectionGetRoomConnections,
   getEntityName,
@@ -42,6 +46,7 @@ import {
   featureRemoveFromSlot,
   featureIsUniquePlaced,
   featureGetResourceConverterEfficiency,
+  researchUnlockIsFeatureUnlocked,
   resourceCanAfford,
   resourcePayCost,
   updateGamestate,
@@ -57,7 +62,7 @@ import {
   transportElevatorExtendExecute,
   transportElevatorShrinkExecute,
 } from '@helpers/transport-placement';
-import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
+import type { InhabitantInstance, PlacedRoomId, RoomUpgradePath } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { ResourceType } from '@interfaces/resource';
@@ -237,6 +242,73 @@ export class PanelRoomInfoComponent {
     if (breakdown.effectiveFear >= 2) return 'progress-warning';
     return 'progress-success';
   });
+
+  // --- Room Upgrades ---
+
+  public roomUpgradesUnlocked = computed(() => researchUnlockIsFeatureUnlocked('room_upgrades'));
+
+  public visibleUpgrades = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return [];
+    const darkUpgradeUnlocked = gamestate().world.corruptionEffects.darkUpgradeUnlocked;
+    return roomUpgradeGetVisible(room.placedRoom, darkUpgradeUnlocked);
+  });
+
+  public appliedUpgrade = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+    return roomUpgradeGetApplied(room.placedRoom);
+  });
+
+  public getUpgradeCostEntries(path: RoomUpgradePath): { type: ResourceType; amount: number }[] {
+    return Object.entries(path.cost)
+      .filter(([, v]) => v !== undefined && v > 0)
+      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
+  }
+
+  public canAffordUpgrade(path: RoomUpgradePath): boolean {
+    return resourceCanAfford(path.cost);
+  }
+
+  public async onApplyUpgrade(path: RoomUpgradePath): Promise<void> {
+    const room = this.selectedRoom();
+    if (!room) return;
+
+    const darkUpgradeUnlocked = gamestate().world.corruptionEffects.darkUpgradeUnlocked;
+    const validation = roomUpgradeCanApply(room.placedRoom, path.id, darkUpgradeUnlocked);
+    if (!validation.valid) {
+      notifyError(validation.reason ?? 'Cannot apply upgrade');
+      return;
+    }
+
+    if (!resourceCanAfford(path.cost)) {
+      notifyError('Not enough resources');
+      return;
+    }
+
+    const paid = await resourcePayCost(path.cost);
+    if (!paid) {
+      notifyError('Not enough resources');
+      return;
+    }
+
+    await updateGamestate((s) => {
+      const newFloors = s.world.floors.map((floor) => ({
+        ...floor,
+        rooms: floor.rooms.map((r) =>
+          r.id === room.id
+            ? roomUpgradeApply(r, path.id)
+            : r,
+        ),
+      }));
+      return {
+        ...s,
+        world: { ...s.world, floors: newFloors },
+      };
+    });
+
+    notifySuccess(`Applied ${path.name} upgrade`);
+  }
 
   public eligibleUnassigned = computed(() => {
     const room = this.selectedRoom();

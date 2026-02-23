@@ -11,6 +11,7 @@
 #   │   └── Automated Defenses (T3)
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
 #   ├── Elevator Action (T2)
+#   ├── Room Specialization (T2)
 #   ├── Teleporters (T4) [Master Architecture]
 #   └── Advanced Manufacturing (T2)
 #       └── Dark Forge Mastery (T3)
@@ -68,6 +69,22 @@
     - type: feature_flag
       featureFlag: elevators
       description: Elevators
+  tier: 2
+  requiredTicks: 150
+
+- id: 6c5df5e7-1faa-42a5-b97f-1d8ccd997d48
+  name: Room Specialization
+  description: Research techniques to specialize production rooms, unlocking unique upgrade paths that enhance their output and capabilities.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Basic Engineering
+  unlocks:
+    - type: feature_flag
+      featureFlag: room_upgrades
+      description: Room Upgrades
   tier: 2
   requiredTicks: 150
 
