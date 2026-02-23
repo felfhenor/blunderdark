@@ -47,17 +47,15 @@
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Assigned</div>
-        <div class="flex flex-wrap gap-2">
-          @for (inh of assignedInhabitants(); track inh.instanceId) {
-            <span class="badge badge-xs badge-outline">
-              {{ inh.defName }}
-              @if (inh.isHybrid) {
-                (H)
-              }
-              @if (inh.mutated) {
-                (M)
-              }
-            </span>
+        <div class="flex flex-col gap-1">
+          @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
+            <app-inhabitant-card
+              [instance]="inh.instance"
+              [definition]="inh.def"
+              [compact]="true"
+              [showAssignment]="false"
+              [showHybridBadge]="true"
+            />
           }
         </div>
       } @else {

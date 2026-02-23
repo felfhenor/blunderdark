@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
   darkForgeAddJob,
@@ -34,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostListComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,9 +71,10 @@ export class PanelDarkForgeComponent {
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { ...i, defName: def?.name ?? i.name };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+        return { instance: i, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public availableRecipes = computed(() => {

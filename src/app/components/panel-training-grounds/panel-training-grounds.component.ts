@@ -60,14 +60,15 @@ export class PanelTrainingGroundsComponent {
         );
         return {
           instanceId: i.instanceId,
-          name: def?.name ?? i.name,
+          instanceName: i.name,
+          defName: def?.name ?? i.name,
           trained: i.trained ?? false,
           progress,
           percent,
           bonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
         };
       });
-    return sortBy(mapped, [(e) => e.name]);
+    return sortBy(mapped, [(e) => e.defName]);
   });
 
   public trainingTimeSeconds = computed(() => {

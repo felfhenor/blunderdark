@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   breedingCompleted$,
@@ -29,7 +30,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-breeding-pits',
-  imports: [DecimalPipe, ModalComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, ModalComponent],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,9 +86,10 @@ export class PanelBreedingPitsComponent {
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { ...i, defName: def?.name ?? i.name };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+        return { instance: i, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public availableRecipes = computed(() => {
@@ -95,8 +97,9 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room || room.breedingJob || room.mutationJob) return [];
 
+    const instances = assigned.map((a) => a.instance);
     const floor = this.breedingFloor();
-    const entries = breedingGetAvailableRecipes(assigned).map((r) => {
+    const entries = breedingGetAvailableRecipes(instances).map((r) => {
       const adjacentTypes = floor
         ? breedingGetAdjacentRoomTypeIds(room, floor)
         : new Set<string>();
@@ -115,8 +118,9 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room || room.breedingJob || room.mutationJob) return [];
 
+    const instances = assigned.map((a) => a.instance);
     return sortBy(
-      breedingGetMutatableInhabitants(assigned),
+      breedingGetMutatableInhabitants(instances),
       [(i) => contentGetEntry<InhabitantContent>(i.definitionId)?.name ?? ''],
     );
   });

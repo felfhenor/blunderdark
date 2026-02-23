@@ -39,9 +39,15 @@
       <!-- Assigned Workers -->
       @if (assignedWorkers().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Workers</div>
-        <div class="flex flex-wrap gap-2">
-          @for (w of assignedWorkers(); track w.instanceId) {
-            <span class="badge badge-xs badge-outline">{{ w.defName }}</span>
+        <div class="flex flex-col gap-1">
+          @for (w of assignedWorkers(); track w.instance.instanceId) {
+            <app-inhabitant-card
+              [instance]="w.instance"
+              [definition]="w.def"
+              [compact]="true"
+              [showAssignment]="false"
+              [showHybridBadge]="true"
+            />
           }
         </div>
       } @else {

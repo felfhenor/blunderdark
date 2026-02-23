@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
@@ -28,7 +29,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, ModalComponent, StatRowComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, ModalComponent, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,12 +94,11 @@ export class PanelTortureChamberComponent {
     const mapped = state.world.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(
-          i.definitionId,
-        );
-        return { ...i, defName: def?.name ?? i.name };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+        const def = contentGetEntry<InhabitantContent>(i.definitionId);
+        return { instance: i, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public availablePrisoners = computed(() => {

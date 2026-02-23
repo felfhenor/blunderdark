@@ -2,6 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   alchemyLabCanConvert,
   alchemyLabCompleted$,
@@ -29,7 +30,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,9 +66,10 @@ export class PanelAlchemyLabComponent {
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { ...i, defName: def?.name ?? i.name };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+        return { instance: i, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public availableRecipes = computed(() => {

@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   contentGetEntry,
@@ -34,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, CurrencyCostListComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,9 +81,10 @@ export class PanelSummoningCircleComponent {
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { ...i, defName: def?.name ?? i.name };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+        return { instance: i, def };
+      })
+      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public availableRecipes = computed(() => {
