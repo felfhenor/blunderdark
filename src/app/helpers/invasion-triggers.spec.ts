@@ -322,7 +322,7 @@ describe('invasion-triggers', () => {
 
   describe('invasionTriggerProcessSchedule', () => {
     it('should do nothing during grace period', () => {
-      const state = makeGameState({ day: 15 });
+      const state = makeGameState({ day: 5 });
       const rng = seedrandom('grace');
       invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();

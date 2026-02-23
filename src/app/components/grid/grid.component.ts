@@ -70,6 +70,7 @@ import {
   transportPortalStep,
 } from '@helpers/transport-placement';
 import { gridCreateEmpty } from '@helpers/grid';
+import { roomUpgradeGetApplied } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -234,7 +235,8 @@ export class GridComponent implements AfterViewInit {
     const map = new Map<string, { color: string; name: string }>();
     for (const room of floor.rooms) {
       const def = productionGetRoomDefinition(room.roomTypeId);
-      const baseName = def?.name ?? 'Room';
+      const upgrade = roomUpgradeGetApplied(room);
+      const baseName = upgrade?.name ?? def?.name ?? 'Room';
       map.set(room.id, {
         color: getRoomColor(room.roomTypeId),
         name: room.suffix ? `${baseName} ${room.suffix}` : baseName,
