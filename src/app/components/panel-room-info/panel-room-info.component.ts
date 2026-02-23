@@ -69,6 +69,7 @@ import type { ResourceType } from '@interfaces/resource';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
+import { startCase } from 'es-toolkit';
 
 @Component({
   selector: 'app-panel-room-info',
@@ -263,6 +264,10 @@ export class PanelRoomInfoComponent {
     if (!room) return undefined;
     return roomUpgradeGetApplied(room.placedRoom);
   });
+
+  public formatEffectType(type: string): string {
+    return startCase(type);
+  }
 
   public getUpgradeCostEntries(path: RoomUpgradePath): { type: ResourceType; amount: number }[] {
     return Object.entries(path.cost)

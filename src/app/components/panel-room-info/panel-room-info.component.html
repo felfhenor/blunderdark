@@ -151,7 +151,7 @@
                       -{{ effect.value }} fear
                     }
                     @default {
-                      {{ effect.type }}: {{ effect.value }}
+                      {{ formatEffectType(effect.type) }}: {{ effect.value }}
                     }
                   }
                 </span>
@@ -190,7 +190,7 @@
                                 -{{ effect.value }} fear
                               }
                               @default {
-                                {{ effect.type }}: {{ effect.value }}
+                                {{ formatEffectType(effect.type) }}: {{ effect.value }}
                               }
                             }
                           </span>
