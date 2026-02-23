@@ -23,7 +23,11 @@
 
   &.selected {
     border-color: var(--color-primary);
-    background-color: color-mix(in oklch, var(--color-primary) 15%, transparent);
+    background-color: color-mix(
+      in oklch,
+      var(--color-primary) 15%,
+      transparent
+    );
   }
 }
 
@@ -47,11 +51,6 @@
 .stat-low {
   color: var(--color-error);
   opacity: 0.8;
-}
-
-.detail-panel {
-  max-height: 300px;
-  overflow-y: auto;
 }
 
 .reassign-list {
