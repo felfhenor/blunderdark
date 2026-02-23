@@ -1,11 +1,13 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import {
+  connectionAddToFloor,
+  connectionValidate,
+} from '@helpers/connections';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
-import { hallwayPlacementFindPointPath } from '@helpers/hallway-placement';
-import { hallwayAdd, hallwayAddToGrid } from '@helpers/hallways';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
-import { generateHallwaySuffix, generateRoomSuffix } from '@helpers/suffix';
+import { generateRoomSuffix } from '@helpers/suffix';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
@@ -17,8 +19,6 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
-  Hallway,
-  HallwayId,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
@@ -106,32 +106,24 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
     }
   }
 
-  // Connect all auto-placed rooms with hallways
+  // Connect all adjacent auto-placed rooms with doors
   for (let i = 0; i < placedRoomIds.length; i++) {
     for (let j = i + 1; j < placedRoomIds.length; j++) {
-      const roomA = floorCurrent.rooms.find((r) => r.id === placedRoomIds[i]);
-      const roomB = floorCurrent.rooms.find((r) => r.id === placedRoomIds[j]);
-      if (!roomA || !roomB) continue;
+      const roomAId = placedRoomIds[i] as PlacedRoomId;
+      const roomBId = placedRoomIds[j] as PlacedRoomId;
 
-      const path = hallwayPlacementFindPointPath(
-        floorCurrent.grid,
-        { x: roomA.anchorX, y: roomA.anchorY },
-        { x: roomB.anchorX, y: roomB.anchorY },
+      const validation = connectionValidate(floorCurrent, roomAId, roomBId);
+      if (!validation.valid || !validation.edgeTiles) continue;
+
+      const result = connectionAddToFloor(
+        floorCurrent,
+        roomAId,
+        roomBId,
+        validation.edgeTiles,
       );
-      if (!path) continue;
-
-      const hallway: Hallway = {
-        id: rngUuid<HallwayId>(),
-        suffix: generateHallwaySuffix(floorCurrent),
-        tiles: path,
-        upgrades: [],
-      };
-
-      floorCurrent = {
-        ...floorCurrent,
-        grid: hallwayAddToGrid(floorCurrent.grid, hallway),
-        hallways: hallwayAdd(floorCurrent.hallways, hallway),
-      };
+      if (result) {
+        floorCurrent = result.floor;
+      }
     }
   }
 
