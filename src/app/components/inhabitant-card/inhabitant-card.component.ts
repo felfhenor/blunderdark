@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { StatNameComponent } from '@components/stat-name/stat-name.component';
+import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { efficiencyDoesTraitApply } from '@helpers/efficiency';
@@ -21,7 +21,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-inhabitant-card',
-  imports: [DecimalPipe, NgClass, HungerIndicatorComponent, IconComponent, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, HungerIndicatorComponent, IconComponent, StatRowComponent, TippyDirective],
   templateUrl: './inhabitant-card.component.html',
   styleUrl: './inhabitant-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

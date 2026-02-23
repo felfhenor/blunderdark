@@ -79,20 +79,7 @@
               </div>
 
               <!-- Stats -->
-              <div class="flex flex-wrap gap-x-2 gap-y-0 mb-1 text-xs">
-                <app-stat-name type="hp" [value]="entry.def.stats.hp" />
-                <app-stat-name type="attack" [value]="entry.def.stats.attack" />
-                <app-stat-name
-                  type="defense"
-                  [value]="entry.def.stats.defense"
-                />
-                <app-stat-name type="speed" [value]="entry.def.stats.speed" />
-                <app-stat-name
-                  type="workerEfficiency"
-                  [value]="entry.def.stats.workerEfficiency"
-                  suffix="x"
-                />
-              </div>
+              <app-stat-row class="flex-wrap mb-1 text-xs" [stats]="entry.def.stats" />
 
               <!-- Traits -->
               @if (entry.def.traits.length > 0) {

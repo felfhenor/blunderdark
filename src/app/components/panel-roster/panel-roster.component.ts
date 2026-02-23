@@ -7,7 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
-import { StatNameComponent } from '@components/stat-name/stat-name.component';
+import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   inhabitantAssignToRoom,
   inhabitantRename,
@@ -43,7 +43,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, NgClass, InhabitantCardComponent, StatNameComponent, SweetAlert2Module],
+  imports: [DecimalPipe, NgClass, InhabitantCardComponent, StatRowComponent, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -223,11 +223,6 @@ export class PanelRosterComponent {
         notifyError('Failed to rename creature');
       }
     }
-  }
-
-  public getStatClass(value: number, stat: string): string {
-    if (stat === 'workerEfficiency') return value > 1.0 ? 'stat-high' : value < 1.0 ? 'stat-low' : '';
-    return '';
   }
 
   public getStateClass(state: string): string {

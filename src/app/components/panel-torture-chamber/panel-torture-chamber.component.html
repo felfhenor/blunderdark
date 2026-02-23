@@ -59,20 +59,7 @@
                   {{ prisoner.invaderClass }}
                 </span>
               </div>
-              <span
-                class="text-xs opacity-60 inline-flex items-center gap-2 flex-wrap"
-              >
-                <app-stat-name type="hp" [value]="prisoner.stats.hp" />
-                /
-                <app-stat-name type="attack" [value]="prisoner.stats.attack" />
-                /
-                <app-stat-name
-                  type="defense"
-                  [value]="prisoner.stats.defense"
-                />
-                /
-                <app-stat-name type="speed" [value]="prisoner.stats.speed" />
-              </span>
+              <app-stat-row class="text-xs opacity-60" [stats]="prisoner.stats" [showWorkerEfficiency]="false" />
               @if (canStartJob()) {
                 <div class="flex gap-2 mt-1">
                   <button

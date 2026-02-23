@@ -1,3 +1,4 @@
+import type { CombatStats } from '@interfaces/combat-stats';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId } from '@interfaces/room-shape';
@@ -12,11 +13,7 @@ export type InhabitantTrait = {
   targetRoomId?: string;
 };
 
-export type InhabitantStats = {
-  hp: number;
-  attack: number;
-  defense: number;
-  speed: number;
+export type InhabitantStats = CombatStats & {
   workerEfficiency: number;
 };
 

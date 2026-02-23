@@ -20,6 +20,8 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [IconComponent, DecimalPipe, TippyDirective],
   host: {
     class: 'inline-flex items-center gap-1 align-baseline text-base',
+    '[class.stat-high]': 'highlight() === "high"',
+    '[class.stat-low]': 'highlight() === "low"',
   },
   template: `
     <app-icon [name]="icon()" [color]="color()" [tp]="description()" [tpDelay]="250" tpClassName="game-tooltip" />
@@ -36,6 +38,16 @@ import { TippyDirective } from '@ngneat/helipopper';
       stroke-width: 18px;
       stroke-linejoin: round;
     }
+
+    :host.stat-high {
+      color: var(--color-success);
+      font-weight: bold;
+    }
+
+    :host.stat-low {
+      color: var(--color-error);
+      opacity: 0.8;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,6 +56,7 @@ export class StatNameComponent {
   public value = input<number>();
   public prefix = input<string>('');
   public suffix = input<string>('');
+  public highlight = input<'high' | 'low'>();
 
   public icon = computed(() => STAT_ICON_MAP[this.type()]);
   public color = computed(() => STAT_COLOR_MAP[this.type()]);

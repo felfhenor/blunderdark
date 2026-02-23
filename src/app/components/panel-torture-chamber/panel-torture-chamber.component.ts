@@ -1,7 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
-import { StatNameComponent } from '@components/stat-name/stat-name.component';
+import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   contentGetEntry,
   floorAll,
@@ -28,7 +28,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, ModalComponent, StatNameComponent],
+  imports: [DecimalPipe, ModalComponent, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

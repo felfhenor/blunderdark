@@ -6,6 +6,7 @@ export * from './biome';
 export * from './biome-restriction';
 export * from './breeding';
 export * from './combat';
+export * from './combat-stats';
 export * from './connection';
 export * from './content-abilityeffect';
 export * from './content-alchemyrecipe';
