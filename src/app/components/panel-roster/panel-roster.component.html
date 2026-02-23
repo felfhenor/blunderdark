@@ -131,7 +131,12 @@
           <!-- Current assignment -->
           <div class="mt-1 text-xs">
             <span class="opacity-50">Assigned:</span>
-            {{ entry.roomName ?? 'None' }}
+            @if (entry.roomName) {
+              {{ entry.roomName }}
+              <span class="opacity-50">({{ entry.floorName }})</span>
+            } @else {
+              None
+            }
           </div>
 
           <!-- Unassign button -->
@@ -163,7 +168,8 @@
                     )
                   "
                 >
-                  {{ r.roomDef.name }}
+                  {{ r.room.suffix ? r.roomDef.name + ' ' + r.room.suffix : r.roomDef.name }}
+                  <span class="opacity-50">({{ r.floorName }})</span>
                 </button>
               }
               @if (availableRooms().length === 0) {

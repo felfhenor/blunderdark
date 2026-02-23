@@ -38,6 +38,7 @@ type RosterEntry = {
   instance: InhabitantInstance;
   def: InhabitantContent;
   roomName: string | undefined;
+  floorName: string | undefined;
 };
 
 @Component({
@@ -66,6 +67,7 @@ export class PanelRosterComponent {
         if (!def) return undefined;
 
         let roomName: string | undefined = undefined;
+        let floorName: string | undefined = undefined;
         if (inst.assignedRoomId) {
           for (const floor of floors) {
             const room = floor.rooms.find(
@@ -73,13 +75,15 @@ export class PanelRosterComponent {
             );
             if (room) {
               const roomDef = productionGetRoomDefinition(room.roomTypeId);
-              roomName = roomDef?.name ?? 'Unknown Room';
+              const baseName = roomDef?.name ?? 'Unknown Room';
+              roomName = room.suffix ? `${baseName} ${room.suffix}` : baseName;
+              floorName = floor.name;
               break;
             }
           }
         }
 
-        return { instance: inst, def, roomName } as RosterEntry;
+        return { instance: inst, def, roomName, floorName } as RosterEntry;
       })
       .filter((e): e is RosterEntry => e !== undefined);
     return sortBy(entries, [(e) => e.def.name]);
