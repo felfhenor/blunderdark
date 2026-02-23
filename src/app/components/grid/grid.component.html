@@ -54,6 +54,9 @@
                 [tpDelay]="250"
               >&#9670;{{ fInfo.occupied | number:'1.0-2' }}/{{ fInfo.total | number:'1.0-2' }}</span>
             }
+            @if (isInvasionCurrent(tile.roomId)) {
+              <span class="invasion-attack-icon">&#9876;</span>
+            }
           }
           @if (getDoorways(colIdx, rowIdx); as dirs) {
             @if (dirs.has('top')) {

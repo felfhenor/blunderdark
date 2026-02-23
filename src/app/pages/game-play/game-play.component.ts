@@ -16,6 +16,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
 import { GridComponent } from '@components/grid/grid.component';
+import { HudInvasionComponent } from '@components/hud-invasion/hud-invasion.component';
 import { MoraleBarComponent } from '@components/morale-bar/morale-bar.component';
 import { PanelAlchemyLabComponent } from '@components/panel-alchemy-lab/panel-alchemy-lab.component';
 import { PanelAltarComponent } from '@components/panel-altar/panel-altar.component';
@@ -82,6 +83,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     TeleportOutletDirective,
     GridComponent,
     GameResearchComponent,
+    HudInvasionComponent,
     MoraleBarComponent,
     PanelAlchemyLabComponent,
     PanelAltarComponent,

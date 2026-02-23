@@ -56,6 +56,7 @@ import type {
   InhabitantInstanceId,
   InvasionObjective,
   InvasionOrchestratorResult,
+  PendingInvasionWarning,
   PlacedRoom,
   PlacedRoomId,
   SpecialInvasionType,
@@ -145,6 +146,52 @@ function fearBreakdownToNumericMap(
     result.set(roomId, breakdown.effectiveFear);
   }
   return result;
+}
+
+/**
+ * Find the entry room on floor 0 for an invasion.
+ * Picks the non-transport room farthest from the altar by graph distance,
+ * or falls back to the top-left room if the altar isn't on floor 0.
+ */
+export function invasionFindEntryRoom(state: GameState): PlacedRoom | undefined {
+  const floors = state.world.floors;
+  const floor0 = floors[0];
+  if (!floor0) return undefined;
+
+  const regularRooms = floor0.rooms.filter((r) => !r.transportType);
+  if (regularRooms.length === 0) return undefined;
+
+  // Find altar room
+  const altarTypeId = roomRoleFindById('altar');
+  let altarRoom: { room: PlacedRoom; floorIndex: number } | undefined;
+  for (let fi = 0; fi < floors.length; fi++) {
+    const floor = floors[fi];
+    const room = altarTypeId ? floor.rooms.find((r) => r.roomTypeId === altarTypeId) : undefined;
+    if (room) {
+      altarRoom = { room, floorIndex: fi };
+      break;
+    }
+  }
+
+  if (altarRoom && altarRoom.floorIndex === 0) {
+    const fearBreakdown0 = fearLevelCalculateAllForFloor(floor0);
+    const fearMap0 = fearBreakdownToNumericMap(fearBreakdown0);
+    const graph0 = pathfindingBuildDungeonGraph(floor0, fearMap0);
+
+    let bestRoom: PlacedRoom | undefined;
+    let bestDist = 0;
+    for (const room of regularRooms) {
+      if (room.id === altarRoom.room.id) continue;
+      const testPath = pathfindingFindPath(graph0, room.id, altarRoom.room.id);
+      if (testPath.length > bestDist) {
+        bestDist = testPath.length;
+        bestRoom = room;
+      }
+    }
+    return bestRoom ?? altarRoom.room;
+  }
+
+  return sortBy(regularRooms, [(r: PlacedRoom) => r.anchorX + r.anchorY])[0];
 }
 
 /**
@@ -415,20 +462,22 @@ export function invasionStart(
   state: GameState,
   seed: string,
   invasionType: 'scheduled' | SpecialInvasionType,
+  warning?: PendingInvasionWarning,
 ): void {
   const day = state.clock.day;
 
-  // 1. Generate invader party
-  const profile = invasionCompositionCalculateDungeonProfile(state);
-  const invaders = invasionCompositionGenerateParty(profile, seed);
+  // 1. Generate invader party (use pre-computed from warning if available)
+  const invaders = warning?.invaders ?? invasionCompositionGenerateParty(
+    invasionCompositionCalculateDungeonProfile(state), seed,
+  );
 
   if (invaders.length === 0) {
     state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day);
     return;
   }
 
-  // 2. Assign objectives
-  const objectives = invasionObjectiveAssign(state, seed);
+  // 2. Assign objectives (use pre-computed from warning if available)
+  const objectives = warning?.objectives ?? invasionObjectiveAssign(state, seed);
 
   // 3. Find altar room across all floors
   const altarTypeId = roomRoleFindById('altar');

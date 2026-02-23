@@ -1,6 +1,8 @@
 import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
-import { invasionStart } from '@helpers/invasion-process';
+import { invasionFindEntryRoom, invasionStart } from '@helpers/invasion-process';
+import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
+import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
@@ -9,6 +11,7 @@ import type {
   GameState,
   InvasionHistoryEntry,
   InvasionSchedule,
+  PlacedRoomId,
   SpecialInvasionType,
 } from '@interfaces';
 import type { PRNG } from 'seedrandom';
@@ -165,11 +168,15 @@ export function invasionTriggerProcessSchedule(
   if (invasionTriggerShouldShowWarning(schedule, currentTime) && !schedule.warningDismissed) {
     if (!schedule.warningActive) {
       schedule.warningActive = true;
+      if (!schedule.pendingWarning) {
+        invasionTriggerGenerateWarning(state, `invasion-${schedule.nextInvasionDay}-scheduled`, 'scheduled');
+      }
       notify('Invasion', 'Invasion approaching!');
     }
   } else if (
     !invasionTriggerShouldShowWarning(schedule, currentTime) &&
-    !invasionTriggerShouldTrigger(schedule, currentDay)
+    !invasionTriggerShouldTrigger(schedule, currentDay) &&
+    !schedule.pendingWarning
   ) {
     schedule.warningActive = false;
     schedule.warningDismissed = false;
@@ -191,10 +198,12 @@ export function invasionTriggerProcessSchedule(
 
   // Check if scheduled invasion triggers
   if (invasionTriggerShouldTrigger(schedule, currentDay)) {
+    const warning = schedule.pendingWarning;
     schedule.warningActive = false;
     schedule.warningDismissed = false;
     schedule.nextInvasionDay = undefined;
-    invasionStart(state, `invasion-${currentDay}-scheduled`, 'scheduled');
+    schedule.pendingWarning = undefined;
+    invasionStart(state, `invasion-${currentDay}-scheduled`, 'scheduled', warning);
   }
 }
 
@@ -222,11 +231,54 @@ export function invasionTriggerRecordAndReschedule(
   schedule.nextInvasionVariance = result.variance;
 }
 
+// --- Warning generation ---
+
+/**
+ * Generate a pending invasion warning and store it on the schedule.
+ * Pre-computes invaders, objectives, and entry room for display.
+ */
+export function invasionTriggerGenerateWarning(
+  state: GameState,
+  seed: string,
+  invasionType: 'scheduled' | SpecialInvasionType,
+): void {
+  const profile = invasionCompositionCalculateDungeonProfile(state);
+  const invaders = invasionCompositionGenerateParty(profile, seed);
+  const objectives = invasionObjectiveAssign(state, seed);
+  const entryRoom = invasionFindEntryRoom(state);
+
+  state.world.invasionSchedule.pendingWarning = {
+    seed,
+    invasionType,
+    invaders,
+    objectives,
+    entryRoomId: (entryRoom?.id ?? '') as PlacedRoomId,
+    profile,
+  };
+}
+
 // --- Debug ---
 
+/**
+ * Two-phase debug invasion trigger.
+ * Phase 1: generates warning preview.
+ * Phase 2: starts the invasion using the pre-generated warning.
+ */
 export function debugTriggerInvasion(): void {
   updateGamestate((state) => {
-    invasionStart(state, `invasion-${state.clock.day}-debug`, 'scheduled');
+    const schedule = state.world.invasionSchedule;
+    if (schedule.pendingWarning) {
+      // Phase 2: start invasion from pending warning
+      const warning = schedule.pendingWarning;
+      schedule.pendingWarning = undefined;
+      schedule.warningActive = false;
+      invasionStart(state, warning.seed, warning.invasionType, warning);
+    } else {
+      // Phase 1: generate warning
+      const seed = `invasion-${state.clock.day}-debug`;
+      invasionTriggerGenerateWarning(state, seed, 'scheduled');
+      schedule.warningActive = true;
+    }
     return state;
   });
 }
@@ -254,4 +306,16 @@ export const invasionTriggerIsInGracePeriodSignal = computed(() =>
 
 export const invasionTriggerHistory = computed(
   () => gamestate().world.invasionSchedule.invasionHistory,
+);
+
+export const invasionTriggerPendingWarning = computed(
+  () => gamestate().world.invasionSchedule.pendingWarning,
+);
+
+export const invasionTriggerWarningInvaders = computed(
+  () => gamestate().world.invasionSchedule.pendingWarning?.invaders ?? [],
+);
+
+export const invasionTriggerWarningObjectives = computed(
+  () => gamestate().world.invasionSchedule.pendingWarning?.objectives ?? [],
 );

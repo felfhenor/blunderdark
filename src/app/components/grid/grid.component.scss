@@ -210,7 +210,11 @@
 
   &.invasion-entry { outline: 2px solid oklch(0.6 0.2 25); outline-offset: -2px; }
   &.invasion-path { box-shadow: inset 0 0 8px 2px oklch(0.5 0.15 25 / 0.3); }
-  &.invasion-current { animation: invasion-pulse 0.8s ease-in-out infinite; }
+  &.invasion-current {
+    animation: invasion-pulse 0.8s ease-in-out infinite;
+    outline: 3px solid oklch(0.7 0.25 25);
+    outline-offset: -3px;
+  }
 
   &.disconnected::before {
     content: '';
@@ -319,6 +323,23 @@
   pointer-events: auto;
   white-space: nowrap;
   z-index: 3;
+}
+
+.invasion-attack-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 16px;
+  color: oklch(0.8 0.2 50);
+  filter: drop-shadow(0 0 4px oklch(0.7 0.25 40 / 0.8));
+  animation: attack-icon-pulse 1s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes attack-icon-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
 }
 
 .assignment-inline {

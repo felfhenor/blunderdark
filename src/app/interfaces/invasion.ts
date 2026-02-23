@@ -12,6 +12,15 @@ export type CombatantId = Branded<string, 'CombatantId'>;
 
 export type SpecialInvasionType = 'crusade' | 'raid' | 'bounty_hunter';
 
+export type PendingInvasionWarning = {
+  seed: string;
+  invasionType: 'scheduled' | SpecialInvasionType;
+  invaders: InvaderInstance[];
+  objectives: InvasionObjective[];
+  entryRoomId: PlacedRoomId;
+  profile: DungeonProfile;
+};
+
 export type InvasionHistoryEntry = {
   day: number;
   type: 'scheduled' | SpecialInvasionType;
@@ -30,6 +39,7 @@ export type InvasionSchedule = {
   pendingSpecialInvasions: PendingSpecialInvasion[];
   warningActive: boolean;
   warningDismissed: boolean;
+  pendingWarning?: PendingInvasionWarning;
 };
 
 // --- Composition types ---

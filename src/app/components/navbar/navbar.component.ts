@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BadgeDisconnectedRoomsComponent } from '@components/badge-disconnected-rooms/badge-disconnected-rooms.component';
+import { BadgeInvasionWarningComponent } from '@components/badge-invasion-warning/badge-invasion-warning.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
@@ -36,6 +37,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-navbar',
   imports: [
     BadgeDisconnectedRoomsComponent,
+    BadgeInvasionWarningComponent,
     TippyDirective,
     RequireSetupDirective,
     IconComponent,

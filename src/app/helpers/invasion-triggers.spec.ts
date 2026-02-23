@@ -32,6 +32,16 @@ vi.mock('@helpers/notify', () => ({
 const mockInvasionStart = vi.fn();
 vi.mock('@helpers/invasion-process', () => ({
   invasionStart: (...args: unknown[]) => mockInvasionStart(...args),
+  invasionFindEntryRoom: vi.fn(() => ({ id: 'entry-room-id' })),
+}));
+
+vi.mock('@helpers/invasion-composition', () => ({
+  invasionCompositionCalculateDungeonProfile: vi.fn(() => ({ corruption: 0, wealth: 0, knowledge: 0, size: 1, threatLevel: 0 })),
+  invasionCompositionGenerateParty: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/invasion-objectives', () => ({
+  invasionObjectiveAssign: vi.fn(() => []),
 }));
 
 function makeSchedule(
@@ -353,6 +363,7 @@ describe('invasion-triggers', () => {
         state,
         'invasion-45-scheduled',
         'scheduled',
+        undefined,
       );
       // History should NOT be recorded yet (happens after battle via recordAndReschedule)
       expect(state.world.invasionSchedule.invasionHistory).toHaveLength(0);
@@ -371,6 +382,7 @@ describe('invasion-triggers', () => {
         state,
         'invasion-50-scheduled',
         'scheduled',
+        undefined,
       );
     });
 
