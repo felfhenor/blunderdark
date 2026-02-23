@@ -253,61 +253,87 @@ describe('corruptionEffectProcess — mutations', () => {
     vi.clearAllMocks();
   });
 
-  it('should fire mutation on crossing 100', () => {
+  it('should fire mutation on crossing 500', () => {
     const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 100, inhabitants });
-    const rng = seedrandom('mutation-100');
+    const state = makeGameState({ corruption: 500, inhabitants });
+    const rng = seedrandom('mutation-500');
     corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(100);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
     expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
   });
 
-  it('should not fire when already above 100 and tracked', () => {
+  it('should not fire below 500', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({ corruption: 499, inhabitants });
+    const rng = seedrandom('below-500');
+    corruptionEffectProcess(state, rng);
+    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
+  });
+
+  it('should not fire when already at same milestone and tracked', () => {
     const inhabitants = [makeInhabitant()];
     const state = makeGameState({
-      corruption: 150,
+      corruption: 650,
       inhabitants,
-      corruptionEffects: { lastMutationCorruption: 120 },
+      corruptionEffects: { lastMutationCorruption: 500 },
     });
     const rng = seedrandom('no-refire');
     corruptionEffectProcess(state, rng);
     expect(inhabitants[0].mutationTraitIds).toBeUndefined();
   });
 
-  it('should re-fire on re-crossing (drop below then back above)', () => {
+  it('should fire again at next 500 milestone', () => {
     const inhabitants = [makeInhabitant()];
-
-    // First: corruption at 100, fires mutation
-    const state = makeGameState({ corruption: 100, inhabitants });
-    const rng1 = seedrandom('recross-1');
+    const state = makeGameState({ corruption: 500, inhabitants });
+    const rng1 = seedrandom('milestone-1');
     corruptionEffectProcess(state, rng1);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(100);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
 
-    // Drop below 100 — resets tracking
-    state.world.resources.corruption.current = 80;
-    const rng2 = seedrandom('recross-2');
+    // Not yet at 1000
+    state.world.resources.corruption.current = 800;
+    const rng2 = seedrandom('milestone-2');
     corruptionEffectProcess(state, rng2);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBeUndefined();
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
 
-    // Back above 100 — fires again
-    state.world.resources.corruption.current = 110;
-    const rng3 = seedrandom('recross-3');
+    // Reaches 1000
+    state.world.resources.corruption.current = 1000;
+    const rng3 = seedrandom('milestone-3');
     corruptionEffectProcess(state, rng3);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(110);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(1000);
+  });
+
+  it('should not re-fire when corruption drops and returns to same milestone', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({ corruption: 500, inhabitants });
+    const rng1 = seedrandom('drop-1');
+    corruptionEffectProcess(state, rng1);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
+
+    // Drop below 500
+    state.world.resources.corruption.current = 300;
+    const rng2 = seedrandom('drop-2');
+    corruptionEffectProcess(state, rng2);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
+
+    // Back above 500 but below 1000
+    state.world.resources.corruption.current = 600;
+    const rng3 = seedrandom('drop-3');
+    corruptionEffectProcess(state, rng3);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
   });
 
   it('should handle no inhabitants gracefully', () => {
-    const state = makeGameState({ corruption: 100 });
+    const state = makeGameState({ corruption: 500 });
     const rng = seedrandom('no-inhabitants');
     corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(100);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
   });
 
   it('should emit mutation_applied event with trait name', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 100, inhabitants });
+    const state = makeGameState({ corruption: 500, inhabitants });
     const rng = seedrandom('mutation-event');
     corruptionEffectProcess(state, rng);
 
@@ -395,12 +421,12 @@ describe('corruptionEffectProcess — combined thresholds', () => {
     vi.clearAllMocks();
   });
 
-  it('should handle 0 → 250 crossing all thresholds at once', () => {
+  it('should handle 0 → 500 crossing all thresholds at once', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const inhabitants = [makeInhabitant()];
     const state = makeGameState({
-      corruption: 250,
+      corruption: 500,
       inhabitants,
       day: 15,
     });
@@ -409,8 +435,8 @@ describe('corruptionEffectProcess — combined thresholds', () => {
 
     // All thresholds should fire
     expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(true);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(250);
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBe(250);
+    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
+    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBe(500);
     expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledWith(
       expect.anything(),
@@ -439,7 +465,7 @@ describe('corruptionEffectProcess — combined thresholds', () => {
 describe('constants', () => {
   it('should have correct threshold values', () => {
     expect(CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE).toBe(50);
-    expect(CORRUPTION_EFFECT_THRESHOLD_MUTATION).toBe(100);
+    expect(CORRUPTION_EFFECT_THRESHOLD_MUTATION).toBe(500);
     expect(CORRUPTION_EFFECT_THRESHOLD_CRUSADE).toBe(200);
   });
 });

@@ -13,7 +13,7 @@ import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 // --- Constants ---
 
 export const CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE = 50;
-export const CORRUPTION_EFFECT_THRESHOLD_MUTATION = 100;
+export const CORRUPTION_EFFECT_THRESHOLD_MUTATION = 500;
 export const CORRUPTION_EFFECT_THRESHOLD_CRUSADE = 200;
 
 export const corruptionEffectEvent$ = new Subject<CorruptionEffectEvent>();
@@ -72,35 +72,34 @@ export function corruptionEffectProcess(
     });
   }
 
-  // 100 threshold: mutation on crossing
-  if (corruption >= CORRUPTION_EFFECT_THRESHOLD_MUTATION) {
-    if (
-      effects.lastMutationCorruption === undefined ||
-      effects.lastMutationCorruption < CORRUPTION_EFFECT_THRESHOLD_MUTATION
-    ) {
-      reputationAwardInPlace(state, 'Embrace Corruption');
-      const target = corruptionEffectSelectMutationTarget(
+  // Every 500 corruption: mutation
+  const mutationMilestone =
+    Math.floor(corruption / CORRUPTION_EFFECT_THRESHOLD_MUTATION) *
+    CORRUPTION_EFFECT_THRESHOLD_MUTATION;
+  if (
+    mutationMilestone >= CORRUPTION_EFFECT_THRESHOLD_MUTATION &&
+    mutationMilestone > (effects.lastMutationCorruption ?? 0)
+  ) {
+    reputationAwardInPlace(state, 'Embrace Corruption');
+    const target = corruptionEffectSelectMutationTarget(
+      state.world.inhabitants,
+      effectiveRng,
+    );
+    if (target) {
+      const targetIndex = state.world.inhabitants.indexOf(target);
+      const result = corruptionEffectApplyMutationTrait(
         state.world.inhabitants,
+        targetIndex,
         effectiveRng,
       );
-      if (target) {
-        const targetIndex = state.world.inhabitants.indexOf(target);
-        const result = corruptionEffectApplyMutationTrait(
-          state.world.inhabitants,
-          targetIndex,
-          effectiveRng,
-        );
-        if (result) {
-          corruptionEffectEvent$.next({
-            type: 'mutation_applied',
-            description: `${target.name} mutated: gained ${result.traitName}`,
-          });
-        }
+      if (result) {
+        corruptionEffectEvent$.next({
+          type: 'mutation_applied',
+          description: `${target.name} mutated: gained ${result.traitName}`,
+        });
       }
-      effects.lastMutationCorruption = corruption;
     }
-  } else {
-    effects.lastMutationCorruption = undefined;
+    effects.lastMutationCorruption = mutationMilestone;
   }
 
   // 200 threshold: crusade on crossing
