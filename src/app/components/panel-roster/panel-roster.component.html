@@ -109,6 +109,25 @@
             </div>
           }
 
+          <!-- Mutation Traits -->
+          @if (selectedMutationTraits().length > 0) {
+            <div class="mt-1">
+              <span class="text-xs opacity-50">Mutations:</span>
+              @for (mt of selectedMutationTraits(); track mt.id) {
+                <div class="text-xs ml-1">
+                  <span
+                    class="font-semibold"
+                    [class.text-accent]="!mt.isNegative"
+                    [class.text-error]="!!mt.isNegative"
+                  >
+                    {{ mt.name }}
+                  </span>
+                  — {{ mt.description }}
+                </div>
+              }
+            </div>
+          }
+
           <!-- Current assignment -->
           <div class="mt-1 text-xs">
             <span class="opacity-50">Assigned:</span>

@@ -22,6 +22,7 @@ import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
+  MutationTraitContent,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
@@ -124,6 +125,19 @@ export class PanelRosterComponent {
     const entry = this.selectedEntry();
     if (!entry) return undefined;
     return effectiveStatsCalculate(entry.def, entry.instance);
+  });
+
+  public selectedMutationTraits = computed<MutationTraitContent[]>(() => {
+    const entry = this.selectedEntry();
+    if (!entry) return [];
+    const ids = entry.instance.mutationTraitIds;
+    if (!ids || ids.length === 0) return [];
+    const traits: MutationTraitContent[] = [];
+    for (const id of ids) {
+      const trait = contentGetEntry<MutationTraitContent>(id);
+      if (trait) traits.push(trait);
+    }
+    return traits;
   });
 
   public availableRooms = computed(() => {

@@ -42,7 +42,7 @@ export class InhabitantCardComponent {
   public instance = input.required<InhabitantInstance>();
   public definition = input.required<InhabitantContent>();
   public showStats = input(true);
-  public showTraits = input(true);
+  public showTraits = input(false);
   public showAssignment = input(true);
   public showState = input(true);
   public showType = input(false);
