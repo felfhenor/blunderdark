@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { invaderGetDefinitionById } from '@helpers/invaders';
-import { gamestate } from '@helpers/state-game';
 import {
   invasionTriggerPendingWarning,
   invasionTriggerWarningActive,
 } from '@helpers/invasion-triggers';
-import type { RoomContent } from '@interfaces/content-room';
+import { gamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
+import type { RoomContent } from '@interfaces/content-room';
 import { TippyDirective } from '@ngneat/helipopper';
 
 type InvaderGroup = {
@@ -28,8 +28,12 @@ type ObjectiveInfo = {
     '[class.hidden]': '!invasionTriggerWarningActive()',
   },
   template: `
-    <span class="invasion-warning-badge px-1.5 rounded whitespace-nowrap text-warning text-xs font-semibold" [tp]="tooltipTpl" tpPlacement="bottom">
-      Invasion Incoming!
+    <span
+      class="invasion-warning-badge px-1.5 rounded whitespace-nowrap text-warning text-xs font-semibold"
+      [tp]="tooltipTpl"
+      tpPlacement="bottom"
+    >
+      Invasion incoming!
     </span>
 
     <ng-template #tooltipTpl>
@@ -45,7 +49,10 @@ type ObjectiveInfo = {
           <div class="font-semibold mt-2 mb-1">Objectives:</div>
           @for (obj of objectiveInfos(); track obj.name) {
             <div>
-              {{ obj.name }}@if (obj.targetRoomName) {<span class="opacity-60"> — {{ obj.targetRoomName }}</span>}
+              {{ obj.name }}
+              @if (obj.targetRoomName) {
+                <span class="opacity-60">— {{ obj.targetRoomName }}</span>
+              }
             </div>
           }
         }
@@ -55,7 +62,8 @@ type ObjectiveInfo = {
   styles: `
     .invasion-warning-badge {
       background: color-mix(in oklch, var(--color-warning) 15%, transparent);
-      border: 1px solid color-mix(in oklch, var(--color-warning) 40%, transparent);
+      border: 1px solid
+        color-mix(in oklch, var(--color-warning) 40%, transparent);
       animation: invasion-warning-pulse 1.5s ease-in-out infinite;
     }
 
@@ -99,7 +107,9 @@ export class BadgeInvasionWarningComponent {
       }));
   });
 
-  private resolveTargetRoomName(targetId: string | undefined): string | undefined {
+  private resolveTargetRoomName(
+    targetId: string | undefined,
+  ): string | undefined {
     if (!targetId) return undefined;
 
     const state = gamestate();
