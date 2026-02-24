@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
 import {
   featureCalculateCorruptionGenerationPerTick,
@@ -24,17 +25,17 @@ export const corruptionCurrent = computed(
 );
 
 export const corruptionLevel = computed((): CorruptionLevel => {
-  const value = corruptionCurrent();
-  if (value >= CORRUPTION_THRESHOLD_CRITICAL) return 'critical';
-  if (value >= CORRUPTION_THRESHOLD_HIGH) return 'high';
-  if (value >= CORRUPTION_THRESHOLD_MEDIUM) return 'medium';
-  return 'low';
+  return corruptionGetLevel(corruptionCurrent());
 });
 
 export function corruptionGetLevel(value: number): CorruptionLevel {
-  if (value >= CORRUPTION_THRESHOLD_CRITICAL) return 'critical';
-  if (value >= CORRUPTION_THRESHOLD_HIGH) return 'high';
-  if (value >= CORRUPTION_THRESHOLD_MEDIUM) return 'medium';
+  const resistance = researchUnlockGetPassiveBonusWithMastery('corruptionResistance');
+  const scaledCritical = CORRUPTION_THRESHOLD_CRITICAL * (1 + resistance);
+  const scaledHigh = CORRUPTION_THRESHOLD_HIGH * (1 + resistance);
+  const scaledMedium = CORRUPTION_THRESHOLD_MEDIUM * (1 + resistance);
+  if (value >= scaledCritical) return 'critical';
+  if (value >= scaledHigh) return 'high';
+  if (value >= scaledMedium) return 'medium';
   return 'low';
 }
 
@@ -188,7 +189,8 @@ export function corruptionGenerationProcess(state: GameState): void {
     state.clock.hour,
     'corruption',
   );
-  const finalPerTick = basePerTick * dayNightMod;
+  const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
+  const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus);
 
   resourceAdd('corruption', finalPerTick);
 }

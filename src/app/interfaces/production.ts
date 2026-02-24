@@ -15,6 +15,7 @@ export type ResourceProductionBreakdown = {
   inhabitantBonus: number;
   adjacencyBonus: number;
   modifierEffect: number;
+  researchBonus: number;
   final: number;
 };
 
@@ -43,6 +44,7 @@ export type RoomProductionDetail = {
   workerCount: number;
   adjacencyBonus: number;
   featureBonus: number;
+  researchBonus: number;
   modifierEffect: number;
   modifierDetails: ModifierDetail[];
   flatFeatureProduction: number;

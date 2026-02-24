@@ -34,6 +34,11 @@ import type { FearLevelBreakdown } from '@interfaces';
         Altar Aura: -{{ breakdown().altarAuraReduction | number: '1.0-2' }}
       </div>
     }
+    @if (breakdown().researchReduction !== 0) {
+      <div class="text-xs text-success">
+        Research: -{{ breakdown().researchReduction | number: '1.0-2' }}
+      </div>
+    }
     @if (breakdown().propagatedFear !== 0) {
       <div class="text-xs text-error">
         Adjacent: +{{ breakdown().propagatedFear | number: '1.0-2' }}

@@ -8,6 +8,7 @@ import { featureCalculateFearReduction } from '@helpers/features';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
 import { throneRoomGetFearLevel } from '@helpers/throne-room';
 import type {
@@ -92,8 +93,9 @@ export function fearLevelCalculateEffective(
   altarAuraReduction: number,
   propagatedFear: number = 0,
   featureReduction: number = 0,
+  researchReduction: number = 0,
 ): number {
-  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction + propagatedFear;
+  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction - researchReduction + propagatedFear;
   return Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw));
 }
 
@@ -263,6 +265,7 @@ export function fearLevelGetForRoom(
     : 0;
 
   const featureReduction = featureCalculateFearReduction(placedRoom);
+  const researchReduction = researchUnlockGetPassiveBonusWithMastery('fearReduction');
 
   const effectiveFear = fearLevelCalculateEffective(
     baseFear,
@@ -271,6 +274,7 @@ export function fearLevelGetForRoom(
     altarAuraReduction,
     0,
     featureReduction,
+    researchReduction,
   );
 
   return {
@@ -279,6 +283,7 @@ export function fearLevelGetForRoom(
     upgradeAdjustment,
     altarAuraReduction,
     featureReduction,
+    researchReduction,
     propagatedFear: 0,
     propagationSources: [],
     effectiveFear,
@@ -354,6 +359,7 @@ export function fearLevelCalculateAllForFloor(
         breakdown.altarAuraReduction,
         breakdown.propagatedFear,
         breakdown.featureReduction,
+        breakdown.researchReduction,
       );
     }
   }

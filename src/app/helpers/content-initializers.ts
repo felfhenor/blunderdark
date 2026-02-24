@@ -180,6 +180,7 @@ function ensureFeature(feature: Partial<FeatureContent>): FeatureContent {
     })),
     unique: feature.unique ?? undefined,
     maintenanceCost: feature.maintenanceCost ?? undefined,
+    requiredFeatureFlag: feature.requiredFeatureFlag ?? undefined,
   };
 }
 

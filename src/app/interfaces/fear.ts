@@ -10,6 +10,7 @@ export type FearLevelBreakdown = {
   upgradeAdjustment: number;
   altarAuraReduction: number;
   featureReduction: number;
+  researchReduction: number;
   propagatedFear: number;
   propagationSources: FearPropagationSource[];
   effectiveFear: number;

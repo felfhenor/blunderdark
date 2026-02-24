@@ -85,6 +85,7 @@ const mockResearchUnlockProcessCompletion = vi.fn();
 vi.mock('@helpers/research-unlocks', () => ({
   researchUnlockProcessCompletion: (...args: unknown[]) =>
     mockResearchUnlockProcessCompletion(...args),
+  researchUnlockGetPassiveBonusWithMastery: () => 0,
 }));
 
 // --- Mock data ---

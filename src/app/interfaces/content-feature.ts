@@ -38,4 +38,5 @@ export type FeatureContent = IsContentItem &
     bonuses: FeatureBonus[];
     unique?: boolean;
     maintenanceCost?: ResourceCost;
+    requiredFeatureFlag?: string;
   };

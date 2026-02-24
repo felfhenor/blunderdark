@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -85,6 +86,11 @@ export function darkForgeGetCraftingTicks(
     if (adjDef?.forgingAdjacencyEffects?.forgingSpeedBonus) {
       ticks = Math.round(ticks * (1 - adjDef.forgingAdjacencyEffects.forgingSpeedBonus));
     }
+  }
+
+  const researchCraftBonus = researchUnlockGetPassiveBonusWithMastery('craftingSpeed');
+  if (researchCraftBonus > 0) {
+    ticks = Math.max(1, Math.round(ticks * (1 / (1 + researchCraftBonus))));
   }
 
   return Math.max(1, ticks);

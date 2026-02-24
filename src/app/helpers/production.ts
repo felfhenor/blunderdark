@@ -33,6 +33,7 @@ import {
   roomUpgradeGetSecondaryProduction,
 } from '@helpers/room-upgrades';
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
@@ -56,6 +57,12 @@ import type {
   ResourceProductionBreakdown,
   RoomProductionDetail,
 } from '@interfaces/production';
+
+function productionGetResearchMultiplier(resourceType: string): number {
+  const resourceBonus = researchUnlockGetPassiveBonusWithMastery(`${resourceType}Production`);
+  const allBonus = researchUnlockGetPassiveBonusWithMastery('allProduction');
+  return 1 + resourceBonus + allBonus;
+}
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
   const room = contentGetEntry<RoomContent>(roomTypeId);
@@ -305,6 +312,7 @@ export function productionCalculateTotal(
           room,
           resourceType,
         );
+        const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const final =
           baseAmount *
           (1 +
@@ -317,7 +325,8 @@ export function productionCalculateTotal(
           depthModifier *
           dayNightResourceMod *
           seasonMod *
-          creatureModifier;
+          creatureModifier *
+          researchMultiplier;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }
@@ -455,6 +464,7 @@ export function productionCalculateSingleRoom(
       room,
       resourceType,
     );
+    const researchMultiplier = productionGetResearchMultiplier(resourceType);
     production[resourceType] =
       baseAmount *
       (1 +
@@ -467,7 +477,8 @@ export function productionCalculateSingleRoom(
       depthModifier *
       dayNightResourceMod *
       seasonMod *
-      creatureModifier;
+      creatureModifier *
+      researchMultiplier;
   }
 
   // Add flat production from features
@@ -624,6 +635,7 @@ export function productionCalculateBreakdowns(
           room,
           resourceType,
         );
+        const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const modifier =
           stateModifier *
           envModifier *
@@ -638,7 +650,8 @@ export function productionCalculateBreakdowns(
             adjacencyBonusVal +
             featureAdjacentBonus +
             featureProductionBonus);
-        const finalAmount = withBonuses * modifier;
+        const afterModifiers = withBonuses * modifier;
+        const finalAmount = afterModifiers * researchMultiplier;
 
         if (!breakdowns[resourceType]) {
           breakdowns[resourceType] = {
@@ -646,6 +659,7 @@ export function productionCalculateBreakdowns(
             inhabitantBonus: 0,
             adjacencyBonus: 0,
             modifierEffect: 0,
+            researchBonus: 0,
             final: 0,
           };
         }
@@ -655,7 +669,8 @@ export function productionCalculateBreakdowns(
           baseAmount * inhabitantBonus;
         breakdowns[resourceType].adjacencyBonus +=
           baseAmount * adjacencyBonusVal;
-        breakdowns[resourceType].modifierEffect += finalAmount - withBonuses;
+        breakdowns[resourceType].modifierEffect += afterModifiers - withBonuses;
+        breakdowns[resourceType].researchBonus += finalAmount - afterModifiers;
         breakdowns[resourceType].final += finalAmount;
       }
 
@@ -684,6 +699,7 @@ export function productionCalculateBreakdowns(
             inhabitantBonus: 0,
             adjacencyBonus: 0,
             modifierEffect: 0,
+            researchBonus: 0,
             final: 0,
           };
         }
@@ -931,13 +947,15 @@ export function productionCalculateDetailedBreakdown(
         featureProductionBonus;
       const withBonuses = effectiveBase * (1 + totalBonus);
       const afterModifiers = withBonuses * combinedModifier;
+      const researchMultiplier = productionGetResearchMultiplier(resourceType);
+      const afterResearch = afterModifiers * researchMultiplier;
 
       // Handle resource conversion efficiency
-      let conversionAdjusted = afterModifiers;
+      let conversionAdjusted = afterResearch;
       if (hasConversion && room.convertedOutputResource === resourceType) {
         const efficiency = featureGetResourceConverterEfficiency(room);
         if (efficiency !== undefined) {
-          conversionAdjusted = afterModifiers * efficiency;
+          conversionAdjusted = afterResearch * efficiency;
         }
       }
 
@@ -953,7 +971,7 @@ export function productionCalculateDetailedBreakdown(
       let finalAmount =
         (hasConversion && room.convertedOutputResource === resourceType
           ? conversionAdjusted
-          : afterModifiers) + flatForType;
+          : afterResearch) + flatForType;
       finalAmount *= upgradeMultiplier;
 
       // Secondary production from upgrades
@@ -973,6 +991,7 @@ export function productionCalculateDetailedBreakdown(
         adjacencyBonus:
           effectiveBase * (adjacencyBonusVal + featureAdjacentBonus),
         featureBonus: effectiveBase * featureProductionBonus,
+        researchBonus: afterResearch - afterModifiers,
         modifierEffect: afterModifiers - withBonuses,
         modifierDetails,
         flatFeatureProduction: flatForType,

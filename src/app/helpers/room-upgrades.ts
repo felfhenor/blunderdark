@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { featureCalculateCapacityBonus } from '@helpers/features';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import type {
   PlacedRoom,
   RoomId,
@@ -135,6 +136,9 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
   }
 
   bonus += featureCalculateCapacityBonus(placedRoom);
+
+  const researchCapBonus = researchUnlockGetPassiveBonusWithMastery('roomCapacity');
+  bonus += Math.floor(researchCapBonus);
 
   return roomDef.maxInhabitants + bonus;
 }

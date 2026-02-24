@@ -135,6 +135,10 @@ vi.mock('@helpers/room-upgrades', () => ({
   }),
 }));
 
+vi.mock('@helpers/research-unlocks', () => ({
+  researchUnlockIsFeatureUnlocked: () => true,
+}));
+
 let mockResourceMap: Record<string, { current: number; max: number }>;
 
 vi.mock('@helpers/resources', () => ({

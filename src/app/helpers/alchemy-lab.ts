@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { resourceAdd, resourceSubtract } from '@helpers/resources';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -81,6 +82,11 @@ export function alchemyLabGetConversionTicks(
         ticks * (1 - adjDef.alchemyAdjacencyEffects.alchemySpeedBonus),
       );
     }
+  }
+
+  const researchCraftBonus = researchUnlockGetPassiveBonusWithMastery('craftingSpeed');
+  if (researchCraftBonus > 0) {
+    ticks = Math.max(1, Math.round(ticks * (1 / (1 + researchCraftBonus))));
   }
 
   return Math.max(1, ticks);

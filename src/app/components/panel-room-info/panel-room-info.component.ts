@@ -404,7 +404,8 @@ export class PanelRoomInfoComponent {
   public featureRemoveSlotIndex = 0;
 
   public availableFeatures = computed(() => {
-    const allFeatures = contentGetEntriesByType<FeatureContent>('feature');
+    const allFeatures = contentGetEntriesByType<FeatureContent>('feature')
+      .filter((f) => !f.requiredFeatureFlag || researchUnlockIsFeatureUnlocked(f.requiredFeatureFlag));
     const resources = gamestate().world.resources;
 
     const entries = allFeatures.map((f) => {

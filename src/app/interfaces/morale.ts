@@ -2,7 +2,8 @@ export type MoraleEventType =
   | 'ally_death'
   | 'trap_trigger'
   | 'high_fear_room'
-  | 'room_capture';
+  | 'room_capture'
+  | 'research_penalty';
 
 export type MoraleEvent = {
   turn: number;

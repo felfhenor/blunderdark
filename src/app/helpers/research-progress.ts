@@ -1,7 +1,10 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { reputationAwardInPlace } from '@helpers/reputation';
-import { researchUnlockProcessCompletion } from '@helpers/research-unlocks';
+import {
+  researchUnlockGetPassiveBonusWithMastery,
+  researchUnlockProcessCompletion,
+} from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
@@ -167,6 +170,9 @@ export function researchCalculateSpeedModifier(
   // Ruler bonus (researchSpeed from throne room ruler)
   const rulerBonus = throneRoomGetRulerBonusValue(floors, 'researchSpeed');
   bonus += rulerBonus;
+
+  // Research passive bonus
+  bonus += researchUnlockGetPassiveBonusWithMastery('researchSpeed');
 
   return 1 + bonus;
 }

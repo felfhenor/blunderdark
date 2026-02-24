@@ -31,6 +31,7 @@ import {
   invasionWinLossResolveDetailedResult,
 } from '@helpers/invasion-win-loss';
 import {
+  moraleApply,
   moraleApplyAllyDeath,
   moraleApplyFearRoomEntry,
   moraleApplyRoomCapture,
@@ -38,6 +39,7 @@ import {
   moraleInit,
   moraleIsRetreating,
 } from '@helpers/morale';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import {
   pathfindingBuildDungeonGraph,
   pathfindingFindPath,
@@ -560,6 +562,12 @@ export function invasionStart(
 
   // 7. Init morale
   moraleInit();
+
+  // 7b. Apply research-based morale penalty
+  const researchMoralePenalty = researchUnlockGetPassiveBonusWithMastery('invaderMoralePenalty');
+  if (researchMoralePenalty > 0) {
+    moraleApply('research_penalty', -researchMoralePenalty, 0, 'Dungeon wards');
+  }
 
   // 8. Build invader HP map
   const invaderHpMap: Record<string, number> = {};

@@ -12,6 +12,9 @@ import {
   RESOURCE_LABEL_MAP,
   gamestate,
   altarRoomGetNextUpgrade,
+  legendaryInhabitantCanRecruit,
+  legendaryInhabitantGetResearchUnlocked,
+  legendaryInhabitantIsRecruited,
   recruitmentGetRecruitable,
   recruitmentGetShortfall,
   recruitmentIsRosterFull,
@@ -22,11 +25,18 @@ import {
   recruitmentUnlockedTier,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
+  resourcePayCost,
+  inhabitantAdd,
 } from '@helpers';
+import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { rngUuid } from '@helpers/rng';
 import type {
+  InhabitantInstance,
+  InhabitantInstanceId,
   ResourceType,
   RoomUpgradePath,
 } from '@interfaces';
+import type { LegendaryRequirementCheck } from '@helpers/legendary-inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
@@ -35,6 +45,15 @@ type RecruitableEntry = {
   def: InhabitantContent;
   affordable: boolean;
   shortfall: { type: ResourceType; needed: number }[];
+  costEntries: { type: ResourceType; amount: number }[];
+};
+
+type LegendaryEntry = {
+  def: InhabitantContent;
+  recruited: boolean;
+  canRecruit: boolean;
+  affordable: boolean;
+  requirements: LegendaryRequirementCheck[];
   costEntries: { type: ResourceType; amount: number }[];
 };
 
@@ -131,5 +150,78 @@ export class PanelAltarComponent {
     } else if (result.error) {
       notifyError(result.error);
     }
+  }
+
+  // --- Legendary Recruitment ---
+
+  public legendaryInhabitants = computed<LegendaryEntry[]>(() => {
+    const state = gamestate();
+    const unlocked = legendaryInhabitantGetResearchUnlocked();
+
+    return unlocked.map((def) => {
+      const recruited = legendaryInhabitantIsRecruited(def.id, state.world.inhabitants);
+      const result = legendaryInhabitantCanRecruit(
+        def, state.world.inhabitants, state.world.floors, state.world.resources,
+      );
+      const affordable = resourceCanAfford(def.cost);
+      const costEntries = Object.entries(def.cost)
+        .filter(([, amount]) => amount && amount > 0)
+        .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
+
+      return {
+        def,
+        recruited,
+        canRecruit: result.allowed && affordable && !this.rosterFull(),
+        affordable,
+        requirements: result.missingRequirements,
+        costEntries,
+      };
+    });
+  });
+
+  public hasLegendaries = computed(() => this.legendaryInhabitants().length > 0);
+
+  public getLegendaryDisabledReason(entry: LegendaryEntry): string {
+    if (entry.recruited) return 'Already recruited';
+    if (this.rosterFull()) return 'Roster full';
+    const unmet = entry.requirements.filter((r) => !r.met);
+    if (unmet.length > 0) {
+      return unmet.map((r) => r.requirement.description).join(', ');
+    }
+    if (!entry.affordable) return 'Insufficient resources';
+    return '';
+  }
+
+  public async onRecruitLegendary(def: InhabitantContent): Promise<void> {
+    const state = gamestate();
+    const result = legendaryInhabitantCanRecruit(
+      def, state.world.inhabitants, state.world.floors, state.world.resources,
+    );
+    if (!result.allowed) {
+      notifyError('Requirements not met');
+      return;
+    }
+
+    if (!resourceCanAfford(def.cost)) {
+      notifyError('Not enough resources');
+      return;
+    }
+
+    const paid = await resourcePayCost(def.cost);
+    if (!paid) {
+      notifyError('Not enough resources');
+      return;
+    }
+
+    const instance: InhabitantInstance = {
+      instanceId: rngUuid<InhabitantInstanceId>(),
+      definitionId: def.id,
+      name: generateInhabitantName(def.type),
+      state: 'normal',
+      assignedRoomId: undefined,
+    };
+
+    await inhabitantAdd(instance);
+    notifySuccess(`Recruited ${instance.name} the ${def.name}!`);
   }
 }

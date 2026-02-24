@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngUuid } from '@helpers/rng';
 import type {
   Floor,
@@ -188,11 +189,13 @@ export function trapRollTrigger(
   // Trap triggers
   const moralePenalty = def.effectType === 'fear' ? 10 : 0;
   const chargesAfter = trap.remainingCharges - 1;
+  const researchTrapBonus = researchUnlockGetPassiveBonusWithMastery('trapDamage');
+  const finalDamage = Math.round(def.damage * (1 + researchTrapBonus));
 
   return {
     triggered: true,
     disarmed: false,
-    damage: def.damage,
+    damage: finalDamage,
     effectType: def.effectType,
     duration: def.duration,
     trapDestroyed: chargesAfter <= 0,

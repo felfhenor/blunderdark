@@ -2,6 +2,7 @@
   name: Storage Expansion
   description: "Magical containers that double the room's resource storage capacity. Enchanted chests expand to hold far more than their physical size suggests."
   category: functional
+  requiredFeatureFlag: feature_room_enhancement
   cost:
     gold: 100
     crystals: 25
@@ -14,6 +15,7 @@
   name: Efficiency Enchantment
   description: "Arcane runes etched into the room's walls that amplify worker productivity. The enchantment hums with focused magical energy."
   category: functional
+  requiredFeatureFlag: feature_room_enhancement
   cost:
     gold: 120
     flux: 20
@@ -26,6 +28,7 @@
   name: Fear Ward
   description: "Protective glyphs that suppress dread and panic within the room. Inhabitants feel an unnatural calm washing over them."
   category: functional
+  requiredFeatureFlag: feature_room_enhancement
   cost:
     gold: 80
     essence: 15
@@ -38,6 +41,7 @@
   name: Corruption Seal
   description: "Sacred bindings that neutralize all corruption generation within the room. A faint golden shimmer keeps dark energies at bay."
   category: functional
+  requiredFeatureFlag: feature_advanced_room_mods
   cost:
     gold: 150
     essence: 30
@@ -50,6 +54,7 @@
   name: Training Station
   description: "Practice dummies, weapon racks, and training manuals that allow inhabitants to hone their skills passively while working."
   category: functional
+  requiredFeatureFlag: feature_advanced_room_mods
   cost:
     gold: 90
     crystals: 15
@@ -62,6 +67,7 @@
   name: Resource Converter
   description: "An alchemical apparatus that can transform one resource into another, though some material is lost in the conversion process."
   category: functional
+  requiredFeatureFlag: feature_advanced_room_mods
   cost:
     gold: 200
     flux: 30
