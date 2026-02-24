@@ -112,7 +112,8 @@ export function hallwayPlacementFindPointPath(
 ): TileOffset[] | undefined {
   // Single-tile hallway: source and dest are the same empty tile
   if (source.x === dest.x && source.y === dest.y) {
-    if (!grid[source.y]?.[source.x]?.occupied) return [{ x: source.x, y: source.y }];
+    if (!grid[source.y]?.[source.x]?.occupied)
+      return [{ x: source.x, y: source.y }];
     return undefined;
   }
 
@@ -233,7 +234,7 @@ export const hallwayPlacementStatusMessage = computed(() => {
   if (step === 'preview') {
     const path = hallwayPlacementPreviewPath();
     if (!path) return 'No valid path found';
-    return `${path.length} tiles — ${calculateHallwayCost(path)} Crystals`;
+    return `${path.length} tiles`;
   }
   return '';
 });

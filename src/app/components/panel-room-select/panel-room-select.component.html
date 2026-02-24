@@ -23,6 +23,10 @@
           [class.opacity-70]="!hallwayPath() || hallwayPlacementCanAfford()"
         >
           {{ hallwayStatus() }}
+          @if (hallwayPath()) {
+            —
+            <app-currency-cost type="crystals" [amount]="hallwayCost()" />
+          }
         </p>
       </div>
 
@@ -89,7 +93,10 @@
             <div class="cost-row flex gap-2 w-full">
               @for (cost of elevatorCostEntries(); track cost.type) {
                 <span class="text-xs opacity-70">
-                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
+                  <app-currency-cost
+                    [type]="cost.type"
+                    [amount]="cost.amount"
+                  />
                 </span>
               }
             </div>
@@ -115,7 +122,10 @@
             <div class="cost-row flex gap-2 w-full">
               @for (cost of portalCostEntries(); track cost.type) {
                 <span class="text-xs opacity-70">
-                  <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
+                  <app-currency-cost
+                    [type]="cost.type"
+                    [amount]="cost.amount"
+                  />
                 </span>
               }
             </div>
@@ -181,7 +191,9 @@
               <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
             }
             @if (getGlobalLimitLabel(room); as globalLabel) {
-              <span class="badge badge-sm badge-outline">{{ globalLabel }}</span>
+              <span class="badge badge-sm badge-outline">
+                {{ globalLabel }}
+              </span>
             }
             <div
               class="shape-preview"

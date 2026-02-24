@@ -49,10 +49,14 @@ import {
   floorCurrentIndex,
   floorSetCurrentByIndex,
   gridSelectedTile,
+  hallwayPlacementBuildStep,
   optionsGet,
   roomPlacementSelectedTypeId,
 } from '@helpers';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
 import {
   autosaveEvent$,
   autosaveInstallBeforeUnload,
@@ -138,7 +142,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public invasionRecentLog = computed(() => invasionBattleLog().slice(-15));
 
   private invasionBattle = viewChild(PanelInvasionBattleComponent);
-  private invasionLogContainer = viewChild<ElementRef<HTMLElement>>('invasionLogContainer');
+  private invasionLogContainer = viewChild<ElementRef<HTMLElement>>(
+    'invasionLogContainer',
+  );
 
   public activePanel = signal<string | undefined>(undefined);
   private buildPanelClosedForPlacement = false;
@@ -183,9 +189,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public hasTortureChamber = computed(() =>
     this.hasRoomOfRole('tortureChamber'),
   );
-  public hasBreedingPits = computed(() =>
-    this.hasRoomOfRole('breedingPits'),
-  );
+  public hasBreedingPits = computed(() => this.hasRoomOfRole('breedingPits'));
   public isMerchantPresent = merchantIsPresent;
   public hasNoActiveResearch = computed(
     () => !gamestate().world.research.activeResearch,
@@ -306,6 +310,14 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         this.activePanel.set(undefined);
       } else if (this.buildPanelClosedForPlacement) {
         this.buildPanelClosedForPlacement = false;
+        this.activePanel.set('build');
+      }
+    });
+
+    // Reopen build panel when hallway placement reaches preview step
+    effect(() => {
+      const step = hallwayPlacementBuildStep();
+      if (step === 'preview') {
         this.activePanel.set('build');
       }
     });
