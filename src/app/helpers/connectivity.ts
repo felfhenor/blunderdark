@@ -1,30 +1,15 @@
 import { computed } from '@angular/core';
 import { altarRoomFind } from '@helpers/altar-room';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type {
-  Floor,
-  PlacedRoomId,
-} from '@interfaces';
+import type { Floor, PlacedRoomId } from '@interfaces';
 
 /**
- * Compute the set of room IDs reachable from the Altar Room via connections.
- * BFS traversal through the connection graph, treating hallways as intermediate nodes.
- * The Altar Room is always in the connected set (root node).
- * Rooms on floors without an Altar are all considered disconnected.
+ * BFS on a single floor from one or more seed room IDs.
+ * Traverses same-floor connections (rooms + hallways as intermediate nodes).
  */
-export function connectivityGetConnectedRoomIds(
-  floor: Floor,
-  floors: Floor[],
-): Set<PlacedRoomId> {
+function bfsOnFloor(floor: Floor, seeds: PlacedRoomId[]): Set<PlacedRoomId> {
   const connected = new Set<PlacedRoomId>();
 
-  const altar = altarRoomFind(floors);
-  if (!altar || altar.floor.id !== floor.id) return connected;
-
-  const altarRoomId = altar.room.id;
-  connected.add(altarRoomId);
-
-  // Build adjacency list from connections (rooms + hallways are all nodes)
   const adjacency = new Map<string, string[]>();
   for (const conn of floor.connections) {
     const aId = conn.roomAId as string;
@@ -36,10 +21,16 @@ export function connectivityGetConnectedRoomIds(
     adjacency.get(bId)!.push(aId);
   }
 
-  // BFS from altar
   const visited = new Set<string>();
-  const queue: string[] = [altarRoomId];
-  visited.add(altarRoomId);
+  const queue: string[] = [];
+
+  for (const seed of seeds) {
+    if (!visited.has(seed)) {
+      visited.add(seed);
+      queue.push(seed);
+      connected.add(seed);
+    }
+  }
 
   while (queue.length > 0) {
     const current = queue.shift()!;
@@ -49,12 +40,91 @@ export function connectivityGetConnectedRoomIds(
       if (visited.has(neighbor)) continue;
       visited.add(neighbor);
       queue.push(neighbor);
-      // Add to connected set (could be room or hallway ID, both are fine)
       connected.add(neighbor as PlacedRoomId);
     }
   }
 
   return connected;
+}
+
+/**
+ * Compute connected room IDs for all floors at once, propagating connectivity
+ * through vertical transport links (stairs, elevators, portals).
+ *
+ * Algorithm:
+ * 1. BFS on the Altar's floor from the Altar room
+ * 2. Find connected transport rooms → propagate to other floors as seeds
+ * 3. BFS on those floors from the transport seed rooms
+ * 4. Repeat until no new floors are discovered
+ */
+function connectivityComputeGlobal(
+  floors: Floor[],
+  altar: { room: { id: PlacedRoomId }; floor: Floor },
+): Map<string, Set<PlacedRoomId>> {
+  const result = new Map<string, Set<PlacedRoomId>>();
+  const seedSets = new Map<string, Set<PlacedRoomId>>();
+
+  seedSets.set(altar.floor.id, new Set([altar.room.id]));
+  result.set(altar.floor.id, bfsOnFloor(altar.floor, [altar.room.id]));
+
+  const propagatedRooms = new Set<PlacedRoomId>();
+  const floorQueue: Floor[] = [altar.floor];
+
+  while (floorQueue.length > 0) {
+    const currentFloor = floorQueue.shift()!;
+    const connected = result.get(currentFloor.id)!;
+
+    for (const room of currentFloor.rooms) {
+      if (!room.transportGroupId || !connected.has(room.id)) continue;
+      if (propagatedRooms.has(room.id)) continue;
+      propagatedRooms.add(room.id);
+
+      for (const otherFloor of floors) {
+        if (otherFloor.id === currentFloor.id) continue;
+
+        let hasNewSeeds = false;
+        let otherSeeds = seedSets.get(otherFloor.id);
+        if (!otherSeeds) {
+          otherSeeds = new Set();
+          seedSets.set(otherFloor.id, otherSeeds);
+        }
+
+        for (const otherRoom of otherFloor.rooms) {
+          if (otherRoom.transportGroupId === room.transportGroupId) {
+            if (!otherSeeds.has(otherRoom.id)) {
+              otherSeeds.add(otherRoom.id);
+              hasNewSeeds = true;
+            }
+          }
+        }
+
+        if (hasNewSeeds) {
+          result.set(otherFloor.id, bfsOnFloor(otherFloor, [...otherSeeds]));
+          floorQueue.push(otherFloor);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Compute the set of room IDs reachable from the Altar Room via connections
+ * and vertical transport links.
+ * BFS traversal through the connection graph, treating hallways as intermediate nodes.
+ * The Altar Room is always in the connected set (root node).
+ * On non-Altar floors, transport rooms connected to the Altar network serve as seeds.
+ */
+export function connectivityGetConnectedRoomIds(
+  floor: Floor,
+  floors: Floor[],
+): Set<PlacedRoomId> {
+  const altar = altarRoomFind(floors);
+  if (!altar) return new Set<PlacedRoomId>();
+
+  const globalConnected = connectivityComputeGlobal(floors, altar);
+  return globalConnected.get(floor.id) ?? new Set<PlacedRoomId>();
 }
 
 /**
@@ -95,16 +165,14 @@ export const connectivityDisconnectedRoomIds = computed<Set<PlacedRoomId>>(
 /**
  * Reactive signal: set of connected room IDs on the current floor.
  */
-export const connectivityConnectedRoomIds = computed<Set<PlacedRoomId>>(
-  () => {
-    const state = gamestate();
-    const floors = state.world.floors;
-    const currentFloor = floors[state.world.currentFloorIndex];
-    if (!currentFloor) return new Set<PlacedRoomId>();
+export const connectivityConnectedRoomIds = computed<Set<PlacedRoomId>>(() => {
+  const state = gamestate();
+  const floors = state.world.floors;
+  const currentFloor = floors[state.world.currentFloorIndex];
+  if (!currentFloor) return new Set<PlacedRoomId>();
 
-    return connectivityGetConnectedRoomIds(currentFloor, floors);
-  },
-);
+  return connectivityGetConnectedRoomIds(currentFloor, floors);
+});
 
 /**
  * Check if a specific room is connected to the Altar on its floor.
