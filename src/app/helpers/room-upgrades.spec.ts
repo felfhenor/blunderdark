@@ -12,9 +12,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // --- Mocks ---
 
 const mockContent = new Map<string, unknown>();
+const mockResearchUnlocked = new Set<string>();
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+}));
+
+vi.mock('@helpers/research-unlocks', () => ({
+  researchUnlockIsUnlocked: (_type: string, id: string) =>
+    mockResearchUnlocked.has(id),
+  researchUnlockGetPassiveBonusWithMastery: () => 0,
 }));
 
 const {
@@ -126,10 +133,15 @@ function createPlacedRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 
 beforeEach(() => {
   mockContent.clear();
+  mockResearchUnlocked.clear();
   mockContent.set(CRYSTAL_MINE_ID, crystalMineRoom);
   // Register each upgrade in mockContent for direct lookup
   for (const u of allUpgrades) {
     mockContent.set(u.id, u);
+  }
+  // By default, all upgrades are research-unlocked
+  for (const u of allUpgrades) {
+    mockResearchUnlocked.add(u.id);
   }
 });
 
@@ -305,6 +317,16 @@ describe('roomUpgradeGetAvailable', () => {
     const available = roomUpgradeGetAvailable(room);
     expect(available).toEqual([]);
   });
+
+  it('should exclude upgrades not yet researched', () => {
+    mockResearchUnlocked.delete('upgrade-efficiency');
+    const room = createPlacedRoom();
+    const available = roomUpgradeGetAvailable(room);
+    expect(
+      available.find((p) => p.id === 'upgrade-efficiency'),
+    ).toBeUndefined();
+    expect(available).toHaveLength(2); // capacity + specialization (dark excluded by default)
+  });
 });
 
 describe('roomUpgradeGetVisible', () => {
@@ -332,11 +354,21 @@ describe('roomUpgradeGetVisible', () => {
     expect(darkEntry!.lockReason).toBeUndefined();
   });
 
-  it('should mark non-dark upgrades as unlocked regardless', () => {
+  it('should mark non-dark upgrades as unlocked when researched', () => {
     const room = createPlacedRoom();
     const visible = roomUpgradeGetVisible(room);
     const normalEntries = visible.filter((v) => !v.path.requiresDarkUpgrade);
     expect(normalEntries.every((v) => !v.locked)).toBe(true);
+  });
+
+  it('should mark upgrades as locked when not researched', () => {
+    mockResearchUnlocked.clear();
+    const room = createPlacedRoom();
+    const visible = roomUpgradeGetVisible(room);
+    expect(visible.every((v) => v.locked)).toBe(true);
+    expect(visible.every((v) => v.lockReason === 'Requires research')).toBe(
+      true,
+    );
   });
 
   it('should return empty array for room with upgrade applied', () => {

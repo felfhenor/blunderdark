@@ -6,7 +6,7 @@ import type { SummonRecipeId } from '@interfaces/content-summonrecipe';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { PrisonerId } from '@interfaces/invasion';
-import type { UpgradePathId } from '@interfaces/room';
+import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 
 export type PlacedRoomId = Branded<string, 'PlacedRoomId'>;
 export type TransportType = 'stair' | 'elevator' | 'portal';
@@ -60,7 +60,7 @@ export type PlacedRoom = {
   anchorY: number;
   suffix: string;
   rotation?: Rotation;
-  appliedUpgradePathId?: UpgradePathId;
+  appliedUpgradePathId?: RoomUpgradeId;
   spawnTicksRemaining?: number;
   breedingJob?: BreedingJob;
   mutationJob?: MutationJob;

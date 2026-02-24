@@ -181,7 +181,7 @@ function makeGameState(overrides: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: { rooms: [], inhabitants: [], abilities: [], roomupgrades: [], passiveBonuses: [] },
       },
       reputation: {
         terror: 0,

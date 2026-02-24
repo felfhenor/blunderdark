@@ -25,10 +25,6 @@ vi.mock('@helpers/content', () => {
     production: {},
     requiresWorkers: false,
     adjacencyBonuses: [],
-    upgradePaths: [
-      { id: 'altar-upgrade-2', upgradeLevel: 2, effects: [] },
-      { id: 'altar-upgrade-3', upgradeLevel: 3, effects: [] },
-    ],
   });
 
   entries.set('room-shadow-library', {

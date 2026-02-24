@@ -126,7 +126,7 @@ export class NotifyService {
       inhabitant: 'Creature',
       ability: 'Ability',
       roomfeature: 'Room Feature',
-      upgrade: 'Upgrade',
+      roomupgrade: 'Upgrade',
       biome: 'Biome',
     };
     const label = UNLOCK_LABELS[unlock.type];

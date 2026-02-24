@@ -195,7 +195,7 @@ function makeState(overrides: Partial<{
           rooms: [],
           inhabitants: [],
           abilities: [],
-          upgrades: [],
+          roomupgrades: [],
           passiveBonuses: [],
         },
       },

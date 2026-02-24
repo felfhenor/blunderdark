@@ -14,7 +14,7 @@ import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { FeatureId } from '@interfaces/content-feature';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { RoomId } from '@interfaces/content-room';
-import type { UpgradePathId } from '@interfaces/room';
+import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 import { Subject } from 'rxjs';
 
 // --- Unlock events ---
@@ -93,7 +93,7 @@ export function researchUnlockIsUnlocked(
     | RoomId
     | InhabitantId
     | CombatAbilityId
-    | UpgradePathId
+    | RoomUpgradeId
     | FeatureId
     | BiomeType,
   unlockedContent?: UnlockedContent,
@@ -106,8 +106,8 @@ export function researchUnlockIsUnlocked(
       return content.inhabitants.includes(id as InhabitantId);
     case 'ability':
       return content.abilities.includes(id as CombatAbilityId);
-    case 'upgrade':
-      return content.upgrades.includes(id as UpgradePathId);
+    case 'roomupgrade':
+      return content.roomupgrades.includes(id as RoomUpgradeId);
     case 'roomfeature':
       return (content.roomfeatures ?? []).includes(id as FeatureId);
     case 'biome':
@@ -211,7 +211,7 @@ export function researchUnlockApplyEffects(
     rooms: [...current.rooms],
     inhabitants: [...current.inhabitants],
     abilities: [...current.abilities],
-    upgrades: [...current.upgrades],
+    roomupgrades: [...current.roomupgrades],
     passiveBonuses: [...current.passiveBonuses],
     featureFlags: [...(current.featureFlags ?? [])],
     roomfeatures: [...(current.roomfeatures ?? [])],
@@ -241,9 +241,12 @@ export function researchUnlockApplyEffects(
           ];
         }
         break;
-      case 'upgrade':
-        if (!result.upgrades.includes(unlock.targetUpgradepathId)) {
-          result.upgrades = [...result.upgrades, unlock.targetUpgradepathId];
+      case 'roomupgrade':
+        if (!result.roomupgrades.includes(unlock.targetRoomupgradeId)) {
+          result.roomupgrades = [
+            ...result.roomupgrades,
+            unlock.targetRoomupgradeId,
+          ];
         }
         break;
       case 'passive_bonus':

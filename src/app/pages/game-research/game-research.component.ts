@@ -26,7 +26,6 @@ import type {
   BiomeType,
   ResearchBranch,
   ResearchContent,
-  RoomContent,
   UnlockEffect,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -249,15 +248,9 @@ export class GameResearchComponent {
         const entry = contentGetEntry(unlock.targetCombatabilityId);
         return { type: 'Ability', name: entry?.name ?? 'Unknown' };
       }
-      case 'upgrade': {
-        const rooms = contentGetEntriesByType<RoomContent>('room');
-        for (const room of rooms) {
-          const path = room.upgradePaths?.find(
-            (p) => p.id === unlock.targetUpgradepathId,
-          );
-          if (path) return { type: 'Upgrade', name: path.name };
-        }
-        return { type: 'Upgrade', name: 'Unknown' };
+      case 'roomupgrade': {
+        const entry = contentGetEntry(unlock.targetRoomupgradeId);
+        return { type: 'Upgrade', name: entry?.name ?? 'Unknown' };
       }
       case 'passive_bonus':
         return { type: 'Bonus', name: unlock.description };

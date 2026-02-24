@@ -72,7 +72,7 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
           rooms: [],
           inhabitants: [],
           abilities: [],
-          upgrades: [],
+          roomupgrades: [],
           passiveBonuses: [],
         },
       },

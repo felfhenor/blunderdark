@@ -79,7 +79,7 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
             rooms: [],
             inhabitants: [],
             abilities: [],
-            upgrades: [],
+            roomupgrades: [],
             passiveBonuses: [],
           },
         },

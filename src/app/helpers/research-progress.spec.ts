@@ -145,7 +145,6 @@ const shadowLibraryRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -181,7 +180,7 @@ function makeResearchState(
       rooms: [],
       inhabitants: [],
       abilities: [],
-      upgrades: [],
+      roomupgrades: [],
       passiveBonuses: [],
     },
     ...overrides,

@@ -91,7 +91,7 @@ export function defaultUnlockedContent(): UnlockedContent {
     rooms: [],
     inhabitants: [],
     abilities: [],
-    upgrades: [],
+    roomupgrades: [],
     passiveBonuses: [],
     featureFlags: [],
     roomfeatures: [],

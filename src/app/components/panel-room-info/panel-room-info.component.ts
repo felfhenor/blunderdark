@@ -74,7 +74,7 @@ import type {
   InhabitantInstance,
   PlacedRoomId,
   RoomUpgradeEffect,
-  RoomUpgradePath,
+  RoomUpgradeContent,
 } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -322,7 +322,7 @@ export class PanelRoomInfoComponent {
   }
 
   public getUpgradeCostEntries(
-    path: RoomUpgradePath,
+    path: RoomUpgradeContent,
   ): { type: ResourceType; amount: number }[] {
     return Object.entries(path.cost)
       .filter(([, v]) => v !== undefined && v > 0)
@@ -332,11 +332,11 @@ export class PanelRoomInfoComponent {
       }));
   }
 
-  public canAffordUpgrade(path: RoomUpgradePath): boolean {
+  public canAffordUpgrade(path: RoomUpgradeContent): boolean {
     return resourceCanAfford(path.cost);
   }
 
-  public async onApplyUpgrade(path: RoomUpgradePath): Promise<void> {
+  public async onApplyUpgrade(path: RoomUpgradeContent): Promise<void> {
     const room = this.selectedRoom();
     if (!room) return;
 

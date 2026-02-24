@@ -34,7 +34,7 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   ResourceType,
-  RoomUpgradePath,
+  RoomUpgradeContent,
 } from '@interfaces';
 import type { LegendaryRequirementCheck } from '@helpers/legendary-inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -73,7 +73,7 @@ export class PanelAltarComponent {
   public maxInhabitants = recruitmentMaxInhabitantCount;
   public tierUnlocked = recruitmentUnlockedTier;
 
-  public nextUpgrade = computed<RoomUpgradePath | undefined>(() => {
+  public nextUpgrade = computed<RoomUpgradeContent | undefined>(() => {
     return altarRoomGetNextUpgrade(gamestate().world.floors);
   });
 
@@ -109,7 +109,7 @@ export class PanelAltarComponent {
   });
 
   public getCostEntries(
-    upgrade: RoomUpgradePath,
+    upgrade: RoomUpgradeContent,
   ): { type: ResourceType; amount: number }[] {
     return Object.entries(upgrade.cost)
       .filter(([, amount]) => amount && amount > 0)

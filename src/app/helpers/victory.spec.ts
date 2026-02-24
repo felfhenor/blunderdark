@@ -117,7 +117,7 @@ function makeState(overrides: {
           rooms: [],
           inhabitants: [],
           abilities: [],
-          upgrades: [],
+          roomupgrades: [],
           passiveBonuses: [],
         },
       },

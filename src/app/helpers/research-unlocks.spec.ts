@@ -9,7 +9,7 @@ import type {
   ResourceMap,
   UnlockEffect,
   UnlockedContent,
-  UpgradePathId,
+  RoomUpgradeId,
 } from '@interfaces';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { ResearchId } from '@interfaces/content-research';
@@ -63,7 +63,7 @@ function makeUnlockedContent(
     rooms: [],
     inhabitants: [],
     abilities: [],
-    upgrades: [],
+    roomupgrades: [],
     passiveBonuses: [],
     featureFlags: [],
     roomfeatures: [],
@@ -213,19 +213,19 @@ describe('researchUnlockIsUnlocked', () => {
 
   it('should check upgrade unlock status', () => {
     const content = makeUnlockedContent({
-      upgrades: ['upgrade-1' as UpgradePathId],
+      roomupgrades: ['upgrade-1' as RoomUpgradeId],
     });
     expect(
       researchUnlockIsUnlocked(
-        'upgrade',
-        'upgrade-1' as UpgradePathId,
+        'roomupgrade',
+        'upgrade-1' as RoomUpgradeId,
         content,
       ),
     ).toBe(true);
     expect(
       researchUnlockIsUnlocked(
-        'upgrade',
-        'upgrade-2' as UpgradePathId,
+        'roomupgrade',
+        'upgrade-2' as RoomUpgradeId,
         content,
       ),
     ).toBe(false);
@@ -341,10 +341,10 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should add upgrade unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'upgrade', targetUpgradepathId: 'upgrade-1' as UpgradePathId },
+      { type: 'roomupgrade', targetRoomupgradeId: 'upgrade-1' as RoomUpgradeId },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
-    expect(result.upgrades).toEqual(['upgrade-1' as UpgradePathId]);
+    expect(result.roomupgrades).toEqual(['upgrade-1' as RoomUpgradeId]);
   });
 
   it('should add biome unlock', () => {

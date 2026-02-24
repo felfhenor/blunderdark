@@ -26,6 +26,7 @@ export * from './content-reputationeffect';
 export * from './content-research';
 export * from './content-room';
 export * from './content-roomshape';
+export * from './content-roomupgrade';
 export * from './content-seasonbonus';
 export * from './content-summonrecipe';
 export * from './content-synergy';

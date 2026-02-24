@@ -94,7 +94,6 @@ function createTestRoomDef(
     inhabitantRestriction: undefined,
     fearLevel: 1,
     fearReductionAura: 0,
-    upgradePaths: [],
     autoPlace: false,
     ...overrides,
   } as RoomContent;

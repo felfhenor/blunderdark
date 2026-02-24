@@ -1,6 +1,9 @@
 import { contentGetEntry } from '@helpers/content';
 import { featureCalculateCapacityBonus } from '@helpers/features';
-import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
+import {
+  researchUnlockGetPassiveBonusWithMastery,
+  researchUnlockIsUnlocked,
+} from '@helpers/research-unlocks';
 import type {
   PlacedRoom,
   RoomId,
@@ -100,13 +103,15 @@ export function roomUpgradeGetAvailable(
 ): RoomUpgradeContent[] {
   if (placedRoom.appliedUpgradePathId) return [];
   return roomUpgradeGetPaths(placedRoom.roomTypeId).filter(
-    (p) => !p.requiresDarkUpgrade || darkUpgradeUnlocked,
+    (p) =>
+      researchUnlockIsUnlocked('roomupgrade', p.id) &&
+      (!p.requiresDarkUpgrade || darkUpgradeUnlocked),
   );
 }
 
 /**
  * Returns all upgrade paths for a room with lock status.
- * Dark upgrades are visible but locked until corruption >= 50.
+ * Upgrades are locked if not yet researched or if they require dark upgrades.
  */
 export function roomUpgradeGetVisible(
   placedRoom: PlacedRoom,
@@ -114,12 +119,16 @@ export function roomUpgradeGetVisible(
 ): VisibleUpgrade[] {
   if (placedRoom.appliedUpgradePathId) return [];
   return roomUpgradeGetPaths(placedRoom.roomTypeId).map((path) => {
-    const locked = !!path.requiresDarkUpgrade && !darkUpgradeUnlocked;
-    return {
-      path,
-      locked,
-      lockReason: locked ? 'Requires 50 Corruption' : undefined,
-    };
+    const researchLocked = !researchUnlockIsUnlocked('roomupgrade', path.id);
+    const darkLocked = !!path.requiresDarkUpgrade && !darkUpgradeUnlocked;
+    const locked = researchLocked || darkLocked;
+    let lockReason: string | undefined;
+    if (researchLocked) {
+      lockReason = 'Requires research';
+    } else if (darkLocked) {
+      lockReason = 'Requires 50 Corruption';
+    }
+    return { path, locked, lockReason };
   });
 }
 

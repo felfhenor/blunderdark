@@ -4,9 +4,14 @@ import type { FeatureId } from '@interfaces/content-feature';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomId } from '@interfaces/content-room';
-import type { UpgradePathId } from '@interfaces/room';
+import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 
-export type ResearchBranch = 'dark' | 'arcane' | 'engineering' | 'dominion';
+export type ResearchBranch =
+  | 'dark'
+  | 'arcane'
+  | 'engineering'
+  | 'dominion'
+  | 'architecture';
 
 export type ResearchNodeState = 'completed' | 'active' | 'available' | 'locked';
 
@@ -25,9 +30,9 @@ export type AbilityUnlock = {
   targetCombatabilityId: CombatAbilityId;
 };
 
-export type UpgradeUnlock = {
-  type: 'upgrade';
-  targetUpgradepathId: UpgradePathId;
+export type RoomUpgradeUnlock = {
+  type: 'roomupgrade';
+  targetRoomupgradeId: RoomUpgradeId;
 };
 
 export type PassiveBonusUnlock = {
@@ -57,7 +62,7 @@ export type UnlockEffect =
   | RoomUnlock
   | InhabitantUnlock
   | AbilityUnlock
-  | UpgradeUnlock
+  | RoomUpgradeUnlock
   | PassiveBonusUnlock
   | FeatureFlagUnlock
   | RoomFeatureUnlock
@@ -76,7 +81,7 @@ export type UnlockContentType = Extract<
       | 'room'
       | 'inhabitant'
       | 'ability'
-      | 'upgrade'
+      | 'roomupgrade'
       | 'roomfeature'
       | 'biome';
   }
@@ -86,7 +91,7 @@ export type UnlockedContent = {
   rooms: RoomId[];
   inhabitants: InhabitantId[];
   abilities: CombatAbilityId[];
-  upgrades: UpgradePathId[];
+  roomupgrades: RoomUpgradeId[];
   passiveBonuses: { bonusType: string; value: number; description: string }[];
   featureFlags: string[];
   roomfeatures: FeatureId[];
@@ -101,8 +106,8 @@ export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
       return unlock.targetInhabitantId;
     case 'ability':
       return unlock.targetCombatabilityId;
-    case 'upgrade':
-      return unlock.targetUpgradepathId;
+    case 'roomupgrade':
+      return unlock.targetRoomupgradeId;
     case 'roomfeature':
       return unlock.targetFeatureId;
     case 'biome':

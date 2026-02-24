@@ -23,9 +23,9 @@ import type {
   PlacedRoomId,
   RoomId,
   RoomShapeContent,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeId,
 } from '@interfaces';
+import type { RoomUpgradeContent } from '@interfaces/content-roomupgrade';
 import type { RoomContent } from '@interfaces/content-room';
 import { GRID_SIZE } from '@interfaces/grid';
 
@@ -169,7 +169,7 @@ export const altarRoomLevel = computed<number>(() => {
  */
 export function altarRoomGetNextUpgrade(
   floors: Floor[],
-): RoomUpgradePath | undefined {
+): RoomUpgradeContent | undefined {
   const altar = altarRoomFind(floors);
   if (!altar) return undefined;
 
@@ -195,7 +195,7 @@ export function altarRoomGetNextUpgrade(
  * Apply the next upgrade to the Altar Room.
  */
 export async function altarRoomApplyUpgrade(
-  upgradePathId: UpgradePathId,
+  upgradePathId: RoomUpgradeId,
 ): Promise<{ success: boolean; error?: string }> {
   const state = gamestate();
   const altar = altarRoomFind(state.world.floors);

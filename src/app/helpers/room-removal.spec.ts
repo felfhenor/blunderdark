@@ -125,7 +125,7 @@ beforeEach(() => {
     inhabitantRestriction: undefined,
     fearLevel: 0,
     fearReductionAura: 1,
-    upgradePaths: [],
+
   });
 
   // Crystal Mine: removable: true, cost 50 gold
@@ -146,7 +146,7 @@ beforeEach(() => {
     inhabitantRestriction: undefined,
     fearLevel: 1,
     fearReductionAura: 0,
-    upgradePaths: [],
+
   });
 
   // Throne Room: removable: true, cost 100 gold + 50 crystals
@@ -167,7 +167,7 @@ beforeEach(() => {
     inhabitantRestriction: 'unique',
     fearLevel: 'variable',
     fearReductionAura: 0,
-    upgradePaths: [],
+
   });
 
   // Shapes

@@ -1,4 +1,4 @@
-import type { RoomUpgradePath } from '@interfaces/room';
+import type { RoomUpgradeContent } from '@interfaces/content-roomupgrade';
 
 export type UpgradeValidation = {
   valid: boolean;
@@ -6,7 +6,7 @@ export type UpgradeValidation = {
 };
 
 export type VisibleUpgrade = {
-  path: RoomUpgradePath;
+  path: RoomUpgradeContent;
   locked: boolean;
   lockReason?: string;
 };
