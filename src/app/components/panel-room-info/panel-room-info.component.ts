@@ -41,7 +41,6 @@ import {
   inhabitantUnassignFromRoom,
   fearLevelBreakdownMap,
   fearLevelGetLabel,
-  FEAR_LEVEL_MAX,
   featureGetSlotCount,
   featureGetForSlot,
   featureAttachToSlot,
@@ -225,8 +224,6 @@ export class PanelRoomInfoComponent {
     return fearLevelGetLabel(breakdown.effectiveFear);
   });
 
-  public fearMax = FEAR_LEVEL_MAX;
-
   public fearLabelClass = computed(() => {
     const breakdown = this.fearBreakdown();
     if (!breakdown) return '';
@@ -238,14 +235,6 @@ export class PanelRoomInfoComponent {
       case 4: return 'text-error';
       default: return '';
     }
-  });
-
-  public fearProgressClass = computed(() => {
-    const breakdown = this.fearBreakdown();
-    if (!breakdown) return 'progress-success';
-    if (breakdown.effectiveFear >= 4) return 'progress-error';
-    if (breakdown.effectiveFear >= 2) return 'progress-warning';
-    return 'progress-success';
   });
 
   // --- Room Upgrades ---

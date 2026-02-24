@@ -80,12 +80,6 @@
               {{ fearLabel() }}
             </span>
           </div>
-          <progress
-            class="progress w-full"
-            [ngClass]="fearProgressClass()"
-            [value]="fear.effectiveFear"
-            [max]="fearMax"
-          ></progress>
           <ng-template #fearBreakdownTip>
             <div class="text-xs opacity-70">
               Base: {{ fear.baseFear | number: '1.0-2' }}
