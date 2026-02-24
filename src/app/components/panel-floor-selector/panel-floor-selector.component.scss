@@ -30,7 +30,10 @@
 }
 
 .floor-detail {
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.2s ease-in-out forwards;
+  // Keep entrance animation running even when the game is paused,
+  // otherwise the panel stays invisible (frozen at opacity: 0).
+  animation-play-state: running !important;
 }
 
 @keyframes fadeIn {
