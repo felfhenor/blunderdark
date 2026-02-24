@@ -142,10 +142,16 @@
                 <span class="badge badge-xs badge-success badge-outline" [tp]="formatEffectTooltip(effect)" [tpDelay]="250">
                   @switch (effect.type) {
                     @case ('productionBonus') {
-                      +{{ effect.value * 100 }}% {{ effect.resource ?? 'all' }} production
+                      +{{ effect.value * 100 }}%
+                      @if (effect.resource) {
+                        <app-currency-name [type]="$any(effect.resource)" />
+                      } @else {
+                        all
+                      }
+                      production
                     }
                     @case ('secondaryProduction') {
-                      +{{ effect.value }} {{ effect.resource }}/sec
+                      +<app-currency-cost [type]="$any(effect.resource)" [amount]="effect.value" />/sec
                     }
                     @case ('productionMultiplier') {
                       x{{ effect.value }} production
@@ -187,10 +193,16 @@
                           <span class="badge badge-xs badge-success badge-outline" [tp]="formatEffectTooltip(effect)" [tpDelay]="250">
                             @switch (effect.type) {
                               @case ('productionBonus') {
-                                +{{ effect.value * 100 }}% {{ effect.resource ?? 'all' }} production
+                                +{{ effect.value * 100 }}%
+                                @if (effect.resource) {
+                                  <app-currency-name [type]="$any(effect.resource)" />
+                                } @else {
+                                  all
+                                }
+                                production
                               }
                               @case ('secondaryProduction') {
-                                +{{ effect.value }} {{ effect.resource }}/sec
+                                +<app-currency-cost [type]="$any(effect.resource)" [amount]="effect.value" />/sec
                               }
                               @case ('productionMultiplier') {
                                 x{{ effect.value }} production
