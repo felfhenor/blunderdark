@@ -24,15 +24,15 @@
       }
 
       @if (efficiencyBreakdown(); as eff) {
-        <div class="mt-1">
-          <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4 mt-1 text-xs">
+          <div class="flex items-center gap-1">
             <span
-              class="text-xs opacity-50 cursor-help underline decoration-dotted"
+              class="opacity-50 cursor-help underline decoration-dotted"
               [tp]="efficiencyBreakdownTip"
               [tpDelay]="250"
             >Efficiency:</span>
             <span
-              class="text-xs font-semibold"
+              class="font-semibold"
               [class.text-success]="eff.totalMultiplier > 1.0"
               [class.text-error]="eff.totalMultiplier < 1.0"
             >
@@ -43,88 +43,141 @@
               />
             </span>
           </div>
-          <ng-template #efficiencyBreakdownTip>
-            <div class="text-xs opacity-70">
-              Base: {{ eff.baseEfficiency | number: '1.0-2' }}x
+          @if (fearBreakdown(); as fear) {
+            <div class="flex items-center gap-1">
+              <span
+                class="opacity-50 cursor-help underline decoration-dotted"
+                [tp]="fearBreakdownTip"
+                [tpDelay]="250"
+              >Fear:</span>
+              <span class="font-semibold" [ngClass]="fearLabelClass()">
+                {{ fearLabel() }}
+              </span>
             </div>
-            @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
-              <div class="text-xs">
-                <span>{{ contrib.name }}:</span>
-                <span
-                  [class.text-success]="contrib.totalBonus > 0"
-                  [class.text-error]="contrib.totalBonus < 0"
+            <ng-template #fearBreakdownTip>
+              <div class="text-xs opacity-70">
+                Base: {{ fear.baseFear | number: '1.0-2' }}
+              </div>
+              @if (fear.inhabitantModifier !== 0) {
+                <div
+                  class="text-xs"
+                  [class.text-error]="fear.inhabitantModifier > 0"
+                  [class.text-success]="fear.inhabitantModifier < 0"
                 >
-                  {{ contrib.totalBonus >= 0 ? '+' : ''
-                  }}{{ contrib.totalBonus | number: '1.0-2' }}x
-                </span>
-                @for (tb of contrib.traitBonuses; track tb.traitName) {
-                  @if (tb.applies) {
-                    <span class="opacity-50">({{ tb.traitName }})</span>
-                  }
-                }
-              </div>
-            }
-          </ng-template>
-        </div>
-      }
-
-      @if (fearBreakdown(); as fear) {
-        <div class="mt-2">
-          <div class="flex items-center gap-2">
-            <span
-              class="text-xs opacity-50 cursor-help underline decoration-dotted"
-              [tp]="fearBreakdownTip"
-              [tpDelay]="250"
-            >Fear:</span>
-            <span class="text-xs font-semibold" [ngClass]="fearLabelClass()">
-              {{ fearLabel() }}
-            </span>
-          </div>
-          <ng-template #fearBreakdownTip>
-            <div class="text-xs opacity-70">
-              Base: {{ fear.baseFear | number: '1.0-2' }}
-            </div>
-            @if (fear.inhabitantModifier !== 0) {
-              <div
-                class="text-xs"
-                [class.text-error]="fear.inhabitantModifier > 0"
-                [class.text-success]="fear.inhabitantModifier < 0"
-              >
-                Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
-                }}{{ fear.inhabitantModifier | number: '1.0-2' }}
-              </div>
-            }
-            @if (fear.upgradeAdjustment !== 0) {
-              <div
-                class="text-xs"
-                [class.text-error]="fear.upgradeAdjustment > 0"
-                [class.text-success]="fear.upgradeAdjustment < 0"
-              >
-                Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
-                }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
-              </div>
-            }
-            @if (fear.altarAuraReduction !== 0) {
-              <div class="text-xs text-success">
-                Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
-              </div>
-            }
-            @if (fear.propagatedFear !== 0) {
-              <div class="text-xs text-error">
-                Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
-              </div>
-              @for (
-                source of fear.propagationSources;
-                track source.sourceRoomId
-              ) {
-                <div class="text-xs opacity-70 ml-2">
-                  +{{ source.amount | number: '1.0-2' }} from
-                  {{ source.sourceRoomName }}
+                  Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
+                  }}{{ fear.inhabitantModifier | number: '1.0-2' }}
                 </div>
               }
-            }
-          </ng-template>
+              @if (fear.upgradeAdjustment !== 0) {
+                <div
+                  class="text-xs"
+                  [class.text-error]="fear.upgradeAdjustment > 0"
+                  [class.text-success]="fear.upgradeAdjustment < 0"
+                >
+                  Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
+                  }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
+                </div>
+              }
+              @if (fear.altarAuraReduction !== 0) {
+                <div class="text-xs text-success">
+                  Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
+                </div>
+              }
+              @if (fear.propagatedFear !== 0) {
+                <div class="text-xs text-error">
+                  Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
+                </div>
+                @for (
+                  source of fear.propagationSources;
+                  track source.sourceRoomId
+                ) {
+                  <div class="text-xs opacity-70 ml-2">
+                    +{{ source.amount | number: '1.0-2' }} from
+                    {{ source.sourceRoomName }}
+                  </div>
+                }
+              }
+            </ng-template>
+          }
         </div>
+        <ng-template #efficiencyBreakdownTip>
+          <div class="text-xs opacity-70">
+            Base: {{ eff.baseEfficiency | number: '1.0-2' }}x
+          </div>
+          @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
+            <div class="text-xs">
+              <span>{{ contrib.name }}:</span>
+              <span
+                [class.text-success]="contrib.totalBonus > 0"
+                [class.text-error]="contrib.totalBonus < 0"
+              >
+                {{ contrib.totalBonus >= 0 ? '+' : ''
+                }}{{ contrib.totalBonus | number: '1.0-2' }}x
+              </span>
+              @for (tb of contrib.traitBonuses; track tb.traitName) {
+                @if (tb.applies) {
+                  <span class="opacity-50">({{ tb.traitName }})</span>
+                }
+              }
+            </div>
+          }
+        </ng-template>
+      }
+      @if (!efficiencyBreakdown() && fearBreakdown(); as fear) {
+        <div class="flex items-center gap-1 mt-1 text-xs">
+          <span
+            class="opacity-50 cursor-help underline decoration-dotted"
+            [tp]="fearBreakdownTip"
+            [tpDelay]="250"
+          >Fear:</span>
+          <span class="font-semibold" [ngClass]="fearLabelClass()">
+            {{ fearLabel() }}
+          </span>
+        </div>
+        <ng-template #fearBreakdownTip>
+          <div class="text-xs opacity-70">
+            Base: {{ fear.baseFear | number: '1.0-2' }}
+          </div>
+          @if (fear.inhabitantModifier !== 0) {
+            <div
+              class="text-xs"
+              [class.text-error]="fear.inhabitantModifier > 0"
+              [class.text-success]="fear.inhabitantModifier < 0"
+            >
+              Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
+              }}{{ fear.inhabitantModifier | number: '1.0-2' }}
+            </div>
+          }
+          @if (fear.upgradeAdjustment !== 0) {
+            <div
+              class="text-xs"
+              [class.text-error]="fear.upgradeAdjustment > 0"
+              [class.text-success]="fear.upgradeAdjustment < 0"
+            >
+              Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
+              }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
+            </div>
+          }
+          @if (fear.altarAuraReduction !== 0) {
+            <div class="text-xs text-success">
+              Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
+            </div>
+          }
+          @if (fear.propagatedFear !== 0) {
+            <div class="text-xs text-error">
+              Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
+            </div>
+            @for (
+              source of fear.propagationSources;
+              track source.sourceRoomId
+            ) {
+              <div class="text-xs opacity-70 ml-2">
+                +{{ source.amount | number: '1.0-2' }} from
+                {{ source.sourceRoomName }}
+              </div>
+            }
+          }
+        </ng-template>
       }
 
       <!-- Room Upgrades -->
