@@ -1,6 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { BadgeDisconnectedRoomsComponent } from '@components/badge-disconnected-rooms/badge-disconnected-rooms.component';
+import { BadgeFloorDepthComponent } from '@components/badge-floor-depth/badge-floor-depth.component';
 import { BadgeInvasionWarningComponent } from '@components/badge-invasion-warning/badge-invasion-warning.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
@@ -13,8 +21,6 @@ import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   uiCloseAllMenus,
-  floorAll,
-  floorCurrent,
   GAME_TIME_SPEEDS,
   gameTimeSpeed,
   optionsGet,
@@ -37,6 +43,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-navbar',
   imports: [
     BadgeDisconnectedRoomsComponent,
+    BadgeFloorDepthComponent,
     BadgeInvasionWarningComponent,
     TippyDirective,
     RequireSetupDirective,
@@ -68,9 +75,6 @@ export class NavbarComponent {
   public isPaused = computed(() => optionsGet('gameloopPaused'));
   public gameTimeSpeed = gameTimeSpeed;
   public gameSpeeds = GAME_TIME_SPEEDS;
-  public currentFloorDepth = computed(() => floorCurrent()?.depth ?? 1);
-  public totalFloors = computed(() => floorAll().length);
-
   public readonly panelConfigs: Array<{
     name: string;
     icon: Icon;
