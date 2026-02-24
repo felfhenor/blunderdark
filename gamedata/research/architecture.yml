@@ -1,0 +1,345 @@
+# Architecture Branch research nodes
+# A new branch focused on room upgrades and structural improvement.
+# Room upgrades are bundled by thematic room pair to keep the tree compact.
+#
+# Tree structure (max 4 per tier):
+#   Structural Mastery (T1, root)
+#   ├── Resource Room Design (T2) → Expanded Tunnels + Expanded Grove
+#   │   ├── Deep Extraction (T3) → Deep Vein Mine + Bountiful Grove
+#   │   └── Aquatic & Soul Engineering (T3) → Expanded Lake + Necrotic Well + Purified Well
+#   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault
+#   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Grand Arena
+#   │   └── Combat Specialization (T3) → Elite Arena + Inquisitor's Chamber + War Room
+#   └── Scholarly Design (T2) → Expanded Archives + Expanded Nexus
+#       └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle
+#   Resonant Design (T4) [Deep Extraction + Sanctum Design] → Resonant Mine + Tranquil Garden
+#   Deep Water & Financial Design (T4) [Aquatic & Soul + Sanctum Design] → Deepwater Lake + Investment Vault
+#   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall + Corruption Chamber
+#   Arcane Facility Mastery (T4) [Workshop Mastery + Quarters & Arena] → Amplified Nexus + Binding Circle
+#   Abyssal Waters (T5) [Deep Water + Resonant] → Dark Waters + Dragon's Hoard
+#   Ascendant Altar (T5) [Deep Water + Resonant] → Ascendant Altar + Forbidden Archives
+#   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dread Chamber + Dark Pool + Expanded Laboratory
+#   Architectural Mastery (T6) → capstone passive
+
+# --- TIER 1: Root node ---
+
+- id: 7f9bf027-2523-4f11-a7a5-7151032cbda4
+  name: Structural Mastery
+  description: Study the fundamental principles of room design and structural enhancement, unlocking the ability to specialize and upgrade dungeon chambers.
+  branch: architecture
+  cost:
+    research: 10
+    gold: 5
+  prerequisiteResearchIds: []
+  unlocks:
+    - type: feature_flag
+      featureFlag: room_upgrades
+      description: Room Upgrades
+  tier: 1
+  requiredTicks: 50
+
+# --- TIER 2: Four domain branches ---
+
+- id: 39ced9b4-9669-4816-9dd0-7dc9a727fb91
+  name: Resource Room Design
+  description: Develop improved layouts for resource-gathering chambers, expanding capacity in crystal mines and mushroom groves.
+  branch: architecture
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Structural Mastery
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Tunnels
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Grove
+  tier: 2
+  requiredTicks: 150
+
+- id: e74e80c8-d49d-4f8b-b350-bdb4a7dccb5a
+  name: Sanctum Design
+  description: Reinforce the dungeon's core structures, empowering the altar's aura and improving vault security.
+  branch: architecture
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Structural Mastery
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Empowered Altar
+    - type: roomupgrade
+      targetRoomupgradeId: Reinforced Vault
+  tier: 2
+  requiredTicks: 150
+
+- id: 8df5ad74-0cb8-4d37-a32c-537d586d7a5d
+  name: Quarters & Arena Design
+  description: Improve inhabitant living spaces and training facilities, adding comfort amenities and expanded sparring areas.
+  branch: architecture
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Structural Mastery
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Comfortable Quarters
+    - type: roomupgrade
+      targetRoomupgradeId: Grand Arena
+  tier: 2
+  requiredTicks: 150
+
+- id: fc82c262-8dbe-4ecf-ab43-71b9e66a436a
+  name: Scholarly Design
+  description: Construct additional wings in knowledge-focused rooms, creating space for more researchers and channelers.
+  branch: architecture
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Structural Mastery
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Archives
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Nexus
+  tier: 2
+  requiredTicks: 150
+
+# --- TIER 3: Specialization (each requires a T2 node) ---
+
+- id: ddd38946-a22c-4f1a-97bb-75bf8dbe70c9
+  name: Deep Extraction
+  description: Dig deeper crystal veins and optimize mushroom grove layouts, significantly boosting mineral and food production.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Resource Room Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Deep Vein Mine
+    - type: roomupgrade
+      targetRoomupgradeId: Bountiful Grove
+  tier: 3
+  requiredTicks: 300
+
+- id: 5fff8e11-8791-46c4-bcd0-77243a7a76d8
+  name: Aquatic & Soul Engineering
+  description: Engineer expanded underground lake chambers and improved soul collection basins, boosting both food and essence infrastructure.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Resource Room Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Lake
+    - type: roomupgrade
+      targetRoomupgradeId: Necrotic Well
+    - type: roomupgrade
+      targetRoomupgradeId: Purified Well
+  tier: 3
+  requiredTicks: 300
+
+- id: c3f26b97-5c82-4a7e-9d46-5d7ad992136e
+  name: Combat Specialization
+  description: Design elite training equipment, war planning chambers, and specialized interrogation facilities for combat-focused rooms.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Quarters & Arena Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Elite Arena
+    - type: roomupgrade
+      targetRoomupgradeId: Inquisitor's Chamber
+    - type: roomupgrade
+      targetRoomupgradeId: War Room
+  tier: 3
+  requiredTicks: 300
+
+- id: ebecac55-a338-4fa3-a2fa-f679250f04a0
+  name: Workshop Mastery
+  description: Master the design of arcane workshops, improving alchemy distillation, trap crafting throughput, and summoning circle capacity.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Scholarly Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Distillery
+    - type: roomupgrade
+      targetRoomupgradeId: Master Trapworks
+    - type: roomupgrade
+      targetRoomupgradeId: Dual Circle
+  tier: 3
+  requiredTicks: 300
+
+# --- TIER 4: Convergence nodes (cross-path prerequisites) ---
+
+- id: 2d9e47ca-77be-4fcb-81cc-11c25a230fec
+  name: Resonant Design
+  description: Tap into crystal resonance frequencies for flux extraction and design calming garden layouts that soothe inhabitants.
+  branch: architecture
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Deep Extraction
+    - Sanctum Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Resonant Mine
+    - type: roomupgrade
+      targetRoomupgradeId: Tranquil Garden
+  tier: 4
+  requiredTicks: 500
+
+- id: 0a636b7f-7923-4b99-8bfc-c93bfb4d4bd4
+  name: Deep Water & Financial Design
+  description: Engineer deeper lake basins for improved aquaculture and design investment-oriented vault systems for maximum gold accumulation.
+  branch: architecture
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Aquatic & Soul Engineering
+    - Sanctum Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Deepwater Lake
+    - type: roomupgrade
+      targetRoomupgradeId: Investment Vault
+  tier: 4
+  requiredTicks: 500
+
+- id: 590d6bb5-d174-4aa7-8253-a73d2538009b
+  name: Advanced Combat Design
+  description: Build specialized drill halls for defensive training and redesign torture chambers for maximum corruption output.
+  branch: architecture
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Combat Specialization
+    - Scholarly Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Drill Hall
+    - type: roomupgrade
+      targetRoomupgradeId: Corruption Chamber
+  tier: 4
+  requiredTicks: 500
+
+- id: a88b6a30-2a68-4981-b007-99907ba48f1f
+  name: Arcane Facility Mastery
+  description: Amplify ley line conduits and engineer enhanced binding circles for extended summoning duration and boosted stats.
+  branch: architecture
+  cost:
+    research: 100
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Workshop Mastery
+    - Quarters & Arena Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Amplified Nexus
+    - type: roomupgrade
+      targetRoomupgradeId: Binding Circle
+  tier: 4
+  requiredTicks: 500
+
+# --- TIER 5: Pinnacle upgrades ---
+
+- id: 7f4ea2e2-dd3a-46d8-a76a-2bccd2427221
+  name: Abyssal Waters
+  description: Infuse underground lakes with dark energies and design legendary treasure chambers that attract gold through sheer reputation.
+  branch: architecture
+  cost:
+    research: 200
+    gold: 60
+    crystals: 30
+  prerequisiteResearchIds:
+    - Deep Water & Financial Design
+    - Resonant Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Dark Waters
+    - type: roomupgrade
+      targetRoomupgradeId: Dragon's Hoard
+  tier: 5
+  requiredTicks: 750
+
+- id: 3984163b-6561-4de2-be72-0d4535b09341
+  name: Ascendant Altar
+  description: Reconstruct the altar with transcendent architecture and expand the library with forbidden knowledge sections.
+  branch: architecture
+  cost:
+    research: 200
+    gold: 60
+    crystals: 30
+  prerequisiteResearchIds:
+    - Deep Water & Financial Design
+    - Resonant Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Ascendant Altar
+    - type: roomupgrade
+      targetRoomupgradeId: Forbidden Archives
+  tier: 5
+  requiredTicks: 750
+
+- id: 2b5e2f7f-a0e2-4d64-a321-f1058a6a5eb9
+  name: Dark Facility Mastery
+  description: Construct fear-inducing torture chambers, corrupt spawning pools for dark variants, and expand alchemy laboratories with additional workstations.
+  branch: architecture
+  cost:
+    research: 200
+    gold: 60
+    crystals: 30
+  prerequisiteResearchIds:
+    - Advanced Combat Design
+    - Arcane Facility Mastery
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Dread Chamber
+    - type: roomupgrade
+      targetRoomupgradeId: Dark Pool
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Laboratory
+  tier: 5
+  requiredTicks: 750
+
+# --- TIER 6: Ultimate mastery ---
+
+- id: 72fc362d-b7b4-4532-bbf2-102d6c4f9c2b
+  name: Architectural Mastery
+  description: Achieve transcendent understanding of dungeon architecture, amplifying the effectiveness of all room upgrades.
+  branch: architecture
+  cost:
+    research: 400
+    gold: 120
+    crystals: 60
+  prerequisiteResearchIds:
+    - Abyssal Waters
+    - Ascendant Altar
+  unlocks:
+    - type: passive_bonus
+      bonusType: architectureMastery
+      value: 0.50
+      description: +50% to all architecture branch bonuses
+  tier: 6
+  requiredTicks: 1000

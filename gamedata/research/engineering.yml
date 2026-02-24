@@ -1,19 +1,18 @@
 # Engineering Branch research nodes (tier 2+)
 # Root node (Basic Engineering) is in base.yml
 #
-# Tree structure:
+# Tree structure (max 4 per tier):
 #   Basic Engineering (T1)
 #   ├── Advanced Construction (T2)
-#   │   ├── Master Architecture (T3)
+#   │   ├── Master Architecture (T3) [+Fortified Barracks]
 #   │   │   └── Siege Works (T4) [+Trap Design]
 #   │   └── Elevator Action (T3)
 #   ├── Trap Design (T2)
-#   │   └── Automated Defenses (T3)
+#   │   └── Automated Defenses (T3) [+Streamlined Workshop]
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
-#   ├── Room Specialization (T2)
 #   └── Advanced Manufacturing (T2)
-#       └── Dark Forge Mastery (T3)
-#           └── Golem Assembly (T4) [+Master Architecture]
+#       └── Dark Forge Mastery (T3) [+Master Forge]
+#           └── Golem Assembly (T4) [+Master Architecture, +Infernal Forge]
 #   Fusion Core Construction (T4) [Advanced Construction]
 #   Teleporters (T5) [Master Architecture]
 #   War Machines (T5) [Siege Works + Mechanical Sentinels]
@@ -21,7 +20,7 @@
 #   Primal Dominion (T5) [War Machines + Industrial Mastery]
 #   Grand Artificer (T6) [War Machines + Industrial Mastery]
 
-# --- TIER 2: Four paths branch from Basic Engineering ---
+# --- TIER 2: Three paths branch from Basic Engineering ---
 
 - id: 9e81a510-1b8d-4c20-8e7f-56a4b2f063fc
   name: Advanced Construction
@@ -54,22 +53,6 @@
       targetRoomId: Trap Workshop
     - type: room
       targetRoomId: Training Grounds
-  tier: 2
-  requiredTicks: 150
-
-- id: 6c5df5e7-1faa-42a5-b97f-1d8ccd997d48
-  name: Room Specialization
-  description: Research techniques to specialize production rooms, unlocking unique upgrade paths that enhance their output and capabilities.
-  branch: engineering
-  cost:
-    research: 25
-    gold: 5
-  prerequisiteResearchIds:
-    - Basic Engineering
-  unlocks:
-    - type: feature_flag
-      featureFlag: room_upgrades
-      description: Room Upgrades
   tier: 2
   requiredTicks: 150
 
@@ -110,7 +93,7 @@
 
 - id: 6fc62ebf-39d2-47b0-9ba3-92c0241f6146
   name: Master Architecture
-  description: Design complex multi-room structures with reinforced walls and optimized layouts for maximum efficiency.
+  description: Design complex multi-room structures with reinforced walls and optimized layouts, also fortifying barracks for increased troop housing.
   branch: engineering
   cost:
     research: 50
@@ -122,12 +105,14 @@
       bonusType: roomCapacity
       value: 1
       description: +1 max inhabitant capacity for all rooms
+    - type: roomupgrade
+      targetRoomupgradeId: Fortified Barracks
   tier: 3
   requiredTicks: 300
 
 - id: 687957be-a605-4d0d-811e-591a71f21300
   name: Automated Defenses
-  description: Create self-resetting traps and automated defense systems that require no inhabitant intervention.
+  description: Create self-resetting traps and automated defense systems, streamlining workshop processes for maximum efficiency.
   branch: engineering
   cost:
     research: 50
@@ -139,12 +124,14 @@
       bonusType: trapDamage
       value: 0.15
       description: +15% trap damage
+    - type: roomupgrade
+      targetRoomupgradeId: Streamlined Workshop
   tier: 3
   requiredTicks: 300
 
 - id: e1af3b41-800b-4190-82de-7e8a2e626986
   name: Dark Forge Mastery
-  description: Construct a forge powered by dungeon energy, capable of smelting exotic materials into powerful equipment.
+  description: Construct a forge powered by dungeon energy, capable of smelting exotic materials and improving forge capacity and speed.
   branch: engineering
   cost:
     research: 50
@@ -156,6 +143,8 @@
       bonusType: goldProduction
       value: 0.15
       description: +15% gold production from all sources
+    - type: roomupgrade
+      targetRoomupgradeId: Master Forge
   tier: 3
   requiredTicks: 300
 
@@ -217,7 +206,7 @@
 
 - id: 0493134f-837b-4636-909a-ca334d605466
   name: Golem Assembly
-  description: Assemble powerful golems from forged materials, combining architectural precision with manufacturing might.
+  description: Assemble powerful golems from forged materials and unlock infernal forge schematics for smelting higher-tier materials.
   branch: engineering
   cost:
     research: 100
@@ -231,6 +220,8 @@
       bonusType: goldProduction
       value: 0.20
       description: +20% gold production from all sources
+    - type: roomupgrade
+      targetRoomupgradeId: Infernal Forge
   tier: 4
   requiredTicks: 500
 

@@ -1,17 +1,17 @@
 # Arcane Branch research nodes (tier 2+)
 # Root node (Arcane Basics) is in base.yml
 #
-# Tree structure:
+# Tree structure (max 4 per tier):
 #   Arcane Basics (T1)
 #   ├── Flux Manipulation (T2)
 #   │   └── Arcane Amplification (T3)
-#   │       └── Dimensional Studies (T4) [+Enchantment]
+#   │       └── Dimensional Studies (T4) [+Enchantment, +Overcharged Nexus]
 #   ├── Ley Line Tapping (T2)
 #   │   └── Elemental Binding (T3)
 #   │       └── Ley Line Mastery (T4) [+Ley Line Tapping]
-#   ├── Enchantment (T2)
-#   │   ├── Advanced Room Modifications (T3)
-#   │   └── Warding (T3)
+#   ├── Enchantment (T2) [+Arcane Library]
+#   │   ├── Advanced Room Modifications (T3) [+Advanced Laboratory]
+#   │   └── Warding (T3) [+Arcane Trapworks]
 #   │       └── Spellweave Lattice (T4) [+Arcane Amplification]
 #   └── Crystal Biome (T2)
 #   Arcane Convergence (T5) [Dimensional Studies + Ley Line Mastery]
@@ -20,7 +20,7 @@
 #   Aberrant Summoning (T5) [Planar Nexus]
 #   Grand Arcanum (T6) [Arcane Convergence + Planar Nexus]
 
-# --- TIER 2: Three paths branch from Arcane Basics ---
+# --- TIER 2: Four paths branch from Arcane Basics ---
 
 - id: dd1436c4-151c-4915-8645-ffb953df3870
   name: Flux Manipulation
@@ -55,7 +55,7 @@
 
 - id: 85974131-d05e-4b8e-81f5-4ae3247e781a
   name: Enchantment
-  description: Imbue objects and rooms with persistent magical effects that enhance their function.
+  description: Imbue objects and rooms with persistent magical effects, including arcane amplification glyphs that boost library research output.
   branch: arcane
   cost:
     research: 25
@@ -67,6 +67,8 @@
       bonusType: researchSpeed
       value: 0.05
       description: +5% research speed
+    - type: roomupgrade
+      targetRoomupgradeId: Arcane Library
   tier: 2
   requiredTicks: 150
 
@@ -123,7 +125,7 @@
 
 - id: 4500639c-fd48-4ee5-b05b-b1cb37f8d609
   name: Advanced Room Modifications
-  description: Combine enchantment theory with advanced arcane engineering to unlock powerful room modifications including training stations, corruption seals, and resource converters.
+  description: Combine enchantment theory with advanced arcane engineering to unlock powerful room modifications and higher-tier alchemy recipes.
   branch: arcane
   cost:
     research: 50
@@ -137,12 +139,14 @@
       targetFeatureId: Corruption Seal
     - type: roomfeature
       targetFeatureId: Resource Converter
+    - type: roomupgrade
+      targetRoomupgradeId: Advanced Laboratory
   tier: 3
   requiredTicks: 300
 
 - id: 21df8436-d4be-4f55-b2eb-217dfec171a0
   name: Warding
-  description: Create powerful protective wards that shield rooms and inhabitants from magical intrusion.
+  description: Create powerful protective wards that shield rooms from magical intrusion and infuse trap crafting with arcane energies.
   branch: arcane
   cost:
     research: 50
@@ -154,6 +158,8 @@
       bonusType: invaderMoralePenalty
       value: 5
       description: Invaders suffer -5 morale on entering warded dungeon
+    - type: roomupgrade
+      targetRoomupgradeId: Arcane Trapworks
   tier: 3
   requiredTicks: 300
 
@@ -161,7 +167,7 @@
 
 - id: 75c17355-430c-4e6b-a878-b21921698019
   name: Dimensional Studies
-  description: Explore the boundaries between planes, unlocking the ability to bend space within your dungeon.
+  description: Explore the boundaries between planes and push the ley line nexus beyond safe limits, bending space and amplifying flux output.
   branch: arcane
   cost:
     research: 100
@@ -177,6 +183,8 @@
       description: +20% flux production from all sources
     - type: roomfeature
       targetFeatureId: Time Dilation Field
+    - type: roomupgrade
+      targetRoomupgradeId: Overcharged Nexus
   tier: 4
   requiredTicks: 500
 

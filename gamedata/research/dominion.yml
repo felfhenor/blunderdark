@@ -4,19 +4,19 @@
 # Theme: The art of commanding, recruiting, and empowering dungeon creatures.
 # Primary currency: food (thematic — feeding/maintaining creatures). Secondary: gold.
 #
-# Tree structure:
+# Tree structure (max 4 per tier):
 #   Creature Lore (T1)
 #   ├── Stone Shaping (T2) → Gargoyle
 #   │   └── Nature Attunement (T3) → Dryad
 #   ├── Dark Pacts (T2) → Imp
-#   │   └── Spirit Binding (T3) → Wraith
+#   │   └── Spirit Binding (T3) → Wraith [+Greater Circle]
 #   ├── Elemental Crystallization (T2) → Stone Elemental
 #   │   └── Transmutation (T3) → Mimic
 #   └── Martial Training (T2) → Orc
-#       └── Creature Quarters (T3) → feature_room_enhancement
-#   Horde Tactics (T4) [Nature Attunement + Creature Quarters]
+#       └── Creature Quarters (T3) → features [+Teeming Pool]
+#   Horde Tactics (T4) [Nature Attunement + Creature Quarters, +Incubation Chamber]
 #   Pack Mentality (T4) [Spirit Binding + Transmutation]
-#   Elite Training (T4) [Creature Quarters + Transmutation]
+#   Elite Training (T4) [Creature Quarters + Transmutation, +Mutagenic Pits]
 #   Supreme Command (T5) [Horde Tactics + Pack Mentality]
 #   Creature Synergy (T5) [Elite Training + Horde Tactics]
 #   Forced March (T5) [Pack Mentality + Elite Training]
@@ -103,7 +103,7 @@
 
 - id: e1b0fbf9-fe73-4c64-b0a1-3cf6a118d320
   name: Spirit Binding
-  description: Learn to bind restless spirits into corporeal forms, enabling the recruitment of wraiths as fearsome ethereal servants.
+  description: Learn to bind restless spirits into corporeal forms, enabling wraith recruitment and expanding the summoning circle's power for higher-tier entities.
   branch: dominion
   cost:
     research: 50
@@ -113,6 +113,8 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Wraith
+    - type: roomupgrade
+      targetRoomupgradeId: Greater Circle
   tier: 3
   requiredTicks: 300
 
@@ -133,7 +135,7 @@
 
 - id: 849a01b0-b6b5-47ea-8c77-daf471b6a6d3
   name: Creature Quarters
-  description: Develop magical augmentation techniques that allow rooms to be fitted with storage expansions, efficiency enchantments, and protective wards.
+  description: Develop magical augmentation techniques for room modifications and enhance spawning pool biology for faster creature production.
   branch: dominion
   cost:
     research: 50
@@ -147,6 +149,8 @@
       targetFeatureId: Efficiency Enchantment
     - type: roomfeature
       targetFeatureId: Fear Ward
+    - type: roomupgrade
+      targetRoomupgradeId: Teeming Pool
   tier: 3
   requiredTicks: 300
 
@@ -154,7 +158,7 @@
 
 - id: 9c082222-e010-4872-9ab3-cac0b697ca41
   name: Horde Tactics
-  description: Coordinate large groups of diverse creatures to fight as a unified force, maximizing the dungeon's inhabitant capacity.
+  description: Coordinate large groups of diverse creatures as a unified force, maximizing inhabitant capacity and designing advanced incubation chambers.
   branch: dominion
   cost:
     research: 100
@@ -168,6 +172,8 @@
       bonusType: maxInhabitants
       value: 5
       description: +5 maximum inhabitants
+    - type: roomupgrade
+      targetRoomupgradeId: Incubation Chamber
   tier: 4
   requiredTicks: 500
 
@@ -192,7 +198,7 @@
 
 - id: f027eb3f-b483-4fa0-abd3-dfd0273725fa
   name: Elite Training
-  description: Develop advanced training regimens that produce elite creatures at reduced recruitment costs.
+  description: Develop advanced training regimens that produce elite creatures at reduced costs, incorporating controlled mutation techniques for enhanced breeding.
   branch: dominion
   cost:
     research: 100
@@ -206,6 +212,8 @@
       bonusType: recruitmentCostReduction
       value: 0.10
       description: -10% recruitment cost for all creatures
+    - type: roomupgrade
+      targetRoomupgradeId: Mutagenic Pits
   tier: 4
   requiredTicks: 500
 

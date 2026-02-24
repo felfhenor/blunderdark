@@ -1,25 +1,25 @@
 # Dark Branch research nodes (tier 2+)
 # Root node (Dark Arts Fundamentals) is in base.yml
 #
-# Tree structure:
+# Tree structure (max 4 per tier):
 #   Dark Arts Fundamentals (T1)
 #   ├── Soul Manipulation (T2)
 #   │   └── Soul Well Mastery (T3)
-#   ├── Shadow Magic (T2)
-#   │   └── Corruption Control (T3)
+#   ├── Shadow Magic (T2) [+Blighted Grove]
+#   │   └── Corruption Control (T3) [+Corrupted Mine]
 #   │       └── Shadow Weaving (T4) [+Shadow Magic]
 #   ├── Necromancy (T2)
 #   │   └── Undead Mastery (T3)
-#   │       └── Dark Rituals (T4) [+Soul Well Mastery]
+#   │       └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
 #   └── Corrupted Biome (T2)
-#   Soul Forge (T4) [Soul Well Mastery + Undead Mastery]
+#   Soul Forge (T4) [Soul Well Mastery + Undead Mastery, +Abyssal Conduit]
 #   Abyssal Gateway (T5) [Dark Rituals + Shadow Weaving]
 #   Abyssal Summoning (T5) [Abyssal Gateway + Soul Forge]
 #   Necromantic Ascension (T5) [Soul Forge]
 #   Serpent's Gaze (T5) [Abyssal Gateway]
 #   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
 
-# --- TIER 2: Three paths branch from Dark Arts Fundamentals ---
+# --- TIER 2: Four paths branch from Dark Arts Fundamentals ---
 
 - id: 36c41bbd-675c-4300-abf7-273cd46333ef
   name: Soul Manipulation
@@ -40,7 +40,7 @@
 
 - id: 1b956dec-e63e-467d-bd4d-20541f157d40
   name: Shadow Magic
-  description: Harness the power of shadows to conceal, deceive, and strike from darkness.
+  description: Harness the power of shadows to conceal, deceive, and corrupt mushroom groves with shadow magic for tainted but abundant harvests.
   branch: dark
   cost:
     research: 25
@@ -52,6 +52,8 @@
       bonusType: corruptionGeneration
       value: 0.10
       description: +10% corruption generation
+    - type: roomupgrade
+      targetRoomupgradeId: Blighted Grove
   tier: 2
   requiredTicks: 150
 
@@ -127,7 +129,7 @@
 
 - id: b4b92c13-7086-471f-8855-5c01301e73ea
   name: Corruption Control
-  description: Master the volatile forces of corruption, bending them to your will without self-destruction.
+  description: Master the volatile forces of corruption, bending them to your will and infusing crystal mines with dark energy for vastly increased yield.
   branch: dark
   cost:
     research: 50
@@ -140,6 +142,8 @@
       bonusType: corruptionResistance
       value: 0.10
       description: Corruption thresholds increased by 10%
+    - type: roomupgrade
+      targetRoomupgradeId: Corrupted Mine
   tier: 3
   requiredTicks: 300
 
@@ -147,7 +151,7 @@
 
 - id: 153fd103-9151-4b42-8d1a-8c39f69fd377
   name: Dark Rituals
-  description: Perform elaborate ceremonies combining necromancy and soul magic for devastating effects.
+  description: Perform elaborate ceremonies combining necromancy and soul magic, unlocking forbidden library wings dedicated to the darkest tomes.
   branch: dark
   cost:
     research: 100
@@ -161,6 +165,8 @@
       bonusType: essenceProduction
       value: 0.20
       description: +20% essence production from all sources
+    - type: roomupgrade
+      targetRoomupgradeId: Necronomicon Wing
   tier: 4
   requiredTicks: 500
 
@@ -180,6 +186,27 @@
       bonusType: fearReduction
       value: 1
       description: All rooms gain +1 fear reduction
+  tier: 4
+  requiredTicks: 500
+
+- id: 031cb877-8674-4213-ae08-424ca51fd8c8
+  name: Soul Forge
+  description: Forge captured souls into powerful artifacts, imbue minions with stolen life force, and channel abyssal energies through the soul well.
+  branch: dark
+  cost:
+    research: 100
+    essence: 30
+    corruption: 15
+  prerequisiteResearchIds:
+    - Soul Well Mastery
+    - Undead Mastery
+  unlocks:
+    - type: passive_bonus
+      bonusType: inhabitantStats
+      value: 0.10
+      description: +10% to all inhabitant combat stats
+    - type: roomupgrade
+      targetRoomupgradeId: Abyssal Conduit
   tier: 4
   requiredTicks: 500
 
@@ -205,25 +232,6 @@
       targetFeatureId: Void Gate
   tier: 5
   requiredTicks: 750
-
-- id: 031cb877-8674-4213-ae08-424ca51fd8c8
-  name: Soul Forge
-  description: Forge captured souls into powerful artifacts and imbue minions with stolen life force.
-  branch: dark
-  cost:
-    research: 100
-    essence: 30
-    corruption: 15
-  prerequisiteResearchIds:
-    - Soul Well Mastery
-    - Undead Mastery
-  unlocks:
-    - type: passive_bonus
-      bonusType: inhabitantStats
-      value: 0.10
-      description: +10% to all inhabitant combat stats
-  tier: 4
-  requiredTicks: 500
 
 - id: 1771e65b-0113-4318-8eac-c10f6496d849
   name: Abyssal Summoning
