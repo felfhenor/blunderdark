@@ -7,6 +7,8 @@ import type { UpgradePathId } from '@interfaces/room';
 
 export type ResearchBranch = 'dark' | 'arcane' | 'engineering' | 'dominion';
 
+export type ResearchNodeState = 'completed' | 'active' | 'available' | 'locked';
+
 export type RoomUnlock = {
   type: 'room';
   targetRoomId: RoomId;

@@ -1,16 +1,21 @@
-<app-modal [(visible)]="visible" [allowEscToClose]="false" [widthClass]="'max-w-4xl'">
+<app-modal
+  [(visible)]="visible"
+  [allowEscToClose]="false"
+  [widthClass]="'max-w-4xl'"
+>
   <div replacement>
-    <div class="battle-container flex flex-col bg-base-100 rounded-lg overflow-hidden">
+    <div
+      class="battle-container flex flex-col bg-base-100 rounded-lg overflow-hidden"
+    >
       <!-- Header -->
-      <div class="flex items-center justify-between px-4 py-3 bg-base-200 flex-shrink-0">
+      <div
+        class="flex items-center justify-between px-4 py-3 bg-base-200 flex-shrink-0"
+      >
         <h1 class="text-lg font-bold">
-          @switch (phase()) {
-            @case ('results') { Invasion - Results }
-            @case ('rewards') {
-              @if (isVictory()) { Victory - Rewards } @else { Defeat - Penalties }
-            }
-            @case ('prisoners') { Captured Prisoners }
-          }
+          <app-invasion-phase-title
+            [phase]="phase()"
+            [isVictory]="isVictory()"
+          />
         </h1>
       </div>
 

@@ -32,7 +32,10 @@ import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 
-type NodeState = 'completed' | 'active' | 'available' | 'locked';
+import { ResearchStateBadgeComponent } from '@components/research-state-badge/research-state-badge.component';
+import type { ResearchNodeState } from '@interfaces';
+
+type NodeState = ResearchNodeState;
 
 @Component({
   selector: 'app-game-research',
@@ -43,6 +46,7 @@ type NodeState = 'completed' | 'active' | 'available' | 'locked';
     TippyDirective,
     IconComponent,
     SweetAlert2Module,
+    ResearchStateBadgeComponent,
   ],
   templateUrl: './game-research.component.html',
   styleUrl: './game-research.component.scss',

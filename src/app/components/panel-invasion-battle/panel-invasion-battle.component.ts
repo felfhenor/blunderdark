@@ -7,6 +7,7 @@ import {
 import { InvasionPrisonersPhaseComponent } from '@components/invasion-prisoners-phase/invasion-prisoners-phase.component';
 import { InvasionResultsPhaseComponent } from '@components/invasion-results-phase/invasion-results-phase.component';
 import { InvasionRewardsPhaseComponent } from '@components/invasion-rewards-phase/invasion-rewards-phase.component';
+import { InvasionPhaseTitleComponent } from '@components/invasion-phase-title/invasion-phase-title.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   invasionRewardApplyDefeat,
@@ -17,17 +18,22 @@ import { invasionTriggerRecordAndReschedule } from '@helpers/invasion-triggers';
 import { updateGamestate } from '@helpers/state-game';
 import type {
   ActiveInvasion,
+  BattlePhase,
   CapturedPrisoner,
   InvasionOrchestratorResult,
   PrisonerAction,
   PrisonerHandlingResult,
 } from '@interfaces';
 
-type BattlePhase = 'results' | 'rewards' | 'prisoners';
-
 @Component({
   selector: 'app-panel-invasion-battle',
-  imports: [ModalComponent, InvasionResultsPhaseComponent, InvasionRewardsPhaseComponent, InvasionPrisonersPhaseComponent],
+  imports: [
+    ModalComponent,
+    InvasionResultsPhaseComponent,
+    InvasionRewardsPhaseComponent,
+    InvasionPrisonersPhaseComponent,
+    InvasionPhaseTitleComponent,
+  ],
   templateUrl: './panel-invasion-battle.component.html',
   styleUrl: './panel-invasion-battle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,12 +43,16 @@ export class PanelInvasionBattleComponent {
   public phase = signal<BattlePhase>('results');
   public result = signal<InvasionOrchestratorResult | undefined>(undefined);
   public prisonersRemaining = signal<CapturedPrisoner[]>([]);
-  public prisonerResults = signal<Map<string, PrisonerHandlingResult>>(new Map());
+  public prisonerResults = signal<Map<string, PrisonerHandlingResult>>(
+    new Map(),
+  );
   public rewardsApplied = signal(false);
 
   private currentInvasion: ActiveInvasion | undefined;
 
-  public isVictory = computed(() => this.result()?.detailedResult.outcome === 'victory');
+  public isVictory = computed(
+    () => this.result()?.detailedResult.outcome === 'victory',
+  );
 
   public showResults(invasion: ActiveInvasion): void {
     if (!invasion.result) return;
@@ -89,8 +99,14 @@ export class PanelInvasionBattleComponent {
     }
   }
 
-  public async handlePrisoner(prisoner: CapturedPrisoner, action: PrisonerAction): Promise<void> {
-    const handlingResult = await invasionRewardApplyPrisonerAction(prisoner, action);
+  public async handlePrisoner(
+    prisoner: CapturedPrisoner,
+    action: PrisonerAction,
+  ): Promise<void> {
+    const handlingResult = await invasionRewardApplyPrisonerAction(
+      prisoner,
+      action,
+    );
 
     this.prisonerResults.update((map) => {
       const next = new Map(map);
@@ -98,7 +114,9 @@ export class PanelInvasionBattleComponent {
       return next;
     });
 
-    this.prisonersRemaining.update((list) => list.filter((p) => p.id !== prisoner.id));
+    this.prisonersRemaining.update((list) =>
+      list.filter((p) => p.id !== prisoner.id),
+    );
   }
 
   public dismiss(): void {

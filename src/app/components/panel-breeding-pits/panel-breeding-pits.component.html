@@ -121,19 +121,7 @@
     @if (lastMutationResult(); as result) {
       <div class="text-center">
         <p class="text-lg font-semibold">{{ result.name }}</p>
-        @switch (result.outcome) {
-          @case ('positive') {
-            <p class="text-success mt-2">Positive mutation! Stats improved.</p>
-          }
-          @case ('neutral') {
-            <p class="text-warning mt-2">
-              Neutral mutation. No significant change.
-            </p>
-          }
-          @case ('negative') {
-            <p class="text-error mt-2">Negative mutation. Stats decreased.</p>
-          }
-        }
+        <app-mutation-outcome-text [outcome]="result.outcome" />
       </div>
     }
   </div>

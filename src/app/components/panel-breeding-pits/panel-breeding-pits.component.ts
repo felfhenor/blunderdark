@@ -1,8 +1,14 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { MutationOutcomeTextComponent } from '@components/mutation-outcome-text/mutation-outcome-text.component';
 import {
   breedingCompleted$,
   breedingGetAdjacentRoomTypeIds,
@@ -30,21 +36,32 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-breeding-pits',
-  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, ModalComponent],
+  imports: [
+    DecimalPipe,
+    InhabitantCardComponent,
+    JobProgressComponent,
+    ModalComponent,
+    MutationOutcomeTextComponent,
+  ],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelBreedingPitsComponent {
   public showMutationResult = signal(false);
-  public lastMutationResult = signal<{ name: string; outcome: string } | undefined>(undefined);
+  public lastMutationResult = signal<
+    { name: string; outcome: string } | undefined
+  >(undefined);
 
   private subscriptions = [
     breedingCompleted$.subscribe((evt) => {
       notify('Breeding', `Hybrid created: ${evt.hybridName}`);
     }),
     mutationCompleted$.subscribe((evt) => {
-      this.lastMutationResult.set({ name: evt.inhabitantName, outcome: evt.outcome });
+      this.lastMutationResult.set({
+        name: evt.inhabitantName,
+        outcome: evt.outcome,
+      });
       this.showMutationResult.set(true);
       notify('Breeding', `Mutation ${evt.outcome}: ${evt.inhabitantName}`);
     }),
@@ -75,7 +92,9 @@ export class PanelBreedingPitsComponent {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return { instance: i, def };
       })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+      .filter(
+        (e): e is typeof e & { def: InhabitantContent } => e.def !== undefined,
+      );
     return sortBy(mapped, [(e) => e.def.name]);
   });
 
@@ -90,7 +109,11 @@ export class PanelBreedingPitsComponent {
       const adjacentTypes = floor
         ? breedingGetAdjacentRoomTypeIds(room, floor)
         : new Set<string>();
-      const ticks = breedingGetHybridTicks(room, adjacentTypes, r.recipe.timeMultiplier);
+      const ticks = breedingGetHybridTicks(
+        room,
+        adjacentTypes,
+        r.recipe.timeMultiplier,
+      );
       return {
         ...r,
         ticks,
@@ -106,10 +129,9 @@ export class PanelBreedingPitsComponent {
     if (!room || room.breedingJob || room.mutationJob) return [];
 
     const instances = assigned.map((a) => a.instance);
-    return sortBy(
-      breedingGetMutatableInhabitants(instances),
-      [(i) => contentGetEntry<InhabitantContent>(i.definitionId)?.name ?? ''],
-    );
+    return sortBy(breedingGetMutatableInhabitants(instances), [
+      (i) => contentGetEntry<InhabitantContent>(i.definitionId)?.name ?? '',
+    ]);
   });
 
   public breedingProgress = computed(() => {
@@ -117,9 +139,16 @@ export class PanelBreedingPitsComponent {
     if (!room?.breedingJob) return undefined;
     const job = room.breedingJob;
     const elapsed = job.targetTicks - job.ticksRemaining;
-    const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
+    const percent = Math.min(
+      100,
+      Math.round((elapsed / job.targetTicks) * 100),
+    );
     const recipe = contentGetEntry<BreedingRecipeContent>(job.recipeId);
-    return { percent, recipeName: recipe?.resultName ?? 'Unknown', ticksRemaining: job.ticksRemaining };
+    return {
+      percent,
+      recipeName: recipe?.resultName ?? 'Unknown',
+      ticksRemaining: job.ticksRemaining,
+    };
   });
 
   public mutationProgress = computed(() => {
@@ -127,9 +156,18 @@ export class PanelBreedingPitsComponent {
     if (!room?.mutationJob) return undefined;
     const job = room.mutationJob;
     const elapsed = job.targetTicks - job.ticksRemaining;
-    const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
-    const target = gamestate().world.inhabitants.find((i) => i.instanceId === job.targetInstanceId);
-    return { percent, targetName: target?.name ?? 'Unknown', ticksRemaining: job.ticksRemaining };
+    const percent = Math.min(
+      100,
+      Math.round((elapsed / job.targetTicks) * 100),
+    );
+    const target = gamestate().world.inhabitants.find(
+      (i) => i.instanceId === job.targetInstanceId,
+    );
+    return {
+      percent,
+      targetName: target?.name ?? 'Unknown',
+      ticksRemaining: job.ticksRemaining,
+    };
   });
 
   public async startBreeding(
@@ -159,7 +197,9 @@ export class PanelBreedingPitsComponent {
     });
   }
 
-  public async startMutation(targetInstanceId: InhabitantInstanceId): Promise<void> {
+  public async startMutation(
+    targetInstanceId: InhabitantInstanceId,
+  ): Promise<void> {
     const room = this.breedingRoom();
     if (!room) return;
 

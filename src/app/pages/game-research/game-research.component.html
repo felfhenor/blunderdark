@@ -128,23 +128,8 @@
                 <!-- Node Name & State Badge -->
                 <div class="flex items-start justify-between">
                   <h3 class="card-title text-sm">{{ node.name }}</h3>
-                  @switch (selectedNodeState()) {
-                    @case ('completed') {
-                      <span class="badge badge-success badge-sm">
-                        Completed
-                      </span>
-                    }
-                    @case ('active') {
-                      <span class="badge badge-info badge-sm">In Progress</span>
-                    }
-                    @case ('available') {
-                      <span class="badge badge-warning badge-sm">
-                        Available
-                      </span>
-                    }
-                    @case ('locked') {
-                      <span class="badge badge-ghost badge-sm">Locked</span>
-                    }
+                  @if (selectedNodeState(); as nodeState) {
+                    <app-research-state-badge [state]="nodeState" />
                   }
                 </div>
 

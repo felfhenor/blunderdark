@@ -2,10 +2,16 @@ import type { InvasionId } from '@interfaces/content-invasion';
 import type { CombatResult } from '@interfaces/combat';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
-import type { InvaderInstance, InvaderClassType, InvaderStats } from '@interfaces/invader';
+import type {
+  InvaderInstance,
+  InvaderClassType,
+  InvaderStats,
+} from '@interfaces/invader';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import type { ResourceType } from '@interfaces/resource';
+
+export type BattlePhase = 'results' | 'rewards' | 'prisoners';
 
 export type PrisonerId = Branded<string, 'PrisonerId'>;
 export type CombatantId = Branded<string, 'CombatantId'>;
