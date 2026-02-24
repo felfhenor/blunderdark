@@ -62,7 +62,7 @@ import {
   transportElevatorExtendExecute,
   transportElevatorShrinkExecute,
 } from '@helpers/transport-placement';
-import type { InhabitantInstance, PlacedRoomId, RoomUpgradePath } from '@interfaces';
+import type { InhabitantInstance, PlacedRoomId, RoomUpgradeEffect, RoomUpgradePath } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { ResourceType } from '@interfaces/resource';
@@ -267,6 +267,27 @@ export class PanelRoomInfoComponent {
 
   public formatEffectType(type: string): string {
     return startCase(type);
+  }
+
+  public formatEffectTooltip(effect: RoomUpgradeEffect): string {
+    switch (effect.type) {
+      case 'productionBonus':
+        return `Increases production of ${effect.resource ?? 'all resources'} by ${effect.value * 100}%`;
+      case 'secondaryProduction':
+        return `Produces ${effect.value} ${effect.resource ?? 'resource'} per second as a bonus`;
+      case 'productionMultiplier':
+        return `Multiplies all production by ${effect.value}x`;
+      case 'maxInhabitantBonus':
+        return `Allows ${effect.value} more inhabitants in this room`;
+      case 'fearReduction':
+        return `Reduces fear level by ${effect.value}`;
+      case 'fearIncrease':
+        return `Increases fear level by ${effect.value}`;
+      case 'fearReductionAura':
+        return `Reduces fear in adjacent rooms by ${effect.value}`;
+      default:
+        return `${startCase(effect.type)}: ${effect.value}`;
+    }
   }
 
   public getUpgradeCostEntries(path: RoomUpgradePath): { type: ResourceType; amount: number }[] {

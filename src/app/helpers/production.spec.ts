@@ -14,6 +14,25 @@ vi.mock('@helpers/content', () => {
     adjacencyBonuses: [
       { adjacentRoomId: 'room-dark-forge', bonus: 0.1, description: 'Forge heats rock' },
     ],
+    upgradePaths: [
+      {
+        id: 'upgrade-multiplier',
+        name: 'Deep Vein Extraction',
+        description: '+50% crystal production',
+        cost: { crystals: 75 },
+        effects: [{ type: 'productionMultiplier', value: 1.5, resource: 'crystals' }],
+      },
+      {
+        id: 'upgrade-secondary',
+        name: 'Crystal Resonance',
+        description: 'Produces flux as a bonus',
+        cost: { crystals: 80 },
+        effects: [
+          { type: 'fearReduction', value: 1 },
+          { type: 'secondaryProduction', value: 0.2, resource: 'flux' },
+        ],
+      },
+    ],
   });
   entries.set('room-throne', {
     id: 'room-throne',
@@ -232,6 +251,7 @@ import type {
   PlacedRoomId,
   RoomId,
   ResourceMap,
+  UpgradePathId,
   RoomShapeId,
 } from '@interfaces';
 import {
@@ -1458,5 +1478,156 @@ describe('productionCalculateBreakdowns', () => {
     expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
     expect(breakdowns['crystals'].adjacencyBonus).toBeCloseTo(0.1);
     expect(breakdowns['crystals'].final).toBeCloseTo(1.3);
+  });
+});
+
+describe('upgrade effects in production', () => {
+  it('should apply productionMultiplier from upgrade to single room production', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      appliedUpgradePathId: 'upgrade-multiplier' as UpgradePathId,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = productionCalculateSingleRoom(mine, floor);
+    // Base 1.0 * (1 + 0.2 goblin bonus) = 1.2, then * 1.5 multiplier = 1.8
+    expect(production['crystals']).toBeCloseTo(1.8);
+  });
+
+  it('should add secondaryProduction from upgrade to single room production', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = productionCalculateSingleRoom(mine, floor);
+    // Base crystals: 1.0 * (1 + 0.2) = 1.2
+    // Secondary flux: 0.2 (flat bonus from upgrade)
+    expect(production['crystals']).toBeCloseTo(1.2);
+    expect(production['flux']).toBeCloseTo(0.2);
+  });
+
+  it('should include upgrade effects in total production', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = productionCalculateTotal([floor]);
+    expect(production['crystals']).toBeCloseTo(1.2);
+    expect(production['flux']).toBeCloseTo(0.2);
+  });
+
+  it('should not apply upgrade effects when no upgrade is applied', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const production = productionCalculateSingleRoom(mine, floor);
+    // No upgrade: base 1.0 * (1 + 0.2) = 1.2, no flux
+    expect(production['crystals']).toBeCloseTo(1.2);
+    expect(production['flux']).toBeUndefined();
+  });
+
+  it('should include productionMultiplier in breakdowns', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      appliedUpgradePathId: 'upgrade-multiplier' as UpgradePathId,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const breakdowns = productionCalculateBreakdowns([floor]);
+    // Base 1.0 * (1 + 0.2) = 1.2, then * 1.5 = 1.8
+    expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
+    expect(breakdowns['crystals'].final).toBeCloseTo(1.8);
+  });
+
+  it('should include secondaryProduction in breakdowns', () => {
+    const mine: PlacedRoom = {
+      id: 'placed-mine' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+    };
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-goblin' as InhabitantId,
+        name: 'Goblin',
+        state: 'normal',
+        assignedRoomId: 'placed-mine' as PlacedRoomId,
+      },
+    ];
+    const floor = makeFloor([mine], inhabitants);
+    const breakdowns = productionCalculateBreakdowns([floor]);
+    expect(breakdowns['crystals'].final).toBeCloseTo(1.2);
+    expect(breakdowns['flux']).toBeDefined();
+    expect(breakdowns['flux'].base).toBeCloseTo(0.2);
+    expect(breakdowns['flux'].final).toBeCloseTo(0.2);
   });
 });

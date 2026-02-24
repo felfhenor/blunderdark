@@ -18,7 +18,7 @@ import type { ResourceType } from '@interfaces';
   template: `
     <app-icon [name]="icon()" [color]="color()" />
     @if (short()) {
-      <span>{{ amount() | number:'1.0-0' }}</span>
+      <span>{{ amount() | number:'1.0-1' }}</span>
     } @else {
       <span>{{ label() }}</span>
     }

@@ -23,6 +23,10 @@ import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
+import {
+  roomUpgradeGetProductionMultiplier,
+  roomUpgradeGetSecondaryProduction,
+} from '@helpers/room-upgrades';
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { gamestate } from '@helpers/state-game';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
@@ -325,6 +329,22 @@ export function productionCalculateTotal(
       // Apply resource conversion if active
       roomProduction = featureApplyResourceConversion(roomProduction, room);
 
+      // Apply production multiplier from upgrades
+      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
+      if (upgradeMultiplier !== 1.0) {
+        for (const key of Object.keys(roomProduction)) {
+          roomProduction[key] = (roomProduction[key] ?? 0) * upgradeMultiplier;
+        }
+      }
+
+      // Add secondary production from upgrades (flat bonus, not affected by modifiers)
+      const secondaryProduction = roomUpgradeGetSecondaryProduction(room);
+      for (const [resourceType, amount] of Object.entries(secondaryProduction)) {
+        if (!amount) continue;
+        roomProduction[resourceType] =
+          (roomProduction[resourceType] ?? 0) + amount;
+      }
+
       for (const [resourceType, amount] of Object.entries(roomProduction)) {
         if (!amount) continue;
         totalProduction[resourceType] =
@@ -455,6 +475,21 @@ export function productionCalculateSingleRoom(
 
   // Apply resource conversion if active
   production = featureApplyResourceConversion(production, room);
+
+  // Apply production multiplier from upgrades
+  const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
+  if (upgradeMultiplier !== 1.0) {
+    for (const key of Object.keys(production)) {
+      production[key] = (production[key] ?? 0) * upgradeMultiplier;
+    }
+  }
+
+  // Add secondary production from upgrades (flat bonus, not affected by modifiers)
+  const secondaryProduction = roomUpgradeGetSecondaryProduction(room);
+  for (const [resourceType, amount] of Object.entries(secondaryProduction)) {
+    if (!amount) continue;
+    production[resourceType] = (production[resourceType] ?? 0) + amount;
+  }
 
   return production;
 }
@@ -615,6 +650,38 @@ export function productionCalculateBreakdowns(
           baseAmount * adjacencyBonusVal;
         breakdowns[resourceType].modifierEffect += finalAmount - withBonuses;
         breakdowns[resourceType].final += finalAmount;
+      }
+
+      // Apply production multiplier from upgrades to breakdown finals
+      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
+      if (upgradeMultiplier !== 1.0) {
+        for (const [resourceType, baseAmount] of Object.entries(base)) {
+          if (!baseAmount || !breakdowns[resourceType]) continue;
+          const prevFinal = breakdowns[resourceType].final;
+          breakdowns[resourceType].final =
+            prevFinal * upgradeMultiplier;
+          breakdowns[resourceType].modifierEffect +=
+            prevFinal * (upgradeMultiplier - 1);
+        }
+      }
+
+      // Add secondary production from upgrades to breakdowns
+      const secondaryProduction = roomUpgradeGetSecondaryProduction(room);
+      for (const [resourceType, amount] of Object.entries(
+        secondaryProduction,
+      )) {
+        if (!amount) continue;
+        if (!breakdowns[resourceType]) {
+          breakdowns[resourceType] = {
+            base: 0,
+            inhabitantBonus: 0,
+            adjacencyBonus: 0,
+            modifierEffect: 0,
+            final: 0,
+          };
+        }
+        breakdowns[resourceType].base += amount;
+        breakdowns[resourceType].final += amount;
       }
     }
   }

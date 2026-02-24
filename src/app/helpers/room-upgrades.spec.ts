@@ -26,6 +26,8 @@ const {
   roomUpgradeGetAvailable,
   roomUpgradeGetVisible,
   roomUpgradeGetEffectiveMaxInhabitants,
+  roomUpgradeGetSecondaryProduction,
+  roomUpgradeGetProductionMultiplier,
 } = await import('@helpers/room-upgrades');
 
 // --- Test data ---
@@ -411,5 +413,77 @@ describe('roomUpgradeGetEffectiveMaxInhabitants', () => {
     });
     const result = roomUpgradeGetEffectiveMaxInhabitants(room, crystalMineRoom);
     expect(result).toBe(2);
+  });
+});
+
+describe('roomUpgradeGetSecondaryProduction', () => {
+  it('should return empty object when no upgrade is applied', () => {
+    const room = createPlacedRoom();
+    const result = roomUpgradeGetSecondaryProduction(room);
+    expect(result).toEqual({});
+  });
+
+  it('should return secondary production from specialization upgrade', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-specialization' as UpgradePathId,
+    });
+    const result = roomUpgradeGetSecondaryProduction(room);
+    expect(result).toEqual({ flux: 0.2 });
+  });
+
+  it('should return empty object for upgrade with no secondary production', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-capacity' as UpgradePathId,
+    });
+    const result = roomUpgradeGetSecondaryProduction(room);
+    expect(result).toEqual({});
+  });
+
+  it('should return empty object for nonexistent upgrade path', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'nonexistent' as UpgradePathId,
+    });
+    const result = roomUpgradeGetSecondaryProduction(room);
+    expect(result).toEqual({});
+  });
+});
+
+describe('roomUpgradeGetProductionMultiplier', () => {
+  it('should return 1.0 when no upgrade is applied', () => {
+    const room = createPlacedRoom();
+    const result = roomUpgradeGetProductionMultiplier(room);
+    expect(result).toBe(1.0);
+  });
+
+  it('should return 1.5 for efficiency upgrade', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-efficiency' as UpgradePathId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room);
+    expect(result).toBe(1.5);
+  });
+
+  it('should return 2.0 for dark upgrade', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-dark' as UpgradePathId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room);
+    expect(result).toBe(2.0);
+  });
+
+  it('should return 1.0 for upgrade with no production multiplier', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-capacity' as UpgradePathId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room);
+    expect(result).toBe(1.0);
+  });
+
+  it('should return 1.0 for nonexistent upgrade path', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'nonexistent' as UpgradePathId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room);
+    expect(result).toBe(1.0);
   });
 });

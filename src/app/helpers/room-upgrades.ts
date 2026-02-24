@@ -3,6 +3,7 @@ import { featureCalculateCapacityBonus } from '@helpers/features';
 import type {
   PlacedRoom,
   RoomId,
+  RoomProduction,
   RoomUpgradeEffect,
   RoomUpgradePath,
   UpgradePathId,
@@ -124,4 +125,38 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
   bonus += featureCalculateCapacityBonus(placedRoom);
 
   return roomDef.maxInhabitants + bonus;
+}
+
+/**
+ * Extract all secondaryProduction effects from a room's applied upgrade
+ * and return them as a RoomProduction record (e.g. { essence: 0.2, flux: 0.2 }).
+ */
+export function roomUpgradeGetSecondaryProduction(
+  placedRoom: PlacedRoom,
+): RoomProduction {
+  const effects = roomUpgradeGetAppliedEffects(placedRoom);
+  const result: RoomProduction = {};
+  for (const effect of effects) {
+    if (effect.type === 'secondaryProduction' && effect.resource) {
+      result[effect.resource] = (result[effect.resource] ?? 0) + effect.value;
+    }
+  }
+  return result;
+}
+
+/**
+ * Extract productionMultiplier effects from a room's applied upgrade
+ * and return the combined multiplier. Returns 1.0 if no multiplier effects.
+ */
+export function roomUpgradeGetProductionMultiplier(
+  placedRoom: PlacedRoom,
+): number {
+  const effects = roomUpgradeGetAppliedEffects(placedRoom);
+  let multiplier = 1.0;
+  for (const effect of effects) {
+    if (effect.type === 'productionMultiplier') {
+      multiplier *= effect.value;
+    }
+  }
+  return multiplier;
 }
