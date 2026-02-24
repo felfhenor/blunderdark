@@ -305,7 +305,7 @@ export class PanelRoomInfoComponent {
       case 'productionBonus':
         return `Increases production of ${effect.resource ?? 'all resources'} by ${effect.value * 100}%`;
       case 'secondaryProduction':
-        return `Produces ${effect.value} ${effect.resource ?? 'resource'} per second as a bonus`;
+        return `Produces ${productionPerMinute(effect.value)} ${effect.resource ?? 'resource'} per minute as a bonus`;
       case 'productionMultiplier':
         return `Multiplies all production by ${effect.value}x`;
       case 'maxInhabitantBonus':

@@ -1,6 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { productionPerMinute } from '@helpers';
 import type { RoomUpgradeEffect } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { startCase } from 'es-toolkit';
@@ -25,7 +31,12 @@ import { startCase } from 'es-toolkit';
           production
         }
         @case ('secondaryProduction') {
-          +<app-currency-cost [type]="$any(effect().resource)" [amount]="effect().value" />/sec
+          +
+          <app-currency-cost
+            [type]="$any(effect().resource)"
+            [amount]="perMinuteValue()"
+          />
+          /min
         }
         @case ('productionMultiplier') {
           x{{ effect().value }} production
@@ -47,6 +58,9 @@ import { startCase } from 'es-toolkit';
 export class UpgradeEffectBadgeComponent {
   public effect = input.required<RoomUpgradeEffect>();
   public tooltipText = input.required<string>();
+  public perMinuteValue = computed(() =>
+    productionPerMinute(this.effect().value),
+  );
 
   public formatEffectType(type: string): string {
     return startCase(type);

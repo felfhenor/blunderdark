@@ -85,13 +85,13 @@
             @if (info.prod; as bd) {
               <div class="flex justify-between">
                 <span class="opacity-70">Base:</span>
-                <span>{{ formatBreakdownRate(bd.base) }}/sec</span>
+                <span>{{ formatBreakdownRate(bd.base) }}/min</span>
               </div>
               @if (bd.inhabitantBonus !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Workers:</span>
                   <span class="text-success">
-                    {{ formatBreakdownRate(bd.inhabitantBonus) }}/sec
+                    {{ formatBreakdownRate(bd.inhabitantBonus) }}/min
                   </span>
                 </div>
               }
@@ -99,7 +99,7 @@
                 <div class="flex justify-between">
                   <span class="opacity-70">Adjacency:</span>
                   <span class="text-success">
-                    {{ formatBreakdownRate(bd.adjacencyBonus) }}/sec
+                    {{ formatBreakdownRate(bd.adjacencyBonus) }}/min
                   </span>
                 </div>
               }
@@ -110,7 +110,7 @@
                     [class.text-success]="bd.modifierEffect > 0"
                     [class.text-error]="bd.modifierEffect <= 0"
                   >
-                    {{ formatBreakdownRate(bd.modifierEffect) }}/sec
+                    {{ formatBreakdownRate(bd.modifierEffect) }}/min
                   </span>
                 </div>
               }
@@ -120,7 +120,7 @@
                 <div class="flex justify-between">
                   <span class="opacity-70">Feeding:</span>
                   <span class="text-error">
-                    {{ formatBreakdownRate(-cd.inhabitantFood) }}/sec
+                    {{ formatBreakdownRate(-cd.inhabitantFood) }}/min
                   </span>
                 </div>
               }
@@ -128,7 +128,7 @@
                 <div class="flex justify-between">
                   <span class="opacity-70">Legendary Upkeep:</span>
                   <span class="text-error">
-                    {{ formatBreakdownRate(-cd.legendaryUpkeep) }}/sec
+                    {{ formatBreakdownRate(-cd.legendaryUpkeep) }}/min
                   </span>
                 </div>
               }
@@ -136,7 +136,7 @@
                 <div class="flex justify-between">
                   <span class="opacity-70">Maintenance:</span>
                   <span class="text-error">
-                    {{ formatBreakdownRate(-cd.featureMaintenance) }}/sec
+                    {{ formatBreakdownRate(-cd.featureMaintenance) }}/min
                   </span>
                 </div>
               }
@@ -148,7 +148,7 @@
                 [class.text-success]="info.net > 0"
                 [class.text-error]="info.net < 0"
               >
-                {{ formatBreakdownRate(info.net) }}/sec
+                {{ formatBreakdownRate(info.net) }}/min
               </span>
             </div>
           </div>
