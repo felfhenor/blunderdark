@@ -7,85 +7,28 @@ import {
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
-  consumptionBreakdowns,
-  corruptionGetLevel,
-  corruptionGetLevelDescription,
   gamestate,
   hungerCalculateTotalConsumption,
   hungerGetWarningLevel,
-  productionBreakdowns,
   productionPerMinute,
   productionRates,
+  RESOURCE_DISPLAY,
+  resourceDisplayFormatBreakdownRate,
+  resourceDisplayGetBreakdown,
+  resourceDisplayGetCorruptionBadgeClass,
+  resourceDisplayGetCorruptionColorClass,
+  resourceDisplayGetCorruptionInfo,
+  resourceDisplayGetCurrent,
+  resourceDisplayGetMax,
+  resourceDisplayGetPercent,
+  resourceDisplayIsFull,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
-import type { CorruptionLevel } from '@interfaces/corruption';
 import type { ResourceType } from '@interfaces';
-import type {
-  ResourceConsumptionBreakdown,
-  ResourceProductionBreakdown,
-} from '@interfaces/production';
 import { TippyDirective } from '@ngneat/helipopper';
-
-type ResourceBreakdownInfo = {
-  prod: ResourceProductionBreakdown | undefined;
-  cons: ResourceConsumptionBreakdown | undefined;
-  net: number;
-};
-
-type ResourceDisplay = {
-  type: ResourceType;
-  label: string;
-  color: string;
-  description: string;
-};
 
 const LOW_THRESHOLD = 0.2;
 const CRITICAL_THRESHOLD = 0.1;
-
-const RESOURCE_DISPLAY: ResourceDisplay[] = [
-  {
-    type: 'crystals',
-    label: 'Crystals',
-    color: 'progress-info',
-    description: 'Magical crystals used for construction and upgrades.',
-  },
-  {
-    type: 'food',
-    label: 'Food',
-    color: 'progress-success',
-    description: 'Sustenance for your dungeon inhabitants.',
-  },
-  {
-    type: 'gold',
-    label: 'Gold',
-    color: 'progress-warning',
-    description: 'Currency for hiring and trading.',
-  },
-  {
-    type: 'flux',
-    label: 'Flux',
-    color: 'progress-secondary',
-    description: 'Arcane energy that powers magical rooms.',
-  },
-  {
-    type: 'research',
-    label: 'Research',
-    color: 'progress-primary',
-    description: 'Knowledge points for unlocking new technologies.',
-  },
-  {
-    type: 'essence',
-    label: 'Essence',
-    color: 'progress-accent',
-    description: 'Spiritual energy harvested from the dungeon.',
-  },
-  {
-    type: 'corruption',
-    label: 'Corruption',
-    color: 'progress-error',
-    description: 'Dark energy that spreads through your dungeon.',
-  },
-];
 
 @Component({
   selector: 'app-panel-resources',
@@ -96,11 +39,17 @@ const RESOURCE_DISPLAY: ResourceDisplay[] = [
 })
 export class PanelResourcesComponent {
   public readonly resources = RESOURCE_DISPLAY;
-
-  public resourceAll = computed(() => gamestate().world.resources);
   public rates = productionRates;
-  public breakdowns = productionBreakdowns;
-  public consumptions = consumptionBreakdowns;
+
+  public readonly getCurrent = resourceDisplayGetCurrent;
+  public readonly getMax = resourceDisplayGetMax;
+  public readonly getPercent = resourceDisplayGetPercent;
+  public readonly isFull = resourceDisplayIsFull;
+  public readonly getResourceBreakdown = resourceDisplayGetBreakdown;
+  public readonly formatBreakdownRate = resourceDisplayFormatBreakdownRate;
+  public readonly getCorruptionColorClass = resourceDisplayGetCorruptionColorClass;
+  public readonly getCorruptionBadgeClass = resourceDisplayGetCorruptionBadgeClass;
+  public corruptionInfo = computed(() => resourceDisplayGetCorruptionInfo());
 
   public foodWarning = computed(() => {
     const state = gamestate();
@@ -124,25 +73,7 @@ export class PanelResourcesComponent {
 
   public dismissFoodWarning(): void {
     this.foodWarningDismissed.set(true);
-    // Reset after 60 seconds so it can reappear if condition persists
     setTimeout(() => this.foodWarningDismissed.set(false), 60_000);
-  }
-
-  public getCurrent(type: ResourceType): number {
-    return this.resourceAll()[type].current;
-  }
-
-  public getMax(type: ResourceType): number {
-    return this.resourceAll()[type].max;
-  }
-
-  public getPercent(type: ResourceType): number {
-    const res = this.resourceAll()[type];
-    if (type === 'corruption') {
-      return res.current === 0 ? 0 : Math.min(100, (res.current / 200) * 100);
-    }
-    if (res.max === 0) return 0;
-    return (res.current / res.max) * 100;
   }
 
   public getRate(type: ResourceType): number {
@@ -150,13 +81,8 @@ export class PanelResourcesComponent {
     return productionPerMinute(perTick);
   }
 
-  public isFull(type: ResourceType): boolean {
-    const res = this.resourceAll()[type];
-    return res.max > 0 && res.current >= res.max;
-  }
-
   public getWarningClass(type: ResourceType): string {
-    const res = this.resourceAll()[type];
+    const res = gamestate().world.resources[type];
     if (res.max === 0) return '';
     const ratio = res.current / res.max;
 
@@ -178,60 +104,5 @@ export class PanelResourcesComponent {
     if (rate > 0) return `+${rate.toFixed(2)}/min`;
     if (rate < 0) return `${rate.toFixed(2)}/min`;
     return '0/min';
-  }
-
-  public getResourceBreakdown(type: ResourceType): ResourceBreakdownInfo | undefined {
-    const prod = this.breakdowns()[type];
-    const cons = this.consumptions()[type];
-    if (!prod && !cons) return undefined;
-
-    const productionFinal = prod?.final ?? 0;
-    const consumptionTotal = cons?.total ?? 0;
-
-    return {
-      prod: prod ?? undefined,
-      cons: cons ?? undefined,
-      net: productionFinal - consumptionTotal,
-    };
-  }
-
-  public formatBreakdownRate(perTick: number): string {
-    const perMin = productionPerMinute(perTick);
-    if (perMin > 0) return `+${perMin.toFixed(2)}`;
-    if (perMin < 0) return perMin.toFixed(2);
-    return '0';
-  }
-
-  public corruptionInfo = computed(() => {
-    const value = this.getCurrent('corruption');
-    const level = corruptionGetLevel(value);
-    const description = corruptionGetLevelDescription(level);
-    return { value, level, description };
-  });
-
-  public getCorruptionColorClass(level: CorruptionLevel): string {
-    switch (level) {
-      case 'low':
-        return 'text-success';
-      case 'medium':
-        return 'text-warning';
-      case 'high':
-        return 'text-orange-400';
-      case 'critical':
-        return 'text-error';
-    }
-  }
-
-  public getCorruptionBadgeClass(level: CorruptionLevel): string {
-    switch (level) {
-      case 'low':
-        return 'badge-success';
-      case 'medium':
-        return 'badge-warning';
-      case 'high':
-        return 'badge-ghost bg-orange-400/20 text-orange-400';
-      case 'critical':
-        return 'badge-error';
-    }
   }
 }

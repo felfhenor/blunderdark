@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
@@ -13,13 +14,12 @@ import {
   darkForgeGetStatBonuses,
   darkForgeRemoveJob,
   DARK_FORGE_MAX_QUEUE_SIZE,
-  floorAll,
+  findRoomByRole,
   floorCurrent,
   gamestate,
   notify,
   resourceCanAfford,
   resourcePayCost,
-  roomRoleFindById,
   updateGamestate,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
@@ -35,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,14 +46,7 @@ export class PanelDarkForgeComponent {
   });
 
   public forgeRoom = computed(() => {
-    const roleId = roomRoleFindById('darkForge');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return room;
-    }
-    return undefined;
+    return findRoomByRole('darkForge')?.room;
   });
 
   public roomDef = computed(() => {

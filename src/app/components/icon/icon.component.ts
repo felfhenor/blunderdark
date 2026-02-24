@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { hostBinding } from 'ngxtension/host-binding';
 import { ICON_ALL } from '@helpers';
@@ -13,6 +13,7 @@ import type { Icon } from '@interfaces';
   },
   templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconComponent {
   public name = input.required<Icon>();

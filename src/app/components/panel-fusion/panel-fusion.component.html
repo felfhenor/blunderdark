@@ -12,26 +12,8 @@
       </div>
 
       <!-- Tabs -->
-      <div
-        role="tablist"
-        class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0"
-      >
-        <button
-          role="tab"
-          class="tab"
-          [class.tab-active]="activeTab() === 'fuse'"
-          (click)="setTab('fuse')"
-        >
-          Fuse
-        </button>
-        <button
-          role="tab"
-          class="tab"
-          [class.tab-active]="activeTab() === 'recipes'"
-          (click)="setTab('recipes')"
-        >
-          Recipes
-        </button>
+      <div class="bg-base-200 px-4 flex-shrink-0">
+        <app-tab-bar [tabs]="tabDefs" [(activeTab)]="activeTab" />
       </div>
 
       <!-- Fuse Tab -->
@@ -139,7 +121,7 @@
                     <div class="flex items-center justify-between">
                       <h3 class="text-sm font-bold">{{ p.hybridDef.name }}</h3>
                       <span class="badge badge-xs badge-secondary">
-                        Hybrid T{{ p.hybridDef.tier | number: '1.0-2' }}
+                        Hybrid T{{ p.hybridDef.tier | number: '1.0-0' }}
                       </span>
                     </div>
                     <p class="text-xs opacity-60">

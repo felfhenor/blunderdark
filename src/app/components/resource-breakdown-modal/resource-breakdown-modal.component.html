@@ -30,11 +30,8 @@
     }
 
     <!-- Tabs -->
-    <div role="tablist" class="tabs tabs-bordered mb-3">
-      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'base'" (click)="setTab('base')">Base</button>
-      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'workers'" (click)="setTab('workers')">Workers</button>
-      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'modifiers'" (click)="setTab('modifiers')">Modifiers</button>
-      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'costs'" (click)="setTab('costs')">Costs</button>
+    <div class="mb-3">
+      <app-tab-bar [tabs]="tabDefs" [(activeTab)]="activeTab" />
     </div>
 
     <!-- Tab content -->

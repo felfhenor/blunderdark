@@ -9,8 +9,8 @@
       <!-- Active Queue -->
       @if (queueState(); as qs) {
         <div class="divider my-2 text-xs opacity-60">
-          Crafting Queue ({{ qs.jobs.length | number: '1.0-2' }}/{{
-            qs.maxSize | number: '1.0-2'
+          Crafting Queue ({{ qs.jobs.length | number: '1.0-0' }}/{{
+            qs.maxSize | number: '1.0-0'
           }})
         </div>
         <div class="flex flex-col gap-2">
@@ -33,14 +33,7 @@
                 </div>
               </div>
               @if (job.isActive) {
-                <progress
-                  class="progress progress-warning w-full"
-                  [value]="job.percent"
-                  max="100"
-                ></progress>
-                <span class="text-xs opacity-40">
-                  {{ job.percent | number: '1.0-2' }}%
-                </span>
+                <app-job-progress [percent]="job.percent" colorClass="progress-warning" />
               }
             </div>
           }
@@ -129,7 +122,7 @@
             <div class="flex items-center justify-between">
               <span class="text-xs">{{ item.name }}</span>
               <span class="badge badge-xs badge-outline">
-                x{{ item.count | number: '1.0-2' }}
+                x{{ item.count | number: '1.0-0' }}
               </span>
             </div>
           }

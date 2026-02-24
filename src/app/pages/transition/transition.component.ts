@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   imports: [],
   templateUrl: './transition.component.html',
   styleUrl: './transition.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransitionComponent implements OnInit {
   private route = inject(ActivatedRoute);

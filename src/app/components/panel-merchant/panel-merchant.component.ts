@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
+import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import { contentGetEntry } from '@helpers/content';
 import {
   merchantCanAffordTrade,
@@ -26,8 +28,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-type TradeCategory = 'all' | MerchantTradeType;
-
 type TradeEntry = {
   trade: MerchantTradeContent;
   stock: number;
@@ -38,7 +38,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [DecimalPipe, NgClass, CurrencyCostComponent, ModalComponent],
+  imports: [DecimalPipe, NgClass, CurrencyCostComponent, ModalComponent, TabBarComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +48,7 @@ export class PanelMerchantComponent {
 
   public isPresent = merchantIsPresent;
   public daysRemaining = merchantDaysRemaining;
-  public activeCategory = signal<TradeCategory>('all');
+  public activeCategory = signal<string>('all');
 
   public tradeEntries = computed((): TradeEntry[] => {
     const inventory = merchantInventory();
@@ -101,9 +101,15 @@ export class PanelMerchantComponent {
     };
   });
 
-  public setCategory(category: TradeCategory): void {
-    this.activeCategory.set(category);
-  }
+  public tabDefs = computed<TabDefinition[]>(() => {
+    const counts = this.categoryCounts();
+    return [
+      { id: 'all', label: 'All', count: counts.all },
+      { id: 'buy', label: 'Buy', count: counts.buy },
+      { id: 'sell', label: 'Sell', count: counts.sell },
+      { id: 'special', label: 'Special', count: counts.special },
+    ];
+  });
 
   public async executeTrade(tradeId: MerchantTradeId): Promise<void> {
     const result = await merchantExecuteTrade(tradeId);

@@ -1,5 +1,6 @@
 import { sortBy } from 'es-toolkit/compat';
 import { combatResolve } from '@helpers/combat';
+import { gridManhattanDistance } from '@helpers/grid-math';
 import type {
   ActionResult,
   Combatant,
@@ -391,10 +392,6 @@ export function invasionCombatExecuteAiTurn(
 
 // --- Internal helpers ---
 
-function manhattanDistance(a: TilePosition, b: TilePosition): number {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-}
-
 function findNearestEnemy(
   position: TilePosition,
   enemies: Combatant[],
@@ -404,7 +401,7 @@ function findNearestEnemy(
 
   for (const enemy of enemies) {
     if (!enemy.position) continue;
-    const dist = manhattanDistance(position, enemy.position);
+    const dist = gridManhattanDistance(position.x, position.y, enemy.position.x, enemy.position.y);
     if (dist < nearestDist) {
       nearestDist = dist;
       nearest = enemy;
@@ -422,7 +419,7 @@ function findBestMoveToward(
   let bestDist = Infinity;
 
   for (const target of moveTargets) {
-    const dist = manhattanDistance(target, goal);
+    const dist = gridManhattanDistance(target.x, target.y, goal.x, goal.y);
     if (dist < bestDist) {
       bestDist = dist;
       best = target;

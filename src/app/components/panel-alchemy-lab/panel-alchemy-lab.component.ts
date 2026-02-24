@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
@@ -14,12 +15,11 @@ import {
   alchemyLabStartConversion,
   alchemyLabStopConversion,
   contentGetEntry,
-  floorAll,
+  findRoomByRole,
   floorCurrent,
   gamestate,
   notify,
   resourceCanAfford,
-  roomRoleFindById,
   updateGamestate,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
@@ -30,7 +30,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,14 +41,7 @@ export class PanelAlchemyLabComponent {
   });
 
   public labRoom = computed(() => {
-    const roleId = roomRoleFindById('alchemyLab');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return room;
-    }
-    return undefined;
+    return findRoomByRole('alchemyLab')?.room;
   });
 
   public roomDef = computed(() => {

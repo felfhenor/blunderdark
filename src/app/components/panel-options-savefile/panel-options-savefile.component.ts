@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
@@ -30,6 +30,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   ],
   templateUrl: './panel-options-savefile.component.html',
   styleUrl: './panel-options-savefile.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelOptionsSavefileComponent {
   private router = inject(Router);

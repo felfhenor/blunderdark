@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ModalChangelogComponent } from '@components/modal-changelog/modal-changelog.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -32,6 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   ],
   templateUrl: './connect-buttons.component.html',
   styleUrl: './connect-buttons.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConnectButtonsComponent {
   public readonly externalLinks = [

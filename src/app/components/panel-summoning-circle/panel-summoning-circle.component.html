@@ -15,14 +15,9 @@
             <span class="text-xs">Summoning: {{ sp.recipeName }}</span>
             <span class="badge badge-xs badge-primary">In Progress</span>
           </div>
-          <progress
-            class="progress progress-primary w-full mt-1"
-            [value]="sp.percent"
-            max="100"
-          ></progress>
-          <span class="text-xs opacity-40">
-            {{ sp.percent | number: '1.0-2' }}%
-          </span>
+          <div class="mt-1">
+            <app-job-progress [percent]="sp.percent" />
+          </div>
         </div>
       }
 

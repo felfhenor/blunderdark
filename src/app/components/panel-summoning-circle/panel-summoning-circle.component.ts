@@ -1,17 +1,17 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   contentGetEntry,
-  floorAll,
+  findRoomByRole,
   floorCurrent,
   gamestate,
   notify,
   resourceCanAfford,
   resourcePayCost,
-  roomRoleFindById,
   summoningCanStart,
   summoningCompleted$,
   summoningExpired$,
@@ -35,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent, ModalComponent],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,14 +56,7 @@ export class PanelSummoningCircleComponent {
   ];
 
   public summoningRoom = computed(() => {
-    const roleId = roomRoleFindById('summoningCircle');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return room;
-    }
-    return undefined;
+    return findRoomByRole('summoningCircle')?.room;
   });
 
   public roomDef = computed(() => {

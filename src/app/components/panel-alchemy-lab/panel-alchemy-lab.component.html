@@ -19,14 +19,7 @@
             <app-currency-cost [type]="conv.outputResource" [amount]="conv.outputAmount" />
           </span>
           @if (conv.inputConsumed) {
-            <progress
-              class="progress progress-warning w-full"
-              [value]="conv.percent"
-              max="100"
-            ></progress>
-            <span class="text-xs opacity-40">
-              {{ conv.percent | number: '1.0-2' }}%
-            </span>
+            <app-job-progress [percent]="conv.percent" colorClass="progress-warning" />
           } @else {
             <span class="text-xs text-error">Waiting for resources...</span>
           }

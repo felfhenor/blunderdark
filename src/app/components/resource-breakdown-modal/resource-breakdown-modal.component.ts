@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
+import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import {
   consumptionCalculateDetailedBreakdown,
   gamestate,
@@ -22,11 +24,9 @@ import type {
 } from '@interfaces/production';
 import { sortBy } from 'es-toolkit/compat';
 
-type BreakdownTab = 'base' | 'workers' | 'modifiers' | 'costs';
-
 @Component({
   selector: 'app-resource-breakdown-modal',
-  imports: [ModalComponent, CurrencyNameComponent],
+  imports: [ModalComponent, CurrencyNameComponent, TabBarComponent],
   templateUrl: './resource-breakdown-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,7 +34,14 @@ export class ResourceBreakdownModalComponent {
   public visible = model<boolean>(false);
   public resourceType = input.required<ResourceType>();
 
-  public activeTab = signal<BreakdownTab>('base');
+  public activeTab = signal<string>('base');
+
+  public readonly tabDefs: TabDefinition[] = [
+    { id: 'base', label: 'Base' },
+    { id: 'workers', label: 'Workers' },
+    { id: 'modifiers', label: 'Modifiers' },
+    { id: 'costs', label: 'Costs' },
+  ];
 
   public breakdown = computed<ResourceDetailedBreakdown | undefined>(() => {
     if (!this.visible()) return undefined;
@@ -120,10 +127,6 @@ export class ResourceBreakdownModalComponent {
     if (!bd) return [];
     return sortBy(bd.consumption, [(c) => -c.amount]);
   });
-
-  public setTab(tab: BreakdownTab): void {
-    this.activeTab.set(tab);
-  }
 
   public formatRate(perTick: number): string {
     const perMin = productionPerMinute(perTick);

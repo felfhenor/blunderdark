@@ -1,15 +1,15 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   contentGetEntry,
-  floorAll,
+  findRoomByRole,
   floorCurrent,
   gamestate,
   notify,
-  roomRoleFindById,
   tortureConversionComplete$,
   tortureExtractionComplete$,
   tortureGetAdjacentRoomTypeIds,
@@ -29,7 +29,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, InhabitantCardComponent, ModalComponent, StatRowComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, ModalComponent, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,15 +69,7 @@ export class PanelTortureChamberComponent {
   ];
 
   public tortureRoom = computed(() => {
-    const roleId = roomRoleFindById('tortureChamber');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return room;
-    }
-
-    return undefined;
+    return findRoomByRole('tortureChamber')?.room;
   });
 
   public roomDef = computed(() => {

@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -20,6 +20,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [AnalyticsClickDirective, SFXDirective, SweetAlert2Module],
   templateUrl: './button-savefile-import.component.html',
   styleUrl: './button-savefile-import.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonSavefileImportComponent {
   private router = inject(Router);

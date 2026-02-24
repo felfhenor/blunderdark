@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { saveSerialize, notifySuccess, notifyError } from '@helpers';
@@ -8,6 +8,7 @@ import { saveSerialize, notifySuccess, notifyError } from '@helpers';
   imports: [AnalyticsClickDirective, SFXDirective],
   templateUrl: './button-savefile-export.component.html',
   styleUrl: './button-savefile-export.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonSavefileExportComponent {
   exportSavefile() {

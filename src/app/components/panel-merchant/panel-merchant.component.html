@@ -3,7 +3,7 @@
     <div class="card-body p-4">
       <div class="flex items-center justify-between">
         <span class="badge badge-warning badge-xs">
-          {{ daysRemaining() | number: '1.0-2' }} days left
+          {{ daysRemaining() | number: '1.0-0' }} days left
         </span>
       </div>
       <p class="text-xs opacity-50">
@@ -26,41 +26,14 @@
   <div body>
     <div class="flex items-center justify-between mb-3">
       <span class="text-xs opacity-70">
-        Departing in {{ daysRemaining() | number: '1.0-2' }} day{{
+        Departing in {{ daysRemaining() | number: '1.0-0' }} day{{
           daysRemaining() === 1 ? '' : 's'
         }}
       </span>
     </div>
 
-    <div class="tabs tabs-boxed tabs-xs mb-3">
-      <button
-        class="tab"
-        [class.tab-active]="activeCategory() === 'all'"
-        (click)="setCategory('all')"
-      >
-        All ({{ categoryCounts().all | number: '1.0-2' }})
-      </button>
-      <button
-        class="tab"
-        [class.tab-active]="activeCategory() === 'buy'"
-        (click)="setCategory('buy')"
-      >
-        Buy ({{ categoryCounts().buy | number: '1.0-2' }})
-      </button>
-      <button
-        class="tab"
-        [class.tab-active]="activeCategory() === 'sell'"
-        (click)="setCategory('sell')"
-      >
-        Sell ({{ categoryCounts().sell | number: '1.0-2' }})
-      </button>
-      <button
-        class="tab"
-        [class.tab-active]="activeCategory() === 'special'"
-        (click)="setCategory('special')"
-      >
-        Special ({{ categoryCounts().special | number: '1.0-2' }})
-      </button>
+    <div class="mb-3">
+      <app-tab-bar [tabs]="tabDefs()" [(activeTab)]="activeCategory" variant="boxed" size="xs" />
     </div>
 
     <div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
@@ -114,7 +87,7 @@
 
               <div class="flex flex-col items-end gap-2 flex-shrink-0">
                 <span class="text-xs opacity-50">
-                  Stock: {{ entry.stock | number: '1.0-2' }}
+                  Stock: {{ entry.stock | number: '1.0-0' }}
                 </span>
                 <button
                   class="btn btn-xs btn-primary"

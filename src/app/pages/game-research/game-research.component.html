@@ -80,7 +80,7 @@
             @for (tierGroup of tierNodes(); track tierGroup.tier) {
               <div class="tier-group">
                 <div class="tier-label text-xs opacity-50 mb-2 text-center">
-                  Tier {{ tierGroup.tier | number: '1.0-2' }}
+                  Tier {{ tierGroup.tier | number: '1.0-0' }}
                 </div>
                 <div
                   class="tier-nodes"
@@ -168,7 +168,7 @@
                 <!-- Tier & Branch -->
                 <div class="flex gap-2 text-xs">
                   <span class="badge badge-outline badge-xs">
-                    Tier {{ node.tier | number: '1.0-2' }}
+                    Tier {{ node.tier | number: '1.0-0' }}
                   </span>
                   <span class="badge badge-outline badge-xs capitalize">
                     {{ node.branch }}

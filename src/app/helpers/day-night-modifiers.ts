@@ -1,4 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
+import { formatMultiplierAsPercentage } from '@helpers/format';
+import { findModifierMultiplier } from '@helpers/modifier-utils';
 import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { DayNightPhase, DayNightResourceModifier, DayNightCreatureModifier } from '@interfaces/day-night';
@@ -83,10 +85,10 @@ const CREATURE_MODIFIERS: readonly DayNightCreatureModifier[] = [
  */
 export function dayNightGetResourceModifier(hour: number, resourceType: string): number {
   const phase = dayNightGetPhase(hour);
-  const modifier = RESOURCE_MODIFIERS.find(
+  return findModifierMultiplier(
+    RESOURCE_MODIFIERS,
     (m) => m.phase === phase && m.resourceType === resourceType,
   );
-  return modifier?.multiplier ?? 1.0;
 }
 
 /**
@@ -106,10 +108,10 @@ export function dayNightGetActiveResourceModifiers(hour: number): DayNightResour
  */
 export function dayNightGetCreatureModifier(hour: number, creatureType: string): number {
   const phase = dayNightGetPhase(hour);
-  const modifier = CREATURE_MODIFIERS.find(
+  return findModifierMultiplier(
+    CREATURE_MODIFIERS,
     (m) => m.phase === phase && m.creatureType === creatureType,
   );
-  return modifier?.multiplier ?? 1.0;
 }
 
 /**
@@ -191,11 +193,7 @@ export function dayNightGetAllActiveModifiers(hour: number): {
  * Format a multiplier as a percentage string.
  * e.g., 1.25 → "+25%", 0.90 → "-10%"
  */
-export function dayNightFormatMultiplier(multiplier: number): string {
-  const percentage = Math.round((multiplier - 1.0) * 100);
-  const sign = percentage >= 0 ? '+' : '';
-  return `${sign}${percentage}%`;
-}
+export const dayNightFormatMultiplier = formatMultiplierAsPercentage;
 
 /**
  * Get a display label for a phase.

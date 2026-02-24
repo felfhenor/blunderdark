@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import type { ElementRef } from '@angular/core';
 import {
+  ChangeDetectionStrategy,
   Component,
   effect,
   input,
@@ -19,6 +20,7 @@ import { uiModalOpenCount } from '@helpers/ui';
   host: {
     '(document:keydown.escape)': 'onEscapeKey($event)',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalComponent {
   public visible = model<boolean>(false);

@@ -1,3 +1,5 @@
+import { formatMultiplierAsPercentage } from '@helpers/format';
+import { findModifierMultiplier } from '@helpers/modifier-utils';
 import type { Season } from '@interfaces';
 import type { SeasonResourceModifier, SeasonRecruitmentModifier, SeasonSpawnRateModifier } from '@interfaces/season-bonus';
 
@@ -115,10 +117,10 @@ const SEASON_BONUS_SPAWN_RATE_MODIFIERS: readonly SeasonSpawnRateModifier[] = [
  * Returns 1.0 if no modifier applies.
  */
 export function seasonBonusGetResourceModifier(season: Season, resourceType: string): number {
-  const modifier = SEASON_BONUS_RESOURCE_MODIFIERS.find(
+  return findModifierMultiplier(
+    SEASON_BONUS_RESOURCE_MODIFIERS,
     (m) => m.season === season && m.resourceType === resourceType,
   );
-  return modifier?.multiplier ?? 1.0;
 }
 
 /**
@@ -135,10 +137,10 @@ export function seasonBonusGetActiveResourceModifiers(season: Season): SeasonRes
  * Returns 1.0 if no modifier applies.
  */
 export function seasonBonusGetRecruitmentCostMultiplier(season: Season): number {
-  const modifier = SEASON_BONUS_RECRUITMENT_MODIFIERS.find(
+  return findModifierMultiplier(
+    SEASON_BONUS_RECRUITMENT_MODIFIERS,
     (m) => m.season === season,
   );
-  return modifier?.multiplier ?? 1.0;
 }
 
 // --- Spawn rate modifier functions ---
@@ -148,10 +150,10 @@ export function seasonBonusGetRecruitmentCostMultiplier(season: Season): number 
  * Returns 1.0 if no modifier applies.
  */
 export function seasonBonusGetSpawnRateModifier(season: Season, creatureType: string): number {
-  const modifier = SEASON_BONUS_SPAWN_RATE_MODIFIERS.find(
+  return findModifierMultiplier(
+    SEASON_BONUS_SPAWN_RATE_MODIFIERS,
     (m) => m.season === season && m.creatureType === creatureType,
   );
-  return modifier?.multiplier ?? 1.0;
 }
 
 // --- Flag-based queries ---
@@ -197,11 +199,7 @@ export function seasonBonusGetAllActive(season: Season): {
  * Format a multiplier as a percentage string.
  * e.g., 1.50 → "+50%", 0.75 → "-25%"
  */
-export function seasonBonusFormatMultiplier(multiplier: number): string {
-  const percentage = Math.round((multiplier - 1.0) * 100);
-  const sign = percentage >= 0 ? '+' : '';
-  return `${sign}${percentage}%`;
-}
+export const seasonBonusFormatMultiplier = formatMultiplierAsPercentage;
 
 /**
  * Get a display label for a season.

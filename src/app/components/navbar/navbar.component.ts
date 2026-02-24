@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BadgeDisconnectedRoomsComponent } from '@components/badge-disconnected-rooms/badge-disconnected-rooms.component';
 import { BadgeInvasionWarningComponent } from '@components/badge-invasion-warning/badge-invasion-warning.component';
@@ -54,6 +54,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   providers: [],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
   public meta = inject(MetaService);

@@ -1,9 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
-  floorAll,
-  roomRoleFindById,
+  findRoomByRole,
   gamestate,
   contentGetEntry,
   trainingGetProgressPercent,
@@ -19,21 +19,16 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-training-grounds',
-  imports: [DecimalPipe, StatNameComponent],
+  imports: [DecimalPipe, JobProgressComponent, StatNameComponent],
   templateUrl: './panel-training-grounds.component.html',
   styleUrl: './panel-training-grounds.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelTrainingGroundsComponent {
   public trainingRoom = computed(() => {
-    const roleId = roomRoleFindById('trainingGrounds');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return trainingGetRoomInfo(room.id);
-    }
-    return undefined;
+    const room = findRoomByRole('trainingGrounds')?.room;
+    if (!room) return undefined;
+    return trainingGetRoomInfo(room.id);
   });
 
   public roomDef = computed(() => {

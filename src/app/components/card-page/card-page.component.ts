@@ -1,5 +1,5 @@
 
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 type CardSize = 'main' | 'sub' | 'heroes' | 'heroes-sub';
 
@@ -8,6 +8,7 @@ type CardSize = 'main' | 'sub' | 'heroes' | 'heroes-sub';
   imports: [],
   templateUrl: './card-page.component.html',
   styleUrl: './card-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardPageComponent {
   public heightProfile = input<CardSize>('main');

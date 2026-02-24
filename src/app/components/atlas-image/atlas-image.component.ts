@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import type { AtlasedImage } from '@interfaces';
 import { ContentService } from '@services/content.service';
 
@@ -8,6 +8,7 @@ import { ContentService } from '@services/content.service';
   imports: [CommonModule],
   templateUrl: './atlas-image.component.html',
   styleUrl: './atlas-image.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AtlasImageComponent {
   private contentService = inject(ContentService);

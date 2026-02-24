@@ -1,4 +1,5 @@
 import { contentGetEntriesByType } from '@helpers/content';
+import { createLazyCache } from '@helpers/lazy-cache';
 import type { BiomeType, RoomId } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import type { ProductionModifierContext, ProductionModifierResult, ProductionModifierDefinition } from '@interfaces/production-modifier';
@@ -11,10 +12,7 @@ export const PRODUCTION_MODIFIER_NIGHT_END = 6;
 
 // --- Lazy lookup maps built from room data ---
 
-let timeOfDayMap: { day: Map<string, number>; night: Map<string, number> } | undefined = undefined;
-let biomeMap: Map<string, Map<string, number>> | undefined = undefined;
-
-function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
+const timeOfDayCache = createLazyCache((): { day: Map<string, number>; night: Map<string, number> } => {
   const rooms = contentGetEntriesByType<RoomContent>('room');
   const day = new Map<string, number>();
   const night = new Map<string, number>();
@@ -28,16 +26,9 @@ function buildTimeOfDayMap(): { day: Map<string, number>; night: Map<string, num
     }
   }
   return { day, night };
-}
+});
 
-function getTimeOfDayMap(): { day: Map<string, number>; night: Map<string, number> } {
-  if (!timeOfDayMap) {
-    timeOfDayMap = buildTimeOfDayMap();
-  }
-  return timeOfDayMap;
-}
-
-function buildBiomeMap(): Map<string, Map<string, number>> {
+const biomeCache = createLazyCache((): Map<string, Map<string, number>> => {
   const rooms = contentGetEntriesByType<RoomContent>('room');
   const map = new Map<string, Map<string, number>>();
   for (const room of rooms) {
@@ -52,18 +43,11 @@ function buildBiomeMap(): Map<string, Map<string, number>> {
     }
   }
   return map;
-}
-
-function getBiomeMap(): Map<string, Map<string, number>> {
-  if (!biomeMap) {
-    biomeMap = buildBiomeMap();
-  }
-  return biomeMap;
-}
+});
 
 export function productionModifierResetCache(): void {
-  timeOfDayMap = undefined;
-  biomeMap = undefined;
+  timeOfDayCache.reset();
+  biomeCache.reset();
 }
 
 // --- Time-of-day helpers ---
@@ -79,7 +63,7 @@ export function productionModifierIsDayTime(hour: number): boolean {
 // --- Time-of-day modifier ---
 
 function evaluateTimeOfDay(context: ProductionModifierContext): number {
-  const map = getTimeOfDayMap();
+  const map = timeOfDayCache.get();
   if (productionModifierIsNightTime(context.hour)) {
     return 1.0 + (map.night.get(context.roomTypeId) ?? 0);
   }
@@ -93,7 +77,7 @@ function evaluateTimeOfDay(context: ProductionModifierContext): number {
  * Returns 1.0 for rooms not affected by the biome or for neutral biome.
  */
 export function productionModifierGetBiomeBonus(biome: BiomeType, roomTypeId: RoomId): number {
-  const map = getBiomeMap();
+  const map = biomeCache.get();
   const biomeRooms = map.get(biome);
   if (!biomeRooms) return 1.0;
   return 1.0 + (biomeRooms.get(roomTypeId) ?? 0);

@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, computed, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
@@ -28,6 +28,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   providers: [],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
   public meta = inject(MetaService);

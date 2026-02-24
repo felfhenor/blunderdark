@@ -16,25 +16,8 @@
   <span title>Changelog</span>
 
   <div body>
-    <div class="tabs tabs-boxed justify-center mt-1">
-      <a
-        class="tab"
-        [class.tab-active]="currentView() === 'recent'"
-        (click)="currentView.set('recent')"
-        (keydown.enter)="currentView.set('recent')"
-        tabindex="1"
-      >
-        Recent
-      </a>
-      <a
-        class="tab"
-        [class.tab-active]="currentView() === 'all'"
-        (click)="currentView.set('all')"
-        (keydown.enter)="currentView.set('all')"
-        tabindex="1"
-      >
-        All
-      </a>
+    <div class="flex justify-center mt-1">
+      <app-tab-bar [tabs]="tabDefs" [(activeTab)]="currentView" variant="boxed" />
     </div>
 
     <div

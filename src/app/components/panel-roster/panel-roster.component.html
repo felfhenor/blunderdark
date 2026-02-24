@@ -9,7 +9,7 @@
           [class.btn-ghost]="activeFilter() !== 'all'"
           (click)="setFilter('all')"
         >
-          All ({{ allCount() | number: '1.0-2' }})
+          All ({{ allCount() | number: '1.0-0' }})
         </button>
         <button
           class="btn btn-xs"
@@ -17,7 +17,7 @@
           [class.btn-ghost]="activeFilter() !== 'assigned'"
           (click)="setFilter('assigned')"
         >
-          Assigned ({{ assignedCount() | number: '1.0-2' }})
+          Assigned ({{ assignedCount() | number: '1.0-0' }})
         </button>
         <button
           class="btn btn-xs"
@@ -25,7 +25,7 @@
           [class.btn-ghost]="activeFilter() !== 'unassigned'"
           (click)="setFilter('unassigned')"
         >
-          Idle ({{ unassignedCount() | number: '1.0-2' }})
+          Idle ({{ unassignedCount() | number: '1.0-0' }})
         </button>
       </div>
 
@@ -79,7 +79,7 @@
             <span class="opacity-70">Type:</span>
             {{ entry.def.type }}
             <span class="opacity-70 ml-2">Tier:</span>
-            {{ entry.def.tier | number: '1.0-2' }}
+            {{ entry.def.tier | number: '1.0-0' }}
             <span class="opacity-70 ml-2">State:</span>
             <span
               class="badge badge-xs"

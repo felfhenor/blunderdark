@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import type { AtlasedImage } from '@interfaces';
 import { ContentService } from '@services/content.service';
 
@@ -7,6 +7,7 @@ import { ContentService } from '@services/content.service';
   imports: [],
   templateUrl: './atlas-animation.component.html',
   styleUrl: './atlas-animation.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AtlasAnimationComponent {
   private contentService = inject(ContentService);

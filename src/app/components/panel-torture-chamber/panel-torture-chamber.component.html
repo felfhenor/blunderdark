@@ -22,14 +22,9 @@
             </span>
             <span class="badge badge-xs badge-error">In Progress</span>
           </div>
-          <progress
-            class="progress progress-error w-full mt-1"
-            [value]="tp.percent"
-            max="100"
-          ></progress>
-          <span class="text-xs opacity-40">
-            {{ tp.percent | number: '1.0-2' }}%
-          </span>
+          <div class="mt-1">
+            <app-job-progress [percent]="tp.percent" colorClass="progress-error" />
+          </div>
         </div>
       }
 

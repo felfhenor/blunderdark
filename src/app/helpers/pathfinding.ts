@@ -1,3 +1,4 @@
+import { gridManhattanDistance } from '@helpers/grid-math';
 import type { Floor, GridState, PlacedRoomId, TileOffset } from '@interfaces';
 import { GRID_SIZE } from '@interfaces/grid';
 import type {
@@ -314,15 +315,6 @@ const TILE_DIRS: ReadonlyArray<[number, number]> = [
   [-1, 0],
 ];
 
-function manhattanDistance(
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number,
-): number {
-  return Math.abs(ax - bx) + Math.abs(ay - by);
-}
-
 /**
  * A* pathfinding on the tile grid.
  * Uses Manhattan distance heuristic and a min-heap priority queue.
@@ -361,7 +353,7 @@ export function tilePathfindingFindPath(
   const heap: HeapEntry[] = [];
   let tieBreaker = 0;
   heapPush(heap, [
-    manhattanDistance(start.x, start.y, end.x, end.y),
+    gridManhattanDistance(start.x, start.y, end.x, end.y),
     tieBreaker++,
     start.x,
     start.y,
@@ -409,7 +401,7 @@ export function tilePathfindingFindPath(
         gScore[nIdx] = tentativeG;
         cameFromX[nIdx] = cx;
         cameFromY[nIdx] = cy;
-        const f = tentativeG + manhattanDistance(nx, ny, end.x, end.y);
+        const f = tentativeG + gridManhattanDistance(nx, ny, end.x, end.y);
         heapPush(heap, [f, tieBreaker++, nx, ny]);
       }
     }

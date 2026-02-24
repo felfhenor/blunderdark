@@ -1,7 +1,7 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
     <h3 class="card-title text-sm">
-      Altar Room (Level {{ level() | number: '1.0-2' }})
+      Altar Room (Level {{ level() | number: '1.0-0' }})
     </h3>
 
     <div class="mt-2">
@@ -51,8 +51,8 @@
       <div class="divider my-2 text-xs opacity-60">
         Recruitment
         <span class="ml-1">
-          {{ inhabitantCount() | number: '1.0-2' }}/{{
-            maxInhabitants() | number: '1.0-2'
+          {{ inhabitantCount() | number: '1.0-0' }}/{{
+            maxInhabitants() | number: '1.0-0'
           }}
         </span>
       </div>
@@ -69,7 +69,7 @@
               <div class="flex items-center justify-between mb-1">
                 <span class="text-xs font-semibold">{{ entry.def.name }}</span>
                 <span class="badge badge-sm badge-ghost">
-                  T{{ entry.def.tier | number: '1.0-2' }}
+                  T{{ entry.def.tier | number: '1.0-0' }}
                 </span>
               </div>
 

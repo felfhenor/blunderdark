@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import { PanelOptionsComponent } from '@components/panel-options/panel-options.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -15,6 +15,7 @@ import { uiShowOptionsMenu } from '@helpers/ui';
   ],
   templateUrl: './button-settings.component.html',
   styleUrl: './button-settings.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonSettingsComponent {
   public showSettings = computed(() => uiShowOptionsMenu());

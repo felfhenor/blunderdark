@@ -1,5 +1,5 @@
 import type { AfterViewInit, OnDestroy } from '@angular/core';
-import { Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { gameStart } from '@helpers/game-init';
 import { setupIs } from '@helpers/setup';
@@ -14,6 +14,7 @@ import { SoundService } from '@services/sound.service';
   imports: [],
   templateUrl: './game-generate-world.component.html',
   styleUrl: './game-generate-world.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameGenerateWorldComponent implements AfterViewInit, OnDestroy {
   private router = inject(Router);

@@ -60,14 +60,7 @@
                 }
               </div>
               @if (!trainee.trained) {
-                <progress
-                  class="progress progress-info w-full"
-                  [value]="trainee.percent"
-                  max="100"
-                ></progress>
-                <span class="text-xs opacity-40">
-                  {{ trainee.percent | number: '1.0-2' }}%
-                </span>
+                <app-job-progress [percent]="trainee.percent" colorClass="progress-info" />
               } @else {
                 <div class="flex gap-2">
                   @if (trainee.bonuses.defense > 0) {

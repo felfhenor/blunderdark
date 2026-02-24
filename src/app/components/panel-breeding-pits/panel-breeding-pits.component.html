@@ -15,14 +15,9 @@
             <span class="text-xs">Breeding: {{ bp.recipeName }}</span>
             <span class="badge badge-xs badge-accent">In Progress</span>
           </div>
-          <progress
-            class="progress progress-accent w-full mt-1"
-            [value]="bp.percent"
-            max="100"
-          ></progress>
-          <span class="text-xs opacity-40">
-            {{ bp.percent | number: '1.0-2' }}%
-          </span>
+          <div class="mt-1">
+            <app-job-progress [percent]="bp.percent" colorClass="progress-accent" />
+          </div>
         </div>
       }
 
@@ -33,14 +28,9 @@
             <span class="text-xs">Mutating: {{ mp.targetName }}</span>
             <span class="badge badge-xs badge-secondary">In Progress</span>
           </div>
-          <progress
-            class="progress progress-secondary w-full mt-1"
-            [value]="mp.percent"
-            max="100"
-          ></progress>
-          <span class="text-xs opacity-40">
-            {{ mp.percent | number: '1.0-2' }}%
-          </span>
+          <div class="mt-1">
+            <app-job-progress [percent]="mp.percent" colorClass="progress-secondary" />
+          </div>
         </div>
       }
 

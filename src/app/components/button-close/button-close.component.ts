@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 
@@ -8,5 +8,6 @@ import { SFXDirective } from '@directives/sfx.directive';
   providers: [],
   templateUrl: './button-close.component.html',
   styleUrl: './button-close.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonCloseComponent {}

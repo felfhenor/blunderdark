@@ -1,5 +1,5 @@
 import { DecimalPipe, TitleCasePipe } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { autosaveReset } from '@helpers/autosave';
@@ -10,6 +10,7 @@ import type { AutosaveInterval } from '@interfaces';
   imports: [FormsModule, TitleCasePipe, DecimalPipe],
   templateUrl: './panel-options-ui.component.html',
   styleUrl: './panel-options-ui.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelOptionsUIComponent extends OptionsBaseComponent {
   public currentTheme = signal<string>(this.optionsGet('uiTheme') as string);

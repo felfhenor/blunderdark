@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { contentGetEntry } from '@helpers';
 
 @Component({
@@ -6,6 +6,7 @@ import { contentGetEntry } from '@helpers';
   imports: [],
   templateUrl: './content-name.component.html',
   styleUrl: './content-name.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentNameComponent {
   public id = input.required<string>();

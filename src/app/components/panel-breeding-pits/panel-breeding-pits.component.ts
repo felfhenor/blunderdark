@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   breedingCompleted$,
@@ -9,11 +10,10 @@ import {
   breedingGetHybridTicks,
   breedingGetMutatableInhabitants,
   contentGetEntry,
-  floorAll,
+  findRoomByRole,
   gamestate,
   mutationCompleted$,
   notify,
-  roomRoleFindById,
   updateGamestate,
   MUTATION_BASE_TICKS,
 } from '@helpers';
@@ -30,7 +30,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-breeding-pits',
-  imports: [DecimalPipe, InhabitantCardComponent, ModalComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, ModalComponent],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,24 +51,11 @@ export class PanelBreedingPitsComponent {
   ];
 
   public breedingRoom = computed(() => {
-    const roleId = roomRoleFindById('breedingPits');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      const room = floor.rooms.find((r) => r.roomTypeId === roleId);
-      if (room) return room;
-    }
-    return undefined;
+    return findRoomByRole('breedingPits')?.room;
   });
 
   public breedingFloor = computed<Floor | undefined>(() => {
-    const roleId = roomRoleFindById('breedingPits');
-    if (!roleId) return undefined;
-
-    for (const floor of floorAll()) {
-      if (floor.rooms.some((r) => r.roomTypeId === roleId)) return floor;
-    }
-    return undefined;
+    return findRoomByRole('breedingPits')?.floor;
   });
 
   public roomDef = computed(() => {

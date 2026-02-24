@@ -11,6 +11,8 @@ import { CurrencyCostListComponent } from '@components/currency-cost-list/curren
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
+import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
+import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import { contentGetEntry } from '@helpers/content';
 import type { FusionPreview, MutationTraitPreviewEntry } from '@helpers/fusion';
 import {
@@ -33,8 +35,6 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
-type FusionTab = 'fuse' | 'recipes';
-
 type StatDelta = {
   stat: keyof InhabitantStats;
   hybridValue: number;
@@ -52,7 +52,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TabBarComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,7 +60,12 @@ type RecipeEntry = {
 export class PanelFusionComponent {
   public visible = model<boolean>(false);
 
-  public activeTab = signal<FusionTab>('fuse');
+  public activeTab = signal<string>('fuse');
+
+  public readonly tabDefs: TabDefinition[] = [
+    { id: 'fuse', label: 'Fuse' },
+    { id: 'recipes', label: 'Recipes' },
+  ];
   public slotA = signal<InhabitantInstanceId | undefined>(undefined);
   public slotB = signal<InhabitantInstanceId | undefined>(undefined);
   public searchQuery = signal('');
@@ -257,10 +262,6 @@ export class PanelFusionComponent {
     this.slotA.set(undefined);
     this.slotB.set(undefined);
     this.showConfirmation.set(false);
-  }
-
-  public setTab(tab: FusionTab): void {
-    this.activeTab.set(tab);
   }
 
   public requestFuse(): void {
