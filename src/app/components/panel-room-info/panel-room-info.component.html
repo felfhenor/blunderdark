@@ -64,7 +64,11 @@
       @if (fearBreakdown(); as fear) {
         <div class="mt-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs opacity-50">Fear:</span>
+            <span
+              class="text-xs opacity-50 cursor-help underline decoration-dotted"
+              [tp]="fearBreakdownTip"
+              [tpDelay]="250"
+            >Fear:</span>
             <span class="text-xs font-semibold" [ngClass]="fearLabelClass()">
               {{ fearLabel() }}
             </span>
@@ -75,18 +79,13 @@
             [value]="fear.effectiveFear"
             [max]="fearMax"
           ></progress>
-          @if (
-            fear.inhabitantModifier !== 0 ||
-            fear.upgradeAdjustment !== 0 ||
-            fear.altarAuraReduction !== 0 ||
-            fear.propagatedFear !== 0
-          ) {
-            <div class="text-xs opacity-40 ml-2">
+          <ng-template #fearBreakdownTip>
+            <div class="text-xs opacity-70">
               Base: {{ fear.baseFear | number: '1.0-2' }}
             </div>
             @if (fear.inhabitantModifier !== 0) {
               <div
-                class="text-xs ml-2"
+                class="text-xs"
                 [class.text-error]="fear.inhabitantModifier > 0"
                 [class.text-success]="fear.inhabitantModifier < 0"
               >
@@ -96,7 +95,7 @@
             }
             @if (fear.upgradeAdjustment !== 0) {
               <div
-                class="text-xs ml-2"
+                class="text-xs"
                 [class.text-error]="fear.upgradeAdjustment > 0"
                 [class.text-success]="fear.upgradeAdjustment < 0"
               >
@@ -105,25 +104,25 @@
               </div>
             }
             @if (fear.altarAuraReduction !== 0) {
-              <div class="text-xs ml-2 text-success">
+              <div class="text-xs text-success">
                 Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
               </div>
             }
             @if (fear.propagatedFear !== 0) {
-              <div class="text-xs ml-2 text-error">
+              <div class="text-xs text-error">
                 Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
               </div>
               @for (
                 source of fear.propagationSources;
                 track source.sourceRoomId
               ) {
-                <div class="text-xs ml-4 opacity-50">
+                <div class="text-xs opacity-70 ml-2">
                   +{{ source.amount | number: '1.0-2' }} from
                   {{ source.sourceRoomName }}
                 </div>
               }
             }
-          }
+          </ng-template>
         </div>
       }
 
