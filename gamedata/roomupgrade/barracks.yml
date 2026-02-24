@@ -1,0 +1,28 @@
+- id: c2dbdf17-8fa7-44df-9e03-81daef197773
+  name: Fortified Barracks
+  description: Reinforce walls and expand sleeping quarters, increasing troop capacity and hardening the structure against assault.
+  cost:
+    gold: 100
+    crystals: 40
+  effects:
+    - type: maxInhabitantBonus
+      value: 4
+- id: 6680ccd4-db73-4e8a-a0fc-5b0e8da3e79f
+  name: Comfortable Quarters
+  description: Replace crude bunks with proper beds and add a mess hall. Eliminates the barracks' fearsome atmosphere and improves unit morale.
+  cost:
+    gold: 80
+    crystals: 20
+  effects:
+    - type: fearReduction
+      value: 1
+- id: 55becbce-b298-44c0-a864-e73ae5657305
+  name: War Room
+  description: Add strategic planning tables and communication crystals. Grants a defensive bonus to all rooms on the floor during invasions.
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 20
+  effects:
+    - type: fearIncrease
+      value: 1

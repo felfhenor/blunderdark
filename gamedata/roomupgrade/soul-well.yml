@@ -1,0 +1,43 @@
+- id: e795e43b-16cd-4a74-aed5-4977d275ce21
+  name: Necrotic Well
+  description: Deepen the well's connection to the spirit realm, boosting essence yield and allowing more workers to channel its power.
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 25
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: essence
+    - type: maxInhabitantBonus
+      value: 1
+- id: 61d78e22-a230-4c66-80a1-60367cb543f1
+  name: Purified Well
+  description: Purify the well's output for greater efficiency. The refined essence calms the surrounding area, reducing fear.
+  cost:
+    gold: 100
+    crystals: 80
+    essence: 40
+  effects:
+    - type: productionMultiplier
+      value: 1.75
+      resource: essence
+    - type: fearReduction
+      value: 1
+- id: a8710392-9176-41ff-a458-249277acd8ad
+  name: Abyssal Conduit
+  description: Tear open a rift to the abyss. The well becomes a conduit for raw dark power, massively boosting essence but flooding the area with corruption and terror.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 140
+    crystals: 90
+    essence: 60
+  effects:
+    - type: productionMultiplier
+      value: 2.5
+      resource: essence
+    - type: secondaryProduction
+      value: 0.6
+      resource: corruption
+    - type: fearIncrease
+      value: 2

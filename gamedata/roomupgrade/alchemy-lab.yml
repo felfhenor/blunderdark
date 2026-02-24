@@ -1,0 +1,28 @@
+- id: c3b02001-0002-4001-8001-000000000001
+  name: Distillery
+  description: Refine the conversion process to use fewer raw materials per cycle. Reduces input costs to 3 Crystals + 3 Food per Flux.
+  cost:
+    gold: 100
+    crystals: 50
+  effects:
+    - type: alchemyCostMultiplier
+      value: 0.6
+- id: c3b02001-0002-4001-8001-000000000002
+  name: Advanced Laboratory
+  description: Unlock advanced transmutation recipes for producing Essence and concentrated Flux from exotic inputs.
+  cost:
+    gold: 120
+    essence: 40
+    flux: 20
+  effects:
+    - type: alchemyTierUnlock
+      value: 1
+- id: c3b02001-0002-4001-8001-000000000003
+  name: Expanded Laboratory
+  description: Add additional workstations, increasing the lab's inhabitant capacity from 1 to 3.
+  cost:
+    gold: 80
+    crystals: 40
+  effects:
+    - type: maxInhabitantBonus
+      value: 2

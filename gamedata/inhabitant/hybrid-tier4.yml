@@ -1,0 +1,150 @@
+- id: 6b0b2867-7b73-4a40-8474-501c5ff44338
+  name: Dread Lich
+  type: undead
+  tier: 4
+  description: A Lich empowered by wraith essence. Its mastery of death magic is unparalleled, commanding spectral armies from beyond the veil.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 45
+    attack: 28
+    defense: 14
+    speed: 12
+    workerEfficiency: 1.3
+  statOverrides:
+    attack: 28
+    workerEfficiency: 1.3
+  inhabitantTraitIds:
+    - Supreme Necromancy
+    - Spectral Command
+    - Aura of Dread
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 4664645d-8ef9-4e13-964c-90ac538372fc
+  name: Bone Lord
+  type: undead
+  tier: 4
+  description: A Lich that has fully merged with skeletal constructs. Its body is an ever-shifting mass of enchanted bones that reforms endlessly.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 60
+    attack: 24
+    defense: 22
+    speed: 8
+    workerEfficiency: 1.1
+  inhabitantTraitIds:
+    - Bone Reformation
+    - Skeletal Mastery
+    - Ancient Scholar
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 42581aa9-374f-46e0-ae3f-42a1805e2b3f
+  name: Phantom Colossus
+  type: undead
+  tier: 4
+  description: A Stone Elemental possessed by wraith energy. This towering spectral construct phases between solid and ethereal, making it nearly impossible to destroy.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 80
+    attack: 20
+    defense: 24
+    speed: 6
+    workerEfficiency: 0.7
+  inhabitantTraitIds:
+    - Phase Shift
+    - Spectral Crush
+    - Towering Horror
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 62fe2a27-ee46-46a4-b1e7-2100d56fc74d
+  name: Death Warlord
+  type: undead
+  tier: 4
+  description: An Orc resurrected and empowered by Lich necromancy. This undead warlord combines brutal physical might with dark magical power.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 75
+    attack: 28
+    defense: 20
+    speed: 10
+    workerEfficiency: 0.8
+  inhabitantTraitIds:
+    - Undying Might
+    - Dark Regeneration
+    - Warlord's Presence
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

@@ -1,0 +1,360 @@
+- id: 0f3124ad-474d-4de7-995c-43ca12f59d3b
+  name: Death Knight
+  type: undead
+  tier: 3
+  description: A skeleton empowered by wraith essence. Clad in spectral armor, it leads undead forces with ruthless efficiency.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 55
+    attack: 22
+    defense: 20
+    speed: 10
+    workerEfficiency: 0.7
+  statOverrides:
+    hp: 55
+    attack: 22
+    defense: 20
+  inhabitantTraitIds:
+    - Undead Commander
+    - Spectral Armor
+    - Dread Presence
+  fearTolerance: 99
+  fearModifier: 2
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: b8fae618-4f4c-4e3a-9c2a-2a1c4a7ee4d0
+  name: War Chief
+  type: creature
+  tier: 3
+  description: An orc-goblin hybrid that combines brute strength with cunning tactics. A natural leader of raiding parties.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 50
+    attack: 20
+    defense: 16
+    speed: 14
+    workerEfficiency: 1.0
+  inhabitantTraitIds:
+    - Rally Cry
+    - Tactical Cunning
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 3
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 3e320143-3940-42a4-a360-6fe080aa9787
+  name: Phantom Flame
+  type: undead
+  tier: 3
+  description: A wraith fused with imp fire. This spectral inferno phases through walls, leaving trails of ghostly flame.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 20
+    defense: 6
+    speed: 18
+    workerEfficiency: 0.6
+  inhabitantTraitIds:
+    - Phase Strike
+    - Ghost Fire
+    - Spectral Terror
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 4ad69db9-6260-4b45-b501-9b47750d44df
+  name: Bone Golem
+  type: undead
+  tier: 3
+  description: A Stone Elemental animated by skeletal necromancy. Its rock body is reinforced with enchanted bone, making it nearly indestructible.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 70
+    attack: 16
+    defense: 28
+    speed: 4
+    workerEfficiency: 0.8
+  statOverrides:
+    hp: 70
+    defense: 28
+  inhabitantTraitIds:
+    - Living Fortress
+    - Structural Reinforcement
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c04feb7c-1f40-424c-82b9-c342111fe8c3
+  name: Iron Brute
+  type: creature
+  tier: 3
+  description: An orc fused with Stone Elemental essence. Its skin has hardened to iron, making it a walking siege engine.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 65
+    attack: 24
+    defense: 22
+    speed: 6
+    workerEfficiency: 0.9
+  statOverrides:
+    hp: 65
+    attack: 24
+  inhabitantTraitIds:
+    - Siege Breaker
+    - Iron Skin
+  fearTolerance: 4
+  fearModifier: 1
+  foodConsumptionRate: 4
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    hungry:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 91d2866c-0bbe-41ae-9766-fe1ed7c39bb1
+  name: Trap Mimic
+  type: creature
+  tier: 3
+  description: A Mimic crossbred with Kobold trap expertise. Disguises itself as dungeon furniture, springing devastating ambushes with mechanical precision.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 40
+    attack: 18
+    defense: 16
+    speed: 14
+    workerEfficiency: 0.85
+  inhabitantTraitIds:
+    - Perfect Ambush
+    - Furniture Form
+    - Adaptive Form
+  fearTolerance: 3
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 1651911c-8641-4778-849b-82856e58d03e
+  name: Shadow Orc
+  type: creature
+  tier: 3
+  description: An Orc infused with Shadow Beast essence. Moves silently despite its bulk, striking from darkness with devastating force.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 55
+    attack: 22
+    defense: 14
+    speed: 14
+    workerEfficiency: 0.8
+  inhabitantTraitIds:
+    - Shadow Strike
+    - Dark Vision
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 3
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 8c65a99d-161a-4d05-8ed3-095ab0563db7
+  name: Frost Golem
+  type: undead
+  tier: 3
+  description: A Stone Elemental frozen solid by Frost Wraith magic. Radiates intense cold that slows everything around it.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 65
+    attack: 14
+    defense: 26
+    speed: 4
+    workerEfficiency: 0.75
+  inhabitantTraitIds:
+    - Freezing Aura
+    - Ice Wall
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 0a1be968-55a2-4378-a60f-586bf00d9fce
+  name: Arcane Wraith
+  type: undead
+  tier: 3
+  description: A Wraith merged with an Arcane Familiar. This spectral scholar hoards forbidden knowledge and manipulates magical energies.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 30
+    attack: 18
+    defense: 8
+    speed: 16
+    workerEfficiency: 1.4
+  inhabitantTraitIds:
+    - Spectral Research
+    - Flux Channeler
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

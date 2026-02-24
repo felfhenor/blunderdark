@@ -1,0 +1,35 @@
+- id: b7389938-e7a1-4c43-81b9-5161f4046f1a
+  name: Deepwater Lake
+  description: Train fishers in deep-water techniques and install luminescent lures to dramatically increase the food catch.
+  cost:
+    gold: 80
+    crystals: 30
+  effects:
+    - type: productionMultiplier
+      value: 1.6
+      resource: food
+- id: 2f85cfdc-0955-42de-a028-fd37fe5efee2
+  name: Expanded Lake
+  description: Excavate additional chambers to extend the lake's reach, accommodating more fishers.
+  cost:
+    gold: 70
+    crystals: 25
+  effects:
+    - type: maxInhabitantBonus
+      value: 2
+- id: 240a8e7e-7af0-4fa4-8e6d-0c5653e3994b
+  name: Dark Waters
+  description: Embrace the lake's deepest depths. Strange creatures lurk below, providing both food and an unsettling presence.
+  cost:
+    gold: 90
+    crystals: 40
+    essence: 15
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: food
+    - type: fearIncrease
+      value: 1
+    - type: secondaryProduction
+      value: 0.1
+      resource: essence

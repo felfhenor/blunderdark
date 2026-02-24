@@ -1,0 +1,37 @@
+- id: 130ef3cc-fac2-4ea3-aa55-9a3b95df771e
+  name: Reinforced Vault
+  description: Reinforce walls with enchanted steel and add additional warding glyphs. Increases gold production and eliminates security risks.
+  cost:
+    gold: 150
+    crystals: 80
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: gold
+    - type: fearReduction
+      value: 1
+- id: 20618e2f-fc5e-4b94-814a-43a8162130af
+  name: Investment Vault
+  description: Transform the vault into a financial hub. Double gold generation rate and house a dedicated treasurer.
+  cost:
+    gold: 200
+    crystals: 60
+  effects:
+    - type: productionMultiplier
+      value: 2.0
+      resource: gold
+    - type: maxInhabitantBonus
+      value: 1
+- id: 1c4a601d-ae48-4174-8a54-2632afe614da
+  name: Dragon's Hoard
+  description: Amass a legendary treasure hoard. Massively boosts gold production but the overwhelming wealth attracts dangerous attention.
+  cost:
+    gold: 180
+    crystals: 100
+    essence: 20
+  effects:
+    - type: productionMultiplier
+      value: 2.5
+      resource: gold
+    - type: fearIncrease
+      value: 2

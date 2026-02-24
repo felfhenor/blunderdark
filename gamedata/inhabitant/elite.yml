@@ -1,0 +1,179 @@
+- id: 86d7ac62-3300-4d3c-9bc4-d5d12ee9d845
+  name: Dragon
+  type: dragon
+  tier: 4
+  description: An ancient wyrm of immense power. Its presence inspires ferocity in all dungeon defenders.
+  cost:
+    gold: 500
+    essence: 200
+    crystals: 100
+  stats:
+    hp: 500
+    attack: 80
+    defense: 60
+    speed: 20
+    workerEfficiency: 1.0
+  inhabitantTraitIds:
+    - Draconic Fury
+    - Fire Breath
+    - Fearless
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    attack: 0.10
+    fear: 0.05
+  rulerFearLevel: 4
+  fearTolerance: 99
+  fearModifier: 2
+  fearPropagationDistance: 2
+  foodConsumptionRate: 5
+  upkeepCost:
+    gold: 10
+    food: 8
+  recruitmentRequirements:
+    - requirementType: room
+      targetName: Treasure Vault
+      description: Requires a Treasure Vault to house the dragon's hoard.
+    - requirementType: resource
+      targetName: gold
+      value: 500
+      description: Requires 500 gold to entice the dragon.
+    - requirementType: resource
+      targetName: flux
+      value: 200
+      description: Requires 200 flux to bind the dragon's will.
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.95
+      defenseMultiplier: 0.95
+    hungry:
+      productionMultiplier: 0.8
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 8339f820-cd95-415f-ad76-fbdafe974800
+  name: Lich
+  type: undead
+  tier: 4
+  description: A master of dark arcana who has transcended death itself. Its intellect accelerates all research and flux generation.
+  cost:
+    gold: 400
+    essence: 300
+    crystals: 50
+  stats:
+    hp: 300
+    attack: 40
+    defense: 30
+    speed: 15
+    workerEfficiency: 1.0
+  inhabitantTraitIds:
+    - Scholarly
+    - Undead Master
+    - Fearless
+    - Ancient Knowledge
+    - Throne Scholar
+    - Soul Siphon
+    - Library Specialist
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    researchSpeed: 0.20
+    fluxProduction: 0.15
+  rulerFearLevel: 3
+  fearTolerance: 99
+  fearModifier: 1
+  foodConsumptionRate: 0
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 1.0
+      defenseMultiplier: 1.0
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 29912034-2c86-498a-a666-0daa617f400c
+  name: Demon Lord
+  type: demon
+  tier: 4
+  description: A terrifying lord of the abyss. Its malevolent aura corrupts everything and crushes the will of invaders.
+  cost:
+    gold: 450
+    essence: 150
+    corruption: 100
+  stats:
+    hp: 400
+    attack: 70
+    defense: 50
+    speed: 25
+    workerEfficiency: 1.0
+  inhabitantTraitIds:
+    - Abyssal Corruption
+    - Dread Aura
+    - Crushing Presence
+    - Fearless
+  restrictionTags:
+    - unique
+  rulerBonuses:
+    corruptionGeneration: 0.25
+    fear: 0.10
+    invaderMorale: -0.10
+  rulerFearLevel: 5
+  fearTolerance: 99
+  fearModifier: 2
+  fearPropagationDistance: 2
+  foodConsumptionRate: 3
+  corruptionGeneration: 10
+  upkeepCost:
+    gold: 8
+    corruption: 5
+  recruitmentRequirements:
+    - requirementType: room_level
+      targetName: Altar Room
+      value: 3
+      description: Requires an Altar Room upgraded to level 3 to perform the binding ritual.
+    - requirementType: resource
+      targetName: gold
+      value: 300
+      description: Requires 300 gold as a tribute offering.
+    - requirementType: resource
+      targetName: corruption
+      value: 500
+      description: Requires 500 corruption to tear open the abyssal rift.
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.95
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.95
+      defenseMultiplier: 0.95
+    hungry:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.95
+      defenseMultiplier: 0.95
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

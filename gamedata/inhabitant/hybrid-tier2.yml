@@ -1,0 +1,289 @@
+- id: a8f39e56-9179-4c0e-8889-19ae72f8518a
+  name: Hobgoblin
+  type: creature
+  tier: 2
+  description: A hulking brute born from goblin cunning and kobold resourcefulness. Stronger and more disciplined than either parent.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 40
+    attack: 14
+    defense: 12
+    speed: 14
+    workerEfficiency: 1.1
+  statOverrides:
+    hp: 40
+    attack: 14
+    defense: 12
+  inhabitantTraitIds:
+    - Disciplined
+    - Taskmaster
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 2.5
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: d180840f-3057-42e6-b75c-3db3aadb0863
+  name: Bone Goblin
+  type: undead
+  tier: 2
+  description: A goblin skeleton reanimated with residual goblin instincts. Tireless and eerily efficient at mining.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 12
+    defense: 14
+    speed: 10
+    workerEfficiency: 1.2
+  inhabitantTraitIds:
+    - Tireless Miner
+    - Undead Resilience
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 6d75d3c3-229e-48c9-97d0-e3667400f485
+  name: Fire Kobold
+  type: creature
+  tier: 2
+  description: A kobold infused with imp fire. Its traps burn with hellish flame and it moves with supernatural speed.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 25
+    attack: 14
+    defense: 8
+    speed: 20
+    workerEfficiency: 0.95
+  inhabitantTraitIds:
+    - Burning Traps
+    - Blazing Speed
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 2fdb586f-fe41-4a2c-965a-b9803ceff2ca
+  name: Flame Skeleton
+  type: undead
+  tier: 2
+  description: A skeleton wreathed in imp fire. Its bones glow with infernal heat, terrifying invaders and igniting anything it touches.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 30
+    attack: 16
+    defense: 10
+    speed: 12
+    workerEfficiency: 0.8
+  inhabitantTraitIds:
+    - Burning Bones
+    - Terrifying Visage
+  fearTolerance: 3
+  fearModifier: 1
+  foodConsumptionRate: 0
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: f4fe56f0-b88e-4376-b637-a0006224d754
+  name: Goblin Firestarter
+  type: creature
+  tier: 2
+  description: A goblin consumed by imp fire. Volatile and unpredictable, it excels at causing chaos among invaders.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 28
+    attack: 16
+    defense: 6
+    speed: 16
+    workerEfficiency: 0.9
+  inhabitantTraitIds:
+    - Arsonist
+    - Chaotic Nature
+  fearTolerance: 1
+  fearModifier: 0
+  foodConsumptionRate: 2
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 1.2
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: b69de17a-d56d-413e-a0c3-58519cddaab8
+  name: Slime Knight
+  type: creature
+  tier: 2
+  description: A skeleton encased in living slime. The ooze absorbs impacts while the bones provide structure.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 45
+    attack: 12
+    defense: 18
+    speed: 8
+    workerEfficiency: 0.9
+  inhabitantTraitIds:
+    - Ooze Armor
+    - Adaptive Form
+  fearTolerance: 3
+  fearModifier: 0
+  foodConsumptionRate: 1
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.2
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+
+- id: 1ab6be58-6d2a-4d42-b9e4-e824778ee1f4
+  name: Fungal Horror
+  type: fungal
+  tier: 2
+  description: A Myconid that has absorbed slime essence. A pulsating mass of spores and ooze that spreads corruption wherever it goes.
+  cost:
+    gold: 0
+    food: 0
+  stats:
+    hp: 35
+    attack: 10
+    defense: 12
+    speed: 6
+    workerEfficiency: 1.3
+  inhabitantTraitIds:
+    - Bountiful Growth
+    - Spore Cloud
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 1
+  restrictionTags:
+    - hybrid
+  stateModifiers:
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5

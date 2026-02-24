@@ -1,0 +1,44 @@
+- id: d042c9be-de98-4973-88c1-26dd20d3d739
+  name: Deep Vein Mine
+  description: Optimized mining techniques increase crystal yield by 50%.
+  cost:
+    crystals: 75
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: crystals
+- id: c601bf43-d9d9-4e35-8608-14295382e789
+  name: Expanded Tunnels
+  description: Widen the mine shafts to accommodate more workers, increasing capacity from 2 to 4.
+  cost:
+    crystals: 60
+  effects:
+    - type: maxInhabitantBonus
+      value: 2
+- id: a247b92c-7631-42b0-ad95-ea76ad2b864e
+  name: Resonant Mine
+  description: Harmonic crystal formations reduce fear in the mine and produce a small amount of flux.
+  cost:
+    crystals: 80
+  effects:
+    - type: fearReduction
+      value: 1
+    - type: secondaryProduction
+      value: 0.2
+      resource: flux
+- id: 60431433-92ba-43c7-ad45-fb6b5aecb271
+  name: Corrupted Mine
+  description: Infuse the mine with dark energy. Crystal output doubles, but the corruption taints everything nearby.
+  requiresDarkUpgrade: true
+  cost:
+    crystals: 100
+    essence: 30
+  effects:
+    - type: productionMultiplier
+      value: 2.0
+      resource: crystals
+    - type: secondaryProduction
+      value: 0.3
+      resource: corruption
+    - type: fearIncrease
+      value: 1

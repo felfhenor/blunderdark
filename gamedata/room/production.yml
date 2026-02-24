@@ -1,0 +1,283 @@
+- id: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
+  name: Crystal Mine
+  description: An excavation that extracts crystals from deep rock veins. Requires workers for full output. Benefits from proximity to other mines, forges, and libraries.
+  shapeId: L-Shape
+  cost:
+    gold: 50
+  production:
+    crystals: 1
+  requiresWorkers: true
+  maxInhabitants: 2
+  maxFeatures: 1
+  fearLevel: 1
+  roomUpgradeIds:
+    - Deep Vein Mine
+    - Expanded Tunnels
+    - Resonant Mine
+    - Corrupted Mine
+  timeOfDayBonus:
+    period: day
+    bonus: 0.1
+  biomeBonuses:
+    volcanic: 0.15
+    crystal: 0.4
+  invasionProfile:
+    dimension: wealth
+    weight: 10
+  forgingAdjacencyEffects:
+    forgingSpeedBonus: 0.3
+  alchemyAdjacencyEffects:
+    alchemySpeedBonus: 0.2
+  adjacencyBonuses:
+    - adjacentRoomId: Crystal Mine
+      bonus: 0.1
+      description: Shared mineral veins between adjacent mines boost extraction.
+    - adjacentRoomId: Dark Forge
+      bonus: 0.15
+      description: Nearby forge heats rock, making crystal extraction easier.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.1
+      description: Library scholars identify optimal mining patterns.
+- id: 7fb314ad-a447-469f-82df-4b8c68f9deff
+  name: Mushroom Grove
+  description: A grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
+  shapeId: T-Shape
+  reputationAction: Build Mushroom Grove
+  cost:
+    gold: 40
+  production:
+    food: 1.6
+  requiresWorkers: true
+  maxInhabitants: 3
+  maxFeatures: 1
+  fearLevel: 1
+  roomUpgradeIds:
+    - Bountiful Grove
+    - Expanded Grove
+    - Tranquil Garden
+    - Blighted Grove
+  timeOfDayBonus:
+    period: day
+    bonus: 0.15
+  biomeBonuses:
+    fungal: 0.6
+  alchemyAdjacencyEffects:
+    alchemyCostReduction: 0.15
+  adjacencyBonuses:
+    - adjacentRoomId: Soul Well
+      bonus: 0.4
+      description: Soul Well moisture accelerates fungal growth dramatically.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Library knowledge improves cultivation techniques.
+    - adjacentRoomId: Dark Forge
+      bonus: 0.15
+      description: Forge warmth creates ideal growing conditions.
+- id: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
+  name: Shadow Library
+  description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
+  shapeId: Small L-Shape
+  reputationAction: Build Library
+  cost:
+    gold: 80
+    crystals: 30
+  production:
+    research: 0.6
+    corruption: 0.2
+  requiresWorkers: true
+  maxInhabitants: 1
+  maxFeatures: 2
+  fearLevel: 2
+  roomUpgradeIds:
+    - Arcane Library
+    - Expanded Archives
+    - Forbidden Archives
+    - Necronomicon Wing
+  timeOfDayBonus:
+    period: night
+    bonus: 0.2
+  biomeBonuses:
+    corrupted: 1
+  invasionProfile:
+    dimension: knowledge
+    weight: 15
+  objectiveTypes:
+    - DefileLibrary
+  breedingAdjacencyEffects:
+    researchBonus: 5
+  summoningAdjacencyEffects:
+    summonTimeReduction: 0.25
+  adjacencyBonuses:
+    - adjacentRoomId: Soul Well
+      bonus: 0.15
+      description: Soul essence enhances arcane research comprehension.
+    - adjacentRoomId: Crystal Mine
+      bonus: 0.1
+      description: Crystal mine ore samples provide material for arcane study.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.2
+      description: Adjacent libraries share knowledge and cross-reference tomes.
+- id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
+  name: Soul Well
+  description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
+  shapeId: Square 3x3
+  cost:
+    gold: 100
+    crystals: 50
+  production:
+    essence: 0.3
+    corruption: 0.4
+  requiresWorkers: false
+  maxInhabitants: 2
+  maxFeatures: 2
+  fearLevel: 3
+  roomUpgradeIds:
+    - Necrotic Well
+    - Purified Well
+    - Abyssal Conduit
+  timeOfDayBonus:
+    period: night
+    bonus: 0.15
+  biomeBonuses:
+    corrupted: 1
+  invasionProfile:
+    dimension: corruption
+    weight: 15
+  objectiveTypes:
+    - SealPortal
+  breedingAdjacencyEffects:
+    mutationOddsBonus: 0.1
+  summoningAdjacencyEffects:
+    summonStatBonus: 2
+  tortureAdjacencyEffects:
+    tortureSpeedBonus: 0.15
+  adjacencyBonuses:
+    - adjacentRoomId: Mushroom Grove
+      bonus: 0.2
+      description: Living fungi attract wandering spirits to the well.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Arcane knowledge from the library focuses the well's spiritual draw.
+    - adjacentRoomId: Soul Well
+      bonus: 0.25
+      description: Nearby wells create a spiritual resonance that amplifies essence flow.
+- id: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
+  name: Underground Lake
+  description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
+  shapeId: T-Shape
+  cost:
+    gold: 60
+    crystals: 20
+  production:
+    food: 1
+  requiresWorkers: true
+  maxInhabitants: 3
+  maxFeatures: 3
+  fearLevel: 0
+  roomUpgradeIds:
+    - Deepwater Lake
+    - Expanded Lake
+    - Dark Waters
+  biomeBonuses:
+    flooded: 0.5
+  adjacencyBonuses:
+    - adjacentRoomId: Mushroom Grove
+      bonus: 0.3
+      description: Lake moisture dramatically boosts fungal growth in the adjacent grove.
+    - adjacentRoomId: Soul Well
+      bonus: 0.15
+      description: Spiritual waters from the Soul Well attract richer fish populations.
+    - adjacentRoomId: Underground Lake
+      bonus: 0.2
+      description: Connected lakes form a larger ecosystem with more abundant catches.
+- id: a7ef7e24-f250-45e7-986d-ad06b3610b52
+  name: Ley Line Nexus
+  description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
+  shapeId: T-Shape
+  reputationAction: Activate Ley Line Nexus
+  maxFeatures: 1
+  biomeBonuses:
+    crystal: 0.1
+  invasionProfile:
+    dimension: knowledge
+    weight: 10
+  objectiveTypes:
+    - SealPortal
+  cost:
+    gold: 100
+    crystals: 50
+    essence: 20
+  production:
+    flux: 2
+  requiresWorkers: true
+  maxInhabitants: 2
+  fearLevel: 2
+  roomUpgradeIds:
+    - Amplified Nexus
+    - Expanded Nexus
+    - Overcharged Nexus
+  adjacencyBonuses:
+    - adjacentRoomId: Shadow Library
+      bonus: 0.2
+      description: Arcane knowledge from the Shadow Library amplifies ley line channeling.
+    - adjacentRoomId: Soul Well
+      bonus: 0.15
+      description: Soul essence from the Well resonates with the ley line's magical frequency.
+    - adjacentRoomId: Ley Line Nexus
+      bonus: 0.25
+      description: Adjacent nexus points create a powerful ley line network with amplified output.
+- id: 827472bd-6bbb-482f-86c8-ad30d5613237
+  name: Treasure Vault
+  description: A fortified chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
+  shapeId: Square 3x3
+  reputationAction: Build Treasure Vault
+  cost:
+    gold: 120
+    crystals: 40
+  production:
+    gold: 0.8
+  requiresWorkers: false
+  maxInhabitants: 1
+  maxFeatures: 3
+  fearLevel: 1
+  roomUpgradeIds:
+    - Reinforced Vault
+    - Investment Vault
+    - "Dragon's Hoard"
+  invasionProfile:
+    dimension: wealth
+    weight: 15
+  objectiveTypes:
+    - StealTreasure
+    - PlunderVault
+  throneAdjacencyEffects:
+    goldProductionBonus: 0.05
+  adjacencyBonuses:
+    - adjacentRoomId: Dark Forge
+      bonus: 0.15
+      description: Forged valuables fill the vault more efficiently.
+    - adjacentRoomId: Altar Room
+      bonus: 0.25
+      description: The altar's dark power blesses the vault's gold, increasing its yield.
+    - adjacentRoomId: Throne Room
+      bonus: 0.2
+      description: Proximity to the Throne Room encourages tribute and efficient accounting.
+    - adjacentRoomId: Treasure Vault
+      bonus: 0.1
+      description: Connected vaults share security infrastructure, reducing overhead.
+- id: b3a7c1e9-5f82-4d6a-a1c3-9e4b2d7f8a05
+  name: Gold Vein
+  description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
+  shapeId: Square 2x2
+  reputationAction: Mine Gold Vein
+  cost: {}
+  production:
+    gold: 0.4
+  requiresWorkers: false
+  autoPlace: true
+  isUnique: true
+  removable: true
+  maxInhabitants: 0
+  maxFeatures: 0
+  fearLevel: 0
+  adjacencyBonuses: []

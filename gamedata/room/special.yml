@@ -1,0 +1,69 @@
+- id: f48589fe-4326-4320-9506-64fe2ff5bcca
+  name: Altar Room
+  description: The dark heart of your dungeon. This ancient altar is the source of your power, enabling room construction and creature recruitment. Its calming aura reduces fear in adjacent rooms.
+  shapeId: Square 3x3
+  cost: {}
+  production:
+    essence: 0.2
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: true
+  removable: false
+  autoPlace: true
+  maxInhabitants: 0
+  maxFeatures: 1
+  inhabitantRestriction: null
+  fearLevel: 0
+  fearReductionAura: 1
+  roomUpgradeIds:
+    - Empowered Altar
+    - Ascendant Altar
+  role: altar
+  trainingAdjacencyEffects:
+    statBonus: 1
+  objectiveTypes:
+    - DestroyAltar
+- id: c9a1e8f5-2347-4885-b477-3363f9617077
+  name: Throne Room
+  description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
+  shapeId: Square 4x4
+  cost:
+    gold: 100
+    crystals: 50
+  production: {}
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: true
+  maxInhabitants: 1
+  maxFeatures: 4
+  inhabitantRestriction: unique
+  fearLevel: variable
+  role: throne
+- id: bf618a8c-5b95-4a63-9168-98da24e061c4
+  name: Spawning Pool
+  description: A bubbling pool of primordial ooze that periodically spawns basic creatures. The pool generates inhabitants automatically, growing your workforce without manual recruitment. Upgrades can accelerate spawning or produce stronger creatures.
+  shapeId: Square 2x2
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 2
+  maxFeatures: 1
+  fearLevel: 1
+  roomUpgradeIds:
+    - Teeming Pool
+    - Dark Pool
+  role: spawningPool
+  spawnRate: 25
+  spawnType: Goblin
+  spawnCapacity: 10
+  breedingAdjacencyEffects:
+    hybridTimeReduction: 0.25
+  adjacencyBonuses:
+    - adjacentRoomId: Mushroom Grove
+      bonus: 0.15
+      description: Organic matter from the Mushroom Grove feeds the pool.
+    - adjacentRoomId: Soul Well
+      bonus: 0.2
+      description: Soul essence from the Well accelerates spawning.

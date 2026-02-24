@@ -1,0 +1,91 @@
+- id: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
+  name: Barracks
+  description: A hall lined with weapon racks and sleeping quarters. Houses and trains your fighters, providing no resource production but significantly boosting your dungeon's combat readiness. Its military atmosphere can unsettle peaceful creatures.
+  shapeId: I-Shape
+  cost:
+    gold: 70
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 6
+  maxFeatures: 1
+  fearLevel: 1
+  roomUpgradeIds:
+    - Fortified Barracks
+    - Comfortable Quarters
+    - War Room
+  role: barracks
+  trainingAdjacencyEffects:
+    timeReduction: 0.2
+  tortureAdjacencyEffects:
+    tortureConversionBonus: 0.1
+  adjacencyBonuses:
+    - adjacentRoomId: Dark Forge
+      bonus: 0.15
+      description: The Dark Forge provides weapons and armor for garrisoned troops.
+    - adjacentRoomId: Throne Room
+      bonus: 0.2
+      description: Proximity to the Throne Room improves command structure and morale.
+    - adjacentRoomId: Barracks
+      bonus: 0.1
+      description: Connected barracks share training resources and patrol routes.
+- id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
+  name: Training Grounds
+  description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
+  shapeId: T-Shape
+  role: trainingGrounds
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 4
+  maxFeatures: 2
+  inhabitantRestriction: null
+  fearLevel: 1
+  isUnique: true
+  roomUpgradeIds:
+    - Elite Arena
+    - Grand Arena
+    - Drill Hall
+  forgingAdjacencyEffects:
+    forgingStatBonus: 1
+  adjacencyBonuses:
+    - adjacentRoomId: Barracks
+      bonus: 0.2
+      description: Shared training resources and weapon racks reduce training time by 20%.
+    - adjacentRoomId: Dark Forge
+      bonus: 0.1
+      description: Forged weapons and armor improve training quality.
+    - adjacentRoomId: Altar Room
+      bonus: 0.15
+      description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
+- id: 6d638daa-6e43-4569-a931-eb4710009da9
+  name: Trap Workshop
+  description: A crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
+  shapeId: Square 2x2
+  role: trapWorkshop
+  cost:
+    gold: 90
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 2
+  maxFeatures: 1
+  inhabitantRestriction: null
+  fearLevel: 2
+  roomUpgradeIds:
+    - Master Trapworks
+    - Streamlined Workshop
+    - Arcane Trapworks
+  forgingAdjacencyEffects:
+    forgingEffectivenessBonus: 0.2
+  adjacencyBonuses:
+    - adjacentRoomId: Dark Forge
+      bonus: 0.2
+      description: The Dark Forge provides superior materials, increasing trap durability.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Library research improves trap design efficiency.
+    - adjacentRoomId: Crystal Mine
+      bonus: 0.1
+      description: Crystal Mine provides raw materials for trap mechanisms.

@@ -1,0 +1,31 @@
+- id: 716874c3-4fbb-4214-8d47-195f278b8233
+  name: Empowered Altar
+  description: Channel deeper magical energies to expand your dungeon-building capabilities and strengthen the calming aura.
+  upgradeLevel: 2
+  cost:
+    gold: 150
+    crystals: 75
+    essence: 30
+  effects:
+    - type: fearReductionAura
+      value: 2
+    - type: secondaryProduction
+      value: 0.2
+      resource: essence
+- id: d31f3072-b312-40be-8a7e-6898bd0d4581
+  name: Ascendant Altar
+  description: Unlock the altar's full potential, granting access to advanced rooms and maximizing its stabilizing influence.
+  upgradeLevel: 3
+  cost:
+    gold: 300
+    crystals: 150
+    essence: 60
+  effects:
+    - type: fearReductionAura
+      value: 3
+    - type: secondaryProduction
+      value: 0.4
+      resource: essence
+    - type: secondaryProduction
+      value: 0.2
+      resource: flux

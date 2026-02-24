@@ -1,0 +1,41 @@
+- id: 35ef7cb9-832a-4935-be46-ab19ae5e0ad3
+  name: Bountiful Grove
+  description: Enhanced fungal cultivation techniques increase food yield by 50%.
+  cost:
+    gold: 60
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: food
+- id: 078aee06-566f-4e86-adbd-9d9c9a5b2bc4
+  name: Expanded Grove
+  description: Extend the growing chambers to accommodate more workers, increasing capacity from 3 to 5.
+  cost:
+    gold: 50
+  effects:
+    - type: maxInhabitantBonus
+      value: 2
+- id: 69a262d5-5350-44fa-b05e-5b7e0f5d50f3
+  name: Tranquil Garden
+  description: Calming spores and gentle bioluminescence eliminate all fear in the grove.
+  cost:
+    gold: 45
+  effects:
+    - type: fearReduction
+      value: 1
+- id: 339a23a7-3753-4052-a388-6b7941e7c458
+  name: Blighted Grove
+  description: Corrupt the fungi with dark spores. Massively boosts food output but produces corruption and unsettles nearby inhabitants.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 70
+    essence: 25
+  effects:
+    - type: productionMultiplier
+      value: 2.0
+      resource: food
+    - type: secondaryProduction
+      value: 0.2
+      resource: corruption
+    - type: fearIncrease
+      value: 1

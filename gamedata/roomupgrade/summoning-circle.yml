@@ -1,0 +1,31 @@
+- id: 9a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+  name: Greater Circle
+  description: Unlock advanced summoning recipes, allowing access to more powerful creatures.
+  cost:
+    gold: 200
+    essence: 100
+    flux: 50
+  effects:
+    - type: summonTierUnlock
+      value: 1
+- id: ab3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
+  name: Dual Circle
+  description: Inscribe a second summoning circle, allowing an additional summoner to work in parallel.
+  cost:
+    gold: 150
+    crystals: 80
+  effects:
+    - type: maxInhabitantBonus
+      value: 1
+- id: bc4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
+  name: Binding Circle
+  description: Master the art of planar binding. Temporary summons last 50% longer and permanent summons gain +1 to all stats.
+  cost:
+    gold: 180
+    essence: 60
+    flux: 40
+  effects:
+    - type: summonDurationMultiplier
+      value: 1.5
+    - type: summonStatBonus
+      value: 1

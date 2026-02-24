@@ -1,0 +1,23 @@
+- id: e1f02001-0001-4001-8001-000000000001
+  name: Master Forge
+  description: Expand the forge to house more workers and speed up crafting by 25%.
+  cost:
+    gold: 120
+    crystals: 60
+  effects:
+    - type: maxInhabitantBonus
+      value: 2
+    - type: forgingSpeedMultiplier
+      value: 0.75
+- id: e1f02001-0001-4001-8001-000000000002
+  name: Infernal Forge
+  description: Unlock advanced recipes and add +2 to all stat bonuses on forged items.
+  cost:
+    gold: 150
+    essence: 40
+    flux: 30
+  effects:
+    - type: forgingTierUnlock
+      value: 1
+    - type: forgingStatBonus
+      value: 2

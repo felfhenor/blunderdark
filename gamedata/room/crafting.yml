@@ -1,0 +1,169 @@
+- id: ae673803-b514-4da9-a0d4-df448aa412a4
+  name: Dark Forge
+  description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
+  shapeId: Square 2x2
+  role: darkForge
+  cost:
+    gold: 60
+    crystals: 20
+  production:
+    gold: 1.2
+  requiresWorkers: true
+  maxInhabitants: 2
+  maxFeatures: 1
+  fearLevel: 2
+  isUnique: true
+  roomUpgradeIds:
+    - Master Forge
+    - Infernal Forge
+  biomeBonuses:
+    volcanic: 0.5
+  adjacencyBonuses:
+    - adjacentRoomId: Crystal Mine
+      bonus: 0.15
+      description: Raw crystal ore fuels the forge's smelting process.
+- id: c3b02001-0001-4001-8001-000000000001
+  name: Alchemy Lab
+  description: A laboratory for transmuting raw resources into refined magical materials. Assign an alchemist to begin converting crystals and food into flux, or unlock advanced recipes to produce essence and other exotic substances.
+  shapeId: Small L-Shape
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: true
+  maxInhabitants: 1
+  maxFeatures: 2
+  inhabitantRestriction: null
+  fearLevel: 2
+  isUnique: true
+  roomUpgradeIds:
+    - Distillery
+    - Advanced Laboratory
+    - Expanded Laboratory
+  role: alchemyLab
+  biomeBonuses:
+    crystal: 0.2
+  adjacencyBonuses:
+    - adjacentRoomId: Crystal Mine
+      bonus: 0.15
+      description: Crystal Mine provides a steady supply of raw materials.
+    - adjacentRoomId: Mushroom Grove
+      bonus: 0.1
+      description: Fresh mushroom substrate aids in reagent preparation.
+- id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
+  name: Breeding Pits
+  description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign two compatible inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
+  shapeId: Square 3x3
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 4
+  maxFeatures: 2
+  inhabitantRestriction: null
+  fearLevel: 4
+  isUnique: true
+  roomUpgradeIds:
+    - Incubation Chamber
+    - Mutagenic Pits
+  role: breedingPits
+  adjacencyBonuses:
+    - adjacentRoomId: Spawning Pool
+      bonus: 0.15
+      description: Primordial ooze from the Spawning Pool accelerates hybrid gestation.
+    - adjacentRoomId: Soul Well
+      bonus: 0.1
+      description: Soul essence stabilizes mutagenic processes.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.1
+      description: Library knowledge improves breeding recipe accuracy.
+- id: 8f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c
+  name: Summoning Circle
+  description: A ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
+  shapeId: L-Shape
+  cost:
+    gold: 150
+    essence: 80
+    flux: 40
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 1
+  maxFeatures: 2
+  inhabitantRestriction: null
+  fearLevel: 3
+  isUnique: true
+  roomUpgradeIds:
+    - Greater Circle
+    - Dual Circle
+    - Binding Circle
+  role: summoningCircle
+  adjacencyBonuses:
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Arcane knowledge from the Shadow Library enhances summoning rituals.
+    - adjacentRoomId: Soul Well
+      bonus: 0.1
+      description: Soul essence from the Well stabilizes planar connections.
+- id: e4b7c9a1-3f5d-4e8b-a2c6-d0f1e3a5b7c9
+  name: Fusion Core
+  description: A chamber of crystallized energy where two creatures are merged into a single, more powerful hybrid. The arcane machinery hums with volatile flux, requiring no workers but demanding significant resources to construct.
+  shapeId: U-Shape
+  cost:
+    gold: 120
+    crystals: 60
+    essence: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  inhabitantRestriction: null
+  fearLevel: 3
+  isUnique: true
+  role: fusionCore
+  adjacencyBonuses:
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Arcane knowledge stabilizes the fusion process.
+    - adjacentRoomId: Soul Well
+      bonus: 0.1
+      description: Soul essence fuels the core's binding rituals.
+- id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
+  name: Torture Chamber
+  description: A chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
+  shapeId: Small L-Shape
+  reputationAction: Place Torture Chamber
+  cost:
+    gold: 120
+    crystals: 40
+    essence: 20
+  production:
+    corruption: 0.4
+  requiresWorkers: true
+  maxInhabitants: 1
+  maxFeatures: 1
+  inhabitantRestriction: null
+  fearLevel: 4
+  isUnique: true
+  roomUpgradeIds:
+    - "Inquisitor's Chamber"
+    - Corruption Chamber
+    - Dread Chamber
+  role: tortureChamber
+  timeOfDayBonus:
+    period: night
+    bonus: 0.2
+  invasionProfile:
+    dimension: corruption
+    weight: 10
+  adjacencyBonuses:
+    - adjacentRoomId: Soul Well
+      bonus: 0.2
+      description: Soul Well's spectral energy intensifies the chamber's dark methods.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Forbidden knowledge from the Shadow Library refines interrogation techniques.
+    - adjacentRoomId: Barracks
+      bonus: 0.1
+      description: Military discipline from the Barracks aids in prisoner control.

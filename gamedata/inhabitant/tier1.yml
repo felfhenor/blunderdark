@@ -1,0 +1,188 @@
+- id: 213e57d9-7372-4684-b305-b8786635a660
+  name: Goblin
+  type: creature
+  tier: 1
+  description: A scrappy green-skinned worker with a knack for extracting crystals from rock.
+  cost:
+    gold: 50
+    food: 20
+  stats:
+    hp: 30
+    attack: 10
+    defense: 8
+    speed: 12
+    workerEfficiency: 1.0
+  inhabitantTraitIds:
+    - Miner
+  fearTolerance: 1
+  fearModifier: 0
+  foodConsumptionRate: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 6ecba454-025a-4404-8c0b-ac1f1a0b4779
+  name: Kobold
+  type: creature
+  tier: 1
+  description: A swift, cunning reptilian that excels at setting traps for intruders.
+  cost:
+    gold: 40
+    food: 15
+  stats:
+    hp: 20
+    attack: 8
+    defense: 5
+    speed: 18
+    workerEfficiency: 0.9
+  inhabitantTraitIds:
+    - Trapper
+  fearTolerance: 2
+  fearModifier: 0
+  foodConsumptionRate: 1.5
+  stateModifiers:
+    scared:
+      productionMultiplier: 1.1
+      foodConsumptionMultiplier: 2.0
+      attackMultiplier: 1.2
+      defenseMultiplier: 0.8
+    hungry:
+      productionMultiplier: 0.7
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c970d8c0-e920-4844-95ff-362f971abf06
+  name: Skeleton
+  type: undead
+  tier: 1
+  description: A tireless undead guardian that never needs food or rest.
+  cost:
+    gold: 60
+    essence: 15
+  stats:
+    hp: 40
+    attack: 12
+    defense: 15
+    speed: 6
+    workerEfficiency: 0.7
+  inhabitantTraitIds:
+    - Guardian
+  fearTolerance: 4
+  fearModifier: 1
+  foodConsumptionRate: 0
+  corruptionGeneration: 1
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.9
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.9
+      defenseMultiplier: 0.95
+    hungry:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: 0a597510-e8c7-4aab-ad71-43ce6f51ad50
+  name: Myconid
+  type: fungal
+  tier: 1
+  description: A sentient mushroom creature that thrives in dark, damp environments.
+  cost:
+    gold: 45
+    food: 25
+  stats:
+    hp: 25
+    attack: 5
+    defense: 10
+    speed: 8
+    workerEfficiency: 1.3
+  inhabitantTraitIds:
+    - Farmer
+  fearTolerance: 1
+  fearModifier: -1
+  foodConsumptionRate: 1
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.3
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: d336e6e7-2d96-41cb-af02-106b34efbc16
+  name: Slime
+  type: ooze
+  tier: 1
+  description: A cheap, adaptable blob that can fill any role poorly but costs almost nothing to recruit.
+  cost:
+    gold: 15
+  stats:
+    hp: 15
+    attack: 3
+    defense: 3
+    speed: 5
+    workerEfficiency: 0.6
+  inhabitantTraitIds:
+    - Adaptable
+  fearTolerance: 0
+  fearModifier: 0
+  foodConsumptionRate: 0.5
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.5
+    hungry:
+      productionMultiplier: 0.8
+      foodConsumptionMultiplier: 1.0
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.2
+      defenseMultiplier: 0.2
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
