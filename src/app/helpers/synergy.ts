@@ -2,7 +2,10 @@ import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { productionGetRoomDefinition } from '@helpers/production';
-import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
+import {
+  roomShapeGetAbsoluteTiles,
+  roomShapeResolve,
+} from '@helpers/room-shapes';
 import { gamestate } from '@helpers/state-game';
 import type {
   Connection,
@@ -33,10 +36,7 @@ function buildAdjacencyMap(
     );
   }
 
-  const map = new Map<
-    string,
-    { adjacentIds: string[]; tiles: TileOffset[] }
-  >();
+  const map = new Map<string, { adjacentIds: string[]; tiles: TileOffset[] }>();
   for (const room of floor.rooms) {
     const thisTiles = roomTiles.get(room.id) ?? [];
     const adjacentIds: string[] = [];
@@ -60,8 +60,12 @@ function isConnectedTo(
   allRooms: PlacedRoom[],
 ): boolean {
   for (const conn of connections) {
-    const otherId =
-      conn.roomAId === roomId ? conn.roomBId : conn.roomBId === roomId ? conn.roomAId : null;
+    let otherId: PlacedRoomId | null = null;
+    if (conn.roomAId === roomId) {
+      otherId = conn.roomBId;
+    } else if (conn.roomBId === roomId) {
+      otherId = conn.roomAId;
+    }
     if (!otherId) continue;
     const otherRoom = allRooms.find((r) => r.id === otherId);
     if (otherRoom && otherRoom.roomTypeId === targetRoomTypeId) return true;
@@ -99,9 +103,7 @@ export function synergyEvaluateCondition(
         (i) => i.assignedRoomId === room.id,
       );
       return assigned.some((i) => {
-        const def = contentGetEntry<InhabitantContent>(
-          i.definitionId,
-        );
+        const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return def?.type === condition.inhabitantType;
       });
     }
@@ -159,9 +161,7 @@ export function synergyEvaluateAll(
   return result;
 }
 
-export function synergyGetActive(
-  roomId: PlacedRoomId,
-): SynergyContent[] {
+export function synergyGetActive(roomId: PlacedRoomId): SynergyContent[] {
   return synergyActiveMap().get(roomId) ?? [];
 }
 
@@ -226,9 +226,7 @@ export function synergyGetPotentialForRoom(
   return potentials;
 }
 
-export function synergyFormatEffect(
-  effect: SynergyEffect,
-): string {
+export function synergyFormatEffect(effect: SynergyEffect): string {
   if (effect.type === 'productionBonus') {
     const pct = Math.round(effect.value * 100);
     const resource = effect.resource ? ` ${effect.resource}` : '';

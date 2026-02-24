@@ -15,6 +15,10 @@ import {
 } from '@helpers';
 import type { PlacedRoomId } from '@interfaces';
 
+function formatRoomName(name: string, suffix: string | undefined): string {
+  return suffix ? `${name} ${suffix}` : name;
+}
+
 @Component({
   selector: 'app-panel-hallway-info',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,7 +26,9 @@ import type { PlacedRoomId } from '@interfaces';
     @if (selectedHallwayTile(); as info) {
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4">
-          <h3 class="card-title text-sm">Corridor{{ info.suffix ? ' ' + info.suffix : '' }}</h3>
+          <h3 class="card-title text-sm">
+            Corridor{{ info.suffix ? ' ' + info.suffix : '' }}
+          </h3>
           @if (info.startRoomName && info.endRoomName) {
             <div class="text-xs opacity-50">
               <span>{{ info.startRoomName }}</span>
@@ -124,8 +130,10 @@ export class PanelHallwayInfoComponent {
       y: tile.y,
       hallwayId: gridTile.hallwayId,
       suffix: hallway.suffix,
-      startRoomName: startDef ? (startSuffix ? `${startDef.name} ${startSuffix}` : startDef.name) : undefined,
-      endRoomName: endDef ? (endSuffix ? `${endDef.name} ${endSuffix}` : endDef.name) : undefined,
+      startRoomName: startDef
+        ? formatRoomName(startDef.name, startSuffix)
+        : undefined,
+      endRoomName: endDef ? formatRoomName(endDef.name, endSuffix) : undefined,
     };
   });
 

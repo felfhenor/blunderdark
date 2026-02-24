@@ -9,7 +9,12 @@ import {
   reputationLevelUp$,
   researchUnlock$,
 } from '@helpers';
-import type { IsContentItem, ReputationType, UnlockEffect } from '@interfaces';
+import type {
+  IsContentItem,
+  ReputationType,
+  UnlockContentType,
+  UnlockEffect,
+} from '@interfaces';
 import type {
   CorruptionEffectEvent,
   CorruptionEffectEventType,
@@ -104,16 +109,14 @@ export class NotifyService {
 
     const targetId = getUnlockTargetId(unlock)!;
     const entry = contentGetEntry<IsContentItem>(targetId);
-    const label =
-      unlock.type === 'room'
-        ? 'Room'
-        : unlock.type === 'inhabitant'
-          ? 'Creature'
-          : unlock.type === 'ability'
-            ? 'Ability'
-            : unlock.type === 'roomfeature'
-              ? 'Room Feature'
-              : 'Upgrade';
+    const UNLOCK_LABELS: Record<UnlockContentType, string> = {
+      room: 'Room',
+      inhabitant: 'Creature',
+      ability: 'Ability',
+      roomfeature: 'Room Feature',
+      upgrade: 'Upgrade',
+    };
+    const label = UNLOCK_LABELS[unlock.type];
 
     return `${label}: ${entry?.name ?? targetId}`;
   }

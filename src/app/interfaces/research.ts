@@ -56,6 +56,11 @@ export type UnlockEffect =
   | FeatureFlagUnlock
   | RoomFeatureUnlock;
 
+export type UnlockContentType = Extract<
+  UnlockEffect,
+  { type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature' }
+>['type'];
+
 export type UnlockedContent = {
   rooms: RoomId[];
   inhabitants: InhabitantId[];

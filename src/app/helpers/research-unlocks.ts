@@ -4,6 +4,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
   ResearchContent,
+  UnlockContentType,
   UnlockEffect,
   UnlockedContent,
 } from '@interfaces';
@@ -86,7 +87,7 @@ export function researchUnlockGetPassiveBonusWithMastery(
  * Check if content of a given type and ID is unlocked.
  */
 export function researchUnlockIsUnlocked(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
+  type: UnlockContentType,
   id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId | FeatureId,
   unlockedContent?: UnlockedContent,
 ): boolean {
@@ -145,7 +146,7 @@ export const researchUnlockedContent = computed<UnlockedContent>(() => {
  * Used for UI display ("Requires: [Research Name]").
  */
 export function researchUnlockGetRequiredResearchName(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
+  type: UnlockContentType,
   id: string,
 ): string | undefined {
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
@@ -163,7 +164,7 @@ export function researchUnlockGetRequiredResearchName(
  * Check if a room requires research to unlock (i.e., is referenced in any research node's unlocks).
  */
 export function researchUnlockIsResearchGated(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
+  type: UnlockContentType,
   id: string,
 ): boolean {
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
