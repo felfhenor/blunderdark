@@ -56,4 +56,5 @@ export type RoomContent = IsContentItem &
       tortureSpeedBonus?: number;
       tortureConversionBonus?: number;
     };
+    reputationAction?: string;
   };

@@ -12,12 +12,12 @@ import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   CapturedPrisoner,
   GameState,
-  InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
   InvaderClassType,
   PlacedRoom,
 } from '@interfaces';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type {
   TortureConversionCompleteEvent,
@@ -40,7 +40,7 @@ export const TORTURE_CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {
   ranger: 0.35,
 };
 
-export const CONVERTED_PRISONER_DEF_ID = '1df0572f-4dc5-4ba8-9c4d-d1df84f58979';
+const CONVERTED_PRISONER_NAME = 'Converted Prisoner';
 
 const tortureExtractionCompleteSubject =
   new Subject<TortureExtractionCompleteEvent>();
@@ -167,10 +167,13 @@ export function tortureCalculateExtractionReward(
  */
 export function tortureCreateConvertedInhabitant(
   prisoner: CapturedPrisoner,
-): InhabitantInstance {
+): InhabitantInstance | undefined {
+  const def = contentGetEntry<InhabitantContent>(CONVERTED_PRISONER_NAME);
+  if (!def) return undefined;
+
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
-    definitionId: CONVERTED_PRISONER_DEF_ID as InhabitantId,
+    definitionId: def.id,
     name: `${prisoner.name} (Converted)`,
     state: 'normal',
     assignedRoomId: undefined,
@@ -230,7 +233,10 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
       room.tortureJob.ticksRemaining -= numTicks;
 
       // Add extra corruption while processing
-      resourceAdd('corruption', TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks);
+      resourceAdd(
+        'corruption',
+        TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks,
+      );
 
       if (room.tortureJob.ticksRemaining <= 0) {
         const job = room.tortureJob;
@@ -266,18 +272,20 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
 
             if (success) {
               const newInhabitant = tortureCreateConvertedInhabitant(prisoner);
-              state.world.inhabitants = [
-                ...state.world.inhabitants,
-                newInhabitant,
-              ];
-              inhabitantsChanged = true;
+              if (newInhabitant) {
+                state.world.inhabitants = [
+                  ...state.world.inhabitants,
+                  newInhabitant,
+                ];
+                inhabitantsChanged = true;
 
-              tortureConversionCompleteSubject.next({
-                roomId: room.id,
-                prisonerName: prisoner.name,
-                success: true,
-                inhabitantName: newInhabitant.name,
-              });
+                tortureConversionCompleteSubject.next({
+                  roomId: room.id,
+                  prisonerName: prisoner.name,
+                  success: true,
+                  inhabitantName: newInhabitant.name,
+                });
+              }
             } else {
               tortureConversionCompleteSubject.next({
                 roomId: room.id,

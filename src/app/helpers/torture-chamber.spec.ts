@@ -27,6 +27,7 @@ const TORTURE_CHAMBER_ID = 'tc100001-0001-0001-0001-000000000001';
 const SOUL_WELL_ID = 'tc100001-0001-0001-0001-000000000002';
 const BARRACKS_ID = 'tc100001-0001-0001-0001-000000000003';
 const GOBLIN_ID = 'tc200001-0001-0001-0001-000000000001';
+const CONVERTED_PRISONER_ID = 'tc200001-0001-0001-0001-000000000099';
 
 // --- Upgrade paths ---
 
@@ -334,7 +335,6 @@ import {
   tortureCalculateExtractionReward,
   tortureCreateConvertedInhabitant,
   tortureChamberProcess,
-  CONVERTED_PRISONER_DEF_ID,
 } from '@helpers/torture-chamber';
 
 // --- Setup ---
@@ -344,6 +344,11 @@ beforeEach(() => {
   mockContent.set(TORTURE_CHAMBER_ID, tortureChamberDef);
   mockContent.set(SOUL_WELL_ID, soulWellDef);
   mockContent.set(BARRACKS_ID, barracksDef);
+  mockContent.set('Converted Prisoner', {
+    id: CONVERTED_PRISONER_ID,
+    name: 'Converted Prisoner',
+    __type: 'inhabitant',
+  });
 });
 
 // --- Tests ---
@@ -557,26 +562,37 @@ describe('Converted Inhabitant Creation', () => {
   it('should create inhabitant with correct definitionId', () => {
     const prisoner = makePrisoner();
     const inhabitant = tortureCreateConvertedInhabitant(prisoner);
-    expect(inhabitant.definitionId).toBe(CONVERTED_PRISONER_DEF_ID);
+    expect(inhabitant).toBeDefined();
+    expect(inhabitant!.definitionId).toBe(CONVERTED_PRISONER_ID);
   });
 
   it('should set state to normal', () => {
     const prisoner = makePrisoner();
     const inhabitant = tortureCreateConvertedInhabitant(prisoner);
-    expect(inhabitant.state).toBe('normal');
+    expect(inhabitant).toBeDefined();
+    expect(inhabitant!.state).toBe('normal');
   });
 
   it('should include prisoner name in inhabitant name', () => {
     const prisoner = makePrisoner({ name: 'Sir Lance' });
     const inhabitant = tortureCreateConvertedInhabitant(prisoner);
-    expect(inhabitant.name).toContain('Sir Lance');
-    expect(inhabitant.name).toContain('Converted');
+    expect(inhabitant).toBeDefined();
+    expect(inhabitant!.name).toContain('Sir Lance');
+    expect(inhabitant!.name).toContain('Converted');
   });
 
   it('should not have an assigned room', () => {
     const prisoner = makePrisoner();
     const inhabitant = tortureCreateConvertedInhabitant(prisoner);
-    expect(inhabitant.assignedRoomId).toBeUndefined();
+    expect(inhabitant).toBeDefined();
+    expect(inhabitant!.assignedRoomId).toBeUndefined();
+  });
+
+  it('should return undefined when content not found', () => {
+    mockContent.delete('Converted Prisoner');
+    const prisoner = makePrisoner();
+    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+    expect(inhabitant).toBeUndefined();
   });
 });
 
@@ -833,12 +849,6 @@ describe('Constants', () => {
     expect(TORTURE_CONVERT_SUCCESS_RATES.cleric).toBe(0.1);
     expect(TORTURE_CONVERT_SUCCESS_RATES.paladin).toBe(0.05);
     expect(TORTURE_CONVERT_SUCCESS_RATES.ranger).toBe(0.35);
-  });
-
-  it('should reference correct converted prisoner definition ID', () => {
-    expect(CONVERTED_PRISONER_DEF_ID).toBe(
-      '1df0572f-4dc5-4ba8-9c4d-d1df84f58979',
-    );
   });
 });
 

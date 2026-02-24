@@ -83,6 +83,7 @@
   name: Mushroom Grove
   description: A grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
   shapeId: T-Shape
+  reputationAction: Build Mushroom Grove
   cost:
     gold: 40
   production:
@@ -117,6 +118,7 @@
   name: Shadow Library
   description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
   shapeId: Small L-Shape
+  reputationAction: Build Library
   cost:
     gold: 80
     crystals: 30
@@ -287,6 +289,7 @@
   name: Treasure Vault
   description: A fortified chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
   shapeId: Square 3x3
+  reputationAction: Build Treasure Vault
   cost:
     gold: 120
     crystals: 40
@@ -356,6 +359,7 @@
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
   shapeId: T-Shape
+  reputationAction: Activate Ley Line Nexus
   maxFeatures: 1
   biomeBonuses:
     crystal: 0.1
@@ -391,6 +395,7 @@
   name: Gold Vein
   description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
   shapeId: Square 2x2
+  reputationAction: Mine Gold Vein
   cost: {}
   production:
     gold: 0.4
@@ -571,6 +576,7 @@
   name: Torture Chamber
   description: A chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
   shapeId: Small L-Shape
+  reputationAction: Place Torture Chamber
   cost:
     gold: 120
     crystals: 40

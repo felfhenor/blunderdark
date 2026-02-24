@@ -329,6 +329,7 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
     forgingAdjacencyEffects: room.forgingAdjacencyEffects ?? undefined,
     alchemyAdjacencyEffects: room.alchemyAdjacencyEffects ?? undefined,
     tortureAdjacencyEffects: room.tortureAdjacencyEffects ?? undefined,
+    reputationAction: room.reputationAction ?? undefined,
   };
 }
 

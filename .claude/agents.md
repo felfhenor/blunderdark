@@ -5,7 +5,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 ## Core Policies
 
 - **All imports must be at the top of the file** — never place `import` statements in the middle of a file after non-import code (type definitions, constants, `vi.mock()` calls, etc.). In test files, Vitest hoists `vi.mock()` automatically, so imports can and should come before mock setup.
-- **NEVER hardcode content UUIDs in TypeScript.** Use `roomRoleFindById(role)` for special rooms, data fields on `RoomContent` for behavior, `contentGetEntriesByType()` for querying. In spec files, define test-local UUID constants.
+- **NEVER hardcode content UUIDs in TypeScript.** UUIDs can change at any time. Use `roomRoleFindById(role)` for special rooms, `contentGetEntry<T>('Name')` for name-based lookups, data fields on content types (e.g. `RoomContent.reputationAction`) for behavior, `contentGetEntriesByType()` for querying. Never create UUID-keyed lookup maps — instead add a data field to the content type's YAML and interface. In spec files, define test-local UUID constants.
 - **All gamedata UUIDs must be real v4 UUIDs** — generate with `crypto.randomUUID()`.
 - **Always use branded ID types, never plain `string`.** Define via `type MyId = Branded<string, 'MyId'>` in interface files. Cast at creation points: `rngUuid<HallwayId>()`, `'test-id' as PlacedRoomId`.
 - **Use named types instead of bracket notation.** Never use indexed access types like `GameState['world']['floors']` or `Floor['grid']` when a named type exists. Use the real type directly: `Floor[]`, `GridState`, `GameId`, `BiomeType`, `ResourceMap`, `PlacedRoom`, etc. The generic `GameOptions[T]` pattern is acceptable since `T` is a type parameter.
