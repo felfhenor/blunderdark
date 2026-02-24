@@ -80,9 +80,8 @@
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
   unlocks:
-    - type: feature_flag
-      featureFlag: biome_corrupted
-      description: Corrupted Biome
+    - type: biome
+      targetBiome: corrupted
     - type: roomfeature
       targetFeatureId: Fungal Network
   tier: 2

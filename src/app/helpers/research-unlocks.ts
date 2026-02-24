@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  BiomeType,
   GameState,
   ResearchContent,
   UnlockContentType,
@@ -135,6 +136,19 @@ export function researchUnlockIsFeatureUnlocked(
 }
 
 /**
+ * Check if a biome is unlocked via research.
+ */
+export function researchUnlockIsBiomeUnlocked(
+  biome: BiomeType,
+  unlockedContent?: UnlockedContent,
+): boolean {
+  const content =
+    unlockedContent ?? gamestate()?.world?.research?.unlockedContent;
+  if (!content) return false;
+  return (content.biomes ?? []).includes(biome);
+}
+
+/**
  * Computed signal for unlocked content.
  */
 export const researchUnlockedContent = computed<UnlockedContent>(() => {
@@ -193,6 +207,7 @@ export function researchUnlockApplyEffects(
     passiveBonuses: [...current.passiveBonuses],
     featureFlags: [...(current.featureFlags ?? [])],
     roomfeatures: [...(current.roomfeatures ?? [])],
+    biomes: [...(current.biomes ?? [])],
   };
 
   for (const unlock of unlocks) {
@@ -244,6 +259,11 @@ export function researchUnlockApplyEffects(
             ...result.roomfeatures,
             unlock.targetFeatureId,
           ];
+        }
+        break;
+      case 'biome':
+        if (!result.biomes.includes(unlock.targetBiome)) {
+          result.biomes = [...result.biomes, unlock.targetBiome];
         }
         break;
     }

@@ -1,4 +1,5 @@
 import type {
+  BiomeType,
   CombatAbilityId,
   GameId,
   GameState,
@@ -18,6 +19,7 @@ import {
   researchUnlockApplyEffects,
   researchUnlockGetPassiveBonuses,
   researchUnlockGetRequiredResearchName,
+  researchUnlockIsBiomeUnlocked,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   researchUnlockOnComplete,
@@ -63,6 +65,9 @@ function makeUnlockedContent(
     abilities: [],
     upgrades: [],
     passiveBonuses: [],
+    featureFlags: [],
+    roomfeatures: [],
+    biomes: [],
     ...overrides,
   };
 }
@@ -325,7 +330,10 @@ describe('researchUnlockApplyEffects', () => {
 
   it('should add ability unlock', () => {
     const effects: UnlockEffect[] = [
-      { type: 'ability', targetCombatabilityId: 'ability-1' as CombatAbilityId },
+      {
+        type: 'ability',
+        targetCombatabilityId: 'ability-1' as CombatAbilityId,
+      },
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.abilities).toEqual(['ability-1' as CombatAbilityId]);
@@ -337,6 +345,41 @@ describe('researchUnlockApplyEffects', () => {
     ];
     const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
     expect(result.upgrades).toEqual(['upgrade-1' as UpgradePathId]);
+  });
+
+  it('should add biome unlock', () => {
+    const effects: UnlockEffect[] = [{ type: 'biome', targetBiome: 'crystal' }];
+    const result = researchUnlockApplyEffects(effects, makeUnlockedContent());
+    expect(result.biomes).toEqual(['crystal']);
+  });
+
+  it('should not duplicate biome unlock', () => {
+    const effects: UnlockEffect[] = [{ type: 'biome', targetBiome: 'crystal' }];
+    const current = makeUnlockedContent({ biomes: ['crystal'] });
+    const result = researchUnlockApplyEffects(effects, current);
+    expect(result.biomes).toEqual(['crystal']);
+  });
+});
+
+describe('researchUnlockIsBiomeUnlocked', () => {
+  it('should return true when biome is in unlocked content', () => {
+    const content = makeUnlockedContent({
+      biomes: ['crystal' as BiomeType],
+    });
+    expect(researchUnlockIsBiomeUnlocked('crystal', content)).toBe(true);
+  });
+
+  it('should return false when biome is not in unlocked content', () => {
+    const content = makeUnlockedContent();
+    expect(researchUnlockIsBiomeUnlocked('crystal', content)).toBe(false);
+  });
+
+  it('should read from gamestate when no content provided', () => {
+    mockGameState = makeGameState(
+      makeUnlockedContent({ biomes: ['corrupted' as BiomeType] }),
+    );
+    expect(researchUnlockIsBiomeUnlocked('corrupted')).toBe(true);
+    expect(researchUnlockIsBiomeUnlocked('crystal')).toBe(false);
   });
 });
 

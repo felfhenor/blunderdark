@@ -12,21 +12,23 @@ export type Biome = {
   description: string;
   color: string;
   effectsLabel: string;
-  featureFlag?: string;
+  requiresResearch?: boolean;
 };
 
 export const BIOME_DATA: Record<BiomeType, Biome> = {
   volcanic: {
     type: 'volcanic',
     name: 'Volcanic',
-    description: 'A scorching cavern with rivers of magma and obsidian formations.',
+    description:
+      'A scorching cavern with rivers of magma and obsidian formations.',
     color: '#e63946',
     effectsLabel: '+Fire damage, -Water creatures',
   },
   flooded: {
     type: 'flooded',
     name: 'Flooded',
-    description: 'Waterlogged tunnels with dripping stalactites and underground pools.',
+    description:
+      'Waterlogged tunnels with dripping stalactites and underground pools.',
     color: '#457b9d',
     effectsLabel: '+Water creatures, slower movement',
   },
@@ -36,20 +38,22 @@ export const BIOME_DATA: Record<BiomeType, Biome> = {
     description: 'Glittering caverns lined with luminous crystal growths.',
     color: '#a8dadc',
     effectsLabel: '+Crystal production, light bonus',
-    featureFlag: 'biome_crystal',
+    requiresResearch: true,
   },
   corrupted: {
     type: 'corrupted',
     name: 'Corrupted',
-    description: 'Dark passages pulsing with malevolent energy and twisted stone.',
+    description:
+      'Dark passages pulsing with malevolent energy and twisted stone.',
     color: '#6a0572',
     effectsLabel: '+Corruption gain, +Dark energy',
-    featureFlag: 'biome_corrupted',
+    requiresResearch: true,
   },
   fungal: {
     type: 'fungal',
     name: 'Fungal',
-    description: 'Damp caves carpeted with bioluminescent mushrooms and spore clouds.',
+    description:
+      'Damp caves carpeted with bioluminescent mushrooms and spore clouds.',
     color: '#2d6a4f',
     effectsLabel: '+Food production, spore hazards',
   },

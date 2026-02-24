@@ -80,9 +80,8 @@
   prerequisiteResearchIds:
     - Arcane Basics
   unlocks:
-    - type: feature_flag
-      featureFlag: biome_crystal
-      description: Crystal Biome
+    - type: biome
+      targetBiome: crystal
   tier: 2
   requiredTicks: 150
 

@@ -262,6 +262,20 @@ export class GameResearchComponent {
         return { type: 'Bonus', name: unlock.description };
       case 'feature_flag':
         return { type: 'Feature', name: unlock.description };
+      case 'biome': {
+        const biomeNames: Record<string, string> = {
+          volcanic: 'Volcanic',
+          flooded: 'Flooded',
+          crystal: 'Crystal',
+          corrupted: 'Corrupted',
+          fungal: 'Fungal',
+          neutral: 'Neutral',
+        };
+        return {
+          type: 'Biome',
+          name: biomeNames[unlock.targetBiome] ?? 'Unknown',
+        };
+      }
       case 'roomfeature': {
         const entry = contentGetEntry(unlock.targetFeatureId);
         return { type: 'Feature', name: entry?.name ?? 'Unknown' };

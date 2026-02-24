@@ -177,7 +177,8 @@ const validateResearchTree = () => {
   branches.forEach((branch: string) => {
     const branchNodes = researchNodes.filter((n: any) => n.branch === branch);
     const rootNodes = branchNodes.filter(
-      (n: any) => !n.prerequisiteResearchIds || n.prerequisiteResearchIds.length === 0,
+      (n: any) =>
+        !n.prerequisiteResearchIds || n.prerequisiteResearchIds.length === 0,
     );
     if (rootNodes.length === 0) {
       errors.push(
@@ -240,21 +241,49 @@ const validateResearchTree = () => {
     if (!isArray(node.unlocks)) return;
     node.unlocks.forEach((unlock: any, idx: number) => {
       if (!unlock.type) {
-        errors.push(`Node "${node.name}" unlock[${idx}] is missing "type" field`);
+        errors.push(
+          `Node "${node.name}" unlock[${idx}] is missing "type" field`,
+        );
         return;
       }
       if (unlock.type === 'passive_bonus') {
         if (!unlock.bonusType) {
-          errors.push(`Node "${node.name}" unlock[${idx}] passive_bonus is missing "bonusType"`);
+          errors.push(
+            `Node "${node.name}" unlock[${idx}] passive_bonus is missing "bonusType"`,
+          );
         }
         return;
       }
       if (unlock.type === 'feature_flag') {
         if (!unlock.featureFlag) {
-          errors.push(`Node "${node.name}" unlock[${idx}] feature_flag is missing "featureFlag"`);
+          errors.push(
+            `Node "${node.name}" unlock[${idx}] feature_flag is missing "featureFlag"`,
+          );
         }
         if (!unlock.description) {
-          errors.push(`Node "${node.name}" unlock[${idx}] feature_flag is missing "description"`);
+          errors.push(
+            `Node "${node.name}" unlock[${idx}] feature_flag is missing "description"`,
+          );
+        }
+        return;
+      }
+      if (unlock.type === 'biome') {
+        const validBiomes = [
+          'volcanic',
+          'flooded',
+          'crystal',
+          'corrupted',
+          'fungal',
+          'neutral',
+        ];
+        if (!unlock.targetBiome) {
+          errors.push(
+            `Node "${node.name}" unlock[${idx}] biome is missing "targetBiome"`,
+          );
+        } else if (!validBiomes.includes(unlock.targetBiome)) {
+          errors.push(
+            `Node "${node.name}" unlock[${idx}] biome has invalid targetBiome "${unlock.targetBiome}"`,
+          );
         }
         return;
       }
@@ -268,22 +297,30 @@ const validateResearchTree = () => {
       const targetField = targetFieldMap[unlock.type];
       const targetId = targetField ? unlock[targetField] : undefined;
       if (!targetId) {
-        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) is missing "${targetField}"`);
+        errors.push(
+          `Node "${node.name}" unlock[${idx}] (${unlock.type}) is missing "${targetField}"`,
+        );
         return;
       }
       if (!allContentIds.has(targetId)) {
-        errors.push(`Node "${node.name}" unlock[${idx}] (${unlock.type}) references invalid ID "${targetId}"`);
+        errors.push(
+          `Node "${node.name}" unlock[${idx}] (${unlock.type}) references invalid ID "${targetId}"`,
+        );
       }
     });
   });
 
   if (errors.length > 0) {
-    console.error(`\nResearch tree validation failed with ${errors.length} error(s):`);
+    console.error(
+      `\nResearch tree validation failed with ${errors.length} error(s):`,
+    );
     errors.forEach((err) => console.error(`  - ${err}`));
     process.exit(1);
   }
 
-  console.log(`Research tree validation passed — ${researchNodes.length} nodes, ${branches.size} branches, no errors.`);
+  console.log(
+    `Research tree validation passed — ${researchNodes.length} nodes, ${branches.size} branches, no errors.`,
+  );
 };
 
 processFiles();

@@ -1,3 +1,4 @@
+import type { BiomeType } from '@interfaces/biome';
 import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { FeatureId } from '@interfaces/content-feature';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
@@ -47,6 +48,11 @@ export type RoomFeatureUnlock = {
   targetFeatureId: FeatureId;
 };
 
+export type BiomeUnlock = {
+  type: 'biome';
+  targetBiome: BiomeType;
+};
+
 export type UnlockEffect =
   | RoomUnlock
   | InhabitantUnlock
@@ -54,7 +60,8 @@ export type UnlockEffect =
   | UpgradeUnlock
   | PassiveBonusUnlock
   | FeatureFlagUnlock
-  | RoomFeatureUnlock;
+  | RoomFeatureUnlock
+  | BiomeUnlock;
 
 export type UnlockContentType = Extract<
   UnlockEffect,
@@ -69,6 +76,7 @@ export type UnlockedContent = {
   passiveBonuses: { bonusType: string; value: number; description: string }[];
   featureFlags: string[];
   roomfeatures: FeatureId[];
+  biomes: BiomeType[];
 };
 
 export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
@@ -85,6 +93,7 @@ export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
       return unlock.targetFeatureId;
     case 'passive_bonus':
     case 'feature_flag':
+    case 'biome':
       return undefined;
   }
 }

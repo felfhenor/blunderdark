@@ -2,6 +2,7 @@ import type {
   AbilityUnlock,
   AlchemyRecipeContent,
   AlchemyRecipeId,
+  BiomeUnlock,
   BreedingRecipeContent,
   BreedingRecipeId,
   CompositionWeightConfig,
@@ -276,6 +277,11 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
         targetFeatureId:
           (effect as Partial<RoomFeatureUnlock>).targetFeatureId ??
           ('' as FeatureId),
+      };
+    case 'biome':
+      return {
+        type: 'biome',
+        targetBiome: (effect as Partial<BiomeUnlock>).targetBiome ?? 'neutral',
       };
   }
 }

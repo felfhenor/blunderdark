@@ -95,6 +95,7 @@ export function defaultUnlockedContent(): UnlockedContent {
     passiveBonuses: [],
     featureFlags: [],
     roomfeatures: [],
+    biomes: [],
   };
 }
 

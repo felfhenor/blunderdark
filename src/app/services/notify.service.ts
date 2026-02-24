@@ -107,6 +107,18 @@ export class NotifyService {
       return unlock.description;
     }
 
+    if (unlock.type === 'biome') {
+      const biomeNames: Record<string, string> = {
+        volcanic: 'Volcanic',
+        flooded: 'Flooded',
+        crystal: 'Crystal',
+        corrupted: 'Corrupted',
+        fungal: 'Fungal',
+        neutral: 'Neutral',
+      };
+      return `Biome: ${biomeNames[unlock.targetBiome] ?? 'Unknown'}`;
+    }
+
     const targetId = getUnlockTargetId(unlock)!;
     const entry = contentGetEntry<IsContentItem>(targetId);
     const UNLOCK_LABELS: Record<UnlockContentType, string> = {
