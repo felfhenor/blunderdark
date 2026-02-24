@@ -6,13 +6,11 @@ import {
   model,
   signal,
 } from '@angular/core';
-import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { formatDurationSeconds } from '@helpers/game-time';
-import { optionsGet } from '@helpers/state-options';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
   researchArePrerequisitesMet,
@@ -23,14 +21,16 @@ import {
 } from '@helpers/research-progress';
 import { resourceCanAfford } from '@helpers/resources';
 import { gamestate } from '@helpers/state-game';
+import { optionsGet } from '@helpers/state-options';
 import type {
   ResearchBranch,
   ResearchContent,
   RoomContent,
   UnlockEffect,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
 import { TippyDirective } from '@ngneat/helipopper';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { sortBy } from 'es-toolkit/compat';
 
 type NodeState = 'completed' | 'active' | 'available' | 'locked';
 
@@ -260,7 +260,7 @@ export class GameResearchComponent {
         return { type: 'Feature', name: unlock.description };
       case 'roomfeature': {
         const entry = contentGetEntry(unlock.targetFeatureId);
-        return { type: 'Room Feature', name: entry?.name ?? 'Unknown' };
+        return { type: 'Feature', name: entry?.name ?? 'Unknown' };
       }
     }
   }
