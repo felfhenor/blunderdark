@@ -23,6 +23,7 @@ import { resourceCanAfford } from '@helpers/resources';
 import { gamestate } from '@helpers/state-game';
 import { optionsGet } from '@helpers/state-options';
 import type {
+  BiomeType,
   ResearchBranch,
   ResearchContent,
   RoomContent,
@@ -263,7 +264,7 @@ export class GameResearchComponent {
       case 'feature_flag':
         return { type: 'Feature', name: unlock.description };
       case 'biome': {
-        const biomeNames: Record<string, string> = {
+        const biomeNames: Record<BiomeType, string> = {
           volcanic: 'Volcanic',
           flooded: 'Flooded',
           crystal: 'Crystal',

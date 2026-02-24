@@ -89,7 +89,13 @@ export function researchUnlockGetPassiveBonusWithMastery(
  */
 export function researchUnlockIsUnlocked(
   type: UnlockContentType,
-  id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId | FeatureId,
+  id:
+    | RoomId
+    | InhabitantId
+    | CombatAbilityId
+    | UpgradePathId
+    | FeatureId
+    | BiomeType,
   unlockedContent?: UnlockedContent,
 ): boolean {
   const content = unlockedContent ?? gamestate().world.research.unlockedContent;
@@ -104,6 +110,8 @@ export function researchUnlockIsUnlocked(
       return content.upgrades.includes(id as UpgradePathId);
     case 'roomfeature':
       return (content.roomfeatures ?? []).includes(id as FeatureId);
+    case 'biome':
+      return (content.biomes ?? []).includes(id as BiomeType);
   }
 }
 

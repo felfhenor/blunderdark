@@ -63,9 +63,23 @@ export type UnlockEffect =
   | RoomFeatureUnlock
   | BiomeUnlock;
 
+/**
+ * Content-targeting unlock types (i.e., those that reference a specific ID).
+ * When adding a new UnlockEffect variant, add it here if it targets a content
+ * ID or typed identifier (like BiomeType), and update all switch statements
+ * that consume UnlockContentType (researchUnlockIsUnlocked, UNLOCK_LABELS, etc.).
+ */
 export type UnlockContentType = Extract<
   UnlockEffect,
-  { type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature' }
+  {
+    type:
+      | 'room'
+      | 'inhabitant'
+      | 'ability'
+      | 'upgrade'
+      | 'roomfeature'
+      | 'biome';
+  }
 >['type'];
 
 export type UnlockedContent = {
@@ -91,9 +105,10 @@ export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
       return unlock.targetUpgradepathId;
     case 'roomfeature':
       return unlock.targetFeatureId;
+    case 'biome':
+      return unlock.targetBiome;
     case 'passive_bonus':
     case 'feature_flag':
-    case 'biome':
       return undefined;
   }
 }
