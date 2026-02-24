@@ -5,7 +5,6 @@
 #   Dark Arts Fundamentals (T1)
 #   ├── Soul Manipulation (T2)
 #   │   └── Soul Well Mastery (T3)
-#   │       └── Soul Forge (T5) [+Dark Rituals]
 #   ├── Shadow Magic (T2)
 #   │   └── Corruption Control (T3)
 #   │       └── Shadow Weaving (T4) [+Shadow Magic]
@@ -13,8 +12,11 @@
 #   │   └── Undead Mastery (T3)
 #   │       └── Dark Rituals (T4) [+Soul Well Mastery]
 #   └── Corrupted Biome (T2)
-#               ├── Abyssal Gateway (T5) [+Shadow Weaving]
-#               └── Soul Forge (T5) [+Soul Well Mastery→ already via Dark Rituals]
+#   Soul Forge (T4) [Soul Well Mastery + Undead Mastery]
+#   Abyssal Gateway (T5) [Dark Rituals + Shadow Weaving]
+#   Abyssal Summoning (T5) [Abyssal Gateway + Soul Forge]
+#   Necromantic Ascension (T5) [Soul Forge]
+#   Serpent's Gaze (T5) [Abyssal Gateway]
 #   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
 
 # --- TIER 2: Three paths branch from Dark Arts Fundamentals ---
@@ -81,6 +83,9 @@
     - type: feature_flag
       featureFlag: biome_corrupted
       description: Corrupted Biome
+    - type: feature_flag
+      featureFlag: feature_fungal_network
+      description: Unlocks Fungal Network room feature
   tier: 2
   requiredTicks: 150
 
@@ -100,6 +105,9 @@
       bonusType: undeadEfficiency
       value: 0.20
       description: +20% undead worker efficiency
+    - type: feature_flag
+      featureFlag: feature_phylactery
+      description: Unlocks Phylactery prestige feature
   tier: 3
   requiredTicks: 300
 
@@ -196,6 +204,9 @@
       bonusType: essenceProduction
       value: 0.25
       description: +25% essence production from all sources
+    - type: feature_flag
+      featureFlag: feature_void_gate
+      description: Unlocks Void Gate prestige feature
   tier: 5
   requiredTicks: 750
 
@@ -204,16 +215,69 @@
   description: Forge captured souls into powerful artifacts and imbue minions with stolen life force.
   branch: dark
   cost:
-    research: 200
-    essence: 60
-    corruption: 30
+    research: 100
+    essence: 30
+    corruption: 15
   prerequisiteResearchIds:
-    - Dark Rituals
+    - Soul Well Mastery
+    - Undead Mastery
   unlocks:
     - type: passive_bonus
       bonusType: inhabitantStats
       value: 0.10
       description: +10% to all inhabitant combat stats
+  tier: 4
+  requiredTicks: 500
+
+- id: 1771e65b-0113-4318-8eac-c10f6496d849
+  name: Abyssal Summoning
+  description: Command the deepest forces of the abyss to bind a demon lord to your service, the most feared of all infernal entities.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisiteResearchIds:
+    - Abyssal Gateway
+    - Soul Forge
+  unlocks:
+    - type: feature_flag
+      featureFlag: legendary_recruit_demon_lord
+      description: Unlocks Demon Lord legendary recruitment
+  tier: 5
+  requiredTicks: 750
+
+- id: 2a744cf1-30fe-45d1-a135-dfe3ca596bea
+  name: Necromantic Ascension
+  description: Achieve the pinnacle of necromantic power, enabling the binding of an ancient lich — an undead sorcerer of terrifying intellect.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisiteResearchIds:
+    - Soul Forge
+  unlocks:
+    - type: feature_flag
+      featureFlag: legendary_recruit_lich
+      description: Unlocks Lich legendary recruitment
+  tier: 5
+  requiredTicks: 750
+
+- id: d311dfe1-5fc4-4b3f-a394-670e219cb154
+  name: Serpent's Gaze
+  description: Unravel the petrification mysteries of the shadow realm, allowing the recruitment of a medusa whose gaze turns flesh to stone.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisiteResearchIds:
+    - Abyssal Gateway
+  unlocks:
+    - type: feature_flag
+      featureFlag: legendary_recruit_medusa
+      description: Unlocks Medusa legendary recruitment
   tier: 5
   requiredTicks: 750
 

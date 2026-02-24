@@ -4,6 +4,11 @@ import { altarRoomCanRecruit } from '@helpers/altar-room';
 import { contentGetEntriesByType } from '@helpers/content';
 import { inhabitantAdd } from '@helpers/inhabitants';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import {
+  researchUnlockGetPassiveBonusWithMastery,
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+} from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
@@ -20,19 +25,31 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
 
 /**
- * Signal for the currently unlocked recruitment tier.
- * Tier 1 is always unlocked. Higher tiers will be unlockable
- * via research or other progression systems in the future.
+ * Signal for the highest tier of inhabitants that have been research-unlocked.
+ * Used for display purposes (e.g. showing "Tier X unlocked" in the UI).
  */
 export const recruitmentUnlockedTier = computed<number>(() => {
-  return 1;
+  const allDefs = contentGetEntriesByType<InhabitantContent>('inhabitant');
+  let maxTier = 1;
+  for (const def of allDefs) {
+    if (def.restrictionTags.length !== 0) continue;
+    if (def.tier <= 1) continue;
+    if (
+      researchUnlockIsResearchGated('inhabitant', def.id) &&
+      researchUnlockIsUnlocked('inhabitant', def.id)
+    ) {
+      maxTier = Math.max(maxTier, def.tier);
+    }
+  }
+  return maxTier;
 });
 
 /**
  * Signal for the maximum number of total inhabitants allowed.
  */
 export const recruitmentMaxInhabitantCount = computed<number>(() => {
-  return RECRUITMENT_DEFAULT_MAX_INHABITANTS;
+  const bonus = researchUnlockGetPassiveBonusWithMastery('maxInhabitants');
+  return RECRUITMENT_DEFAULT_MAX_INHABITANTS + Math.floor(bonus);
 });
 
 /**
@@ -51,16 +68,20 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
 
 /**
  * Get all inhabitant definitions available for display in the recruitment panel.
- * Filters out inhabitants with any restriction tags (unique, summoned, converted,
- * hybrid) and sorts by tier then name.
+ * Filters out inhabitants with restriction tags and those gated behind research
+ * that hasn't been completed yet. Sorts by tier then name.
  */
 export function recruitmentGetRecruitable(): InhabitantContent[] {
-  const allDefs = contentGetEntriesByType<InhabitantContent>(
-    'inhabitant',
-  );
+  const allDefs = contentGetEntriesByType<InhabitantContent>('inhabitant');
 
   return sortBy(
-    allDefs.filter((def) => def.restrictionTags.length === 0),
+    allDefs.filter((def) => {
+      if (def.restrictionTags.length !== 0) return false;
+      const gated = researchUnlockIsResearchGated('inhabitant', def.id);
+      if (gated && !researchUnlockIsUnlocked('inhabitant', def.id))
+        return false;
+      return true;
+    }),
     [(d) => d.tier, (d) => d.name],
   );
 }
@@ -87,20 +108,28 @@ export function recruitmentGetShortfall(
 }
 
 /**
- * Apply season recruitment cost multiplier to a base cost.
- * Uses Math.ceil to round up adjusted costs.
+ * Apply season recruitment cost multiplier and research discount to a base cost.
+ * Uses Math.ceil to round up adjusted costs, minimum 1 per resource.
  */
 export function recruitmentGetAdjustedCost(
   cost: ResourceCost,
   season: Season,
 ): ResourceCost {
-  const multiplier = seasonBonusGetRecruitmentCostMultiplier(season);
-  if (multiplier === 1.0) return cost;
+  const seasonMultiplier = seasonBonusGetRecruitmentCostMultiplier(season);
+  const researchDiscount = researchUnlockGetPassiveBonusWithMastery(
+    'recruitmentCostReduction',
+  );
+  const combinedMultiplier = seasonMultiplier * (1 - researchDiscount);
+
+  if (combinedMultiplier === 1.0) return cost;
 
   const adjusted: ResourceCost = {};
   for (const [type, amount] of Object.entries(cost)) {
     if (!amount) continue;
-    adjusted[type as ResourceType] = Math.ceil(amount * multiplier);
+    adjusted[type as ResourceType] = Math.max(
+      1,
+      Math.ceil(amount * combinedMultiplier),
+    );
   }
   return adjusted;
 }
@@ -111,20 +140,24 @@ export function recruitmentGetAdjustedCost(
  */
 export async function recruitmentRecruit(
   def: InhabitantContent,
-): Promise<{ success: boolean; error?: string; instance?: InhabitantInstance }> {
+): Promise<{
+  success: boolean;
+  error?: string;
+  instance?: InhabitantInstance;
+}> {
   if (!altarRoomCanRecruit()) {
     return { success: false, error: 'Altar required for recruitment' };
   }
 
   const state = gamestate();
   const totalInhabitants = state.world.inhabitants.length;
-  if (totalInhabitants >= RECRUITMENT_DEFAULT_MAX_INHABITANTS) {
+  if (totalInhabitants >= recruitmentMaxInhabitantCount()) {
     return { success: false, error: 'Roster full' };
   }
 
-  // Tier 1 always unlocked; higher tiers gated by progression
-  if (def.tier > 1) {
-    return { success: false, error: `Requires Tier ${def.tier}` };
+  const gated = researchUnlockIsResearchGated('inhabitant', def.id);
+  if (gated && !researchUnlockIsUnlocked('inhabitant', def.id)) {
+    return { success: false, error: `Requires research to unlock ${def.name}` };
   }
 
   const adjustedCost = recruitmentGetAdjustedCost(

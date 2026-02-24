@@ -1,0 +1,287 @@
+# Dominion Branch research nodes (tier 2+)
+# Root node (Creature Lore) is in base.yml
+#
+# Theme: The art of commanding, recruiting, and empowering dungeon creatures.
+# Primary currency: food (thematic — feeding/maintaining creatures). Secondary: gold.
+#
+# Tree structure:
+#   Creature Lore (T1)
+#   ├── Stone Shaping (T2) → Gargoyle
+#   │   └── Nature Attunement (T3) → Dryad
+#   ├── Dark Pacts (T2) → Imp
+#   │   └── Spirit Binding (T3) → Wraith
+#   ├── Elemental Crystallization (T2) → Stone Elemental
+#   │   └── Transmutation (T3) → Mimic
+#   └── Martial Training (T2) → Orc
+#       └── Creature Quarters (T3) → feature_room_enhancement
+#   Horde Tactics (T4) [Nature Attunement + Creature Quarters]
+#   Pack Mentality (T4) [Spirit Binding + Transmutation]
+#   Elite Training (T4) [Creature Quarters + Transmutation]
+#   Supreme Command (T5) [Horde Tactics + Pack Mentality]
+#   Creature Synergy (T5) [Elite Training + Horde Tactics]
+#   Forced March (T5) [Pack Mentality + Elite Training]
+#   Sovereign's Will (T6) [Supreme Command + Creature Synergy]
+
+# --- TIER 2: Four paths branch from Creature Lore ---
+
+- id: cfc13507-6610-4adf-822b-b1c1beacdd6e
+  name: Stone Shaping
+  description: Master the art of sculpting stone into living forms, enabling the recruitment of gargoyles as vigilant sentinels.
+  branch: dominion
+  cost:
+    research: 25
+    food: 5
+  prerequisiteResearchIds:
+    - Creature Lore
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Gargoyle
+  tier: 2
+  requiredTicks: 150
+
+- id: e01d43f1-b4c6-4483-800f-7bfad3aa2daf
+  name: Dark Pacts
+  description: Forge binding contracts with demonic entities, allowing imps to be recruited as mischievous but effective dungeon workers.
+  branch: dominion
+  cost:
+    research: 25
+    food: 5
+  prerequisiteResearchIds:
+    - Creature Lore
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Imp
+  tier: 2
+  requiredTicks: 150
+
+- id: 1e1a283e-3b94-4d52-b218-09090cedaec7
+  name: Elemental Crystallization
+  description: Learn to coalesce raw flux into semi-sentient crystalline forms, enabling the recruitment of stone elementals.
+  branch: dominion
+  cost:
+    research: 25
+    food: 5
+  prerequisiteResearchIds:
+    - Creature Lore
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Stone Elemental
+  tier: 2
+  requiredTicks: 150
+
+- id: f6487b40-fc5d-4909-92f3-5c049ff13d96
+  name: Martial Training
+  description: Establish combat training programs that attract orcish warriors to serve as powerful frontline fighters.
+  branch: dominion
+  cost:
+    research: 25
+    food: 5
+  prerequisiteResearchIds:
+    - Creature Lore
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Orc
+  tier: 2
+  requiredTicks: 150
+
+# --- TIER 3: Creature specializations ---
+
+- id: 9984c67b-e4eb-4734-9e7c-757f9713eccb
+  name: Nature Attunement
+  description: Harmonize with the natural arcane energies of living things, allowing dryads to be recruited as regenerative caretakers of the dungeon.
+  branch: dominion
+  cost:
+    research: 50
+    food: 15
+  prerequisiteResearchIds:
+    - Stone Shaping
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Dryad
+  tier: 3
+  requiredTicks: 300
+
+- id: e1b0fbf9-fe73-4c64-b0a1-3cf6a118d320
+  name: Spirit Binding
+  description: Learn to bind restless spirits into corporeal forms, enabling the recruitment of wraiths as fearsome ethereal servants.
+  branch: dominion
+  cost:
+    research: 50
+    food: 15
+  prerequisiteResearchIds:
+    - Dark Pacts
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Wraith
+  tier: 3
+  requiredTicks: 300
+
+- id: de20f99f-edc6-4cab-a775-cb8a1626881e
+  name: Transmutation
+  description: Study the art of reshaping matter and identity, unlocking the ability to recruit mimics — shapeshifting creatures of deception.
+  branch: dominion
+  cost:
+    research: 50
+    food: 15
+  prerequisiteResearchIds:
+    - Elemental Crystallization
+  unlocks:
+    - type: inhabitant
+      targetInhabitantId: Mimic
+  tier: 3
+  requiredTicks: 300
+
+- id: 849a01b0-b6b5-47ea-8c77-daf471b6a6d3
+  name: Creature Quarters
+  description: Develop magical augmentation techniques that allow rooms to be fitted with storage expansions, efficiency enchantments, and protective wards.
+  branch: dominion
+  cost:
+    research: 50
+    food: 15
+  prerequisiteResearchIds:
+    - Martial Training
+  unlocks:
+    - type: feature_flag
+      featureFlag: feature_room_enhancement
+      description: Unlocks Storage Expansion, Efficiency Enchantment, and Fear Ward room features
+  tier: 3
+  requiredTicks: 300
+
+# --- TIER 4: Advanced combinations ---
+
+- id: 9c082222-e010-4872-9ab3-cac0b697ca41
+  name: Horde Tactics
+  description: Coordinate large groups of diverse creatures to fight as a unified force, maximizing the dungeon's inhabitant capacity.
+  branch: dominion
+  cost:
+    research: 100
+    food: 30
+    gold: 15
+  prerequisiteResearchIds:
+    - Nature Attunement
+    - Creature Quarters
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 5
+      description: +5 maximum inhabitants
+  tier: 4
+  requiredTicks: 500
+
+- id: 79328f84-7d0f-4c45-94c6-9cf361661fd9
+  name: Pack Mentality
+  description: Instill a collective mindset among dungeon creatures, boosting their cooperation and work output.
+  branch: dominion
+  cost:
+    research: 100
+    food: 30
+    gold: 15
+  prerequisiteResearchIds:
+    - Spirit Binding
+    - Transmutation
+  unlocks:
+    - type: passive_bonus
+      bonusType: globalWorkerEfficiency
+      value: 0.10
+      description: +10% worker efficiency for all inhabitants
+  tier: 4
+  requiredTicks: 500
+
+- id: f027eb3f-b483-4fa0-abd3-dfd0273725fa
+  name: Elite Training
+  description: Develop advanced training regimens that produce elite creatures at reduced recruitment costs.
+  branch: dominion
+  cost:
+    research: 100
+    food: 30
+    gold: 15
+  prerequisiteResearchIds:
+    - Creature Quarters
+    - Transmutation
+  unlocks:
+    - type: passive_bonus
+      bonusType: recruitmentCostReduction
+      value: 0.10
+      description: -10% recruitment cost for all creatures
+  tier: 4
+  requiredTicks: 500
+
+# --- TIER 5: Pinnacle powers ---
+
+- id: f6087134-bc85-4d00-955f-d50b71e50ed8
+  name: Supreme Command
+  description: Achieve unparalleled mastery over creature hierarchies, vastly expanding the dungeon's ability to house minions.
+  branch: dominion
+  cost:
+    research: 200
+    food: 60
+    gold: 30
+  prerequisiteResearchIds:
+    - Horde Tactics
+    - Pack Mentality
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 10
+      description: +10 maximum inhabitants
+  tier: 5
+  requiredTicks: 750
+
+- id: cda817bf-8ae7-4d87-a419-736e7fb98e04
+  name: Creature Synergy
+  description: Unlock the secrets of inter-species cooperation, dramatically boosting the productivity of all dungeon workers.
+  branch: dominion
+  cost:
+    research: 200
+    food: 60
+    gold: 30
+  prerequisiteResearchIds:
+    - Elite Training
+    - Horde Tactics
+  unlocks:
+    - type: passive_bonus
+      bonusType: globalWorkerEfficiency
+      value: 0.15
+      description: +15% worker efficiency for all inhabitants
+  tier: 5
+  requiredTicks: 750
+
+- id: 67338f35-6b17-49ce-bad4-61125fd851fa
+  name: Forced March
+  description: Drive creatures to serve with ruthless efficiency, slashing the cost to recruit new minions.
+  branch: dominion
+  cost:
+    research: 200
+    food: 60
+    gold: 30
+  prerequisiteResearchIds:
+    - Pack Mentality
+    - Elite Training
+  unlocks:
+    - type: passive_bonus
+      bonusType: recruitmentCostReduction
+      value: 0.10
+      description: -10% recruitment cost for all creatures
+  tier: 5
+  requiredTicks: 750
+
+# --- TIER 6: Ultimate mastery ---
+
+- id: f475812b-dbb3-42e8-9594-600517d05d44
+  name: Sovereign's Will
+  description: Transcend the limits of creature command, becoming an absolute sovereign whose will amplifies all dominion bonuses.
+  branch: dominion
+  cost:
+    research: 400
+    food: 120
+    gold: 60
+  prerequisiteResearchIds:
+    - Supreme Command
+    - Creature Synergy
+  unlocks:
+    - type: passive_bonus
+      bonusType: dominionMastery
+      value: 0.50
+      description: +50% to all dominion branch bonuses
+  tier: 6
+  requiredTicks: 1000

@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import type { InhabitantStats } from '@interfaces/inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
@@ -63,12 +64,40 @@ export function effectiveStatsCalculate(
     }
   }
 
+  // Research passive bonuses
+  const statsBonus =
+    researchUnlockGetPassiveBonusWithMastery('inhabitantStats');
+  if (statsBonus > 0) {
+    hp *= 1 + statsBonus;
+    attack *= 1 + statsBonus;
+    defense *= 1 + statsBonus;
+    speed *= 1 + statsBonus;
+  }
+
+  const defBonus = researchUnlockGetPassiveBonusWithMastery('defenseBonus');
+  if (defBonus > 0) {
+    defense *= 1 + defBonus;
+  }
+
+  const undeadBonus =
+    researchUnlockGetPassiveBonusWithMastery('undeadEfficiency');
+  if (undeadBonus > 0 && definition.type === 'undead') {
+    workerEfficiency *= 1 + undeadBonus;
+  }
+
+  const globalEfficiency = researchUnlockGetPassiveBonusWithMastery(
+    'globalWorkerEfficiency',
+  );
+  if (globalEfficiency > 0) {
+    workerEfficiency *= 1 + globalEfficiency;
+  }
+
   // Clamp
   return {
-    hp: Math.max(1, hp),
-    attack: Math.max(0, attack),
-    defense: Math.max(0, defense),
-    speed: Math.max(1, speed),
+    hp: Math.max(1, Math.round(hp)),
+    attack: Math.max(0, Math.round(attack)),
+    defense: Math.max(0, Math.round(defense)),
+    speed: Math.max(1, Math.round(speed)),
     workerEfficiency: Math.max(0.1, Math.round(workerEfficiency * 100) / 100),
   };
 }

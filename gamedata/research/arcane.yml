@@ -10,11 +10,14 @@
 #   │   └── Elemental Binding (T3)
 #   │       └── Ley Line Mastery (T4) [+Ley Line Tapping]
 #   ├── Enchantment (T2)
+#   │   ├── Advanced Room Modifications (T3)
 #   │   └── Warding (T3)
 #   │       └── Spellweave Lattice (T4) [+Arcane Amplification]
 #   └── Crystal Biome (T2)
 #   Arcane Convergence (T5) [Dimensional Studies + Ley Line Mastery]
 #   Planar Nexus (T5) [Spellweave Lattice + Dimensional Studies]
+#   Planar Binding (T5) [Arcane Convergence + Planar Nexus]
+#   Aberrant Summoning (T5) [Planar Nexus]
 #   Grand Arcanum (T6) [Arcane Convergence + Planar Nexus]
 
 # --- TIER 2: Three paths branch from Arcane Basics ---
@@ -119,6 +122,22 @@
   tier: 3
   requiredTicks: 300
 
+- id: 4500639c-fd48-4ee5-b05b-b1cb37f8d609
+  name: Advanced Room Modifications
+  description: Combine enchantment theory with advanced arcane engineering to unlock powerful room modifications including training stations, corruption seals, and resource converters.
+  branch: arcane
+  cost:
+    research: 50
+    flux: 15
+  prerequisiteResearchIds:
+    - Enchantment
+  unlocks:
+    - type: feature_flag
+      featureFlag: feature_advanced_room_mods
+      description: Unlocks Training Station, Corruption Seal, and Resource Converter room features
+  tier: 3
+  requiredTicks: 300
+
 - id: 21df8436-d4be-4f55-b2eb-217dfec171a0
   name: Warding
   description: Create powerful protective wards that shield rooms and inhabitants from magical intrusion.
@@ -154,6 +173,9 @@
       bonusType: fluxProduction
       value: 0.20
       description: +20% flux production from all sources
+    - type: feature_flag
+      featureFlag: feature_time_dilation
+      description: Unlocks Time Dilation Field prestige feature
   tier: 4
   requiredTicks: 500
 
@@ -192,6 +214,9 @@
       bonusType: researchSpeed
       value: 0.10
       description: +10% research speed
+    - type: feature_flag
+      featureFlag: feature_elder_runes
+      description: Unlocks Elder Runes prestige feature
   tier: 4
   requiredTicks: 500
 
@@ -232,6 +257,41 @@
       bonusType: allProduction
       value: 0.15
       description: +15% to all resource production
+  tier: 5
+  requiredTicks: 750
+
+- id: da630228-917b-4ab1-a30c-cebb1b8634c9
+  name: Planar Binding
+  description: Master the art of binding creatures from other planes of existence, enabling the recruitment of an ancient dragon of immense power.
+  branch: arcane
+  cost:
+    research: 200
+    flux: 60
+    crystals: 30
+  prerequisiteResearchIds:
+    - Arcane Convergence
+    - Planar Nexus
+  unlocks:
+    - type: feature_flag
+      featureFlag: legendary_recruit_dragon
+      description: Unlocks Dragon legendary recruitment
+  tier: 5
+  requiredTicks: 750
+
+- id: 0c4358c0-e787-41d3-a989-c91263f67ccf
+  name: Aberrant Summoning
+  description: Pierce the veil between dimensions to summon a beholder — an alien entity of vast intellect and devastating eye rays.
+  branch: arcane
+  cost:
+    research: 200
+    flux: 60
+    crystals: 30
+  prerequisiteResearchIds:
+    - Planar Nexus
+  unlocks:
+    - type: feature_flag
+      featureFlag: legendary_recruit_beholder
+      description: Unlocks Beholder legendary recruitment
   tier: 5
   requiredTicks: 750
 

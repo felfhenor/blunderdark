@@ -24,6 +24,61 @@ const researchUnlockSubject = new Subject<{
 
 export const researchUnlock$ = researchUnlockSubject.asObservable();
 
+// --- Mastery branch mapping ---
+
+const RESEARCH_BONUS_BRANCH_MAP: Record<
+  string,
+  'dark' | 'arcane' | 'engineering' | 'dominion'
+> = {
+  essenceProduction: 'dark',
+  corruptionGeneration: 'dark',
+  undeadEfficiency: 'dark',
+  corruptionResistance: 'dark',
+  fearReduction: 'dark',
+  inhabitantStats: 'dark',
+  fluxProduction: 'arcane',
+  researchSpeed: 'arcane',
+  allProduction: 'arcane',
+  invaderMoralePenalty: 'arcane',
+  goldProduction: 'engineering',
+  roomCapacity: 'engineering',
+  trapDamage: 'engineering',
+  defenseBonus: 'engineering',
+  craftingSpeed: 'engineering',
+  recruitmentCostReduction: 'dominion',
+  maxInhabitants: 'dominion',
+  globalWorkerEfficiency: 'dominion',
+};
+
+const MASTERY_BONUS_TYPE_MAP: Record<string, string> = {
+  dark: 'darkMastery',
+  arcane: 'arcaneMastery',
+  engineering: 'engineeringMastery',
+  dominion: 'dominionMastery',
+};
+
+/**
+ * Get a passive bonus scaled by the mastery multiplier for its branch.
+ * mastery of 0.5 means the bonus is multiplied by 1.5.
+ */
+export function researchUnlockGetPassiveBonusWithMastery(
+  bonusType: string,
+  unlockedContent?: UnlockedContent,
+): number {
+  const raw = researchUnlockGetPassiveBonuses(bonusType, unlockedContent);
+  if (raw === 0) return 0;
+
+  const branch = RESEARCH_BONUS_BRANCH_MAP[bonusType];
+  if (!branch) return raw;
+
+  const masteryBonusType = MASTERY_BONUS_TYPE_MAP[branch];
+  const mastery = researchUnlockGetPassiveBonuses(
+    masteryBonusType,
+    unlockedContent,
+  );
+  return raw * (1 + mastery);
+}
+
 // --- Query functions ---
 
 /**
@@ -54,7 +109,9 @@ export function researchUnlockGetPassiveBonuses(
   bonusType: string,
   unlockedContent?: UnlockedContent,
 ): number {
-  const content = unlockedContent ?? gamestate().world.research.unlockedContent;
+  const content =
+    unlockedContent ?? gamestate()?.world?.research?.unlockedContent;
+  if (!content) return 0;
   return content.passiveBonuses
     .filter((b) => b.bonusType === bonusType)
     .reduce((sum, b) => sum + b.value, 0);
@@ -67,7 +124,9 @@ export function researchUnlockIsFeatureUnlocked(
   featureFlag: string,
   unlockedContent?: UnlockedContent,
 ): boolean {
-  const content = unlockedContent ?? gamestate().world.research.unlockedContent;
+  const content =
+    unlockedContent ?? gamestate()?.world?.research?.unlockedContent;
+  if (!content) return false;
   return (content.featureFlags ?? []).includes(featureFlag);
 }
 

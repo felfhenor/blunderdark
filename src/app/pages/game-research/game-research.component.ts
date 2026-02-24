@@ -58,6 +58,15 @@ export class GameResearchComponent {
     return contentGetEntriesByType<ResearchContent>('research');
   });
 
+  public availableBranches = computed<ResearchBranch[]>(() => {
+    const nodes = this.allNodes();
+    const branches = new Set<ResearchBranch>();
+    for (const node of nodes) {
+      branches.add(node.branch);
+    }
+    return [...branches];
+  });
+
   public branchNodes = computed(() => {
     const branch = this.selectedBranch();
     return this.allNodes().filter((n) => n.branch === branch);

@@ -4,7 +4,7 @@ import type { ResearchId } from '@interfaces/content-research';
 import type { RoomId } from '@interfaces/content-room';
 import type { UpgradePathId } from '@interfaces/room';
 
-export type ResearchBranch = 'dark' | 'arcane' | 'engineering';
+export type ResearchBranch = 'dark' | 'arcane' | 'engineering' | 'dominion';
 
 export type RoomUnlock = {
   type: 'room';

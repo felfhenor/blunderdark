@@ -1,5 +1,5 @@
 # Research nodes define the tech tree for dungeon advancement.
-# Three branches: dark, arcane, engineering
+# Four branches: dark, arcane, engineering, dominion
 # Each node has: id, name, description, branch, cost, prerequisiteResearchIds, unlocks, tier, requiredTicks
 # Unlock effect types: room, inhabitant, ability, upgrade, passive_bonus
 
@@ -14,6 +14,9 @@
   unlocks:
     - type: room
       targetRoomId: Soul Well
+    - type: feature_flag
+      featureFlag: feature_blood_altar
+      description: Unlocks Blood Altar room feature
   tier: 1
   requiredTicks: 50
 
@@ -28,6 +31,9 @@
   unlocks:
     - type: room
       targetRoomId: Shadow Library
+    - type: feature_flag
+      featureFlag: feature_arcane_crystals
+      description: Unlocks Arcane Crystals room feature
   tier: 1
   requiredTicks: 50
 
@@ -44,5 +50,24 @@
       targetRoomId: Dark Forge
     - type: room
       targetRoomId: Barracks
+    - type: feature_flag
+      featureFlag: feature_geothermal_vents
+      description: Unlocks Geothermal Vents room feature
+  tier: 1
+  requiredTicks: 50
+
+# --- DOMINION BRANCH: root node ---
+- id: 79fdb36d-53f4-45f8-b5e1-0e52639803f0
+  name: Creature Lore
+  description: The foundational study of creature mastery, commanding, recruiting, and empowering dungeon creatures.
+  branch: dominion
+  cost:
+    research: 10
+  prerequisiteResearchIds: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: recruitmentCostReduction
+      value: 0.10
+      description: -10% recruitment cost for all creatures
   tier: 1
   requiredTicks: 50

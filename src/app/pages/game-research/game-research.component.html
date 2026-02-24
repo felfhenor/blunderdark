@@ -46,30 +46,16 @@
         role="tablist"
         class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0"
       >
-        <button
-          role="tab"
-          class="tab"
-          [class.tab-active]="selectedBranch() === 'dark'"
-          (click)="selectBranch('dark')"
-        >
-          Dark
-        </button>
-        <button
-          role="tab"
-          class="tab"
-          [class.tab-active]="selectedBranch() === 'arcane'"
-          (click)="selectBranch('arcane')"
-        >
-          Arcane
-        </button>
-        <button
-          role="tab"
-          class="tab"
-          [class.tab-active]="selectedBranch() === 'engineering'"
-          (click)="selectBranch('engineering')"
-        >
-          Engineering
-        </button>
+        @for (branch of availableBranches(); track branch) {
+          <button
+            role="tab"
+            class="tab capitalize"
+            [class.tab-active]="selectedBranch() === branch"
+            (click)="selectBranch(branch)"
+          >
+            {{ branch }}
+          </button>
+        }
       </div>
 
       <!-- Main Content -->
