@@ -34,6 +34,7 @@ export interface GameStateWorld {
   alchemyConversions: AlchemyConversion[];
   prisoners: CapturedPrisoner[];
   invasionSchedule: InvasionSchedule;
+  playerThreat: number;
   activeInvasion?: ActiveInvasion;
   corruptionEffects: CorruptionEffectState;
   victoryProgress: VictoryProgress;

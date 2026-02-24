@@ -14,6 +14,7 @@ import {
   invasionCombatStartNewRound,
 } from '@helpers/invasion-combat';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
+import { invasionThreatGetPartySizeBonus, invasionThreatGetStatBonus } from '@helpers/invasion-threat';
 import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
 import {
   invasionRewardCalculateDefensePenalties,
@@ -51,6 +52,7 @@ import type { RoomContent } from '@interfaces/content-room';
 import type {
   ActiveInvasion,
   CombatantId,
+  DungeonProfile,
   Floor,
   GameState,
   InhabitantInstanceId,
@@ -485,20 +487,22 @@ export function invasionStart(
 ): void {
   const day = state.clock.day;
 
-  // 0. Compute escalation bonus from last invasion's unreachable objectives
+  // 0. Compute escalation + threat party size bonus
   const lastHistory = state.world.invasionSchedule.invasionHistory;
   const lastUnreachable = lastHistory.length > 0
     ? (lastHistory[lastHistory.length - 1].unreachableObjectiveCount ?? 0)
     : 0;
-  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS;
+  const profile = warning?.profile ?? invasionCompositionCalculateDungeonProfile(state);
+  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS
+    + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
   // 1. Generate invader party (use pre-computed from warning if available)
   const invaders = warning?.invaders ?? invasionCompositionGenerateParty(
-    invasionCompositionCalculateDungeonProfile(state), seed, bonusSize,
+    profile, seed, bonusSize,
   );
 
   if (invaders.length === 0) {
-    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day);
+    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
     return;
   }
 
@@ -519,7 +523,7 @@ export function invasionStart(
 
   const floor0 = state.world.floors[0];
   if (!floor0) {
-    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day);
+    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
     return;
   }
 
@@ -532,7 +536,7 @@ export function invasionStart(
 
   if (path.length === 0) {
     console.warn('[INV] EMPTY: no path');
-    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day);
+    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
     return;
   }
 
@@ -602,6 +606,7 @@ export function invasionStart(
     currentTurn: 0,
     roomFearLevels,
     unreachableObjectiveCount,
+    profile,
     completed: false,
   };
 }
@@ -712,18 +717,24 @@ export function invasionProcess(state: GameState): void {
         (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
       );
       const focusedBonus = (invasion.unreachableObjectiveCount ?? 0) * FOCUSED_ASSAULT_ATTACK_BONUS;
+      const threatStatBonus = invasionThreatGetStatBonus(invasion.profile.threatLevel);
       const invaderCombatants = livingInvaderInstances.map((inv, idx) => {
         const invDef = invaderGetDefinitionById(inv.definitionId);
+        const baseAttack = invDef?.baseStats.attack ?? 5;
+        const baseDefense = invDef?.baseStats.defense ?? 5;
+        const baseSpeed = invDef?.baseStats.speed ?? 5;
+        const baseHp = invasion.invaderHpMap[inv.id] ?? inv.currentHp;
+        const baseMaxHp = inv.maxHp;
         return invasionCombatCreateCombatant(
           inv.id as unknown as CombatantId,
           'invader',
           invDef?.name ?? 'Invader',
           {
-            hp: invasion.invaderHpMap[inv.id] ?? inv.currentHp,
-            maxHp: inv.maxHp,
-            attack: (invDef?.baseStats.attack ?? 5) + focusedBonus,
-            defense: invDef?.baseStats.defense ?? 5,
-            speed: invDef?.baseStats.speed ?? 5,
+            hp: baseHp + Math.round(baseHp * threatStatBonus),
+            maxHp: baseMaxHp + Math.round(baseMaxHp * threatStatBonus),
+            attack: baseAttack + focusedBonus + Math.round(baseAttack * threatStatBonus),
+            defense: baseDefense + Math.round(baseDefense * threatStatBonus),
+            speed: baseSpeed,
           },
           { x: idx + roomDefenders.length + 1, y: 0 },
         );
@@ -1119,6 +1130,7 @@ function createEmptyCompletedInvasion(
   seed: string,
   invasionType: 'scheduled' | SpecialInvasionType,
   day: number,
+  profile: DungeonProfile,
 ): ActiveInvasion {
   const emptyResult: InvasionOrchestratorResult = {
     detailedResult: {
@@ -1173,6 +1185,7 @@ function createEmptyCompletedInvasion(
     currentTurn: 0,
     roomFearLevels: {},
     unreachableObjectiveCount: 0,
+    profile,
     completed: true,
     result: emptyResult,
   };

@@ -50,6 +50,7 @@ export function defaultGameState(): GameState {
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: defaultInvasionSchedule(),
+      playerThreat: 0,
       corruptionEffects: defaultCorruptionEffectState(),
       victoryProgress: defaultVictoryProgress(),
       merchant: defaultMerchantState(),

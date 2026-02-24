@@ -73,6 +73,7 @@ export async function worldgenGenerateWorld(): Promise<
     alchemyConversions: [],
     prisoners: [],
     invasionSchedule: defaultInvasionSchedule(),
+    playerThreat: 0,
     corruptionEffects: defaultCorruptionEffectState(),
     victoryProgress: defaultVictoryProgress(),
     merchant: defaultMerchantState(),

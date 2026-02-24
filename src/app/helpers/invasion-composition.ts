@@ -4,6 +4,7 @@ import {
   invaderGetAllDefinitions,
 } from '@helpers/invaders';
 import { rngChoice } from '@helpers/rng';
+import { invasionThreatBlend } from '@helpers/invasion-threat';
 import type {
   CompositionWeightConfig,
   DungeonProfile,
@@ -112,8 +113,9 @@ export function invasionCompositionCalculateDungeonProfile(state: GameState): Du
     Math.round(researchBonus + Math.min(50, dimensionTotals['knowledge'])),
   );
 
-  // Threat level: based on game day
-  const threatLevel = Math.min(100, Math.floor((state.clock.day - 1) / 3));
+  // Threat level: blend day-based threat with player threat
+  const dayThreat = Math.min(100, Math.floor((state.clock.day - 1) / 3));
+  const threatLevel = invasionThreatBlend(dayThreat, state.world.playerThreat);
 
   return { corruption, wealth, knowledge, size: totalRooms, threatLevel };
 }

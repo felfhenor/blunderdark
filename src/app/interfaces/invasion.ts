@@ -262,6 +262,9 @@ export type ActiveInvasion = {
   // Anti-turtling: count of secondary objectives not on the invasion path
   unreachableObjectiveCount: number;
 
+  // Dungeon profile (captured at start for stat bonus during combat)
+  profile: DungeonProfile;
+
   // Completion
   completed: boolean;
   result?: InvasionOrchestratorResult;

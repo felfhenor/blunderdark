@@ -50,6 +50,7 @@ export * from './invasion-objectives';
 export * from './invasion-process';
 export * from './invasion-reward-apply';
 export * from './invasion-rewards';
+export * from './invasion-threat';
 export * from './invasion-triggers';
 export * from './invasion-win-loss';
 export * from './legendary-inhabitant';

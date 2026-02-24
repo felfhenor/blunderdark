@@ -8,6 +8,7 @@ import { gameEventProcess } from '@helpers/game-events';
 import { gameTimeAdvanceClock } from '@helpers/game-time';
 import { hungerProcess, hungerProcessWarnings } from '@helpers/hunger';
 import { invasionProcess } from '@helpers/invasion-process';
+import { invasionThreatDecayProcess } from '@helpers/invasion-threat';
 import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
 import { researchProcess } from '@helpers/research-progress';
@@ -91,6 +92,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     alchemyLabProcess(state);
     tortureChamberProcess(state);
     verticalTransportTravelProcess(state);
+    invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);
     legendaryInhabitantUpkeepProcess(state);

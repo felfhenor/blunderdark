@@ -220,6 +220,7 @@ function makeGameState(overrides: {
         warningActive: false,
         warningDismissed: false,
       },
+      playerThreat: 0,
     },
   } as unknown as GameState;
 }
@@ -298,15 +299,17 @@ describe('invasion-composition', () => {
       expect(profile.size).toBe(3);
     });
 
-    it('should calculate threat level from day', () => {
+    it('should calculate threat level from day blended with player threat', () => {
       const state = makeGameState({ day: 100 });
       const profile = invasionCompositionCalculateDungeonProfile(state);
-      // (100-1)/3 = 33
-      expect(profile.threatLevel).toBe(33);
+      // dayThreat = (100-1)/3 = 33, playerThreat = 0, blended = round(33*0.5 + 0*0.5) = 17
+      expect(profile.threatLevel).toBe(17);
     });
 
     it('should cap threat level at 100', () => {
       const state = makeGameState({ day: 400 });
+      // Set playerThreat to 100 so blended = round(100*0.5 + 100*0.5) = 100
+      state.world.playerThreat = 100;
       const profile = invasionCompositionCalculateDungeonProfile(state);
       expect(profile.threatLevel).toBe(100);
     });

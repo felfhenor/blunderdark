@@ -95,6 +95,7 @@ function makeGameState(overrides: {
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: makeSchedule(overrides.schedule),
+      playerThreat: 0,
       victoryProgress: {
         consecutivePeacefulDays: 0,
         lastPeacefulCheckDay: 0,

@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
 import { INVASION_ESCALATION_EXTRA_INVADERS, invasionFindEntryRoom, invasionStart } from '@helpers/invasion-process';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
+import { invasionThreatGetIntervalReduction, invasionThreatGetPartySizeBonus } from '@helpers/invasion-threat';
 import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
@@ -234,7 +235,15 @@ export function invasionTriggerRecordAndReschedule(
   // Escalation: unreachable objectives reduce the interval to next invasion
   const unreachable = historyEntry.unreachableObjectiveCount ?? 0;
   const escalationReduction = unreachable * INVASION_ESCALATION_INTERVAL_REDUCTION;
-  const escalatedDay = result.day - escalationReduction;
+
+  // Threat: high player threat also reduces the interval
+  const dayThreat = Math.min(100, Math.floor((historyEntry.day - 1) / 3));
+  const blendedThreat = Math.min(100, Math.round(
+    dayThreat * 0.5 + state.world.playerThreat * 0.5,
+  ));
+  const threatReduction = invasionThreatGetIntervalReduction(blendedThreat);
+
+  const escalatedDay = result.day - escalationReduction - threatReduction;
 
   // Enforce minimum gap between invasions even with escalation
   schedule.nextInvasionDay = Math.max(
@@ -262,7 +271,8 @@ export function invasionTriggerGenerateWarning(
   const lastUnreachable = lastHistory.length > 0
     ? (lastHistory[lastHistory.length - 1].unreachableObjectiveCount ?? 0)
     : 0;
-  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS;
+  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS
+    + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
   const invaders = invasionCompositionGenerateParty(profile, seed, bonusSize);
   const objectives = invasionObjectiveAssign(state, seed);

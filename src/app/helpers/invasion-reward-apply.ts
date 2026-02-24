@@ -1,4 +1,10 @@
 import { invasionRewardHandlePrisoner } from '@helpers/invasion-rewards';
+import {
+  THREAT_MAX,
+  THREAT_MIN,
+  invasionThreatCalculateAdjustment,
+  invasionThreatCalculatePerformanceScore,
+} from '@helpers/invasion-threat';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { resourceAdd, resourceSubtract } from '@helpers/resources';
 import { updateGamestate } from '@helpers/state-game';
@@ -33,7 +39,7 @@ export async function invasionRewardApplyVictory(
     }
   }
 
-  // Reputation + victory tracking
+  // Reputation + victory tracking + threat adjustment
   await updateGamestate((state) => {
     reputationAwardInPlace(state, 'Defeat Invader');
     victoryRecordDefenseWin(state);
@@ -53,6 +59,14 @@ export async function invasionRewardApplyVictory(
     if (result.capturedPrisoners.length > 0) {
       state.world.prisoners.push(...result.capturedPrisoners);
     }
+
+    // Adjust player threat upward on victory
+    const perfScore = invasionThreatCalculatePerformanceScore(result.detailedResult);
+    const adjustment = invasionThreatCalculateAdjustment(perfScore, 'victory');
+    state.world.playerThreat = Math.min(
+      THREAT_MAX,
+      Math.max(THREAT_MIN, state.world.playerThreat + adjustment),
+    );
 
     return state;
   });
@@ -80,7 +94,7 @@ export async function invasionRewardApplyDefeat(
     }
   }
 
-  // Remove killed defenders + apply reputation loss
+  // Remove killed defenders + apply reputation loss + threat adjustment
   await updateGamestate((state) => {
     if (result.killedDefenderIds.length > 0) {
       const killedSet = new Set(result.killedDefenderIds);
@@ -96,6 +110,14 @@ export async function invasionRewardApplyDefeat(
         state.world.reputation.terror - penalties.reputationLoss,
       );
     }
+
+    // Adjust player threat downward on defeat
+    const perfScore = invasionThreatCalculatePerformanceScore(result.detailedResult);
+    const adjustment = invasionThreatCalculateAdjustment(perfScore, 'defeat');
+    state.world.playerThreat = Math.min(
+      THREAT_MAX,
+      Math.max(THREAT_MIN, state.world.playerThreat + adjustment),
+    );
 
     return state;
   });
