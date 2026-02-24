@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,24 +23,27 @@ const SOUL_WELL_ID = 'room-soul-well';
 
 // --- Upgrade paths ---
 
-const fluxAmplifierPath: RoomUpgradePath = {
-  id: 'upgrade-flux-amplifier' as UpgradePathId,
+const fluxAmplifierPath: RoomUpgradeContent = {
+  id: 'upgrade-flux-amplifier' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Flux Amplifier',
   description: 'Crystalline focusing arrays amplify flux output.',
   cost: { gold: 120, crystals: 80, essence: 30 },
   effects: [{ type: 'productionMultiplier', value: 1.5, resource: 'flux' }],
 };
 
-const expandedNexusPath: RoomUpgradePath = {
-  id: 'upgrade-expanded-nexus' as UpgradePathId,
+const expandedNexusPath: RoomUpgradeContent = {
+  id: 'upgrade-expanded-nexus' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Expanded Nexus',
   description: 'Widen the convergence chamber for an additional channeler.',
   cost: { gold: 100, crystals: 60 },
   effects: [{ type: 'maxInhabitantBonus', value: 1 }],
 };
 
-const arcaneOverchargePath: RoomUpgradePath = {
-  id: 'upgrade-arcane-overcharge' as UpgradePathId,
+const arcaneOverchargePath: RoomUpgradeContent = {
+  id: 'upgrade-arcane-overcharge' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Arcane Overcharge',
   description: 'Push the ley line beyond its natural limits.',
   cost: { gold: 150, crystals: 100, essence: 40 },
@@ -63,9 +66,13 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -77,7 +84,8 @@ const leyLineNexusRoom: RoomContent = {
   id: LEY_LINE_NEXUS_ID as RoomId,
   name: 'Ley Line Nexus',
   __type: 'room',
-  description: 'A mystical convergence point where underground ley lines intersect.',
+  description:
+    'A mystical convergence point where underground ley lines intersect.',
   shapeId: 'shape-t' as RoomShapeId,
   cost: { gold: 100, crystals: 50, essence: 20 },
   production: { flux: 2.0 },
@@ -93,8 +101,12 @@ const leyLineNexusRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
-  upgradePaths: [fluxAmplifierPath, expandedNexusPath, arcaneOverchargePath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-flux-amplifier' as RoomUpgradeId,
+    'upgrade-expanded-nexus' as RoomUpgradeId,
+    'upgrade-arcane-overcharge' as RoomUpgradeId,
+  ],
 };
 
 const shadowLibraryRoom: RoomContent = {
@@ -113,7 +125,6 @@ const shadowLibraryRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -133,7 +144,6 @@ const soulWellRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 3,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -240,6 +250,9 @@ beforeEach(() => {
   mockContent.set(LEY_LINE_NEXUS_ID, leyLineNexusRoom);
   mockContent.set(SHADOW_LIBRARY_ID, shadowLibraryRoom);
   mockContent.set(SOUL_WELL_ID, soulWellRoom);
+  mockContent.set(fluxAmplifierPath.id, fluxAmplifierPath);
+  mockContent.set(expandedNexusPath.id, expandedNexusPath);
+  mockContent.set(arcaneOverchargePath.id, arcaneOverchargePath);
 });
 
 describe('Ley Line Nexus: definition', () => {
@@ -259,16 +272,16 @@ describe('Ley Line Nexus: definition', () => {
     expect(leyLineNexusRoom.requiresWorkers).toBe(true);
   });
 
-  it('should have 3 upgrade paths', () => {
-    expect(leyLineNexusRoom.upgradePaths).toHaveLength(3);
-  });
-
   it('should have 3 adjacency bonuses', () => {
     expect(leyLineNexusRoom.adjacencyBonuses).toHaveLength(3);
   });
 
   it('should cost gold, crystals, and essence', () => {
-    expect(leyLineNexusRoom.cost).toEqual({ gold: 100, crystals: 50, essence: 20 });
+    expect(leyLineNexusRoom.cost).toEqual({
+      gold: 100,
+      crystals: 50,
+      essence: 20,
+    });
   });
 });
 
@@ -400,15 +413,21 @@ describe('Ley Line Nexus: Flux Amplifier upgrade', () => {
 describe('Ley Line Nexus: Expanded Nexus upgrade', () => {
   it('should change capacity from 2 to 3', () => {
     const room = createPlacedNexus({
-      appliedUpgradePathId: 'upgrade-expanded-nexus' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-expanded-nexus' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, leyLineNexusRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      leyLineNexusRoom,
+    );
     expect(effective).toBe(3);
   });
 
   it('should keep capacity at 2 without upgrade', () => {
     const room = createPlacedNexus();
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, leyLineNexusRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      leyLineNexusRoom,
+    );
     expect(effective).toBe(2);
   });
 });
@@ -426,7 +445,9 @@ describe('Ley Line Nexus: Arcane Overcharge upgrade', () => {
     expect(prodEffect!.value).toBe(2.0);
     expect(prodEffect!.resource).toBe('flux');
 
-    const fearEffect = overcharge!.effects.find((e) => e.type === 'fearIncrease');
+    const fearEffect = overcharge!.effects.find(
+      (e) => e.type === 'fearIncrease',
+    );
     expect(fearEffect!.value).toBe(1);
 
     const secEffect = overcharge!.effects.find(
@@ -440,7 +461,7 @@ describe('Ley Line Nexus: Arcane Overcharge upgrade', () => {
 describe('Ley Line Nexus: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedNexus({
-      appliedUpgradePathId: 'upgrade-flux-amplifier' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-flux-amplifier' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-nexus');
     expect(result.valid).toBe(false);

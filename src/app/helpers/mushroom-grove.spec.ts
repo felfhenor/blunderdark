@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,24 +24,28 @@ const DARK_FORGE_ID = 'room-dark-forge';
 
 // --- Upgrade paths ---
 
-const bountifulHarvestPath: RoomUpgradePath = {
-  id: 'upgrade-bountiful-harvest' as UpgradePathId,
+const bountifulHarvestPath: RoomUpgradeContent = {
+  id: 'upgrade-bountiful-harvest' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Bountiful Harvest',
-  description: 'Enhanced fungal cultivation techniques increase food yield by 50%.',
+  description:
+    'Enhanced fungal cultivation techniques increase food yield by 50%.',
   cost: { gold: 60 },
   effects: [{ type: 'productionMultiplier', value: 1.5, resource: 'food' }],
 };
 
-const expandedGrowthPath: RoomUpgradePath = {
-  id: 'upgrade-expanded-growth' as UpgradePathId,
+const expandedGrowthPath: RoomUpgradeContent = {
+  id: 'upgrade-expanded-growth' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Expanded Growth',
   description: 'Extend the growing chambers to accommodate more workers.',
   cost: { gold: 50 },
   effects: [{ type: 'maxInhabitantBonus', value: 2 }],
 };
 
-const tranquilGardenPath: RoomUpgradePath = {
-  id: 'upgrade-tranquil-garden' as UpgradePathId,
+const tranquilGardenPath: RoomUpgradeContent = {
+  id: 'upgrade-tranquil-garden' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Tranquil Garden',
   description: 'Calming spores eliminate all fear in the grove.',
   cost: { gold: 45 },
@@ -60,9 +64,13 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -90,8 +98,12 @@ const mushroomGroveRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [bountifulHarvestPath, expandedGrowthPath, tranquilGardenPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-bountiful-harvest' as RoomUpgradeId,
+    'upgrade-expanded-growth' as RoomUpgradeId,
+    'upgrade-tranquil-garden' as RoomUpgradeId,
+  ],
 };
 
 const soulWellRoom: RoomContent = {
@@ -110,7 +122,6 @@ const soulWellRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -130,7 +141,6 @@ const shadowLibraryRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -150,7 +160,6 @@ const darkForgeRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -248,6 +257,9 @@ beforeEach(() => {
   mockContent.set(SOUL_WELL_ID, soulWellRoom);
   mockContent.set(SHADOW_LIBRARY_ID, shadowLibraryRoom);
   mockContent.set(DARK_FORGE_ID, darkForgeRoom);
+  mockContent.set(bountifulHarvestPath.id, bountifulHarvestPath);
+  mockContent.set(expandedGrowthPath.id, expandedGrowthPath);
+  mockContent.set(tranquilGardenPath.id, tranquilGardenPath);
 });
 
 describe('Mushroom Grove: base production', () => {
@@ -404,7 +416,7 @@ describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
 
   it('should expose effects when upgrade is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-bountiful-harvest' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-bountiful-harvest' as RoomUpgradeId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -416,15 +428,21 @@ describe('Mushroom Grove: Bountiful Harvest upgrade', () => {
 describe('Mushroom Grove: Expanded Growth upgrade', () => {
   it('should change capacity from 3 to 5', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-expanded-growth' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-expanded-growth' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      mushroomGroveRoom,
+    );
     expect(effective).toBe(5);
   });
 
   it('should keep capacity at 3 without upgrade', () => {
     const room = createPlacedRoom();
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      mushroomGroveRoom,
+    );
     expect(effective).toBe(3);
   });
 });
@@ -441,7 +459,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 
   it('should expose fearReduction effect when applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-tranquil-garden' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-tranquil-garden' as RoomUpgradeId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -451,9 +469,12 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 
   it('should not change capacity when Tranquil Garden is applied', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-tranquil-garden' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-tranquil-garden' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, mushroomGroveRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      mushroomGroveRoom,
+    );
     expect(effective).toBe(3);
   });
 });
@@ -461,7 +482,7 @@ describe('Mushroom Grove: Tranquil Garden upgrade', () => {
 describe('Mushroom Grove: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedRoom({
-      appliedUpgradePathId: 'upgrade-bountiful-harvest' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-bountiful-harvest' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-growth');
     expect(result.valid).toBe(false);

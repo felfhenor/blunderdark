@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,24 +23,27 @@ const THRONE_ROOM_ID = 'room-throne-room';
 
 // --- Upgrade paths ---
 
-const fortifiedBarracksPath: RoomUpgradePath = {
-  id: 'upgrade-fortified-barracks' as UpgradePathId,
+const fortifiedBarracksPath: RoomUpgradeContent = {
+  id: 'upgrade-fortified-barracks' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Fortified Barracks',
   description: 'Reinforce walls and expand sleeping quarters.',
   cost: { gold: 100, crystals: 40 },
   effects: [{ type: 'maxInhabitantBonus', value: 4 }],
 };
 
-const comfortableQuartersPath: RoomUpgradePath = {
-  id: 'upgrade-comfortable-quarters' as UpgradePathId,
+const comfortableQuartersPath: RoomUpgradeContent = {
+  id: 'upgrade-comfortable-quarters' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Comfortable Quarters',
   description: 'Replace crude bunks with proper beds.',
   cost: { gold: 80, crystals: 20 },
   effects: [{ type: 'fearReduction', value: 1 }],
 };
 
-const warRoomPath: RoomUpgradePath = {
-  id: 'upgrade-war-room' as UpgradePathId,
+const warRoomPath: RoomUpgradeContent = {
+  id: 'upgrade-war-room' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'War Room',
   description: 'Add strategic planning tables.',
   cost: { gold: 120, crystals: 60, essence: 20 },
@@ -78,8 +81,12 @@ const barracksRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [fortifiedBarracksPath, comfortableQuartersPath, warRoomPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-fortified-barracks' as RoomUpgradeId,
+    'upgrade-comfortable-quarters' as RoomUpgradeId,
+    'upgrade-war-room' as RoomUpgradeId,
+  ],
 };
 
 const darkForgeRoom: RoomContent = {
@@ -98,7 +105,6 @@ const darkForgeRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -118,7 +124,6 @@ const throneRoom: RoomContent = {
   inhabitantRestriction: 'unique',
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -143,9 +148,15 @@ mockContent.set('shape-3x3', {
   width: 3,
   height: 3,
   tiles: [
-    { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
-    { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 },
-    { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 },
+    { x: 0, y: 0 },
+    { x: 1, y: 0 },
+    { x: 2, y: 0 },
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
   ],
 });
 
@@ -156,10 +167,22 @@ mockContent.set('shape-4x4', {
   width: 4,
   height: 4,
   tiles: [
-    { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 },
-    { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
-    { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
-    { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 },
+    { x: 0, y: 0 },
+    { x: 1, y: 0 },
+    { x: 2, y: 0 },
+    { x: 3, y: 0 },
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 0, y: 3 },
+    { x: 1, y: 3 },
+    { x: 2, y: 3 },
+    { x: 3, y: 3 },
   ],
 });
 
@@ -231,6 +254,9 @@ beforeEach(() => {
   mockContent.set(BARRACKS_ID, barracksRoom);
   mockContent.set(DARK_FORGE_ID, darkForgeRoom);
   mockContent.set(THRONE_ROOM_ID, throneRoom);
+  mockContent.set(fortifiedBarracksPath.id, fortifiedBarracksPath);
+  mockContent.set(comfortableQuartersPath.id, comfortableQuartersPath);
+  mockContent.set(warRoomPath.id, warRoomPath);
 });
 
 describe('Barracks: definition', () => {
@@ -252,10 +278,6 @@ describe('Barracks: definition', () => {
 
   it('should have no production', () => {
     expect(barracksRoom.production).toEqual({});
-  });
-
-  it('should have 3 upgrade paths', () => {
-    expect(barracksRoom.upgradePaths).toHaveLength(3);
   });
 
   it('should have 3 adjacency bonuses', () => {
@@ -380,7 +402,7 @@ describe('Barracks: Fortified Barracks upgrade', () => {
 
   it('should change capacity from 6 to 10', () => {
     const room = createPlacedBarracks({
-      appliedUpgradePathId: 'upgrade-fortified-barracks' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-fortified-barracks' as RoomUpgradeId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, barracksRoom);
     expect(effective).toBe(10);
@@ -418,7 +440,7 @@ describe('Barracks: War Room upgrade', () => {
 describe('Barracks: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedBarracks({
-      appliedUpgradePathId: 'upgrade-fortified-barracks' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-fortified-barracks' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-comfortable-quarters');
     expect(result.valid).toBe(false);

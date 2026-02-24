@@ -12,10 +12,10 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
+  RoomUpgradeContent,
+  RoomUpgradeId,
   TrapCraftingQueue,
   TrapInventoryEntry,
-  UpgradePathId,
 } from '@interfaces';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -29,8 +29,9 @@ const DARK_FORGE_ID = 'aa100001-0001-0001-0001-000000000006';
 
 // --- Upgrade paths ---
 
-const masterTrapperPath: RoomUpgradePath = {
-  id: 'upgrade-master-trapper' as UpgradePathId,
+const masterTrapperPath: RoomUpgradeContent = {
+  id: 'upgrade-master-trapper' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Master Trapper',
   description: 'Expand workshop capacity.',
   cost: { gold: 120, crystals: 60, essence: 20 },
@@ -40,8 +41,9 @@ const masterTrapperPath: RoomUpgradePath = {
   ],
 };
 
-const efficientAssemblyPath: RoomUpgradePath = {
-  id: 'upgrade-efficient-assembly' as UpgradePathId,
+const efficientAssemblyPath: RoomUpgradeContent = {
+  id: 'upgrade-efficient-assembly' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Efficient Assembly',
   description: 'Reduce costs and time.',
   cost: { gold: 100, crystals: 50 },
@@ -51,8 +53,9 @@ const efficientAssemblyPath: RoomUpgradePath = {
   ],
 };
 
-const enchantedTrapsPath: RoomUpgradePath = {
-  id: 'upgrade-enchanted-traps' as UpgradePathId,
+const enchantedTrapsPath: RoomUpgradeContent = {
+  id: 'upgrade-enchanted-traps' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Enchanted Traps',
   description: 'Adds bonus damage.',
   cost: { gold: 130, crystals: 70, essence: 30 },
@@ -134,8 +137,12 @@ const workshopDef: RoomContent = {
   ],
   isUnique: false,
   removable: true,
-  upgradePaths: [masterTrapperPath, efficientAssemblyPath, enchantedTrapsPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-master-trapper' as RoomUpgradeId,
+    'upgrade-efficient-assembly' as RoomUpgradeId,
+    'upgrade-enchanted-traps' as RoomUpgradeId,
+  ],
 };
 
 // --- Helpers ---
@@ -210,7 +217,13 @@ function makeGameState(overrides: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: overrides.floors ?? [makeFloor()],
@@ -239,8 +252,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
 }
@@ -265,6 +289,9 @@ beforeEach(() => {
   mockContent.set(TRAP_WORKSHOP_ID, workshopDef);
   mockContent.set(PIT_TRAP_ID, pitTrapDef);
   mockContent.set(ARROW_TRAP_ID, arrowTrapDef);
+  mockContent.set(masterTrapperPath.id, masterTrapperPath);
+  mockContent.set(efficientAssemblyPath.id, efficientAssemblyPath);
+  mockContent.set(enchantedTrapsPath.id, enchantedTrapsPath);
 });
 
 // --- Tests ---
@@ -276,13 +303,6 @@ describe('Trap Workshop Room Definition', () => {
     expect(workshopDef.shapeId).toBe('shape-2x2');
     expect(workshopDef.requiresWorkers).toBe(false);
     expect(workshopDef.cost).toEqual({ gold: 90, crystals: 30 });
-  });
-
-  it('should have 3 mutually exclusive upgrade paths', () => {
-    expect(workshopDef.upgradePaths).toHaveLength(3);
-    expect(workshopDef.upgradePaths[0].name).toBe('Master Trapper');
-    expect(workshopDef.upgradePaths[1].name).toBe('Efficient Assembly');
-    expect(workshopDef.upgradePaths[2].name).toBe('Enchanted Traps');
   });
 
   it('should have adjacency bonuses', () => {
@@ -301,7 +321,7 @@ describe('Crafting Cost', () => {
 
   it('should reduce cost with Efficient Assembly upgrade', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as RoomUpgradeId,
     });
     const cost = trapWorkshopGetCraftingCost(room, { gold: 40, crystals: 16 });
     // 0.75 multiplier: gold 40*0.75=30, crystals 16*0.75=12
@@ -311,7 +331,7 @@ describe('Crafting Cost', () => {
 
   it('should ceil fractional costs', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as RoomUpgradeId,
     });
     const cost = trapWorkshopGetCraftingCost(room, { gold: 30, crystals: 10 });
     // gold 30*0.75=22.5→23, crystals 10*0.75=7.5→8
@@ -350,7 +370,7 @@ describe('Crafting Time', () => {
 
   it('should apply Efficient Assembly speed upgrade', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as RoomUpgradeId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 0.7 multiplier: 15 * 0.7 = 10.5 → 11
@@ -359,7 +379,7 @@ describe('Crafting Time', () => {
 
   it('should apply Master Trapper speed upgrade (slower)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-master-trapper' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-master-trapper' as RoomUpgradeId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 1);
     // 1.2 multiplier: 15 * 1.2 = 18
@@ -368,7 +388,7 @@ describe('Crafting Time', () => {
 
   it('should combine upgrade and worker bonuses', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-efficient-assembly' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-efficient-assembly' as RoomUpgradeId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 2);
     // 0.7 upgrade * 0.8 worker: 15 * 0.7 = 10.5 → 11 (rounded from upgrade)
@@ -385,17 +405,26 @@ describe('Queue Management', () => {
         { roomId: 'room-1' as PlacedRoomId, jobs: [] },
         { roomId: 'room-2' as PlacedRoomId, jobs: [] },
       ];
-      expect(trapWorkshopGetQueue(queues, 'room-1' as PlacedRoomId)?.roomId).toBe('room-1');
+      expect(
+        trapWorkshopGetQueue(queues, 'room-1' as PlacedRoomId)?.roomId,
+      ).toBe('room-1');
     });
 
     it('should return undefined for missing room', () => {
-      expect(trapWorkshopGetQueue([], 'nonexistent' as PlacedRoomId)).toBeUndefined();
+      expect(
+        trapWorkshopGetQueue([], 'nonexistent' as PlacedRoomId),
+      ).toBeUndefined();
     });
   });
 
   describe('trapWorkshopAddJob', () => {
     it('should create new queue entry for room without existing queue', () => {
-      const result = trapWorkshopAddJob([], 'room-1' as PlacedRoomId, PIT_TRAP_ID, 15);
+      const result = trapWorkshopAddJob(
+        [],
+        'room-1' as PlacedRoomId,
+        PIT_TRAP_ID,
+        15,
+      );
       expect(result).toHaveLength(1);
       expect(result[0].roomId).toBe('room-1');
       expect(result[0].jobs).toHaveLength(1);
@@ -411,7 +440,12 @@ describe('Queue Management', () => {
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 5, targetTicks: 15 }],
         },
       ];
-      const result = trapWorkshopAddJob(queues, 'room-1' as PlacedRoomId, ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(
+        queues,
+        'room-1' as PlacedRoomId,
+        ARROW_TRAP_ID,
+        20,
+      );
       expect(result[0].jobs).toHaveLength(2);
       expect(result[0].jobs[1].trapTypeId).toBe(ARROW_TRAP_ID);
     });
@@ -423,7 +457,12 @@ describe('Queue Management', () => {
           jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
         },
       ];
-      const result = trapWorkshopAddJob(queues, 'room-1' as PlacedRoomId, ARROW_TRAP_ID, 20);
+      const result = trapWorkshopAddJob(
+        queues,
+        'room-1' as PlacedRoomId,
+        ARROW_TRAP_ID,
+        20,
+      );
       expect(result).toHaveLength(2);
       expect(result[0].roomId).toBe('room-other');
       expect(result[0].jobs).toHaveLength(1);
@@ -586,8 +625,14 @@ describe('trapWorkshopProcess', () => {
   it('should process multiple workshops across floors', () => {
     const ws1 = makeRoom({ id: 'ws-1' as PlacedRoomId });
     const ws2 = makeRoom({ id: 'ws-2' as PlacedRoomId });
-    const w1 = makeInhabitant({ instanceId: 'w1' as InhabitantInstanceId, assignedRoomId: 'ws-1' as PlacedRoomId });
-    const w2 = makeInhabitant({ instanceId: 'w2' as InhabitantInstanceId, assignedRoomId: 'ws-2' as PlacedRoomId });
+    const w1 = makeInhabitant({
+      instanceId: 'w1' as InhabitantInstanceId,
+      assignedRoomId: 'ws-1' as PlacedRoomId,
+    });
+    const w2 = makeInhabitant({
+      instanceId: 'w2' as InhabitantInstanceId,
+      assignedRoomId: 'ws-2' as PlacedRoomId,
+    });
     const floor1 = makeFloor([ws1], [w1]);
     const floor2 = makeFloor([ws2], [w2]);
     floor2.id = 'floor-2' as FloorId;
@@ -653,7 +698,9 @@ describe('trapWorkshopProcess', () => {
 
     // First job completed and removed
     expect(state.world.trapCraftingQueues[0].jobs).toHaveLength(1);
-    expect(state.world.trapCraftingQueues[0].jobs[0].trapTypeId).toBe(ARROW_TRAP_ID);
+    expect(state.world.trapCraftingQueues[0].jobs[0].trapTypeId).toBe(
+      ARROW_TRAP_ID,
+    );
     // Inventory updated
     expect(state.world.trapInventory[0].trapTypeId).toBe(PIT_TRAP_ID);
   });

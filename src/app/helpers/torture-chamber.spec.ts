@@ -15,8 +15,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
@@ -30,8 +30,9 @@ const GOBLIN_ID = 'tc200001-0001-0001-0001-000000000001';
 
 // --- Upgrade paths ---
 
-const grandInquisitorPath: RoomUpgradePath = {
-  id: 'upgrade-grand-inquisitor' as UpgradePathId,
+const grandInquisitorPath: RoomUpgradeContent = {
+  id: 'upgrade-grand-inquisitor' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Grand Inquisitor',
   description: 'Speed and conversion bonus.',
   cost: { gold: 120, essence: 40 },
@@ -42,12 +43,15 @@ const grandInquisitorPath: RoomUpgradePath = {
   ],
 };
 
-const corruptionEnginePath: RoomUpgradePath = {
-  id: 'upgrade-corruption-engine' as UpgradePathId,
+const corruptionEnginePath: RoomUpgradeContent = {
+  id: 'upgrade-corruption-engine' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Corruption Engine',
   description: 'Double corruption.',
   cost: { gold: 100, flux: 30 },
-  effects: [{ type: 'productionMultiplier', value: 2.0, resource: 'corruption' }],
+  effects: [
+    { type: 'productionMultiplier', value: 2.0, resource: 'corruption' },
+  ],
 };
 
 // --- Mock content ---
@@ -133,9 +137,9 @@ const tortureChamberDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [grandInquisitorPath, corruptionEnginePath],
   autoPlace: false,
   role: 'tortureChamber',
+  roomUpgradeIds: [grandInquisitorPath.id, corruptionEnginePath.id],
 };
 
 const soulWellDef: RoomContent = {
@@ -154,7 +158,6 @@ const soulWellDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
   tortureAdjacencyEffects: { tortureSpeedBonus: 0.15 },
 };
@@ -175,9 +178,8 @@ const barracksDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
-  tortureAdjacencyEffects: { tortureConversionBonus: 0.10 },
+  tortureAdjacencyEffects: { tortureConversionBonus: 0.1 },
 };
 
 // --- Helpers ---
@@ -299,8 +301,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
   mockResourceMap = state.world.resources;
@@ -346,12 +359,6 @@ describe('Torture Chamber Definition', () => {
       crystals: 40,
       essence: 20,
     });
-  });
-
-  it('should have 2 upgrade paths', () => {
-    expect(tortureChamberDef.upgradePaths).toHaveLength(2);
-    expect(tortureChamberDef.upgradePaths[0].name).toBe('Grand Inquisitor');
-    expect(tortureChamberDef.upgradePaths[1].name).toBe('Corruption Engine');
   });
 });
 
@@ -399,7 +406,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should apply Grand Inquisitor upgrade (0.5x)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set());
     expect(ticks).toBe(Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5));
@@ -414,7 +421,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should combine upgrade and adjacency', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
     const afterUpgrade = Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5);
@@ -423,7 +430,7 @@ describe('Extraction Tick Calculation', () => {
 
   it('should never go below 1 tick', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
     expect(ticks).toBeGreaterThanOrEqual(1);
@@ -439,7 +446,7 @@ describe('Conversion Tick Calculation', () => {
 
   it('should apply Grand Inquisitor upgrade (0.5x)', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const ticks = tortureGetConversionTicks(room, new Set());
     expect(ticks).toBe(Math.round(TORTURE_CONVERSION_BASE_TICKS * 0.5));
@@ -473,7 +480,7 @@ describe('Conversion Rate Calculation', () => {
 
   it('should apply Grand Inquisitor conversion bonus', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const rate = tortureGetConversionRate(room, new Set(), 'warrior');
     expect(rate).toBeCloseTo(0.55, 5); // 0.30 + 0.25
@@ -491,7 +498,7 @@ describe('Conversion Rate Calculation', () => {
 
   it('should cap at 95%', () => {
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     // rogue base: 0.50 + 0.25 (upgrade) + 0.10 (barracks) = 0.85
     const rate = tortureGetConversionRate(
@@ -506,7 +513,7 @@ describe('Conversion Rate Calculation', () => {
   it('should hard-cap even with extreme bonuses', () => {
     // Even with stacking, can't exceed 0.95
     const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
     });
     const rate = tortureGetConversionRate(
       room,
@@ -765,7 +772,9 @@ describe('tortureChamberProcess', () => {
       targetTicks: 20,
     };
 
-    const unassigned = makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId });
+    const unassigned = makeInhabitant({
+      assignedRoomId: 'other-room' as PlacedRoomId,
+    });
     const prisoner = makePrisoner();
     const floor = makeFloor([room], [unassigned]);
     const state = makeGameState({
@@ -840,7 +849,7 @@ describe('Adjacency Effects', () => {
 
   it('Barracks should have tortureConversionBonus', () => {
     expect(barracksDef.tortureAdjacencyEffects?.tortureConversionBonus).toBe(
-      0.10,
+      0.1,
     );
   });
 });

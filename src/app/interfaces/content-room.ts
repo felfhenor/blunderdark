@@ -1,11 +1,8 @@
+import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { ResourceCost } from '@interfaces/resource';
-import type {
-  AdjacencyBonus,
-  RoomProduction,
-  RoomUpgradePath,
-} from '@interfaces/room';
+import type { AdjacencyBonus, RoomProduction } from '@interfaces/room';
 import type { HasDescription } from '@interfaces/traits';
 
 export type RoomId = Branded<string, 'RoomId'>;
@@ -25,8 +22,8 @@ export type RoomContent = IsContentItem &
     inhabitantRestriction: string | undefined;
     fearLevel: number | 'variable';
     fearReductionAura: number;
-    upgradePaths: RoomUpgradePath[];
     autoPlace: boolean;
+    roomUpgradeIds: RoomUpgradeId[];
     role?: string;
     timeOfDayBonus?: { period: 'day' | 'night'; bonus: number };
     biomeBonuses?: Partial<Record<string, number>>;

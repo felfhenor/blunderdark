@@ -15,44 +15,14 @@
   inhabitantRestriction: null
   fearLevel: 0
   fearReductionAura: 1
+  roomUpgradeIds:
+    - Empowered Altar
+    - Ascendant Altar
   role: altar
   trainingAdjacencyEffects:
     statBonus: 1
   objectiveTypes:
     - DestroyAltar
-  upgradePaths:
-    - id: 716874c3-4fbb-4214-8d47-195f278b8233
-      name: Empowered Altar
-      description: Channel deeper magical energies to expand your dungeon-building capabilities and strengthen the calming aura.
-      upgradeLevel: 2
-      cost:
-        gold: 150
-        crystals: 75
-        essence: 30
-      effects:
-        - type: fearReductionAura
-          value: 2
-        - type: secondaryProduction
-          value: 0.2
-          resource: essence
-    - id: d31f3072-b312-40be-8a7e-6898bd0d4581
-      name: Ascendant Altar
-      description: Unlock the altar's full potential, granting access to advanced rooms and maximizing its stabilizing influence.
-      upgradeLevel: 3
-      cost:
-        gold: 300
-        crystals: 150
-        essence: 60
-      effects:
-        - type: fearReductionAura
-          value: 3
-        - type: secondaryProduction
-          value: 0.4
-          resource: essence
-        - type: secondaryProduction
-          value: 0.2
-          resource: flux
-
 - id: c9a1e8f5-2347-4885-b477-3363f9617077
   name: Throne Room
   description: The seat of power in your dungeon. Houses a single powerful ruler creature that provides dungeon-wide bonuses.
@@ -69,7 +39,6 @@
   inhabitantRestriction: unique
   fearLevel: variable
   role: throne
-
 - id: 9d9bddd6-cb51-4a9f-866d-cc4773bdec37
   name: Crystal Mine
   description: An excavation that extracts crystals from deep rock veins. Requires workers for full output. Benefits from proximity to other mines, forges, and libraries.
@@ -77,24 +46,29 @@
   cost:
     gold: 50
   production:
-    crystals: 1.0
+    crystals: 1
   requiresWorkers: true
   maxInhabitants: 2
   maxFeatures: 1
   fearLevel: 1
+  roomUpgradeIds:
+    - Deep Vein Mine
+    - Expanded Tunnels
+    - Resonant Mine
+    - Corrupted Mine
   timeOfDayBonus:
     period: day
-    bonus: 0.10
+    bonus: 0.1
   biomeBonuses:
     volcanic: 0.15
-    crystal: 0.40
+    crystal: 0.4
   invasionProfile:
     dimension: wealth
     weight: 10
   forgingAdjacencyEffects:
-    forgingSpeedBonus: 0.30
+    forgingSpeedBonus: 0.3
   alchemyAdjacencyEffects:
-    alchemySpeedBonus: 0.20
+    alchemySpeedBonus: 0.2
   adjacencyBonuses:
     - adjacentRoomId: Crystal Mine
       bonus: 0.1
@@ -105,52 +79,6 @@
     - adjacentRoomId: Shadow Library
       bonus: 0.1
       description: Library scholars identify optimal mining patterns.
-  upgradePaths:
-    - id: d042c9be-de98-4973-88c1-26dd20d3d739
-      name: Deep Vein Mine
-      description: Optimized mining techniques increase crystal yield by 50%.
-      cost:
-        crystals: 75
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: crystals
-    - id: c601bf43-d9d9-4e35-8608-14295382e789
-      name: Expanded Tunnels
-      description: Widen the mine shafts to accommodate more workers, increasing capacity from 2 to 4.
-      cost:
-        crystals: 60
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-    - id: a247b92c-7631-42b0-ad95-ea76ad2b864e
-      name: Resonant Mine
-      description: Harmonic crystal formations reduce fear in the mine and produce a small amount of flux.
-      cost:
-        crystals: 80
-      effects:
-        - type: fearReduction
-          value: 1
-        - type: secondaryProduction
-          value: 0.2
-          resource: flux
-    - id: 60431433-92ba-43c7-ad45-fb6b5aecb271
-      name: Corrupted Mine
-      description: Infuse the mine with dark energy. Crystal output doubles, but the corruption taints everything nearby.
-      requiresDarkUpgrade: true
-      cost:
-        crystals: 100
-        essence: 30
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: crystals
-        - type: secondaryProduction
-          value: 0.3
-          resource: corruption
-        - type: fearIncrease
-          value: 1
-
 - id: 7fb314ad-a447-469f-82df-4b8c68f9deff
   name: Mushroom Grove
   description: A grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
@@ -163,11 +91,16 @@
   maxInhabitants: 3
   maxFeatures: 1
   fearLevel: 1
+  roomUpgradeIds:
+    - Bountiful Grove
+    - Expanded Grove
+    - Tranquil Garden
+    - Blighted Grove
   timeOfDayBonus:
     period: day
     bonus: 0.15
   biomeBonuses:
-    fungal: 0.60
+    fungal: 0.6
   alchemyAdjacencyEffects:
     alchemyCostReduction: 0.15
   adjacencyBonuses:
@@ -180,49 +113,6 @@
     - adjacentRoomId: Dark Forge
       bonus: 0.15
       description: Forge warmth creates ideal growing conditions.
-  upgradePaths:
-    - id: 35ef7cb9-832a-4935-be46-ab19ae5e0ad3
-      name: Bountiful Grove
-      description: Enhanced fungal cultivation techniques increase food yield by 50%.
-      cost:
-        gold: 60
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: food
-    - id: 078aee06-566f-4e86-adbd-9d9c9a5b2bc4
-      name: Expanded Grove
-      description: Extend the growing chambers to accommodate more workers, increasing capacity from 3 to 5.
-      cost:
-        gold: 50
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-    - id: 69a262d5-5350-44fa-b05e-5b7e0f5d50f3
-      name: Tranquil Garden
-      description: Calming spores and gentle bioluminescence eliminate all fear in the grove.
-      cost:
-        gold: 45
-      effects:
-        - type: fearReduction
-          value: 1
-    - id: 339a23a7-3753-4052-a388-6b7941e7c458
-      name: Blighted Grove
-      description: Corrupt the fungi with dark spores. Massively boosts food output but produces corruption and unsettles nearby inhabitants.
-      requiresDarkUpgrade: true
-      cost:
-        gold: 70
-        essence: 25
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: food
-        - type: secondaryProduction
-          value: 0.2
-          resource: corruption
-        - type: fearIncrease
-          value: 1
-
 - id: 89e5e8a8-2ceb-45f5-b2d5-21ded39ceb26
   name: Shadow Library
   description: A repository of forbidden knowledge shrouded in arcane darkness. Scholars study ancient tomes to generate research points. Its eerie atmosphere unsettles all but the most resolute inhabitants.
@@ -237,11 +127,16 @@
   maxInhabitants: 1
   maxFeatures: 2
   fearLevel: 2
+  roomUpgradeIds:
+    - Arcane Library
+    - Expanded Archives
+    - Forbidden Archives
+    - Necronomicon Wing
   timeOfDayBonus:
     period: night
-    bonus: 0.20
+    bonus: 0.2
   biomeBonuses:
-    corrupted: 1.00
+    corrupted: 1
   invasionProfile:
     dimension: knowledge
     weight: 15
@@ -261,61 +156,6 @@
     - adjacentRoomId: Shadow Library
       bonus: 0.2
       description: Adjacent libraries share knowledge and cross-reference tomes.
-  upgradePaths:
-    - id: 041042a7-c517-4fea-b8e7-c98df623d8fe
-      name: Arcane Library
-      description: Enchanted reading lenses and amplified candlelight drastically improve research throughput.
-      cost:
-        gold: 100
-        crystals: 60
-        essence: 20
-      effects:
-        - type: productionMultiplier
-          value: 1.75
-          resource: research
-    - id: 548bc228-bf35-4562-831e-9fcfe396dfa5
-      name: Expanded Archives
-      description: Extend the library with additional reading chambers to accommodate more scholars.
-      cost:
-        gold: 90
-        crystals: 40
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-    - id: 421e6410-bb97-4694-afa8-dafbd2295036
-      name: Forbidden Archives
-      description: Unlock the darkest tomes. Greatly boosts research but intensifies the library's fearsome aura.
-      cost:
-        gold: 120
-        crystals: 80
-        essence: 30
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: research
-        - type: fearIncrease
-          value: 2
-    - id: 995465fb-aeda-468e-8e30-682b54064847
-      name: Necronomicon Wing
-      description: Open the sealed forbidden section. Triples research output and generates essence, but the eldritch knowledge spreads corruption and dread.
-      requiresDarkUpgrade: true
-      cost:
-        gold: 150
-        crystals: 100
-        essence: 50
-      effects:
-        - type: productionMultiplier
-          value: 3.0
-          resource: research
-        - type: secondaryProduction
-          value: 0.3
-          resource: essence
-        - type: secondaryProduction
-          value: 0.4
-          resource: corruption
-        - type: fearIncrease
-          value: 2
-
 - id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   name: Soul Well
   description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
@@ -330,18 +170,22 @@
   maxInhabitants: 2
   maxFeatures: 2
   fearLevel: 3
+  roomUpgradeIds:
+    - Necrotic Well
+    - Purified Well
+    - Abyssal Conduit
   timeOfDayBonus:
     period: night
     bonus: 0.15
   biomeBonuses:
-    corrupted: 1.00
+    corrupted: 1
   invasionProfile:
     dimension: corruption
     weight: 15
   objectiveTypes:
     - SealPortal
   breedingAdjacencyEffects:
-    mutationOddsBonus: 0.10
+    mutationOddsBonus: 0.1
   summoningAdjacencyEffects:
     summonStatBonus: 2
   tortureAdjacencyEffects:
@@ -356,51 +200,6 @@
     - adjacentRoomId: Soul Well
       bonus: 0.25
       description: Nearby wells create a spiritual resonance that amplifies essence flow.
-  upgradePaths:
-    - id: e795e43b-16cd-4a74-aed5-4977d275ce21
-      name: Necrotic Well
-      description: Deepen the well's connection to the spirit realm, boosting essence yield and allowing more workers to channel its power.
-      cost:
-        gold: 120
-        crystals: 60
-        essence: 25
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: essence
-        - type: maxInhabitantBonus
-          value: 1
-    - id: 61d78e22-a230-4c66-80a1-60367cb543f1
-      name: Purified Well
-      description: Purify the well's output for greater efficiency. The refined essence calms the surrounding area, reducing fear.
-      cost:
-        gold: 100
-        crystals: 80
-        essence: 40
-      effects:
-        - type: productionMultiplier
-          value: 1.75
-          resource: essence
-        - type: fearReduction
-          value: 1
-    - id: a8710392-9176-41ff-a458-249277acd8ad
-      name: Abyssal Conduit
-      description: Tear open a rift to the abyss. The well becomes a conduit for raw dark power, massively boosting essence but flooding the area with corruption and terror.
-      requiresDarkUpgrade: true
-      cost:
-        gold: 140
-        crystals: 90
-        essence: 60
-      effects:
-        - type: productionMultiplier
-          value: 2.5
-          resource: essence
-        - type: secondaryProduction
-          value: 0.6
-          resource: corruption
-        - type: fearIncrease
-          value: 2
-
 - id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge
   description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
@@ -416,37 +215,15 @@
   maxFeatures: 1
   fearLevel: 2
   isUnique: true
+  roomUpgradeIds:
+    - Master Forge
+    - Infernal Forge
   biomeBonuses:
-    volcanic: 0.50
+    volcanic: 0.5
   adjacencyBonuses:
     - adjacentRoomId: Crystal Mine
       bonus: 0.15
       description: Raw crystal ore fuels the forge's smelting process.
-  upgradePaths:
-    - id: e1f02001-0001-4001-8001-000000000001
-      name: Master Forge
-      description: Expand the forge to house more workers and speed up crafting by 25%.
-      cost:
-        gold: 120
-        crystals: 60
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-        - type: forgingSpeedMultiplier
-          value: 0.75
-    - id: e1f02001-0001-4001-8001-000000000002
-      name: Infernal Forge
-      description: Unlock advanced recipes and add +2 to all stat bonuses on forged items.
-      cost:
-        gold: 150
-        essence: 40
-        flux: 30
-      effects:
-        - type: forgingTierUnlock
-          value: 1
-        - type: forgingStatBonus
-          value: 2
-
 - id: d49fa0a3-4fa8-4e87-9c72-2c27b1cd1daf
   name: Underground Lake
   description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
@@ -455,13 +232,17 @@
     gold: 60
     crystals: 20
   production:
-    food: 1.0
+    food: 1
   requiresWorkers: true
   maxInhabitants: 3
   maxFeatures: 3
   fearLevel: 0
+  roomUpgradeIds:
+    - Deepwater Lake
+    - Expanded Lake
+    - Dark Waters
   biomeBonuses:
-    flooded: 0.50
+    flooded: 0.5
   adjacencyBonuses:
     - adjacentRoomId: Mushroom Grove
       bonus: 0.3
@@ -472,43 +253,6 @@
     - adjacentRoomId: Underground Lake
       bonus: 0.2
       description: Connected lakes form a larger ecosystem with more abundant catches.
-  upgradePaths:
-    - id: b7389938-e7a1-4c43-81b9-5161f4046f1a
-      name: Deepwater Lake
-      description: Train fishers in deep-water techniques and install luminescent lures to dramatically increase the food catch.
-      cost:
-        gold: 80
-        crystals: 30
-      effects:
-        - type: productionMultiplier
-          value: 1.6
-          resource: food
-    - id: 2f85cfdc-0955-42de-a028-fd37fe5efee2
-      name: Expanded Lake
-      description: Excavate additional chambers to extend the lake's reach, accommodating more fishers.
-      cost:
-        gold: 70
-        crystals: 25
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-    - id: 240a8e7e-7af0-4fa4-8e6d-0c5653e3994b
-      name: Dark Waters
-      description: Embrace the lake's deepest depths. Strange creatures lurk below, providing both food and an unsettling presence.
-      cost:
-        gold: 90
-        crystals: 40
-        essence: 15
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: food
-        - type: fearIncrease
-          value: 1
-        - type: secondaryProduction
-          value: 0.1
-          resource: essence
-
 - id: dcecac50-d80f-4ca9-b004-7a2cb0876ed0
   name: Barracks
   description: A hall lined with weapon racks and sleeping quarters. Houses and trains your fighters, providing no resource production but significantly boosting your dungeon's combat readiness. Its military atmosphere can unsettle peaceful creatures.
@@ -520,11 +264,15 @@
   maxInhabitants: 6
   maxFeatures: 1
   fearLevel: 1
+  roomUpgradeIds:
+    - Fortified Barracks
+    - Comfortable Quarters
+    - War Room
   role: barracks
   trainingAdjacencyEffects:
-    timeReduction: 0.20
+    timeReduction: 0.2
   tortureAdjacencyEffects:
-    tortureConversionBonus: 0.10
+    tortureConversionBonus: 0.1
   adjacencyBonuses:
     - adjacentRoomId: Dark Forge
       bonus: 0.15
@@ -535,36 +283,6 @@
     - adjacentRoomId: Barracks
       bonus: 0.1
       description: Connected barracks share training resources and patrol routes.
-  upgradePaths:
-    - id: c2dbdf17-8fa7-44df-9e03-81daef197773
-      name: Fortified Barracks
-      description: Reinforce walls and expand sleeping quarters, increasing troop capacity and hardening the structure against assault.
-      cost:
-        gold: 100
-        crystals: 40
-      effects:
-        - type: maxInhabitantBonus
-          value: 4
-    - id: 6680ccd4-db73-4e8a-a0fc-5b0e8da3e79f
-      name: Comfortable Quarters
-      description: Replace crude bunks with proper beds and add a mess hall. Eliminates the barracks' fearsome atmosphere and improves unit morale.
-      cost:
-        gold: 80
-        crystals: 20
-      effects:
-        - type: fearReduction
-          value: 1
-    - id: 55becbce-b298-44c0-a864-e73ae5657305
-      name: War Room
-      description: Add strategic planning tables and communication crystals. Grants a defensive bonus to all rooms on the floor during invasions.
-      cost:
-        gold: 120
-        crystals: 60
-        essence: 20
-      effects:
-        - type: fearIncrease
-          value: 1
-
 - id: 827472bd-6bbb-482f-86c8-ad30d5613237
   name: Treasure Vault
   description: A fortified chamber lined with enchanted locks and warding glyphs, designed to store and grow your dungeon's gold reserves. Its passive income comes from interest on stored wealth and tribute from passing merchants.
@@ -578,6 +296,10 @@
   maxInhabitants: 1
   maxFeatures: 3
   fearLevel: 1
+  roomUpgradeIds:
+    - Reinforced Vault
+    - Investment Vault
+    - "Dragon's Hoard"
   invasionProfile:
     dimension: wealth
     weight: 15
@@ -599,45 +321,6 @@
     - adjacentRoomId: Treasure Vault
       bonus: 0.1
       description: Connected vaults share security infrastructure, reducing overhead.
-  upgradePaths:
-    - id: 130ef3cc-fac2-4ea3-aa55-9a3b95df771e
-      name: Reinforced Vault
-      description: Reinforce walls with enchanted steel and add additional warding glyphs. Increases gold production and eliminates security risks.
-      cost:
-        gold: 150
-        crystals: 80
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: gold
-        - type: fearReduction
-          value: 1
-    - id: 20618e2f-fc5e-4b94-814a-43a8162130af
-      name: Investment Vault
-      description: Transform the vault into a financial hub. Double gold generation rate and house a dedicated treasurer.
-      cost:
-        gold: 200
-        crystals: 60
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: gold
-        - type: maxInhabitantBonus
-          value: 1
-    - id: 1c4a601d-ae48-4174-8a54-2632afe614da
-      name: Dragon's Hoard
-      description: Amass a legendary treasure hoard. Massively boosts gold production but the overwhelming wealth attracts dangerous attention.
-      cost:
-        gold: 180
-        crystals: 100
-        essence: 20
-      effects:
-        - type: productionMultiplier
-          value: 2.5
-          resource: gold
-        - type: fearIncrease
-          value: 2
-
 - id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   name: Training Grounds
   description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
@@ -653,6 +336,10 @@
   inhabitantRestriction: null
   fearLevel: 1
   isUnique: true
+  roomUpgradeIds:
+    - Elite Arena
+    - Grand Arena
+    - Drill Hall
   forgingAdjacencyEffects:
     forgingStatBonus: 1
   adjacencyBonuses:
@@ -665,48 +352,13 @@
     - adjacentRoomId: Altar Room
       bonus: 0.15
       description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
-  upgradePaths:
-    - id: 3d0d6ce5-3083-4ef5-824a-7199e7254b0d
-      name: Elite Arena
-      description: Advanced combat techniques grant +1 attack in addition to +1 defense, but training takes 20% longer.
-      cost:
-        gold: 100
-        crystals: 50
-        essence: 20
-      effects:
-        - type: trainingAttackBonus
-          value: 1
-        - type: trainingTimeMultiplier
-          value: 1.2
-    - id: fb9d4aa3-0c93-4178-965d-70dddd13877d
-      name: Grand Arena
-      description: Expanded training facilities increase capacity from 4 to 6 and reduce training time by 30%.
-      cost:
-        gold: 80
-        crystals: 30
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-        - type: trainingTimeMultiplier
-          value: 0.7
-    - id: 24679551-a0b0-4bc0-82af-26bb4cd4b4ca
-      name: Drill Hall
-      description: Intensive defensive drills grant an extra +1 defense bonus to trained inhabitants.
-      cost:
-        gold: 120
-        crystals: 60
-        essence: 30
-      effects:
-        - type: trainingDefenseBonus
-          value: 1
-
 - id: a7ef7e24-f250-45e7-986d-ad06b3610b52
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
   shapeId: T-Shape
   maxFeatures: 1
   biomeBonuses:
-    crystal: 0.10
+    crystal: 0.1
   invasionProfile:
     dimension: knowledge
     weight: 10
@@ -717,10 +369,14 @@
     crystals: 50
     essence: 20
   production:
-    flux: 2.0
+    flux: 2
   requiresWorkers: true
   maxInhabitants: 2
   fearLevel: 2
+  roomUpgradeIds:
+    - Amplified Nexus
+    - Expanded Nexus
+    - Overcharged Nexus
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
       bonus: 0.2
@@ -731,44 +387,6 @@
     - adjacentRoomId: Ley Line Nexus
       bonus: 0.25
       description: Adjacent nexus points create a powerful ley line network with amplified output.
-  upgradePaths:
-    - id: 04da0e2b-8529-48ba-a176-d37b3697cc70
-      name: Amplified Nexus
-      description: Install crystalline focusing arrays that amplify the ley line's natural flux output.
-      cost:
-        gold: 120
-        crystals: 80
-        essence: 30
-      effects:
-        - type: productionMultiplier
-          value: 1.5
-          resource: flux
-    - id: 36f72b2b-6903-4d2e-9bee-7a521b175901
-      name: Expanded Nexus
-      description: Widen the convergence chamber to accommodate an additional channeler.
-      cost:
-        gold: 100
-        crystals: 60
-      effects:
-        - type: maxInhabitantBonus
-          value: 1
-    - id: e52d3a63-cd44-4147-832b-342882f82c40
-      name: Overcharged Nexus
-      description: Push the ley line beyond its natural limits. Dramatically increases flux output but the unstable energies create an unsettling atmosphere and generate research insights.
-      cost:
-        gold: 150
-        crystals: 100
-        essence: 40
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: flux
-        - type: fearIncrease
-          value: 1
-        - type: secondaryProduction
-          value: 0.2
-          resource: research
-
 - id: b3a7c1e9-5f82-4d6a-a1c3-9e4b2d7f8a05
   name: Gold Vein
   description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
@@ -784,8 +402,6 @@
   maxFeatures: 0
   fearLevel: 0
   adjacencyBonuses: []
-  upgradePaths: []
-
 - id: 6d638daa-6e43-4569-a931-eb4710009da9
   name: Trap Workshop
   description: A crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
@@ -800,8 +416,12 @@
   maxFeatures: 1
   inhabitantRestriction: null
   fearLevel: 2
+  roomUpgradeIds:
+    - Master Trapworks
+    - Streamlined Workshop
+    - Arcane Trapworks
   forgingAdjacencyEffects:
-    forgingEffectivenessBonus: 0.20
+    forgingEffectivenessBonus: 0.2
   adjacencyBonuses:
     - adjacentRoomId: Dark Forge
       bonus: 0.2
@@ -812,41 +432,6 @@
     - adjacentRoomId: Crystal Mine
       bonus: 0.1
       description: Crystal Mine provides raw materials for trap mechanisms.
-  upgradePaths:
-    - id: 28f98e31-d05f-471d-b570-3eaa360de063
-      name: Master Trapworks
-      description: Expand the workshop to house more workers and unlock advanced trap designs.
-      cost:
-        gold: 120
-        crystals: 60
-        essence: 20
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-        - type: craftingSpeedMultiplier
-          value: 1.2
-    - id: 970b9a58-445c-4d07-99e9-3236a88ea75f
-      name: Streamlined Workshop
-      description: Streamlined production techniques reduce crafting costs by 25% and time by 30%.
-      cost:
-        gold: 100
-        crystals: 50
-      effects:
-        - type: craftingCostMultiplier
-          value: 0.75
-        - type: craftingSpeedMultiplier
-          value: 0.7
-    - id: d804977d-c0a0-4ef5-93db-eafa2c667490
-      name: Arcane Trapworks
-      description: Infuse crafted traps with elemental energy, adding bonus magical damage to all traps produced.
-      cost:
-        gold: 130
-        crystals: 70
-        essence: 30
-      effects:
-        - type: craftingBonusDamage
-          value: 5
-
 - id: bf618a8c-5b95-4a63-9168-98da24e061c4
   name: Spawning Pool
   description: A bubbling pool of primordial ooze that periodically spawns basic creatures. The pool generates inhabitants automatically, growing your workforce without manual recruitment. Upgrades can accelerate spawning or produce stronger creatures.
@@ -859,6 +444,9 @@
   maxInhabitants: 2
   maxFeatures: 1
   fearLevel: 1
+  roomUpgradeIds:
+    - Teeming Pool
+    - Dark Pool
   role: spawningPool
   spawnRate: 25
   spawnType: Goblin
@@ -872,34 +460,6 @@
     - adjacentRoomId: Soul Well
       bonus: 0.2
       description: Soul essence from the Well accelerates spawning.
-  upgradePaths:
-    - id: 05a95f1e-2b7a-4309-acfd-a960f9416612
-      name: Teeming Pool
-      description: Accelerated growth hormones reduce spawn time from 5 to 3 minutes and increase spawn capacity to 15.
-      cost:
-        gold: 100
-        crystals: 50
-        essence: 20
-      effects:
-        - type: spawnRateReduction
-          value: 10
-        - type: spawnCapacityBonus
-          value: 5
-        - type: maxInhabitantBonus
-          value: 2
-    - id: 8137978c-7955-4e5a-bf86-6fbd4af6141f
-      name: Dark Pool
-      description: Corrupt the pool with dark energy to spawn Skeletons instead of Goblins. The undead aura increases room fear.
-      cost:
-        gold: 100
-        crystals: 40
-        essence: 30
-      effects:
-        - type: spawnTypeChange
-          value: 1
-        - type: fearIncrease
-          value: 2
-
 - id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
   name: Breeding Pits
   description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign two compatible inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
@@ -915,6 +475,9 @@
   inhabitantRestriction: null
   fearLevel: 4
   isUnique: true
+  roomUpgradeIds:
+    - Incubation Chamber
+    - Mutagenic Pits
   role: breedingPits
   adjacencyBonuses:
     - adjacentRoomId: Spawning Pool
@@ -926,32 +489,6 @@
     - adjacentRoomId: Shadow Library
       bonus: 0.1
       description: Library knowledge improves breeding recipe accuracy.
-  upgradePaths:
-    - id: 1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
-      name: Incubation Chamber
-      description: Improved incubation chambers reduce hybrid breeding time by 30% and increase room capacity by 2.
-      cost:
-        gold: 150
-        crystals: 80
-        essence: 40
-      effects:
-        - type: breedingTimeMultiplier
-          value: 0.7
-        - type: maxInhabitantBonus
-          value: 2
-    - id: 2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
-      name: Mutagenic Pits
-      description: Amplified mutagenic fields increase the chance of positive mutations by 15% and boost stat bonuses.
-      cost:
-        gold: 130
-        crystals: 70
-        essence: 50
-      effects:
-        - type: mutationOddsBonus
-          value: 0.15
-        - type: mutationStatBonus
-          value: 0.25
-
 - id: 8f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c
   name: Summoning Circle
   description: A ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
@@ -967,6 +504,10 @@
   inhabitantRestriction: null
   fearLevel: 3
   isUnique: true
+  roomUpgradeIds:
+    - Greater Circle
+    - Dual Circle
+    - Binding Circle
   role: summoningCircle
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
@@ -975,39 +516,6 @@
     - adjacentRoomId: Soul Well
       bonus: 0.1
       description: Soul essence from the Well stabilizes planar connections.
-  upgradePaths:
-    - id: 9a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
-      name: Greater Circle
-      description: Unlock advanced summoning recipes, allowing access to more powerful creatures.
-      cost:
-        gold: 200
-        essence: 100
-        flux: 50
-      effects:
-        - type: summonTierUnlock
-          value: 1
-    - id: ab3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
-      name: Dual Circle
-      description: Inscribe a second summoning circle, allowing an additional summoner to work in parallel.
-      cost:
-        gold: 150
-        crystals: 80
-      effects:
-        - type: maxInhabitantBonus
-          value: 1
-    - id: bc4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
-      name: Binding Circle
-      description: Master the art of planar binding. Temporary summons last 50% longer and permanent summons gain +1 to all stats.
-      cost:
-        gold: 180
-        essence: 60
-        flux: 40
-      effects:
-        - type: summonDurationMultiplier
-          value: 1.5
-        - type: summonStatBonus
-          value: 1
-
 - id: c3b02001-0001-4001-8001-000000000001
   name: Alchemy Lab
   description: A laboratory for transmuting raw resources into refined magical materials. Assign an alchemist to begin converting crystals and food into flux, or unlock advanced recipes to produce essence and other exotic substances.
@@ -1022,46 +530,20 @@
   inhabitantRestriction: null
   fearLevel: 2
   isUnique: true
+  roomUpgradeIds:
+    - Distillery
+    - Advanced Laboratory
+    - Expanded Laboratory
   role: alchemyLab
   biomeBonuses:
-    crystal: 0.20
+    crystal: 0.2
   adjacencyBonuses:
     - adjacentRoomId: Crystal Mine
       bonus: 0.15
       description: Crystal Mine provides a steady supply of raw materials.
     - adjacentRoomId: Mushroom Grove
-      bonus: 0.10
+      bonus: 0.1
       description: Fresh mushroom substrate aids in reagent preparation.
-  upgradePaths:
-    - id: c3b02001-0002-4001-8001-000000000001
-      name: Distillery
-      description: Refine the conversion process to use fewer raw materials per cycle. Reduces input costs to 3 Crystals + 3 Food per Flux.
-      cost:
-        gold: 100
-        crystals: 50
-      effects:
-        - type: alchemyCostMultiplier
-          value: 0.6
-    - id: c3b02001-0002-4001-8001-000000000002
-      name: Advanced Laboratory
-      description: Unlock advanced transmutation recipes for producing Essence and concentrated Flux from exotic inputs.
-      cost:
-        gold: 120
-        essence: 40
-        flux: 20
-      effects:
-        - type: alchemyTierUnlock
-          value: 1
-    - id: c3b02001-0002-4001-8001-000000000003
-      name: Expanded Laboratory
-      description: Add additional workstations, increasing the lab's inhabitant capacity from 1 to 3.
-      cost:
-        gold: 80
-        crystals: 40
-      effects:
-        - type: maxInhabitantBonus
-          value: 2
-
 - id: e4b7c9a1-3f5d-4e8b-a2c6-d0f1e3a5b7c9
   name: Fusion Core
   description: A chamber of crystallized energy where two creatures are merged into a single, more powerful hybrid. The arcane machinery hums with volatile flux, requiring no workers but demanding significant resources to construct.
@@ -1083,9 +565,8 @@
       bonus: 0.15
       description: Arcane knowledge stabilizes the fusion process.
     - adjacentRoomId: Soul Well
-      bonus: 0.10
+      bonus: 0.1
       description: Soul essence fuels the core's binding rituals.
-
 - id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
   name: Torture Chamber
   description: A chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
@@ -1102,57 +583,27 @@
   inhabitantRestriction: null
   fearLevel: 4
   isUnique: true
+  roomUpgradeIds:
+    - "Inquisitor's Chamber"
+    - Corruption Chamber
+    - Dread Chamber
   role: tortureChamber
   timeOfDayBonus:
     period: night
-    bonus: 0.20
+    bonus: 0.2
   invasionProfile:
     dimension: corruption
     weight: 10
   adjacencyBonuses:
     - adjacentRoomId: Soul Well
-      bonus: 0.20
+      bonus: 0.2
       description: Soul Well's spectral energy intensifies the chamber's dark methods.
     - adjacentRoomId: Shadow Library
       bonus: 0.15
       description: Forbidden knowledge from the Shadow Library refines interrogation techniques.
     - adjacentRoomId: Barracks
-      bonus: 0.10
+      bonus: 0.1
       description: Military discipline from the Barracks aids in prisoner control.
-  upgradePaths:
-    - id: 744ed99e-a98a-419e-9b8a-70ffca75c3f5
-      name: Inquisitor's Chamber
-      description: A master interrogator oversees the chamber, halving processing time and boosting conversion odds by 25%.
-      cost:
-        gold: 120
-        essence: 40
-      effects:
-        - type: tortureSpeedMultiplier
-          value: 0.5
-        - type: tortureConversionBonus
-          value: 0.25
-        - type: maxInhabitantBonus
-          value: 1
-    - id: 486e229e-c186-4d74-a71e-79010c9b6bdf
-      name: Corruption Chamber
-      description: Dark machinery amplifies the chamber's corrupting influence, doubling corruption output.
-      cost:
-        gold: 100
-        flux: 30
-      effects:
-        - type: productionMultiplier
-          value: 2.0
-          resource: corruption
-    - id: f5a2a50a-4d0e-47fb-b860-3b41c1a86529
-      name: Dread Chamber
-      description: Screaming echoes and dread enchantments push fear to nightmarish levels.
-      cost:
-        gold: 150
-        essence: 50
-      effects:
-        - type: fearIncrease
-          value: 1
-
 - id: deaaa1f1-07c8-47df-b165-e63b21898e42
   name: Stairway
   description: A narrow stone staircase connecting two adjacent floors. Inhabitants traverse it in about one minute per floor.
@@ -1170,7 +621,6 @@
   inhabitantRestriction: null
   fearLevel: 0
   role: stair
-
 - id: 02d01c66-0ba4-4b82-8ce8-e801e798e731
   name: Elevator Shaft
   description: A mechanical lift system that rapidly transports inhabitants between floors. Faster than stairs and can span multiple floors.
@@ -1189,7 +639,6 @@
   inhabitantRestriction: null
   fearLevel: 0
   role: elevator
-
 - id: 2c382a21-53f8-4667-a7b9-38e900d84761
   name: Portal
   description: A magical gateway that instantly teleports inhabitants between two locations on different floors. Requires flux and essence to construct.

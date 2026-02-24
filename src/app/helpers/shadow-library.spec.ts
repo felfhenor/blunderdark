@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,17 +23,21 @@ const CRYSTAL_MINE_ID = 'room-crystal-mine';
 
 // --- Upgrade paths ---
 
-const arcaneFocusPath: RoomUpgradePath = {
-  id: 'upgrade-arcane-focus' as UpgradePathId,
+const arcaneFocusPath: RoomUpgradeContent = {
+  id: 'upgrade-arcane-focus' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Arcane Focus',
   description:
     'Enchanted reading lenses and amplified candlelight drastically improve research throughput.',
   cost: { gold: 100, crystals: 60, essence: 20 },
-  effects: [{ type: 'productionMultiplier', value: 1.75, resource: 'research' }],
+  effects: [
+    { type: 'productionMultiplier', value: 1.75, resource: 'research' },
+  ],
 };
 
-const expandedArchivesPath: RoomUpgradePath = {
-  id: 'upgrade-expanded-archives' as UpgradePathId,
+const expandedArchivesPath: RoomUpgradeContent = {
+  id: 'upgrade-expanded-archives' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Expanded Archives',
   description:
     'Extend the library with additional reading chambers to accommodate more scholars.',
@@ -41,8 +45,9 @@ const expandedArchivesPath: RoomUpgradePath = {
   effects: [{ type: 'maxInhabitantBonus', value: 2 }],
 };
 
-const forbiddenKnowledgePath: RoomUpgradePath = {
-  id: 'upgrade-forbidden-knowledge' as UpgradePathId,
+const forbiddenKnowledgePath: RoomUpgradeContent = {
+  id: 'upgrade-forbidden-knowledge' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Forbidden Knowledge',
   description:
     'Unlock the darkest tomes. Greatly boosts research but intensifies the fearsome aura.',
@@ -65,9 +70,13 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -96,8 +105,12 @@ const shadowLibraryRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
-  upgradePaths: [arcaneFocusPath, expandedArchivesPath, forbiddenKnowledgePath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-arcane-focus' as RoomUpgradeId,
+    'upgrade-expanded-archives' as RoomUpgradeId,
+    'upgrade-forbidden-knowledge' as RoomUpgradeId,
+  ],
 };
 
 const soulWellRoom: RoomContent = {
@@ -116,7 +129,6 @@ const soulWellRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -136,7 +148,6 @@ const crystalMineRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -208,9 +219,7 @@ function makeFloor(
   };
 }
 
-function createPlacedLibrary(
-  overrides: Partial<PlacedRoom> = {},
-): PlacedRoom {
+function createPlacedLibrary(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'placed-library-1' as PlacedRoomId,
     roomTypeId: SHADOW_LIBRARY_ID as RoomId,
@@ -227,6 +236,9 @@ beforeEach(() => {
   mockContent.set(SHADOW_LIBRARY_ID, shadowLibraryRoom);
   mockContent.set(SOUL_WELL_ID, soulWellRoom);
   mockContent.set(CRYSTAL_MINE_ID, crystalMineRoom);
+  mockContent.set(arcaneFocusPath.id, arcaneFocusPath);
+  mockContent.set(expandedArchivesPath.id, expandedArchivesPath);
+  mockContent.set(forbiddenKnowledgePath.id, forbiddenKnowledgePath);
 });
 
 describe('Shadow Library: definition', () => {
@@ -244,10 +256,6 @@ describe('Shadow Library: definition', () => {
 
   it('should require workers', () => {
     expect(shadowLibraryRoom.requiresWorkers).toBe(true);
-  });
-
-  it('should have 3 upgrade paths', () => {
-    expect(shadowLibraryRoom.upgradePaths).toHaveLength(3);
   });
 
   it('should have 3 adjacency bonuses', () => {
@@ -382,7 +390,7 @@ describe('Shadow Library: Arcane Focus upgrade', () => {
 
   it('should expose effects when upgrade is applied', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-arcane-focus' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-arcane-focus' as RoomUpgradeId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(1);
@@ -394,15 +402,21 @@ describe('Shadow Library: Arcane Focus upgrade', () => {
 describe('Shadow Library: Expanded Archives upgrade', () => {
   it('should change capacity from 1 to 3', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-expanded-archives' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-expanded-archives' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, shadowLibraryRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      shadowLibraryRoom,
+    );
     expect(effective).toBe(3);
   });
 
   it('should keep capacity at 1 without upgrade', () => {
     const room = createPlacedLibrary();
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, shadowLibraryRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      shadowLibraryRoom,
+    );
     expect(effective).toBe(1);
   });
 });
@@ -430,7 +444,7 @@ describe('Shadow Library: Forbidden Knowledge upgrade', () => {
 
   it('should expose both effects when applied', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-forbidden-knowledge' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-forbidden-knowledge' as RoomUpgradeId,
     });
     const effects = roomUpgradeGetAppliedEffects(room);
     expect(effects).toHaveLength(2);
@@ -440,7 +454,7 @@ describe('Shadow Library: Forbidden Knowledge upgrade', () => {
 describe('Shadow Library: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedLibrary({
-      appliedUpgradePathId: 'upgrade-arcane-focus' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-arcane-focus' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-archives');
     expect(result.valid).toBe(false);

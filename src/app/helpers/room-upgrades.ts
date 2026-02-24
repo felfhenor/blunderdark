@@ -6,11 +6,14 @@ import type {
   RoomId,
   RoomProduction,
   RoomUpgradeEffect,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeId,
 } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
-import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
+import type { RoomUpgradeContent } from '@interfaces/content-roomupgrade';
+import type {
+  UpgradeValidation,
+  VisibleUpgrade,
+} from '@interfaces/room-upgrade';
 
 /**
  * Get the display name for a placed room, accounting for applied upgrades and suffix.
@@ -24,19 +27,23 @@ export function roomGetDisplayName(placedRoom: PlacedRoom): string {
   return placedRoom.suffix ? `${baseName} ${placedRoom.suffix}` : baseName;
 }
 
-export function roomUpgradeGetPaths(roomTypeId: RoomId): RoomUpgradePath[] {
+export function roomUpgradeGetPaths(roomTypeId: RoomId): RoomUpgradeContent[] {
   const room = contentGetEntry<RoomContent>(roomTypeId);
-  if (!room) return [];
-  return room.upgradePaths ?? [];
+  if (!room?.roomUpgradeIds?.length) return [];
+  return room.roomUpgradeIds
+    .map((id) => contentGetEntry<RoomUpgradeContent>(id))
+    .filter((u): u is RoomUpgradeContent => u !== undefined);
 }
 
 export function roomUpgradeGetApplied(
   placedRoom: PlacedRoom,
-): RoomUpgradePath | undefined {
+): RoomUpgradeContent | undefined {
   if (!placedRoom.appliedUpgradePathId) return undefined;
 
-  const paths = roomUpgradeGetPaths(placedRoom.roomTypeId);
-  return paths.find((p) => p.id === placedRoom.appliedUpgradePathId) ?? undefined;
+  return (
+    contentGetEntry<RoomUpgradeContent>(placedRoom.appliedUpgradePathId) ??
+    undefined
+  );
 }
 
 export function roomUpgradeGetAppliedEffects(
@@ -79,7 +86,7 @@ export function roomUpgradeCanApply(
 
 export function roomUpgradeApply(
   placedRoom: PlacedRoom,
-  upgradePathId: UpgradePathId,
+  upgradePathId: RoomUpgradeId,
 ): PlacedRoom {
   return {
     ...placedRoom,
@@ -90,7 +97,7 @@ export function roomUpgradeApply(
 export function roomUpgradeGetAvailable(
   placedRoom: PlacedRoom,
   darkUpgradeUnlocked = false,
-): RoomUpgradePath[] {
+): RoomUpgradeContent[] {
   if (placedRoom.appliedUpgradePathId) return [];
   return roomUpgradeGetPaths(placedRoom.roomTypeId).filter(
     (p) => !p.requiresDarkUpgrade || darkUpgradeUnlocked,
@@ -137,7 +144,8 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
 
   bonus += featureCalculateCapacityBonus(placedRoom);
 
-  const researchCapBonus = researchUnlockGetPassiveBonusWithMastery('roomCapacity');
+  const researchCapBonus =
+    researchUnlockGetPassiveBonusWithMastery('roomCapacity');
   bonus += Math.floor(researchCapBonus);
 
   return roomDef.maxInhabitants + bonus;

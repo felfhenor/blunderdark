@@ -12,25 +12,10 @@ vi.mock('@helpers/content', () => {
     production: { crystals: 1.0 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomId: 'room-dark-forge', bonus: 0.1, description: 'Forge heats rock' },
-    ],
-    upgradePaths: [
       {
-        id: 'upgrade-multiplier',
-        name: 'Deep Vein Extraction',
-        description: '+50% crystal production',
-        cost: { crystals: 75 },
-        effects: [{ type: 'productionMultiplier', value: 1.5, resource: 'crystals' }],
-      },
-      {
-        id: 'upgrade-secondary',
-        name: 'Crystal Resonance',
-        description: 'Produces flux as a bonus',
-        cost: { crystals: 80 },
-        effects: [
-          { type: 'fearReduction', value: 1 },
-          { type: 'secondaryProduction', value: 0.2, resource: 'flux' },
-        ],
+        adjacentRoomId: 'room-dark-forge',
+        bonus: 0.1,
+        description: 'Forge heats rock',
       },
     ],
   });
@@ -67,7 +52,11 @@ vi.mock('@helpers/content', () => {
     production: { gold: 1.2 },
     requiresWorkers: true,
     adjacencyBonuses: [
-      { adjacentRoomId: 'room-crystal-mine', bonus: 0.15, description: 'Raw crystal ore fuels forging' },
+      {
+        adjacentRoomId: 'room-crystal-mine',
+        bonus: 0.15,
+        description: 'Raw crystal ore fuels forging',
+      },
     ],
   });
 
@@ -198,9 +187,33 @@ vi.mock('@helpers/content', () => {
     height: 1,
   });
 
+  entries.set('upgrade-multiplier', {
+    id: 'upgrade-multiplier' as RoomUpgradeId,
+    name: 'Crystal Mine Multiplier Upgrade',
+    __type: 'roomupgrade',
+    description: '',
+    cost: {},
+    effects: [
+      { type: 'productionMultiplier', value: 1.5, resource: 'crystals' },
+    ],
+  });
+
+  entries.set('upgrade-secondary', {
+    id: 'upgrade-secondary' as RoomUpgradeId,
+    name: 'Crystal Mine Secondary Upgrade',
+    __type: 'roomupgrade',
+    description: '',
+    cost: {},
+    effects: [{ type: 'secondaryProduction', value: 0.2, resource: 'flux' }],
+  });
+
   return {
     contentGetEntry: vi.fn((id: string) => entries.get(id)),
-    contentGetEntriesByType: vi.fn(() => []),
+    contentGetEntriesByType: vi.fn((type: string) =>
+      [...entries.values()].filter(
+        (e: unknown) => (e as { __type: string }).__type === type,
+      ),
+    ),
     getEntries: vi.fn(),
     contentAllIdsByName: vi.fn(() => new Map()),
   };
@@ -209,7 +222,9 @@ vi.mock('@helpers/content', () => {
 let mockResourceMap: Record<string, { current: number; max: number }>;
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
     for (const room of floor.rooms) {
       ids.add(room.id);
@@ -251,7 +266,7 @@ import type {
   PlacedRoomId,
   RoomId,
   ResourceMap,
-  UpgradePathId,
+  RoomUpgradeId,
   RoomShapeId,
 } from '@interfaces';
 import {
@@ -466,7 +481,10 @@ describe('Wraith Scholar trait in research rooms', () => {
         assignedRoomId: 'placed-library-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateInhabitantBonus(shadowLibrary, inhabitants);
+    const result = productionCalculateInhabitantBonus(
+      shadowLibrary,
+      inhabitants,
+    );
     // Wraith: workerEfficiency (1.1 - 1.0) = 0.1, plus Scholar production_bonus 0.2 = 0.3
     expect(result.bonus).toBeCloseTo(0.3);
     expect(result.hasWorkers).toBe(true);
@@ -489,7 +507,10 @@ describe('Wraith Scholar trait in research rooms', () => {
         assignedRoomId: 'placed-mine-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateInhabitantBonus(crystalMineRoom, inhabitants);
+    const result = productionCalculateInhabitantBonus(
+      crystalMineRoom,
+      inhabitants,
+    );
     // Wraith in crystal mine: workerEfficiency (1.1 - 1.0) = 0.1, Scholar does NOT apply (research != crystals)
     expect(result.bonus).toBeCloseTo(0.1);
   });
@@ -511,7 +532,10 @@ describe('Wraith Scholar trait in research rooms', () => {
         assignedRoomId: 'placed-library-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateInhabitantBonus(shadowLibrary, inhabitants);
+    const result = productionCalculateInhabitantBonus(
+      shadowLibrary,
+      inhabitants,
+    );
     // Wraith: (1.1 - 1.0) + 0.2 = 0.3
     // Goblin: (1.0 - 1.0) + 0.2 = 0.2 (Goblin's production_bonus has no targetResourceType, applies to all)
     // Total: 0.5
@@ -555,7 +579,11 @@ describe('productionCalculateAdjacencyBonus', () => {
   const allRooms = [crystalMine, darkForge, throne, barracks];
 
   it('should return 0 when room has no adjacency bonus rules', () => {
-    const bonus = productionCalculateAdjacencyBonus(throne, ['placed-mine-1'], allRooms);
+    const bonus = productionCalculateAdjacencyBonus(
+      throne,
+      ['placed-mine-1'],
+      allRooms,
+    );
     expect(bonus).toBe(0);
   });
 
@@ -660,7 +688,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     expect(result).toBe(1.0);
   });
 
@@ -674,7 +705,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     expect(result).toBe(0.5);
   });
 
@@ -688,7 +722,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     expect(result).toBe(0.5);
   });
 
@@ -709,7 +746,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     // Per-creature averaging: scared (0.5) + hungry (0.5) / 2 = 0.5
     expect(result).toBeCloseTo(0.5);
   });
@@ -731,7 +771,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-1' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     // Two scared inhabitants: (0.5 + 0.5) / 2 = 0.5
     expect(result).toBe(0.5);
   });
@@ -746,7 +789,10 @@ describe('productionCalculateConditionalModifiers', () => {
         assignedRoomId: 'placed-room-other' as PlacedRoomId,
       },
     ];
-    const result = productionCalculateConditionalModifiers(placedRoom, inhabitants);
+    const result = productionCalculateConditionalModifiers(
+      placedRoom,
+      inhabitants,
+    );
     expect(result).toBe(1.0);
   });
 });
@@ -802,7 +848,13 @@ function makeGameState(
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: {
         terror: 0,
@@ -837,8 +889,19 @@ function makeGameState(
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
   mockResourceMap = state.world.resources;
@@ -990,7 +1053,9 @@ describe('productionProcess', () => {
       anchorY: 0,
     };
     const floor = makeFloor([throne]);
-    const state = makeGameState([floor], { gold: { current: 999.8, max: 1000 } });
+    const state = makeGameState([floor], {
+      gold: { current: 999.8, max: 1000 },
+    });
     productionProcess(state);
     // Should cap at 1000, not 1000.3
     expect(state.world.resources.gold.current).toBe(1000);
@@ -1122,15 +1187,18 @@ describe('production changes on assignment state changes', () => {
     expect(prodEmpty).toEqual({});
 
     // Assign one inhabitant
-    const floorAssigned = makeFloor([mine], [
-      {
-        instanceId: 'inst-1' as InhabitantInstanceId,
-        definitionId: 'def-goblin' as InhabitantId,
-        name: 'Goblin',
-        state: 'normal',
-        assignedRoomId: 'placed-mine' as PlacedRoomId,
-      },
-    ]);
+    const floorAssigned = makeFloor(
+      [mine],
+      [
+        {
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
+          name: 'Goblin',
+          state: 'normal',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
+        },
+      ],
+    );
     const prodAssigned = productionCalculateSingleRoom(mine, floorAssigned);
     expect(prodAssigned['crystals']).toBeCloseTo(1.2);
   });
@@ -1145,43 +1213,49 @@ describe('production changes on assignment state changes', () => {
     };
 
     // Two inhabitants assigned
-    const floorTwo = makeFloor([mine], [
-      {
-        instanceId: 'inst-1' as InhabitantInstanceId,
-        definitionId: 'def-goblin' as InhabitantId,
-        name: 'Goblin 1',
-        state: 'normal',
-        assignedRoomId: 'placed-mine' as PlacedRoomId,
-      },
-      {
-        instanceId: 'inst-2' as InhabitantInstanceId,
-        definitionId: 'def-goblin' as InhabitantId,
-        name: 'Goblin 2',
-        state: 'normal',
-        assignedRoomId: 'placed-mine' as PlacedRoomId,
-      },
-    ]);
+    const floorTwo = makeFloor(
+      [mine],
+      [
+        {
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
+          name: 'Goblin 1',
+          state: 'normal',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
+        },
+        {
+          instanceId: 'inst-2' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
+          name: 'Goblin 2',
+          state: 'normal',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
+        },
+      ],
+    );
     const prodTwo = productionCalculateSingleRoom(mine, floorTwo);
     // Base 1.0 * (1 + 0.2 + 0.2) = 1.4
     expect(prodTwo['crystals']).toBeCloseTo(1.4);
 
     // Unassign one (only one remains)
-    const floorOne = makeFloor([mine], [
-      {
-        instanceId: 'inst-1' as InhabitantInstanceId,
-        definitionId: 'def-goblin' as InhabitantId,
-        name: 'Goblin 1',
-        state: 'normal',
-        assignedRoomId: 'placed-mine' as PlacedRoomId,
-      },
-      {
-        instanceId: 'inst-2' as InhabitantInstanceId,
-        definitionId: 'def-goblin' as InhabitantId,
-        name: 'Goblin 2',
-        state: 'normal',
-        assignedRoomId: undefined,
-      },
-    ]);
+    const floorOne = makeFloor(
+      [mine],
+      [
+        {
+          instanceId: 'inst-1' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
+          name: 'Goblin 1',
+          state: 'normal',
+          assignedRoomId: 'placed-mine' as PlacedRoomId,
+        },
+        {
+          instanceId: 'inst-2' as InhabitantInstanceId,
+          definitionId: 'def-goblin' as InhabitantId,
+          name: 'Goblin 2',
+          state: 'normal',
+          assignedRoomId: undefined,
+        },
+      ],
+    );
     const prodOne = productionCalculateSingleRoom(mine, floorOne);
     // Base 1.0 * (1 + 0.2) = 1.2
     expect(prodOne['crystals']).toBeCloseTo(1.2);
@@ -1203,15 +1277,18 @@ describe('production changes on assignment state changes', () => {
 
     // Assign inhabitant — now produces
     const floorsAssigned = [
-      makeFloor([mine], [
-        {
-          instanceId: 'inst-1' as InhabitantInstanceId,
-          definitionId: 'def-goblin' as InhabitantId,
-          name: 'Goblin',
-          state: 'normal',
-          assignedRoomId: 'placed-mine' as PlacedRoomId,
-        },
-      ]),
+      makeFloor(
+        [mine],
+        [
+          {
+            instanceId: 'inst-1' as InhabitantInstanceId,
+            definitionId: 'def-goblin' as InhabitantId,
+            name: 'Goblin',
+            state: 'normal',
+            assignedRoomId: 'placed-mine' as PlacedRoomId,
+          },
+        ],
+      ),
     ];
     const totalAssigned = productionCalculateTotal(floorsAssigned);
     expect(totalAssigned['crystals']).toBeCloseTo(1.2);
@@ -1489,7 +1566,7 @@ describe('upgrade effects in production', () => {
       shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
-      appliedUpgradePathId: 'upgrade-multiplier' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-multiplier' as RoomUpgradeId,
     };
     const inhabitants: InhabitantInstance[] = [
       {
@@ -1513,7 +1590,7 @@ describe('upgrade effects in production', () => {
       shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
-      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-secondary' as RoomUpgradeId,
     };
     const inhabitants: InhabitantInstance[] = [
       {
@@ -1539,7 +1616,7 @@ describe('upgrade effects in production', () => {
       shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
-      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-secondary' as RoomUpgradeId,
     };
     const inhabitants: InhabitantInstance[] = [
       {
@@ -1587,7 +1664,7 @@ describe('upgrade effects in production', () => {
       shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
-      appliedUpgradePathId: 'upgrade-multiplier' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-multiplier' as RoomUpgradeId,
     };
     const inhabitants: InhabitantInstance[] = [
       {
@@ -1612,7 +1689,7 @@ describe('upgrade effects in production', () => {
       shapeId: 'shape-1' as RoomShapeId,
       anchorX: 0,
       anchorY: 0,
-      appliedUpgradePathId: 'upgrade-secondary' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-secondary' as RoomUpgradeId,
     };
     const inhabitants: InhabitantInstance[] = [
       {

@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,24 +23,27 @@ const SOUL_WELL_ID = 'room-soul-well';
 
 // --- Upgrade paths ---
 
-const deepFishingPath: RoomUpgradePath = {
-  id: 'upgrade-deep-fishing' as UpgradePathId,
+const deepFishingPath: RoomUpgradeContent = {
+  id: 'upgrade-deep-fishing' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Deep Fishing',
   description: 'Deep-water techniques increase the food catch.',
   cost: { gold: 80, crystals: 30 },
   effects: [{ type: 'productionMultiplier', value: 1.6, resource: 'food' }],
 };
 
-const expandedLakePath: RoomUpgradePath = {
-  id: 'upgrade-expanded-lake' as UpgradePathId,
+const expandedLakePath: RoomUpgradeContent = {
+  id: 'upgrade-expanded-lake' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Expanded Lake',
   description: 'Excavate additional chambers for more fishers.',
   cost: { gold: 70, crystals: 25 },
   effects: [{ type: 'maxInhabitantBonus', value: 2 }],
 };
 
-const darkWatersPath: RoomUpgradePath = {
-  id: 'upgrade-dark-waters' as UpgradePathId,
+const darkWatersPath: RoomUpgradeContent = {
+  id: 'upgrade-dark-waters' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Dark Waters',
   description: 'Strange creatures provide food and an unsettling presence.',
   cost: { gold: 90, crystals: 40, essence: 15 },
@@ -57,15 +60,19 @@ const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
-  contentGetEntriesByType: vi.fn(() => []),
+  contentGetEntriesByType: () => [],
   getEntries: vi.fn(),
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -93,8 +100,12 @@ const undergroundLakeRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [deepFishingPath, expandedLakePath, darkWatersPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-deep-fishing' as RoomUpgradeId,
+    'upgrade-expanded-lake' as RoomUpgradeId,
+    'upgrade-dark-waters' as RoomUpgradeId,
+  ],
 };
 
 const mushroomGroveRoom: RoomContent = {
@@ -113,7 +124,6 @@ const mushroomGroveRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -133,7 +143,6 @@ const soulWellRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 3,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -221,6 +230,9 @@ beforeEach(() => {
   mockContent.set(UNDERGROUND_LAKE_ID, undergroundLakeRoom);
   mockContent.set(MUSHROOM_GROVE_ID, mushroomGroveRoom);
   mockContent.set(SOUL_WELL_ID, soulWellRoom);
+  mockContent.set(deepFishingPath.id, deepFishingPath);
+  mockContent.set(expandedLakePath.id, expandedLakePath);
+  mockContent.set(darkWatersPath.id, darkWatersPath);
 });
 
 describe('Underground Lake: definition', () => {
@@ -238,10 +250,6 @@ describe('Underground Lake: definition', () => {
 
   it('should require workers', () => {
     expect(undergroundLakeRoom.requiresWorkers).toBe(true);
-  });
-
-  it('should have 3 upgrade paths', () => {
-    expect(undergroundLakeRoom.upgradePaths).toHaveLength(3);
   });
 
   it('should have 3 adjacency bonuses', () => {
@@ -378,15 +386,21 @@ describe('Underground Lake: Deep Fishing upgrade', () => {
 describe('Underground Lake: Expanded Lake upgrade', () => {
   it('should change capacity from 3 to 5', () => {
     const room = createPlacedLake({
-      appliedUpgradePathId: 'upgrade-expanded-lake' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-expanded-lake' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, undergroundLakeRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      undergroundLakeRoom,
+    );
     expect(effective).toBe(5);
   });
 
   it('should keep capacity at 3 without upgrade', () => {
     const room = createPlacedLake();
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, undergroundLakeRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      undergroundLakeRoom,
+    );
     expect(effective).toBe(3);
   });
 });
@@ -418,7 +432,7 @@ describe('Underground Lake: Dark Waters upgrade', () => {
 describe('Underground Lake: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedLake({
-      appliedUpgradePathId: 'upgrade-deep-fishing' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-deep-fishing' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-expanded-lake');
     expect(result.valid).toBe(false);

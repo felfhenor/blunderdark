@@ -8,8 +8,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -22,8 +22,9 @@ const THRONE_ROOM_ID = 'room-throne-room';
 
 // --- Upgrade paths ---
 
-const reinforcedVaultPath: RoomUpgradePath = {
-  id: 'upgrade-reinforced-vault' as UpgradePathId,
+const reinforcedVaultPath: RoomUpgradeContent = {
+  id: 'upgrade-reinforced-vault' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Reinforced Vault',
   description: 'Reinforce walls with enchanted steel.',
   cost: { gold: 150, crystals: 80 },
@@ -33,8 +34,9 @@ const reinforcedVaultPath: RoomUpgradePath = {
   ],
 };
 
-const investmentVaultPath: RoomUpgradePath = {
-  id: 'upgrade-investment-vault' as UpgradePathId,
+const investmentVaultPath: RoomUpgradeContent = {
+  id: 'upgrade-investment-vault' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Investment Vault',
   description: 'Transform the vault into a financial hub.',
   cost: { gold: 200, crystals: 60 },
@@ -44,8 +46,9 @@ const investmentVaultPath: RoomUpgradePath = {
   ],
 };
 
-const dragonsHoardPath: RoomUpgradePath = {
-  id: 'upgrade-dragons-hoard' as UpgradePathId,
+const dragonsHoardPath: RoomUpgradeContent = {
+  id: 'upgrade-dragons-hoard' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: "Dragon's Hoard",
   description: 'Amass a legendary treasure hoard.',
   cost: { gold: 180, crystals: 100, essence: 20 },
@@ -61,15 +64,19 @@ const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
-  contentGetEntriesByType: vi.fn(() => []),
+  contentGetEntriesByType: () => [],
   getEntries: vi.fn(),
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -98,8 +105,12 @@ const treasureVaultRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [reinforcedVaultPath, investmentVaultPath, dragonsHoardPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-reinforced-vault' as RoomUpgradeId,
+    'upgrade-investment-vault' as RoomUpgradeId,
+    'upgrade-dragons-hoard' as RoomUpgradeId,
+  ],
 };
 
 const darkForgeRoom: RoomContent = {
@@ -118,7 +129,6 @@ const darkForgeRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -138,7 +148,6 @@ const altarRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 0,
   fearReductionAura: 1,
-  upgradePaths: [],
   autoPlace: true,
 };
 
@@ -158,7 +167,6 @@ const throneRoom: RoomContent = {
   inhabitantRestriction: 'unique',
   fearLevel: 0,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -252,6 +260,9 @@ beforeEach(() => {
   mockContent.set(DARK_FORGE_ID, darkForgeRoom);
   mockContent.set(ALTAR_ROOM_ID, altarRoom);
   mockContent.set(THRONE_ROOM_ID, throneRoom);
+  mockContent.set(reinforcedVaultPath.id, reinforcedVaultPath);
+  mockContent.set(investmentVaultPath.id, investmentVaultPath);
+  mockContent.set(dragonsHoardPath.id, dragonsHoardPath);
 });
 
 describe('Treasure Vault: definition', () => {
@@ -269,10 +280,6 @@ describe('Treasure Vault: definition', () => {
 
   it('should not require workers for passive production', () => {
     expect(treasureVaultRoom.requiresWorkers).toBe(false);
-  });
-
-  it('should have 3 upgrade paths', () => {
-    expect(treasureVaultRoom.upgradePaths).toHaveLength(3);
   });
 
   it('should have 4 adjacency bonuses', () => {
@@ -435,9 +442,12 @@ describe('Treasure Vault: Investment Vault upgrade', () => {
 
   it('should change capacity from 1 to 2', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-investment-vault' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-investment-vault' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      treasureVaultRoom,
+    );
     expect(effective).toBe(2);
   });
 });
@@ -454,17 +464,18 @@ describe("Treasure Vault: Dragon's Hoard upgrade", () => {
     );
     expect(prodEffect!.value).toBe(2.5);
 
-    const fearEffect = hoard!.effects.find(
-      (e) => e.type === 'fearIncrease',
-    );
+    const fearEffect = hoard!.effects.find((e) => e.type === 'fearIncrease');
     expect(fearEffect!.value).toBe(2);
   });
 
   it('should not change capacity', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-dragons-hoard' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-dragons-hoard' as RoomUpgradeId,
     });
-    const effective = roomUpgradeGetEffectiveMaxInhabitants(room, treasureVaultRoom);
+    const effective = roomUpgradeGetEffectiveMaxInhabitants(
+      room,
+      treasureVaultRoom,
+    );
     expect(effective).toBe(1);
   });
 });
@@ -472,7 +483,7 @@ describe("Treasure Vault: Dragon's Hoard upgrade", () => {
 describe('Treasure Vault: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedVault({
-      appliedUpgradePathId: 'upgrade-reinforced-vault' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-reinforced-vault' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-investment-vault');
     expect(result.valid).toBe(false);

@@ -14,8 +14,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,24 +30,27 @@ const DARK_TRANSMUTE_ID = 'b2a01001-0001-4001-8001-000000000003';
 
 // --- Upgrade paths ---
 
-const efficientDistillationPath: RoomUpgradePath = {
-  id: 'c3b02001-0002-4001-8001-000000000001' as UpgradePathId,
+const efficientDistillationPath: RoomUpgradeContent = {
+  id: 'c3b02001-0002-4001-8001-000000000001' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Efficient Distillation',
   description: 'Reduced costs.',
   cost: { gold: 100, crystals: 50 },
   effects: [{ type: 'alchemyCostMultiplier', value: 0.6 }],
 };
 
-const advancedAlchemyPath: RoomUpgradePath = {
-  id: 'c3b02001-0002-4001-8001-000000000002' as UpgradePathId,
+const advancedAlchemyPath: RoomUpgradeContent = {
+  id: 'c3b02001-0002-4001-8001-000000000002' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Advanced Alchemy',
   description: 'Unlock advanced recipes.',
   cost: { gold: 120, essence: 40, flux: 20 },
   effects: [{ type: 'alchemyTierUnlock', value: 1 }],
 };
 
-const expandedCapacityPath: RoomUpgradePath = {
-  id: 'c3b02001-0002-4001-8001-000000000003' as UpgradePathId,
+const expandedCapacityPath: RoomUpgradeContent = {
+  id: 'c3b02001-0002-4001-8001-000000000003' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Expanded Capacity',
   description: 'More workers.',
   cost: { gold: 80, crystals: 40 },
@@ -80,8 +83,14 @@ vi.mock('@helpers/rng', () => ({
 }));
 
 vi.mock('@helpers/room-shapes', () => ({
-  roomShapeResolve: vi.fn(() => ({ tiles: [{ x: 0, y: 0 }], width: 1, height: 1 })),
-  roomShapeGetAbsoluteTiles: vi.fn((_shape: unknown, ax: number, ay: number) => [{ x: ax, y: ay }]),
+  roomShapeResolve: vi.fn(() => ({
+    tiles: [{ x: 0, y: 0 }],
+    width: 1,
+    height: 1,
+  })),
+  roomShapeGetAbsoluteTiles: vi.fn(
+    (_shape: unknown, ax: number, ay: number) => [{ x: ax, y: ay }],
+  ),
 }));
 
 vi.mock('@helpers/adjacency', () => ({
@@ -166,7 +175,9 @@ function makePlacedRoom(overrides?: Partial<PlacedRoom>): PlacedRoom {
   };
 }
 
-function makeInhabitant(overrides?: Partial<InhabitantInstance>): InhabitantInstance {
+function makeInhabitant(
+  overrides?: Partial<InhabitantInstance>,
+): InhabitantInstance {
   return {
     instanceId: 'inh-1' as InhabitantInstanceId,
     definitionId: 'def-goblin' as InhabitantId,
@@ -222,7 +233,13 @@ function makeGameState(overrides?: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: overrides?.floors ?? [makeFloor()],
@@ -277,17 +294,30 @@ describe('alchemy-lab', () => {
       name: 'Alchemy Lab',
       role: 'alchemyLab',
       maxInhabitants: 1,
-      upgradePaths: [efficientDistillationPath, advancedAlchemyPath, expandedCapacityPath],
+      roomUpgradeIds: [
+        efficientDistillationPath.id,
+        advancedAlchemyPath.id,
+        expandedCapacityPath.id,
+      ],
     };
     mockContent.set(ALCHEMY_LAB_ID, labDef);
+    mockContent.set(efficientDistillationPath.id, efficientDistillationPath);
+    mockContent.set(advancedAlchemyPath.id, advancedAlchemyPath);
+    mockContent.set(expandedCapacityPath.id, expandedCapacityPath);
   });
 
   describe('Recipe Availability', () => {
     it('should return only basic recipes without upgrade', async () => {
-      const allRecipes = [makeFluxRecipe(), makeEssenceRecipe(), makeDarkTransmuteRecipe()];
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeEssenceRecipe(),
+        makeDarkTransmuteRecipe(),
+      ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
 
-      const { alchemyLabGetAvailableRecipes } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
       const result = alchemyLabGetAvailableRecipes(room);
 
@@ -296,11 +326,19 @@ describe('alchemy-lab', () => {
     });
 
     it('should return basic and advanced recipes with Advanced Alchemy upgrade', async () => {
-      const allRecipes = [makeFluxRecipe(), makeEssenceRecipe(), makeDarkTransmuteRecipe()];
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeEssenceRecipe(),
+        makeDarkTransmuteRecipe(),
+      ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
 
-      const { alchemyLabGetAvailableRecipes } = await import('@helpers/alchemy-lab');
-      const room = makePlacedRoom({ appliedUpgradePathId: advancedAlchemyPath.id });
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: advancedAlchemyPath.id,
+      });
       const result = alchemyLabGetAvailableRecipes(room);
 
       expect(result).toHaveLength(3);
@@ -309,14 +347,18 @@ describe('alchemy-lab', () => {
 
   describe('Conversion Tick Calculation', () => {
     it('should return base ticks for 1 worker with no adjacency', async () => {
-      const { alchemyLabGetConversionTicks } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetConversionTicks } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
       const ticks = alchemyLabGetConversionTicks(room, 1, 15, new Set());
       expect(ticks).toBe(15);
     });
 
     it('should reduce ticks with additional workers (25% per extra)', async () => {
-      const { alchemyLabGetConversionTicks } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetConversionTicks } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
 
       // 2 workers: 15 * (1 - 0.25) = 15 * 0.75 = 11.25 → 11
@@ -329,7 +371,9 @@ describe('alchemy-lab', () => {
     });
 
     it('should cap worker bonus at 0.5 multiplier', async () => {
-      const { alchemyLabGetConversionTicks } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetConversionTicks } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
 
       // 4 workers: 15 * max(0.5, 1 - 0.75) = 15 * 0.5 = 7.5 → 8
@@ -341,11 +385,13 @@ describe('alchemy-lab', () => {
       const mineDef: Partial<RoomContent> = {
         id: CRYSTAL_MINE_ID as RoomId,
         name: 'Crystal Mine',
-        alchemyAdjacencyEffects: { alchemySpeedBonus: 0.20 },
+        alchemyAdjacencyEffects: { alchemySpeedBonus: 0.2 },
       };
       mockContent.set(CRYSTAL_MINE_ID, mineDef);
 
-      const { alchemyLabGetConversionTicks } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetConversionTicks } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
       const adjacentTypes = new Set([CRYSTAL_MINE_ID]);
 
@@ -357,17 +403,31 @@ describe('alchemy-lab', () => {
 
   describe('Effective Cost Calculation', () => {
     it('should return base cost with no modifiers', async () => {
-      const { alchemyLabGetEffectiveCost } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetEffectiveCost } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
-      const cost = alchemyLabGetEffectiveCost(room, { crystals: 5, food: 5 }, new Set());
+      const cost = alchemyLabGetEffectiveCost(
+        room,
+        { crystals: 5, food: 5 },
+        new Set(),
+      );
 
       expect(cost).toEqual({ crystals: 5, food: 5 });
     });
 
     it('should apply Efficient Distillation cost reduction', async () => {
-      const { alchemyLabGetEffectiveCost } = await import('@helpers/alchemy-lab');
-      const room = makePlacedRoom({ appliedUpgradePathId: efficientDistillationPath.id });
-      const cost = alchemyLabGetEffectiveCost(room, { crystals: 5, food: 5 }, new Set());
+      const { alchemyLabGetEffectiveCost } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: efficientDistillationPath.id,
+      });
+      const cost = alchemyLabGetEffectiveCost(
+        room,
+        { crystals: 5, food: 5 },
+        new Set(),
+      );
 
       // 5 * 0.6 = 3
       expect(cost).toEqual({ crystals: 3, food: 3 });
@@ -381,19 +441,33 @@ describe('alchemy-lab', () => {
       };
       mockContent.set(MUSHROOM_GROVE_ID, groveDef);
 
-      const { alchemyLabGetEffectiveCost } = await import('@helpers/alchemy-lab');
+      const { alchemyLabGetEffectiveCost } = await import(
+        '@helpers/alchemy-lab'
+      );
       const room = makePlacedRoom();
       const adjacentTypes = new Set([MUSHROOM_GROVE_ID]);
 
       // 5 * (1 - 0.15) = 5 * 0.85 = 4.25 → 4
-      const cost = alchemyLabGetEffectiveCost(room, { crystals: 5, food: 5 }, adjacentTypes);
+      const cost = alchemyLabGetEffectiveCost(
+        room,
+        { crystals: 5, food: 5 },
+        adjacentTypes,
+      );
       expect(cost).toEqual({ crystals: 4, food: 4 });
     });
 
     it('should not reduce cost below 1', async () => {
-      const { alchemyLabGetEffectiveCost } = await import('@helpers/alchemy-lab');
-      const room = makePlacedRoom({ appliedUpgradePathId: efficientDistillationPath.id });
-      const cost = alchemyLabGetEffectiveCost(room, { crystals: 1, food: 1 }, new Set());
+      const { alchemyLabGetEffectiveCost } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: efficientDistillationPath.id,
+      });
+      const cost = alchemyLabGetEffectiveCost(
+        room,
+        { crystals: 1, food: 1 },
+        new Set(),
+      );
 
       expect(cost).toEqual({ crystals: 1, food: 1 });
     });
@@ -401,8 +475,15 @@ describe('alchemy-lab', () => {
 
   describe('Conversion Management', () => {
     it('should start a new conversion', async () => {
-      const { alchemyLabStartConversion } = await import('@helpers/alchemy-lab');
-      const result = alchemyLabStartConversion([], 'room-1' as PlacedRoomId, FLUX_RECIPE_ID as AlchemyRecipeId, 15);
+      const { alchemyLabStartConversion } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const result = alchemyLabStartConversion(
+        [],
+        'room-1' as PlacedRoomId,
+        FLUX_RECIPE_ID as AlchemyRecipeId,
+        15,
+      );
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -415,16 +496,25 @@ describe('alchemy-lab', () => {
     });
 
     it('should replace existing conversion when switching recipe', async () => {
-      const { alchemyLabStartConversion } = await import('@helpers/alchemy-lab');
-      const existing: AlchemyConversion[] = [{
-        roomId: 'room-1' as PlacedRoomId,
-        recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
-        progress: 5,
-        targetTicks: 15,
-        inputConsumed: true,
-      }];
+      const { alchemyLabStartConversion } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const existing: AlchemyConversion[] = [
+        {
+          roomId: 'room-1' as PlacedRoomId,
+          recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
+          progress: 5,
+          targetTicks: 15,
+          inputConsumed: true,
+        },
+      ];
 
-      const result = alchemyLabStartConversion(existing, 'room-1' as PlacedRoomId, ESSENCE_RECIPE_ID as AlchemyRecipeId, 25);
+      const result = alchemyLabStartConversion(
+        existing,
+        'room-1' as PlacedRoomId,
+        ESSENCE_RECIPE_ID as AlchemyRecipeId,
+        25,
+      );
       expect(result).toHaveLength(1);
       expect(result[0].recipeId).toBe(ESSENCE_RECIPE_ID);
       expect(result[0].progress).toBe(0);
@@ -433,29 +523,39 @@ describe('alchemy-lab', () => {
 
     it('should stop a conversion', async () => {
       const { alchemyLabStopConversion } = await import('@helpers/alchemy-lab');
-      const conversions: AlchemyConversion[] = [{
-        roomId: 'room-1' as PlacedRoomId,
-        recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
-        progress: 5,
-        targetTicks: 15,
-        inputConsumed: true,
-      }];
+      const conversions: AlchemyConversion[] = [
+        {
+          roomId: 'room-1' as PlacedRoomId,
+          recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
+          progress: 5,
+          targetTicks: 15,
+          inputConsumed: true,
+        },
+      ];
 
-      const result = alchemyLabStopConversion(conversions, 'room-1' as PlacedRoomId);
+      const result = alchemyLabStopConversion(
+        conversions,
+        'room-1' as PlacedRoomId,
+      );
       expect(result).toHaveLength(0);
     });
 
     it('should get conversion for a room', async () => {
       const { alchemyLabGetConversion } = await import('@helpers/alchemy-lab');
-      const conversions: AlchemyConversion[] = [{
-        roomId: 'room-1' as PlacedRoomId,
-        recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
-        progress: 5,
-        targetTicks: 15,
-        inputConsumed: true,
-      }];
+      const conversions: AlchemyConversion[] = [
+        {
+          roomId: 'room-1' as PlacedRoomId,
+          recipeId: FLUX_RECIPE_ID as AlchemyRecipeId,
+          progress: 5,
+          targetTicks: 15,
+          inputConsumed: true,
+        },
+      ];
 
-      const result = alchemyLabGetConversion(conversions, 'room-1' as PlacedRoomId);
+      const result = alchemyLabGetConversion(
+        conversions,
+        'room-1' as PlacedRoomId,
+      );
       expect(result).toBeDefined();
       expect(result?.recipeId).toBe(FLUX_RECIPE_ID);
     });
@@ -471,31 +571,45 @@ describe('alchemy-lab', () => {
     it('should allow conversion with assigned worker in alchemy lab', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
       const floors = [makeFloor()];
-      const { canConvert } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
+      const { canConvert } = alchemyLabCanConvert(
+        'room-1' as PlacedRoomId,
+        floors,
+      );
       expect(canConvert).toBe(true);
     });
 
     it('should reject conversion without workers', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
       const floors = [makeFloor({ inhabitants: [] })];
-      const { canConvert, reason } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
+      const { canConvert, reason } = alchemyLabCanConvert(
+        'room-1' as PlacedRoomId,
+        floors,
+      );
       expect(canConvert).toBe(false);
       expect(reason).toContain('1 inhabitant');
     });
 
     it('should reject conversion for non-alchemy-lab room', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
-      const floors = [makeFloor({
-        rooms: [makePlacedRoom({ roomTypeId: 'other-room' as RoomId })],
-      })];
-      const { canConvert, reason } = alchemyLabCanConvert('room-1' as PlacedRoomId, floors);
+      const floors = [
+        makeFloor({
+          rooms: [makePlacedRoom({ roomTypeId: 'other-room' as RoomId })],
+        }),
+      ];
+      const { canConvert, reason } = alchemyLabCanConvert(
+        'room-1' as PlacedRoomId,
+        floors,
+      );
       expect(canConvert).toBe(false);
       expect(reason).toContain('not an Alchemy Lab');
     });
 
     it('should reject for non-existent room', async () => {
       const { alchemyLabCanConvert } = await import('@helpers/alchemy-lab');
-      const { canConvert, reason } = alchemyLabCanConvert('nonexistent' as PlacedRoomId, [makeFloor()]);
+      const { canConvert, reason } = alchemyLabCanConvert(
+        'nonexistent' as PlacedRoomId,
+        [makeFloor()],
+      );
       expect(canConvert).toBe(false);
       expect(reason).toContain('not found');
     });
@@ -630,9 +744,11 @@ describe('alchemy-lab', () => {
 
       const state = makeGameState({
         alchemyConversions: [conversion],
-        floors: [makeFloor({
-          rooms: [makePlacedRoom({ roomTypeId: 'other-type' as RoomId })],
-        })],
+        floors: [
+          makeFloor({
+            rooms: [makePlacedRoom({ roomTypeId: 'other-type' as RoomId })],
+          }),
+        ],
       });
       alchemyLabProcess(state);
 
@@ -680,19 +796,35 @@ describe('alchemy-lab', () => {
 
   describe('Upgrade Effects', () => {
     it('should apply alchemyCostMultiplier from Efficient Distillation', async () => {
-      const { alchemyLabGetEffectiveCost } = await import('@helpers/alchemy-lab');
-      const room = makePlacedRoom({ appliedUpgradePathId: efficientDistillationPath.id });
-      const cost = alchemyLabGetEffectiveCost(room, { crystals: 5, food: 5 }, new Set());
+      const { alchemyLabGetEffectiveCost } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: efficientDistillationPath.id,
+      });
+      const cost = alchemyLabGetEffectiveCost(
+        room,
+        { crystals: 5, food: 5 },
+        new Set(),
+      );
 
       expect(cost).toEqual({ crystals: 3, food: 3 });
     });
 
     it('should unlock advanced recipes with alchemyTierUnlock', async () => {
-      const allRecipes = [makeFluxRecipe(), makeEssenceRecipe(), makeDarkTransmuteRecipe()];
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeEssenceRecipe(),
+        makeDarkTransmuteRecipe(),
+      ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
 
-      const { alchemyLabGetAvailableRecipes } = await import('@helpers/alchemy-lab');
-      const room = makePlacedRoom({ appliedUpgradePathId: advancedAlchemyPath.id });
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: advancedAlchemyPath.id,
+      });
       const result = alchemyLabGetAvailableRecipes(room);
 
       expect(result).toHaveLength(3);

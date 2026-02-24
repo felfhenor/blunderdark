@@ -16,8 +16,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -35,8 +35,9 @@ const RECIPE_GOBLIN_KOBOLD_ID = 'bb300001-0001-0001-0001-000000000001';
 
 // --- Upgrade paths ---
 
-const enhancedIncubatorsPath: RoomUpgradePath = {
-  id: 'upgrade-enhanced-incubators' as UpgradePathId,
+const enhancedIncubatorsPath: RoomUpgradeContent = {
+  id: 'upgrade-enhanced-incubators' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Enhanced Incubators',
   description: 'Reduce breeding time.',
   cost: { gold: 150, crystals: 80, essence: 40 },
@@ -46,8 +47,9 @@ const enhancedIncubatorsPath: RoomUpgradePath = {
   ],
 };
 
-const mutationAmplifierPath: RoomUpgradePath = {
-  id: 'upgrade-mutation-amplifier' as UpgradePathId,
+const mutationAmplifierPath: RoomUpgradeContent = {
+  id: 'upgrade-mutation-amplifier' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Mutation Amplifier',
   description: 'Better mutation odds.',
   cost: { gold: 130, crystals: 70, essence: 50 },
@@ -91,7 +93,8 @@ vi.mock('@helpers/room-upgrades', async () => {
 
 vi.mock('@helpers/rng', () => ({
   rngChoice: (choices: unknown[]) => choices[0],
-  rngChoiceWeightedByRarity: (choices: unknown[]) => choices.length > 0 ? choices[0] : undefined,
+  rngChoiceWeightedByRarity: (choices: unknown[]) =>
+    choices.length > 0 ? choices[0] : undefined,
   rngUuid: () => 'test-uuid-' + Math.random().toString(36).slice(2, 8),
   rngRandom: () => seedrandom('test-seed'),
 }));
@@ -106,7 +109,9 @@ vi.mock('@helpers/adjacency', () => ({
 
 vi.mock('@helpers/room-shapes', () => ({
   roomShapeResolve: () => ({ tiles: [{ x: 0, y: 0 }], width: 1, height: 1 }),
-  roomShapeGetAbsoluteTiles: (_shape: unknown, x: number, y: number) => [{ x, y }],
+  roomShapeGetAbsoluteTiles: (_shape: unknown, x: number, y: number) => [
+    { x, y },
+  ],
 }));
 
 // --- Inhabitant definitions ---
@@ -188,9 +193,9 @@ const breedingPitsDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [enhancedIncubatorsPath, mutationAmplifierPath],
   autoPlace: false,
   role: 'breedingPits',
+  roomUpgradeIds: [enhancedIncubatorsPath.id, mutationAmplifierPath.id],
 };
 
 const spawningPoolDef: RoomContent = {
@@ -209,7 +214,6 @@ const spawningPoolDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
   breedingAdjacencyEffects: { hybridTimeReduction: 0.25 },
 };
@@ -230,9 +234,8 @@ const soulWellDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
-  breedingAdjacencyEffects: { mutationOddsBonus: 0.10 },
+  breedingAdjacencyEffects: { mutationOddsBonus: 0.1 },
 };
 
 // --- Helpers ---
@@ -279,9 +282,7 @@ function makeFloor(
   };
 }
 
-function makeGameState(overrides: {
-  floors?: Floor[];
-}): GameState {
+function makeGameState(overrides: { floors?: Floor[] }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test-game' as GameId,
@@ -305,7 +306,13 @@ function makeGameState(overrides: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: overrides.floors ?? [makeFloor()],
@@ -334,8 +341,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
 }
@@ -394,6 +412,8 @@ beforeEach(() => {
   mockContent.set(RECIPE_GOBLIN_KOBOLD_ID, goblinKoboldRecipe);
   mockContent.set(MT_POS_ID, mockPosTrait);
   mockContent.set(MT_NEG_ID, mockNegTrait);
+  mockContent.set(enhancedIncubatorsPath.id, enhancedIncubatorsPath);
+  mockContent.set(mutationAmplifierPath.id, mutationAmplifierPath);
 });
 
 // --- Tests ---
@@ -404,13 +424,11 @@ describe('Breeding Pits Room Definition', () => {
     expect(breedingPitsDef.fearLevel).toBe(4);
     expect(breedingPitsDef.role).toBe('breedingPits');
     expect(breedingPitsDef.requiresWorkers).toBe(false);
-    expect(breedingPitsDef.cost).toEqual({ gold: 120, crystals: 60, essence: 30 });
-  });
-
-  it('should have 2 upgrade paths', () => {
-    expect(breedingPitsDef.upgradePaths).toHaveLength(2);
-    expect(breedingPitsDef.upgradePaths[0].name).toBe('Enhanced Incubators');
-    expect(breedingPitsDef.upgradePaths[1].name).toBe('Mutation Amplifier');
+    expect(breedingPitsDef.cost).toEqual({
+      gold: 120,
+      crystals: 60,
+      essence: 30,
+    });
   });
 });
 
@@ -435,8 +453,14 @@ describe('Recipe Matching', () => {
 
 describe('Available Recipes', () => {
   it('should find available recipes from assigned inhabitants', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+    });
 
     const recipes = breedingGetAvailableRecipes([goblin, kobold]);
     expect(recipes).toHaveLength(1);
@@ -444,15 +468,24 @@ describe('Available Recipes', () => {
   });
 
   it('should return empty when no valid pairs exist', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const skeleton = makeInhabitant({ instanceId: 's1' as InhabitantInstanceId, definitionId: SKELETON_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const skeleton = makeInhabitant({
+      instanceId: 's1' as InhabitantInstanceId,
+      definitionId: SKELETON_ID as InhabitantId,
+    });
 
     const recipes = breedingGetAvailableRecipes([goblin, skeleton]);
     expect(recipes).toHaveLength(0);
   });
 
   it('should return empty for single inhabitant', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
     const recipes = breedingGetAvailableRecipes([goblin]);
     expect(recipes).toHaveLength(0);
   });
@@ -460,8 +493,14 @@ describe('Available Recipes', () => {
 
 describe('Mutatable Inhabitants', () => {
   it('should return inhabitants that are not mutated', () => {
-    const normal = makeInhabitant({ instanceId: 'n1' as InhabitantInstanceId, mutated: false });
-    const mutated = makeInhabitant({ instanceId: 'm1' as InhabitantInstanceId, mutated: true });
+    const normal = makeInhabitant({
+      instanceId: 'n1' as InhabitantInstanceId,
+      mutated: false,
+    });
+    const mutated = makeInhabitant({
+      instanceId: 'm1' as InhabitantInstanceId,
+      mutated: true,
+    });
 
     const result = breedingGetMutatableInhabitants([normal, mutated]);
     expect(result).toHaveLength(1);
@@ -469,7 +508,10 @@ describe('Mutatable Inhabitants', () => {
   });
 
   it('should return all if none are mutated', () => {
-    const a = makeInhabitant({ instanceId: 'a' as InhabitantInstanceId, mutated: false });
+    const a = makeInhabitant({
+      instanceId: 'a' as InhabitantInstanceId,
+      mutated: false,
+    });
     const b = makeInhabitant({ instanceId: 'b' as InhabitantInstanceId });
 
     const result = breedingGetMutatableInhabitants([a, b]);
@@ -491,36 +533,58 @@ describe('Hybrid Tick Calculation', () => {
   });
 
   it('should apply Enhanced Incubators upgrade (0.7x)', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-enhanced-incubators' as RoomUpgradeId,
+    });
     const ticks = breedingGetHybridTicks(room, new Set(), 1.0);
     expect(ticks).toBe(Math.round(BREEDING_BASE_TICKS * 0.7));
   });
 
   it('should apply adjacency hybridTimeReduction', () => {
     const room = makeRoom();
-    const ticks = breedingGetHybridTicks(room, new Set([SPAWNING_POOL_ID]), 1.0);
+    const ticks = breedingGetHybridTicks(
+      room,
+      new Set([SPAWNING_POOL_ID]),
+      1.0,
+    );
     // 25 * (1 - 0.25) = 18.75 → 19
     expect(ticks).toBe(Math.round(BREEDING_BASE_TICKS * 0.75));
   });
 
   it('should combine upgrade and adjacency', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
-    const ticks = breedingGetHybridTicks(room, new Set([SPAWNING_POOL_ID]), 1.0);
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-enhanced-incubators' as RoomUpgradeId,
+    });
+    const ticks = breedingGetHybridTicks(
+      room,
+      new Set([SPAWNING_POOL_ID]),
+      1.0,
+    );
     // 25 * 0.7 = 17.5 → 18, then 18 * 0.75 = 13.5 → 14
     const afterUpgrade = Math.round(BREEDING_BASE_TICKS * 0.7);
     expect(ticks).toBe(Math.round(afterUpgrade * 0.75));
   });
 
   it('should never go below 1 tick', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-enhanced-incubators' as UpgradePathId });
-    const ticks = breedingGetHybridTicks(room, new Set([SPAWNING_POOL_ID]), 0.01);
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-enhanced-incubators' as RoomUpgradeId,
+    });
+    const ticks = breedingGetHybridTicks(
+      room,
+      new Set([SPAWNING_POOL_ID]),
+      0.01,
+    );
     expect(ticks).toBeGreaterThanOrEqual(1);
   });
 });
 
 describe('Hybrid Stat Calculation', () => {
   it('should average parent stats and add recipe bonuses', () => {
-    const stats = breedingCalculateHybridStats(goblinDef, koboldDef, goblinKoboldRecipe);
+    const stats = breedingCalculateHybridStats(
+      goblinDef,
+      koboldDef,
+      goblinKoboldRecipe,
+    );
     // hp: avg(30, 20) = 25, attack: avg(10, 8) + 2 = 11
     // defense: avg(8, 5) = 7 (rounds), speed: avg(12, 18) + 3 = 18
     // workerEfficiency: (1.0 + 0.9) / 2 = 0.95
@@ -532,7 +596,12 @@ describe('Hybrid Stat Calculation', () => {
   });
 
   it('should apply statBonusMultiplier to recipe bonuses', () => {
-    const stats = breedingCalculateHybridStats(goblinDef, koboldDef, goblinKoboldRecipe, 2.0);
+    const stats = breedingCalculateHybridStats(
+      goblinDef,
+      koboldDef,
+      goblinKoboldRecipe,
+      2.0,
+    );
     // speed: avg(12, 18) + 3*2 = 15 + 6 = 21
     // attack: avg(10, 8) + 2*2 = 9 + 4 = 13
     expect(stats.speed).toBe(21);
@@ -549,7 +618,9 @@ describe('Mutation Odds', () => {
   });
 
   it('should increase positive odds with Mutation Amplifier upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-mutation-amplifier' as RoomUpgradeId,
+    });
     const odds = breedingGetMutationOdds(room, new Set());
     expect(odds.positive).toBeCloseTo(0.75, 5);
   });
@@ -557,11 +628,13 @@ describe('Mutation Odds', () => {
   it('should increase positive odds with Soul Well adjacency', () => {
     const room = makeRoom();
     const odds = breedingGetMutationOdds(room, new Set([SOUL_WELL_ID]));
-    expect(odds.positive).toBeCloseTo(0.70, 5);
+    expect(odds.positive).toBeCloseTo(0.7, 5);
   });
 
   it('should cap positive at 0.95', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-mutation-amplifier' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-mutation-amplifier' as RoomUpgradeId,
+    });
     // 0.6 + 0.15 (upgrade) + 0.10 (adjacency) + ... would exceed
     // Let's just verify the cap with both
     const odds = breedingGetMutationOdds(room, new Set([SOUL_WELL_ID]));
@@ -658,8 +731,16 @@ describe('breedingPitsProcess', () => {
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: room.id });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: room.id });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      assignedRoomId: room.id,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+      assignedRoomId: room.id,
+    });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -679,8 +760,16 @@ describe('breedingPitsProcess', () => {
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: room.id });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: room.id });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      assignedRoomId: room.id,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+      assignedRoomId: room.id,
+    });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -704,9 +793,19 @@ describe('breedingPitsProcess', () => {
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
-    const bystander = makeInhabitant({ instanceId: 'b1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: undefined });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+    });
+    const bystander = makeInhabitant({
+      instanceId: 'b1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      assignedRoomId: undefined,
+    });
     const floor = makeFloor([room], [goblin, kobold, bystander]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold, bystander];
@@ -731,8 +830,14 @@ describe('breedingPitsProcess', () => {
       targetTicks: 25,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+    });
     const floor = makeFloor([room], [goblin, kobold]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin, kobold];
@@ -751,7 +856,10 @@ describe('breedingPitsProcess', () => {
       targetTicks: 15,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
     const floor = makeFloor([room], [goblin]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin];
@@ -769,7 +877,11 @@ describe('breedingPitsProcess', () => {
       targetTicks: 15,
     };
 
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, mutated: false });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      mutated: false,
+    });
     const floor = makeFloor([room], [goblin]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [goblin];
@@ -817,9 +929,21 @@ describe('breedingPitsProcess', () => {
       targetTicks: 15,
     };
 
-    const g1 = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: 'bp-1' as PlacedRoomId });
-    const k1 = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId, assignedRoomId: 'bp-1' as PlacedRoomId });
-    const g2 = makeInhabitant({ instanceId: 'g2' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId, assignedRoomId: 'bp-2' as PlacedRoomId });
+    const g1 = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      assignedRoomId: 'bp-1' as PlacedRoomId,
+    });
+    const k1 = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+      assignedRoomId: 'bp-1' as PlacedRoomId,
+    });
+    const g2 = makeInhabitant({
+      instanceId: 'g2' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      assignedRoomId: 'bp-2' as PlacedRoomId,
+    });
 
     const floor1 = makeFloor([room1], [g1, k1]);
     const floor2 = makeFloor([room2], [g2]);
@@ -837,8 +961,14 @@ describe('breedingPitsProcess', () => {
 
 describe('Hybrid Creation', () => {
   it('should create a hybrid with correct properties', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+    });
 
     const hybrid = breedingCreateHybrid(goblin, kobold, goblinKoboldRecipe);
 
@@ -851,8 +981,14 @@ describe('Hybrid Creation', () => {
   });
 
   it('should store stat differences in instanceStatBonuses', () => {
-    const goblin = makeInhabitant({ instanceId: 'g1' as InhabitantInstanceId, definitionId: GOBLIN_ID as InhabitantId });
-    const kobold = makeInhabitant({ instanceId: 'k1' as InhabitantInstanceId, definitionId: KOBOLD_ID as InhabitantId });
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+    });
+    const kobold = makeInhabitant({
+      instanceId: 'k1' as InhabitantInstanceId,
+      definitionId: KOBOLD_ID as InhabitantId,
+    });
 
     const hybrid = breedingCreateHybrid(goblin, kobold, goblinKoboldRecipe);
 
@@ -887,10 +1023,12 @@ describe('Upgrade Effects', () => {
 
 describe('Adjacency Effects', () => {
   it('Spawning Pool should have hybridTimeReduction', () => {
-    expect(spawningPoolDef.breedingAdjacencyEffects?.hybridTimeReduction).toBe(0.25);
+    expect(spawningPoolDef.breedingAdjacencyEffects?.hybridTimeReduction).toBe(
+      0.25,
+    );
   });
 
   it('Soul Well should have mutationOddsBonus', () => {
-    expect(soulWellDef.breedingAdjacencyEffects?.mutationOddsBonus).toBe(0.10);
+    expect(soulWellDef.breedingAdjacencyEffects?.mutationOddsBonus).toBe(0.1);
   });
 });

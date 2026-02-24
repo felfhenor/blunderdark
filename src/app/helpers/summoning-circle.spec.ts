@@ -12,10 +12,10 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
+  RoomUpgradeContent,
+  RoomUpgradeId,
   SummonRecipeContent,
   SummonRecipeId,
-  UpgradePathId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -34,24 +34,27 @@ const RECIPE_ADVANCED_ID = 'sc300001-0001-0001-0001-000000000003';
 
 // --- Upgrade paths ---
 
-const greaterSummoningPath: RoomUpgradePath = {
-  id: 'upgrade-greater-summoning' as UpgradePathId,
+const greaterSummoningPath: RoomUpgradeContent = {
+  id: 'upgrade-greater-summoning' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Greater Summoning',
   description: 'Unlock advanced recipes.',
   cost: { gold: 200, essence: 100, flux: 50 },
   effects: [{ type: 'summonTierUnlock', value: 1 }],
 };
 
-const dualCirclePath: RoomUpgradePath = {
-  id: 'upgrade-dual-circle' as UpgradePathId,
+const dualCirclePath: RoomUpgradeContent = {
+  id: 'upgrade-dual-circle' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Dual Circle',
   description: 'Additional summoner slot.',
   cost: { gold: 150, crystals: 80 },
   effects: [{ type: 'maxInhabitantBonus', value: 1 }],
 };
 
-const bindingMasteryPath: RoomUpgradePath = {
-  id: 'upgrade-binding-mastery' as UpgradePathId,
+const bindingMasteryPath: RoomUpgradeContent = {
+  id: 'upgrade-binding-mastery' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Binding Mastery',
   description: 'Longer temp, +1 stats.',
   cost: { gold: 180, essence: 60, flux: 40 },
@@ -111,7 +114,9 @@ vi.mock('@helpers/adjacency', () => ({
 
 vi.mock('@helpers/room-shapes', () => ({
   roomShapeResolve: () => ({ tiles: [{ x: 0, y: 0 }], width: 1, height: 1 }),
-  roomShapeGetAbsoluteTiles: (_shape: unknown, x: number, y: number) => [{ x, y }],
+  roomShapeGetAbsoluteTiles: (_shape: unknown, x: number, y: number) => [
+    { x, y },
+  ],
 }));
 
 // --- Inhabitant definitions ---
@@ -221,9 +226,13 @@ const summoningCircleDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [greaterSummoningPath, dualCirclePath, bindingMasteryPath],
   autoPlace: false,
   role: 'summoningCircle',
+  roomUpgradeIds: [
+    greaterSummoningPath.id,
+    dualCirclePath.id,
+    bindingMasteryPath.id,
+  ],
 };
 
 const libraryDef: RoomContent = {
@@ -242,7 +251,6 @@ const libraryDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
   summoningAdjacencyEffects: { summonTimeReduction: 0.25 },
 };
@@ -263,7 +271,6 @@ const soulWellDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
   summoningAdjacencyEffects: { summonStatBonus: 2 },
 };
@@ -312,9 +319,7 @@ function makeFloor(
   };
 }
 
-function makeGameState(overrides: {
-  floors?: Floor[];
-}): GameState {
+function makeGameState(overrides: { floors?: Floor[] }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test-game' as GameId,
@@ -338,7 +343,13 @@ function makeGameState(overrides: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: overrides.floors ?? [makeFloor()],
@@ -367,8 +378,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
 }
@@ -409,14 +431,11 @@ describe('Summoning Circle Room Definition', () => {
     expect(summoningCircleDef.fearLevel).toBe(3);
     expect(summoningCircleDef.role).toBe('summoningCircle');
     expect(summoningCircleDef.requiresWorkers).toBe(false);
-    expect(summoningCircleDef.cost).toEqual({ gold: 150, essence: 80, flux: 40 });
-  });
-
-  it('should have 3 upgrade paths', () => {
-    expect(summoningCircleDef.upgradePaths).toHaveLength(3);
-    expect(summoningCircleDef.upgradePaths[0].name).toBe('Greater Summoning');
-    expect(summoningCircleDef.upgradePaths[1].name).toBe('Dual Circle');
-    expect(summoningCircleDef.upgradePaths[2].name).toBe('Binding Mastery');
+    expect(summoningCircleDef.cost).toEqual({
+      gold: 150,
+      essence: 80,
+      flux: 40,
+    });
   });
 });
 
@@ -429,7 +448,9 @@ describe('Recipe Availability', () => {
   });
 
   it('should include advanced recipes with Greater Summoning upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-greater-summoning' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-greater-summoning' as RoomUpgradeId,
+    });
     const recipes = summoningGetAvailableRecipes(room);
     expect(recipes).toHaveLength(3); // fire + spectral + advanced
     expect(recipes.some((r) => r.tier === 'advanced')).toBe(true);
@@ -477,7 +498,9 @@ describe('Stat Bonus Calculation', () => {
   });
 
   it('should add Binding Mastery upgrade bonus to all stats', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-binding-mastery' as RoomUpgradeId,
+    });
     const bonuses = summoningGetStatBonuses(room, new Set(), fireRecipe);
     // attack: 5 (recipe) + 1 (upgrade) = 6
     expect(bonuses.attack).toBe(6);
@@ -489,7 +512,11 @@ describe('Stat Bonus Calculation', () => {
 
   it('should add Soul Well adjacency bonus to all stats', () => {
     const room = makeRoom();
-    const bonuses = summoningGetStatBonuses(room, new Set([SOUL_WELL_ID]), fireRecipe);
+    const bonuses = summoningGetStatBonuses(
+      room,
+      new Set([SOUL_WELL_ID]),
+      fireRecipe,
+    );
     // attack: 5 (recipe) + 2 (adjacency) = 7
     expect(bonuses.attack).toBe(7);
     expect(bonuses.hp).toBe(2);
@@ -498,8 +525,14 @@ describe('Stat Bonus Calculation', () => {
   });
 
   it('should combine upgrade and adjacency bonuses', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
-    const bonuses = summoningGetStatBonuses(room, new Set([SOUL_WELL_ID]), fireRecipe);
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-binding-mastery' as RoomUpgradeId,
+    });
+    const bonuses = summoningGetStatBonuses(
+      room,
+      new Set([SOUL_WELL_ID]),
+      fireRecipe,
+    );
     // attack: 5 (recipe) + 1 (upgrade) + 2 (adjacency) = 8
     expect(bonuses.attack).toBe(8);
     // hp: 0 + 1 + 2 = 3
@@ -515,7 +548,9 @@ describe('Duration Calculation', () => {
   });
 
   it('should apply Binding Mastery multiplier', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-binding-mastery' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-binding-mastery' as RoomUpgradeId,
+    });
     const duration = summoningGetEffectiveDuration(room, 50);
     expect(duration).toBe(75); // 50 * 1.5
   });
@@ -530,13 +565,19 @@ describe('Summoning Can Start', () => {
 
   it('should return false when no inhabitants are assigned', () => {
     const room = makeRoom();
-    const inhabitants = [makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId })];
+    const inhabitants = [
+      makeInhabitant({ assignedRoomId: 'other-room' as PlacedRoomId }),
+    ];
     expect(summoningCanStart(room, inhabitants)).toBe(false);
   });
 
   it('should return false when there is an active summon job', () => {
     const room = makeRoom();
-    room.summonJob = { recipeId: RECIPE_FIRE_ID as SummonRecipeId, ticksRemaining: 10, targetTicks: 20 };
+    room.summonJob = {
+      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
+      ticksRemaining: 10,
+      targetTicks: 20,
+    };
     const inhabitants = [makeInhabitant()];
     expect(summoningCanStart(room, inhabitants)).toBe(false);
   });
@@ -544,7 +585,12 @@ describe('Summoning Can Start', () => {
 
 describe('Inhabitant Creation', () => {
   it('should create a permanent summoned inhabitant', () => {
-    const inh = summoningCreateInhabitant(fireElementalDef, fireRecipe, { attack: 5 }, false);
+    const inh = summoningCreateInhabitant(
+      fireElementalDef,
+      fireRecipe,
+      { attack: 5 },
+      false,
+    );
     expect(inh.isSummoned).toBe(true);
     expect(inh.isTemporary).toBeUndefined();
     expect(inh.temporaryTicksRemaining).toBeUndefined();
@@ -554,14 +600,26 @@ describe('Inhabitant Creation', () => {
   });
 
   it('should create a temporary summoned inhabitant', () => {
-    const inh = summoningCreateInhabitant(spectralServantDef, spectralRecipe, {}, true, 50);
+    const inh = summoningCreateInhabitant(
+      spectralServantDef,
+      spectralRecipe,
+      {},
+      true,
+      50,
+    );
     expect(inh.isSummoned).toBe(true);
     expect(inh.isTemporary).toBe(true);
     expect(inh.temporaryTicksRemaining).toBe(50);
   });
 
   it('should not set instanceStatBonuses when empty', () => {
-    const inh = summoningCreateInhabitant(spectralServantDef, spectralRecipe, {}, true, 50);
+    const inh = summoningCreateInhabitant(
+      spectralServantDef,
+      spectralRecipe,
+      {},
+      true,
+      50,
+    );
     expect(inh.instanceStatBonuses).toBeUndefined();
   });
 });
@@ -744,7 +802,9 @@ describe('Upgrade Effects', () => {
 
 describe('Adjacency Effects', () => {
   it('Shadow Library should have summonTimeReduction', () => {
-    expect(libraryDef.summoningAdjacencyEffects?.summonTimeReduction).toBe(0.25);
+    expect(libraryDef.summoningAdjacencyEffects?.summonTimeReduction).toBe(
+      0.25,
+    );
   });
 
   it('Soul Well should have summonStatBonus', () => {

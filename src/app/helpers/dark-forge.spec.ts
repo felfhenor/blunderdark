@@ -16,8 +16,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -28,12 +28,14 @@ const CRYSTAL_MINE_ID = '9d9bddd6-cb51-4a9f-866d-cc4773bdec37';
 const TRAINING_GROUNDS_ID = '46b5aa14-f6c5-48db-a9dd-d1d070dfde56';
 const IRON_SWORD_ID = 'a1f01001-0001-4001-8001-000000000001' as ForgeRecipeId;
 const DARK_SHIELD_ID = 'a1f01001-0001-4001-8001-000000000002' as ForgeRecipeId;
-const INFERNAL_BLADE_ID = 'a1f01001-0001-4001-8001-000000000006' as ForgeRecipeId;
+const INFERNAL_BLADE_ID =
+  'a1f01001-0001-4001-8001-000000000006' as ForgeRecipeId;
 
 // --- Upgrade paths ---
 
-const masterForgePath: RoomUpgradePath = {
-  id: 'e1f02001-0001-4001-8001-000000000001' as UpgradePathId,
+const masterForgePath: RoomUpgradeContent = {
+  id: 'e1f02001-0001-4001-8001-000000000001' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Master Forge',
   description: 'Expand forge capacity and speed.',
   cost: { gold: 120, crystals: 60 },
@@ -43,8 +45,9 @@ const masterForgePath: RoomUpgradePath = {
   ],
 };
 
-const infernalForgePath: RoomUpgradePath = {
-  id: 'e1f02001-0001-4001-8001-000000000002' as UpgradePathId,
+const infernalForgePath: RoomUpgradeContent = {
+  id: 'e1f02001-0001-4001-8001-000000000002' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Infernal Forge',
   description: 'Unlock advanced recipes.',
   cost: { gold: 150, essence: 40, flux: 30 },
@@ -80,8 +83,14 @@ vi.mock('@helpers/rng', () => ({
 }));
 
 vi.mock('@helpers/room-shapes', () => ({
-  roomShapeResolve: vi.fn(() => ({ tiles: [{ x: 0, y: 0 }], width: 1, height: 1 })),
-  roomShapeGetAbsoluteTiles: vi.fn((_shape: unknown, ax: number, ay: number) => [{ x: ax, y: ay }]),
+  roomShapeResolve: vi.fn(() => ({
+    tiles: [{ x: 0, y: 0 }],
+    width: 1,
+    height: 1,
+  })),
+  roomShapeGetAbsoluteTiles: vi.fn(
+    (_shape: unknown, ax: number, ay: number) => [{ x: ax, y: ay }],
+  ),
 }));
 
 vi.mock('@helpers/adjacency', () => ({
@@ -89,9 +98,13 @@ vi.mock('@helpers/adjacency', () => ({
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -155,9 +168,9 @@ const forgeDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [masterForgePath, infernalForgePath],
   autoPlace: false,
   role: 'darkForge',
+  roomUpgradeIds: [masterForgePath.id, infernalForgePath.id],
 };
 
 const crystalMineDef: RoomContent = {
@@ -176,9 +189,8 @@ const crystalMineDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
-  forgingAdjacencyEffects: { forgingSpeedBonus: 0.30 },
+  forgingAdjacencyEffects: { forgingSpeedBonus: 0.3 },
 };
 
 const trainingGroundsDef: RoomContent = {
@@ -197,7 +209,6 @@ const trainingGroundsDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [],
   autoPlace: false,
   forgingAdjacencyEffects: { forgingStatBonus: 1 },
 };
@@ -274,7 +285,13 @@ function makeGameState(overrides: {
         activeResearch: undefined,
         activeResearchProgress: 0,
         activeResearchStartTick: 0,
-        unlockedContent: { rooms: [], inhabitants: [], abilities: [], upgrades: [], passiveBonuses: [] },
+        unlockedContent: {
+          rooms: [],
+          inhabitants: [],
+          abilities: [],
+          roomupgrades: [],
+          passiveBonuses: [],
+        },
       },
       reputation: { terror: 0, wealth: 0, knowledge: 0, harmony: 0, chaos: 0 },
       floors: overrides.floors ?? [makeFloor()],
@@ -303,8 +320,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
 }
@@ -335,13 +363,19 @@ beforeEach(() => {
   mockContent.set(INFERNAL_BLADE_ID, infernalBladeRecipe);
   mockContent.set(CRYSTAL_MINE_ID, crystalMineDef);
   mockContent.set(TRAINING_GROUNDS_ID, trainingGroundsDef);
+  mockContent.set(masterForgePath.id, masterForgePath);
+  mockContent.set(infernalForgePath.id, infernalForgePath);
 });
 
 // --- Tests ---
 
 describe('Recipe Availability', () => {
   it('should return only basic recipes without Infernal Forge upgrade', () => {
-    vi.mocked(contentGetEntriesByType).mockReturnValue([ironSwordRecipe, darkShieldRecipe, infernalBladeRecipe]);
+    vi.mocked(contentGetEntriesByType).mockReturnValue([
+      ironSwordRecipe,
+      darkShieldRecipe,
+      infernalBladeRecipe,
+    ]);
     const room = makeRoom();
     const recipes = darkForgeGetAvailableRecipes(room);
     expect(recipes).toHaveLength(2);
@@ -349,7 +383,11 @@ describe('Recipe Availability', () => {
   });
 
   it('should include advanced recipes with Infernal Forge upgrade', () => {
-    vi.mocked(contentGetEntriesByType).mockReturnValue([ironSwordRecipe, darkShieldRecipe, infernalBladeRecipe]);
+    vi.mocked(contentGetEntriesByType).mockReturnValue([
+      ironSwordRecipe,
+      darkShieldRecipe,
+      infernalBladeRecipe,
+    ]);
     const room = makeRoom({ appliedUpgradePathId: infernalForgePath.id });
     const recipes = darkForgeGetAvailableRecipes(room);
     expect(recipes).toHaveLength(3);
@@ -392,7 +430,7 @@ describe('Crafting Tick Calculation', () => {
     const room = makeRoom();
     const adjacentTypes = new Set([CRYSTAL_MINE_ID]);
     const ticks = darkForgeGetCraftingTicks(room, 1, 1.0, adjacentTypes);
-    expect(ticks).toBe(Math.round(DARK_FORGE_BASE_CRAFTING_TICKS * (1 - 0.30)));
+    expect(ticks).toBe(Math.round(DARK_FORGE_BASE_CRAFTING_TICKS * (1 - 0.3)));
   });
 
   it('should combine upgrade, worker, and adjacency bonuses', () => {
@@ -426,7 +464,11 @@ describe('Stat Bonus Calculation', () => {
   it('should add adjacency stat bonus from Training Grounds', () => {
     const room = makeRoom();
     const adjacentTypes = new Set([TRAINING_GROUNDS_ID]);
-    const bonuses = darkForgeGetStatBonuses(room, ironSwordRecipe, adjacentTypes);
+    const bonuses = darkForgeGetStatBonuses(
+      room,
+      ironSwordRecipe,
+      adjacentTypes,
+    );
     expect(bonuses.attack).toBe(4); // 3 + 1
     expect(bonuses.hp).toBe(1);
     expect(bonuses.defense).toBe(1);
@@ -436,7 +478,11 @@ describe('Stat Bonus Calculation', () => {
   it('should combine upgrade and adjacency stat bonuses', () => {
     const room = makeRoom({ appliedUpgradePathId: infernalForgePath.id });
     const adjacentTypes = new Set([TRAINING_GROUNDS_ID]);
-    const bonuses = darkForgeGetStatBonuses(room, ironSwordRecipe, adjacentTypes);
+    const bonuses = darkForgeGetStatBonuses(
+      room,
+      ironSwordRecipe,
+      adjacentTypes,
+    );
     // recipe attack 3 + upgrade 2 + adjacency 1 = 6
     expect(bonuses.attack).toBe(6);
     expect(bonuses.hp).toBe(3); // 0 + 2 + 1
@@ -448,7 +494,12 @@ describe('Stat Bonus Calculation', () => {
 describe('Queue Management', () => {
   describe('darkForgeAddJob', () => {
     it('should create new queue entry for room without existing queue', () => {
-      const result = darkForgeAddJob([], 'forge-1' as PlacedRoomId, IRON_SWORD_ID, 20);
+      const result = darkForgeAddJob(
+        [],
+        'forge-1' as PlacedRoomId,
+        IRON_SWORD_ID,
+        20,
+      );
       expect(result).toHaveLength(1);
       expect(result[0].roomId).toBe('forge-1');
       expect(result[0].jobs).toHaveLength(1);
@@ -464,7 +515,12 @@ describe('Queue Management', () => {
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 5, targetTicks: 20 }],
         },
       ];
-      const result = darkForgeAddJob(queues, 'forge-1' as PlacedRoomId, DARK_SHIELD_ID, 25);
+      const result = darkForgeAddJob(
+        queues,
+        'forge-1' as PlacedRoomId,
+        DARK_SHIELD_ID,
+        25,
+      );
       expect(result[0].jobs).toHaveLength(2);
       expect(result[0].jobs[1].recipeId).toBe(DARK_SHIELD_ID);
     });
@@ -476,7 +532,12 @@ describe('Queue Management', () => {
           jobs: [{ recipeId: IRON_SWORD_ID, progress: 0, targetTicks: 20 }],
         },
       ];
-      const result = darkForgeAddJob(queues, 'forge-1' as PlacedRoomId, DARK_SHIELD_ID, 25);
+      const result = darkForgeAddJob(
+        queues,
+        'forge-1' as PlacedRoomId,
+        DARK_SHIELD_ID,
+        25,
+      );
       expect(result).toHaveLength(2);
       expect(result[0].roomId).toBe('forge-other');
       expect(result[0].jobs).toHaveLength(1);
@@ -565,7 +626,11 @@ describe('darkForgeCanQueue', () => {
 
   it('should return not found for missing room', () => {
     const floor = makeFloor();
-    const result = darkForgeCanQueue('nonexistent' as PlacedRoomId, [floor], []);
+    const result = darkForgeCanQueue(
+      'nonexistent' as PlacedRoomId,
+      [floor],
+      [],
+    );
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not found');
   });
@@ -580,13 +645,17 @@ describe('Inventory Management', () => {
   });
 
   it('should increment count for existing item', () => {
-    const inventory: ForgeInventoryEntry[] = [{ recipeId: IRON_SWORD_ID, count: 2 }];
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 2 },
+    ];
     const result = darkForgeAddToInventory(inventory, IRON_SWORD_ID);
     expect(result[0].count).toBe(3);
   });
 
   it('should handle multiple items independently', () => {
-    const inventory: ForgeInventoryEntry[] = [{ recipeId: IRON_SWORD_ID, count: 1 }];
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 1 },
+    ];
     const result = darkForgeAddToInventory(inventory, DARK_SHIELD_ID);
     expect(result).toHaveLength(2);
     expect(result[0].recipeId).toBe(IRON_SWORD_ID);
@@ -685,8 +754,14 @@ describe('darkForgeProcess', () => {
   it('should process multiple forges across floors', () => {
     const forge1 = makeRoom({ id: 'forge-1' as PlacedRoomId });
     const forge2 = makeRoom({ id: 'forge-2' as PlacedRoomId });
-    const w1 = makeInhabitant({ instanceId: 'w1' as InhabitantInstanceId, assignedRoomId: 'forge-1' as PlacedRoomId });
-    const w2 = makeInhabitant({ instanceId: 'w2' as InhabitantInstanceId, assignedRoomId: 'forge-2' as PlacedRoomId });
+    const w1 = makeInhabitant({
+      instanceId: 'w1' as InhabitantInstanceId,
+      assignedRoomId: 'forge-1' as PlacedRoomId,
+    });
+    const w2 = makeInhabitant({
+      instanceId: 'w2' as InhabitantInstanceId,
+      assignedRoomId: 'forge-2' as PlacedRoomId,
+    });
     const floor1 = makeFloor([forge1], [w1]);
     const floor2 = makeFloor([forge2], [w2]);
     floor2.id = 'floor-2' as FloorId;
@@ -752,7 +827,9 @@ describe('darkForgeProcess', () => {
 
     // First job completed and removed
     expect(state.world.forgeCraftingQueues[0].jobs).toHaveLength(1);
-    expect(state.world.forgeCraftingQueues[0].jobs[0].recipeId).toBe(DARK_SHIELD_ID);
+    expect(state.world.forgeCraftingQueues[0].jobs[0].recipeId).toBe(
+      DARK_SHIELD_ID,
+    );
     // Inventory updated
     expect(state.world.forgeInventory[0].recipeId).toBe(IRON_SWORD_ID);
   });

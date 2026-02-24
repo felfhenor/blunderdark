@@ -12,8 +12,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,8 +26,9 @@ const SKELETON_DEF_ID = 'aa200001-0001-0001-0001-000000000002';
 
 // --- Upgrade paths ---
 
-const rapidSpawningPath: RoomUpgradePath = {
-  id: 'upgrade-rapid-spawning' as UpgradePathId,
+const rapidSpawningPath: RoomUpgradeContent = {
+  id: 'upgrade-rapid-spawning' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Rapid Spawning',
   description: 'Faster spawns and higher capacity.',
   cost: { gold: 100, crystals: 50 },
@@ -38,8 +39,9 @@ const rapidSpawningPath: RoomUpgradePath = {
   ],
 };
 
-const darkSpawningPath: RoomUpgradePath = {
-  id: 'upgrade-dark-spawning' as UpgradePathId,
+const darkSpawningPath: RoomUpgradeContent = {
+  id: 'upgrade-dark-spawning' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Dark Spawning',
   description: 'Spawn Skeletons instead.',
   cost: { gold: 120, crystals: 60, essence: 20 },
@@ -55,7 +57,7 @@ const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
-  contentGetEntriesByType: vi.fn(() => []),
+  contentGetEntriesByType: () => [],
   getEntries: vi.fn(),
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
@@ -133,8 +135,11 @@ const spawningPoolDef: RoomContent = {
   adjacencyBonuses: [],
   isUnique: false,
   removable: true,
-  upgradePaths: [rapidSpawningPath, darkSpawningPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-rapid-spawning' as RoomUpgradeId,
+    'upgrade-dark-spawning' as RoomUpgradeId,
+  ],
   role: 'spawningPool',
   spawnRate: 25,
   spawnType: 'Goblin',
@@ -256,8 +261,19 @@ function makeGameState(overrides: {
       stairs: [],
       elevators: [],
       portals: [],
-      victoryProgress: { consecutivePeacefulDays: 0, lastPeacefulCheckDay: 0, consecutiveZeroCorruptionDays: 0, lastZeroCorruptionCheckDay: 0, totalInvasionDefenseWins: 0 },
-      merchant: { isPresent: false, arrivalDay: 0, departureDayRemaining: 0, inventory: [] },
+      victoryProgress: {
+        consecutivePeacefulDays: 0,
+        lastPeacefulCheckDay: 0,
+        consecutiveZeroCorruptionDays: 0,
+        lastZeroCorruptionCheckDay: 0,
+        totalInvasionDefenseWins: 0,
+      },
+      merchant: {
+        isPresent: false,
+        arrivalDay: 0,
+        departureDayRemaining: 0,
+        inventory: [],
+      },
     },
   };
 }
@@ -282,6 +298,8 @@ beforeEach(() => {
   mockContent.set(SPAWNING_POOL_ID, spawningPoolDef);
   mockContent.set('Goblin', goblinDef);
   mockContent.set('Skeleton', skeletonDef);
+  mockContent.set(rapidSpawningPath.id, rapidSpawningPath);
+  mockContent.set(darkSpawningPath.id, darkSpawningPath);
 });
 
 // --- Tests ---
@@ -295,12 +313,6 @@ describe('Spawning Pool Room Definition', () => {
     expect(spawningPoolDef.shapeId).toBe('shape-2x2');
     expect(spawningPoolDef.role).toBe('spawningPool');
   });
-
-  it('should have 2 upgrade paths', () => {
-    expect(spawningPoolDef.upgradePaths).toHaveLength(2);
-    expect(spawningPoolDef.upgradePaths[0].name).toBe('Rapid Spawning');
-    expect(spawningPoolDef.upgradePaths[1].name).toBe('Dark Spawning');
-  });
 });
 
 describe('spawningPoolGetEffectiveRate', () => {
@@ -310,13 +322,17 @@ describe('spawningPoolGetEffectiveRate', () => {
   });
 
   it('should reduce rate with Rapid Spawning upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-rapid-spawning' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-rapid-spawning' as RoomUpgradeId,
+    });
     // base 25 - spawnRateReduction 10 = 15
     expect(spawningPoolGetEffectiveRate(room, 25)).toBe(15);
   });
 
   it('should clamp rate to minimum of 1', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-rapid-spawning' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-rapid-spawning' as RoomUpgradeId,
+    });
     // base 5 - reduction 10 = -5, clamped to 1
     expect(spawningPoolGetEffectiveRate(room, 5)).toBe(1);
   });
@@ -329,7 +345,9 @@ describe('spawningPoolGetEffectiveCapacity', () => {
   });
 
   it('should increase capacity with Rapid Spawning upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-rapid-spawning' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-rapid-spawning' as RoomUpgradeId,
+    });
     // base 10 + spawnCapacityBonus 5 = 15
     expect(spawningPoolGetEffectiveCapacity(room, 10)).toBe(15);
   });
@@ -342,7 +360,9 @@ describe('spawningPoolGetSpawnType', () => {
   });
 
   it('should return Skeleton with Dark Spawning upgrade', () => {
-    const room = makeRoom({ appliedUpgradePathId: 'upgrade-dark-spawning' as UpgradePathId });
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-dark-spawning' as RoomUpgradeId,
+    });
     expect(spawningPoolGetSpawnType(room, 'Goblin')).toBe('Skeleton');
   });
 });
@@ -354,17 +374,32 @@ describe('spawningPoolCountUnassigned', () => {
 
   it('should count only unassigned inhabitants', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'a' as InhabitantInstanceId, assignedRoomId: undefined }),
-      makeInhabitant({ instanceId: 'b' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId }),
-      makeInhabitant({ instanceId: 'c' as InhabitantInstanceId, assignedRoomId: undefined }),
+      makeInhabitant({
+        instanceId: 'a' as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
+      makeInhabitant({
+        instanceId: 'b' as InhabitantInstanceId,
+        assignedRoomId: 'room-1' as PlacedRoomId,
+      }),
+      makeInhabitant({
+        instanceId: 'c' as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
     ];
     expect(spawningPoolCountUnassigned(inhabitants)).toBe(2);
   });
 
   it('should return 0 when all assigned', () => {
     const inhabitants = [
-      makeInhabitant({ instanceId: 'a' as InhabitantInstanceId, assignedRoomId: 'room-1' as PlacedRoomId }),
-      makeInhabitant({ instanceId: 'b' as InhabitantInstanceId, assignedRoomId: 'room-2' as PlacedRoomId }),
+      makeInhabitant({
+        instanceId: 'a' as InhabitantInstanceId,
+        assignedRoomId: 'room-1' as PlacedRoomId,
+      }),
+      makeInhabitant({
+        instanceId: 'b' as InhabitantInstanceId,
+        assignedRoomId: 'room-2' as PlacedRoomId,
+      }),
     ];
     expect(spawningPoolCountUnassigned(inhabitants)).toBe(0);
   });
@@ -456,7 +491,10 @@ describe('spawningPoolProcess', () => {
     const floor = makeFloor([room]);
     // Fill with 10 unassigned inhabitants (capacity = 10)
     const inhabitants = Array.from({ length: 10 }, (_, i) =>
-      makeInhabitant({ instanceId: `inh-${i}` as InhabitantInstanceId, assignedRoomId: undefined }),
+      makeInhabitant({
+        instanceId: `inh-${i}` as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
     );
     const state = makeGameState({ floors: [floor], inhabitants });
 
@@ -472,10 +510,16 @@ describe('spawningPoolProcess', () => {
     // 9 unassigned + 5 assigned = 14 total, but only 9 unassigned < 10 capacity
     const inhabitants = [
       ...Array.from({ length: 9 }, (_, i) =>
-        makeInhabitant({ instanceId: `un-${i}` as InhabitantInstanceId, assignedRoomId: undefined }),
+        makeInhabitant({
+          instanceId: `un-${i}` as InhabitantInstanceId,
+          assignedRoomId: undefined,
+        }),
       ),
       ...Array.from({ length: 5 }, (_, i) =>
-        makeInhabitant({ instanceId: `as-${i}` as InhabitantInstanceId, assignedRoomId: 'some-room' as PlacedRoomId }),
+        makeInhabitant({
+          instanceId: `as-${i}` as InhabitantInstanceId,
+          assignedRoomId: 'some-room' as PlacedRoomId,
+        }),
       ),
     ];
     const state = makeGameState({ floors: [floor], inhabitants });
@@ -493,9 +537,7 @@ describe('spawningPoolProcess', () => {
     spawningPoolProcess(state);
 
     // Floor inhabitants should be synced with world inhabitants
-    expect(state.world.floors[0].inhabitants).toEqual(
-      state.world.inhabitants,
-    );
+    expect(state.world.floors[0].inhabitants).toEqual(state.world.inhabitants);
   });
 
   it('should not process rooms that are not spawning pools', () => {
@@ -516,8 +558,14 @@ describe('spawningPoolProcess', () => {
   });
 
   it('should process multiple spawning pools across floors', () => {
-    const pool1 = makeRoom({ id: 'pool-1' as PlacedRoomId, spawnTicksRemaining: 1 });
-    const pool2 = makeRoom({ id: 'pool-2' as PlacedRoomId, spawnTicksRemaining: 1 });
+    const pool1 = makeRoom({
+      id: 'pool-1' as PlacedRoomId,
+      spawnTicksRemaining: 1,
+    });
+    const pool2 = makeRoom({
+      id: 'pool-2' as PlacedRoomId,
+      spawnTicksRemaining: 1,
+    });
     const floor1 = makeFloor([pool1]);
     const floor2 = makeFloor([pool2]);
     floor2.id = 'floor-2' as FloorId;
@@ -533,7 +581,7 @@ describe('spawningPoolProcess', () => {
   it('should use reduced spawn rate with Rapid Spawning upgrade', () => {
     const room = makeRoom({
       spawnTicksRemaining: undefined,
-      appliedUpgradePathId: 'upgrade-rapid-spawning' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-rapid-spawning' as RoomUpgradeId,
     });
     const floor = makeFloor([room]);
     const state = makeGameState({ floors: [floor] });
@@ -547,12 +595,15 @@ describe('spawningPoolProcess', () => {
   it('should use increased capacity with Rapid Spawning upgrade', () => {
     const room = makeRoom({
       spawnTicksRemaining: 1,
-      appliedUpgradePathId: 'upgrade-rapid-spawning' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-rapid-spawning' as RoomUpgradeId,
     });
     const floor = makeFloor([room]);
     // 10 unassigned - at base capacity but below upgraded capacity (15)
     const inhabitants = Array.from({ length: 10 }, (_, i) =>
-      makeInhabitant({ instanceId: `inh-${i}` as InhabitantInstanceId, assignedRoomId: undefined }),
+      makeInhabitant({
+        instanceId: `inh-${i}` as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
     );
     const state = makeGameState({ floors: [floor], inhabitants });
 
@@ -565,7 +616,7 @@ describe('spawningPoolProcess', () => {
   it('should spawn Skeletons with Dark Spawning upgrade', () => {
     const room = makeRoom({
       spawnTicksRemaining: 1,
-      appliedUpgradePathId: 'upgrade-dark-spawning' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-dark-spawning' as RoomUpgradeId,
     });
     const floor = makeFloor([room]);
     const state = makeGameState({ floors: [floor] });
@@ -602,7 +653,10 @@ describe('spawningPoolProcess', () => {
     const floor = makeFloor([room]);
     // Fill to default capacity (10)
     const inhabitants = Array.from({ length: 10 }, (_, i) =>
-      makeInhabitant({ instanceId: `inh-${i}` as InhabitantInstanceId, assignedRoomId: undefined }),
+      makeInhabitant({
+        instanceId: `inh-${i}` as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
     );
     const state = makeGameState({ floors: [floor], inhabitants });
 
@@ -616,7 +670,10 @@ describe('spawningPoolProcess', () => {
     const room = makeRoom({ spawnTicksRemaining: 1 });
     const floor = makeFloor([room]);
     const inhabitants = Array.from({ length: 10 }, (_, i) =>
-      makeInhabitant({ instanceId: `inh-${i}` as InhabitantInstanceId, assignedRoomId: undefined }),
+      makeInhabitant({
+        instanceId: `inh-${i}` as InhabitantInstanceId,
+        assignedRoomId: undefined,
+      }),
     );
     const state = makeGameState({ floors: [floor], inhabitants });
 

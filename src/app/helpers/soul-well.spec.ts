@@ -10,8 +10,8 @@ import type {
   RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradePath,
-  UpgradePathId,
+  RoomUpgradeContent,
+  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,11 +23,12 @@ const SHADOW_LIBRARY_ID = 'room-shadow-library';
 
 // --- Upgrade paths ---
 
-const necroticEnhancementPath: RoomUpgradePath = {
-  id: 'upgrade-necrotic-enhancement' as UpgradePathId,
+const necroticEnhancementPath: RoomUpgradeContent = {
+  id: 'upgrade-necrotic-enhancement' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Necrotic Enhancement',
   description:
-    'Deepen the well\'s connection to the spirit realm, boosting essence yield.',
+    "Deepen the well's connection to the spirit realm, boosting essence yield.",
   cost: { gold: 120, crystals: 60, essence: 25 },
   effects: [
     { type: 'productionMultiplier', value: 1.5, resource: 'essence' },
@@ -35,11 +36,12 @@ const necroticEnhancementPath: RoomUpgradePath = {
   ],
 };
 
-const essenceMasteryPath: RoomUpgradePath = {
-  id: 'upgrade-essence-mastery' as UpgradePathId,
+const essenceMasteryPath: RoomUpgradeContent = {
+  id: 'upgrade-essence-mastery' as RoomUpgradeId,
+  __type: 'roomupgrade',
   name: 'Essence Mastery',
   description:
-    'Purify the well\'s output for greater efficiency, reducing fear.',
+    "Purify the well's output for greater efficiency, reducing fear.",
   cost: { gold: 100, crystals: 80, essence: 40 },
   effects: [
     { type: 'productionMultiplier', value: 1.75, resource: 'essence' },
@@ -59,9 +61,13 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/connectivity', () => ({
-  connectivityGetConnectedRoomIds: (floor: { rooms: Array<{ id: string }> }) => {
+  connectivityGetConnectedRoomIds: (floor: {
+    rooms: Array<{ id: string }>;
+  }) => {
     const ids = new Set<string>();
-    for (const room of floor.rooms) { ids.add(room.id); }
+    for (const room of floor.rooms) {
+      ids.add(room.id);
+    }
     return ids;
   },
   connectivityGetDisconnectedRoomIds: () => new Set<string>(),
@@ -90,8 +96,11 @@ const soulWellRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 3,
   fearReductionAura: 0,
-  upgradePaths: [necroticEnhancementPath, essenceMasteryPath],
   autoPlace: false,
+  roomUpgradeIds: [
+    'upgrade-necrotic-enhancement' as RoomUpgradeId,
+    'upgrade-essence-mastery' as RoomUpgradeId,
+  ],
 };
 
 const mushroomGroveRoom: RoomContent = {
@@ -110,7 +119,6 @@ const mushroomGroveRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 1,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -130,7 +138,6 @@ const shadowLibraryRoom: RoomContent = {
   inhabitantRestriction: undefined,
   fearLevel: 2,
   fearReductionAura: 0,
-  upgradePaths: [],
   autoPlace: false,
 };
 
@@ -223,6 +230,8 @@ beforeEach(() => {
   mockContent.set(SOUL_WELL_ID, soulWellRoom);
   mockContent.set(MUSHROOM_GROVE_ID, mushroomGroveRoom);
   mockContent.set(SHADOW_LIBRARY_ID, shadowLibraryRoom);
+  mockContent.set(necroticEnhancementPath.id, necroticEnhancementPath);
+  mockContent.set(essenceMasteryPath.id, essenceMasteryPath);
 });
 
 describe('Soul Well: definition', () => {
@@ -240,10 +249,6 @@ describe('Soul Well: definition', () => {
 
   it('should not require workers for passive production', () => {
     expect(soulWellRoom.requiresWorkers).toBe(false);
-  });
-
-  it('should have 2 upgrade paths', () => {
-    expect(soulWellRoom.upgradePaths).toHaveLength(2);
   });
 
   it('should have 3 adjacency bonuses', () => {
@@ -371,7 +376,7 @@ describe('Soul Well: Necrotic Enhancement upgrade', () => {
 
   it('should change capacity from 2 to 3', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as RoomUpgradeId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(3);
@@ -392,16 +397,14 @@ describe('Soul Well: Essence Mastery upgrade', () => {
     expect(prodEffect!.value).toBe(1.75);
     expect(prodEffect!.resource).toBe('essence');
 
-    const fearEffect = mastery!.effects.find(
-      (e) => e.type === 'fearReduction',
-    );
+    const fearEffect = mastery!.effects.find((e) => e.type === 'fearReduction');
     expect(fearEffect).toBeDefined();
     expect(fearEffect!.value).toBe(1);
   });
 
   it('should not change capacity', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-essence-mastery' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-essence-mastery' as RoomUpgradeId,
     });
     const effective = roomUpgradeGetEffectiveMaxInhabitants(room, soulWellRoom);
     expect(effective).toBe(2);
@@ -411,7 +414,7 @@ describe('Soul Well: Essence Mastery upgrade', () => {
 describe('Soul Well: upgrade mutual exclusivity', () => {
   it('should prevent applying a second upgrade', () => {
     const room = createPlacedWell({
-      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as UpgradePathId,
+      appliedUpgradePathId: 'upgrade-necrotic-enhancement' as RoomUpgradeId,
     });
     const result = roomUpgradeCanApply(room, 'upgrade-essence-mastery');
     expect(result.valid).toBe(false);

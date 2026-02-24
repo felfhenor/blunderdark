@@ -28,7 +28,7 @@ import type {
   UnlockEffect,
   MutationTraitContent,
   MutationTraitId,
-  UpgradeUnlock,
+  RoomUpgradeUnlock,
 } from '@interfaces';
 import type {
   AbilityEffectContent,
@@ -67,7 +67,10 @@ import type {
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces/content-victorypath';
-import type { UpgradePathId } from '@interfaces/room';
+import type {
+  RoomUpgradeContent,
+  RoomUpgradeId,
+} from '@interfaces/content-roomupgrade';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,6 +93,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   research: ensureResearch,
   room: ensureRoom,
   roomshape: ensureRoomShape,
+  roomupgrade: ensureRoomUpgrade,
   seasonbonus: ensureSeasonBonus,
   summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
@@ -258,12 +262,12 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
           (effect as Partial<AbilityUnlock>).targetCombatabilityId ??
           ('' as CombatAbilityId),
       };
-    case 'upgrade':
+    case 'roomupgrade':
       return {
-        type: 'upgrade',
-        targetUpgradepathId:
-          (effect as Partial<UpgradeUnlock>).targetUpgradepathId ??
-          ('' as UpgradePathId),
+        type: 'roomupgrade',
+        targetRoomupgradeId:
+          (effect as Partial<RoomUpgradeUnlock>).targetRoomupgradeId ??
+          ('' as RoomUpgradeId),
       };
     case 'feature_flag':
       return {
@@ -308,8 +312,8 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
     inhabitantRestriction: room.inhabitantRestriction ?? undefined,
     fearLevel: room.fearLevel ?? 0,
     fearReductionAura: room.fearReductionAura ?? 0,
-    upgradePaths: room.upgradePaths ?? [],
     autoPlace: room.autoPlace ?? false,
+    roomUpgradeIds: room.roomUpgradeIds ?? [],
     role: room.role ?? undefined,
     timeOfDayBonus: room.timeOfDayBonus ?? undefined,
     biomeBonuses: room.biomeBonuses ?? undefined,
@@ -325,6 +329,25 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
     forgingAdjacencyEffects: room.forgingAdjacencyEffects ?? undefined,
     alchemyAdjacencyEffects: room.alchemyAdjacencyEffects ?? undefined,
     tortureAdjacencyEffects: room.tortureAdjacencyEffects ?? undefined,
+  };
+}
+
+function ensureRoomUpgrade(
+  upgrade: Partial<RoomUpgradeContent>,
+): RoomUpgradeContent {
+  return {
+    id: (upgrade.id ?? 'UNKNOWN') as RoomUpgradeId,
+    name: upgrade.name ?? 'UNKNOWN',
+    __type: 'roomupgrade',
+    description: upgrade.description ?? '',
+    cost: upgrade.cost ?? {},
+    effects: (upgrade.effects ?? []).map((e) => ({
+      type: e.type ?? '',
+      value: e.value ?? 0,
+      resource: e.resource ?? undefined,
+    })),
+    upgradeLevel: upgrade.upgradeLevel ?? undefined,
+    requiresDarkUpgrade: upgrade.requiresDarkUpgrade ?? undefined,
   };
 }
 
