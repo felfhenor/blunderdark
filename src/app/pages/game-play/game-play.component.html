@@ -82,7 +82,7 @@
 
 <div class="game-container">
   <div class="resource-bar-wrapper">
-    <app-resource-bar-top />
+    <app-resource-bar-top (resourceClick)="openResourceBreakdown($event)" />
   </div>
   <app-side-tab-rail
     [tabs]="tabDefinitions()"
@@ -130,6 +130,13 @@
 <app-panel-fusion [(visible)]="showFusion" />
 <app-panel-invasion-battle />
 <app-panel-victory />
+
+@if (breakdownResourceType(); as resType) {
+  <app-resource-breakdown-modal
+    [(visible)]="showResourceBreakdown"
+    [resourceType]="resType"
+  />
+}
 <app-victory-menu [(visible)]="showVictoryMenu" />
 
 @if (isAutosaving()) {

@@ -14,16 +14,21 @@ import {
   featureCalculateAdjacentProductionBonus,
   featureCalculateFlatProduction,
   featureCalculateProductionBonus,
+  featureGetResourceConverterEfficiency,
 } from '@helpers/features';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { productionModifierCalculate } from '@helpers/production-modifiers';
+import {
+  productionModifierCalculate,
+  productionModifierEvaluate,
+} from '@helpers/production-modifiers';
 import { resourceAdd } from '@helpers/resources';
 import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
 import {
+  roomGetDisplayName,
   roomUpgradeGetProductionMultiplier,
   roomUpgradeGetSecondaryProduction,
 } from '@helpers/room-upgrades';
@@ -47,7 +52,9 @@ import type { RoomContent } from '@interfaces/content-room';
 import type {
   ActiveAdjacencyBonus,
   InhabitantBonusResult,
+  ModifierDetail,
   ResourceProductionBreakdown,
+  RoomProductionDetail,
 } from '@interfaces/production';
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
@@ -687,6 +694,296 @@ export function productionCalculateBreakdowns(
   }
 
   return breakdowns;
+}
+
+export function productionCalculateDetailedBreakdown(
+  floors: Floor[],
+  resourceType: string,
+  hour?: number,
+  season?: Season,
+): RoomProductionDetail[] {
+  const details: RoomProductionDetail[] = [];
+
+  for (const floor of floors) {
+    const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
+
+    const roomTiles = new Map<string, TileOffset[]>();
+    for (const room of floor.rooms) {
+      const shape = roomShapeResolve(room);
+      roomTiles.set(
+        room.id,
+        roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY),
+      );
+    }
+
+    for (const room of floor.rooms) {
+      if (!connectedIds.has(room.id)) continue;
+
+      const roomDef = productionGetRoomDefinition(room.roomTypeId);
+      if (!roomDef) continue;
+
+      const base = roomDef.production;
+      if (!base || Object.keys(base).length === 0) continue;
+
+      const { bonus: inhabitantBonusVal, hasWorkers } =
+        productionCalculateInhabitantBonus(room, floor.inhabitants);
+
+      if (roomDef.requiresWorkers && !hasWorkers) continue;
+
+      const assignedWorkers = floor.inhabitants.filter(
+        (i) =>
+          i.assignedRoomId === room.id &&
+          !(
+            i.travelTicksRemaining !== undefined &&
+            i.travelTicksRemaining > 0
+          ),
+      );
+
+      const thisTiles = roomTiles.get(room.id) ?? [];
+      const adjacentRoomIds: string[] = [];
+      for (const other of floor.rooms) {
+        if (other.id === room.id) continue;
+        if (!connectedIds.has(other.id)) continue;
+        const otherTiles = roomTiles.get(other.id) ?? [];
+        if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
+          adjacentRoomIds.push(other.id);
+        }
+      }
+
+      const adjacencyBonusVal = productionCalculateAdjacencyBonus(
+        room,
+        adjacentRoomIds,
+        floor.rooms,
+      );
+      const adjacentPlacedRooms = adjacentRoomIds
+        .map((id) => floor.rooms.find((r) => r.id === id))
+        .filter((r): r is PlacedRoom => r !== undefined);
+      const featureAdjacentBonus =
+        featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
+      const featureProductionBonus = featureCalculateProductionBonus(
+        room,
+        resourceType,
+      );
+      const stateModifier = productionCalculateConditionalModifiers(
+        room,
+        floor.inhabitants,
+      );
+
+      const baseAmount = base[resourceType] ?? 0;
+
+      // Check if this room has resource conversion
+      const hasConversion =
+        room.convertedOutputResource !== undefined &&
+        room.convertedOutputResource !== null;
+
+      // If room converts to a different resource, skip unless it converts TO this type
+      if (hasConversion && room.convertedOutputResource !== resourceType) {
+        // Check if flat production or secondary production contributes
+        const flatProd = featureCalculateFlatProduction(
+          room,
+          GAME_TIME_TICKS_PER_MINUTE,
+        );
+        const secondaryProd = roomUpgradeGetSecondaryProduction(room);
+        const hasFlatForType = (flatProd[resourceType] ?? 0) > 0;
+        const hasSecondaryForType = (secondaryProd[resourceType] ?? 0) > 0;
+        if (!hasFlatForType && !hasSecondaryForType) continue;
+      }
+
+      // If room converts and the target IS this resource, we need to compute the converted amount
+      let effectiveBase = baseAmount;
+      if (hasConversion && room.convertedOutputResource === resourceType) {
+        // Sum all base production values (they get converted)
+        let totalBase = 0;
+        for (const amount of Object.values(base)) {
+          if (amount && amount > 0) totalBase += amount;
+        }
+        effectiveBase = totalBase;
+      }
+
+      // Skip rooms with no relevant production
+      if (
+        effectiveBase <= 0 &&
+        !hasConversion
+      ) {
+        const flatProd = featureCalculateFlatProduction(
+          room,
+          GAME_TIME_TICKS_PER_MINUTE,
+        );
+        const secondaryProd = roomUpgradeGetSecondaryProduction(room);
+        if (
+          (flatProd[resourceType] ?? 0) <= 0 &&
+          (secondaryProd[resourceType] ?? 0) <= 0
+        )
+          continue;
+      }
+
+      // Build modifier details
+      const modifierDetails: ModifierDetail[] = [];
+
+      const depthModifier = floorModifierGetMultiplier(
+        floor.depth,
+        resourceType,
+      );
+      if (depthModifier !== 1.0) {
+        modifierDetails.push({
+          name: `Floor ${floor.depth} Depth`,
+          multiplier: depthModifier,
+        });
+      }
+
+      if (hour !== undefined) {
+        const envResults = productionModifierEvaluate({
+          roomTypeId: room.roomTypeId,
+          floorDepth: floor.depth,
+          floorBiome: floor.biome,
+          hour,
+        });
+        for (const result of envResults) {
+          modifierDetails.push({
+            name: result.description,
+            multiplier: result.multiplier,
+          });
+        }
+
+        const dayNightResourceMod = dayNightGetResourceModifier(
+          hour,
+          resourceType,
+        );
+        if (dayNightResourceMod !== 1.0) {
+          modifierDetails.push({
+            name: 'Time of Day (Resource)',
+            multiplier: dayNightResourceMod,
+          });
+        }
+
+        const creatureModifier =
+          dayNightCalculateCreatureProductionModifier(
+            hour,
+            floor.inhabitants,
+            room.id,
+          );
+        if (creatureModifier !== 1.0) {
+          modifierDetails.push({
+            name: 'Creature Day/Night',
+            multiplier: creatureModifier,
+          });
+        }
+      }
+
+      if (season) {
+        const seasonMod = seasonBonusGetResourceModifier(
+          season,
+          resourceType,
+        );
+        if (seasonMod !== 1.0) {
+          modifierDetails.push({
+            name: `Season (${season})`,
+            multiplier: seasonMod,
+          });
+        }
+      }
+
+      if (stateModifier !== 1.0) {
+        modifierDetails.push({
+          name: 'Creature State',
+          multiplier: stateModifier,
+        });
+      }
+
+      // Calculate combined modifier
+      const dayNightResourceMod =
+        hour !== undefined
+          ? dayNightGetResourceModifier(hour, resourceType)
+          : 1.0;
+      const seasonMod = season
+        ? seasonBonusGetResourceModifier(season, resourceType)
+        : 1.0;
+      const envModifier =
+        hour !== undefined
+          ? productionModifierCalculate({
+              roomTypeId: room.roomTypeId,
+              floorDepth: floor.depth,
+              floorBiome: floor.biome,
+              hour,
+            })
+          : 1.0;
+      const creatureModifier =
+        hour !== undefined
+          ? dayNightCalculateCreatureProductionModifier(
+              hour,
+              floor.inhabitants,
+              room.id,
+            )
+          : 1.0;
+
+      const combinedModifier =
+        stateModifier *
+        envModifier *
+        depthModifier *
+        dayNightResourceMod *
+        seasonMod *
+        creatureModifier;
+
+      const totalBonus =
+        inhabitantBonusVal +
+        adjacencyBonusVal +
+        featureAdjacentBonus +
+        featureProductionBonus;
+      const withBonuses = effectiveBase * (1 + totalBonus);
+      const afterModifiers = withBonuses * combinedModifier;
+
+      // Handle resource conversion efficiency
+      let conversionAdjusted = afterModifiers;
+      if (hasConversion && room.convertedOutputResource === resourceType) {
+        const efficiency = featureGetResourceConverterEfficiency(room);
+        if (efficiency !== undefined) {
+          conversionAdjusted = afterModifiers * efficiency;
+        }
+      }
+
+      // Flat production from features
+      const flatProduction = featureCalculateFlatProduction(
+        room,
+        GAME_TIME_TICKS_PER_MINUTE,
+      );
+      const flatForType = flatProduction[resourceType] ?? 0;
+
+      // Upgrade multiplier
+      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
+      let finalAmount =
+        (hasConversion && room.convertedOutputResource === resourceType
+          ? conversionAdjusted
+          : afterModifiers) + flatForType;
+      finalAmount *= upgradeMultiplier;
+
+      // Secondary production from upgrades
+      const secondaryProduction = roomUpgradeGetSecondaryProduction(room);
+      const secondaryForType = secondaryProduction[resourceType] ?? 0;
+      finalAmount += secondaryForType;
+
+      if (finalAmount === 0 && effectiveBase === 0 && flatForType === 0 && secondaryForType === 0) continue;
+
+      details.push({
+        roomId: room.id,
+        roomName: roomGetDisplayName(room),
+        floorDepth: floor.depth,
+        base: effectiveBase,
+        inhabitantBonus: effectiveBase * inhabitantBonusVal,
+        workerCount: assignedWorkers.length,
+        adjacencyBonus:
+          effectiveBase * (adjacencyBonusVal + featureAdjacentBonus),
+        featureBonus: effectiveBase * featureProductionBonus,
+        modifierEffect: afterModifiers - withBonuses,
+        modifierDetails,
+        flatFeatureProduction: flatForType,
+        upgradeSecondaryProduction: secondaryForType,
+        upgradeMultiplier,
+        final: finalAmount,
+      });
+    }
+  }
+
+  return details;
 }
 
 export const productionBreakdowns = computed(() => {

@@ -1,0 +1,220 @@
+<app-modal [(visible)]="visible" [showCloseButton]="true" [widthClass]="'max-w-2xl'">
+  <div title class="inline-flex items-center gap-2">
+    <app-currency-name [type]="resourceType()" />
+    Breakdown
+  </div>
+
+  <div body>
+    <!-- Summary bar -->
+    @if (breakdown(); as bd) {
+      <div class="flex items-center justify-center gap-6 py-2 text-sm border-b border-base-300 mb-3">
+        <span>
+          Production:
+          <span class="font-semibold text-success">{{ formatRate(bd.totals.totalProduction) }}/min</span>
+        </span>
+        <span>
+          Costs:
+          <span class="font-semibold text-error">{{ formatRate(-bd.totals.totalConsumption) }}/min</span>
+        </span>
+        <span>
+          Net:
+          <span
+            class="font-semibold"
+            [class.text-success]="bd.totals.net > 0"
+            [class.text-error]="bd.totals.net < 0"
+          >
+            {{ formatRate(bd.totals.net) }}/min
+          </span>
+        </span>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div role="tablist" class="tabs tabs-bordered mb-3">
+      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'base'" (click)="setTab('base')">Base</button>
+      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'workers'" (click)="setTab('workers')">Workers</button>
+      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'modifiers'" (click)="setTab('modifiers')">Modifiers</button>
+      <button role="tab" class="tab" [class.tab-active]="activeTab() === 'costs'" (click)="setTab('costs')">Costs</button>
+    </div>
+
+    <!-- Tab content -->
+    <div class="overflow-y-auto max-h-[400px]">
+
+      <!-- Base Tab -->
+      @if (activeTab() === 'base') {
+        @if (sortedProduction().length === 0) {
+          <div class="text-center opacity-50 py-8">No rooms producing this resource.</div>
+        } @else {
+          <table class="table table-xs w-full">
+            <thead class="sticky top-0 bg-base-100 z-10">
+              <tr>
+                <th>Room</th>
+                <th class="text-right">Floor</th>
+                <th class="text-right">Rate/min</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (room of sortedProduction(); track room.roomId) {
+                <tr>
+                  <td>{{ room.roomName }}</td>
+                  <td class="text-right">{{ room.floorDepth }}</td>
+                  <td class="text-right font-semibold"
+                    [class.text-success]="room.final > 0"
+                    [class.text-error]="room.final < 0"
+                  >
+                    {{ formatRate(room.final) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot class="sticky bottom-0 bg-base-100 z-10">
+              @if (breakdown(); as bd) {
+                <tr class="font-semibold border-t border-base-300">
+                  <td colspan="2">Total</td>
+                  <td class="text-right text-success">{{ formatRate(bd.totals.totalProduction) }}</td>
+                </tr>
+              }
+            </tfoot>
+          </table>
+        }
+      }
+
+      <!-- Workers Tab -->
+      @if (activeTab() === 'workers') {
+        @if (roomsWithWorkers().length === 0) {
+          <div class="text-center opacity-50 py-8">No workers assigned to rooms producing this resource.</div>
+        } @else {
+          <table class="table table-xs w-full">
+            <thead class="sticky top-0 bg-base-100 z-10">
+              <tr>
+                <th>Room</th>
+                <th class="text-right">Workers</th>
+                <th class="text-right">Bonus/min</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (room of roomsWithWorkers(); track room.roomId) {
+                <tr>
+                  <td>{{ room.roomName }}</td>
+                  <td class="text-right">{{ room.workerCount }}</td>
+                  <td class="text-right text-success">{{ formatRate(room.inhabitantBonus) }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot class="sticky bottom-0 bg-base-100 z-10">
+              @if (breakdown(); as bd) {
+                <tr class="font-semibold border-t border-base-300">
+                  <td colspan="2">Total</td>
+                  <td class="text-right text-success">{{ formatRate(bd.totals.inhabitantBonus) }}</td>
+                </tr>
+              }
+            </tfoot>
+          </table>
+        }
+      }
+
+      <!-- Modifiers Tab -->
+      @if (activeTab() === 'modifiers') {
+        @if (roomsWithModifiers().length === 0) {
+          <div class="text-center opacity-50 py-8">No modifiers active for this resource.</div>
+        } @else {
+          <div class="flex flex-col gap-3">
+            @for (room of roomsWithModifiers(); track room.roomId) {
+              <div class="bg-base-200/50 rounded-lg p-3">
+                <div class="font-semibold text-sm mb-1">{{ room.roomName }} <span class="opacity-50">(Floor {{ room.floorDepth }})</span></div>
+                <div class="flex flex-col gap-0.5 text-xs">
+                  @if (room.adjacencyBonus !== 0) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">Adjacency</span>
+                      <span class="text-success">{{ formatRate(room.adjacencyBonus) }}/min</span>
+                    </div>
+                  }
+                  @if (room.featureBonus !== 0) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">Feature Bonus</span>
+                      <span class="text-success">{{ formatRate(room.featureBonus) }}/min</span>
+                    </div>
+                  }
+                  @for (mod of room.modifierDetails; track mod.name) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">{{ mod.name }}</span>
+                      <span
+                        [class.text-success]="mod.multiplier > 1"
+                        [class.text-error]="mod.multiplier < 1"
+                      >
+                        {{ formatMultiplier(mod.multiplier) }}
+                      </span>
+                    </div>
+                  }
+                  @if (room.upgradeMultiplier !== 1) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">Upgrade</span>
+                      <span
+                        [class.text-success]="room.upgradeMultiplier > 1"
+                        [class.text-error]="room.upgradeMultiplier < 1"
+                      >
+                        {{ formatMultiplier(room.upgradeMultiplier) }}
+                      </span>
+                    </div>
+                  }
+                  @if (room.flatFeatureProduction !== 0) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">Feature Flat Bonus</span>
+                      <span class="text-success">{{ formatRate(room.flatFeatureProduction) }}/min</span>
+                    </div>
+                  }
+                  @if (room.upgradeSecondaryProduction !== 0) {
+                    <div class="flex justify-between">
+                      <span class="opacity-70">Upgrade Secondary</span>
+                      <span class="text-success">{{ formatRate(room.upgradeSecondaryProduction) }}/min</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- Costs Tab -->
+      @if (activeTab() === 'costs') {
+        @if (consumptionDetails().length === 0) {
+          <div class="text-center opacity-50 py-8">No costs for this resource.</div>
+        } @else {
+          <table class="table table-xs w-full">
+            <thead class="sticky top-0 bg-base-100 z-10">
+              <tr>
+                <th>Source</th>
+                <th>Type</th>
+                <th class="text-right">Cost/min</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cost of consumptionDetails(); track $index) {
+                <tr>
+                  <td>
+                    {{ cost.sourceName }}
+                    @if (cost.roomName) {
+                      <span class="opacity-50">({{ cost.roomName }})</span>
+                    }
+                  </td>
+                  <td>{{ categoryLabel(cost.category) }}</td>
+                  <td class="text-right text-error">{{ formatRate(-cost.amount) }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot class="sticky bottom-0 bg-base-100 z-10">
+              @if (breakdown(); as bd) {
+                <tr class="font-semibold border-t border-base-300">
+                  <td colspan="2">Total</td>
+                  <td class="text-right text-error">{{ formatRate(-bd.totals.totalConsumption) }}</td>
+                </tr>
+              }
+            </tfoot>
+          </table>
+        }
+      }
+
+    </div>
+  </div>
+</app-modal>

@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { featureGetAllForRoom } from '@helpers/features';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import {
   hungerGetConsumptionRate,
@@ -11,9 +12,13 @@ import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifi
 import type {
   Floor,
   InhabitantInstance,
+  ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { ResourceConsumptionBreakdown } from '@interfaces/production';
+import type {
+  ConsumptionDetail,
+  ResourceConsumptionBreakdown,
+} from '@interfaces/production';
 
 /**
  * Calculate consumption breakdowns for all resource types.
@@ -86,6 +91,76 @@ export function consumptionCalculateBreakdowns(
   }
 
   return breakdowns;
+}
+
+/**
+ * Calculate detailed per-source consumption breakdown for a specific resource type.
+ */
+export function consumptionCalculateDetailedBreakdown(
+  floors: Floor[],
+  inhabitants: InhabitantInstance[],
+  resourceType: ResourceType,
+): ConsumptionDetail[] {
+  const details: ConsumptionDetail[] = [];
+
+  // 1. Inhabitant food consumption (food resource only)
+  if (resourceType === 'food') {
+    for (const inhabitant of inhabitants) {
+      const rate = hungerGetConsumptionRate(inhabitant.definitionId);
+      if (rate <= 0) continue;
+
+      const consumptionMultiplier =
+        stateModifierGetFoodConsumptionMultiplier(inhabitant);
+      const perTick =
+        hungerGetPerTickConsumption(rate) * consumptionMultiplier;
+
+      details.push({
+        sourceName: inhabitant.name,
+        category: 'feeding',
+        amount: perTick,
+      });
+    }
+  }
+
+  // 2. Legendary inhabitant upkeep
+  for (const inhabitant of inhabitants) {
+    const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
+    if (!def?.upkeepCost || Object.keys(def.upkeepCost).length === 0)
+      continue;
+
+    const amountPerMinute = def.upkeepCost[resourceType];
+    if (!amountPerMinute || amountPerMinute <= 0) continue;
+
+    const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+    details.push({
+      sourceName: def.name,
+      category: 'legendary_upkeep',
+      amount: perTick,
+    });
+  }
+
+  // 3. Feature maintenance costs
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const features = featureGetAllForRoom(room);
+      for (const feature of features) {
+        if (!feature.maintenanceCost) continue;
+
+        const amountPerMinute = feature.maintenanceCost[resourceType];
+        if (!amountPerMinute || amountPerMinute <= 0) continue;
+
+        const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+        details.push({
+          sourceName: feature.name,
+          category: 'feature_maintenance',
+          amount: perTick,
+          roomName: roomGetDisplayName(room),
+        });
+      }
+    }
+  }
+
+  return details;
 }
 
 export const consumptionBreakdowns = computed(() => {

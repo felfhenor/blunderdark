@@ -25,6 +25,7 @@ import { PanelDarkForgeComponent } from '@components/panel-dark-forge/panel-dark
 import { PanelFloorSelectorComponent } from '@components/panel-floor-selector/panel-floor-selector.component';
 import { PanelInvasionBattleComponent } from '@components/panel-invasion-battle/panel-invasion-battle.component';
 import { PanelFusionComponent } from '@components/panel-fusion/panel-fusion.component';
+import { ResourceBreakdownModalComponent } from '@components/resource-breakdown-modal/resource-breakdown-modal.component';
 import { PanelHallwayInfoComponent } from '@components/panel-hallway-info/panel-hallway-info.component';
 import { PanelMerchantComponent } from '@components/panel-merchant/panel-merchant.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
@@ -72,7 +73,7 @@ import { notifyError } from '@helpers/notify';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { gamestate } from '@helpers/state-game';
 import { transportPlacementActive } from '@helpers/transport-placement';
-import type { SideTabDefinition } from '@interfaces';
+import type { ResourceType, SideTabDefinition } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { GameResearchComponent } from '@pages/game-research/game-research.component';
 
@@ -95,6 +96,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelHallwayInfoComponent,
     PanelMerchantComponent,
     PanelVictoryComponent,
+    ResourceBreakdownModalComponent,
     VictoryMenuComponent,
     PanelReputationComponent,
     ResourceBarTopComponent,
@@ -126,6 +128,8 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   public showResearch = signal(false);
   public showFusion = signal(false);
   public showVictoryMenu = signal(false);
+  public showResourceBreakdown = signal(false);
+  public breakdownResourceType = signal<ResourceType | undefined>(undefined);
   public canShowFusion = computed(
     () => fusionHasAvailableCreatures() && fusionHasRoom(),
   );
@@ -489,6 +493,11 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       isModal: true,
     },
   ]);
+
+  public openResourceBreakdown(type: ResourceType): void {
+    this.breakdownResourceType.set(type);
+    this.showResourceBreakdown.set(true);
+  }
 
   public onModalTabClick(tabId: string): void {
     switch (tabId) {

@@ -28,3 +28,46 @@ export type ResourceConsumptionBreakdown = {
   /** Per-tick total consumption */
   total: number;
 };
+
+export type ModifierDetail = {
+  name: string;
+  multiplier: number;
+};
+
+export type RoomProductionDetail = {
+  roomId: string;
+  roomName: string;
+  floorDepth: number;
+  base: number;
+  inhabitantBonus: number;
+  workerCount: number;
+  adjacencyBonus: number;
+  featureBonus: number;
+  modifierEffect: number;
+  modifierDetails: ModifierDetail[];
+  flatFeatureProduction: number;
+  upgradeSecondaryProduction: number;
+  upgradeMultiplier: number;
+  final: number;
+};
+
+export type ConsumptionDetail = {
+  sourceName: string;
+  category: 'feeding' | 'legendary_upkeep' | 'feature_maintenance';
+  amount: number;
+  roomName?: string;
+};
+
+export type ResourceDetailedBreakdown = {
+  production: RoomProductionDetail[];
+  consumption: ConsumptionDetail[];
+  totals: {
+    base: number;
+    inhabitantBonus: number;
+    adjacencyBonus: number;
+    modifierEffect: number;
+    totalProduction: number;
+    totalConsumption: number;
+    net: number;
+  };
+};

@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  output,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
@@ -163,6 +164,12 @@ export class ResourceBarTopComponent {
       case 'critical':
         return 'badge-error';
     }
+  }
+
+  public resourceClick = output<ResourceType>();
+
+  public openBreakdown(type: ResourceType): void {
+    this.resourceClick.emit(type);
   }
 
   public getCorruptionColorClass(level: CorruptionLevel): string {
