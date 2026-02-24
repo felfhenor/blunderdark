@@ -8,7 +8,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [TippyDirective],
   template: `
     <span
-      class="badge badge-info badge-soft badge-outline px-1.5 rounded whitespace-nowrap text-info text-xs font-semibold"
+      class="badge badge-info badge-soft badge-outline px-1.5 whitespace-nowrap text-info text-xs font-semibold"
       tp="Current Floor / Total Floors"
       tpPlacement="bottom"
     >
