@@ -1,6 +1,9 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { researchUnlockIsFeatureUnlocked } from '@helpers/research-unlocks';
+import {
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+} from '@helpers/research-unlocks';
 import { resourceSubtract } from '@helpers/resources';
 import { roomUpgradeGetPaths } from '@helpers/room-upgrades';
 import type {
@@ -18,16 +21,6 @@ import type { RoomContent } from '@interfaces/content-room';
 /** Ticks of discontent before a legendary inhabitant leaves (5 game-minutes). */
 export const LEGENDARY_DISCONTENTED_DEPARTURE_TICKS =
   5 * GAME_TIME_TICKS_PER_MINUTE;
-
-/** Maps legendary inhabitant names to their research feature flags. */
-const LEGENDARY_FEATURE_FLAG_MAP: Record<string, string> = {
-  Dragon: 'legendary_recruit_dragon',
-  Beholder: 'legendary_recruit_beholder',
-  'Demon Lord': 'legendary_recruit_demon_lord',
-  Lich: 'legendary_recruit_lich',
-  Medusa: 'legendary_recruit_medusa',
-  'Ancient Treant': 'legendary_recruit_ancient_treant',
-};
 
 export type LegendaryRequirementCheck = {
   requirement: RecruitmentRequirement;
@@ -123,16 +116,6 @@ function legendaryInhabitantCheckRequirement(
 }
 
 /**
- * Get the feature flag required to recruit a specific legendary inhabitant.
- * Returns undefined if the legendary has no feature flag mapping.
- */
-export function legendaryInhabitantGetFeatureFlag(
-  def: InhabitantContent,
-): string | undefined {
-  return LEGENDARY_FEATURE_FLAG_MAP[def.name];
-}
-
-/**
  * Check if a legendary inhabitant can be recruited.
  * Validates research unlock, uniqueness (only 1 of each type), and all recruitment requirements.
  * Pure function — takes state as parameters for testability.
@@ -144,8 +127,10 @@ export function legendaryInhabitantCanRecruit(
   resources: ResourceMap,
 ): LegendaryRecruitmentResult {
   // Check research unlock first
-  const featureFlag = legendaryInhabitantGetFeatureFlag(def);
-  if (featureFlag && !researchUnlockIsFeatureUnlocked(featureFlag)) {
+  if (
+    researchUnlockIsResearchGated('inhabitant', def.id) &&
+    !researchUnlockIsUnlocked('inhabitant', def.id)
+  ) {
     return {
       allowed: false,
       missingRequirements: [
@@ -201,13 +186,12 @@ export function legendaryInhabitantGetAll(): InhabitantContent[] {
 }
 
 /**
- * Get all legendary inhabitants whose research feature flag is unlocked.
- * Legendaries without a feature flag mapping are excluded (they require research).
+ * Get all legendary inhabitants whose research unlock is completed.
  */
 export function legendaryInhabitantGetResearchUnlocked(): InhabitantContent[] {
   return legendaryInhabitantGetAll().filter((def) => {
-    const flag = legendaryInhabitantGetFeatureFlag(def);
-    return flag !== undefined && researchUnlockIsFeatureUnlocked(flag);
+    if (!researchUnlockIsResearchGated('inhabitant', def.id)) return false;
+    return researchUnlockIsUnlocked('inhabitant', def.id);
   });
 }
 

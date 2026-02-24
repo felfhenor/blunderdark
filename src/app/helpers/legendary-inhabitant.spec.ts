@@ -78,7 +78,13 @@ vi.mock('@helpers/content', () => {
     cost: { gold: 500, flux: 200 },
     stats: { hp: 500, attack: 70, defense: 60, speed: 20, workerEfficiency: 1 },
     traits: [
-      { id: 't1', name: 'Draconic Fury', effectType: 'aura_attack_bonus', effectValue: 0.15, description: '' },
+      {
+        id: 't1',
+        name: 'Draconic Fury',
+        effectType: 'aura_attack_bonus',
+        effectValue: 0.15,
+        description: '',
+      },
     ],
     restrictionTags: ['unique'],
     rulerBonuses: {},
@@ -136,7 +142,8 @@ vi.mock('@helpers/room-upgrades', () => ({
 }));
 
 vi.mock('@helpers/research-unlocks', () => ({
-  researchUnlockIsFeatureUnlocked: () => true,
+  researchUnlockIsResearchGated: () => true,
+  researchUnlockIsUnlocked: () => true,
 }));
 
 let mockResourceMap: Record<string, { current: number; max: number }>;
@@ -201,7 +208,9 @@ function makeResources(
   } as ResourceMap;
 }
 
-function makeFloor(rooms: { roomTypeId: string; appliedUpgradePathId?: string }[] = []): Floor {
+function makeFloor(
+  rooms: { roomTypeId: string; appliedUpgradePathId?: string }[] = [],
+): Floor {
   return {
     id: 'floor-1' as FloorId,
     name: 'Floor 1',
@@ -214,7 +223,9 @@ function makeFloor(rooms: { roomTypeId: string; appliedUpgradePathId?: string }[
       shapeId: 'shape-2x1' as RoomShapeId,
       anchorX: 0,
       anchorY: i,
-      ...(r.appliedUpgradePathId ? { appliedUpgradePathId: r.appliedUpgradePathId } : {}),
+      ...(r.appliedUpgradePathId
+        ? { appliedUpgradePathId: r.appliedUpgradePathId }
+        : {}),
     })),
     hallways: [],
     inhabitants: [],
@@ -324,12 +335,19 @@ describe('legendaryInhabitantCanRecruit', () => {
         flux: { current: 500, max: 500 },
       });
 
-      const result = legendaryInhabitantCanRecruit(def, inhabitants, floors, resources);
+      const result = legendaryInhabitantCanRecruit(
+        def,
+        inhabitants,
+        floors,
+        resources,
+      );
 
       expect(result.allowed).toBe(false);
       expect(result.missingRequirements).toHaveLength(1);
       expect(result.missingRequirements[0].met).toBe(false);
-      expect(result.missingRequirements[0].requirement.description).toContain('already been recruited');
+      expect(result.missingRequirements[0].requirement.description).toContain(
+        'already been recruited',
+      );
     });
 
     it('should allow recruiting a different legendary when one already exists', () => {
@@ -341,7 +359,12 @@ describe('legendaryInhabitantCanRecruit', () => {
         flux: { current: 500, max: 500 },
       });
 
-      const result = legendaryInhabitantCanRecruit(def, inhabitants, floors, resources);
+      const result = legendaryInhabitantCanRecruit(
+        def,
+        inhabitants,
+        floors,
+        resources,
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -517,7 +540,12 @@ describe('legendaryInhabitantCanRecruit', () => {
       const def = makeDragonDef();
       def.recruitmentRequirements = undefined;
 
-      const result = legendaryInhabitantCanRecruit(def, [], [makeFloor()], makeResources());
+      const result = legendaryInhabitantCanRecruit(
+        def,
+        [],
+        [makeFloor()],
+        makeResources(),
+      );
 
       expect(result.allowed).toBe(true);
       expect(result.missingRequirements).toHaveLength(0);
@@ -563,7 +591,11 @@ function makeGameState(opts: {
       currentFloorIndex: 0,
       hallways: [],
       season: { currentSeason: 'growth', ticksInSeason: 0 },
-      research: { activeResearchId: undefined, completedResearchIds: [], researchProgress: 0 },
+      research: {
+        activeResearchId: undefined,
+        completedResearchIds: [],
+        researchProgress: 0,
+      },
       reputation: {},
       grid: [],
     },

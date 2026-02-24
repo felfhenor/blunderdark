@@ -272,9 +272,8 @@
     - Arcane Convergence
     - Planar Nexus
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_dragon
-      description: Unlocks Dragon legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Dragon
   tier: 5
   requiredTicks: 750
 
@@ -289,9 +288,8 @@
   prerequisiteResearchIds:
     - Planar Nexus
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_beholder
-      description: Unlocks Beholder legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Beholder
   tier: 5
   requiredTicks: 750
 

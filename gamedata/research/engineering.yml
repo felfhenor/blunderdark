@@ -305,9 +305,8 @@
     - War Machines
     - Industrial Mastery
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_ancient_treant
-      description: Unlocks Ancient Treant legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Ancient Treant
   tier: 5
   requiredTicks: 750
 

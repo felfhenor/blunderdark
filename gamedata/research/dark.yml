@@ -237,9 +237,8 @@
     - Abyssal Gateway
     - Soul Forge
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_demon_lord
-      description: Unlocks Demon Lord legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Demon Lord
   tier: 5
   requiredTicks: 750
 
@@ -254,9 +253,8 @@
   prerequisiteResearchIds:
     - Soul Forge
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_lich
-      description: Unlocks Lich legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Lich
   tier: 5
   requiredTicks: 750
 
@@ -271,9 +269,8 @@
   prerequisiteResearchIds:
     - Abyssal Gateway
   unlocks:
-    - type: feature_flag
-      featureFlag: legendary_recruit_medusa
-      description: Unlocks Medusa legendary recruitment
+    - type: inhabitant
+      targetInhabitantId: Medusa
   tier: 5
   requiredTicks: 750
 
