@@ -24,7 +24,7 @@
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Summoners</div>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
             <app-inhabitant-card
               [instance]="inh.instance"

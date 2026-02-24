@@ -16,10 +16,16 @@
           </div>
           <span class="text-xs opacity-50">
             Output:
-            <app-currency-cost [type]="conv.outputResource" [amount]="conv.outputAmount" />
+            <app-currency-cost
+              [type]="conv.outputResource"
+              [amount]="conv.outputAmount"
+            />
           </span>
           @if (conv.inputConsumed) {
-            <app-job-progress [percent]="conv.percent" colorClass="progress-warning" />
+            <app-job-progress
+              [percent]="conv.percent"
+              colorClass="progress-warning"
+            />
           } @else {
             <span class="text-xs text-error">Waiting for resources...</span>
           }
@@ -32,7 +38,7 @@
       <!-- Assigned Workers -->
       @if (assignedWorkers().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Workers</div>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           @for (w of assignedWorkers(); track w.instance.instanceId) {
             <app-inhabitant-card
               [instance]="w.instance"
@@ -70,7 +76,10 @@
               </span>
               <span class="text-xs opacity-50">
                 Output:
-                <app-currency-cost [type]="entry.recipe.outputResource" [amount]="entry.recipe.outputAmount" />
+                <app-currency-cost
+                  [type]="entry.recipe.outputResource"
+                  [amount]="entry.recipe.outputAmount"
+                />
               </span>
               <span class="text-xs opacity-50">
                 Cycle: {{ entry.timeSeconds | number: '1.0-0' }} sec

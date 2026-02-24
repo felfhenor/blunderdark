@@ -28,7 +28,9 @@ type ObjectiveStatus = {
   },
   template: `
     @if (invasionIsActive()) {
-      <div class="hud-container w-96 px-3 py-2 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200">
+      <div
+        class="hud-container w-96 px-3 py-2 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
+      >
         <!-- Path progress -->
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold text-warning">Invasion</span>
@@ -56,20 +58,26 @@ type ObjectiveStatus = {
         <!-- Invader HP bars -->
         @if (livingInvaders().length > 0) {
           <div class="mb-1">
-            <div class="text-xs font-semibold mb-0.5">Invaders ({{ livingInvaders().length }})</div>
+            <div class="text-xs font-semibold mb-0.5">
+              Invaders ({{ livingInvaders().length }})
+            </div>
             <div class="flex flex-col gap-0.5 max-h-24 overflow-y-auto">
               @for (inv of livingInvaders(); track inv.name + $index) {
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-2">
                   <span class="text-xs truncate w-20">{{ inv.name }}</span>
                   <progress
                     class="progress flex-1 h-1.5"
                     [class.progress-success]="inv.hpPercent > 60"
-                    [class.progress-warning]="inv.hpPercent > 25 && inv.hpPercent <= 60"
+                    [class.progress-warning]="
+                      inv.hpPercent > 25 && inv.hpPercent <= 60
+                    "
                     [class.progress-error]="inv.hpPercent <= 25"
                     [value]="inv.hp"
                     [max]="inv.maxHp"
                   ></progress>
-                  <span class="text-xs opacity-50 w-8 text-right">{{ inv.hp }}</span>
+                  <span class="text-xs opacity-50 w-8 text-right">
+                    {{ inv.hp }}
+                  </span>
                 </div>
               }
             </div>
@@ -81,15 +89,22 @@ type ObjectiveStatus = {
           <div>
             <div class="text-xs font-semibold mb-0.5">Objectives</div>
             @for (obj of objectives(); track obj.name) {
-              <div class="flex items-center gap-1 text-xs">
+              <div class="flex items-center gap-2 text-xs">
                 @if (obj.isCompleted) {
                   <span class="text-success">&#10003;</span>
                 } @else {
                   <span class="opacity-40">&#9675;</span>
                 }
-                <span [class.line-through]="obj.isCompleted" [class.opacity-50]="obj.isCompleted">{{ obj.name }}</span>
+                <span
+                  [class.line-through]="obj.isCompleted"
+                  [class.opacity-50]="obj.isCompleted"
+                >
+                  {{ obj.name }}
+                </span>
                 @if (!obj.isCompleted && obj.progress > 0) {
-                  <span class="opacity-40">({{ obj.progress | number:'1.0-0' }}%)</span>
+                  <span class="opacity-40">
+                    ({{ obj.progress | number: '1.0-0' }}%)
+                  </span>
                 }
               </div>
             }
@@ -116,7 +131,9 @@ export class HudInvasionComponent {
     const floorIndex = inv.roomFloorMap[roomId] ?? 0;
     const floor = state.world.floors[floorIndex];
     const room = floor?.rooms.find((r) => r.id === roomId);
-    const def = room ? contentGetEntry<RoomContent>(room.roomTypeId) : undefined;
+    const def = room
+      ? contentGetEntry<RoomContent>(room.roomTypeId)
+      : undefined;
 
     return {
       current: inv.currentRoomIndex + 1,

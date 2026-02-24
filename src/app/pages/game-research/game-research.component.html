@@ -9,7 +9,7 @@
       >
         <h1 class="text-lg font-bold">Research</h1>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-4">
           <span class="text-sm opacity-70">
             Speed: {{ speedModifier() * 100 | number: '1.0-0' }}%
           </span>
@@ -20,7 +20,7 @@
       <!-- Active Research Summary Bar -->
       @if (activeResearchNode(); as active) {
         <div
-          class="active-summary flex items-center gap-3 px-4 py-2 bg-base-300 flex-shrink-0"
+          class="active-summary flex items-center gap-4 px-4 py-2 bg-base-300 flex-shrink-0"
         >
           <span class="text-sm font-semibold">Researching:</span>
           <span class="text-sm">{{ active.name }}</span>
@@ -138,7 +138,7 @@
         >
           @if (selectedNode(); as node) {
             <div class="card bg-base-200">
-              <div class="card-body p-4 gap-3">
+              <div class="card-body p-4 gap-4">
                 <!-- Node Name & State Badge -->
                 <div class="flex items-start justify-between">
                   <h3 class="card-title text-sm">{{ node.name }}</h3>

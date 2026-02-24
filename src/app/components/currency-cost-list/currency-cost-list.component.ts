@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import type { ResourceCost, ResourceType } from '@interfaces';
 
@@ -11,7 +16,7 @@ import type { ResourceCost, ResourceType } from '@interfaces';
     }
   `,
   host: {
-    class: 'inline-flex items-center gap-1 flex-wrap',
+    class: 'inline-flex items-center gap-2 flex-wrap',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

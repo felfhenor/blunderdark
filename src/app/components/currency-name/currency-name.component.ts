@@ -6,19 +6,23 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
-import { RESOURCE_COLOR_MAP, RESOURCE_ICON_MAP, RESOURCE_LABEL_MAP } from '@helpers';
+import {
+  RESOURCE_COLOR_MAP,
+  RESOURCE_ICON_MAP,
+  RESOURCE_LABEL_MAP,
+} from '@helpers';
 import type { ResourceType } from '@interfaces';
 
 @Component({
   selector: 'app-currency-name',
   imports: [IconComponent, DecimalPipe],
   host: {
-    class: 'inline-flex items-center gap-1 align-baseline',
+    class: 'inline-flex items-center gap-2 align-baseline',
   },
   template: `
     <app-icon [name]="icon()" [color]="color()" />
     @if (short()) {
-      <span>{{ amount() | number:'1.0-1' }}</span>
+      <span>{{ amount() | number: '1.0-1' }}</span>
     } @else {
       <span>{{ label() }}</span>
     }

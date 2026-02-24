@@ -21,10 +21,12 @@ import type { MoraleEvent } from '@interfaces/morale';
   },
   template: `
     @if (isVisible()) {
-      <div class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200">
+      <div
+        class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
+      >
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
-          <span class="flex items-center gap-1">
+          <span class="flex items-center gap-2">
             @if (moraleIsRetreating()) {
               <span class="badge badge-error badge-xs">RETREATING</span>
             }
@@ -48,13 +50,18 @@ import type { MoraleEvent } from '@interfaces/morale';
         </div>
 
         @if (latestEvent(); as evt) {
-          <div class="morale-float-text text-xs font-semibold mt-0.5" [ngClass]="floatTextClass()">
+          <div
+            class="morale-float-text text-xs font-semibold mt-0.5"
+            [ngClass]="floatTextClass()"
+          >
             {{ evt.delta > 0 ? '+' : '' }}{{ evt.delta }} {{ evt.description }}
           </div>
         }
 
         @if (showLog() && eventLog().length > 0) {
-          <div class="morale-log absolute bottom-full left-0 z-100 min-w-[220px] max-w-[300px] max-h-[200px] overflow-y-auto p-3 mb-1 rounded-lg">
+          <div
+            class="morale-log absolute bottom-full left-0 z-100 min-w-[220px] max-w-[300px] max-h-[200px] overflow-y-auto p-3 mb-1 rounded-lg"
+          >
             <div class="text-xs font-semibold mb-1">Morale Log</div>
             @for (evt of eventLog(); track $index) {
               <div class="flex justify-between text-xs gap-2">

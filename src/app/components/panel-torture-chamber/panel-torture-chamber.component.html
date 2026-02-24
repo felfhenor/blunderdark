@@ -23,7 +23,10 @@
             <span class="badge badge-xs badge-error">In Progress</span>
           </div>
           <div class="mt-1">
-            <app-job-progress [percent]="tp.percent" colorClass="progress-error" />
+            <app-job-progress
+              [percent]="tp.percent"
+              colorClass="progress-error"
+            />
           </div>
         </div>
       }
@@ -31,7 +34,7 @@
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Torturer</div>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
             <app-inhabitant-card
               [instance]="inh.instance"
@@ -60,7 +63,11 @@
                   {{ prisoner.invaderClass }}
                 </span>
               </div>
-              <app-stat-row class="text-xs opacity-60" [stats]="prisoner.stats" [showWorkerEfficiency]="false" />
+              <app-stat-row
+                class="text-xs opacity-60"
+                [stats]="prisoner.stats"
+                [showWorkerEfficiency]="false"
+              />
               @if (canStartJob()) {
                 <div class="flex gap-2 mt-1">
                   <button

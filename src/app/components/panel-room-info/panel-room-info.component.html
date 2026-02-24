@@ -8,7 +8,10 @@
 
       @if (isDisconnected()) {
         <div class="alert alert-error py-2 px-3 text-xs animate-pulse">
-          <span>Disconnected — not connected to the Altar Room. Production, inhabitants, and bonuses are disabled.</span>
+          <span>
+            Disconnected — not connected to the Altar Room. Production,
+            inhabitants, and bonuses are disabled.
+          </span>
         </div>
       }
 
@@ -25,12 +28,14 @@
 
       @if (efficiencyBreakdown(); as eff) {
         <div class="flex items-center gap-4 mt-1 text-xs">
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2">
             <span
               class="opacity-50 cursor-help underline decoration-dotted"
               [tp]="efficiencyBreakdownTip"
               [tpDelay]="250"
-            >Efficiency:</span>
+            >
+              Efficiency:
+            </span>
             <span
               class="font-semibold"
               [class.text-success]="eff.totalMultiplier > 1.0"
@@ -43,60 +48,22 @@
               />
             </span>
           </div>
+
           @if (fearBreakdown(); as fear) {
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-2">
               <span
                 class="opacity-50 cursor-help underline decoration-dotted"
                 [tp]="fearBreakdownTip"
                 [tpDelay]="250"
-              >Fear:</span>
+              >
+                Fear:
+              </span>
               <span class="font-semibold" [ngClass]="fearLabelClass()">
                 {{ fearLabel() }}
               </span>
             </div>
             <ng-template #fearBreakdownTip>
-              <div class="text-xs opacity-70">
-                Base: {{ fear.baseFear | number: '1.0-2' }}
-              </div>
-              @if (fear.inhabitantModifier !== 0) {
-                <div
-                  class="text-xs"
-                  [class.text-error]="fear.inhabitantModifier > 0"
-                  [class.text-success]="fear.inhabitantModifier < 0"
-                >
-                  Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
-                  }}{{ fear.inhabitantModifier | number: '1.0-2' }}
-                </div>
-              }
-              @if (fear.upgradeAdjustment !== 0) {
-                <div
-                  class="text-xs"
-                  [class.text-error]="fear.upgradeAdjustment > 0"
-                  [class.text-success]="fear.upgradeAdjustment < 0"
-                >
-                  Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
-                  }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
-                </div>
-              }
-              @if (fear.altarAuraReduction !== 0) {
-                <div class="text-xs text-success">
-                  Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
-                </div>
-              }
-              @if (fear.propagatedFear !== 0) {
-                <div class="text-xs text-error">
-                  Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
-                </div>
-                @for (
-                  source of fear.propagationSources;
-                  track source.sourceRoomId
-                ) {
-                  <div class="text-xs opacity-70 ml-2">
-                    +{{ source.amount | number: '1.0-2' }} from
-                    {{ source.sourceRoomName }}
-                  </div>
-                }
-              }
+              <app-fear-breakdown-tooltip [breakdown]="fear" />
             </ng-template>
           }
         </div>
@@ -124,59 +91,20 @@
         </ng-template>
       }
       @if (!efficiencyBreakdown() && fearBreakdown(); as fear) {
-        <div class="flex items-center gap-1 mt-1 text-xs">
+        <div class="flex items-center gap-2 mt-1 text-xs">
           <span
             class="opacity-50 cursor-help underline decoration-dotted"
             [tp]="fearBreakdownTip"
             [tpDelay]="250"
-          >Fear:</span>
+          >
+            Fear:
+          </span>
           <span class="font-semibold" [ngClass]="fearLabelClass()">
             {{ fearLabel() }}
           </span>
         </div>
         <ng-template #fearBreakdownTip>
-          <div class="text-xs opacity-70">
-            Base: {{ fear.baseFear | number: '1.0-2' }}
-          </div>
-          @if (fear.inhabitantModifier !== 0) {
-            <div
-              class="text-xs"
-              [class.text-error]="fear.inhabitantModifier > 0"
-              [class.text-success]="fear.inhabitantModifier < 0"
-            >
-              Inhabitants: {{ fear.inhabitantModifier > 0 ? '+' : ''
-              }}{{ fear.inhabitantModifier | number: '1.0-2' }}
-            </div>
-          }
-          @if (fear.upgradeAdjustment !== 0) {
-            <div
-              class="text-xs"
-              [class.text-error]="fear.upgradeAdjustment > 0"
-              [class.text-success]="fear.upgradeAdjustment < 0"
-            >
-              Upgrades: {{ fear.upgradeAdjustment > 0 ? '+' : ''
-              }}{{ fear.upgradeAdjustment | number: '1.0-2' }}
-            </div>
-          }
-          @if (fear.altarAuraReduction !== 0) {
-            <div class="text-xs text-success">
-              Altar Aura: -{{ fear.altarAuraReduction | number: '1.0-2' }}
-            </div>
-          }
-          @if (fear.propagatedFear !== 0) {
-            <div class="text-xs text-error">
-              Adjacent: +{{ fear.propagatedFear | number: '1.0-2' }}
-            </div>
-            @for (
-              source of fear.propagationSources;
-              track source.sourceRoomId
-            ) {
-              <div class="text-xs opacity-70 ml-2">
-                +{{ source.amount | number: '1.0-2' }} from
-                {{ source.sourceRoomName }}
-              </div>
-            }
-          }
+          <app-fear-breakdown-tooltip [breakdown]="fear" />
         </ng-template>
       }
 
@@ -192,34 +120,10 @@
               </div>
               <p class="text-xs opacity-70">{{ upgrade.description }}</p>
               @for (effect of upgrade.effects; track effect.type) {
-                <span class="badge badge-xs badge-success badge-outline" [tp]="formatEffectTooltip(effect)" [tpDelay]="250">
-                  @switch (effect.type) {
-                    @case ('productionBonus') {
-                      +{{ effect.value * 100 }}%
-                      @if (effect.resource) {
-                        <app-currency-name [type]="$any(effect.resource)" />
-                      } @else {
-                        all
-                      }
-                      production
-                    }
-                    @case ('secondaryProduction') {
-                      +<app-currency-cost [type]="$any(effect.resource)" [amount]="effect.value" />/sec
-                    }
-                    @case ('productionMultiplier') {
-                      x{{ effect.value }} production
-                    }
-                    @case ('maxInhabitantBonus') {
-                      +{{ effect.value }} max inhabitants
-                    }
-                    @case ('fearReduction') {
-                      -{{ effect.value }} fear
-                    }
-                    @default {
-                      {{ formatEffectType(effect.type) }}: {{ effect.value }}
-                    }
-                  }
-                </span>
+                <app-upgrade-effect-badge
+                  [effect]="effect"
+                  [tooltipText]="formatEffectTooltip(effect)"
+                />
               }
             </div>
           </div>
@@ -237,55 +141,43 @@
                       <h5 class="text-sm font-semibold">
                         {{ entry.path.name }}
                         @if (entry.locked) {
-                          <span class="badge badge-xs badge-warning ml-1">Locked</span>
+                          <span class="badge badge-xs badge-warning ml-1">
+                            Locked
+                          </span>
                         }
                       </h5>
-                      <p class="text-xs opacity-70">{{ entry.path.description }}</p>
-                      <div class="flex flex-wrap gap-1 mt-1">
+                      <p class="text-xs opacity-70">
+                        {{ entry.path.description }}
+                      </p>
+                      <div class="flex flex-wrap gap-2 mt-1">
                         @for (effect of entry.path.effects; track effect.type) {
-                          <span class="badge badge-xs badge-success badge-outline" [tp]="formatEffectTooltip(effect)" [tpDelay]="250">
-                            @switch (effect.type) {
-                              @case ('productionBonus') {
-                                +{{ effect.value * 100 }}%
-                                @if (effect.resource) {
-                                  <app-currency-name [type]="$any(effect.resource)" />
-                                } @else {
-                                  all
-                                }
-                                production
-                              }
-                              @case ('secondaryProduction') {
-                                +<app-currency-cost [type]="$any(effect.resource)" [amount]="effect.value" />/sec
-                              }
-                              @case ('productionMultiplier') {
-                                x{{ effect.value }} production
-                              }
-                              @case ('maxInhabitantBonus') {
-                                +{{ effect.value }} max inhabitants
-                              }
-                              @case ('fearReduction') {
-                                -{{ effect.value }} fear
-                              }
-                              @default {
-                                {{ formatEffectType(effect.type) }}: {{ effect.value }}
-                              }
-                            }
-                          </span>
+                          <app-upgrade-effect-badge
+                            [effect]="effect"
+                            [tooltipText]="formatEffectTooltip(effect)"
+                          />
                         }
                       </div>
                       <div class="flex flex-wrap gap-2 mt-1">
-                        @for (cost of getUpgradeCostEntries(entry.path); track cost.type) {
+                        @for (
+                          cost of getUpgradeCostEntries(entry.path);
+                          track cost.type
+                        ) {
                           <span
                             class="badge badge-xs"
                             [class.badge-error]="!canAffordUpgrade(entry.path)"
                             [class.badge-outline]="canAffordUpgrade(entry.path)"
                           >
-                            <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
+                            <app-currency-cost
+                              [type]="cost.type"
+                              [amount]="cost.amount"
+                            />
                           </span>
                         }
                       </div>
                       @if (entry.locked && entry.lockReason) {
-                        <p class="text-xs text-warning mt-1">{{ entry.lockReason }}</p>
+                        <p class="text-xs text-warning mt-1">
+                          {{ entry.lockReason }}
+                        </p>
                       }
                     </div>
                     <button
@@ -365,7 +257,7 @@
         <div class="divider my-2 text-xs opacity-60">Inhabitants</div>
 
         @if (assignedInhabitants().length > 0) {
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-2">
             @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
               <div class="flex items-center justify-between gap-2">
                 <app-inhabitant-card
@@ -622,7 +514,10 @@
                           [class.badge-error]="!entry.affordable"
                           [class.badge-outline]="entry.affordable"
                         >
-                          <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
+                          <app-currency-cost
+                            [type]="cost.type"
+                            [amount]="cost.amount"
+                          />
                         </span>
                       }
                     </div>
@@ -671,7 +566,10 @@
                   />
                   <button
                     class="btn btn-xs btn-primary flex-shrink-0"
-                    (click)="onAssignInhabitant(inh.instance.instanceId); showInhabitantSelect.set(false)"
+                    (click)="
+                      onAssignInhabitant(inh.instance.instanceId);
+                      showInhabitantSelect.set(false)
+                    "
                   >
                     Choose
                   </button>

@@ -33,7 +33,12 @@
     </div>
 
     <div class="mb-3">
-      <app-tab-bar [tabs]="tabDefs()" [(activeTab)]="activeCategory" variant="boxed" size="xs" />
+      <app-tab-bar
+        [tabs]="tabDefs()"
+        [(activeTab)]="activeCategory"
+        variant="boxed"
+        size="xs"
+      />
     </div>
 
     <div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
@@ -60,7 +65,7 @@
                   {{ entry.trade.description }}
                 </p>
 
-                <div class="flex flex-wrap items-center gap-3 mt-1.5">
+                <div class="flex flex-wrap items-center gap-4 mt-1.5">
                   <div class="flex items-center gap-2">
                     <span class="text-xs opacity-50">Cost:</span>
                     @for (cost of entry.costEntries; track cost.type) {
@@ -69,7 +74,10 @@
                         [class.badge-error]="!entry.affordable"
                         [class.badge-outline]="entry.affordable"
                       >
-                        <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
+                        <app-currency-cost
+                          [type]="cost.type"
+                          [amount]="cost.amount"
+                        />
                       </span>
                     }
                   </div>
@@ -78,7 +86,10 @@
                     <span class="text-xs opacity-50">Gain:</span>
                     @for (reward of entry.rewardEntries; track reward.type) {
                       <span class="badge badge-xs badge-success badge-outline">
-                        <app-currency-cost [type]="reward.type" [amount]="reward.amount" />
+                        <app-currency-cost
+                          [type]="reward.type"
+                          [amount]="reward.amount"
+                        />
                       </span>
                     }
                   </div>

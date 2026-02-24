@@ -19,14 +19,20 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-stat-name',
   imports: [IconComponent, DecimalPipe, TippyDirective],
   host: {
-    class: 'inline-flex items-center gap-1 align-baseline text-base',
+    class: 'inline-flex items-center gap-2 align-baseline text-base',
     '[class.stat-high]': 'highlight() === "high"',
     '[class.stat-low]': 'highlight() === "low"',
   },
   template: `
-    <app-icon [name]="icon()" [color]="color()" [tp]="description()" [tpDelay]="250" tpClassName="game-tooltip" />
+    <app-icon
+      [name]="icon()"
+      [color]="color()"
+      [tp]="description()"
+      [tpDelay]="250"
+      tpClassName="game-tooltip"
+    />
     @if (value() !== undefined) {
-      <span>{{ prefix() }}{{ value() | number:'1.0-2' }}{{ suffix() }}</span>
+      <span>{{ prefix() }}{{ value() | number: '1.0-2' }}{{ suffix() }}</span>
     } @else {
       <span>{{ label() }}</span>
     }

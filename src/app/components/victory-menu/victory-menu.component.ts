@@ -52,7 +52,7 @@ type PathViewModel = {
           @for (path of paths(); track path.id) {
             <button
               role="tab"
-              class="tab gap-1.5"
+              class="tab gap-2"
               [class.tab-active]="selectedPath()?.id === path.id"
               (click)="selectedPathId.set(path.id)"
             >

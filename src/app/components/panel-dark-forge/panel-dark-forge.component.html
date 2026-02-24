@@ -33,7 +33,10 @@
                 </div>
               </div>
               @if (job.isActive) {
-                <app-job-progress [percent]="job.percent" colorClass="progress-warning" />
+                <app-job-progress
+                  [percent]="job.percent"
+                  colorClass="progress-warning"
+                />
               }
             </div>
           }
@@ -43,7 +46,7 @@
       <!-- Assigned Workers -->
       @if (assignedWorkers().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Workers</div>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           @for (w of assignedWorkers(); track w.instance.instanceId) {
             <app-inhabitant-card
               [instance]="w.instance"

@@ -1,4 +1,6 @@
-<div class="resource-bar-top inline-flex items-center gap-1 px-2 py-1 rounded-b-lg backdrop-blur-sm opacity-70 hover:opacity-100 transition-opacity duration-200">
+<div
+  class="resource-bar-top inline-flex items-center gap-2 px-2 py-1 rounded-b-lg backdrop-blur-sm opacity-70 hover:opacity-100 transition-opacity duration-200"
+>
   @for (res of resources; track res.type) {
     <div
       class="resource-chip inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded tabular-nums cursor-pointer whitespace-nowrap text-xs"
@@ -8,10 +10,7 @@
       [tpDelay]="250"
       (click)="openBreakdown(res.type)"
     >
-      <app-currency-cost
-        [type]="res.type"
-        [amount]="getCurrent(res.type)"
-      />
+      <app-currency-cost [type]="res.type" [amount]="getCurrent(res.type)" />
       @if (res.type === 'corruption') {
         <span
           class="badge badge-xs ml-1"
@@ -154,5 +153,4 @@
       </div>
     </ng-template>
   }
-
 </div>

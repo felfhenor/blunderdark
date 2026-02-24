@@ -22,13 +22,33 @@ function statHighlight(
   selector: 'app-stat-row',
   imports: [StatNameComponent],
   host: {
-    class: 'inline-flex gap-1.5',
+    class: 'inline-flex gap-2',
   },
   template: `
-    <app-stat-name type="hp" [value]="stats().hp" [prefix]="prefix()" [highlight]="highlights().hp" />
-    <app-stat-name type="attack" [value]="stats().attack" [prefix]="prefix()" [highlight]="highlights().attack" />
-    <app-stat-name type="defense" [value]="stats().defense" [prefix]="prefix()" [highlight]="highlights().defense" />
-    <app-stat-name type="speed" [value]="stats().speed" [prefix]="prefix()" [highlight]="highlights().speed" />
+    <app-stat-name
+      type="hp"
+      [value]="stats().hp"
+      [prefix]="prefix()"
+      [highlight]="highlights().hp"
+    />
+    <app-stat-name
+      type="attack"
+      [value]="stats().attack"
+      [prefix]="prefix()"
+      [highlight]="highlights().attack"
+    />
+    <app-stat-name
+      type="defense"
+      [value]="stats().defense"
+      [prefix]="prefix()"
+      [highlight]="highlights().defense"
+    />
+    <app-stat-name
+      type="speed"
+      [value]="stats().speed"
+      [prefix]="prefix()"
+      [highlight]="highlights().speed"
+    />
     @if (showWorkerEfficiency() && stats().workerEfficiency !== undefined) {
       <app-stat-name
         type="workerEfficiency"

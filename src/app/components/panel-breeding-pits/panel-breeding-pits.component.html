@@ -16,7 +16,10 @@
             <span class="badge badge-xs badge-accent">In Progress</span>
           </div>
           <div class="mt-1">
-            <app-job-progress [percent]="bp.percent" colorClass="progress-accent" />
+            <app-job-progress
+              [percent]="bp.percent"
+              colorClass="progress-accent"
+            />
           </div>
         </div>
       }
@@ -29,7 +32,10 @@
             <span class="badge badge-xs badge-secondary">In Progress</span>
           </div>
           <div class="mt-1">
-            <app-job-progress [percent]="mp.percent" colorClass="progress-secondary" />
+            <app-job-progress
+              [percent]="mp.percent"
+              colorClass="progress-secondary"
+            />
           </div>
         </div>
       }
@@ -37,7 +43,7 @@
       <!-- Assigned Inhabitants -->
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Assigned</div>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
             <app-inhabitant-card
               [instance]="inh.instance"

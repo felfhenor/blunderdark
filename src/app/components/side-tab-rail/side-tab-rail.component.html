@@ -1,14 +1,22 @@
 <div
-  class="side-tab-rail flex flex-col gap-1 p-1"
+  class="side-tab-rail flex flex-col gap-2 p-1"
   [class.has-active-panel]="!!activePanel()"
 >
   @for (tab of visibleTabs(); track tab.id) {
     <button
       class="tab-btn flex items-center bg-base-200 rounded-lg whitespace-nowrap py-2 px-2 text-xs transition-colors cursor-pointer"
-      [class.bg-primary]="activePanel() === tab.id && !tab.isModal && !tab.action"
-      [class.text-primary-content]="activePanel() === tab.id && !tab.isModal && !tab.action"
-      [class.font-bold]="activePanel() === tab.id && !tab.isModal && !tab.action"
-      [style.opacity]="activePanel() === tab.id && !tab.isModal && !tab.action ? 1 : 0.7"
+      [class.bg-primary]="
+        activePanel() === tab.id && !tab.isModal && !tab.action
+      "
+      [class.text-primary-content]="
+        activePanel() === tab.id && !tab.isModal && !tab.action
+      "
+      [class.font-bold]="
+        activePanel() === tab.id && !tab.isModal && !tab.action
+      "
+      [style.opacity]="
+        activePanel() === tab.id && !tab.isModal && !tab.action ? 1 : 0.7
+      "
       (click)="onTabClick(tab)"
     >
       @if (tab.icon) {
