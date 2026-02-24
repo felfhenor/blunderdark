@@ -17,6 +17,7 @@ import {
   INVASION_TRIGGER_MAX_VARIANCE,
   INVASION_TRIGGER_MIN_DAYS_BETWEEN,
   INVASION_TRIGGER_WARNING_MINUTES,
+  INVASION_ESCALATION_INTERVAL_REDUCTION,
 } from '@helpers/invasion-triggers';
 import { defaultInvasionSchedule } from '@helpers/defaults';
 
@@ -33,6 +34,7 @@ const mockInvasionStart = vi.fn();
 vi.mock('@helpers/invasion-process', () => ({
   invasionStart: (...args: unknown[]) => mockInvasionStart(...args),
   invasionFindEntryRoom: vi.fn(() => ({ id: 'entry-room-id' })),
+  INVASION_ESCALATION_EXTRA_INVADERS: 1,
 }));
 
 vi.mock('@helpers/invasion-composition', () => ({
@@ -536,6 +538,54 @@ describe('invasion-triggers', () => {
       invasionTriggerRecordAndReschedule(state, { day: 50, type: 'crusade' }, rng);
 
       expect(state.world.invasionSchedule.invasionHistory[0].type).toBe('crusade');
+    });
+
+    it('should reduce next invasion interval based on unreachable objectives', () => {
+      const state = makeGameState({ day: 45 });
+      const rng = seedrandom('escalation-test');
+
+      // First: record without unreachable objectives to get baseline
+      const rngBaseline = seedrandom('escalation-test');
+      const stateBaseline = makeGameState({ day: 45 });
+      invasionTriggerRecordAndReschedule(stateBaseline, { day: 45, type: 'scheduled', unreachableObjectiveCount: 0 }, rngBaseline);
+      const baselineDay = stateBaseline.world.invasionSchedule.nextInvasionDay!;
+
+      // Now with 2 unreachable objectives
+      invasionTriggerRecordAndReschedule(state, { day: 45, type: 'scheduled', unreachableObjectiveCount: 2 }, rng);
+      const escalatedDay = state.world.invasionSchedule.nextInvasionDay!;
+
+      // Should be reduced by 2 * INVASION_ESCALATION_INTERVAL_REDUCTION = 4 days
+      const expectedReduction = 2 * INVASION_ESCALATION_INTERVAL_REDUCTION;
+      expect(escalatedDay).toBe(Math.max(
+        45 + INVASION_TRIGGER_MIN_DAYS_BETWEEN,
+        baselineDay - expectedReduction,
+      ));
+    });
+
+    it('should enforce minimum gap even with escalation', () => {
+      const state = makeGameState({ day: 45 });
+      const rng = seedrandom('min-gap-escalation');
+
+      // Use a very high unreachable count to try to push next day below minimum
+      invasionTriggerRecordAndReschedule(state, { day: 45, type: 'scheduled', unreachableObjectiveCount: 100 }, rng);
+      const nextDay = state.world.invasionSchedule.nextInvasionDay!;
+
+      // Should never be earlier than day + INVASION_TRIGGER_MIN_DAYS_BETWEEN
+      expect(nextDay).toBeGreaterThanOrEqual(45 + INVASION_TRIGGER_MIN_DAYS_BETWEEN);
+    });
+
+    it('should not change interval when unreachableObjectiveCount is 0', () => {
+      const rng1 = seedrandom('no-escalation');
+      const rng2 = seedrandom('no-escalation');
+      const state1 = makeGameState({ day: 45 });
+      const state2 = makeGameState({ day: 45 });
+
+      invasionTriggerRecordAndReschedule(state1, { day: 45, type: 'scheduled' }, rng1);
+      invasionTriggerRecordAndReschedule(state2, { day: 45, type: 'scheduled', unreachableObjectiveCount: 0 }, rng2);
+
+      expect(state1.world.invasionSchedule.nextInvasionDay).toBe(
+        state2.world.invasionSchedule.nextInvasionDay,
+      );
     });
   });
 

@@ -421,6 +421,22 @@ describe('invasion-composition', () => {
       const size = invasionCompositionGetPartySize(1, rng);
       expect(size).toBeGreaterThanOrEqual(3);
     });
+
+    it('should add bonusSize to the base party size', () => {
+      const rng1 = seedrandom('bonus-test');
+      const rng2 = seedrandom('bonus-test');
+      const baseSize = invasionCompositionGetPartySize(10, rng1, 0);
+      const bonusSize = invasionCompositionGetPartySize(10, rng2, 3);
+      expect(bonusSize).toBe(baseSize + 3);
+    });
+
+    it('should default bonusSize to 0', () => {
+      const rng1 = seedrandom('default-bonus');
+      const rng2 = seedrandom('default-bonus');
+      const withoutArg = invasionCompositionGetPartySize(10, rng1);
+      const withZero = invasionCompositionGetPartySize(10, rng2, 0);
+      expect(withoutArg).toBe(withZero);
+    });
   });
 
   // --- invasionCompositionSelectParty ---

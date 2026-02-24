@@ -1,5 +1,31 @@
 import type { FloorDepthResourceModifier, FloorDepthModifierTier } from '@interfaces/floor-modifier';
 
+// --- Deep Objective Corruption ---
+
+export type DeepObjectiveCorruptionTier = {
+  minDepth: number;
+  maxDepth: number;
+  corruptionPerMinute: number;
+};
+
+export const DEEP_OBJECTIVE_CORRUPTION_TIERS: readonly DeepObjectiveCorruptionTier[] = [
+  { minDepth: 1, maxDepth: 3, corruptionPerMinute: 0 },
+  { minDepth: 4, maxDepth: 6, corruptionPerMinute: 0.1 },
+  { minDepth: 7, maxDepth: 9, corruptionPerMinute: 0.2 },
+  { minDepth: 10, maxDepth: 10, corruptionPerMinute: 0.5 },
+];
+
+/**
+ * Get the deep objective corruption rate (per game-minute) for a given floor depth.
+ * Objective rooms on deeper floors passively generate corruption.
+ */
+export function floorModifierGetObjectiveCorruptionRate(depth: number): number {
+  const tier = DEEP_OBJECTIVE_CORRUPTION_TIERS.find(
+    (t) => depth >= t.minDepth && depth <= t.maxDepth,
+  );
+  return tier?.corruptionPerMinute ?? 0;
+}
+
 // --- Configuration ---
 
 export const FLOOR_MODIFIER_TIERS: readonly FloorDepthModifierTier[] = [

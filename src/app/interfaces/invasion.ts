@@ -24,6 +24,7 @@ export type PendingInvasionWarning = {
 export type InvasionHistoryEntry = {
   day: number;
   type: 'scheduled' | SpecialInvasionType;
+  unreachableObjectiveCount?: number;
 };
 
 export type PendingSpecialInvasion = {
@@ -257,6 +258,9 @@ export type ActiveInvasion = {
 
   // Fear levels per room (captured at start for determinism)
   roomFearLevels: Record<string, number>;
+
+  // Anti-turtling: count of secondary objectives not on the invasion path
+  unreachableObjectiveCount: number;
 
   // Completion
   completed: boolean;

@@ -177,11 +177,18 @@ export function invasionCompositionGetWeights(
 /**
  * Determine party size based on dungeon room count.
  * Small (1-10): 3-5, Medium (11-25): 6-10, Large (26+): 11-15.
+ * bonusSize adds extra invaders (from escalation mechanics).
  */
-export function invasionCompositionGetPartySize(roomCount: number, rng: () => number): number {
-  if (roomCount <= 10) return 3 + Math.floor(rng() * 3); // 3-5
-  if (roomCount <= 25) return 6 + Math.floor(rng() * 5); // 6-10
-  return 11 + Math.floor(rng() * 5); // 11-15
+export function invasionCompositionGetPartySize(
+  roomCount: number,
+  rng: () => number,
+  bonusSize: number = 0,
+): number {
+  let baseSize: number;
+  if (roomCount <= 10) baseSize = 3 + Math.floor(rng() * 3); // 3-5
+  else if (roomCount <= 25) baseSize = 6 + Math.floor(rng() * 5); // 6-10
+  else baseSize = 11 + Math.floor(rng() * 5); // 11-15
+  return baseSize + bonusSize;
 }
 
 // --- Party composition (pure function) ---
@@ -195,9 +202,10 @@ export function invasionCompositionSelectParty(
   invaderDefs: InvaderContent[],
   weights: InvaderClassWeights,
   seed: string,
+  bonusSize: number = 0,
 ): InvaderContent[] {
   const rng = seedrandom(seed);
-  const partySize = invasionCompositionGetPartySize(profile.size, rng);
+  const partySize = invasionCompositionGetPartySize(profile.size, rng, bonusSize);
   const maxPerClass = Math.floor(partySize * 0.5);
 
   // Group definitions by class
@@ -345,13 +353,14 @@ function ensureClassDiversity(
 export function invasionCompositionGenerateParty(
   profile: DungeonProfile,
   seed: string,
+  bonusSize: number = 0,
 ): InvaderInstance[] {
   const invaderDefs = invaderGetAllDefinitions();
   const config = invasionCompositionGetWeightConfig();
   if (!config || invaderDefs.length === 0) return [];
 
   const weights = invasionCompositionGetWeights(profile, config);
-  const selected = invasionCompositionSelectParty(profile, invaderDefs, weights, seed);
+  const selected = invasionCompositionSelectParty(profile, invaderDefs, weights, seed, bonusSize);
 
   return selected.map((def) => invaderCreateInstance(def));
 }

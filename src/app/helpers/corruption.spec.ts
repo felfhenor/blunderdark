@@ -41,6 +41,16 @@ vi.mock('@helpers/day-night-modifiers', () => ({
   dayNightGetResourceModifier: vi.fn(() => 1.0),
 }));
 
+vi.mock('@helpers/floor-modifiers', () => ({
+  floorModifierGetObjectiveCorruptionRate: vi.fn((depth: number) => {
+    if (depth >= 1 && depth <= 3) return 0;
+    if (depth >= 4 && depth <= 6) return 0.1;
+    if (depth >= 7 && depth <= 9) return 0.2;
+    if (depth === 10) return 0.5;
+    return 0;
+  }),
+}));
+
 const {
   corruptionAdd,
   corruptionSpend,
@@ -50,6 +60,7 @@ const {
   corruptionGenerationCalculateInhabitantRate,
   corruptionGenerationProcess,
   corruptionGenerationCalculateTotalPerMinute,
+  corruptionCalculateDeepObjectiveRate,
   CORRUPTION_THRESHOLD_MEDIUM,
   CORRUPTION_THRESHOLD_HIGH,
   CORRUPTION_THRESHOLD_CRITICAL,
@@ -536,5 +547,127 @@ describe('Corruption Seal', () => {
     corruptionGenerationProcess(state);
     // Existing corruption preserved
     expect(state.world.resources.corruption.current).toBe(50);
+  });
+});
+
+describe('corruptionCalculateDeepObjectiveRate', () => {
+  function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
+    return {
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-type-1' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+      ...overrides,
+    };
+  }
+
+  function makeFloor(overrides: Partial<Floor> = {}): Floor {
+    return {
+      id: 'floor-1' as FloorId,
+      name: 'Floor 1',
+      depth: 1,
+      biome: 'neutral',
+      grid: [],
+      rooms: [],
+      hallways: [],
+      inhabitants: [],
+      connections: [],
+      traps: [],
+      ...overrides,
+    };
+  }
+
+  it('should return 0 for objective rooms on floors 1-3', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+      objectiveTypes: ['StealTreasure'],
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 1, rooms: [makeRoom()] }),
+      makeFloor({ id: 'f2' as FloorId, depth: 2, rooms: [makeRoom({ id: 'r2' as PlacedRoomId })] }),
+      makeFloor({ id: 'f3' as FloorId, depth: 3, rooms: [makeRoom({ id: 'r3' as PlacedRoomId })] }),
+    ];
+
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBe(0);
+  });
+
+  it('should return correct rate for objective rooms on floor 5', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+      objectiveTypes: ['StealTreasure'],
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 5, rooms: [makeRoom()] }),
+    ];
+
+    // 0.1 per minute / GAME_TIME_TICKS_PER_MINUTE
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBeCloseTo(0.1 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should return correct rate for objective rooms on floor 10', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+      objectiveTypes: ['StealTreasure'],
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 10, rooms: [makeRoom()] }),
+    ];
+
+    // 0.5 per minute / GAME_TIME_TICKS_PER_MINUTE
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBeCloseTo(0.5 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should return 0 for non-objective rooms on any floor', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+      objectiveTypes: [],
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 10, rooms: [makeRoom()] }),
+    ];
+
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBe(0);
+  });
+
+  it('should return 0 for rooms with no objectiveTypes defined', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 10, rooms: [makeRoom()] }),
+    ];
+
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBe(0);
+  });
+
+  it('should sum rates across multiple objective rooms on different floors', async () => {
+    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
+    contentGetEntry.mockReturnValue({
+      id: 'room-type-1',
+      objectiveTypes: ['StealTreasure'],
+    } as ReturnType<typeof contentGetEntry>);
+
+    const floors = [
+      makeFloor({ depth: 5, rooms: [makeRoom()] }),
+      makeFloor({ id: 'f2' as FloorId, depth: 10, rooms: [makeRoom({ id: 'r2' as PlacedRoomId })] }),
+    ];
+
+    // 0.1 + 0.5 = 0.6 per minute / GAME_TIME_TICKS_PER_MINUTE
+    expect(corruptionCalculateDeepObjectiveRate(floors)).toBeCloseTo(0.6 / GAME_TIME_TICKS_PER_MINUTE);
+  });
+
+  it('should return 0 for empty floors', () => {
+    expect(corruptionCalculateDeepObjectiveRate([])).toBe(0);
   });
 });

@@ -5,11 +5,13 @@ import {
   featureCalculateCorruptionGenerationPerTick,
   featureGetCorruptionSealedRoomIds,
 } from '@helpers/features';
+import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { resourceAdd } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { GameState, InhabitantInstance } from '@interfaces';
+import type { Floor, GameState, InhabitantInstance } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { RoomContent } from '@interfaces/content-room';
 import type { CorruptionLevel } from '@interfaces/corruption';
 
 export const CORRUPTION_THRESHOLD_LOW = 0;
@@ -131,6 +133,26 @@ export function corruptionGenerationCalculateInhabitantRate(
 }
 
 /**
+ * Calculate per-tick corruption generation from objective rooms on deep floors.
+ * Objective rooms (rooms with objectiveTypes) on deeper floors passively generate
+ * corruption, making it costly to bury them where invaders can't reach.
+ */
+export function corruptionCalculateDeepObjectiveRate(
+  floors: Floor[],
+): number {
+  let totalPerMinute = 0;
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
+      if (roomDef?.objectiveTypes && roomDef.objectiveTypes.length > 0) {
+        totalPerMinute += floorModifierGetObjectiveCorruptionRate(floor.depth);
+      }
+    }
+  }
+  return totalPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+}
+
+/**
  * Process inhabitant-based corruption generation each tick.
  * Applies day/night modifier (night +50%) to inhabitant-generated corruption.
  * Room-based corruption production is handled by the standard production pipeline.
@@ -157,7 +179,9 @@ export function corruptionGenerationProcess(state: GameState): void {
     );
   }
 
-  const basePerTick = inhabitantPerTick + featurePerTick;
+  const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(state.world.floors ?? []);
+
+  const basePerTick = inhabitantPerTick + featurePerTick + deepObjectivePerTick;
   if (basePerTick <= 0) return;
 
   const dayNightMod = dayNightGetResourceModifier(

@@ -70,6 +70,9 @@ const INVASION_BASE_TICKS_PER_ROOM = 2;
 const INVASION_TICKS_PER_DEFENDER = 2;
 const MAX_ROUNDS_PER_ROOM = 10;
 
+export const FOCUSED_ASSAULT_ATTACK_BONUS = 2; // +2 attack per unreachable objective
+export const INVASION_ESCALATION_EXTRA_INVADERS = 1; // extra invaders per unreachable objective (from last invasion)
+
 // --- Computed signals ---
 
 export const invasionIsActive = computed(() => {
@@ -105,6 +108,22 @@ export const invasionBattleLog = computed(() => {
   if (!inv) return [];
   return inv.battleLog;
 });
+
+// --- Anti-turtling: count unreachable objectives ---
+
+/**
+ * Count secondary objectives whose target rooms are NOT on the invasion path.
+ * These are "unreachable" objectives that invaders cannot visit.
+ */
+export function invasionCountUnreachableObjectives(
+  objectives: InvasionObjective[],
+  path: PlacedRoomId[],
+): number {
+  const pathSet = new Set<string>(path);
+  return objectives.filter(
+    (o) => !o.isPrimary && o.targetId && !pathSet.has(o.targetId),
+  ).length;
+}
 
 // --- Multi-floor path building ---
 
@@ -466,9 +485,16 @@ export function invasionStart(
 ): void {
   const day = state.clock.day;
 
+  // 0. Compute escalation bonus from last invasion's unreachable objectives
+  const lastHistory = state.world.invasionSchedule.invasionHistory;
+  const lastUnreachable = lastHistory.length > 0
+    ? (lastHistory[lastHistory.length - 1].unreachableObjectiveCount ?? 0)
+    : 0;
+  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS;
+
   // 1. Generate invader party (use pre-computed from warning if available)
   const invaders = warning?.invaders ?? invasionCompositionGenerateParty(
-    invasionCompositionCalculateDungeonProfile(state), seed,
+    invasionCompositionCalculateDungeonProfile(state), seed, bonusSize,
   );
 
   if (invaders.length === 0) {
@@ -512,6 +538,9 @@ export function invasionStart(
 
   const entryRoomId = path[0];
 
+  // 4b. Count unreachable secondary objectives (anti-turtling)
+  const unreachableObjectiveCount = invasionCountUnreachableObjectives(objectives, path);
+
   // 5. Count all defenders across floors in the path
   const pathRoomSet = new Set(path);
   const defenderIds = state.world.inhabitants
@@ -541,6 +570,17 @@ export function invasionStart(
   const firstRoomTicks = calculateRoomTicks(firstRoomDefenders.length);
 
   // 10. Store active invasion
+  const battleLog: ActiveInvasion['battleLog'] = [];
+
+  if (unreachableObjectiveCount > 0) {
+    const totalBonus = unreachableObjectiveCount * FOCUSED_ASSAULT_ATTACK_BONUS;
+    battleLog.push({
+      turn: 0,
+      type: 'room_enter',
+      message: `The invaders are focused — no distractions! (+${totalBonus} attack)`,
+    });
+  }
+
   state.world.activeInvasion = {
     seed,
     invasionType,
@@ -558,9 +598,10 @@ export function invasionStart(
     invasionState,
     currentRoomTurnQueue: undefined,
     currentRoomDefenderIds: firstRoomDefenders.map((i) => i.instanceId),
-    battleLog: [],
+    battleLog,
     currentTurn: 0,
     roomFearLevels,
+    unreachableObjectiveCount,
     completed: false,
   };
 }
@@ -670,6 +711,7 @@ export function invasionProcess(state: GameState): void {
       const livingInvaderInstances = invasion.invasionState.invaders.filter(
         (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
       );
+      const focusedBonus = (invasion.unreachableObjectiveCount ?? 0) * FOCUSED_ASSAULT_ATTACK_BONUS;
       const invaderCombatants = livingInvaderInstances.map((inv, idx) => {
         const invDef = invaderGetDefinitionById(inv.definitionId);
         return invasionCombatCreateCombatant(
@@ -679,7 +721,7 @@ export function invasionProcess(state: GameState): void {
           {
             hp: invasion.invaderHpMap[inv.id] ?? inv.currentHp,
             maxHp: inv.maxHp,
-            attack: invDef?.baseStats.attack ?? 5,
+            attack: (invDef?.baseStats.attack ?? 5) + focusedBonus,
             defense: invDef?.baseStats.defense ?? 5,
             speed: invDef?.baseStats.speed ?? 5,
           },
@@ -1130,6 +1172,7 @@ function createEmptyCompletedInvasion(
     battleLog: [{ turn: 0, type: 'invasion_end', message: 'No invaders appeared.' }],
     currentTurn: 0,
     roomFearLevels: {},
+    unreachableObjectiveCount: 0,
     completed: true,
     result: emptyResult,
   };

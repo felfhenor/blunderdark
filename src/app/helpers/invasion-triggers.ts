@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
-import { invasionFindEntryRoom, invasionStart } from '@helpers/invasion-process';
+import { INVASION_ESCALATION_EXTRA_INVADERS, invasionFindEntryRoom, invasionStart } from '@helpers/invasion-process';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
 import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
 import type { GameTime } from '@interfaces/game-time';
@@ -23,6 +23,9 @@ export const INVASION_TRIGGER_MIN_INTERVAL = 5;
 export const INVASION_TRIGGER_MAX_VARIANCE = 2;
 export const INVASION_TRIGGER_MIN_DAYS_BETWEEN = 3;
 export const INVASION_TRIGGER_WARNING_MINUTES = 2;
+
+// Escalation: unreachable objectives make future invasions come sooner
+export const INVASION_ESCALATION_INTERVAL_REDUCTION = 2; // days sooner per unreachable objective
 
 // --- Pure functions ---
 
@@ -227,7 +230,17 @@ export function invasionTriggerRecordAndReschedule(
     schedule.gracePeriodEnd,
     effectiveRng,
   );
-  schedule.nextInvasionDay = result.day;
+
+  // Escalation: unreachable objectives reduce the interval to next invasion
+  const unreachable = historyEntry.unreachableObjectiveCount ?? 0;
+  const escalationReduction = unreachable * INVASION_ESCALATION_INTERVAL_REDUCTION;
+  const escalatedDay = result.day - escalationReduction;
+
+  // Enforce minimum gap between invasions even with escalation
+  schedule.nextInvasionDay = Math.max(
+    historyEntry.day + INVASION_TRIGGER_MIN_DAYS_BETWEEN,
+    escalatedDay,
+  );
   schedule.nextInvasionVariance = result.variance;
 }
 
@@ -243,7 +256,15 @@ export function invasionTriggerGenerateWarning(
   invasionType: 'scheduled' | SpecialInvasionType,
 ): void {
   const profile = invasionCompositionCalculateDungeonProfile(state);
-  const invaders = invasionCompositionGenerateParty(profile, seed);
+
+  // Escalation: add bonus invaders based on last invasion's unreachable objectives
+  const lastHistory = state.world.invasionSchedule.invasionHistory;
+  const lastUnreachable = lastHistory.length > 0
+    ? (lastHistory[lastHistory.length - 1].unreachableObjectiveCount ?? 0)
+    : 0;
+  const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS;
+
+  const invaders = invasionCompositionGenerateParty(profile, seed, bonusSize);
   const objectives = invasionObjectiveAssign(state, seed);
   const entryRoom = invasionFindEntryRoom(state);
 

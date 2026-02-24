@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEEP_OBJECTIVE_CORRUPTION_TIERS,
   FLOOR_MODIFIER_TIERS,
   floorModifierFormatPercentage,
   floorModifierGet,
   floorModifierGetMultiplier,
+  floorModifierGetObjectiveCorruptionRate,
 } from '@helpers/floor-modifiers';
 
 // --- Tier configuration ---
@@ -221,5 +223,63 @@ describe('floorModifierFormatPercentage', () => {
   it('should handle 50% correctly', () => {
     expect(floorModifierFormatPercentage(0.50)).toBe('+50%');
     expect(floorModifierFormatPercentage(-0.50)).toBe('-50%');
+  });
+});
+
+// --- DEEP_OBJECTIVE_CORRUPTION_TIERS ---
+
+describe('DEEP_OBJECTIVE_CORRUPTION_TIERS', () => {
+  it('should cover depths 1 through 10', () => {
+    for (let d = 1; d <= 10; d++) {
+      const tier = DEEP_OBJECTIVE_CORRUPTION_TIERS.find(
+        (t) => d >= t.minDepth && d <= t.maxDepth,
+      );
+      expect(tier).toBeDefined();
+    }
+  });
+
+  it('should have non-overlapping depth ranges', () => {
+    for (let i = 0; i < DEEP_OBJECTIVE_CORRUPTION_TIERS.length; i++) {
+      for (let j = i + 1; j < DEEP_OBJECTIVE_CORRUPTION_TIERS.length; j++) {
+        const a = DEEP_OBJECTIVE_CORRUPTION_TIERS[i];
+        const b = DEEP_OBJECTIVE_CORRUPTION_TIERS[j];
+        const overlaps = a.minDepth <= b.maxDepth && b.minDepth <= a.maxDepth;
+        expect(overlaps).toBe(false);
+      }
+    }
+  });
+});
+
+// --- floorModifierGetObjectiveCorruptionRate ---
+
+describe('floorModifierGetObjectiveCorruptionRate', () => {
+  it('should return 0 for depths 1-3', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(1)).toBe(0);
+    expect(floorModifierGetObjectiveCorruptionRate(2)).toBe(0);
+    expect(floorModifierGetObjectiveCorruptionRate(3)).toBe(0);
+  });
+
+  it('should return 0.1 for depths 4-6', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(4)).toBeCloseTo(0.1);
+    expect(floorModifierGetObjectiveCorruptionRate(5)).toBeCloseTo(0.1);
+    expect(floorModifierGetObjectiveCorruptionRate(6)).toBeCloseTo(0.1);
+  });
+
+  it('should return 0.2 for depths 7-9', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(7)).toBeCloseTo(0.2);
+    expect(floorModifierGetObjectiveCorruptionRate(8)).toBeCloseTo(0.2);
+    expect(floorModifierGetObjectiveCorruptionRate(9)).toBeCloseTo(0.2);
+  });
+
+  it('should return 0.5 for depth 10', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(10)).toBeCloseTo(0.5);
+  });
+
+  it('should return 0 for depth 0 (out of range)', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(0)).toBe(0);
+  });
+
+  it('should return 0 for depth 11 (out of range)', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(11)).toBe(0);
   });
 });

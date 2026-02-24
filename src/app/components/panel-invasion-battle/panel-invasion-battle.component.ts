@@ -106,6 +106,7 @@ export class PanelInvasionBattleComponent {
         invasionTriggerRecordAndReschedule(state, {
           day: invasion.day,
           type: invasion.invasionType,
+          unreachableObjectiveCount: invasion.unreachableObjectiveCount ?? 0,
         });
         state.world.activeInvasion = undefined;
         return state;
