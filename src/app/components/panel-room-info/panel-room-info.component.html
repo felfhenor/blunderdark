@@ -27,6 +27,11 @@
         <div class="mt-1">
           <div class="flex items-center gap-2">
             <span
+              class="text-xs opacity-50 cursor-help underline decoration-dotted"
+              [tp]="efficiencyBreakdownTip"
+              [tpDelay]="250"
+            >Efficiency:</span>
+            <span
               class="text-xs font-semibold"
               [class.text-success]="eff.totalMultiplier > 1.0"
               [class.text-error]="eff.totalMultiplier < 1.0"
@@ -38,26 +43,28 @@
               />
             </span>
           </div>
-          <div class="text-xs opacity-40 ml-2">
-            Base: {{ eff.baseEfficiency | number: '1.0-2' }}x
-          </div>
-          @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
-            <div class="text-xs ml-2">
-              <span>{{ contrib.name }}:</span>
-              <span
-                [class.text-success]="contrib.totalBonus > 0"
-                [class.text-error]="contrib.totalBonus < 0"
-              >
-                {{ contrib.totalBonus >= 0 ? '+' : ''
-                }}{{ contrib.totalBonus | number: '1.0-2' }}x
-              </span>
-              @for (tb of contrib.traitBonuses; track tb.traitName) {
-                @if (tb.applies) {
-                  <span class="opacity-50">({{ tb.traitName }})</span>
-                }
-              }
+          <ng-template #efficiencyBreakdownTip>
+            <div class="text-xs opacity-70">
+              Base: {{ eff.baseEfficiency | number: '1.0-2' }}x
             </div>
-          }
+            @for (contrib of eff.inhabitantBonuses; track contrib.instanceId) {
+              <div class="text-xs">
+                <span>{{ contrib.name }}:</span>
+                <span
+                  [class.text-success]="contrib.totalBonus > 0"
+                  [class.text-error]="contrib.totalBonus < 0"
+                >
+                  {{ contrib.totalBonus >= 0 ? '+' : ''
+                  }}{{ contrib.totalBonus | number: '1.0-2' }}x
+                </span>
+                @for (tb of contrib.traitBonuses; track tb.traitName) {
+                  @if (tb.applies) {
+                    <span class="opacity-50">({{ tb.traitName }})</span>
+                  }
+                }
+              </div>
+            }
+          </ng-template>
         </div>
       }
 
