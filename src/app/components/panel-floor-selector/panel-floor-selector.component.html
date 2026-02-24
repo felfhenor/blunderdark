@@ -211,26 +211,7 @@
         </p>
 
         <div class="effects-summary text-xs opacity-60">
-          @switch (floor.biome) {
-            @case ('volcanic') {
-              <p>Effects: +Fire damage, -Water creatures</p>
-            }
-            @case ('flooded') {
-              <p>Effects: +Water creatures, slower movement</p>
-            }
-            @case ('crystal') {
-              <p>Effects: +Crystal production, light bonus</p>
-            }
-            @case ('corrupted') {
-              <p>Effects: +Corruption gain, +Dark energy</p>
-            }
-            @case ('fungal') {
-              <p>Effects: +Food production, spore hazards</p>
-            }
-            @case ('neutral') {
-              <p>Effects: No special modifiers</p>
-            }
-          }
+          <p>Effects: {{ selectedFloorBiome().effectsLabel }}</p>
         </div>
 
         @if (depthModifiers().length > 0) {

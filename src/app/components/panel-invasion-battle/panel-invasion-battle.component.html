@@ -16,194 +16,33 @@
 
       @switch (phase()) {
         @case ('results') {
-          <div class="flex-1 overflow-y-auto p-4">
-            @if (result(); as res) {
-              <!-- Win/Loss Banner -->
-              <div class="text-center mb-4">
-                @if (isVictory()) {
-                  <div class="text-2xl font-bold text-success mb-1">Victory!</div>
-                  <p class="text-sm opacity-70">The invaders have been repelled.</p>
-                } @else {
-                  <div class="text-2xl font-bold text-error mb-1">Defeat</div>
-                  <p class="text-sm opacity-70">The dungeon has fallen.</p>
-                }
-              </div>
-
-              <!-- Stats Grid -->
-              <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                <div class="stat-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">Invaders</div>
-                  <div class="text-lg font-bold">{{ res.detailedResult.invadersKilled }} / {{ res.detailedResult.invaderCount }}</div>
-                  <div class="text-xs opacity-50">killed</div>
-                </div>
-                <div class="stat-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">Defenders</div>
-                  <div class="text-lg font-bold">{{ res.detailedResult.defendersLost }} / {{ res.detailedResult.defenderCount }}</div>
-                  <div class="text-xs opacity-50">lost</div>
-                </div>
-                <div class="stat-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">Turns</div>
-                  <div class="text-lg font-bold">{{ res.detailedResult.turnsTaken }}</div>
-                </div>
-                <div class="stat-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">Objectives</div>
-                  <div class="text-lg font-bold">{{ res.detailedResult.objectivesCompleted }} / {{ res.detailedResult.objectivesTotal }}</div>
-                  <div class="text-xs opacity-50">completed by invaders</div>
-                </div>
-              </div>
-
-              <div class="text-center mt-3">
-                <span class="badge badge-sm">End reason: {{ res.detailedResult.endReason }}</span>
-              </div>
-            }
-          </div>
-          <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
-            <button class="btn btn-sm btn-primary" (click)="advancePhase()">
-              @if (isVictory()) { View Rewards } @else { View Penalties }
-            </button>
-          </div>
+          @if (result(); as res) {
+            <app-invasion-results-phase
+              [result]="res"
+              [isVictory]="isVictory()"
+              (advance)="advancePhase()"
+            />
+          }
         }
 
         @case ('rewards') {
-          <div class="flex-1 overflow-y-auto p-4">
-            @if (result(); as res) {
-              @if (isVictory() && res.rewards) {
-                <div class="text-center mb-4">
-                  <div class="text-xl font-bold text-success">Spoils of War</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                  @if (res.rewards.goldGain > 0) {
-                    <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                      <div class="text-xs opacity-50">Gold</div>
-                      <div class="text-lg font-bold text-warning">+{{ res.rewards.goldGain }}</div>
-                    </div>
-                  }
-                  @if (res.rewards.reputationGain > 0) {
-                    <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                      <div class="text-xs opacity-50">Reputation</div>
-                      <div class="text-lg font-bold text-info">+{{ res.rewards.reputationGain }}</div>
-                    </div>
-                  }
-                  @if (res.rewards.experienceGain > 0) {
-                    <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                      <div class="text-xs opacity-50">Experience</div>
-                      <div class="text-lg font-bold text-accent">+{{ res.rewards.experienceGain }}</div>
-                    </div>
-                  }
-                  @for (entry of res.rewards.resourceGains | keyvalue; track entry.key) {
-                    @if (entry.value && entry.value > 0) {
-                      <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                        <div class="text-xs opacity-50">{{ entry.key }}</div>
-                        <div class="text-lg font-bold text-success">+{{ entry.value }}</div>
-                      </div>
-                    }
-                  }
-                </div>
-                @if (res.capturedPrisoners.length > 0) {
-                  <div class="text-center mt-3 text-sm opacity-70">
-                    {{ res.capturedPrisoners.length }} prisoner(s) captured
-                  </div>
-                }
-              } @else if (!isVictory() && res.penalties) {
-                <div class="text-center mb-4">
-                  <div class="text-xl font-bold text-error">Losses Suffered</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                  @if (res.penalties.goldLost > 0) {
-                    <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                      <div class="text-xs opacity-50">Gold Lost</div>
-                      <div class="text-lg font-bold text-error">-{{ res.penalties.goldLost }}</div>
-                    </div>
-                  }
-                  @if (res.penalties.reputationLoss > 0) {
-                    <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                      <div class="text-xs opacity-50">Reputation Lost</div>
-                      <div class="text-lg font-bold text-error">-{{ res.penalties.reputationLoss }}</div>
-                    </div>
-                  }
-                  @for (entry of res.penalties.resourceLosses | keyvalue; track entry.key) {
-                    @if (entry.value && entry.value > 0) {
-                      <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                        <div class="text-xs opacity-50">{{ entry.key }}</div>
-                        <div class="text-lg font-bold text-error">-{{ entry.value }}</div>
-                      </div>
-                    }
-                  }
-                  @if (res.killedDefenderIds.length > 0) {
-                    <div class="penalty-box bg-base-200 rounded-lg p-3 text-center col-span-2">
-                      <div class="text-xs opacity-50">Defenders Killed</div>
-                      <div class="text-lg font-bold text-error">{{ res.killedDefenderIds.length }}</div>
-                    </div>
-                  }
-                </div>
-              }
-            }
-          </div>
-          <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
-            <button class="btn btn-sm btn-primary" (click)="advancePhase()">
-              @if (prisonersRemaining().length > 0) {
-                Handle Prisoners ({{ prisonersRemaining().length }})
-              } @else {
-                Dismiss
-              }
-            </button>
-          </div>
+          @if (result(); as res) {
+            <app-invasion-rewards-phase
+              [result]="res"
+              [isVictory]="isVictory()"
+              [hasPrisoners]="prisonersRemaining().length > 0"
+              [prisonerCount]="prisonersRemaining().length"
+              (advance)="advancePhase()"
+            />
+          }
         }
 
         @case ('prisoners') {
-          <div class="flex-1 overflow-y-auto p-4">
-            <div class="text-center mb-4">
-              <div class="text-xl font-bold">Prisoner Handling</div>
-              <p class="text-sm opacity-70">Decide the fate of each captured invader.</p>
-            </div>
-
-            @for (prisoner of prisonersRemaining(); track prisoner.id) {
-              <div class="card bg-base-200 mb-3">
-                <div class="card-body p-3">
-                  <div class="flex items-center justify-between mb-2">
-                    <div>
-                      <span class="font-bold text-sm">{{ prisoner.name }}</span>
-                      <span class="badge badge-xs badge-outline ml-2">{{ prisoner.invaderClass }}</span>
-                    </div>
-                    <div class="text-xs opacity-50">
-                      HP {{ prisoner.stats.hp }} / ATK {{ prisoner.stats.attack }} / DEF {{ prisoner.stats.defense }}
-                    </div>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    @for (action of prisonerActions; track action) {
-                      <button
-                        class="btn btn-xs"
-                        [class.btn-error]="action === 'execute'"
-                        [class.btn-warning]="action === 'ransom'"
-                        [class.btn-info]="action === 'convert'"
-                        [class.btn-accent]="action === 'sacrifice'"
-                        [class.btn-secondary]="action === 'experiment'"
-                        (click)="handlePrisoner(prisoner, action)"
-                      >
-                        <span>{{ getPrisonerActionLabel(action) }}</span>
-                        <span class="text-xs opacity-70 ml-1">({{ getPrisonerActionDescription(action) }})</span>
-                      </button>
-                    }
-                  </div>
-                </div>
-              </div>
-            }
-
-            @if (prisonersRemaining().length === 0) {
-              <div class="text-center py-4">
-                <p class="text-sm opacity-50">All prisoners have been handled.</p>
-              </div>
-            }
-          </div>
-          <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
-            <button
-              class="btn btn-sm btn-primary"
-              [disabled]="prisonersRemaining().length > 0"
-              (click)="dismiss()"
-            >
-              Done
-            </button>
-          </div>
+          <app-invasion-prisoners-phase
+            [prisoners]="prisonersRemaining()"
+            (handlePrisoner)="handlePrisoner($event.prisoner, $event.action)"
+            (dismiss)="dismiss()"
+          />
         }
       }
     </div>

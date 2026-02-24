@@ -1,12 +1,12 @@
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
-import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
-import { IconComponent } from '@components/icon/icon.component';
+import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
+import { UpgradeEffectBadgeComponent } from '@components/upgrade-effect-badge/upgrade-effect-badge.component';
 import {
   connectivityDisconnectedRoomIds,
   inhabitantAssignToRoom,
@@ -74,7 +74,7 @@ import { startCase } from 'es-toolkit';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyCostComponent, CurrencyNameComponent, IconComponent, InhabitantCardComponent, StatNameComponent, TippyDirective, ModalComponent, SynergyTooltipComponent],
+  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyCostComponent, FearBreakdownTooltipComponent, InhabitantCardComponent, StatNameComponent, TippyDirective, ModalComponent, SynergyTooltipComponent, UpgradeEffectBadgeComponent],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -253,10 +253,6 @@ export class PanelRoomInfoComponent {
     if (!room) return undefined;
     return roomUpgradeGetApplied(room.placedRoom);
   });
-
-  public formatEffectType(type: string): string {
-    return startCase(type);
-  }
 
   public formatEffectTooltip(effect: RoomUpgradeEffect): string {
     switch (effect.type) {

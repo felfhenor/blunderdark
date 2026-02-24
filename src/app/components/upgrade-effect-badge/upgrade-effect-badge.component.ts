@@ -1,0 +1,54 @@
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import type { RoomUpgradeEffect } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
+import { startCase } from 'es-toolkit';
+
+@Component({
+  selector: 'app-upgrade-effect-badge',
+  imports: [CurrencyCostComponent, CurrencyNameComponent, TippyDirective],
+  template: `
+    <span
+      class="badge badge-xs badge-success badge-outline"
+      [tp]="tooltipText()"
+      [tpDelay]="250"
+    >
+      @switch (effect().type) {
+        @case ('productionBonus') {
+          +{{ effect().value * 100 }}%
+          @if (effect().resource) {
+            <app-currency-name [type]="$any(effect().resource)" />
+          } @else {
+            all
+          }
+          production
+        }
+        @case ('secondaryProduction') {
+          +<app-currency-cost [type]="$any(effect().resource)" [amount]="effect().value" />/sec
+        }
+        @case ('productionMultiplier') {
+          x{{ effect().value }} production
+        }
+        @case ('maxInhabitantBonus') {
+          +{{ effect().value }} max inhabitants
+        }
+        @case ('fearReduction') {
+          -{{ effect().value }} fear
+        }
+        @default {
+          {{ formatEffectType(effect().type) }}: {{ effect().value }}
+        }
+      }
+    </span>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class UpgradeEffectBadgeComponent {
+  public effect = input.required<RoomUpgradeEffect>();
+  public tooltipText = input.required<string>();
+
+  public formatEffectType(type: string): string {
+    return startCase(type);
+  }
+}

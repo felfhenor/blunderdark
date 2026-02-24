@@ -4,7 +4,9 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { KeyValuePipe } from '@angular/common';
+import { InvasionPrisonersPhaseComponent } from '@components/invasion-prisoners-phase/invasion-prisoners-phase.component';
+import { InvasionResultsPhaseComponent } from '@components/invasion-results-phase/invasion-results-phase.component';
+import { InvasionRewardsPhaseComponent } from '@components/invasion-rewards-phase/invasion-rewards-phase.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   invasionRewardApplyDefeat,
@@ -25,7 +27,7 @@ type BattlePhase = 'results' | 'rewards' | 'prisoners';
 
 @Component({
   selector: 'app-panel-invasion-battle',
-  imports: [KeyValuePipe, ModalComponent],
+  imports: [ModalComponent, InvasionResultsPhaseComponent, InvasionRewardsPhaseComponent, InvasionPrisonersPhaseComponent],
   templateUrl: './panel-invasion-battle.component.html',
   styleUrl: './panel-invasion-battle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,34 +118,4 @@ export class PanelInvasionBattleComponent {
     this.visible.set(false);
     this.currentInvasion = undefined;
   }
-
-  public getPrisonerActionLabel(action: PrisonerAction): string {
-    const labels: Record<PrisonerAction, string> = {
-      execute: 'Execute',
-      ransom: 'Ransom',
-      convert: 'Convert',
-      sacrifice: 'Sacrifice',
-      experiment: 'Experiment',
-    };
-    return labels[action];
-  }
-
-  public getPrisonerActionDescription(action: PrisonerAction): string {
-    const descriptions: Record<PrisonerAction, string> = {
-      execute: '+2 Fear, +1 Reputation',
-      ransom: 'Gold based on class',
-      convert: 'Chance to join, +5 Corruption',
-      sacrifice: 'Random boon, +5 Corruption',
-      experiment: 'Research points, +3 Corruption',
-    };
-    return descriptions[action];
-  }
-
-  public readonly prisonerActions: PrisonerAction[] = [
-    'execute',
-    'ransom',
-    'convert',
-    'sacrifice',
-    'experiment',
-  ];
 }
