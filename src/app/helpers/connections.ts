@@ -3,8 +3,8 @@ import {
   adjacencyGetSharedEdges,
 } from '@helpers/adjacency';
 import { floorCurrent } from '@helpers/floor';
-import { productionGetRoomDefinition } from '@helpers/production';
 import { rngUuid } from '@helpers/rng';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
@@ -51,10 +51,7 @@ function getEntityTiles(
  */
 export function getEntityName(floor: Floor, entityId: string): string {
   const room = floor.rooms.find((r) => r.id === entityId);
-  if (room) {
-    const name = productionGetRoomDefinition(room.roomTypeId)?.name ?? 'Unknown';
-    return room.suffix ? `${name} ${room.suffix}` : name;
-  }
+  if (room) return roomGetDisplayName(room);
 
   const hallway = floor.hallways.find((h) => h.id === entityId);
   if (hallway) return hallway.suffix ? `Corridor ${hallway.suffix}` : 'Corridor';

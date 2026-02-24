@@ -11,6 +11,18 @@ import type {
 import type { RoomContent } from '@interfaces/content-room';
 import type { UpgradeValidation, VisibleUpgrade } from '@interfaces/room-upgrade';
 
+/**
+ * Get the display name for a placed room, accounting for applied upgrades and suffix.
+ * Returns the upgrade name if one is applied, otherwise the base room type name.
+ * Appends the room suffix (e.g. "A", "B") if present.
+ */
+export function roomGetDisplayName(placedRoom: PlacedRoom): string {
+  const upgrade = roomUpgradeGetApplied(placedRoom);
+  const def = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
+  const baseName = upgrade?.name ?? def?.name ?? 'Unknown';
+  return placedRoom.suffix ? `${baseName} ${placedRoom.suffix}` : baseName;
+}
+
 export function roomUpgradeGetPaths(roomTypeId: RoomId): RoomUpgradePath[] {
   const room = contentGetEntry<RoomContent>(roomTypeId);
   if (!room) return [];

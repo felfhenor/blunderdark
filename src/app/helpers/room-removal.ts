@@ -5,6 +5,7 @@ import {
 } from '@helpers/room-placement';
 import { resourceAdd } from '@helpers/resources';
 import { roomShapeGetRotated, roomShapeGet } from '@helpers/room-shapes';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   IsContentItem,
@@ -48,7 +49,7 @@ export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefine
 
   if (!roomPlacementIsRemovable(room.roomTypeId)) {
     return {
-      roomName: roomDef.name,
+      roomName: roomGetDisplayName(room),
       refund: {},
       displacedInhabitantNames: [],
       canRemove: false,
@@ -66,7 +67,7 @@ export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefine
     });
 
   return {
-    roomName: roomDef.name,
+    roomName: roomGetDisplayName(room),
     refund,
     displacedInhabitantNames,
     canRemove: true,

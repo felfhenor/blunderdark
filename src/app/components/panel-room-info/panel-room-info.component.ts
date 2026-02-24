@@ -21,6 +21,7 @@ import {
   contentGetEntriesByType,
   roomUpgradeGetEffectiveMaxInhabitants,
   roomUpgradeGetVisible,
+  roomGetDisplayName,
   roomUpgradeGetApplied,
   roomUpgradeCanApply,
   roomUpgradeApply,
@@ -98,12 +99,10 @@ export class PanelRoomInfoComponent {
 
     const effectiveMax = roomUpgradeGetEffectiveMaxInhabitants(room, def);
     const upgrade = roomUpgradeGetApplied(room);
-    const baseName = upgrade?.name ?? def.name;
-    const displayName = room.suffix ? `${baseName} ${room.suffix}` : baseName;
 
     return {
       id: room.id,
-      name: displayName,
+      name: roomGetDisplayName(room),
       baseRoomName: upgrade ? def.name : undefined,
       roomTypeId: room.roomTypeId,
       placedRoom: room,
