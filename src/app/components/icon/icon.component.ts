@@ -8,6 +8,9 @@ import type { Icon } from '@interfaces';
   selector: 'app-icon',
   imports: [NgIcon],
   providers: [provideIcons(ICON_ALL)],
+  host: {
+    class: 'inline-flex items-center justify-center align-middle',
+  },
   templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss',
 })
