@@ -271,7 +271,7 @@ export function darkForgeGetAdjacentRoomTypeIds(
  * Process all Dark Forge rooms each tick.
  * Called inside updateGamestate — mutates state in-place.
  */
-export function darkForgeProcess(state: GameState): void {
+export function darkForgeProcess(state: GameState, numTicks = 1): void {
   const darkForgeTypeId = roomRoleFindById('darkForge');
   if (!darkForgeTypeId) return;
 
@@ -294,7 +294,7 @@ export function darkForgeProcess(state: GameState): void {
       if (assignedCount < 1) continue;
 
       const job = queue.jobs[0];
-      job.progress += 1;
+      job.progress += numTicks;
 
       if (job.progress >= job.targetTicks) {
         // Job complete: add to inventory and remove from queue

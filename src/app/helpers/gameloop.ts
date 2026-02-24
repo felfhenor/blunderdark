@@ -77,28 +77,28 @@ export async function gameloop(totalTicks: number): Promise<void> {
   updateGamestate((state) => {
     state.clock.numTicks += numTicks;
     state.clock = gameTimeAdvanceClock(state.clock, numTicks);
-    hungerProcess(state);
-    productionProcess(state);
-    corruptionGenerationProcess(state);
+    hungerProcess(state, numTicks);
+    productionProcess(state, numTicks);
+    corruptionGenerationProcess(state, numTicks);
     corruptionEffectProcess(state);
     corruptionThresholdProcess(state);
     researchProcess(state, numTicks);
-    trainingProcess(state);
-    trapWorkshopProcess(state);
-    spawningPoolProcess(state);
-    breedingPitsProcess(state);
-    summoningCircleProcess(state);
-    darkForgeProcess(state);
-    alchemyLabProcess(state);
-    tortureChamberProcess(state);
+    trainingProcess(state, numTicks);
+    trapWorkshopProcess(state, numTicks);
+    spawningPoolProcess(state, numTicks);
+    breedingPitsProcess(state, numTicks);
+    summoningCircleProcess(state, numTicks);
+    darkForgeProcess(state, numTicks);
+    alchemyLabProcess(state, numTicks);
+    tortureChamberProcess(state, numTicks);
     verticalTransportTravelProcess(state);
     invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);
-    legendaryInhabitantUpkeepProcess(state);
-    featureTrainingStationProcess(state.world.floors, state.world.inhabitants);
+    legendaryInhabitantUpkeepProcess(state, numTicks);
+    featureTrainingStationProcess(state.world.floors, state.world.inhabitants, numTicks);
     for (const floor of state.world.floors) {
-      featureSacrificeProcess(floor.rooms);
+      featureSacrificeProcess(floor.rooms, numTicks);
     }
     hungerProcessWarnings(state);
     seasonProcess(state);

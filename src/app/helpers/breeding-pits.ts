@@ -342,7 +342,7 @@ export function breedingGetAdjacentRoomTypeIds(
  * Process all Breeding Pits rooms each tick.
  * Called inside updateGamestate — mutates state in-place.
  */
-export function breedingPitsProcess(state: GameState): void {
+export function breedingPitsProcess(state: GameState, numTicks = 1): void {
   const breedingPitsTypeId = roomRoleFindById('breedingPits');
   if (!breedingPitsTypeId) return;
 
@@ -354,7 +354,7 @@ export function breedingPitsProcess(state: GameState): void {
 
       // Process breeding job
       if (room.breedingJob) {
-        room.breedingJob.ticksRemaining -= 1;
+        room.breedingJob.ticksRemaining -= numTicks;
 
         if (room.breedingJob.ticksRemaining <= 0) {
           const recipe = contentGetEntry<BreedingRecipeContent>(
@@ -407,7 +407,7 @@ export function breedingPitsProcess(state: GameState): void {
 
       // Process mutation job
       if (room.mutationJob) {
-        room.mutationJob.ticksRemaining -= 1;
+        room.mutationJob.ticksRemaining -= numTicks;
 
         if (room.mutationJob.ticksRemaining <= 0) {
           const targetIdx = state.world.inhabitants.findIndex(

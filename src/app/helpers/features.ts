@@ -383,7 +383,7 @@ export function featureApplyResourceConversion(
  * Inhabitants assigned to rooms with Training Station features gain XP.
  * Mutates state in-place.
  */
-export function featureTrainingStationProcess(floors: Floor[], allInhabitants: InhabitantInstance[]): void {
+export function featureTrainingStationProcess(floors: Floor[], allInhabitants: InhabitantInstance[], numTicks = 1): void {
   for (const floor of floors) {
     for (const room of floor.rooms) {
       const xpPerTick = featureCalculateTrainingXpPerTick(room);
@@ -391,7 +391,7 @@ export function featureTrainingStationProcess(floors: Floor[], allInhabitants: I
 
       for (const inhabitant of allInhabitants) {
         if (inhabitant.assignedRoomId !== room.id) continue;
-        inhabitant.xp = (inhabitant.xp ?? 0) + xpPerTick;
+        inhabitant.xp = (inhabitant.xp ?? 0) + xpPerTick * numTicks;
       }
     }
   }
@@ -449,10 +449,10 @@ export function featureCreateSacrificeBuff(): SacrificeBuff {
  * Process sacrifice buff tick-down for all rooms on a floor.
  * Removes expired buffs. Mutates rooms in-place.
  */
-export function featureSacrificeProcess(rooms: PlacedRoom[]): void {
+export function featureSacrificeProcess(rooms: PlacedRoom[], numTicks = 1): void {
   for (const room of rooms) {
     if (!room.sacrificeBuff) continue;
-    room.sacrificeBuff.ticksRemaining--;
+    room.sacrificeBuff.ticksRemaining -= numTicks;
     if (room.sacrificeBuff.ticksRemaining <= 0) {
       room.sacrificeBuff = undefined;
     }

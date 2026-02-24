@@ -159,7 +159,7 @@ export function corruptionCalculateDeepObjectiveRate(
  * Room-based corruption production is handled by the standard production pipeline.
  * Mutates state in-place (same pattern as productionProcess/hungerProcess).
  */
-export function corruptionGenerationProcess(state: GameState): void {
+export function corruptionGenerationProcess(state: GameState, numTicks = 1): void {
   const inhabitantPerTick = corruptionGenerationCalculateInhabitantRate(
     state.world.inhabitants,
   );
@@ -192,7 +192,7 @@ export function corruptionGenerationProcess(state: GameState): void {
   const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
   const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus);
 
-  resourceAdd('corruption', finalPerTick);
+  resourceAdd('corruption', finalPerTick * numTicks);
 }
 
 /**

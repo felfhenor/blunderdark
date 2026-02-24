@@ -244,13 +244,14 @@ export function legendaryInhabitantIsAuraActive(
 function legendaryInhabitantCanPayUpkeep(
   def: InhabitantContent,
   resources: ResourceMap,
+  numTicks = 1,
 ): boolean {
   if (!def.upkeepCost) return true;
 
   for (const [type, amountPerMinute] of Object.entries(def.upkeepCost)) {
     const resourceType = type as ResourceType;
     const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
-    if ((resources[resourceType]?.current ?? 0) < perTick) return false;
+    if ((resources[resourceType]?.current ?? 0) < perTick * numTicks) return false;
   }
 
   return true;
@@ -260,13 +261,13 @@ function legendaryInhabitantCanPayUpkeep(
  * Deduct per-tick upkeep cost from resources for one inhabitant.
  * Mutates resources in-place.
  */
-function legendaryInhabitantPayUpkeep(def: InhabitantContent): void {
+function legendaryInhabitantPayUpkeep(def: InhabitantContent, numTicks = 1): void {
   if (!def.upkeepCost) return;
 
   for (const [type, amountPerMinute] of Object.entries(def.upkeepCost)) {
     const resourceType = type as ResourceType;
     const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
-    resourceSubtract(resourceType, perTick);
+    resourceSubtract(resourceType, perTick * numTicks);
   }
 }
 
@@ -297,18 +298,18 @@ function legendaryInhabitantRemoveFromState(
  * 3. If not paid: increment discontentedTicks
  * 4. If discontented for 5+ minutes: remove the legendary permanently
  */
-export function legendaryInhabitantUpkeepProcess(state: GameState): void {
+export function legendaryInhabitantUpkeepProcess(state: GameState, numTicks = 1): void {
   const toRemove: string[] = [];
 
   for (const inhabitant of state.world.inhabitants) {
     const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
     if (!def?.upkeepCost || Object.keys(def.upkeepCost).length === 0) continue;
 
-    if (legendaryInhabitantCanPayUpkeep(def, state.world.resources)) {
-      legendaryInhabitantPayUpkeep(def);
+    if (legendaryInhabitantCanPayUpkeep(def, state.world.resources, numTicks)) {
+      legendaryInhabitantPayUpkeep(def, numTicks);
       inhabitant.discontentedTicks = 0;
     } else {
-      inhabitant.discontentedTicks = (inhabitant.discontentedTicks ?? 0) + 1;
+      inhabitant.discontentedTicks = (inhabitant.discontentedTicks ?? 0) + numTicks;
 
       if (
         inhabitant.discontentedTicks >= LEGENDARY_DISCONTENTED_DEPARTURE_TICKS

@@ -106,7 +106,7 @@ export function hungerCalculateTotalConsumption(
  * 3. Updates hunger ticks and states for each inhabitant
  * 4. Syncs state changes to floor inhabitants
  */
-export function hungerProcess(state: GameState): void {
+export function hungerProcess(state: GameState, numTicks = 1): void {
   const inhabitants = state.world.inhabitants;
   if (inhabitants.length === 0) return;
 
@@ -117,15 +117,16 @@ export function hungerProcess(state: GameState): void {
   let foodSufficient = true;
 
   if (totalConsumption > 0) {
-    const actualSubtracted = resourceSubtract('food', totalConsumption);
-    if (actualSubtracted < totalConsumption) {
+    const scaledConsumption = totalConsumption * numTicks;
+    const actualSubtracted = resourceSubtract('food', scaledConsumption);
+    if (actualSubtracted < scaledConsumption) {
       foodSufficient = false;
     }
   }
 
   // Update hunger states for each inhabitant
   for (const inhabitant of inhabitants) {
-    hungerUpdateInhabitant(inhabitant, foodSufficient);
+    hungerUpdateInhabitant(inhabitant, foodSufficient, numTicks);
   }
 
   // Sync state to floor inhabitants
@@ -139,6 +140,7 @@ export function hungerProcess(state: GameState): void {
 function hungerUpdateInhabitant(
   inhabitant: InhabitantInstance,
   foodSufficient: boolean,
+  numTicks = 1,
 ): void {
   const rate = hungerGetConsumptionRate(inhabitant.definitionId);
 
@@ -157,11 +159,11 @@ function hungerUpdateInhabitant(
     // Recovering: decrement hunger ticks
     inhabitant.hungerTicksWithoutFood = Math.max(
       0,
-      currentTicks - HUNGER_RECOVERY_RATE,
+      currentTicks - HUNGER_RECOVERY_RATE * numTicks,
     );
   } else {
     // Starving: increment hunger ticks
-    inhabitant.hungerTicksWithoutFood = currentTicks + 1;
+    inhabitant.hungerTicksWithoutFood = currentTicks + numTicks;
   }
 
   // Update state based on ticks

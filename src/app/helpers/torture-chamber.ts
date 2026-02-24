@@ -210,7 +210,7 @@ export function tortureGetAdjacentRoomTypeIds(
  * Process all Torture Chamber rooms each tick.
  * Called inside updateGamestate — mutates state in-place.
  */
-export function tortureChamberProcess(state: GameState): void {
+export function tortureChamberProcess(state: GameState, numTicks = 1): void {
   const tortureChamberTypeId = roomRoleFindById('tortureChamber');
   if (!tortureChamberTypeId) return;
 
@@ -227,10 +227,10 @@ export function tortureChamberProcess(state: GameState): void {
       );
       if (!hasWorker) continue;
 
-      room.tortureJob.ticksRemaining -= 1;
+      room.tortureJob.ticksRemaining -= numTicks;
 
       // Add extra corruption while processing
-      resourceAdd('corruption', TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING);
+      resourceAdd('corruption', TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks);
 
       if (room.tortureJob.ticksRemaining <= 0) {
         const job = room.tortureJob;

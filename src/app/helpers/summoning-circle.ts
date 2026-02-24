@@ -234,7 +234,7 @@ export function summoningGetAdjacentRoomTypeIds(
  * Process all Summoning Circle rooms each tick.
  * Called inside updateGamestate — mutates state in-place.
  */
-export function summoningCircleProcess(state: GameState): void {
+export function summoningCircleProcess(state: GameState, numTicks = 1): void {
   const summoningCircleTypeId = roomRoleFindById('summoningCircle');
   if (!summoningCircleTypeId) return;
 
@@ -247,7 +247,7 @@ export function summoningCircleProcess(state: GameState): void {
 
       // Process active summon job
       if (room.summonJob) {
-        room.summonJob.ticksRemaining -= 1;
+        room.summonJob.ticksRemaining -= numTicks;
 
         if (room.summonJob.ticksRemaining <= 0) {
           const recipe = contentGetEntry<SummonRecipeContent>(
@@ -313,7 +313,7 @@ export function summoningCircleProcess(state: GameState): void {
     if (!inh.isTemporary || inh.temporaryTicksRemaining === undefined) continue;
     if (newTemporaryIds.has(inh.instanceId)) continue;
 
-    inh.temporaryTicksRemaining -= 1;
+    inh.temporaryTicksRemaining -= numTicks;
 
     if (inh.temporaryTicksRemaining <= 0) {
       summoningExpiredSubject.next({ inhabitantName: inh.name });

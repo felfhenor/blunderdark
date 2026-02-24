@@ -157,7 +157,7 @@ export function trainingGetProgressPercent(
  * Process training for all Training Grounds rooms.
  * Called each tick inside updateGamestate — mutates state in-place.
  */
-export function trainingProcess(state: GameState): void {
+export function trainingProcess(state: GameState, numTicks = 1): void {
   const trainingGroundsId = roomRoleFindById('trainingGrounds');
 
   for (const floor of state.world.floors) {
@@ -174,7 +174,7 @@ export function trainingProcess(state: GameState): void {
         if (inhabitant.assignedRoomId !== room.id) continue;
         if (inhabitant.trained) continue;
 
-        const progress = (inhabitant.trainingProgress ?? 0) + 1;
+        const progress = (inhabitant.trainingProgress ?? 0) + numTicks;
         inhabitant.trainingProgress = progress;
 
         if (progress >= targetTicks) {

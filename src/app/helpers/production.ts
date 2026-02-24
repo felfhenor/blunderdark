@@ -1014,7 +1014,7 @@ export const productionBreakdowns = computed(() => {
   );
 });
 
-export function productionProcess(state: GameState): void {
+export function productionProcess(state: GameState, numTicks = 1): void {
   const production = productionCalculateTotal(
     state.world.floors,
     state.clock.hour,
@@ -1025,6 +1025,6 @@ export function productionProcess(state: GameState): void {
     if (!amount || amount <= 0) continue;
     const resourceType = type as ResourceType;
 
-    resourceAdd(resourceType, amount);
+    resourceAdd(resourceType, amount * numTicks);
   }
 }

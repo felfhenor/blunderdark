@@ -234,7 +234,7 @@ export function alchemyLabGetAdjacentRoomTypeIds(
  * 3. If input consumed: increment progress.
  * 4. If progress >= target: add output resource, reset cycle (progress=0, inputConsumed=false).
  */
-export function alchemyLabProcess(state: GameState): void {
+export function alchemyLabProcess(state: GameState, numTicks = 1): void {
   const labTypeId = roomRoleFindById('alchemyLab');
   if (!labTypeId) return;
 
@@ -293,7 +293,7 @@ export function alchemyLabProcess(state: GameState): void {
       }
 
       // Step 2: Progress the conversion
-      conversion.progress += 1;
+      conversion.progress += numTicks;
 
       // Step 3: Complete the conversion
       if (conversion.progress >= conversion.targetTicks) {

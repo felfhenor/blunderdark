@@ -112,7 +112,7 @@ export function spawningPoolCreateInhabitant(
  * Process all spawning pools each tick. Called inside updateGamestate.
  * Decrements spawn timers and creates new inhabitants when ready.
  */
-export function spawningPoolProcess(state: GameState): void {
+export function spawningPoolProcess(state: GameState, numTicks = 1): void {
   const spawningPoolTypeId = roomRoleFindById('spawningPool');
   if (!spawningPoolTypeId) return;
 
@@ -139,7 +139,7 @@ export function spawningPoolProcess(state: GameState): void {
       }
 
       // Decrement timer
-      room.spawnTicksRemaining -= 1;
+      room.spawnTicksRemaining -= numTicks;
 
       if (room.spawnTicksRemaining <= 0) {
         // Reset timer

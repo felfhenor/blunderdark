@@ -150,7 +150,7 @@ export function trapWorkshopCanQueue(
 
 // --- Tick processing ---
 
-export function trapWorkshopProcess(state: GameState): void {
+export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
       if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
@@ -170,7 +170,7 @@ export function trapWorkshopProcess(state: GameState): void {
       if (assignedCount < 1) continue;
 
       const job = queue.jobs[0];
-      job.progress += 1;
+      job.progress += numTicks;
 
       if (job.progress >= job.targetTicks) {
         // Job complete: add to inventory and remove from queue
