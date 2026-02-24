@@ -107,7 +107,7 @@
       description: Library scholars identify optimal mining patterns.
   upgradePaths:
     - id: d042c9be-de98-4973-88c1-26dd20d3d739
-      name: Deep Vein Extraction
+      name: Deep Vein Mine
       description: Optimized mining techniques increase crystal yield by 50%.
       cost:
         crystals: 75
@@ -124,7 +124,7 @@
         - type: maxInhabitantBonus
           value: 2
     - id: a247b92c-7631-42b0-ad95-ea76ad2b864e
-      name: Crystal Resonance
+      name: Resonant Mine
       description: Harmonic crystal formations reduce fear in the mine and produce a small amount of flux.
       cost:
         crystals: 80
@@ -135,7 +135,7 @@
           value: 0.2
           resource: flux
     - id: 60431433-92ba-43c7-ad45-fb6b5aecb271
-      name: Corrupted Vein
+      name: Corrupted Mine
       description: Infuse the mine with dark energy. Crystal output doubles, but the corruption taints everything nearby.
       requiresDarkUpgrade: true
       cost:
@@ -182,7 +182,7 @@
       description: Forge warmth creates ideal growing conditions.
   upgradePaths:
     - id: 35ef7cb9-832a-4935-be46-ab19ae5e0ad3
-      name: Bountiful Harvest
+      name: Bountiful Grove
       description: Enhanced fungal cultivation techniques increase food yield by 50%.
       cost:
         gold: 60
@@ -191,7 +191,7 @@
           value: 1.5
           resource: food
     - id: 078aee06-566f-4e86-adbd-9d9c9a5b2bc4
-      name: Expanded Growth
+      name: Expanded Grove
       description: Extend the growing chambers to accommodate more workers, increasing capacity from 3 to 5.
       cost:
         gold: 50
@@ -207,7 +207,7 @@
         - type: fearReduction
           value: 1
     - id: 339a23a7-3753-4052-a388-6b7941e7c458
-      name: Blighted Growth
+      name: Blighted Grove
       description: Corrupt the fungi with dark spores. Massively boosts food output but produces corruption and unsettles nearby inhabitants.
       requiresDarkUpgrade: true
       cost:
@@ -263,7 +263,7 @@
       description: Adjacent libraries share knowledge and cross-reference tomes.
   upgradePaths:
     - id: 041042a7-c517-4fea-b8e7-c98df623d8fe
-      name: Arcane Focus
+      name: Arcane Library
       description: Enchanted reading lenses and amplified candlelight drastically improve research throughput.
       cost:
         gold: 100
@@ -283,7 +283,7 @@
         - type: maxInhabitantBonus
           value: 2
     - id: 421e6410-bb97-4694-afa8-dafbd2295036
-      name: Forbidden Knowledge
+      name: Forbidden Archives
       description: Unlock the darkest tomes. Greatly boosts research but intensifies the library's fearsome aura.
       cost:
         gold: 120
@@ -358,7 +358,7 @@
       description: Nearby wells create a spiritual resonance that amplifies essence flow.
   upgradePaths:
     - id: e795e43b-16cd-4a74-aed5-4977d275ce21
-      name: Necrotic Enhancement
+      name: Necrotic Well
       description: Deepen the well's connection to the spirit realm, boosting essence yield and allowing more workers to channel its power.
       cost:
         gold: 120
@@ -371,7 +371,7 @@
         - type: maxInhabitantBonus
           value: 1
     - id: 61d78e22-a230-4c66-80a1-60367cb543f1
-      name: Essence Mastery
+      name: Purified Well
       description: Purify the well's output for greater efficiency. The refined essence calms the surrounding area, reducing fear.
       cost:
         gold: 100
@@ -474,7 +474,7 @@
       description: Connected lakes form a larger ecosystem with more abundant catches.
   upgradePaths:
     - id: b7389938-e7a1-4c43-81b9-5161f4046f1a
-      name: Deep Fishing
+      name: Deepwater Lake
       description: Train fishers in deep-water techniques and install luminescent lures to dramatically increase the food catch.
       cost:
         gold: 80
@@ -667,7 +667,7 @@
       description: The Altar's dark power infuses training with mystical energy, granting +1 to all trained stats.
   upgradePaths:
     - id: 3d0d6ce5-3083-4ef5-824a-7199e7254b0d
-      name: Elite Training
+      name: Elite Arena
       description: Advanced combat techniques grant +1 attack in addition to +1 defense, but training takes 20% longer.
       cost:
         gold: 100
@@ -679,7 +679,7 @@
         - type: trainingTimeMultiplier
           value: 1.2
     - id: fb9d4aa3-0c93-4178-965d-70dddd13877d
-      name: Mass Training
+      name: Grand Arena
       description: Expanded training facilities increase capacity from 4 to 6 and reduce training time by 30%.
       cost:
         gold: 80
@@ -690,7 +690,7 @@
         - type: trainingTimeMultiplier
           value: 0.7
     - id: 24679551-a0b0-4bc0-82af-26bb4cd4b4ca
-      name: Specialized Drills
+      name: Drill Hall
       description: Intensive defensive drills grant an extra +1 defense bonus to trained inhabitants.
       cost:
         gold: 120
@@ -733,7 +733,7 @@
       description: Adjacent nexus points create a powerful ley line network with amplified output.
   upgradePaths:
     - id: 04da0e2b-8529-48ba-a176-d37b3697cc70
-      name: Flux Amplifier
+      name: Amplified Nexus
       description: Install crystalline focusing arrays that amplify the ley line's natural flux output.
       cost:
         gold: 120
@@ -753,7 +753,7 @@
         - type: maxInhabitantBonus
           value: 1
     - id: e52d3a63-cd44-4147-832b-342882f82c40
-      name: Arcane Overcharge
+      name: Overcharged Nexus
       description: Push the ley line beyond its natural limits. Dramatically increases flux output but the unstable energies create an unsettling atmosphere and generate research insights.
       cost:
         gold: 150
@@ -814,7 +814,7 @@
       description: Crystal Mine provides raw materials for trap mechanisms.
   upgradePaths:
     - id: 28f98e31-d05f-471d-b570-3eaa360de063
-      name: Master Trapper
+      name: Master Trapworks
       description: Expand the workshop to house more workers and unlock advanced trap designs.
       cost:
         gold: 120
@@ -826,7 +826,7 @@
         - type: craftingSpeedMultiplier
           value: 1.2
     - id: 970b9a58-445c-4d07-99e9-3236a88ea75f
-      name: Efficient Assembly
+      name: Streamlined Workshop
       description: Streamlined production techniques reduce crafting costs by 25% and time by 30%.
       cost:
         gold: 100
@@ -837,7 +837,7 @@
         - type: craftingSpeedMultiplier
           value: 0.7
     - id: d804977d-c0a0-4ef5-93db-eafa2c667490
-      name: Enchanted Traps
+      name: Arcane Trapworks
       description: Infuse crafted traps with elemental energy, adding bonus magical damage to all traps produced.
       cost:
         gold: 130
@@ -874,7 +874,7 @@
       description: Soul essence from the Well accelerates spawning.
   upgradePaths:
     - id: 05a95f1e-2b7a-4309-acfd-a960f9416612
-      name: Rapid Spawning
+      name: Teeming Pool
       description: Accelerated growth hormones reduce spawn time from 5 to 3 minutes and increase spawn capacity to 15.
       cost:
         gold: 100
@@ -888,7 +888,7 @@
         - type: maxInhabitantBonus
           value: 2
     - id: 8137978c-7955-4e5a-bf86-6fbd4af6141f
-      name: Dark Spawning
+      name: Dark Pool
       description: Corrupt the pool with dark energy to spawn Skeletons instead of Goblins. The undead aura increases room fear.
       cost:
         gold: 100
@@ -928,7 +928,7 @@
       description: Library knowledge improves breeding recipe accuracy.
   upgradePaths:
     - id: 1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
-      name: Enhanced Incubators
+      name: Incubation Chamber
       description: Improved incubation chambers reduce hybrid breeding time by 30% and increase room capacity by 2.
       cost:
         gold: 150
@@ -940,7 +940,7 @@
         - type: maxInhabitantBonus
           value: 2
     - id: 2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
-      name: Mutation Amplifier
+      name: Mutagenic Pits
       description: Amplified mutagenic fields increase the chance of positive mutations by 15% and boost stat bonuses.
       cost:
         gold: 130
@@ -977,7 +977,7 @@
       description: Soul essence from the Well stabilizes planar connections.
   upgradePaths:
     - id: 9a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
-      name: Greater Summoning
+      name: Greater Circle
       description: Unlock advanced summoning recipes, allowing access to more powerful creatures.
       cost:
         gold: 200
@@ -996,7 +996,7 @@
         - type: maxInhabitantBonus
           value: 1
     - id: bc4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
-      name: Binding Mastery
+      name: Binding Circle
       description: Master the art of planar binding. Temporary summons last 50% longer and permanent summons gain +1 to all stats.
       cost:
         gold: 180
@@ -1034,7 +1034,7 @@
       description: Fresh mushroom substrate aids in reagent preparation.
   upgradePaths:
     - id: c3b02001-0002-4001-8001-000000000001
-      name: Efficient Distillation
+      name: Distillery
       description: Refine the conversion process to use fewer raw materials per cycle. Reduces input costs to 3 Crystals + 3 Food per Flux.
       cost:
         gold: 100
@@ -1043,7 +1043,7 @@
         - type: alchemyCostMultiplier
           value: 0.6
     - id: c3b02001-0002-4001-8001-000000000002
-      name: Advanced Alchemy
+      name: Advanced Laboratory
       description: Unlock advanced transmutation recipes for producing Essence and concentrated Flux from exotic inputs.
       cost:
         gold: 120
@@ -1053,7 +1053,7 @@
         - type: alchemyTierUnlock
           value: 1
     - id: c3b02001-0002-4001-8001-000000000003
-      name: Expanded Capacity
+      name: Expanded Laboratory
       description: Add additional workstations, increasing the lab's inhabitant capacity from 1 to 3.
       cost:
         gold: 80
@@ -1121,7 +1121,7 @@
       description: Military discipline from the Barracks aids in prisoner control.
   upgradePaths:
     - id: 744ed99e-a98a-419e-9b8a-70ffca75c3f5
-      name: Grand Inquisitor
+      name: Inquisitor's Chamber
       description: A master interrogator oversees the chamber, halving processing time and boosting conversion odds by 25%.
       cost:
         gold: 120
@@ -1134,7 +1134,7 @@
         - type: maxInhabitantBonus
           value: 1
     - id: 486e229e-c186-4d74-a71e-79010c9b6bdf
-      name: Corruption Engine
+      name: Corruption Chamber
       description: Dark machinery amplifies the chamber's corrupting influence, doubling corruption output.
       cost:
         gold: 100
@@ -1144,7 +1144,7 @@
           value: 2.0
           resource: corruption
     - id: f5a2a50a-4d0e-47fb-b860-3b41c1a86529
-      name: Fear Amplifier
+      name: Dread Chamber
       description: Screaming echoes and dread enchantments push fear to nightmarish levels.
       cost:
         gold: 150
