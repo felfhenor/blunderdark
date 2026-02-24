@@ -288,9 +288,8 @@
       bonusType: craftingSpeed
       value: 0.25
       description: +25% crafting speed in all workshops
-    - type: feature_flag
-      featureFlag: feature_dragons_hoard
-      description: Unlocks Dragon's Hoard Core prestige feature
+    - type: roomfeature
+      targetFeatureId: "Dragon's Hoard Core"
   tier: 5
   requiredTicks: 750
 

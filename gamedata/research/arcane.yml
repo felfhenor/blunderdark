@@ -132,9 +132,12 @@
   prerequisiteResearchIds:
     - Enchantment
   unlocks:
-    - type: feature_flag
-      featureFlag: feature_advanced_room_mods
-      description: Unlocks Training Station, Corruption Seal, and Resource Converter room features
+    - type: roomfeature
+      targetFeatureId: Training Station
+    - type: roomfeature
+      targetFeatureId: Corruption Seal
+    - type: roomfeature
+      targetFeatureId: Resource Converter
   tier: 3
   requiredTicks: 300
 
@@ -173,9 +176,8 @@
       bonusType: fluxProduction
       value: 0.20
       description: +20% flux production from all sources
-    - type: feature_flag
-      featureFlag: feature_time_dilation
-      description: Unlocks Time Dilation Field prestige feature
+    - type: roomfeature
+      targetFeatureId: Time Dilation Field
   tier: 4
   requiredTicks: 500
 
@@ -214,9 +216,8 @@
       bonusType: researchSpeed
       value: 0.10
       description: +10% research speed
-    - type: feature_flag
-      featureFlag: feature_elder_runes
-      description: Unlocks Elder Runes prestige feature
+    - type: roomfeature
+      targetFeatureId: Elder Runes
   tier: 4
   requiredTicks: 500
 

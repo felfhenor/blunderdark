@@ -83,9 +83,8 @@
     - type: feature_flag
       featureFlag: biome_corrupted
       description: Corrupted Biome
-    - type: feature_flag
-      featureFlag: feature_fungal_network
-      description: Unlocks Fungal Network room feature
+    - type: roomfeature
+      targetFeatureId: Fungal Network
   tier: 2
   requiredTicks: 150
 
@@ -105,9 +104,8 @@
       bonusType: undeadEfficiency
       value: 0.20
       description: +20% undead worker efficiency
-    - type: feature_flag
-      featureFlag: feature_phylactery
-      description: Unlocks Phylactery prestige feature
+    - type: roomfeature
+      targetFeatureId: Phylactery
   tier: 3
   requiredTicks: 300
 
@@ -204,9 +202,8 @@
       bonusType: essenceProduction
       value: 0.25
       description: +25% essence production from all sources
-    - type: feature_flag
-      featureFlag: feature_void_gate
-      description: Unlocks Void Gate prestige feature
+    - type: roomfeature
+      targetFeatureId: Void Gate
   tier: 5
   requiredTicks: 750
 

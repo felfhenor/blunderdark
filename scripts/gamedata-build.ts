@@ -263,6 +263,7 @@ const validateResearchTree = () => {
         inhabitant: 'targetInhabitantId',
         ability: 'targetCombatabilityId',
         upgrade: 'targetUpgradepathId',
+        roomfeature: 'targetFeatureId',
       };
       const targetField = targetFieldMap[unlock.type];
       const targetId = targetField ? unlock[targetField] : undefined;

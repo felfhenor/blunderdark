@@ -94,6 +94,7 @@ export function defaultUnlockedContent(): UnlockedContent {
     upgrades: [],
     passiveBonuses: [],
     featureFlags: [],
+    roomfeatures: [],
   };
 }
 
@@ -103,10 +104,7 @@ export function defaultUnlockedContent(): UnlockedContent {
  * @param depth Floor depth (defaults to 1)
  * @param biome Floor biome (defaults to 'neutral')
  */
-export function defaultFloor(
-  depth = 1,
-  biome: BiomeType = 'neutral',
-): Floor {
+export function defaultFloor(depth = 1, biome: BiomeType = 'neutral'): Floor {
   return {
     id: rngUuid<FloorId>(),
     name: `Floor ${depth}`,

@@ -14,9 +14,8 @@
   unlocks:
     - type: room
       targetRoomId: Soul Well
-    - type: feature_flag
-      featureFlag: feature_blood_altar
-      description: Unlocks Blood Altar room feature
+    - type: roomfeature
+      targetFeatureId: Blood Altar
   tier: 1
   requiredTicks: 50
 
@@ -31,9 +30,8 @@
   unlocks:
     - type: room
       targetRoomId: Shadow Library
-    - type: feature_flag
-      featureFlag: feature_arcane_crystals
-      description: Unlocks Arcane Crystals room feature
+    - type: roomfeature
+      targetFeatureId: Arcane Crystals
   tier: 1
   requiredTicks: 50
 
@@ -50,9 +48,8 @@
       targetRoomId: Dark Forge
     - type: room
       targetRoomId: Barracks
-    - type: feature_flag
-      featureFlag: feature_geothermal_vents
-      description: Unlocks Geothermal Vents room feature
+    - type: roomfeature
+      targetFeatureId: Geothermal Vents
   tier: 1
   requiredTicks: 50
 

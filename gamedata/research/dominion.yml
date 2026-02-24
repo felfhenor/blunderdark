@@ -141,9 +141,12 @@
   prerequisiteResearchIds:
     - Martial Training
   unlocks:
-    - type: feature_flag
-      featureFlag: feature_room_enhancement
-      description: Unlocks Storage Expansion, Efficiency Enchantment, and Fear Ward room features
+    - type: roomfeature
+      targetFeatureId: Storage Expansion
+    - type: roomfeature
+      targetFeatureId: Efficiency Enchantment
+    - type: roomfeature
+      targetFeatureId: Fear Ward
   tier: 3
   requiredTicks: 300
 

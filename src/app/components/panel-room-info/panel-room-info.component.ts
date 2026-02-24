@@ -1,5 +1,10 @@
 import { DecimalPipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
@@ -48,6 +53,8 @@ import {
   featureIsUniquePlaced,
   featureGetResourceConverterEfficiency,
   researchUnlockIsFeatureUnlocked,
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
   resourceCanAfford,
   resourcePayCost,
   updateGamestate,
@@ -63,7 +70,12 @@ import {
   transportElevatorExtendExecute,
   transportElevatorShrinkExecute,
 } from '@helpers/transport-placement';
-import type { InhabitantInstance, PlacedRoomId, RoomUpgradeEffect, RoomUpgradePath } from '@interfaces';
+import type {
+  InhabitantInstance,
+  PlacedRoomId,
+  RoomUpgradeEffect,
+  RoomUpgradePath,
+} from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { ResourceType } from '@interfaces/resource';
@@ -74,7 +86,19 @@ import { startCase } from 'es-toolkit';
 
 @Component({
   selector: 'app-panel-room-info',
-  imports: [DecimalPipe, NgClass, SweetAlert2Module, CurrencyCostComponent, FearBreakdownTooltipComponent, InhabitantCardComponent, StatNameComponent, TippyDirective, ModalComponent, SynergyTooltipComponent, UpgradeEffectBadgeComponent],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    SweetAlert2Module,
+    CurrencyCostComponent,
+    FearBreakdownTooltipComponent,
+    InhabitantCardComponent,
+    StatNameComponent,
+    TippyDirective,
+    ModalComponent,
+    SynergyTooltipComponent,
+    UpgradeEffectBadgeComponent,
+  ],
   templateUrl: './panel-room-info.component.html',
   styleUrl: './panel-room-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -119,10 +143,14 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return undefined;
     const placedRoom = room.placedRoom;
-    if (!placedRoom.transportType || !placedRoom.transportGroupId) return undefined;
+    if (!placedRoom.transportType || !placedRoom.transportGroupId)
+      return undefined;
 
     const state = gamestate();
-    const groups = verticalTransportGetGroupsOnFloor(state.world.floors, floorCurrent()?.depth ?? 0);
+    const groups = verticalTransportGetGroupsOnFloor(
+      state.world.floors,
+      floorCurrent()?.depth ?? 0,
+    );
     const group = groups.find((g) => g.room.id === placedRoom.id);
 
     return {
@@ -154,7 +182,10 @@ export class PanelRoomInfoComponent {
     const info = this.transportInfo();
     if (!info || info.type !== 'elevator') return;
 
-    const result = await transportElevatorExtendExecute(info.groupId, direction);
+    const result = await transportElevatorExtendExecute(
+      info.groupId,
+      direction,
+    );
     if (result.success) {
       notifySuccess(`Elevator extended ${direction}`);
     } else {
@@ -166,7 +197,10 @@ export class PanelRoomInfoComponent {
     const info = this.transportInfo();
     if (!info || info.type !== 'elevator') return;
 
-    const result = await transportElevatorShrinkExecute(info.groupId, floorDepth);
+    const result = await transportElevatorShrinkExecute(
+      info.groupId,
+      floorDepth,
+    );
     if (result.success) {
       notifySuccess(`Elevator floor removed`);
     } else {
@@ -184,7 +218,9 @@ export class PanelRoomInfoComponent {
         const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return { instance: i, name: i.name, def };
       })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
+      .filter(
+        (e): e is typeof e & { def: InhabitantContent } => e.def !== undefined,
+      );
     return sortBy(entries, [(e) => e.def.name]);
   });
 
@@ -207,7 +243,8 @@ export class PanelRoomInfoComponent {
     if (!room) return undefined;
 
     const roomDef = productionGetRoomDefinition(room.roomTypeId);
-    if (!roomDef?.production || Object.keys(roomDef.production).length === 0) return undefined;
+    if (!roomDef?.production || Object.keys(roomDef.production).length === 0)
+      return undefined;
 
     return efficiencyCalculateRoom(room.placedRoom, this.inhabitants());
   });
@@ -228,23 +265,32 @@ export class PanelRoomInfoComponent {
     const breakdown = this.fearBreakdown();
     if (!breakdown) return '';
     switch (breakdown.effectiveFear) {
-      case 0: return 'opacity-50';
-      case 1: return 'text-success';
-      case 2: return 'text-warning';
-      case 3: return 'text-orange-400';
-      case 4: return 'text-error';
-      default: return '';
+      case 0:
+        return 'opacity-50';
+      case 1:
+        return 'text-success';
+      case 2:
+        return 'text-warning';
+      case 3:
+        return 'text-orange-400';
+      case 4:
+        return 'text-error';
+      default:
+        return '';
     }
   });
 
   // --- Room Upgrades ---
 
-  public roomUpgradesUnlocked = computed(() => researchUnlockIsFeatureUnlocked('room_upgrades'));
+  public roomUpgradesUnlocked = computed(() =>
+    researchUnlockIsFeatureUnlocked('room_upgrades'),
+  );
 
   public visibleUpgrades = computed(() => {
     const room = this.selectedRoom();
     if (!room) return [];
-    const darkUpgradeUnlocked = gamestate().world.corruptionEffects.darkUpgradeUnlocked;
+    const darkUpgradeUnlocked =
+      gamestate().world.corruptionEffects.darkUpgradeUnlocked;
     return roomUpgradeGetVisible(room.placedRoom, darkUpgradeUnlocked);
   });
 
@@ -275,10 +321,15 @@ export class PanelRoomInfoComponent {
     }
   }
 
-  public getUpgradeCostEntries(path: RoomUpgradePath): { type: ResourceType; amount: number }[] {
+  public getUpgradeCostEntries(
+    path: RoomUpgradePath,
+  ): { type: ResourceType; amount: number }[] {
     return Object.entries(path.cost)
       .filter(([, v]) => v !== undefined && v > 0)
-      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
+      .map(([type, amount]) => ({
+        type: type as ResourceType,
+        amount: amount as number,
+      }));
   }
 
   public canAffordUpgrade(path: RoomUpgradePath): boolean {
@@ -289,8 +340,13 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const darkUpgradeUnlocked = gamestate().world.corruptionEffects.darkUpgradeUnlocked;
-    const validation = roomUpgradeCanApply(room.placedRoom, path.id, darkUpgradeUnlocked);
+    const darkUpgradeUnlocked =
+      gamestate().world.corruptionEffects.darkUpgradeUnlocked;
+    const validation = roomUpgradeCanApply(
+      room.placedRoom,
+      path.id,
+      darkUpgradeUnlocked,
+    );
     if (!validation.valid) {
       notifyError(validation.reason ?? 'Cannot apply upgrade');
       return;
@@ -311,9 +367,7 @@ export class PanelRoomInfoComponent {
       const newFloors = s.world.floors.map((floor) => ({
         ...floor,
         rooms: floor.rooms.map((r) =>
-          r.id === room.id
-            ? roomUpgradeApply(r, path.id)
-            : r,
+          r.id === room.id ? roomUpgradeApply(r, path.id) : r,
         ),
       }));
       return {
@@ -335,9 +389,7 @@ export class PanelRoomInfoComponent {
     const entries = this.inhabitants()
       .filter((i) => {
         if (i.assignedRoomId !== undefined) return false;
-        const def = contentGetEntry<InhabitantContent>(
-          i.definitionId,
-        );
+        const def = contentGetEntry<InhabitantContent>(i.definitionId);
         return def
           ? inhabitantMeetsRestriction(def, roomDef.inhabitantRestriction)
           : false;
@@ -368,8 +420,7 @@ export class PanelRoomInfoComponent {
 
     const connections = connectionGetRoomConnections(floor, room.id);
     const entries = connections.map((conn) => {
-      const otherId =
-        conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
+      const otherId = conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
       return {
         connectionId: conn.id,
         otherRoomId: otherId,
@@ -404,8 +455,13 @@ export class PanelRoomInfoComponent {
   public featureRemoveSlotIndex = 0;
 
   public availableFeatures = computed(() => {
-    const allFeatures = contentGetEntriesByType<FeatureContent>('feature')
-      .filter((f) => !f.requiredFeatureFlag || researchUnlockIsFeatureUnlocked(f.requiredFeatureFlag));
+    const allFeatures = contentGetEntriesByType<FeatureContent>(
+      'feature',
+    ).filter(
+      (f) =>
+        !researchUnlockIsResearchGated('roomfeature', f.id) ||
+        researchUnlockIsUnlocked('roomfeature', f.id),
+    );
     const resources = gamestate().world.resources;
 
     const entries = allFeatures.map((f) => {
@@ -421,7 +477,10 @@ export class PanelRoomInfoComponent {
       }
       const costEntries = Object.entries(f.cost)
         .filter(([, v]) => v !== undefined && v > 0)
-        .map(([type, amount]) => ({ type: type as ResourceType, amount: amount as number }));
+        .map(([type, amount]) => ({
+          type: type as ResourceType,
+          amount: amount as number,
+        }));
       return { feature: f, affordable, shortfall, costEntries };
     });
     return sortBy(entries, [(e) => e.feature.name]);
@@ -429,7 +488,14 @@ export class PanelRoomInfoComponent {
 
   // --- Resource Converter ---
 
-  private readonly CONVERTIBLE_RESOURCES: ResourceType[] = ['crystals', 'food', 'gold', 'flux', 'research', 'essence'];
+  private readonly CONVERTIBLE_RESOURCES: ResourceType[] = [
+    'crystals',
+    'food',
+    'gold',
+    'flux',
+    'research',
+    'essence',
+  ];
 
   public hasResourceConverter = computed(() => {
     const room = this.selectedRoom();
@@ -458,7 +524,9 @@ export class PanelRoomInfoComponent {
     return this.CONVERTIBLE_RESOURCES.filter((r) => !producedTypes.includes(r));
   });
 
-  public async onSetConvertedResource(resourceType: string | undefined): Promise<void> {
+  public async onSetConvertedResource(
+    resourceType: string | undefined,
+  ): Promise<void> {
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -565,9 +633,7 @@ export class PanelRoomInfoComponent {
 
     const parts: string[] = [];
 
-    const refundEntries = Object.entries(info.refund).filter(
-      ([, v]) => v > 0,
-    );
+    const refundEntries = Object.entries(info.refund).filter(([, v]) => v > 0);
     if (refundEntries.length > 0) {
       const refundStr = refundEntries
         .map(([type, amount]) => `${amount} ${type}`)
@@ -619,7 +685,9 @@ export class PanelRoomInfoComponent {
     if (feature.unique) {
       const state = gamestate();
       if (state && featureIsUniquePlaced(state.world.floors, featureId)) {
-        notifyError(`${feature.name} is unique and already placed in the dungeon`);
+        notifyError(
+          `${feature.name} is unique and already placed in the dungeon`,
+        );
         return;
       }
     }

@@ -258,6 +258,10 @@ export class GameResearchComponent {
         return { type: 'Bonus', name: unlock.description };
       case 'feature_flag':
         return { type: 'Feature', name: unlock.description };
+      case 'roomfeature': {
+        const entry = contentGetEntry(unlock.targetFeatureId);
+        return { type: 'Room Feature', name: entry?.name ?? 'Unknown' };
+      }
     }
   }
 

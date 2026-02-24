@@ -34,7 +34,6 @@
   name: Arcane Crystals
   description: 'Pulsing crystal formations that channel raw magical energy, generating flux and amplifying magic-related production.'
   category: environmental
-  requiredFeatureFlag: feature_arcane_crystals
   cost:
     gold: 75
     crystals: 20
@@ -52,7 +51,6 @@
   name: Blood Altar
   description: 'A dark sacrificial altar that generates corruption passively and allows food sacrifices for temporary power boosts.'
   category: environmental
-  requiredFeatureFlag: feature_blood_altar
   cost:
     gold: 100
     essence: 25
@@ -65,7 +63,6 @@
   name: Geothermal Vents
   description: 'Natural volcanic fissures that supercharge production and imbue defenders with fire damage capabilities.'
   category: environmental
-  requiredFeatureFlag: feature_geothermal_vents
   cost:
     gold: 80
     crystals: 15
@@ -82,7 +79,6 @@
   name: Fungal Network
   description: 'An interconnected mycelium web that enables instant inhabitant transfer between rooms with matching networks.'
   category: environmental
-  requiredFeatureFlag: feature_fungal_network
   cost:
     gold: 60
     food: 20

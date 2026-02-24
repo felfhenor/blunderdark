@@ -9,6 +9,7 @@ import type {
 } from '@interfaces';
 import { getUnlockTargetId } from '@interfaces/research';
 import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { FeatureId } from '@interfaces/content-feature';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { RoomId } from '@interfaces/content-room';
 import type { UpgradePathId } from '@interfaces/room';
@@ -85,8 +86,8 @@ export function researchUnlockGetPassiveBonusWithMastery(
  * Check if content of a given type and ID is unlocked.
  */
 export function researchUnlockIsUnlocked(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
-  id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId,
+  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
+  id: RoomId | InhabitantId | CombatAbilityId | UpgradePathId | FeatureId,
   unlockedContent?: UnlockedContent,
 ): boolean {
   const content = unlockedContent ?? gamestate().world.research.unlockedContent;
@@ -99,6 +100,8 @@ export function researchUnlockIsUnlocked(
       return content.abilities.includes(id as CombatAbilityId);
     case 'upgrade':
       return content.upgrades.includes(id as UpgradePathId);
+    case 'roomfeature':
+      return (content.roomfeatures ?? []).includes(id as FeatureId);
   }
 }
 
@@ -142,7 +145,7 @@ export const researchUnlockedContent = computed<UnlockedContent>(() => {
  * Used for UI display ("Requires: [Research Name]").
  */
 export function researchUnlockGetRequiredResearchName(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
+  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
   id: string,
 ): string | undefined {
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
@@ -160,7 +163,7 @@ export function researchUnlockGetRequiredResearchName(
  * Check if a room requires research to unlock (i.e., is referenced in any research node's unlocks).
  */
 export function researchUnlockIsResearchGated(
-  type: 'room' | 'inhabitant' | 'ability' | 'upgrade',
+  type: 'room' | 'inhabitant' | 'ability' | 'upgrade' | 'roomfeature',
   id: string,
 ): boolean {
   const allNodes = contentGetEntriesByType<ResearchContent>('research');
@@ -188,6 +191,7 @@ export function researchUnlockApplyEffects(
     upgrades: [...current.upgrades],
     passiveBonuses: [...current.passiveBonuses],
     featureFlags: [...(current.featureFlags ?? [])],
+    roomfeatures: [...(current.roomfeatures ?? [])],
   };
 
   for (const unlock of unlocks) {
@@ -231,6 +235,14 @@ export function researchUnlockApplyEffects(
       case 'feature_flag':
         if (!result.featureFlags.includes(unlock.featureFlag)) {
           result.featureFlags = [...result.featureFlags, unlock.featureFlag];
+        }
+        break;
+      case 'roomfeature':
+        if (!result.roomfeatures.includes(unlock.targetFeatureId)) {
+          result.roomfeatures = [
+            ...result.roomfeatures,
+            unlock.targetFeatureId,
+          ];
         }
         break;
     }

@@ -111,7 +111,9 @@ export class NotifyService {
           ? 'Creature'
           : unlock.type === 'ability'
             ? 'Ability'
-            : 'Upgrade';
+            : unlock.type === 'roomfeature'
+              ? 'Room Feature'
+              : 'Upgrade';
 
     return `${label}: ${entry?.name ?? targetId}`;
   }

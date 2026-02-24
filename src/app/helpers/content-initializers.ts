@@ -18,6 +18,7 @@ import type {
   ReputationEffectContent,
   ReputationEffectId,
   ResearchContent,
+  RoomFeatureUnlock,
   RoomShapeContent,
   RoomUnlock,
   Season,
@@ -180,7 +181,6 @@ function ensureFeature(feature: Partial<FeatureContent>): FeatureContent {
     })),
     unique: feature.unique ?? undefined,
     maintenanceCost: feature.maintenanceCost ?? undefined,
-    requiredFeatureFlag: feature.requiredFeatureFlag ?? undefined,
   };
 }
 
@@ -267,10 +267,15 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
     case 'feature_flag':
       return {
         type: 'feature_flag',
-        featureFlag:
-          (effect as Partial<FeatureFlagUnlock>).featureFlag ?? '',
-        description:
-          (effect as Partial<FeatureFlagUnlock>).description ?? '',
+        featureFlag: (effect as Partial<FeatureFlagUnlock>).featureFlag ?? '',
+        description: (effect as Partial<FeatureFlagUnlock>).description ?? '',
+      };
+    case 'roomfeature':
+      return {
+        type: 'roomfeature',
+        targetFeatureId:
+          (effect as Partial<RoomFeatureUnlock>).targetFeatureId ??
+          ('' as FeatureId),
       };
   }
 }
@@ -361,10 +366,7 @@ function ensureInhabitantTrait(
   };
 }
 
-function defaultFusionPassChance(
-  rarity: string,
-  isNegative?: boolean,
-): number {
+function defaultFusionPassChance(rarity: string, isNegative?: boolean): number {
   switch (rarity) {
     case 'common':
       return isNegative ? 60 : 50;
@@ -395,7 +397,8 @@ function ensureMutationTrait(
     rarity,
     isNegative: trait.isNegative ?? undefined,
     fusionPassChance:
-      trait.fusionPassChance ?? defaultFusionPassChance(rarity, trait.isNegative),
+      trait.fusionPassChance ??
+      defaultFusionPassChance(rarity, trait.isNegative),
   };
 }
 

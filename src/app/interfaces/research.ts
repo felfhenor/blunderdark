@@ -1,4 +1,5 @@
 import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { FeatureId } from '@interfaces/content-feature';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { ResearchId } from '@interfaces/content-research';
 import type { RoomId } from '@interfaces/content-room';
@@ -39,13 +40,19 @@ export type FeatureFlagUnlock = {
   description: string;
 };
 
+export type RoomFeatureUnlock = {
+  type: 'roomfeature';
+  targetFeatureId: FeatureId;
+};
+
 export type UnlockEffect =
   | RoomUnlock
   | InhabitantUnlock
   | AbilityUnlock
   | UpgradeUnlock
   | PassiveBonusUnlock
-  | FeatureFlagUnlock;
+  | FeatureFlagUnlock
+  | RoomFeatureUnlock;
 
 export type UnlockedContent = {
   rooms: RoomId[];
@@ -54,6 +61,7 @@ export type UnlockedContent = {
   upgrades: UpgradePathId[];
   passiveBonuses: { bonusType: string; value: number; description: string }[];
   featureFlags: string[];
+  roomfeatures: FeatureId[];
 };
 
 export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
@@ -66,6 +74,8 @@ export function getUnlockTargetId(unlock: UnlockEffect): string | undefined {
       return unlock.targetCombatabilityId;
     case 'upgrade':
       return unlock.targetUpgradepathId;
+    case 'roomfeature':
+      return unlock.targetFeatureId;
     case 'passive_bonus':
     case 'feature_flag':
       return undefined;
