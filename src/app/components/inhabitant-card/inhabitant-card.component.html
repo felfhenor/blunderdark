@@ -1,44 +1,58 @@
 @if (compact()) {
   <!-- Compact mode -->
-  <div class="compact-card flex items-center gap-2">
-    <span class="badge badge-xs badge-outline">
-      T{{ definition().tier | number: '1.0-0' }}
-    </span>
-    <div class="flex flex-col min-w-0">
-      @if (showInstanceName()) {
-        <span class="text-xs font-semibold truncate">
-          {{ instance().name }}
+  <div class="compact-card">
+    <div class="flex items-center gap-2">
+      @if (showTier()) {
+        <span class="badge badge-xs badge-outline">
+          T{{ definition().tier | number: '1.0-0' }}
         </span>
       }
-      @if (showDefinitionName()) {
-        <span class="text-xs truncate" [class.opacity-50]="showInstanceName()">
-          {{ definition().name }}
+      <div class="flex flex-col min-w-0">
+        @if (showInstanceName()) {
+          <span class="text-xs font-semibold truncate">
+            {{ instance().name }}
+          </span>
+        }
+        @if (showDefinitionName()) {
+          <span class="text-xs truncate" [class.opacity-50]="showInstanceName()">
+            {{ definition().name }}
+          </span>
+        }
+      </div>
+      @if (showHybridBadge() && instance().isHybrid) {
+        <span class="badge badge-xs badge-secondary">Hybrid</span>
+      }
+      @if (showAssignment() && instance().assignedRoomId) {
+        <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
+      }
+      @if (showState() && instance().state !== 'normal') {
+        <span class="badge badge-xs" [ngClass]="stateClass()">
+          {{ instance().state }}
         </span>
+      }
+      @if (showHunger()) {
+        <app-hunger-indicator [inhabitantId]="instance().instanceId" />
+      }
+      @if (synergyInfo(); as reasons) {
+        <span class="ml-auto text-success" [tp]="synergyTip">
+          <app-icon name="tablerStar" size="14px" />
+        </span>
+        <ng-template #synergyTip>
+          @for (reason of reasons; track reason) {
+            <div class="text-xs">{{ reason }}</div>
+          }
+        </ng-template>
       }
     </div>
-    @if (showHybridBadge() && instance().isHybrid) {
-      <span class="badge badge-xs badge-secondary">Hybrid</span>
-    }
-    @if (showAssignment() && instance().assignedRoomId) {
-      <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
-    }
-    @if (showState() && instance().state !== 'normal') {
-      <span class="badge badge-xs" [ngClass]="stateClass()">
-        {{ instance().state }}
-      </span>
-    }
-    @if (showHunger()) {
-      <app-hunger-indicator [inhabitantId]="instance().instanceId" />
-    }
-    @if (synergyInfo(); as reasons) {
-      <span class="ml-auto text-success" [tp]="synergyTip">
-        <app-icon name="tablerStar" size="14px" />
-      </span>
-      <ng-template #synergyTip>
-        @for (reason of reasons; track reason) {
-          <div class="text-xs">{{ reason }}</div>
-        }
-      </ng-template>
+    @if (showStats()) {
+      <div class="flex items-center mt-0.5">
+        <app-stat-row
+          class="text-xs opacity-70"
+          [stats]="effectiveStats()"
+          [baseStats]="definition().stats"
+          [showWorkerEfficiency]="showWorkerEfficiency()"
+        />
+      </div>
     }
   </div>
 } @else {
@@ -47,9 +61,11 @@
     <!-- Row 1: Tier + Names + State + Synergy -->
     <div class="flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
-        <span class="badge badge-xs badge-outline">
-          T{{ definition().tier | number: '1.0-0' }}
-        </span>
+        @if (showTier()) {
+          <span class="badge badge-xs badge-outline">
+            T{{ definition().tier | number: '1.0-0' }}
+          </span>
+        }
         <div class="flex flex-col min-w-0">
           @if (showInstanceName()) {
             <span class="text-xs font-semibold truncate">

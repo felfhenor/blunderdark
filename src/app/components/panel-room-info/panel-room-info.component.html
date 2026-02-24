@@ -362,19 +362,9 @@
       }
 
       @if (room.maxInhabitants !== 0) {
-        <div class="divider my-2 text-xs opacity-60">
-          Inhabitants
-          <span>
-            {{ inhabitantCount() | number: '1.0-0' }}/{{
-              room.maxInhabitants === -1 ? 'Unlimited' : room.maxInhabitants
-            }}
-          </span>
-        </div>
+        <div class="divider my-2 text-xs opacity-60">Inhabitants</div>
 
         @if (assignedInhabitants().length > 0) {
-          <div class="divider my-1 text-xs opacity-60">
-            Assigned Inhabitants
-          </div>
           <div class="flex flex-col gap-1">
             @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
               <div class="flex items-center justify-between gap-2">
@@ -383,6 +373,7 @@
                   [instance]="inh.instance"
                   [definition]="inh.def"
                   [compact]="true"
+                  [showTier]="false"
                   [showAssignment]="false"
                   [showHybridBadge]="true"
                 />
@@ -400,46 +391,12 @@
         @if (
           room.maxInhabitants === -1 || inhabitantCount() < room.maxInhabitants
         ) {
-          <div class="divider my-1 text-xs opacity-60">
-            Possible Inhabitants
-          </div>
-          @if (eligibleUnassigned().length > 0) {
-            <div class="flex flex-col gap-2 max-h-[7.5rem] overflow-y-auto">
-              @for (
-                inh of eligibleUnassigned();
-                track inh.instance.instanceId
-              ) {
-                <button
-                  class="btn btn-sm btn-outline btn-success w-full h-auto py-1 justify-between"
-                  (click)="onAssignInhabitant(inh.instance.instanceId)"
-                >
-                  <div class="flex flex-col items-start min-w-0">
-                    <span class="text-xs font-semibold truncate">
-                      {{ inh.instance.name }}
-                    </span>
-                    <span class="text-xs opacity-50 truncate">
-                      {{ inh.def.name }}
-                    </span>
-                  </div>
-                  @if (synergyMatch(inh.instance, inh.def); as reasons) {
-                    <span
-                      class="text-success flex-shrink-0"
-                      [tp]="synergyTipTpl"
-                    >
-                      <app-icon name="tablerStar" size="16px" />
-                    </span>
-                    <ng-template #synergyTipTpl>
-                      @for (reason of reasons; track reason) {
-                        <div class="text-xs">{{ reason }}</div>
-                      }
-                    </ng-template>
-                  }
-                </button>
-              }
-            </div>
-          } @else {
-            <p class="text-xs opacity-50">No eligible inhabitants available.</p>
-          }
+          <button
+            class="btn btn-xs btn-outline btn-accent w-full"
+            (click)="showInhabitantSelect.set(true)"
+          >
+            + Add Inhabitant
+          </button>
         }
       }
 
@@ -686,6 +643,47 @@
     </div>
     <div actions>
       <button class="btn btn-sm" (click)="showFeatureSelect.set(false)">
+        Cancel
+      </button>
+    </div>
+  </app-modal>
+
+  <!-- Inhabitant selection modal -->
+  <app-modal [(visible)]="showInhabitantSelect">
+    <span title>Add Inhabitant</span>
+    <div body>
+      @if (eligibleUnassigned().length === 0) {
+        <p class="text-sm opacity-50">No eligible inhabitants available.</p>
+      } @else {
+        <div class="flex flex-col gap-2 max-h-64 overflow-y-auto">
+          @for (inh of eligibleUnassigned(); track inh.instance.instanceId) {
+            <div class="card card-compact bg-base-200">
+              <div class="card-body p-3">
+                <div class="flex items-start justify-between gap-2">
+                  <app-inhabitant-card
+                    class="flex-1 min-w-0"
+                    [instance]="inh.instance"
+                    [definition]="inh.def"
+                    [showHunger]="true"
+                    [showAssignment]="false"
+                    [showHybridBadge]="true"
+                    [synergyRoomId]="selectedRoom()?.id"
+                  />
+                  <button
+                    class="btn btn-xs btn-primary flex-shrink-0"
+                    (click)="onAssignInhabitant(inh.instance.instanceId); showInhabitantSelect.set(false)"
+                  >
+                    Choose
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div actions>
+      <button class="btn btn-sm" (click)="showInhabitantSelect.set(false)">
         Cancel
       </button>
     </div>

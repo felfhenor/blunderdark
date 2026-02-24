@@ -401,6 +401,8 @@ export class PanelRoomInfoComponent {
     return slots;
   });
 
+  public showInhabitantSelect = signal(false);
+
   public showFeatureSelect = signal(false);
   public featureSelectSlotIndex = signal(0);
   public featureRemoveSlotIndex = 0;
