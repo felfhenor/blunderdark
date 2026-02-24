@@ -4,7 +4,6 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { NgClass } from '@angular/common';
 import {
   gamestate,
   contentGetEntry,
@@ -16,7 +15,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-hunger-indicator',
-  imports: [NgClass, TippyDirective],
+  imports: [TippyDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'inline-block relative',
@@ -25,7 +24,12 @@ import { TippyDirective } from '@ngneat/helipopper';
     @if (shouldShow()) {
       <span
         class="inline-flex items-center px-1 rounded leading-3.5 whitespace-nowrap cursor-default text-xs font-bold"
-        [ngClass]="hungerClass()"
+        [class.bg-warning]="hungerState() === 'hungry'"
+        [class.text-warning-content]="hungerState() === 'hungry'"
+        [class.bg-error]="hungerState() === 'starving'"
+        [class.text-error-content]="hungerState() === 'starving'"
+        [class.bg-neutral]="isInappetent()"
+        [class.text-neutral-content]="isInappetent()"
         [tp]="hungerTip"
         [tpDelay]="250"
       >
@@ -46,24 +50,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       </ng-template>
     }
   `,
-  styles: [
-    `
-      .hunger-hungry {
-        background-color: oklch(var(--wa));
-        color: oklch(var(--wac, 0.9 0.05 80));
-      }
-
-      .hunger-starving {
-        background-color: oklch(var(--er));
-        color: oklch(var(--erc, 0.9 0.05 25));
-      }
-
-      .hunger-inappetent {
-        background-color: oklch(var(--n));
-        color: oklch(var(--nc));
-      }
-    `,
-  ],
 })
 export class HungerIndicatorComponent {
   public inhabitantId = input.required<string>();
@@ -77,9 +63,7 @@ export class HungerIndicatorComponent {
   private definition = computed(() => {
     const inh = this.inhabitant();
     if (!inh) return undefined;
-    return contentGetEntry<InhabitantContent>(
-      inh.definitionId,
-    );
+    return contentGetEntry<InhabitantContent>(inh.definitionId);
   });
 
   public isInappetent = computed(() => {
@@ -87,15 +71,11 @@ export class HungerIndicatorComponent {
     return def ? hungerIsInappetent(def.foodConsumptionRate ?? 0) : false;
   });
 
-  public hungerState = computed(
-    () => this.inhabitant()?.state ?? 'normal',
-  );
+  public hungerState = computed(() => this.inhabitant()?.state ?? 'normal');
 
   public shouldShow = computed(() => {
     const state = this.hungerState();
-    return (
-      state === 'hungry' || state === 'starving' || this.isInappetent()
-    );
+    return state === 'hungry' || state === 'starving' || this.isInappetent();
   });
 
   public hungerLabel = computed(() => {
@@ -107,18 +87,6 @@ export class HungerIndicatorComponent {
         return 'Starving';
       default:
         return 'Fed';
-    }
-  });
-
-  public hungerClass = computed(() => {
-    if (this.isInappetent()) return 'hunger-inappetent';
-    switch (this.hungerState()) {
-      case 'hungry':
-        return 'hunger-hungry';
-      case 'starving':
-        return 'hunger-starving';
-      default:
-        return 'hunger-normal';
     }
   });
 

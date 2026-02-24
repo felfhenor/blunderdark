@@ -29,7 +29,7 @@ type ObjectiveStatus = {
   template: `
     @if (invasionIsActive()) {
       <div
-        class="hud-container w-96 px-3 py-2 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
+        class="bg-base-200/80 w-96 px-3 py-2 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
       >
         <!-- Path progress -->
         <div class="flex items-center justify-between mb-1">
@@ -111,11 +111,6 @@ type ObjectiveStatus = {
           </div>
         }
       </div>
-    }
-  `,
-  styles: `
-    .hud-container {
-      background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
     }
   `,
 })

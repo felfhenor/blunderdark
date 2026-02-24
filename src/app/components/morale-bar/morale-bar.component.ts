@@ -22,7 +22,7 @@ import type { MoraleEvent } from '@interfaces/morale';
   template: `
     @if (isVisible()) {
       <div
-        class="morale-container w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
+        class="bg-base-200/80 w-70 px-2 py-1.5 backdrop-blur-sm rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200"
       >
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold">Invader Morale</span>
@@ -60,7 +60,7 @@ import type { MoraleEvent } from '@interfaces/morale';
 
         @if (showLog() && eventLog().length > 0) {
           <div
-            class="morale-log absolute bottom-full left-0 z-100 min-w-[220px] max-w-[300px] max-h-[200px] overflow-y-auto p-3 mb-1 rounded-lg"
+            class="absolute bottom-full left-0 z-100 min-w-[220px] max-w-[300px] max-h-[200px] overflow-y-auto p-3 mb-1 rounded-lg bg-base-300 border border-base-content/15 shadow-lg"
           >
             <div class="text-xs font-semibold mb-1">Morale Log</div>
             @for (evt of eventLog(); track $index) {
@@ -82,18 +82,8 @@ import type { MoraleEvent } from '@interfaces/morale';
     }
   `,
   styles: `
-    .morale-container {
-      background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
-    }
-
     .morale-float-text {
       animation: morale-fade 2s ease-out forwards;
-    }
-
-    .morale-log {
-      background: oklch(var(--b3));
-      border: 1px solid oklch(var(--bc) / 0.15);
-      box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);
     }
 
     @keyframes morale-fade {

@@ -1,21 +1,4 @@
-.resource-bar-top {
-  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
-}
-
-.corruption-progress-low {
-  color: var(--color-success);
-}
-
-.corruption-progress-medium {
-  color: var(--color-warning);
-}
-
-.corruption-progress-high {
-  color: oklch(0.7 0.15 50);
-}
-
-.corruption-progress-critical {
-  color: var(--color-error);
+.corruption-pulse {
   animation: pulse-warning 1.5s ease-in-out infinite;
 }
 

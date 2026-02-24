@@ -21,7 +21,11 @@ type DisconnectedFloorEntry = {
     '[class.hidden]': 'disconnectedInfo().totalCount === 0',
   },
   template: `
-    <span class="disconnected-badge px-1.5 rounded whitespace-nowrap text-error text-xs font-semibold" [tp]="tooltipTpl" tpPlacement="bottom">
+    <span
+      class="badge badge-error badge-soft badge-outline disconnected-badge whitespace-nowrap text-xs font-semibold"
+      [tp]="tooltipTpl"
+      tpPlacement="bottom"
+    >
       {{ disconnectedInfo().totalCount }} room{{
         disconnectedInfo().totalCount > 1 ? 's' : ''
       }}
@@ -31,7 +35,10 @@ type DisconnectedFloorEntry = {
     <ng-template #tooltipTpl>
       @for (entry of disconnectedInfo().perFloor; track entry.floorName) {
         @if (entry.entireFloor) {
-          <strong>{{ entry.floorName }}</strong> disconnected ({{ entry.roomCount }} room{{ entry.roomCount > 1 ? 's' : '' }})
+          <strong>{{ entry.floorName }}</strong>
+          disconnected ({{ entry.roomCount }} room{{
+            entry.roomCount > 1 ? 's' : ''
+          }})
         } @else {
           <strong>{{ entry.floorName }}</strong>
           <ul>
@@ -47,8 +54,6 @@ type DisconnectedFloorEntry = {
   `,
   styles: `
     .disconnected-badge {
-      background: color-mix(in oklch, var(--color-error) 15%, transparent);
-      border: 1px solid color-mix(in oklch, var(--color-error) 40%, transparent);
       animation: disconnected-flash 1.5s ease-in-out infinite;
     }
 

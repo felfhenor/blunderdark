@@ -8,18 +8,12 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [TippyDirective],
   template: `
     <span
-      class="badge-floor-depth px-1.5 rounded whitespace-nowrap text-info text-xs font-semibold"
+      class="badge badge-info badge-soft badge-outline px-1.5 rounded whitespace-nowrap text-info text-xs font-semibold"
       tp="Current Floor / Total Floors"
       tpPlacement="bottom"
     >
       Floor {{ currentFloorDepth() }}/{{ totalFloors() }}
     </span>
-  `,
-  styles: `
-    .badge-floor-depth {
-      background: color-mix(in oklch, var(--color-info) 15%, transparent);
-      border: 1px solid color-mix(in oklch, var(--color-info) 40%, transparent);
-    }
   `,
 })
 export class BadgeFloorDepthComponent {

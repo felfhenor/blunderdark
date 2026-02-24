@@ -29,7 +29,7 @@ type ObjectiveInfo = {
   },
   template: `
     <span
-      class="invasion-warning-badge px-1.5 rounded whitespace-nowrap text-warning text-xs font-semibold"
+      class="badge badge-warning badge-soft badge-outline invasion-warning-badge whitespace-nowrap text-xs font-semibold"
       [tp]="tooltipTpl"
       tpPlacement="bottom"
     >
@@ -61,9 +61,6 @@ type ObjectiveInfo = {
   `,
   styles: `
     .invasion-warning-badge {
-      background: color-mix(in oklch, var(--color-warning) 15%, transparent);
-      border: 1px solid
-        color-mix(in oklch, var(--color-warning) 40%, transparent);
       animation: invasion-warning-pulse 1.5s ease-in-out infinite;
     }
 

@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,7 +11,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-fear-indicator',
-  imports: [TippyDirective, NgClass],
+  imports: [TippyDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'inline-block relative',
@@ -21,7 +20,13 @@ import { TippyDirective } from '@ngneat/helipopper';
     @if (fearLevel() > 0) {
       <span
         class="inline-flex items-center px-1 rounded leading-3.5 whitespace-nowrap cursor-default text-xs font-bold"
-        [ngClass]="fearClass()"
+        [class.bg-success]="fearLevel() === 1"
+        [class.text-success-content]="fearLevel() === 1"
+        [class.bg-warning]="fearLevel() === 2"
+        [class.text-warning-content]="fearLevel() === 2"
+        [class.fear-high]="fearLevel() === 3"
+        [class.bg-error]="fearLevel() === 4"
+        [class.text-error-content]="fearLevel() === 4"
         [tp]="fearTip"
         [tpDelay]="250"
       >
@@ -77,24 +82,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   `,
   styles: [
     `
-      .fear-low {
-        background-color: var(--color-success);
-        color: var(--color-success-content);
-      }
-
-      .fear-medium {
-        background-color: var(--color-warning);
-        color: var(--color-warning-content);
-      }
-
       .fear-high {
         background-color: oklch(0.45 0.15 40);
         color: oklch(0.9 0.05 40);
-      }
-
-      .fear-very-high {
-        background-color: var(--color-error);
-        color: var(--color-error-content);
       }
     `,
   ],
@@ -109,21 +99,6 @@ export class FearIndicatorComponent {
   public fearLevel = computed(() => this.breakdown()?.effectiveFear ?? 0);
 
   public fearLabel = computed(() => fearLevelGetLabel(this.fearLevel()));
-
-  public fearClass = computed(() => {
-    switch (this.fearLevel()) {
-      case 1:
-        return 'fear-low';
-      case 2:
-        return 'fear-medium';
-      case 3:
-        return 'fear-high';
-      case 4:
-        return 'fear-very-high';
-      default:
-        return '';
-    }
-  });
 
   public fearEffect = computed(() => {
     switch (this.fearLevel()) {

@@ -1,9 +1,8 @@
 @if (foodWarning(); as warning) {
   @if (!foodWarningDismissed()) {
     <div
-      class="food-warning flex items-center justify-between gap-2 px-3 py-1 mb-1 rounded text-xs font-semibold"
-      [class.food-warning-low]="warning.level === 'low'"
-      [class.food-warning-critical]="warning.level === 'critical'"
+      class="flex items-center justify-between gap-2 px-3 py-1 mb-1 rounded text-xs font-semibold"
+      [ngClass]="getFoodWarningClass(warning.level)"
     >
       <span>
         @if (warning.level === 'critical') {
@@ -11,7 +10,7 @@
         } @else {
           Low food!
           @if (warning.secondsRemaining !== undefined) {
-            ~{{ warning.secondsRemaining | number:'1.0-0' }} sec remaining.
+            ~{{ warning.secondsRemaining | number: '1.0-0' }} sec remaining.
           }
         }
       </span>
@@ -24,125 +23,171 @@
     </div>
   }
 }
-<div class="resource-bar flex flex-col gap-2">
+<div class="bg-base-200 p-2 rounded-lg flex flex-col gap-2">
   @for (res of resources; track res.type) {
     <div
-      class="resource-item"
+      class="relative px-2 py-1 rounded cursor-default"
       [ngClass]="getWarningClass(res.type)"
       [tp]="resourceTip"
       tpPlacement="right"
       [tpDelay]="250"
     >
       <div class="flex items-center justify-between mb-0.5">
-        <span class="text-sm font-semibold truncate"><app-currency-name [type]="res.type" /></span>
+        <span class="text-sm font-semibold truncate">
+          <app-currency-name [type]="res.type" />
+        </span>
         @if (res.type === 'corruption') {
-          <span class="badge badge-xs" [ngClass]="getCorruptionBadgeClass(corruptionInfo().level)">
+          <span
+            class="badge badge-xs"
+            [ngClass]="getCorruptionBadgeClass(corruptionInfo().level)"
+          >
             {{ corruptionInfo().level | uppercase }}
           </span>
         }
       </div>
 
-      <div class="text-xs" [class.text-success]="res.type !== 'corruption' && isFull(res.type)" [class.opacity-70]="res.type === 'corruption' || !isFull(res.type)">
+      <div
+        class="text-xs"
+        [class.text-success]="res.type !== 'corruption' && isFull(res.type)"
+        [class.opacity-70]="res.type === 'corruption' || !isFull(res.type)"
+      >
         @if (res.type === 'corruption') {
           {{ getCurrent(res.type) | number: '1.0-0' }}
         } @else {
-          {{ getCurrent(res.type) | number: '1.0-0' }}/{{ getMax(res.type) | number: '1.0-0' }}
+          {{ getCurrent(res.type) | number: '1.0-0' }}/{{
+            getMax(res.type) | number: '1.0-0'
+          }}
         }
       </div>
     </div>
 
     <ng-template #resourceTip>
       <div class="w-[300px]">
-      <div class="font-semibold text-sm mb-1"><app-currency-name [type]="res.type" /></div>
-      <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
+        <div class="font-semibold text-sm mb-1">
+          <app-currency-name [type]="res.type" />
+        </div>
+        <div class="text-xs opacity-70 mb-2">{{ res.description }}</div>
 
-      <progress
-        class="progress w-full h-2 mb-2"
-        [ngClass]="res.type === 'corruption' ? 'corruption-progress-' + corruptionInfo().level : res.color"
-        [value]="getPercent(res.type)"
-        max="100"
-      ></progress>
+        <progress
+          class="progress w-full h-2 mb-2"
+          [ngClass]="
+            res.type === 'corruption'
+              ? getCorruptionColorClass(corruptionInfo().level) +
+                (corruptionInfo().level === 'critical'
+                  ? ' corruption-pulse'
+                  : '')
+              : res.color
+          "
+          [value]="getPercent(res.type)"
+          max="100"
+        ></progress>
 
-      <div class="flex justify-between text-xs mb-1">
-        <span class="opacity-70">Amount:</span>
-        @if (res.type === 'corruption') {
-          <span>{{ getCurrent(res.type) | number: '1.0-0' }}</span>
-        } @else {
-          <span>{{ getCurrent(res.type) | number: '1.0-1' }} / {{ getMax(res.type) | number: '1.0-0' }}</span>
-        }
-      </div>
-
-      @if (res.type === 'corruption') {
         <div class="flex justify-between text-xs mb-1">
-          <span class="opacity-70">Level:</span>
-          <span class="font-semibold" [ngClass]="getCorruptionColorClass(corruptionInfo().level)">
-            {{ corruptionInfo().level | uppercase }}
-          </span>
+          <span class="opacity-70">Amount:</span>
+          @if (res.type === 'corruption') {
+            <span>{{ getCurrent(res.type) | number: '1.0-0' }}</span>
+          } @else {
+            <span>
+              {{ getCurrent(res.type) | number: '1.0-1' }} /
+              {{ getMax(res.type) | number: '1.0-0' }}
+            </span>
+          }
         </div>
-      }
 
-      @if (res.type === 'corruption') {
-        <div class="divider my-1 h-0"></div>
-        <div class="text-xs opacity-80">{{ corruptionInfo().description }}</div>
-      }
-
-      @if (getResourceBreakdown(res.type); as info) {
-        <div class="divider my-1 h-0"></div>
-        <div class="text-xs font-semibold mb-1">Rate Breakdown</div>
-        <div class="flex flex-col gap-0.5 text-xs">
-          @if (info.prod; as bd) {
-            <div class="flex justify-between">
-              <span class="opacity-70">Base:</span>
-              <span>{{ formatBreakdownRate(bd.base) }}/sec</span>
-            </div>
-            @if (bd.inhabitantBonus !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Workers:</span>
-                <span class="text-success">{{ formatBreakdownRate(bd.inhabitantBonus) }}/sec</span>
-              </div>
-            }
-            @if (bd.adjacencyBonus !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Adjacency:</span>
-                <span class="text-success">{{ formatBreakdownRate(bd.adjacencyBonus) }}/sec</span>
-              </div>
-            }
-            @if (bd.modifierEffect !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Modifiers:</span>
-                <span [class.text-success]="bd.modifierEffect > 0" [class.text-error]="bd.modifierEffect <= 0">
-                  {{ formatBreakdownRate(bd.modifierEffect) }}/sec
-                </span>
-              </div>
-            }
-          }
-          @if (info.cons; as cd) {
-            @if (cd.inhabitantFood !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Feeding:</span>
-                <span class="text-error">{{ formatBreakdownRate(-cd.inhabitantFood) }}/sec</span>
-              </div>
-            }
-            @if (cd.legendaryUpkeep !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Legendary Upkeep:</span>
-                <span class="text-error">{{ formatBreakdownRate(-cd.legendaryUpkeep) }}/sec</span>
-              </div>
-            }
-            @if (cd.featureMaintenance !== 0) {
-              <div class="flex justify-between">
-                <span class="opacity-70">Maintenance:</span>
-                <span class="text-error">{{ formatBreakdownRate(-cd.featureMaintenance) }}/sec</span>
-              </div>
-            }
-          }
-          <div class="divider my-0.5 h-0"></div>
-          <div class="flex justify-between font-semibold">
-            <span>Net:</span>
-            <span [class.text-success]="info.net > 0" [class.text-error]="info.net < 0">{{ formatBreakdownRate(info.net) }}/sec</span>
+        @if (res.type === 'corruption') {
+          <div class="flex justify-between text-xs mb-1">
+            <span class="opacity-70">Level:</span>
+            <span
+              class="font-semibold"
+              [ngClass]="getCorruptionColorClass(corruptionInfo().level)"
+            >
+              {{ corruptionInfo().level | uppercase }}
+            </span>
           </div>
-        </div>
-      }
+        }
+
+        @if (res.type === 'corruption') {
+          <div class="divider my-1 h-0"></div>
+          <div class="text-xs opacity-80">
+            {{ corruptionInfo().description }}
+          </div>
+        }
+
+        @if (getResourceBreakdown(res.type); as info) {
+          <div class="divider my-1 h-0"></div>
+          <div class="text-xs font-semibold mb-1">Rate Breakdown</div>
+          <div class="flex flex-col gap-0.5 text-xs">
+            @if (info.prod; as bd) {
+              <div class="flex justify-between">
+                <span class="opacity-70">Base:</span>
+                <span>{{ formatBreakdownRate(bd.base) }}/sec</span>
+              </div>
+              @if (bd.inhabitantBonus !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Workers:</span>
+                  <span class="text-success">
+                    {{ formatBreakdownRate(bd.inhabitantBonus) }}/sec
+                  </span>
+                </div>
+              }
+              @if (bd.adjacencyBonus !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Adjacency:</span>
+                  <span class="text-success">
+                    {{ formatBreakdownRate(bd.adjacencyBonus) }}/sec
+                  </span>
+                </div>
+              }
+              @if (bd.modifierEffect !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Modifiers:</span>
+                  <span
+                    [class.text-success]="bd.modifierEffect > 0"
+                    [class.text-error]="bd.modifierEffect <= 0"
+                  >
+                    {{ formatBreakdownRate(bd.modifierEffect) }}/sec
+                  </span>
+                </div>
+              }
+            }
+            @if (info.cons; as cd) {
+              @if (cd.inhabitantFood !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Feeding:</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.inhabitantFood) }}/sec
+                  </span>
+                </div>
+              }
+              @if (cd.legendaryUpkeep !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Legendary Upkeep:</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.legendaryUpkeep) }}/sec
+                  </span>
+                </div>
+              }
+              @if (cd.featureMaintenance !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Maintenance:</span>
+                  <span class="text-error">
+                    {{ formatBreakdownRate(-cd.featureMaintenance) }}/sec
+                  </span>
+                </div>
+              }
+            }
+            <div class="divider my-0.5 h-0"></div>
+            <div class="flex justify-between font-semibold">
+              <span>Net:</span>
+              <span
+                [class.text-success]="info.net > 0"
+                [class.text-error]="info.net < 0"
+              >
+                {{ formatBreakdownRate(info.net) }}/sec
+              </span>
+            </div>
+          </div>
+        }
       </div>
     </ng-template>
   }

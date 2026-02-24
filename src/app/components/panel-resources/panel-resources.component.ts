@@ -32,7 +32,13 @@ const CRITICAL_THRESHOLD = 0.1;
 
 @Component({
   selector: 'app-panel-resources',
-  imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyNameComponent, TippyDirective],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    UpperCasePipe,
+    CurrencyNameComponent,
+    TippyDirective,
+  ],
   templateUrl: './panel-resources.component.html',
   styleUrl: './panel-resources.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,8 +53,10 @@ export class PanelResourcesComponent {
   public readonly isFull = resourceDisplayIsFull;
   public readonly getResourceBreakdown = resourceDisplayGetBreakdown;
   public readonly formatBreakdownRate = resourceDisplayFormatBreakdownRate;
-  public readonly getCorruptionColorClass = resourceDisplayGetCorruptionColorClass;
-  public readonly getCorruptionBadgeClass = resourceDisplayGetCorruptionBadgeClass;
+  public readonly getCorruptionColorClass =
+    resourceDisplayGetCorruptionColorClass;
+  public readonly getCorruptionBadgeClass =
+    resourceDisplayGetCorruptionBadgeClass;
   public corruptionInfo = computed(() => resourceDisplayGetCorruptionInfo());
 
   public foodWarning = computed(() => {
@@ -86,10 +94,17 @@ export class PanelResourcesComponent {
     if (res.max === 0) return '';
     const ratio = res.current / res.max;
 
-    if (res.current === 0) return 'resource-empty';
-    if (ratio <= CRITICAL_THRESHOLD) return 'resource-critical';
-    if (ratio <= LOW_THRESHOLD) return 'resource-low';
+    if (res.current === 0) return 'border-l-4 border-error bg-error/5';
+    if (ratio <= CRITICAL_THRESHOLD)
+      return 'border-l-4 border-error bg-error/8 corruption-pulse';
+    if (ratio <= LOW_THRESHOLD) return 'border-l-4 border-warning bg-warning/8';
     return '';
+  }
+
+  public getFoodWarningClass(level: string): string {
+    if (level === 'critical')
+      return 'bg-error/15 border border-error/40 text-error corruption-pulse';
+    return 'bg-warning/15 border border-warning/40 text-warning';
   }
 
   public getRateClass(type: ResourceType): string {

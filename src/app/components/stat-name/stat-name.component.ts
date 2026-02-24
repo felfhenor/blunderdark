@@ -20,8 +20,10 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [IconComponent, DecimalPipe, TippyDirective],
   host: {
     class: 'inline-flex items-center gap-2 align-baseline text-base',
-    '[class.stat-high]': 'highlight() === "high"',
-    '[class.stat-low]': 'highlight() === "low"',
+    '[class.text-success]': 'highlight() === "high"',
+    '[class.font-bold]': 'highlight() === "high"',
+    '[class.text-error]': 'highlight() === "low"',
+    '[class.opacity-80]': 'highlight() === "low"',
   },
   template: `
     <app-icon
@@ -43,16 +45,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       stroke: black;
       stroke-width: 18px;
       stroke-linejoin: round;
-    }
-
-    :host.stat-high {
-      color: var(--color-success);
-      font-weight: bold;
-    }
-
-    :host.stat-low {
-      color: var(--color-error);
-      opacity: 0.8;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

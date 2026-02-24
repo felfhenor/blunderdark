@@ -1,5 +1,5 @@
 <div
-  class="resource-bar-top inline-flex items-center gap-2 px-2 py-1 rounded-b-lg backdrop-blur-sm opacity-70 hover:opacity-100 transition-opacity duration-200"
+  class="bg-base-200/80 inline-flex items-center gap-2 px-2 py-1 rounded-b-lg backdrop-blur-sm opacity-70 hover:opacity-100 transition-opacity duration-200"
 >
   @for (res of resources; track res.type) {
     <div
@@ -40,7 +40,10 @@
           class="progress w-full h-2 mb-2"
           [ngClass]="
             res.type === 'corruption'
-              ? 'corruption-progress-' + corruptionInfo().level
+              ? getCorruptionColorClass(corruptionInfo().level) +
+                (corruptionInfo().level === 'critical'
+                  ? ' corruption-pulse'
+                  : '')
               : res.color
           "
           [value]="getPercent(res.type)"
