@@ -4,6 +4,7 @@ import { featureCalculateStorageBonusMultiplier } from '@helpers/features';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
+  GameState,
   ResourceCost,
   ResourceMap,
   ResourceState,
@@ -135,8 +136,26 @@ export function resourceEffectiveMax(
   floors: Floor[],
 ): number {
   if (resourceType === 'corruption') return baseMax;
-  const multiplier = featureCalculateStorageBonusMultiplier(floors);
+  const multiplier = featureCalculateStorageBonusMultiplier(floors, resourceType);
   return Math.floor(baseMax * multiplier);
+}
+
+/**
+ * Recalculate resource maxes based on storage bonuses from features.
+ * Uses defaultResources() as the base max and applies storage bonus multipliers.
+ * Clamps current values if they exceed the new max (e.g. after removing a feature).
+ * Mutates state in-place.
+ */
+export function resourceStorageProcess(state: GameState): void {
+  const defaults = defaultResources();
+  for (const type of Object.keys(defaults) as ResourceType[]) {
+    const baseMax = defaults[type].max;
+    const effectiveMax = resourceEffectiveMax(baseMax, type, state.world.floors);
+    state.world.resources[type].max = effectiveMax;
+    if (state.world.resources[type].current > effectiveMax) {
+      state.world.resources[type].current = effectiveMax;
+    }
+  }
 }
 
 export function resourceMigrate(saved: Partial<ResourceMap>): ResourceMap {

@@ -1284,7 +1284,21 @@ describe("Dragon's Hoard Core (prestige flat_production + storage_bonus)", () =>
     expect(result['gold']).toBeCloseTo(1.0); // 5/5 per tick
   });
 
-  it('provides storage bonus', () => {
+  it('provides storage bonus for gold', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
+    const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    expect(featureCalculateStorageBonusMultiplier([floor], 'gold')).toBe(2.0);
+  });
+
+  it('does not provide storage bonus for non-gold resources', () => {
+    vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
+    const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
+    const floor = makeFloor({ rooms: [room] });
+    expect(featureCalculateStorageBonusMultiplier([floor], 'crystals')).toBe(1.0);
+  });
+
+  it('provides storage bonus when no resourceType filter is passed', () => {
     vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
     const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
     const floor = makeFloor({ rooms: [room] });

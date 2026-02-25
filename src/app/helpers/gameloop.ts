@@ -11,6 +11,7 @@ import { invasionProcess } from '@helpers/invasion-process';
 import { invasionThreatDecayProcess } from '@helpers/invasion-threat';
 import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
+import { resourceStorageProcess } from '@helpers/resources';
 import { researchProcess } from '@helpers/research-progress';
 import { trainingProcess } from '@helpers/training';
 import { breedingPitsProcess } from '@helpers/breeding-pits';
@@ -77,6 +78,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
   updateGamestate((state) => {
     state.clock.numTicks += numTicks;
     state.clock = gameTimeAdvanceClock(state.clock, numTicks);
+    resourceStorageProcess(state);
     hungerProcess(state, numTicks);
     productionProcess(state, numTicks);
     corruptionGenerationProcess(state, numTicks);

@@ -34,6 +34,7 @@ const {
   resourceIsFull,
   resourceMigrate,
   resourceEffectiveMax,
+  resourceStorageProcess,
 } = await import('@helpers/resources');
 
 describe('resourceAdd', () => {
@@ -319,5 +320,71 @@ describe('resourceEffectiveMax', () => {
     mockStorageMultiplier = 1.5;
     // 200 * 1.5 = 300
     expect(resourceEffectiveMax(200, 'essence', [])).toBe(300);
+  });
+});
+
+describe('resourceStorageProcess', () => {
+  beforeEach(() => {
+    mockResources = defaultResources();
+    mockStorageMultiplier = 1;
+  });
+
+  it('leaves maxes at defaults when no storage bonus', () => {
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.gold.max).toBe(1000);
+    expect(state.world.resources.crystals.max).toBe(500);
+    expect(state.world.resources.food.max).toBe(500);
+    expect(state.world.resources.flux.max).toBe(200);
+    expect(state.world.resources.research.max).toBe(300);
+    expect(state.world.resources.essence.max).toBe(200);
+  });
+
+  it('doubles all maxes when storage multiplier is 2', () => {
+    mockStorageMultiplier = 2;
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.gold.max).toBe(2000);
+    expect(state.world.resources.crystals.max).toBe(1000);
+    expect(state.world.resources.food.max).toBe(1000);
+    expect(state.world.resources.flux.max).toBe(400);
+    expect(state.world.resources.research.max).toBe(600);
+    expect(state.world.resources.essence.max).toBe(400);
+  });
+
+  it('does not change corruption max regardless of multiplier', () => {
+    mockStorageMultiplier = 3;
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  it('clamps current to new max when max decreases', () => {
+    mockResources.gold.current = 900;
+    mockResources.gold.max = 2000;
+    mockStorageMultiplier = 1; // back to base: 1000
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.gold.max).toBe(1000);
+    expect(state.world.resources.gold.current).toBe(900);
+  });
+
+  it('clamps current when it exceeds new reduced max', () => {
+    mockResources.gold.current = 1500;
+    mockResources.gold.max = 2000;
+    mockStorageMultiplier = 1; // back to base: 1000
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.gold.max).toBe(1000);
+    expect(state.world.resources.gold.current).toBe(1000);
+  });
+
+  it('preserves current when below new max', () => {
+    mockResources.gold.current = 500;
+    mockStorageMultiplier = 2;
+    const state = { world: { resources: mockResources, floors: [] } } as GameState;
+    resourceStorageProcess(state);
+    expect(state.world.resources.gold.max).toBe(2000);
+    expect(state.world.resources.gold.current).toBe(500);
   });
 });
