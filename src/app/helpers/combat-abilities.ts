@@ -20,6 +20,7 @@ export function combatAbilityInitStates(
     currentCooldown: 0,
     isActive: false,
     remainingDuration: 0,
+    passiveActivated: false,
   }));
 }
 
@@ -126,6 +127,7 @@ export function combatAbilityTryActivate(
     targetsHit,
     statusApplied,
     statusDuration,
+    targetIds: [],
   };
 
   // Put ability on cooldown and mark active if it has duration
@@ -136,6 +138,7 @@ export function combatAbilityTryActivate(
       currentCooldown: ability.cooldown,
       isActive: ability.duration > 0,
       remainingDuration: ability.duration,
+      passiveActivated: s.passiveActivated,
     };
   });
 

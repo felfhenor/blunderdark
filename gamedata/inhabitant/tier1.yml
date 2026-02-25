@@ -14,6 +14,8 @@
     workerEfficiency: 1.0
   inhabitantTraitIds:
     - Miner
+  combatAbilityIds:
+    - Shadow Slash
   fearTolerance: 1
   fearModifier: 0
   foodConsumptionRate: 2
@@ -92,6 +94,8 @@
     workerEfficiency: 0.7
   inhabitantTraitIds:
     - Guardian
+  combatAbilityIds:
+    - Dungeon Ward
   fearTolerance: 4
   fearModifier: 1
   foodConsumptionRate: 0

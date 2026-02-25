@@ -324,7 +324,7 @@ function makeInvaderInstance(
     maxHp: 30,
     statusEffects: [],
     abilityStates: [
-      { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+      { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
     ],
     ...overrides,
   };
@@ -482,7 +482,7 @@ describe('invaderResolveAbility', () => {
   it('returns null when ability is on cooldown', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1' as CombatantId]);
@@ -510,7 +510,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: ROGUE_ID,
       abilityStates: [
-        { abilityId: BACKSTAB_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: BACKSTAB_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, backstabAbility, ['target-1' as CombatantId]);
@@ -524,7 +524,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: MAGE_ID,
       abilityStates: [
-        { abilityId: ARCANE_BOLT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: ARCANE_BOLT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, arcaneBoltAbility, ['target-1' as CombatantId]);
@@ -538,7 +538,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: CLERIC_ID,
       abilityStates: [
-        { abilityId: TURN_UNDEAD_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: TURN_UNDEAD_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const targets = ['undead-1' as CombatantId, 'undead-2' as CombatantId, 'undead-3' as CombatantId];
@@ -553,7 +553,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: PALADIN_ID,
       abilityStates: [
-        { abilityId: AURA_OF_COURAGE_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: AURA_OF_COURAGE_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const allies = ['ally-1' as CombatantId, 'ally-2' as CombatantId];
@@ -567,7 +567,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: RANGER_ID,
       abilityStates: [
-        { abilityId: SCOUT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: SCOUT_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, scoutAbility, ['target-1' as CombatantId]);
@@ -581,7 +581,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: RANGER_ID,
       abilityStates: [
-        { abilityId: MARK_TARGET_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: MARK_TARGET_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, markTargetAbility, ['target-1' as CombatantId]);
@@ -596,7 +596,7 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance({
       definitionId: MAGE_ID,
       abilityStates: [
-        { abilityId: DISPEL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: DISPEL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, dispelAbility, ['target-1' as CombatantId]);
@@ -616,7 +616,7 @@ describe('Rogue disarm', () => {
     const invader = makeInvaderInstance({
       definitionId: ROGUE_ID,
       abilityStates: [
-        { abilityId: DISARM_TRAP_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: DISARM_TRAP_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     // rng returns 0.3 → roll = 30 → 30 <= 60 → success
@@ -630,7 +630,7 @@ describe('Rogue disarm', () => {
     const invader = makeInvaderInstance({
       definitionId: ROGUE_ID,
       abilityStates: [
-        { abilityId: DISARM_TRAP_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: DISARM_TRAP_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     // rng returns 0.8 → roll = 80 → 80 > 60 → failure
@@ -647,7 +647,7 @@ describe('Cleric heal', () => {
       currentHp: 10,
       maxHp: 20,
       abilityStates: [
-        { abilityId: HEAL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: HEAL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, healAbility, ['ally-1' as CombatantId]);
@@ -680,7 +680,7 @@ describe('Cooldown prevents ability reuse', () => {
   it('ability is blocked when on cooldown', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 2, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 2, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, shieldWallAbility, ['target-1' as CombatantId]);
@@ -690,7 +690,7 @@ describe('Cooldown prevents ability reuse', () => {
   it('invaderApplyCooldown sets cooldown on the correct ability', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const updated = invaderApplyCooldown(invader, SHIELD_WALL_ID, 4);
@@ -700,7 +700,7 @@ describe('Cooldown prevents ability reuse', () => {
   it('invaderTickCooldowns decrements cooldowns by 1', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 3, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const ticked = invaderTickCooldowns(invader);
@@ -710,7 +710,7 @@ describe('Cooldown prevents ability reuse', () => {
   it('invaderTickCooldowns does not go below 0', () => {
     const invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const ticked = invaderTickCooldowns(invader);
@@ -720,7 +720,7 @@ describe('Cooldown prevents ability reuse', () => {
   it('ability works again after cooldown expires', () => {
     let invader = makeInvaderInstance({
       abilityStates: [
-        { abilityId: SHIELD_WALL_ID, currentCooldown: 1, isActive: false, remainingDuration: 0 },
+        { abilityId: SHIELD_WALL_ID, currentCooldown: 1, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     // Still on cooldown
@@ -739,7 +739,7 @@ describe('Paladin Smite Evil', () => {
     const invader = makeInvaderInstance({
       definitionId: PALADIN_ID,
       abilityStates: [
-        { abilityId: SMITE_EVIL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0 },
+        { abilityId: SMITE_EVIL_ID, currentCooldown: 0, isActive: false, remainingDuration: 0, passiveActivated: false },
       ],
     });
     const result = invaderResolveAbility(invader, smiteEvilAbility, ['corrupted-1' as CombatantId]);

@@ -42,6 +42,7 @@ export function invaderCreateInstance(
         currentCooldown: 0,
         isActive: false,
         remainingDuration: 0,
+        passiveActivated: false,
       };
     }),
   };

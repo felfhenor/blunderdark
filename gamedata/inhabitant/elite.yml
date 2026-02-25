@@ -17,6 +17,9 @@
     - Draconic Fury
     - Fire Breath
     - Fearless
+  combatAbilityIds:
+    - Breath Weapon
+    - Venom Spit
   restrictionTags:
     - unique
   rulerBonuses:
@@ -85,6 +88,9 @@
     - Throne Scholar
     - Soul Siphon
     - Library Specialist
+  combatAbilityIds:
+    - Lich Shield
+    - Death Bolt
   restrictionTags:
     - unique
   rulerBonuses:
@@ -130,6 +136,9 @@
     - Dread Aura
     - Crushing Presence
     - Fearless
+  combatAbilityIds:
+    - Venom Spit
+    - Terrifying Roar
   restrictionTags:
     - unique
   rulerBonuses:

@@ -1,4 +1,4 @@
-import type { AbilityState } from '@interfaces/combat';
+import type { AbilityState, StatusEffect } from '@interfaces/combat';
 import type { CombatStats } from '@interfaces/combat-stats';
 import type { InvaderId } from '@interfaces/content-invader';
 import type { Branded } from '@interfaces/identifiable';
@@ -13,11 +13,6 @@ export type InvaderClassType =
   | 'ranger';
 
 export type InvaderStats = CombatStats;
-
-export type StatusEffect = {
-  name: string;
-  remainingDuration: number;
-};
 
 export type InvaderInstanceId = Branded<string, 'InvaderInstanceId'>;
 

@@ -175,3 +175,55 @@
   cooldown: 0
   targetType: single
   duration: 3
+
+# --- Defender combat abilities ---
+
+- id: 30e6dc88-8a33-43c9-b8a2-e6106f9c5637
+  name: Dungeon Ward
+  description: Dungeon magic shields the defender, +30% defense for 3 turns
+  effectType: Buff Defense
+  value: 30
+  chance: 100
+  cooldown: 4
+  targetType: self
+  duration: 3
+
+- id: 26277f35-cbf1-4cbc-8e3d-09574a4232d4
+  name: Shadow Slash
+  description: Strikes from the shadows for 180% damage
+  effectType: Damage
+  value: 180
+  chance: 100
+  cooldown: 3
+  targetType: single
+  duration: 0
+
+- id: 89d3a992-e242-4cdd-bc03-905ca8fe1c4f
+  name: Venom Spit
+  description: Spits venom at all enemies for 120% damage
+  effectType: Damage
+  value: 120
+  chance: 100
+  cooldown: 3
+  targetType: aoe
+  duration: 0
+
+- id: 424297a0-b550-4e6c-86ac-9d8c04bd0bf6
+  name: Dark Healing
+  description: Dark magic restores 25% of max HP
+  effectType: Heal
+  value: 25
+  chance: 100
+  cooldown: 4
+  targetType: single
+  duration: 0
+
+- id: 7c20c78f-1fd5-4401-888e-9e1fb5b59dfe
+  name: Terrifying Roar
+  description: A terrifying roar stuns a single target for 2 turns
+  effectType: Stun
+  value: 0
+  chance: 40
+  cooldown: 4
+  targetType: single
+  duration: 2

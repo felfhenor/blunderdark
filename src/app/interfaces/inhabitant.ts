@@ -1,3 +1,4 @@
+import type { AbilityState, StatusEffect } from '@interfaces/combat';
 import type { CombatStats } from '@interfaces/combat-stats';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { Branded } from '@interfaces/identifiable';
@@ -63,4 +64,6 @@ export type InhabitantInstance = {
   travelTicksRemaining?: number;
   discontentedTicks?: number;
   xp?: number;
+  abilityStates?: AbilityState[];
+  statusEffects?: StatusEffect[];
 };

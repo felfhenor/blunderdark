@@ -17,11 +17,17 @@ export type CombatResult = {
 
 export type AbilityTargetType = 'single' | 'aoe' | 'self';
 
+export type StatusEffect = {
+  name: string;
+  remainingDuration: number;
+};
+
 export type AbilityState = {
   abilityId: CombatAbilityId;
   currentCooldown: number;
   isActive: boolean;
   remainingDuration: number;
+  passiveActivated: boolean;
 };
 
 export type AbilityActivation = {
@@ -33,4 +39,5 @@ export type AbilityActivation = {
   targetsHit: number;
   statusApplied: string | undefined;
   statusDuration: number;
+  targetIds: string[];
 };

@@ -1,9 +1,11 @@
 import { computed } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
+import { combatAbilityInitStates } from '@helpers/combat-abilities';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { fearLevelCalculateAllForFloor } from '@helpers/fear-level';
 import {
+  combatantHasStatus,
   invasionCombatAdvanceTurn,
   invasionCombatBuildTurnQueue,
   invasionCombatCreateCombatant,
@@ -47,9 +49,12 @@ import {
   pathfindingFindWithObjectives,
 } from '@helpers/pathfinding';
 import { roomRoleFindById } from '@helpers/room-roles';
-import { trapApplyTrigger, trapGetInHallway, trapRollTrigger } from '@helpers/traps';
+import { trapApplyTrigger, trapGetDefinition, trapGetInHallway, trapRollTrigger } from '@helpers/traps';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { gamestate } from '@helpers/state-game';
+import type { AbilityState } from '@interfaces/combat';
+import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent } from '@interfaces/content-combatability';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type {
@@ -619,6 +624,7 @@ export function invasionStart(
     currentRoomDefenderIds: firstRoomDefenders.map((i) => i.instanceId),
     battleLog,
     currentTurn: 0,
+    scoutedRoomIds: [],
     roomFearLevels,
     unreachableObjectiveCount,
     profile,
@@ -719,12 +725,17 @@ export function invasionProcess(state: GameState): void {
         const stats = defContent
           ? effectiveStatsCalculate(defContent, def)
           : { hp: 10, attack: 5, defense: 5, speed: 5, workerEfficiency: 1 };
+        // Initialize ability states from content definition if not already set
+        const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);
+        const defStatusEffects = def.statusEffects ?? [];
         return invasionCombatCreateCombatant(
           def.instanceId as unknown as CombatantId,
           'defender',
           def.name,
           { ...stats, maxHp: stats.hp },
           { x: idx, y: 0 },
+          defAbilityStates,
+          defStatusEffects,
         );
       });
 
@@ -752,6 +763,8 @@ export function invasionProcess(state: GameState): void {
             speed: baseSpeed,
           },
           { x: idx + roomDefenders.length + 1, y: 0 },
+          inv.abilityStates,
+          inv.statusEffects,
         );
       });
 
@@ -766,14 +779,14 @@ export function invasionProcess(state: GameState): void {
 
   // --- Middle ticks: combat ---
   if (!isFirstTick && !isLastTick && invasion.currentRoomTurnQueue) {
-    processCombatRound(invasion, rng);
+    processCombatRound(invasion, rng, state);
   }
 
   // --- Last tick: clearing room ---
   if (isLastTick) {
     // Run final combat if turn queue still active
     if (invasion.currentRoomTurnQueue) {
-      processCombatRound(invasion, rng);
+      processCombatRound(invasion, rng, state);
     }
 
     // Update invader HP from combat results
@@ -889,6 +902,17 @@ function calculateRoomTicks(defenderCount: number): number {
   return INVASION_BASE_TICKS_PER_ROOM + (defenderCount * INVASION_TICKS_PER_DEFENDER);
 }
 
+/**
+ * Initialize ability states from an inhabitant's content definition.
+ */
+function initAbilityStatesFromContent(content: InhabitantContent | undefined): AbilityState[] {
+  if (!content?.combatAbilityIds?.length) return [];
+  const abilities = content.combatAbilityIds
+    .map((id) => contentGetEntry<CombatAbilityContent>(id))
+    .filter((a): a is CombatAbilityContent => a !== undefined);
+  return combatAbilityInitStates(abilities);
+}
+
 function processHallwayTraps(
   state: GameState,
   invasion: ActiveInvasion,
@@ -896,6 +920,17 @@ function processHallwayTraps(
 ): void {
   const prevRoomId = invasion.path[invasion.currentRoomIndex - 1];
   const roomId = invasion.path[invasion.currentRoomIndex];
+
+  // Scouted rooms: invaders know what's coming, skip trap triggers
+  if (invasion.scoutedRoomIds.includes(roomId)) {
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_scout',
+      roomId,
+      message: `The party bypasses traps in a scouted room.`,
+    });
+    return;
+  }
 
   // Both rooms must be on the same floor for hallway traps to apply
   const prevFloorIndex = invasion.roomFloorMap[prevRoomId] ?? 0;
@@ -922,9 +957,42 @@ function processHallwayTraps(
 
   if (!hallway) return;
 
+  // Check for Disarm Trap ability on any living invader (room-entry passive)
+  const disarmInvader = findDisarmInvader(invasion);
+
   const traps = trapGetInHallway(currentFloor, hallway.id);
   for (const trap of traps) {
     if (!trap.isArmed || trap.remainingCharges <= 0) continue;
+
+    // Disarm passive: invader with Disarm Trap rolls to disarm before the trap fires
+    if (disarmInvader) {
+      const disarmRoll = rng() * 100;
+      if (disarmRoll <= disarmInvader.chance) {
+        const trapDef = trapGetDefinition(trap.trapTypeId);
+        const trapName = trapDef?.name ?? 'a trap';
+        // Disarm success — consume the trap charge without triggering
+        currentFloor = trapApplyTrigger(currentFloor, trap.id, {
+          triggered: false,
+          disarmed: true,
+          trapName,
+          damage: 0,
+          effectType: '',
+          duration: 0,
+          trapDestroyed: false,
+          moralePenalty: 0,
+        });
+        state.world.floors[floorIdx] = currentFloor;
+
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'ability_disarm',
+          roomId,
+          message: `${disarmInvader.invaderName} disarms ${trapName}!`,
+          details: { abilityName: 'Disarm Trap', effectType: 'Disarm' },
+        });
+        continue;
+      }
+    }
 
     const livingInvaders = invasion.invasionState.invaders.filter(
       (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
@@ -984,9 +1052,223 @@ function processHallwayTraps(
   }
 }
 
+/**
+ * Find an invader with the Disarm Trap ability and return the disarm chance + invader name.
+ */
+function findDisarmInvader(
+  invasion: ActiveInvasion,
+): { invaderName: string; chance: number } | undefined {
+  const livingInvaders = invasion.invasionState.invaders.filter(
+    (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
+  );
+
+  for (const inv of livingInvaders) {
+    const invDef = invaderGetDefinitionById(inv.definitionId);
+    if (!invDef) continue;
+
+    for (const abilityState of inv.abilityStates) {
+      const ability = contentGetEntry<CombatAbilityContent>(abilityState.abilityId);
+      if (!ability) continue;
+      const effect = contentGetEntry<AbilityEffectContent>(ability.effectType);
+      if (effect?.statusName === 'disarm') {
+        return { invaderName: invDef.name, chance: ability.value };
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function processCombatKill(
+  invasion: ActiveInvasion,
+  actor: { name: string },
+  target: { id: string; name: string; side: string },
+  roomId: string,
+  damage: number,
+  sourceLabel?: string,
+): void {
+  if (target.side === 'invader') {
+    const invId = target.id as unknown as string;
+    invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, invId);
+    invasion.invaderHpMap[invId] = 0;
+    const invDef = invasion.invasionState.invaders.find((i) => i.id === invId);
+    const classDef = invDef ? invaderGetDefinitionById(invDef.definitionId) : undefined;
+    invasion.killedInvaderClasses.push(classDef?.invaderClass ?? 'warrior');
+
+    // Check if allies have courage status before applying morale penalty
+    const aliveInvaders = invasion.currentRoomTurnQueue?.combatants.filter(
+      (c) => c.hp > 0 && c.side === 'invader' && c.id !== target.id,
+    ) ?? [];
+    const allHaveCourage = aliveInvaders.length > 0 && aliveInvaders.every((c) => combatantHasStatus(c, 'courage'));
+    if (!allHaveCourage) {
+      moraleApplyAllyDeath(
+        invDef ?? invasion.invasionState.invaders[0],
+        invasion.currentTurn,
+      );
+    }
+
+    const msg = sourceLabel
+      ? `${actor.name}'s ${sourceLabel} kills ${target.name}!`
+      : `${actor.name} killed ${target.name}!`;
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'combat_kill',
+      roomId,
+      message: msg,
+      details: { damage },
+    });
+  } else {
+    const defId = target.id as unknown as InhabitantInstanceId;
+    invasion.killedDefenderIds.push(defId);
+    invasion.invasionState = invasionWinLossRecordDefenderLoss(invasion.invasionState);
+
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'defender_killed',
+      roomId,
+      message: `${target.name} has fallen to ${actor.name}!`,
+      details: { damage },
+    });
+  }
+}
+
+function processAbilityResult(
+  invasion: ActiveInvasion,
+  actor: { name: string; id: string },
+  actionResult: { abilityActivation?: { abilityName: string; effectType: string; damage: number; statusApplied?: string; statusDuration: number; targetIds: string[]; targetsHit: number; targetType: string } | undefined },
+  roomId: string,
+): void {
+  const activation = actionResult.abilityActivation;
+  if (!activation) return;
+
+  const { abilityName, effectType, damage, statusApplied, statusDuration, targetIds, targetsHit, targetType } = activation;
+
+  // Handle Scout effect
+  if (effectType === 'Scout Effect' || effectType === 'Scout') {
+    const scoutCount = activation.targetsHit || 2;
+    const currentIdx = invasion.currentRoomIndex;
+    for (let i = 1; i <= scoutCount; i++) {
+      const idx = currentIdx + i;
+      if (idx < invasion.path.length) {
+        const rid = invasion.path[idx];
+        if (!invasion.scoutedRoomIds.includes(rid)) {
+          invasion.scoutedRoomIds.push(rid);
+        }
+      }
+    }
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_scout',
+      roomId,
+      message: `${actor.name} scouts ahead, revealing ${scoutCount} rooms!`,
+      details: { abilityName, effectType },
+    });
+    return;
+  }
+
+  // Handle damage
+  if (damage > 0) {
+    const logType = targetType === 'aoe' && targetsHit > 1
+      ? `${actor.name} uses ${abilityName}, hitting ${targetsHit} targets for ${damage} damage each!`
+      : `${actor.name} uses ${abilityName} for ${damage} damage!`;
+
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_use',
+      roomId,
+      message: logType,
+      details: { abilityName, effectType, damage },
+    });
+
+    // Check for kills and sync HP
+    for (const tid of targetIds) {
+      const target = invasion.currentRoomTurnQueue?.combatants.find((c) => c.id === tid);
+      if (!target) continue;
+      if (target.side === 'invader') {
+        invasion.invaderHpMap[target.id as unknown as string] = target.hp;
+      }
+      if (target.hp <= 0) {
+        processCombatKill(invasion, actor, target, roomId, damage, abilityName);
+      }
+    }
+    return;
+  }
+
+  // Handle heal
+  if (effectType === 'Heal Effect' || effectType === 'Heal') {
+    const targetName = invasion.currentRoomTurnQueue?.combatants.find((c) => targetIds.includes(c.id as string))?.name ?? 'ally';
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_heal',
+      roomId,
+      message: `${actor.name} uses ${abilityName} on ${targetName}, restoring HP!`,
+      details: { abilityName, effectType },
+    });
+
+    // Sync healed invader HP
+    for (const tid of targetIds) {
+      const target = invasion.currentRoomTurnQueue?.combatants.find((c) => c.id === tid);
+      if (target?.side === 'invader') {
+        invasion.invaderHpMap[target.id as unknown as string] = target.hp;
+      }
+    }
+    return;
+  }
+
+  // Handle resurrect
+  if (statusApplied === 'resurrected') {
+    const targetName = invasion.currentRoomTurnQueue?.combatants.find((c) => targetIds.includes(c.id as string))?.name ?? 'fallen ally';
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_heal',
+      roomId,
+      message: `${actor.name} resurrects ${targetName}!`,
+      details: { abilityName, effectType },
+    });
+    return;
+  }
+
+  // Handle buff
+  if (statusApplied === 'shielded' || statusApplied === 'courage') {
+    const durationMsg = statusDuration > 0 ? ` for ${statusDuration} turns` : '';
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_buff',
+      roomId,
+      message: `${actor.name} uses ${abilityName}, gaining ${statusApplied}${durationMsg}!`,
+      details: { abilityName, effectType, statusApplied, duration: statusDuration },
+    });
+    return;
+  }
+
+  // Handle debuff (stun, mark, dispel)
+  if (statusApplied === 'stunned' || statusApplied === 'marked' || statusApplied === 'dispel') {
+    const targetName = invasion.currentRoomTurnQueue?.combatants.find((c) => targetIds.includes(c.id as string))?.name ?? 'target';
+    const statusLabel = statusApplied === 'dispel' ? 'removing all effects' : `inflicting ${statusApplied}`;
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_debuff',
+      roomId,
+      message: `${actor.name} uses ${abilityName} on ${targetName}, ${statusLabel}!`,
+      details: { abilityName, effectType, statusApplied, duration: statusDuration },
+    });
+    return;
+  }
+
+  // Fallback log for any other ability
+  invasion.battleLog.push({
+    turn: invasion.currentTurn,
+    type: 'ability_use',
+    roomId,
+    message: `${actor.name} uses ${abilityName}!`,
+    details: { abilityName, effectType },
+  });
+}
+
 function processCombatRound(
   invasion: ActiveInvasion,
   rng: seedrandom.PRNG,
+  state?: GameState,
 ): void {
   if (!invasion.currentRoomTurnQueue) return;
 
@@ -998,51 +1280,30 @@ function processCombatRound(
       const actor = invasionCombatGetCurrentActor(invasion.currentRoomTurnQueue);
       if (!actor) break;
 
+      // Log stun skip
+      if (actor.statusEffects.some((s) => s.name === 'stunned')) {
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'ability_debuff',
+          roomId,
+          message: `${actor.name} is stunned and cannot act!`,
+        });
+      }
+
       const { queue: newQueue, result: actionResult } = invasionCombatExecuteAiTurn(
         invasion.currentRoomTurnQueue,
         rng,
       );
       invasion.currentRoomTurnQueue = newQueue;
 
+      // Handle attack results
       if (actionResult.action === 'attack' && actionResult.combatResult) {
         const target = invasion.currentRoomTurnQueue.combatants.find(
           (c) => c.id === actionResult.targetId,
         );
         if (actionResult.combatResult.hit) {
           if (actionResult.combatResult.defenderDead && target) {
-            if (target.side === 'invader') {
-              const invId = target.id as unknown as string;
-              invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, invId);
-              invasion.invaderHpMap[invId] = 0;
-              const invDef = invasion.invasionState.invaders.find((i) => i.id === invId);
-              const classDef = invDef ? invaderGetDefinitionById(invDef.definitionId) : undefined;
-              invasion.killedInvaderClasses.push(classDef?.invaderClass ?? 'warrior');
-
-              moraleApplyAllyDeath(
-                invDef ?? invasion.invasionState.invaders[0],
-                invasion.currentTurn,
-              );
-
-              invasion.battleLog.push({
-                turn: invasion.currentTurn,
-                type: 'combat_kill',
-                roomId,
-                message: `${actor.name} killed ${target.name}!`,
-                details: { damage: actionResult.combatResult.damage },
-              });
-            } else {
-              const defId = target.id as unknown as InhabitantInstanceId;
-              invasion.killedDefenderIds.push(defId);
-              invasion.invasionState = invasionWinLossRecordDefenderLoss(invasion.invasionState);
-
-              invasion.battleLog.push({
-                turn: invasion.currentTurn,
-                type: 'defender_killed',
-                roomId,
-                message: `${target.name} has fallen to ${actor.name}!`,
-                details: { damage: actionResult.combatResult.damage },
-              });
-            }
+            processCombatKill(invasion, actor, target, roomId, actionResult.combatResult.damage);
           } else {
             invasion.battleLog.push({
               turn: invasion.currentTurn,
@@ -1055,13 +1316,34 @@ function processCombatRound(
             }
           }
         } else {
-          invasion.battleLog.push({
-            turn: invasion.currentTurn,
-            type: 'combat_miss',
-            roomId,
-            message: `${actor.name} missed ${target?.name ?? 'target'}.`,
+          // Check if miss was due to evasion
+          const wasEvaded = actionResult.combatResult.roll === 0 && target && target.abilityStates.some((s) => {
+            const ability = contentGetEntry<CombatAbilityContent>(s.abilityId);
+            if (!ability) return false;
+            const effect = contentGetEntry<AbilityEffectContent>(ability.effectType);
+            return effect?.overrideTargetsHit === 0;
           });
+          if (wasEvaded) {
+            invasion.battleLog.push({
+              turn: invasion.currentTurn,
+              type: 'combat_miss',
+              roomId,
+              message: `${target?.name ?? 'target'} evades ${actor.name}'s attack!`,
+            });
+          } else {
+            invasion.battleLog.push({
+              turn: invasion.currentTurn,
+              type: 'combat_miss',
+              roomId,
+              message: `${actor.name} missed ${target?.name ?? 'target'}.`,
+            });
+          }
         }
+      }
+
+      // Handle ability results
+      if (actionResult.action === 'ability' && actionResult.abilityActivation) {
+        processAbilityResult(invasion, actor, actionResult, roomId);
       }
 
       invasion.currentRoomTurnQueue = invasionCombatAdvanceTurn(invasion.currentRoomTurnQueue);
@@ -1073,11 +1355,39 @@ function processCombatRound(
     const defendersAlive = alive.filter((c) => c.side === 'defender');
 
     if (invadersAlive.length === 0 || defendersAlive.length === 0) {
+      // Sync ability states back to invader/inhabitant instances
+      syncCombatStateBack(invasion, state);
       break;
     }
 
     invasion.currentRoomTurnQueue = invasionCombatStartNewRound(invasion.currentRoomTurnQueue);
     break; // Only one round per tick
+  }
+}
+
+/**
+ * Sync ability states and status effects from combatants back to invader/inhabitant instances.
+ */
+function syncCombatStateBack(invasion: ActiveInvasion, state?: GameState): void {
+  if (!invasion.currentRoomTurnQueue) return;
+
+  for (const combatant of invasion.currentRoomTurnQueue.combatants) {
+    if (combatant.side === 'invader') {
+      const invId = combatant.id as unknown as string;
+      const invader = invasion.invasionState.invaders.find((i) => i.id === invId);
+      if (invader) {
+        invader.abilityStates = combatant.abilityStates;
+        invader.statusEffects = combatant.statusEffects;
+      }
+      invasion.invaderHpMap[invId] = combatant.hp;
+    } else if (combatant.side === 'defender' && state) {
+      const defId = combatant.id as unknown as InhabitantInstanceId;
+      const inhabitant = state.world.inhabitants.find((i) => i.instanceId === defId);
+      if (inhabitant) {
+        inhabitant.abilityStates = combatant.abilityStates;
+        inhabitant.statusEffects = combatant.statusEffects;
+      }
+    }
   }
 }
 
@@ -1203,6 +1513,7 @@ function createEmptyCompletedInvasion(
     currentRoomDefenderIds: [],
     battleLog: [{ turn: 0, type: 'invasion_end', message: 'No invaders appeared.' }],
     currentTurn: 0,
+    scoutedRoomIds: [],
     roomFearLevels: {},
     unreachableObjectiveCount: 0,
     profile,

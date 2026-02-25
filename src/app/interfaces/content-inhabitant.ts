@@ -1,4 +1,5 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { CombatAbilityId } from '@interfaces/content-combatability';
 import type { InhabitantTraitId } from '@interfaces/content-inhabitanttrait';
 import type {
   InhabitantState,
@@ -34,4 +35,5 @@ export type InhabitantContent = IsContentItem &
     upkeepCost?: Partial<Record<ResourceType, number>>;
     recruitmentRequirements?: RecruitmentRequirement[];
     statOverrides?: Partial<InhabitantStats>;
+    combatAbilityIds?: CombatAbilityId[];
   };

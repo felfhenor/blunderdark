@@ -1,5 +1,5 @@
 import type { InvasionId } from '@interfaces/content-invasion';
-import type { CombatResult } from '@interfaces/combat';
+import type { AbilityActivation, AbilityState, CombatResult, StatusEffect } from '@interfaces/combat';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type {
@@ -169,6 +169,8 @@ export type Combatant = {
   defense: number;
   hasActed: boolean;
   position: TilePosition | undefined;
+  abilityStates: AbilityState[];
+  statusEffects: StatusEffect[];
 };
 
 export type TurnAction = 'move' | 'attack' | 'ability' | 'wait';
@@ -179,6 +181,7 @@ export type ActionResult = {
   targetId: CombatantId | undefined;
   targetPosition: TilePosition | undefined;
   combatResult: CombatResult | undefined;
+  abilityActivation: AbilityActivation | undefined;
 };
 
 export type TurnQueue = {
@@ -198,6 +201,12 @@ export type BattleLogEntryType =
   | 'combat_miss'
   | 'combat_kill'
   | 'defender_killed'
+  | 'ability_use'
+  | 'ability_heal'
+  | 'ability_buff'
+  | 'ability_debuff'
+  | 'ability_scout'
+  | 'ability_disarm'
   | 'morale_change'
   | 'objective_progress'
   | 'objective_complete'
@@ -261,6 +270,9 @@ export type ActiveInvasion = {
   // Battle log (grows each tick)
   battleLog: BattleLogEntry[];
   currentTurn: number;
+
+  // Scouted rooms (trap triggers skipped for these rooms)
+  scoutedRoomIds: string[];
 
   // Fear levels per room (captured at start for determinism)
   roomFearLevels: Record<string, number>;
