@@ -14,6 +14,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Do NOT import `@helpers/notify` in testable helpers** — causes circular deps through barrel exports. Return data and let components call notify.
 - **Do not use `null`** — use `undefined` for optional/missing values.
 - **Prefer modals/popups over separate pages** for new features.
+- **Leverage `es-toolkit` in TypeScript** — for string utilities (`startCase`, `camelCase`, etc.) and collection functions (`sortBy`, `groupBy`, `uniq`, etc.), always prefer `es-toolkit` or `es-toolkit/compat` over manual implementations. Never hand-roll regex-based string transformations when `es-toolkit` provides the function. In templates, prefer Angular's built-in pipes (`titlecase`, `lowercase`, etc.) instead.
 - **NEVER show real (wall-clock) time** — all durations and countdowns must use in-game time units (days, hours, minutes). Never convert game time to real seconds via `ticksToRealSeconds` or `formatDurationSeconds` for display purposes.
 
 ## Content Pipeline

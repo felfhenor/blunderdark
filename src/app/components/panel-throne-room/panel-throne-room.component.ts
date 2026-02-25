@@ -18,6 +18,7 @@ import { formatMultiplierAsPercentage } from '@helpers/format';
 import { gamestate } from '@helpers/state-game';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { startCase } from 'es-toolkit';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
@@ -107,6 +108,6 @@ export class PanelThroneRoomComponent {
   }
 
   private formatBonusName(key: string): string {
-    return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+    return startCase(key);
   }
 }
