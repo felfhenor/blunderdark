@@ -75,7 +75,7 @@ export class HungerIndicatorComponent {
 
   public shouldShow = computed(() => {
     const state = this.hungerState();
-    return state === 'hungry' || state === 'starving' || this.isInappetent();
+    return state === 'hungry' || state === 'starving';
   });
 
   public hungerLabel = computed(() => {
