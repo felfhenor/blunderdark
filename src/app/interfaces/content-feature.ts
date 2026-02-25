@@ -14,7 +14,6 @@ export type FeatureBonusType =
   | 'flat_production'
   | 'corruption_generation'
   | 'combat_bonus'
-  | 'teleport_link'
   | 'storage_bonus'
   | 'corruption_seal'
   | 'training_xp'

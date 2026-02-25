@@ -465,69 +465,6 @@ export function featureSacrificeProcess(rooms: PlacedRoom[], numTicks = 1): void
   }
 }
 
-// --- Fungal Network ---
-
-/**
- * Check if a room has a Fungal Network feature (teleport_link bonus).
- */
-export function featureHasFungalNetwork(placedRoom: PlacedRoom): boolean {
-  return featureGetBonuses(placedRoom, 'teleport_link').length > 0;
-}
-
-/**
- * Get all rooms on floors that have Fungal Network features, excluding a given room.
- */
-export function featureGetFungalNetworkDestinations(
-  floors: Floor[],
-  sourceRoomId: PlacedRoomId,
-): { floor: Floor; room: PlacedRoom }[] {
-  const destinations: { floor: Floor; room: PlacedRoom }[] = [];
-  for (const floor of floors) {
-    for (const room of floor.rooms) {
-      if (room.id === sourceRoomId) continue;
-      if (featureHasFungalNetwork(room)) {
-        destinations.push({ floor, room });
-      }
-    }
-  }
-  return destinations;
-}
-
-/**
- * Check if an inhabitant can be transferred via Fungal Network.
- */
-export function featureCanFungalTransfer(
-  floors: Floor[],
-  sourceRoom: PlacedRoom,
-  inhabitant: InhabitantInstance,
-): { allowed: boolean; reason?: string } {
-  if (!featureHasFungalNetwork(sourceRoom)) {
-    return { allowed: false, reason: 'Source room has no Fungal Network' };
-  }
-
-  if (inhabitant.assignedRoomId !== sourceRoom.id) {
-    return { allowed: false, reason: 'Inhabitant is not assigned to this room' };
-  }
-
-  const destinations = featureGetFungalNetworkDestinations(floors, sourceRoom.id);
-  if (destinations.length === 0) {
-    return { allowed: false, reason: 'No other Fungal Network rooms available' };
-  }
-
-  return { allowed: true };
-}
-
-/**
- * Transfer an inhabitant instantly via Fungal Network.
- */
-export function featureFungalTransfer(
-  inhabitant: InhabitantInstance,
-  destinationRoomId: PlacedRoomId,
-): void {
-  inhabitant.assignedRoomId = destinationRoomId;
-  inhabitant.travelTicksRemaining = 0;
-}
-
 /**
  * Attach a feature to a specific slot on a room.
  * Initializes featureIds array if needed and ensures proper length.

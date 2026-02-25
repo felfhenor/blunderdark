@@ -75,15 +75,3 @@
       targetType: fire
       description: 'Fire damage bonus to inhabitants in combat'
 
-- id: d0d66f94-caaa-4ca1-8dd2-adf8fe778487
-  name: Fungal Network
-  description: 'An interconnected mycelium web that enables instant inhabitant transfer between rooms with matching networks.'
-  category: environmental
-  cost:
-    gold: 60
-    food: 20
-    essence: 10
-  bonuses:
-    - type: teleport_link
-      value: 1
-      description: 'Enables instant transfer between linked Fungal Network rooms'

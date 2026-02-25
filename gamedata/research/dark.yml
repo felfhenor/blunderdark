@@ -87,8 +87,6 @@
     - type: biome
       targetBiome: corrupted
     - type: roomfeature
-      targetFeatureId: Fungal Network
-    - type: roomfeature
       targetFeatureId: Bioluminescent Moss
   tier: 2
   requiredTicks: 150
