@@ -6,7 +6,6 @@ import { CurrencyCostListComponent } from '@components/currency-cost-list/curren
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   alchemyLabCanConvert,
-  alchemyLabCompleted$,
   alchemyLabGetAdjacentRoomTypeIds,
   alchemyLabGetAvailableRecipes,
   alchemyLabGetConversion,
@@ -18,7 +17,6 @@ import {
   floorCurrent,
   gamestate,
   gridSelectedTile,
-  notify,
   resourceCanAfford,
   updateGamestate,
 } from '@helpers';
@@ -36,10 +34,6 @@ import { sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelAlchemyLabComponent {
-  private subscription = alchemyLabCompleted$.subscribe((evt) => {
-    notify('Alchemy', `Converted: +${evt.outputAmount} ${evt.outputResource}`);
-  });
-
   public labRoom = computed(() => {
     const tile = gridSelectedTile();
     const floor = floorCurrent();
