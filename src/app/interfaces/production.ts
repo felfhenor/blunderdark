@@ -58,13 +58,21 @@ export type RoomProductionDetail = {
 
 export type ConsumptionDetail = {
   sourceName: string;
-  category: 'feeding' | 'legendary_upkeep' | 'feature_maintenance';
+  category: 'feeding' | 'legendary_upkeep' | 'feature_maintenance' | 'alchemy_input';
   amount: number;
   roomName?: string;
 };
 
+export type AlchemyConversionDetail = {
+  recipeName: string;
+  roomName: string;
+  floorDepth: number;
+  perTick: number;
+};
+
 export type ResourceDetailedBreakdown = {
   production: RoomProductionDetail[];
+  alchemyProduction: AlchemyConversionDetail[];
   consumption: ConsumptionDetail[];
   totals: {
     base: number;
@@ -72,7 +80,9 @@ export type ResourceDetailedBreakdown = {
     adjacencyBonus: number;
     modifierEffect: number;
     totalProduction: number;
+    alchemyProduction: number;
     totalConsumption: number;
+    alchemyConsumption: number;
     net: number;
   };
 };

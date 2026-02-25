@@ -48,7 +48,7 @@
     <div class="overflow-y-auto max-h-[400px]">
       <!-- Base Tab -->
       @if (activeTab() === 'base') {
-        @if (sortedProduction().length === 0) {
+        @if (sortedProduction().length === 0 && alchemyProductionDetails().length === 0) {
           <div class="text-center opacity-50 py-8">
             No rooms producing this resource.
           </div>
@@ -72,6 +72,18 @@
                     [class.text-error]="room.final < 0"
                   >
                     {{ formatRate(room.final) }}
+                  </td>
+                </tr>
+              }
+              @for (a of alchemyProductionDetails(); track $index) {
+                <tr>
+                  <td>
+                    {{ a.roomName }}
+                    <span class="opacity-50">({{ a.recipeName }})</span>
+                  </td>
+                  <td class="text-right">{{ a.floorDepth }}</td>
+                  <td class="text-right font-semibold text-success">
+                    {{ formatRate(a.perTick) }}
                   </td>
                 </tr>
               }

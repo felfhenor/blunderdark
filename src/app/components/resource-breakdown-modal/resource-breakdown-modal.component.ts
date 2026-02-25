@@ -11,6 +11,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
 import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import {
+  alchemyLabCalculateBreakdown,
   consumptionCalculateDetailedBreakdown,
   gamestate,
   productionCalculateDetailedBreakdown,
@@ -18,6 +19,7 @@ import {
 } from '@helpers';
 import type { ResourceType } from '@interfaces';
 import type {
+  AlchemyConversionDetail,
   ConsumptionDetail,
   ResourceDetailedBreakdown,
   RoomProductionDetail,
@@ -62,12 +64,20 @@ export class ResourceBreakdownModalComponent {
       resType,
     );
 
+    const alchemy = alchemyLabCalculateBreakdown(
+      state.world.floors,
+      state.world.alchemyConversions,
+      resType,
+    );
+
     let totalBase = 0;
     let totalInhabitantBonus = 0;
     let totalAdjacencyBonus = 0;
     let totalModifierEffect = 0;
     let totalProduction = 0;
     let totalConsumption = 0;
+    let totalAlchemyProduction = 0;
+    let totalAlchemyConsumption = 0;
 
     for (const room of production) {
       totalBase += room.base;
@@ -81,17 +91,34 @@ export class ResourceBreakdownModalComponent {
       totalConsumption += c.amount;
     }
 
+    for (const a of alchemy.production) {
+      totalAlchemyProduction += a.perTick;
+    }
+
+    for (const a of alchemy.consumption) {
+      totalAlchemyConsumption += a.amount;
+    }
+
+    const allConsumption = [...consumption, ...alchemy.consumption];
+
     return {
       production,
-      consumption,
+      alchemyProduction: alchemy.production,
+      consumption: allConsumption,
       totals: {
         base: totalBase,
         inhabitantBonus: totalInhabitantBonus,
         adjacencyBonus: totalAdjacencyBonus,
         modifierEffect: totalModifierEffect,
-        totalProduction,
-        totalConsumption,
-        net: totalProduction - totalConsumption,
+        totalProduction: totalProduction + totalAlchemyProduction,
+        alchemyProduction: totalAlchemyProduction,
+        totalConsumption: totalConsumption + totalAlchemyConsumption,
+        alchemyConsumption: totalAlchemyConsumption,
+        net:
+          totalProduction +
+          totalAlchemyProduction -
+          totalConsumption -
+          totalAlchemyConsumption,
       },
     };
   });
@@ -123,6 +150,12 @@ export class ResourceBreakdownModalComponent {
     );
   });
 
+  public alchemyProductionDetails = computed<AlchemyConversionDetail[]>(() => {
+    const bd = this.breakdown();
+    if (!bd) return [];
+    return bd.alchemyProduction;
+  });
+
   public consumptionDetails = computed<ConsumptionDetail[]>(() => {
     const bd = this.breakdown();
     if (!bd) return [];
@@ -143,7 +176,7 @@ export class ResourceBreakdownModalComponent {
   }
 
   public categoryLabel(
-    category: 'feeding' | 'legendary_upkeep' | 'feature_maintenance',
+    category: 'feeding' | 'legendary_upkeep' | 'feature_maintenance' | 'alchemy_input',
   ): string {
     switch (category) {
       case 'feeding':
@@ -152,6 +185,8 @@ export class ResourceBreakdownModalComponent {
         return 'Legendary Upkeep';
       case 'feature_maintenance':
         return 'Maintenance';
+      case 'alchemy_input':
+        return 'Alchemy';
     }
   }
 }

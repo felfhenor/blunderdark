@@ -9,6 +9,7 @@ import {
   roomShapeResolve,
 } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import type {
   AlchemyConversion,
   AlchemyRecipeContent,
@@ -21,6 +22,10 @@ import type {
 } from '@interfaces';
 import type { AlchemyLabCompletedEvent } from '@interfaces/alchemy';
 import type { RoomContent } from '@interfaces/content-room';
+import type {
+  AlchemyConversionDetail,
+  ConsumptionDetail,
+} from '@interfaces/production';
 import { Subject } from 'rxjs';
 
 // --- Constants ---
@@ -220,6 +225,88 @@ export function alchemyLabGetAdjacentRoomTypeIds(
   }
 
   return adjacentTypes;
+}
+
+// --- Breakdown for currency modal ---
+
+/**
+ * Calculate alchemy conversion production and consumption rates
+ * for a given resource type across all active alchemy labs.
+ */
+export function alchemyLabCalculateBreakdown(
+  floors: Floor[],
+  alchemyConversions: AlchemyConversion[],
+  resourceType: ResourceType,
+): {
+  production: AlchemyConversionDetail[];
+  consumption: ConsumptionDetail[];
+} {
+  const production: AlchemyConversionDetail[] = [];
+  const consumption: ConsumptionDetail[] = [];
+
+  const labTypeId = roomRoleFindById('alchemyLab');
+  if (!labTypeId) return { production, consumption };
+
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (room.roomTypeId !== labTypeId) continue;
+
+      const conversion = alchemyConversions.find((c) => c.roomId === room.id);
+      if (!conversion) continue;
+
+      const recipe = contentGetEntry<AlchemyRecipeContent>(
+        conversion.recipeId,
+      );
+      if (!recipe) continue;
+
+      // Must have at least 1 worker
+      const assignedCount = floor.inhabitants.filter(
+        (i) => i.assignedRoomId === room.id,
+      ).length;
+      if (assignedCount < 1) continue;
+
+      // Compute effective ticks and cost
+      const adjacentTypes = alchemyLabGetAdjacentRoomTypeIds(room, floor);
+      const effectiveTicks = alchemyLabGetConversionTicks(
+        room,
+        assignedCount,
+        recipe.baseTicks,
+        adjacentTypes,
+      );
+      const effectiveCost = alchemyLabGetEffectiveCost(
+        room,
+        recipe.inputCost,
+        adjacentTypes,
+      );
+
+      const roomName = roomGetDisplayName(room);
+
+      // Output production for the requested resource
+      if (recipe.outputResource === resourceType) {
+        const perTick = recipe.outputAmount / effectiveTicks;
+        production.push({
+          recipeName: recipe.name,
+          roomName,
+          floorDepth: floor.depth,
+          perTick,
+        });
+      }
+
+      // Input consumption for the requested resource
+      const inputAmount = effectiveCost[resourceType];
+      if (inputAmount && inputAmount > 0) {
+        const perTick = inputAmount / effectiveTicks;
+        consumption.push({
+          sourceName: recipe.name,
+          category: 'alchemy_input',
+          amount: perTick,
+          roomName,
+        });
+      }
+    }
+  }
+
+  return { production, consumption };
 }
 
 // --- Tick processor ---
