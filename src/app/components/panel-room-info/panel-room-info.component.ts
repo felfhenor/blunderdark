@@ -6,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -62,6 +63,9 @@ import {
   verticalTransportGetGroupsOnFloor,
   synergyGetDefinitions,
 } from '@helpers';
+import { roomRoleFindById } from '@helpers/room-roles';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { STORAGE_ROOM_BASE_BONUS } from '@helpers/resources';
 import {
   transportRemovalGetInfo,
   transportRemovalExecute,
@@ -91,6 +95,7 @@ import { startCase } from 'es-toolkit';
     NgClass,
     SweetAlert2Module,
     CurrencyCostComponent,
+    CurrencyNameComponent,
     FearBreakdownTooltipComponent,
     InhabitantCardComponent,
     StatNameComponent,
@@ -300,6 +305,28 @@ export class PanelRoomInfoComponent {
     return roomUpgradeGetApplied(room.placedRoom);
   });
 
+  public isStorageRoom = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    return room.roomTypeId === roomRoleFindById('storage');
+  });
+
+  public storageSpecializationResource = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return undefined;
+    const effects = roomUpgradeGetAppliedEffects(room.placedRoom);
+    const spec = effects.find((e) => e.type === 'storageSpecialization');
+    return spec?.resource;
+  });
+
+  public storageSpecializationAmount = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return 0;
+    const effects = roomUpgradeGetAppliedEffects(room.placedRoom);
+    const spec = effects.find((e) => e.type === 'storageSpecialization');
+    return spec?.value ?? STORAGE_ROOM_BASE_BONUS;
+  });
+
   public formatEffectTooltip(effect: RoomUpgradeEffect): string {
     switch (effect.type) {
       case 'productionBonus':
@@ -316,6 +343,8 @@ export class PanelRoomInfoComponent {
         return `Increases fear level by ${effect.value}`;
       case 'fearReductionAura':
         return `Reduces fear in adjacent rooms by ${effect.value}`;
+      case 'storageSpecialization':
+        return `Specializes this storage room to hold +${effect.value} max ${effect.resource ?? 'resource'} capacity, replacing the general +200 bonus`;
       default:
         return `${startCase(effect.type)}: ${effect.value}`;
     }

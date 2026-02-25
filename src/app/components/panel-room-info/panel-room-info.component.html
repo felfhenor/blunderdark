@@ -195,6 +195,25 @@
         }
       }
 
+      <!-- Storage Bonus -->
+      @if (isStorageRoom()) {
+        <div class="divider my-2 text-xs opacity-60">Storage Bonus</div>
+        <div class="text-xs">
+          @if (storageSpecializationResource(); as res) {
+            <span class="badge badge-sm badge-info badge-outline">
+              +{{ storageSpecializationAmount() }} max
+              <app-currency-name [type]="$any(res)" />
+              capacity
+            </span>
+          } @else {
+            <span class="badge badge-sm badge-info badge-outline">
+              +{{ storageSpecializationAmount() }} max capacity for all
+              resources
+            </span>
+          }
+        </div>
+      }
+
       <!-- Feature Slots -->
       @if (featureSlots().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Features</div>

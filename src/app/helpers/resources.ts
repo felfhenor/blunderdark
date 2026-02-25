@@ -1,6 +1,8 @@
 import { computed, type Signal } from '@angular/core';
 import { defaultResources } from '@helpers/defaults';
 import { featureCalculateStorageBonusMultiplier } from '@helpers/features';
+import { roomRoleFindById } from '@helpers/room-roles';
+import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Floor,
@@ -126,6 +128,47 @@ export function resourceIsFull(type: ResourceType): Signal<boolean> {
   });
 }
 
+export const STORAGE_ROOM_BASE_BONUS = 200;
+export const STORAGE_ROOM_SPECIALIZED_BONUS = 500;
+
+/**
+ * Calculate the flat storage bonus from all Storage Rooms for a given resource type.
+ * Unspecialized rooms add STORAGE_ROOM_BASE_BONUS to every non-corruption resource.
+ * Specialized rooms add the effect value only to the matching resource.
+ */
+export function storageRoomFlatBonus(
+  floors: Floor[],
+  resourceType: ResourceType,
+): number {
+  if (resourceType === 'corruption') return 0;
+
+  const storageRoomTypeId = roomRoleFindById('storage');
+  if (!storageRoomTypeId) return 0;
+
+  let bonus = 0;
+
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      if (room.roomTypeId !== storageRoomTypeId) continue;
+
+      const effects = roomUpgradeGetAppliedEffects(room);
+      const specialization = effects.find(
+        (e) => e.type === 'storageSpecialization',
+      );
+
+      if (specialization) {
+        if (specialization.resource === resourceType) {
+          bonus += specialization.value;
+        }
+      } else {
+        bonus += STORAGE_ROOM_BASE_BONUS;
+      }
+    }
+  }
+
+  return bonus;
+}
+
 /**
  * Compute the effective max for a resource type, including storage bonuses.
  * Corruption is excluded from storage bonuses (already MAX_SAFE_INTEGER).
@@ -136,8 +179,9 @@ export function resourceEffectiveMax(
   floors: Floor[],
 ): number {
   if (resourceType === 'corruption') return baseMax;
+  const flatBonus = storageRoomFlatBonus(floors, resourceType);
   const multiplier = featureCalculateStorageBonusMultiplier(floors, resourceType);
-  return Math.floor(baseMax * multiplier);
+  return Math.floor((baseMax + flatBonus) * multiplier);
 }
 
 /**

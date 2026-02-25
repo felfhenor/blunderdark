@@ -47,6 +47,11 @@ import { startCase } from 'es-toolkit';
         @case ('fearReduction') {
           -{{ effect().value }} fear
         }
+        @case ('storageSpecialization') {
+          +{{ effect().value }} max
+          <app-currency-name [type]="$any(effect().resource)" />
+          storage
+        }
         @default {
           {{ formatEffectType(effect().type) }}: {{ effect().value }}
         }

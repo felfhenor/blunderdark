@@ -1,0 +1,21 @@
+- id: 6c1253fc-765f-4d4f-a831-985f7e31aa96
+  name: Storage Room
+  description: A massive reinforced chamber designed to stockpile resources. Its sheer size increases the maximum capacity for all stored materials. Can be specialized via upgrades to focus on a single resource type for even greater capacity.
+  shapeId: Step 5x5
+  role: storage
+  cost:
+    gold: 80
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  fearLevel: 0
+  adjacencyBonuses: []
+  roomUpgradeIds:
+    - Crystal Vault
+    - Cold Storage
+    - Gold Treasury
+    - Flux Capacitor
+    - Research Archive
+    - Essence Reservoir

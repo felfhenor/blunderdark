@@ -1,0 +1,64 @@
+- id: af72d737-7ade-4039-b67c-5720f4be5e8c
+  name: Crystal Vault
+  description: Line the walls with crystal-resonant panels that preserve and protect mineral stores, dramatically increasing crystal capacity.
+  cost:
+    gold: 75
+    crystals: 150
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: crystals
+
+- id: 3a78cfc8-d58d-49cc-8d88-2a36b2e80e79
+  name: Cold Storage
+  description: Install enchanted cooling systems that keep food fresh indefinitely, dramatically increasing food storage capacity.
+  cost:
+    gold: 75
+    food: 150
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: food
+
+- id: 853de897-85a5-414a-a8a9-e50dc5818067
+  name: Gold Treasury
+  description: Reinforce the chamber with heavy locks and trapped alcoves, creating a secure treasury that holds far more gold.
+  cost:
+    gold: 225
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: gold
+
+- id: 6d7ca369-2b4f-4074-845a-25beb3fc3f8c
+  name: Flux Capacitor
+  description: Install arcane containment fields that stabilize volatile flux energy, allowing much greater quantities to be stored safely.
+  cost:
+    gold: 75
+    flux: 150
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: flux
+
+- id: 8baa6d60-6454-4135-a357-634174393bd1
+  name: Research Archive
+  description: Fill the chamber with enchanted shelves and preservation wards, creating a vast archive that stores far more research materials.
+  cost:
+    gold: 75
+    research: 150
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: research
+
+- id: eb08e4a2-9030-4e3a-a94d-007dfe84810f
+  name: Essence Reservoir
+  description: Carve soul-binding runes into the floor and walls, creating a spiritual reservoir that contains far more essence.
+  cost:
+    gold: 75
+    essence: 150
+  effects:
+    - type: storageSpecialization
+      value: 500
+      resource: essence

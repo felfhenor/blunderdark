@@ -1,12 +1,36 @@
 import { defaultResources } from '@helpers/defaults';
-import type { GameState, ResourceMap } from '@interfaces';
+import type {
+  Floor,
+  GameState,
+  PlacedRoom,
+  ResourceMap,
+  RoomId,
+  RoomUpgradeEffect,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
 let mockStorageMultiplier = 1;
 
+const STORAGE_ROOM_TYPE_ID = 'test-storage-room-type' as RoomId;
+const OTHER_ROOM_TYPE_ID = 'test-other-room-type' as RoomId;
+
+let mockAppliedEffects: Map<string, RoomUpgradeEffect[]> = new Map();
+
 vi.mock('@helpers/features', () => ({
   featureCalculateStorageBonusMultiplier: vi.fn(() => mockStorageMultiplier),
+}));
+
+vi.mock('@helpers/room-roles', () => ({
+  roomRoleFindById: vi.fn((role: string) =>
+    role === 'storage' ? STORAGE_ROOM_TYPE_ID : undefined,
+  ),
+}));
+
+vi.mock('@helpers/room-upgrades', () => ({
+  roomUpgradeGetAppliedEffects: vi.fn((room: PlacedRoom) =>
+    mockAppliedEffects.get(room.id) ?? [],
+  ),
 }));
 
 vi.mock('@helpers/state-game', () => {
@@ -35,7 +59,21 @@ const {
   resourceMigrate,
   resourceEffectiveMax,
   resourceStorageProcess,
+  storageRoomFlatBonus,
+  STORAGE_ROOM_BASE_BONUS,
+  STORAGE_ROOM_SPECIALIZED_BONUS,
 } = await import('@helpers/resources');
+
+function makeRoom(
+  id: string,
+  roomTypeId: RoomId,
+): PlacedRoom {
+  return { id, roomTypeId } as PlacedRoom;
+}
+
+function makeFloor(rooms: PlacedRoom[]): Floor {
+  return { rooms } as Floor;
+}
 
 describe('resourceAdd', () => {
   beforeEach(() => {
@@ -291,9 +329,84 @@ describe('resourceMigrate', () => {
   });
 });
 
+describe('storageRoomFlatBonus', () => {
+  beforeEach(() => {
+    mockAppliedEffects = new Map();
+  });
+
+  it('returns 0 when no storage rooms exist', () => {
+    expect(storageRoomFlatBonus([], 'gold')).toBe(0);
+  });
+
+  it('returns base bonus for one unspecialized storage room', () => {
+    const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    const floors = [makeFloor([room])];
+    expect(storageRoomFlatBonus(floors, 'gold')).toBe(STORAGE_ROOM_BASE_BONUS);
+  });
+
+  it('stacks base bonus for two unspecialized storage rooms', () => {
+    const r1 = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    const r2 = makeRoom('s2', STORAGE_ROOM_TYPE_ID);
+    const floors = [makeFloor([r1, r2])];
+    expect(storageRoomFlatBonus(floors, 'gold')).toBe(
+      STORAGE_ROOM_BASE_BONUS * 2,
+    );
+  });
+
+  it('returns specialized bonus when resource matches', () => {
+    const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    mockAppliedEffects.set('s1', [
+      { type: 'storageSpecialization', value: STORAGE_ROOM_SPECIALIZED_BONUS, resource: 'crystals' },
+    ]);
+    const floors = [makeFloor([room])];
+    expect(storageRoomFlatBonus(floors, 'crystals')).toBe(
+      STORAGE_ROOM_SPECIALIZED_BONUS,
+    );
+  });
+
+  it('returns 0 for non-matching resource on specialized room', () => {
+    const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    mockAppliedEffects.set('s1', [
+      { type: 'storageSpecialization', value: STORAGE_ROOM_SPECIALIZED_BONUS, resource: 'crystals' },
+    ]);
+    const floors = [makeFloor([room])];
+    expect(storageRoomFlatBonus(floors, 'gold')).toBe(0);
+  });
+
+  it('ignores non-storage rooms', () => {
+    const room = makeRoom('r1', OTHER_ROOM_TYPE_ID);
+    const floors = [makeFloor([room])];
+    expect(storageRoomFlatBonus(floors, 'gold')).toBe(0);
+  });
+
+  it('returns 0 for corruption regardless of storage rooms', () => {
+    const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    const floors = [makeFloor([room])];
+    expect(storageRoomFlatBonus(floors, 'corruption')).toBe(0);
+  });
+
+  it('handles mix of specialized and unspecialized rooms', () => {
+    const r1 = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    const r2 = makeRoom('s2', STORAGE_ROOM_TYPE_ID);
+    mockAppliedEffects.set('s2', [
+      { type: 'storageSpecialization', value: STORAGE_ROOM_SPECIALIZED_BONUS, resource: 'gold' },
+    ]);
+    const floors = [makeFloor([r1, r2])];
+    // r1 gives base bonus, r2 gives specialized bonus for gold
+    expect(storageRoomFlatBonus(floors, 'gold')).toBe(
+      STORAGE_ROOM_BASE_BONUS + STORAGE_ROOM_SPECIALIZED_BONUS,
+    );
+    // r1 gives base bonus, r2 specialized for gold so 0 for crystals
+    expect(storageRoomFlatBonus(floors, 'crystals')).toBe(
+      STORAGE_ROOM_BASE_BONUS,
+    );
+  });
+});
+
 describe('resourceEffectiveMax', () => {
   beforeEach(() => {
     mockStorageMultiplier = 1;
+    mockAppliedEffects = new Map();
   });
 
   it('returns base max when no storage bonus (multiplier 1)', () => {
@@ -320,6 +433,14 @@ describe('resourceEffectiveMax', () => {
     mockStorageMultiplier = 1.5;
     // 200 * 1.5 = 300
     expect(resourceEffectiveMax(200, 'essence', [])).toBe(300);
+  });
+
+  it('applies flat bonus before multiplier: (base + flat) * multiplier', () => {
+    const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
+    const floors = [makeFloor([room])];
+    mockStorageMultiplier = 2;
+    // (1000 + 200) * 2 = 2400
+    expect(resourceEffectiveMax(1000, 'gold', floors)).toBe(2400);
   });
 });
 

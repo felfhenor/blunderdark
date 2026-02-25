@@ -10,8 +10,15 @@
 #   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault
 #   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Grand Arena
 #   │   └── Combat Specialization (T3) → Elite Arena + Inquisitor's Chamber + War Room
-#   └── Scholarly Design (T2) → Expanded Archives + Expanded Nexus
-#       └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle
+#   ├── Scholarly Design (T2) → Expanded Archives + Expanded Nexus
+#   │   └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle
+#   └── Storage Design (T2) → Storage Room
+#       ├── Crystal Vault Design (T3) → Crystal Vault
+#       ├── Cold Storage Design (T3) → Cold Storage
+#       ├── Treasury Design (T3) → Gold Treasury
+#       ├── Flux Containment Design (T3) → Flux Capacitor
+#       ├── Archive Design (T3) → Research Archive
+#       └── Essence Reservoir Design (T3) → Essence Reservoir
 #   Resonant Design (T4) [Deep Extraction + Sanctum Design] → Resonant Mine + Tranquil Garden
 #   Deep Water & Financial Design (T4) [Aquatic & Soul + Sanctum Design] → Deepwater Lake + Investment Vault
 #   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall + Corruption Chamber
@@ -108,6 +115,21 @@
   tier: 2
   requiredTicks: 150
 
+- id: 16c3c35b-6a51-4578-94a2-9410008ef98a
+  name: Storage Design
+  description: Design reinforced storage chambers capable of stockpiling resources beyond normal capacity, providing flat increases to all resource caps.
+  branch: architecture
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Structural Mastery
+  unlocks:
+    - type: room
+      targetRoomId: Storage Room
+  tier: 2
+  requiredTicks: 150
+
 # --- TIER 3: Specialization (each requires a T2 node) ---
 
 - id: ddd38946-a22c-4f1a-97bb-75bf8dbe70c9
@@ -181,6 +203,96 @@
       targetRoomupgradeId: Master Trapworks
     - type: roomupgrade
       targetRoomupgradeId: Dual Circle
+  tier: 3
+  requiredTicks: 300
+
+- id: ac9c3906-5c38-415e-898a-927674b53853
+  name: Crystal Vault Design
+  description: Engineer crystal-resonant paneling that dramatically increases crystal storage capacity in a specialized storage room.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Crystal Vault
+  tier: 3
+  requiredTicks: 300
+
+- id: 4a051122-899c-4e0b-ad07-0194b9eb82f2
+  name: Cold Storage Design
+  description: Develop enchanted cooling systems that preserve food indefinitely, dramatically boosting food storage capacity.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Cold Storage
+  tier: 3
+  requiredTicks: 300
+
+- id: fd2fb530-3ac0-46da-893f-08d5912d5a34
+  name: Treasury Design
+  description: Design reinforced vaults with trapped alcoves, creating a secure treasury with massively increased gold capacity.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Gold Treasury
+  tier: 3
+  requiredTicks: 300
+
+- id: 5cbca0cf-74aa-4927-8e28-18f2f4301409
+  name: Flux Containment Design
+  description: Research arcane containment fields that stabilize volatile flux energy, allowing much greater storage capacity.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Flux Capacitor
+  tier: 3
+  requiredTicks: 300
+
+- id: f6e6ec20-b47d-4abb-ad20-057cf59e04ef
+  name: Archive Design
+  description: Develop preservation wards and enchanted shelving to store vast quantities of research materials.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Research Archive
+  tier: 3
+  requiredTicks: 300
+
+- id: f5c09f10-1247-4f3d-b282-396b7c863aab
+  name: Essence Reservoir Design
+  description: Carve soul-binding runes that create spiritual reservoirs capable of containing far more essence.
+  branch: architecture
+  cost:
+    research: 50
+    gold: 15
+  prerequisiteResearchIds:
+    - Storage Design
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Essence Reservoir
   tier: 3
   requiredTicks: 300
 
