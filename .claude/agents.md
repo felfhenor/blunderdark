@@ -14,6 +14,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Do NOT import `@helpers/notify` in testable helpers** — causes circular deps through barrel exports. Return data and let components call notify.
 - **Do not use `null`** — use `undefined` for optional/missing values.
 - **Prefer modals/popups over separate pages** for new features.
+- **NEVER show real (wall-clock) time** — all durations and countdowns must use in-game time units (days, hours, minutes). Never convert game time to real seconds via `ticksToRealSeconds` or `formatDurationSeconds` for display purposes.
 
 ## Content Pipeline
 

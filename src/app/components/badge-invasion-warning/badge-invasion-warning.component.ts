@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { gameEventTimeToMinutes } from '@helpers/game-events';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import {
   invasionTriggerPendingWarning,
@@ -33,11 +34,17 @@ type ObjectiveInfo = {
       [tp]="tooltipTpl"
       tpPlacement="bottom"
     >
-      Invasion incoming!
+      Invasion incoming! ({{ remainingTime() }})
     </span>
 
     <ng-template #tooltipTpl>
       <div class="text-xs">
+        <div class="font-semibold mb-1">Arrives:</div>
+
+        <div class="mb-1">
+          Day {{ arrivalDay() }} 00:00 ({{ remainingTime() }})
+        </div>
+
         @if (invaderGroups().length > 0) {
           <div class="font-semibold mb-1">Invaders:</div>
           @for (group of invaderGroups(); track group.className) {
@@ -73,6 +80,36 @@ type ObjectiveInfo = {
 })
 export class BadgeInvasionWarningComponent {
   public readonly invasionTriggerWarningActive = invasionTriggerWarningActive;
+
+  public arrivalDay = computed(() => {
+    return gamestate().world.invasionSchedule.nextInvasionDay ?? 0;
+  });
+
+  public remainingTime = computed(() => {
+    const state = gamestate();
+    const nextDay = state.world.invasionSchedule.nextInvasionDay;
+    if (nextDay === undefined) return '';
+
+    const invasionMinutes = gameEventTimeToMinutes({
+      day: nextDay,
+      hour: 0,
+      minute: 0,
+    });
+    const currentMinutes = gameEventTimeToMinutes({
+      day: state.clock.day,
+      hour: state.clock.hour,
+      minute: state.clock.minute,
+    });
+    const remaining = Math.max(0, invasionMinutes - currentMinutes);
+
+    const days = Math.floor(remaining / (24 * 60));
+    const hours = Math.floor((remaining % (24 * 60)) / 60);
+    const minutes = remaining % 60;
+
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  });
 
   public invaderGroups = computed((): InvaderGroup[] => {
     const warning = invasionTriggerPendingWarning();
