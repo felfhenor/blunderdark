@@ -1,6 +1,8 @@
 import { contentGetEntry } from '@helpers/content';
+import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngUuid } from '@helpers/rng';
+import { gamestate } from '@helpers/state-game';
 import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type {
   Floor,
@@ -159,7 +161,9 @@ export function trapRollTrigger(
   // Rogues attempt disarm (60% chance) unless trap cannot be disarmed
   if (isRogue && def.canBeDisarmed) {
     const detectionBonus = throneRoomRulerBonus('detection');
-    const disarmChance = Math.max(0, 0.6 - detectionBonus);
+    const allInhabitants = gamestate()?.world?.inhabitants ?? [];
+    const revealAura = legendaryAuraGetBonus(allInhabitants, 'aura_reveal_invaders');
+    const disarmChance = Math.max(0, 0.6 - detectionBonus - revealAura);
     if (roll < disarmChance) {
       return {
         triggered: false,
@@ -193,7 +197,9 @@ export function trapRollTrigger(
   const chargesAfter = trap.remainingCharges - 1;
   const researchTrapBonus = researchUnlockGetPassiveBonusWithMastery('trapDamage');
   const throneTrapBonus = throneRoomRulerBonus('trapEffectiveness');
-  const finalDamage = Math.round(def.damage * (1 + researchTrapBonus + throneTrapBonus));
+  const trapAuraInhabitants = gamestate()?.world?.inhabitants ?? [];
+  const legendaryTrapBonus = legendaryAuraGetBonus(trapAuraInhabitants, 'aura_trap_bonus');
+  const finalDamage = Math.round(def.damage * (1 + researchTrapBonus + throneTrapBonus + legendaryTrapBonus));
 
   return {
     triggered: true,

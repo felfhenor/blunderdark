@@ -5,6 +5,7 @@ import { altarRoomGetFearReductionAura, altarRoomIsAdjacent } from '@helpers/alt
 import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { featureCalculateFearReduction } from '@helpers/features';
+import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
@@ -261,6 +262,13 @@ export function fearLevelGetForRoom(
     if (throneRulerFearBonus !== 0) {
       baseFear *= 1 + throneRulerFearBonus;
     }
+  }
+
+  // Legendary aura fear bonus (multiplicative on base fear)
+  const allInhabitants = gamestate()?.world?.inhabitants ?? [];
+  const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_bonus');
+  if (fearAuraBonus !== 0) {
+    baseFear *= 1 + fearAuraBonus;
   }
 
   const inhabitantModifier = fearLevelCalculateInhabitantModifier(

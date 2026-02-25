@@ -18,6 +18,7 @@ import {
 } from '@helpers/features';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import {
   productionModifierCalculate,
   productionModifierEvaluate,
@@ -80,6 +81,15 @@ function productionGetResearchMultiplier(resourceType: string): number {
   }
 
   return 1 + resourceBonus + allBonus + rulerBonus;
+}
+
+function productionGetLegendaryAuraMultiplier(
+  resourceType: string,
+  allInhabitants: InhabitantInstance[],
+): number {
+  const foodAura = legendaryAuraGetBonus(allInhabitants, 'aura_food_bonus');
+  const gatheringAura = legendaryAuraGetBonus(allInhabitants, 'aura_gathering_bonus');
+  return 1 + gatheringAura + (resourceType === 'food' ? foodAura : 0);
 }
 
 function productionGetReputationMultiplier(resourceType: string): number {
@@ -249,6 +259,7 @@ export function productionCalculateTotal(
 ): RoomProduction {
   const totalProduction: RoomProduction = {};
   const activeSynergies = synergyEvaluateAll(floors);
+  const allInhabitants = floors.flatMap((f) => f.inhabitants);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -344,6 +355,7 @@ export function productionCalculateTotal(
         );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const reputationMultiplier = productionGetReputationMultiplier(resourceType);
+        const legendaryAuraMultiplier = productionGetLegendaryAuraMultiplier(resourceType, allInhabitants);
         const final =
           baseAmount *
           (1 +
@@ -359,7 +371,8 @@ export function productionCalculateTotal(
           seasonMod *
           creatureModifier *
           researchMultiplier *
-          reputationMultiplier;
+          reputationMultiplier *
+          legendaryAuraMultiplier;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }
@@ -428,6 +441,8 @@ export function productionCalculateSingleRoom(
     productionCalculateInhabitantBonus(room, floor.inhabitants);
 
   if (roomDef.requiresWorkers && !hasWorkers) return {};
+
+  const allInhabitants = (floors ?? [floor]).flatMap((f) => f.inhabitants);
 
   const roomTiles = new Map<string, TileOffset[]>();
   for (const r of floor.rooms) {
@@ -505,6 +520,7 @@ export function productionCalculateSingleRoom(
     );
     const researchMultiplier = productionGetResearchMultiplier(resourceType);
     const reputationMultiplier = productionGetReputationMultiplier(resourceType);
+    const legendaryAuraMultiplier = productionGetLegendaryAuraMultiplier(resourceType, allInhabitants);
     production[resourceType] =
       baseAmount *
       (1 +
@@ -520,7 +536,8 @@ export function productionCalculateSingleRoom(
       seasonMod *
       creatureModifier *
       researchMultiplier *
-      reputationMultiplier;
+      reputationMultiplier *
+      legendaryAuraMultiplier;
   }
 
   // Add flat production from features
@@ -591,6 +608,7 @@ export function productionCalculateBreakdowns(
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
   const activeSynergies = synergyEvaluateAll(floors);
+  const allInhabitantsForAura = floors.flatMap((f) => f.inhabitants);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -685,6 +703,7 @@ export function productionCalculateBreakdowns(
         );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const reputationMultiplier = productionGetReputationMultiplier(resourceType);
+        const legendaryAuraMultiplier = productionGetLegendaryAuraMultiplier(resourceType, allInhabitantsForAura);
         const modifier =
           stateModifier *
           envModifier *
@@ -702,7 +721,8 @@ export function productionCalculateBreakdowns(
             synergyBonusVal);
         const afterModifiers = withBonuses * modifier;
         const afterResearch = afterModifiers * researchMultiplier;
-        const finalAmount = afterResearch * reputationMultiplier;
+        const afterReputation = afterResearch * reputationMultiplier;
+        const finalAmount = afterReputation * legendaryAuraMultiplier;
 
         if (!breakdowns[resourceType]) {
           breakdowns[resourceType] = {
@@ -723,7 +743,7 @@ export function productionCalculateBreakdowns(
           baseAmount * adjacencyBonusVal;
         breakdowns[resourceType].modifierEffect += afterModifiers - withBonuses;
         breakdowns[resourceType].researchBonus += afterResearch - afterModifiers;
-        breakdowns[resourceType].reputationBonus += finalAmount - afterResearch;
+        breakdowns[resourceType].reputationBonus += afterReputation - afterResearch;
         breakdowns[resourceType].final += finalAmount;
       }
 
@@ -774,6 +794,7 @@ export function productionCalculateDetailedBreakdown(
 ): RoomProductionDetail[] {
   const details: RoomProductionDetail[] = [];
   const activeSynergies = synergyEvaluateAll(floors);
+  const allInhabitantsForAura = floors.flatMap((f) => f.inhabitants);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -1012,6 +1033,8 @@ export function productionCalculateDetailedBreakdown(
       const afterResearch = afterModifiers * researchMultiplier;
       const reputationMultiplier = productionGetReputationMultiplier(resourceType);
       const afterReputation = afterResearch * reputationMultiplier;
+      const legendaryAuraMultiplier = productionGetLegendaryAuraMultiplier(resourceType, allInhabitantsForAura);
+      const afterLegendaryAura = afterReputation * legendaryAuraMultiplier;
 
       if (reputationMultiplier !== 1.0) {
         modifierDetails.push({
@@ -1020,12 +1043,19 @@ export function productionCalculateDetailedBreakdown(
         });
       }
 
+      if (legendaryAuraMultiplier !== 1.0) {
+        modifierDetails.push({
+          name: 'Legendary Aura',
+          multiplier: legendaryAuraMultiplier,
+        });
+      }
+
       // Handle resource conversion efficiency
-      let conversionAdjusted = afterReputation;
+      let conversionAdjusted = afterLegendaryAura;
       if (hasConversion && room.convertedOutputResource === resourceType) {
         const efficiency = featureGetResourceConverterEfficiency(room);
         if (efficiency !== undefined) {
-          conversionAdjusted = afterReputation * efficiency;
+          conversionAdjusted = afterLegendaryAura * efficiency;
         }
       }
 
@@ -1041,7 +1071,7 @@ export function productionCalculateDetailedBreakdown(
       let finalAmount =
         (hasConversion && room.convertedOutputResource === resourceType
           ? conversionAdjusted
-          : afterReputation) + flatForType;
+          : afterLegendaryAura) + flatForType;
       finalAmount *= upgradeMultiplier;
 
       // Secondary production from upgrades

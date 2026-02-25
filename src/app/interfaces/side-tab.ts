@@ -11,4 +11,5 @@ export type SideTabDefinition = {
   templateRef?: TemplateRef<unknown>;
   hotkey?: string;
   action?: () => void;
+  hidden?: boolean;
 };

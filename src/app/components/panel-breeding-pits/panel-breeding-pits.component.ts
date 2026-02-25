@@ -16,8 +16,9 @@ import {
   breedingGetHybridTicks,
   breedingGetMutatableInhabitants,
   contentGetEntry,
-  findRoomByRole,
+  floorCurrent,
   gamestate,
+  gridSelectedTile,
   mutationCompleted$,
   notify,
   updateGamestate,
@@ -67,13 +68,28 @@ export class PanelBreedingPitsComponent {
     }),
   ];
 
-  public breedingRoom = computed(() => {
-    return findRoomByRole('breedingPits')?.room;
+  private selectedBreedingData = computed(() => {
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return undefined;
+
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    if (!gridTile?.roomId) return undefined;
+
+    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    if (!room) return undefined;
+
+    const def = contentGetEntry<RoomContent>(room.roomTypeId);
+    if (def?.role !== 'breedingPits') return undefined;
+
+    return { room, floor };
   });
 
-  public breedingFloor = computed<Floor | undefined>(() => {
-    return findRoomByRole('breedingPits')?.floor;
-  });
+  public breedingRoom = computed(() => this.selectedBreedingData()?.room);
+
+  public breedingFloor = computed<Floor | undefined>(
+    () => this.selectedBreedingData()?.floor,
+  );
 
   public roomDef = computed(() => {
     const room = this.breedingRoom();

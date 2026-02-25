@@ -37,7 +37,7 @@ export class SideTabRailComponent {
   public modalTabClick = output<string>();
 
   public visibleTabs = computed(() =>
-    this.tabs().filter((tab) => !tab.condition || tab.condition()),
+    this.tabs().filter((tab) => !tab.hidden && (!tab.condition || tab.condition())),
   );
 
   public activePanelTemplate = computed(() => {

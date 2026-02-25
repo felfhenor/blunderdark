@@ -35,7 +35,6 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 2
-  isUnique: true
   roomUpgradeIds:
     - Distillery
     - Advanced Laboratory
@@ -64,7 +63,6 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 4
-  isUnique: true
   roomUpgradeIds:
     - Incubation Chamber
     - Mutagenic Pits

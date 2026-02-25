@@ -243,6 +243,31 @@ export function legendaryInhabitantIsAuraActive(
 }
 
 /**
+ * Sum active legendary aura bonuses of a given effectType across all inhabitants.
+ * Returns 0 if no active auras found.
+ */
+export function legendaryAuraGetBonus(
+  inhabitants: InhabitantInstance[],
+  effectType: string,
+): number {
+  let total = 0;
+
+  for (const inhabitant of inhabitants) {
+    if (!legendaryInhabitantIsAuraActive(inhabitant)) continue;
+    const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
+    if (!def) continue;
+
+    for (const trait of def.traits) {
+      if (trait.effectType === effectType) {
+        total += trait.effectValue;
+      }
+    }
+  }
+
+  return total;
+}
+
+/**
  * Check if upkeep can be paid for an inhabitant's per-tick cost.
  * Returns true if all resources have enough to cover per-tick deduction.
  */

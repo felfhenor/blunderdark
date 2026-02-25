@@ -458,11 +458,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'alchemy',
         label: 'Alchemy',
-        icon: 'gameChemicalDrop',
-        hotkey: 'l',
         isModal: false,
         templateRef: this.alchemyPanel() ?? placeholder,
         condition: this.hasAlchemyLab,
+        hidden: true,
       },
       {
         id: 'torture',
@@ -476,11 +475,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'breeding',
         label: 'Breeding',
-        icon: 'gameCharm',
-        hotkey: 'h',
         isModal: false,
         templateRef: this.breedingPanel() ?? placeholder,
         condition: this.hasBreedingPits,
+        hidden: true,
       },
       {
         id: 'merchant',

@@ -51,6 +51,7 @@ import {
 import { roomRoleFindById } from '@helpers/room-roles';
 import { trapApplyTrigger, trapGetDefinition, trapGetInHallway, trapRollTrigger } from '@helpers/traps';
 import { invaderGetDefinitionById } from '@helpers/invaders';
+import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { gamestate } from '@helpers/state-game';
 import type { AbilityState } from '@interfaces/combat';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
@@ -849,6 +850,11 @@ export function invasionProcess(state: GameState): void {
         if (durabilityBonus > 0) {
           totalDamage = Math.max(1, Math.round(totalDamage * (1 - durabilityBonus)));
         }
+        // Legendary aura room regen reduces altar damage
+        const roomRegenAura = legendaryAuraGetBonus(state.world.inhabitants, 'aura_room_regen');
+        if (roomRegenAura > 0) {
+          totalDamage = Math.max(1, Math.round(totalDamage * (1 - roomRegenAura * 0.15)));
+        }
         invasion.invasionState = invasionWinLossDamageAltar(invasion.invasionState, totalDamage);
         invasion.battleLog.push({
           turn: invasion.currentTurn,
@@ -1145,6 +1151,19 @@ function processAbilityResult(
 
   // Handle Scout effect
   if (effectType === 'Scout Effect' || effectType === 'Scout') {
+    const allInhabitants = gamestate()?.world?.inhabitants ?? [];
+    const negateScout = legendaryAuraGetBonus(allInhabitants, 'aura_negate_scout');
+    if (negateScout > 0) {
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'ability_scout',
+        roomId,
+        message: `${actor.name} tries to scout ahead, but antimagic energy negates their efforts!`,
+        details: { abilityName, effectType },
+      });
+      return;
+    }
+
     const scoutCount = activation.targetsHit || 2;
     const currentIdx = invasion.currentRoomIndex;
     for (let i = 1; i <= scoutCount; i++) {
@@ -1361,6 +1380,34 @@ function processCombatRound(
     }
 
     invasion.currentRoomTurnQueue = invasionCombatStartNewRound(invasion.currentRoomTurnQueue);
+
+    // Legendary aura petrify: chance to stun invaders at start of each round
+    const petrifyInhabitants = state?.world?.inhabitants ?? [];
+    const petrifyChance = legendaryAuraGetBonus(petrifyInhabitants, 'aura_petrify');
+    if (petrifyChance > 0) {
+      const updatedCombatants = invasion.currentRoomTurnQueue.combatants.map((c) => {
+        if (c.side !== 'invader' || c.hp <= 0) return c;
+        if (combatantHasStatus(c, 'stunned')) return c;
+        if (rng() < petrifyChance) {
+          invasion.battleLog.push({
+            turn: invasion.currentTurn,
+            type: 'ability_debuff',
+            roomId,
+            message: `${c.name} is petrified by a dread gaze!`,
+          });
+          return {
+            ...c,
+            statusEffects: [...c.statusEffects, { name: 'stunned', remainingDuration: 2 }],
+          };
+        }
+        return c;
+      });
+      invasion.currentRoomTurnQueue = {
+        ...invasion.currentRoomTurnQueue,
+        combatants: updatedCombatants,
+      };
+    }
+
     break; // Only one round per tick
   }
 }
