@@ -14,6 +14,7 @@ import {
   defaultVictoryProgress,
 } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
+import { reputationAdd } from '@helpers/reputation';
 import { rngUuid } from '@helpers/rng';
 import { worldResolveStartingBiome } from '@helpers/world';
 import type {
@@ -21,6 +22,9 @@ import type {
   InhabitantContent,
   InhabitantInstance,
   InhabitantInstanceId,
+  ReputationActionContent,
+  ReputationType,
+  RoomContent,
 } from '@interfaces';
 import { Subject } from 'rxjs';
 
@@ -56,6 +60,25 @@ export async function worldgenGenerateWorld(): Promise<
 
   startingFloor.inhabitants = startingSlimes;
 
+  // Award reputation for auto-placed rooms that have a reputationAction
+  let reputation = defaultReputationState();
+  for (const room of startingFloor.rooms) {
+    const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
+    if (!roomDef?.reputationAction) continue;
+
+    const action = contentGetEntry<ReputationActionContent>(
+      roomDef.reputationAction,
+    );
+    if (!action?.reputationRewards) continue;
+
+    for (const [type, points] of Object.entries(action.reputationRewards) as [
+      ReputationType,
+      number,
+    ][]) {
+      reputation = reputationAdd(reputation, type, points);
+    }
+  }
+
   return {
     grid: gridCreateEmpty(),
     resources: defaultResources(),
@@ -63,7 +86,7 @@ export async function worldgenGenerateWorld(): Promise<
     hallways: [],
     season: defaultSeasonState(),
     research: defaultResearchState(),
-    reputation: defaultReputationState(),
+    reputation,
     floors: [startingFloor],
     currentFloorIndex: 0,
     trapInventory: [],
