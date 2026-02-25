@@ -13,6 +13,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
 
 import { roomPlacementPreviewShape } from '@helpers/room-placement';
+import { uiIsAnyModalOpen } from '@helpers/ui';
 import type { SideTabDefinition } from '@interfaces';
 
 @Component({
@@ -80,6 +81,9 @@ export class SideTabRailComponent {
     const key = event.key.toLowerCase();
     const tab = this.visibleTabs().find((t) => t.hotkey === key);
     if (tab) {
+      // Don't open a modal if one is already open
+      if (tab.isModal && uiIsAnyModalOpen()) return;
+
       event.preventDefault();
       this.onTabClick(tab);
     }
