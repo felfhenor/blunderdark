@@ -28,6 +28,15 @@ export const victoryIsAchieved = computed(
   () => _victoryAchievedPathId() !== undefined,
 );
 
+/** True only when victory is newly achieved during gameplay (not on load). */
+const _victoryShowPanel = signal(false);
+export const victoryShowPanel: Signal<boolean> =
+  _victoryShowPanel.asReadonly();
+
+export function victoryDismissPanel(): void {
+  _victoryShowPanel.set(false);
+}
+
 export function victoryIsPathComplete(pathId: VictoryPathId): boolean {
   return _victoryProgressMap().get(pathId)?.complete ?? false;
 }
@@ -47,9 +56,6 @@ export function victoryProcess(state: GameState): void {
     state.clock.numTicks - (state.world.victoryProgress.lastEvaluationTick ?? 0);
   if (ticksSinceLastEval < VICTORY_CHECK_INTERVAL) return;
 
-  // Don't re-evaluate if already won
-  if (state.world.victoryProgress.achievedVictoryPathId) return;
-
   state.world.victoryProgress.lastEvaluationTick = state.clock.numTicks;
 
   const paths =
@@ -66,6 +72,7 @@ export function victoryProcess(state: GameState): void {
       state.world.victoryProgress.achievedVictoryPathId = path.id;
       state.world.victoryProgress.achievedVictoryDay = state.clock.day;
       _victoryAchievedPathId.set(path.id);
+      _victoryShowPanel.set(true);
     }
   }
 
@@ -103,7 +110,6 @@ export function victoryCalculatePathCompletionPercent(
 export function victoryEvaluateImmediate(state: GameState): void {
   if (state.world.victoryProgress.achievedVictoryPathId) {
     _victoryAchievedPathId.set(state.world.victoryProgress.achievedVictoryPathId);
-    return;
   }
 
   const paths =
@@ -127,4 +133,5 @@ export function victoryRecordDefenseWin(state: GameState): void {
 export function victoryReset(): void {
   _victoryAchievedPathId.set(undefined);
   _victoryProgressMap.set(new Map());
+  _victoryShowPanel.set(false);
 }

@@ -10,6 +10,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { VictoryConditionRowComponent } from '@components/victory-condition-row/victory-condition-row.component';
 import { contentGetEntriesByType } from '@helpers/content';
 import {
+  victoryAchievedPathId,
   victoryCalculatePathCompletionPercent,
   victoryProgressMap,
 } from '@helpers/victory';
@@ -32,6 +33,7 @@ type PathViewModel = {
   completionPercent: number;
   isClosest: boolean;
   isComplete: boolean;
+  isAchieved: boolean;
 };
 
 @Component({
@@ -56,6 +58,9 @@ type PathViewModel = {
               [class.tab-active]="selectedPath()?.id === path.id"
               (click)="selectedPathId.set(path.id)"
             >
+              @if (path.isAchieved) {
+                <span class="text-success text-xs">&#x2714;</span>
+              }
               <span class="truncate text-xs">{{ path.name }}</span>
               <span
                 class="text-xs opacity-70"
@@ -72,10 +77,13 @@ type PathViewModel = {
           <div>
             <div class="flex items-center gap-2 mb-2">
               <h4 class="font-bold text-sm">{{ path.name }}</h4>
-              @if (path.isClosest) {
+              @if (path.isAchieved) {
+                <span class="badge badge-success badge-xs">
+                  Achieved!
+                </span>
+              } @else if (path.isClosest) {
                 <span class="badge badge-success badge-xs">Closest</span>
-              }
-              @if (path.isComplete) {
+              } @else if (path.isComplete) {
                 <span class="badge badge-accent badge-xs">
                   Victory Available
                 </span>
@@ -125,6 +133,7 @@ export class VictoryMenuComponent {
   public paths = computed<PathViewModel[]>(() => {
     const allPaths = contentGetEntriesByType<VictoryPathContent>('victorypath');
     const progressMap = victoryProgressMap();
+    const achievedId = victoryAchievedPathId();
 
     const viewModels: PathViewModel[] = allPaths.map((path) => {
       const progress = progressMap.get(path.id);
@@ -152,6 +161,7 @@ export class VictoryMenuComponent {
         completionPercent,
         isClosest: false,
         isComplete: progress?.complete ?? false,
+        isAchieved: path.id === achievedId,
       };
     });
 
@@ -176,7 +186,12 @@ export class VictoryMenuComponent {
     if (id !== null) {
       return allPaths.find((p) => p.id === id) ?? null;
     }
-    return allPaths.find((p) => p.isClosest) ?? allPaths[0] ?? null;
+    return (
+      allPaths.find((p) => p.isAchieved) ??
+      allPaths.find((p) => p.isClosest) ??
+      allPaths[0] ??
+      null
+    );
   });
 
   public conditionHint(cond: PathCardCondition): string {

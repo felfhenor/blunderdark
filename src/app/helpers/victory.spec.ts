@@ -42,6 +42,8 @@ const {
   victoryAchievedPathId,
   victoryProgressMap,
   victoryIsAchieved,
+  victoryShowPanel,
+  victoryDismissPanel,
   victoryCalculatePathCompletionPercent,
 } = await import('@helpers/victory');
 
@@ -225,9 +227,13 @@ describe('victoryProcess', () => {
     expect(map.get(TEST_PATH_B_ID)).toEqual(progressB);
   });
 
-  it('skips evaluation when already won', () => {
+  it('continues evaluating progress after victory for free play', () => {
     const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
-    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    const pathB = makePathContent(TEST_PATH_B_ID, 'PathB');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA, pathB]);
+    mockEvaluatePath.mockImplementation((path: VictoryPathContent) =>
+      makeProgress(path.id, false),
+    );
 
     const state = makeState({
       numTicks: 60,
@@ -235,7 +241,28 @@ describe('victoryProcess', () => {
     });
     victoryProcess(state);
 
-    expect(mockEvaluatePath).not.toHaveBeenCalled();
+    expect(mockEvaluatePath).toHaveBeenCalledTimes(2);
+    expect(victoryProgressMap().size).toBe(2);
+  });
+
+  it('does not trigger a new victory when already won', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    const pathB = makePathContent(TEST_PATH_B_ID, 'PathB');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA, pathB]);
+    mockEvaluatePath.mockImplementation((path: VictoryPathContent) =>
+      makeProgress(path.id, true),
+    );
+
+    const state = makeState({
+      numTicks: 60,
+      achievedPathId: TEST_PATH_A_ID,
+    });
+    victoryProcess(state);
+
+    expect(victoryShowPanel()).toBe(false);
+    expect(state.world.victoryProgress.achievedVictoryPathId).toBe(
+      TEST_PATH_A_ID,
+    );
   });
 
   it('does not overwrite first victory if multiple paths complete', () => {
@@ -343,6 +370,60 @@ describe('victoryReset', () => {
     expect(victoryAchievedPathId()).toBeUndefined();
     expect(victoryIsAchieved()).toBe(false);
     expect(victoryProgressMap().size).toBe(0);
+  });
+});
+
+describe('victoryShowPanel / victoryDismissPanel', () => {
+  it('sets victoryShowPanel to true when victory is newly achieved', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+
+    expect(victoryShowPanel()).toBe(true);
+  });
+
+  it('does not set victoryShowPanel on game load via victoryEvaluateImmediate', () => {
+    const state = makeState({ numTicks: 0 });
+    state.world.victoryProgress.achievedVictoryPathId = TEST_PATH_A_ID;
+
+    victoryEvaluateImmediate(state);
+
+    expect(victoryAchievedPathId()).toBe(TEST_PATH_A_ID);
+    expect(victoryShowPanel()).toBe(false);
+  });
+
+  it('clears victoryShowPanel via victoryDismissPanel', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+    expect(victoryShowPanel()).toBe(true);
+
+    victoryDismissPanel();
+    expect(victoryShowPanel()).toBe(false);
+  });
+
+  it('stays false after dismiss even when victory is still achieved', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+    victoryDismissPanel();
+
+    // Simulate next evaluation cycle (already won)
+    state.clock.numTicks = 120;
+    state.world.victoryProgress.lastEvaluationTick = 60;
+    victoryProcess(state);
+
+    expect(victoryShowPanel()).toBe(false);
+    expect(victoryIsAchieved()).toBe(true);
   });
 });
 

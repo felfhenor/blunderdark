@@ -15,8 +15,9 @@ import { gamestate, gamestateSave } from '@helpers/state-game';
 import { optionsSet } from '@helpers/state-options';
 import {
   victoryAchievedPathId,
+  victoryDismissPanel,
   victoryGetProgress,
-  victoryIsAchieved,
+  victoryShowPanel,
 } from '@helpers/victory';
 import type {
   VictoryPathContent,
@@ -156,7 +157,7 @@ export class PanelVictoryComponent {
 
   constructor() {
     effect(() => {
-      if (victoryIsAchieved() && !this.visible()) {
+      if (victoryShowPanel()) {
         optionsSet('gameloopPaused', true);
         this.visible.set(true);
       }
@@ -164,6 +165,7 @@ export class PanelVictoryComponent {
   }
 
   public continuePlaying(): void {
+    victoryDismissPanel();
     this.visible.set(false);
     optionsSet('gameloopPaused', false);
   }
