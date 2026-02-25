@@ -305,6 +305,12 @@ export class PanelRoomInfoComponent {
     return roomUpgradeGetApplied(room.placedRoom);
   });
 
+  public isThrone = computed(() => {
+    const room = this.selectedRoom();
+    if (!room) return false;
+    return room.roomTypeId === roomRoleFindById('throne');
+  });
+
   public isStorageRoom = computed(() => {
     const room = this.selectedRoom();
     if (!room) return false;
