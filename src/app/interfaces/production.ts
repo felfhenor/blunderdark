@@ -16,6 +16,7 @@ export type ResourceProductionBreakdown = {
   adjacencyBonus: number;
   modifierEffect: number;
   researchBonus: number;
+  reputationBonus: number;
   final: number;
 };
 
@@ -46,6 +47,7 @@ export type RoomProductionDetail = {
   featureBonus: number;
   synergyBonus: number;
   researchBonus: number;
+  reputationBonus: number;
   modifierEffect: number;
   modifierDetails: ModifierDetail[];
   flatFeatureProduction: number;

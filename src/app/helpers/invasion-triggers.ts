@@ -4,6 +4,7 @@ import { INVASION_ESCALATION_EXTRA_INVADERS, invasionFindEntryRoom, invasionStar
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
 import { invasionThreatGetIntervalReduction, invasionThreatGetPartySizeBonus } from '@helpers/invasion-threat';
 import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
+import { reputationEffectGetInvasionRateMultiplier } from '@helpers/reputation-effects';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
 import { rngNumberRange, rngRandom } from '@helpers/rng';
@@ -57,14 +58,25 @@ export function invasionTriggerGetLastDay(
 /**
  * Calculate the next invasion day with variance and constraints.
  * Variance is determined at scheduling time and not re-rolled.
+ * invasionRateMultiplier > 1 means more frequent invasions (shorter interval),
+ * < 1 means less frequent (longer interval).
  */
 export function invasionTriggerCalculateNextDay(
   currentDay: number,
   lastInvasionDay: number | undefined,
   gracePeriodEnd: number,
   rng: PRNG,
+  invasionRateMultiplier = 1.0,
 ): { day: number; variance: number } {
-  const interval = invasionTriggerGetInterval(currentDay);
+  const baseInterval = invasionTriggerGetInterval(currentDay);
+  // Higher rate = shorter interval (more frequent), lower rate = longer interval
+  const interval =
+    invasionRateMultiplier > 0
+      ? Math.max(
+          INVASION_TRIGGER_MIN_INTERVAL,
+          Math.round(baseInterval / invasionRateMultiplier),
+        )
+      : baseInterval;
   const variance = rngNumberRange(-INVASION_TRIGGER_MAX_VARIANCE, INVASION_TRIGGER_MAX_VARIANCE + 1, rng);
 
   let nextDay = currentDay + interval + variance;
@@ -158,11 +170,15 @@ export function invasionTriggerProcessSchedule(
 
   // If no invasion scheduled, schedule one
   if (schedule.nextInvasionDay === undefined) {
+    const invasionRateMult = reputationEffectGetInvasionRateMultiplier(
+      state.world.reputation,
+    );
     const result = invasionTriggerCalculateNextDay(
       currentDay,
       invasionTriggerGetLastDay(schedule),
       schedule.gracePeriodEnd,
       effectiveRng,
+      invasionRateMult,
     );
     schedule.nextInvasionDay = result.day;
     schedule.nextInvasionVariance = result.variance;
@@ -225,11 +241,15 @@ export function invasionTriggerRecordAndReschedule(
 
   schedule.invasionHistory.push(historyEntry);
 
+  const invasionRateMult = reputationEffectGetInvasionRateMultiplier(
+    state.world.reputation,
+  );
   const result = invasionTriggerCalculateNextDay(
     historyEntry.day,
     historyEntry.day,
     schedule.gracePeriodEnd,
     effectiveRng,
+    invasionRateMult,
   );
 
   // Escalation: unreachable objectives reduce the interval to next invasion

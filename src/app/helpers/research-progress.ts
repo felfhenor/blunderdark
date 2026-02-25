@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { reputationAwardInPlace } from '@helpers/reputation';
+import { reputationEffectGetProductionMultiplier } from '@helpers/reputation-effects';
 import {
   researchUnlockGetPassiveBonusWithMastery,
   researchUnlockProcessCompletion,
@@ -173,6 +174,19 @@ export function researchCalculateSpeedModifier(
 
   // Research passive bonus
   bonus += researchUnlockGetPassiveBonusWithMastery('researchSpeed');
+
+  // Reputation effect: research_speed (e.g. 0.85 = takes 85% of normal time = 15% faster)
+  const reputation = gamestate()?.world?.reputation;
+  if (reputation) {
+    const reputationTimeMultiplier = reputationEffectGetProductionMultiplier(
+      'research_speed',
+      reputation,
+    );
+    if (reputationTimeMultiplier > 0 && reputationTimeMultiplier !== 1.0) {
+      // effectValue < 1 means faster research: divide to increase progress rate
+      return (1 + bonus) / reputationTimeMultiplier;
+    }
+  }
 
   return 1 + bonus;
 }

@@ -39,6 +39,7 @@ import {
   synergyCalculateProductionBonus,
   synergyEvaluateAll,
 } from '@helpers/synergy';
+import { reputationEffectGetProductionMultiplier } from '@helpers/reputation-effects';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
@@ -79,6 +80,12 @@ function productionGetResearchMultiplier(resourceType: string): number {
   }
 
   return 1 + resourceBonus + allBonus + rulerBonus;
+}
+
+function productionGetReputationMultiplier(resourceType: string): number {
+  const reputation = gamestate()?.world?.reputation;
+  if (!reputation) return 1.0;
+  return reputationEffectGetProductionMultiplier(resourceType, reputation);
 }
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
@@ -336,6 +343,7 @@ export function productionCalculateTotal(
           activeSynergies,
         );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
+        const reputationMultiplier = productionGetReputationMultiplier(resourceType);
         const final =
           baseAmount *
           (1 +
@@ -350,7 +358,8 @@ export function productionCalculateTotal(
           dayNightResourceMod *
           seasonMod *
           creatureModifier *
-          researchMultiplier;
+          researchMultiplier *
+          reputationMultiplier;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }
@@ -495,6 +504,7 @@ export function productionCalculateSingleRoom(
       activeSynergies,
     );
     const researchMultiplier = productionGetResearchMultiplier(resourceType);
+    const reputationMultiplier = productionGetReputationMultiplier(resourceType);
     production[resourceType] =
       baseAmount *
       (1 +
@@ -509,7 +519,8 @@ export function productionCalculateSingleRoom(
       dayNightResourceMod *
       seasonMod *
       creatureModifier *
-      researchMultiplier;
+      researchMultiplier *
+      reputationMultiplier;
   }
 
   // Add flat production from features
@@ -673,6 +684,7 @@ export function productionCalculateBreakdowns(
           activeSynergies,
         );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
+        const reputationMultiplier = productionGetReputationMultiplier(resourceType);
         const modifier =
           stateModifier *
           envModifier *
@@ -689,7 +701,8 @@ export function productionCalculateBreakdowns(
             featureProductionBonus +
             synergyBonusVal);
         const afterModifiers = withBonuses * modifier;
-        const finalAmount = afterModifiers * researchMultiplier;
+        const afterResearch = afterModifiers * researchMultiplier;
+        const finalAmount = afterResearch * reputationMultiplier;
 
         if (!breakdowns[resourceType]) {
           breakdowns[resourceType] = {
@@ -698,6 +711,7 @@ export function productionCalculateBreakdowns(
             adjacencyBonus: 0,
             modifierEffect: 0,
             researchBonus: 0,
+            reputationBonus: 0,
             final: 0,
           };
         }
@@ -708,7 +722,8 @@ export function productionCalculateBreakdowns(
         breakdowns[resourceType].adjacencyBonus +=
           baseAmount * adjacencyBonusVal;
         breakdowns[resourceType].modifierEffect += afterModifiers - withBonuses;
-        breakdowns[resourceType].researchBonus += finalAmount - afterModifiers;
+        breakdowns[resourceType].researchBonus += afterResearch - afterModifiers;
+        breakdowns[resourceType].reputationBonus += finalAmount - afterResearch;
         breakdowns[resourceType].final += finalAmount;
       }
 
@@ -738,6 +753,7 @@ export function productionCalculateBreakdowns(
             adjacencyBonus: 0,
             modifierEffect: 0,
             researchBonus: 0,
+            reputationBonus: 0,
             final: 0,
           };
         }
@@ -994,13 +1010,22 @@ export function productionCalculateDetailedBreakdown(
       const afterModifiers = withBonuses * combinedModifier;
       const researchMultiplier = productionGetResearchMultiplier(resourceType);
       const afterResearch = afterModifiers * researchMultiplier;
+      const reputationMultiplier = productionGetReputationMultiplier(resourceType);
+      const afterReputation = afterResearch * reputationMultiplier;
+
+      if (reputationMultiplier !== 1.0) {
+        modifierDetails.push({
+          name: 'Reputation Effect',
+          multiplier: reputationMultiplier,
+        });
+      }
 
       // Handle resource conversion efficiency
-      let conversionAdjusted = afterResearch;
+      let conversionAdjusted = afterReputation;
       if (hasConversion && room.convertedOutputResource === resourceType) {
         const efficiency = featureGetResourceConverterEfficiency(room);
         if (efficiency !== undefined) {
-          conversionAdjusted = afterResearch * efficiency;
+          conversionAdjusted = afterReputation * efficiency;
         }
       }
 
@@ -1016,7 +1041,7 @@ export function productionCalculateDetailedBreakdown(
       let finalAmount =
         (hasConversion && room.convertedOutputResource === resourceType
           ? conversionAdjusted
-          : afterResearch) + flatForType;
+          : afterReputation) + flatForType;
       finalAmount *= upgradeMultiplier;
 
       // Secondary production from upgrades
@@ -1038,6 +1063,7 @@ export function productionCalculateDetailedBreakdown(
         featureBonus: effectiveBase * featureProductionBonus,
         synergyBonus: effectiveBase * synergyBonusVal,
         researchBonus: afterResearch - afterModifiers,
+        reputationBonus: afterReputation - afterResearch,
         modifierEffect: afterModifiers - withBonuses,
         modifierDetails,
         flatFeatureProduction: flatForType,

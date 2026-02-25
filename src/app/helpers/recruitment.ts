@@ -9,6 +9,7 @@ import {
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
+import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
@@ -67,16 +68,54 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
 });
 
 /**
+ * Get the required harmony attraction level from restriction tags.
+ * 'harmony_attract' requires level >= 1, 'harmony_attract_legendary' requires level >= 2.
+ * Returns 0 if the creature has no harmony attraction restriction.
+ */
+function getRequiredAttractionLevel(restrictionTags: string[]): number {
+  let maxRequired = 0;
+  for (const tag of restrictionTags) {
+    if (tag === 'harmony_attract_legendary') return 2;
+    if (tag === 'harmony_attract') maxRequired = Math.max(maxRequired, 1);
+  }
+  return maxRequired;
+}
+
+/**
+ * Check if all restriction tags are satisfiable by reputation effects.
+ * Returns true if the only restriction tags are harmony attraction tags
+ * and the current attraction level meets the requirement.
+ */
+function areRestrictionTagsSatisfied(
+  restrictionTags: string[],
+  attractionLevel: number,
+): boolean {
+  const harmonyTags = new Set(['harmony_attract', 'harmony_attract_legendary']);
+  // All restriction tags must be harmony attraction tags
+  if (!restrictionTags.every((tag) => harmonyTags.has(tag))) return false;
+  const requiredLevel = getRequiredAttractionLevel(restrictionTags);
+  return attractionLevel >= requiredLevel;
+}
+
+/**
  * Get all inhabitant definitions available for display in the recruitment panel.
- * Filters out inhabitants with restriction tags and those gated behind research
+ * Filters out inhabitants with restriction tags (except harmony_attract tags
+ * which are satisfied by reputation effects) and those gated behind research
  * that hasn't been completed yet. Sorts by tier then name.
  */
 export function recruitmentGetRecruitable(): InhabitantContent[] {
   const allDefs = contentGetEntriesByType<InhabitantContent>('inhabitant');
+  const reputation = gamestate()?.world?.reputation;
+  const attractionLevel = reputation
+    ? reputationEffectGetMaxAttractionLevel(reputation)
+    : 0;
 
   return sortBy(
     allDefs.filter((def) => {
-      if (def.restrictionTags.length !== 0) return false;
+      if (def.restrictionTags.length !== 0) {
+        if (!areRestrictionTagsSatisfied(def.restrictionTags, attractionLevel))
+          return false;
+      }
       const gated = researchUnlockIsResearchGated('inhabitant', def.id);
       if (gated && !researchUnlockIsUnlocked('inhabitant', def.id))
         return false;

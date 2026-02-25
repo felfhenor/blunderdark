@@ -135,6 +135,51 @@ export function reputationEffectGetProductionMultiplier(
 }
 
 /**
+ * Pure function: check if a room is unlocked by reputation effects.
+ * Returns true if no unlock_room effect targets this room name, or if the targeting effect is active.
+ */
+export function reputationEffectIsRoomUnlocked(
+  roomName: string,
+  reputation?: Record<ReputationType, number>,
+  allEffects?: ReputationEffectContent[],
+): boolean {
+  const effects =
+    allEffects ??
+    contentGetEntriesByType<ReputationEffectContent>('reputationeffect');
+
+  const unlockEffects = effects.filter(
+    (e) => e.effectType === 'unlock_room' && e.targetId === roomName,
+  );
+
+  // If no unlock_room effect targets this room, it's not reputation-gated
+  if (unlockEffects.length === 0) return true;
+
+  const rep = reputation ?? gamestate()?.world?.reputation;
+  if (!rep) return true;
+
+  const activeEffects = reputationEffectGetActive(rep, effects);
+  return unlockEffects.some((ue) => activeEffects.some((ae) => ae.id === ue.id));
+}
+
+/**
+ * Pure function: get the maximum creature attraction level from active effects.
+ * Returns 0 if no attraction effects are active. effectValue 1 = basic, 2 = legendary.
+ */
+export function reputationEffectGetMaxAttractionLevel(
+  reputation: Record<ReputationType, number>,
+  allEffects?: ReputationEffectContent[],
+): number {
+  const attractEffects = reputationEffectGetByType(
+    'attract_creature',
+    reputation,
+    allEffects,
+  );
+
+  if (attractEffects.length === 0) return 0;
+  return Math.max(...attractEffects.map((e) => e.effectValue));
+}
+
+/**
  * Computed signal: all currently active reputation effects.
  * Recalculates whenever reputation state changes.
  */

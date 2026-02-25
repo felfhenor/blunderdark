@@ -31,6 +31,7 @@ import {
   roomShapeGetRotated,
   MAX_ROOMS_PER_TYPE,
 } from '@helpers';
+import { reputationEffectIsRoomUnlocked } from '@helpers/reputation-effects';
 import {
   transportPlacementActive,
   transportPlacementType,
@@ -54,7 +55,11 @@ export class PanelRoomSelectComponent {
   public rooms = computed(() =>
     sortBy(
       contentGetEntriesByType<RoomContent>('room').filter(
-        (r) => !r.autoPlace && !this.isResearchLocked(r) && !this.TRANSPORT_ROLES.has(r.role ?? ''),
+        (r) =>
+          !r.autoPlace &&
+          !this.isResearchLocked(r) &&
+          !this.isReputationLocked(r) &&
+          !this.TRANSPORT_ROLES.has(r.role ?? ''),
       ),
       ['name'],
     ),
@@ -88,6 +93,10 @@ export class PanelRoomSelectComponent {
   public isResearchLocked(room: RoomContent): boolean {
     if (!researchUnlockIsResearchGated('room', room.id)) return false;
     return !researchUnlockIsUnlocked('room', room.id);
+  }
+
+  public isReputationLocked(room: RoomContent): boolean {
+    return !reputationEffectIsRoomUnlocked(room.name);
   }
 
   public isBiomeRestricted(room: RoomContent): boolean {
