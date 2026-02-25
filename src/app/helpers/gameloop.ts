@@ -71,8 +71,6 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
   timer.startTimer('gameloop');
 
-  // TODO: game logic (lol)
-
   timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
 
   updateGamestate((state) => {

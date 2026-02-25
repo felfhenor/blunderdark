@@ -115,7 +115,6 @@ function legendaryInhabitantCheckRequirement(
     }
 
     case 'item': {
-      // Item requirements not yet implemented
       return false;
     }
   }

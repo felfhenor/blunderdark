@@ -6,8 +6,8 @@ import {
   corruptionCurrent,
 } from '@helpers/corruption';
 import type { CorruptionEffectState, GameState } from '@interfaces';
-import { Subject } from 'rxjs';
 import type { CorruptionThresholdWarning } from '@interfaces/corruption-threshold';
+import { Subject } from 'rxjs';
 
 // --- Constants ---
 
@@ -150,10 +150,6 @@ export const corruptionThresholdNext = computed(() =>
  * The actual effect triggering (dark upgrades, mutations, crusades) is handled
  * by corruptionEffectProcess() in corruption-effects.ts.
  *
- * Available corruption reduction methods:
- * - Dryad inhabitant (planned): negative corruptionGeneration
- * - Purification rooms (planned): negative corruption production in YAML
- * - corruptionSpend(): manual corruption expenditure on dark upgrades
  */
 export function corruptionThresholdProcess(state: GameState): void {
   const corruption = state.world.resources.corruption.current;
