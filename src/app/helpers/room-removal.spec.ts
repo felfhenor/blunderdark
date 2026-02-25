@@ -1,3 +1,4 @@
+import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
 import {
   roomPlacementPlaceOnFloor,
@@ -5,6 +6,8 @@ import {
 } from '@helpers/room-placement';
 import { roomRemovalCalculateRefund } from '@helpers/room-removal';
 import type {
+  Connection,
+  ConnectionId,
   Floor,
   FloorId,
   HallwayId,
@@ -439,5 +442,125 @@ describe('US-004: Inhabitant Displacement - roomRemovalGetInfo', () => {
       essence: 15,
     });
     expect(refund).toEqual({ gold: 40, crystals: 15, essence: 7 });
+  });
+});
+
+// --- US-005: Connection Cleanup on Removal ---
+
+describe('US-005: Connection Cleanup on Room Removal', () => {
+  it('should remove all connections involving the removed room', () => {
+    const roomA: PlacedRoom = {
+      id: 'room-a' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const roomB: PlacedRoom = {
+      id: 'room-b' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const roomC: PlacedRoom = {
+      id: 'room-c' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 4,
+      anchorY: 0,
+    };
+
+    const connections: Connection[] = [
+      {
+        id: 'conn-ab' as ConnectionId,
+        roomAId: 'room-a' as PlacedRoomId,
+        roomBId: 'room-b' as PlacedRoomId,
+        edgeTiles: [{ x: 2, y: 0 }],
+      },
+      {
+        id: 'conn-bc' as ConnectionId,
+        roomAId: 'room-b' as PlacedRoomId,
+        roomBId: 'room-c' as PlacedRoomId,
+        edgeTiles: [{ x: 4, y: 0 }],
+      },
+    ];
+
+    const floor: Floor = {
+      ...makeFloor([roomA, roomB, roomC]),
+      connections,
+    };
+
+    // Remove room B — should remove both conn-ab and conn-bc
+    const removedFloor = roomPlacementRemoveFromFloor(
+      floor,
+      'room-b' as PlacedRoomId,
+      square2x2,
+    )!;
+    const result = connectionRemoveRoomFromFloor(
+      removedFloor,
+      'room-b' as PlacedRoomId,
+    );
+
+    expect(result.connections).toHaveLength(0);
+    expect(result.rooms).toHaveLength(2);
+  });
+
+  it('should preserve connections not involving the removed room', () => {
+    const roomA: PlacedRoom = {
+      id: 'room-a' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const roomB: PlacedRoom = {
+      id: 'room-b' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 2,
+      anchorY: 0,
+    };
+    const roomC: PlacedRoom = {
+      id: 'room-c' as PlacedRoomId,
+      roomTypeId: CRYSTAL_MINE_TYPE_ID as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 2,
+    };
+
+    const connections: Connection[] = [
+      {
+        id: 'conn-ab' as ConnectionId,
+        roomAId: 'room-a' as PlacedRoomId,
+        roomBId: 'room-b' as PlacedRoomId,
+        edgeTiles: [{ x: 2, y: 0 }],
+      },
+      {
+        id: 'conn-ac' as ConnectionId,
+        roomAId: 'room-a' as PlacedRoomId,
+        roomBId: 'room-c' as PlacedRoomId,
+        edgeTiles: [{ x: 0, y: 2 }],
+      },
+    ];
+
+    const floor: Floor = {
+      ...makeFloor([roomA, roomB, roomC]),
+      connections,
+    };
+
+    // Remove room B — should only remove conn-ab, keep conn-ac
+    const removedFloor = roomPlacementRemoveFromFloor(
+      floor,
+      'room-b' as PlacedRoomId,
+      square2x2,
+    )!;
+    const result = connectionRemoveRoomFromFloor(
+      removedFloor,
+      'room-b' as PlacedRoomId,
+    );
+
+    expect(result.connections).toHaveLength(1);
+    expect(result.connections[0].id).toBe('conn-ac');
   });
 });

@@ -1,3 +1,4 @@
+import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { contentGetEntry } from '@helpers/content';
 import {
   roomPlacementIsRemovable,
@@ -113,8 +114,11 @@ export async function roomRemovalExecute(
     });
 
   // Remove room from floor grid
-  const updatedFloor = roomPlacementRemoveFromFloor(floor, roomId, shape);
-  if (!updatedFloor) return { success: false, error: 'Failed to remove room from grid' };
+  const removedFloor = roomPlacementRemoveFromFloor(floor, roomId, shape);
+  if (!removedFloor) return { success: false, error: 'Failed to remove room from grid' };
+
+  // Remove all connections involving this room (doors to/from adjacent rooms)
+  const updatedFloor = connectionRemoveRoomFromFloor(removedFloor, roomId);
 
   // Update gamestate: remove room from grid + unassign inhabitants
   await updateGamestate((s) => {
