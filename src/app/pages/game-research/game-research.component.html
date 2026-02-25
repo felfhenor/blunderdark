@@ -163,11 +163,21 @@
                         unlock of selectedNodeUnlocks();
                         track unlock.name
                       ) {
-                        <div class="flex items-center gap-2 text-xs">
+                        <div
+                          class="flex items-center gap-2 text-xs"
+                          [tp]="unlock.description"
+                          [tpIsEnabled]="!!unlock.description"
+                        >
                           <span class="badge badge-sm badge-outline">
                             {{ unlock.type }}
                           </span>
-                          <span>{{ unlock.name }}</span>
+                          <span
+                            [class.underline]="!!unlock.description"
+                            [class.decoration-dotted]="!!unlock.description"
+                            [class.cursor-help]="!!unlock.description"
+                          >
+                            {{ unlock.name }}
+                          </span>
                         </div>
                       }
                     </div>

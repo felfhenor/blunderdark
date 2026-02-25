@@ -23,11 +23,16 @@ import { resourceCanAfford } from '@helpers/resources';
 import { gamestate } from '@helpers/state-game';
 import { optionsGet } from '@helpers/state-options';
 import type {
-  BiomeType,
+  CombatAbilityContent,
+  FeatureContent,
+  InhabitantContent,
   ResearchBranch,
   ResearchContent,
+  RoomContent,
+  RoomUpgradeContent,
   UnlockEffect,
 } from '@interfaces';
+import { BIOME_DATA } from '@interfaces/biome';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
@@ -234,45 +239,66 @@ export class GameResearchComponent {
   private formatUnlock(unlock: UnlockEffect): {
     type: string;
     name: string;
+    description: string;
   } {
     switch (unlock.type) {
       case 'room': {
-        const entry = contentGetEntry(unlock.targetRoomId);
-        return { type: 'Room', name: entry?.name ?? 'Unknown' };
+        const entry = contentGetEntry<RoomContent>(unlock.targetRoomId);
+        return {
+          type: 'Room',
+          name: entry?.name ?? 'Unknown',
+          description: entry?.description ?? '',
+        };
       }
       case 'inhabitant': {
-        const entry = contentGetEntry(unlock.targetInhabitantId);
-        return { type: 'Inhabitant', name: entry?.name ?? 'Unknown' };
+        const entry = contentGetEntry<InhabitantContent>(
+          unlock.targetInhabitantId,
+        );
+        return {
+          type: 'Inhabitant',
+          name: entry?.name ?? 'Unknown',
+          description: entry?.description ?? '',
+        };
       }
       case 'ability': {
-        const entry = contentGetEntry(unlock.targetCombatabilityId);
-        return { type: 'Ability', name: entry?.name ?? 'Unknown' };
+        const entry = contentGetEntry<CombatAbilityContent>(
+          unlock.targetCombatabilityId,
+        );
+        return {
+          type: 'Ability',
+          name: entry?.name ?? 'Unknown',
+          description: entry?.description ?? '',
+        };
       }
       case 'roomupgrade': {
-        const entry = contentGetEntry(unlock.targetRoomupgradeId);
-        return { type: 'Upgrade', name: entry?.name ?? 'Unknown' };
+        const entry = contentGetEntry<RoomUpgradeContent>(
+          unlock.targetRoomupgradeId,
+        );
+        return {
+          type: 'Upgrade',
+          name: entry?.name ?? 'Unknown',
+          description: entry?.description ?? '',
+        };
       }
       case 'passive_bonus':
-        return { type: 'Bonus', name: unlock.description };
+        return { type: 'Bonus', name: unlock.description, description: '' };
       case 'feature_flag':
-        return { type: 'Feature', name: unlock.description };
+        return { type: 'Feature', name: unlock.description, description: '' };
       case 'biome': {
-        const biomeNames: Record<BiomeType, string> = {
-          volcanic: 'Volcanic',
-          flooded: 'Flooded',
-          crystal: 'Crystal',
-          corrupted: 'Corrupted',
-          fungal: 'Fungal',
-          neutral: 'Neutral',
-        };
+        const biome = BIOME_DATA[unlock.targetBiome];
         return {
           type: 'Biome',
-          name: biomeNames[unlock.targetBiome] ?? 'Unknown',
+          name: biome?.name ?? 'Unknown',
+          description: biome?.description ?? '',
         };
       }
       case 'roomfeature': {
-        const entry = contentGetEntry(unlock.targetFeatureId);
-        return { type: 'Feature', name: entry?.name ?? 'Unknown' };
+        const entry = contentGetEntry<FeatureContent>(unlock.targetFeatureId);
+        return {
+          type: 'Feature',
+          name: entry?.name ?? 'Unknown',
+          description: entry?.description ?? '',
+        };
       }
     }
   }
