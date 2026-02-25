@@ -25,6 +25,12 @@ vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockEntries.get(id) ?? undefined,
 }));
 
+vi.mock('@helpers/legendary-inhabitant', () => ({
+  LEGENDARY_DISCONTENTED_PRODUCTION_MULTIPLIER: 0.25,
+  LEGENDARY_DISCONTENTED_ATTACK_MULTIPLIER: 0.5,
+  LEGENDARY_DISCONTENTED_DEFENSE_MULTIPLIER: 0.5,
+}));
+
 function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
   return {
     instanceId: 'inst-1' as InhabitantInstanceId,
@@ -501,5 +507,103 @@ describe('Wraith Fearless behavior', () => {
     const wraith = makeInhabitant({ definitionId: WRAITH_ID, state: 'scared' });
     expect(stateModifierGetAttackMultiplier(wraith)).toBe(1.0);
     expect(stateModifierGetDefenseMultiplier(wraith)).toBe(1.0);
+  });
+});
+
+// --- Discontented legendary stat reductions ---
+
+describe('Discontented legendary multipliers', () => {
+  beforeEach(() => {
+    registerDef('dragon', {
+      stateModifiers: {
+        normal: {
+          productionMultiplier: 1.0,
+          foodConsumptionMultiplier: 1.0,
+          attackMultiplier: 1.0,
+          defenseMultiplier: 1.0,
+        },
+      },
+    });
+  });
+
+  it('should reduce production by 75% when discontented', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+      discontentedTicks: 1,
+    });
+    expect(stateModifierGetProductionMultiplier(dragon)).toBe(0.25);
+  });
+
+  it('should reduce attack by 50% when discontented', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+      discontentedTicks: 5,
+    });
+    expect(stateModifierGetAttackMultiplier(dragon)).toBe(0.5);
+  });
+
+  it('should reduce defense by 50% when discontented', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+      discontentedTicks: 10,
+    });
+    expect(stateModifierGetDefenseMultiplier(dragon)).toBe(0.5);
+  });
+
+  it('should not reduce food consumption when discontented', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+      discontentedTicks: 5,
+    });
+    expect(stateModifierGetFoodConsumptionMultiplier(dragon)).toBe(1.0);
+  });
+
+  it('should return normal multipliers when discontentedTicks is 0', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+      discontentedTicks: 0,
+    });
+    expect(stateModifierGetProductionMultiplier(dragon)).toBe(1.0);
+    expect(stateModifierGetAttackMultiplier(dragon)).toBe(1.0);
+    expect(stateModifierGetDefenseMultiplier(dragon)).toBe(1.0);
+  });
+
+  it('should return normal multipliers when discontentedTicks is undefined', () => {
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'normal',
+    });
+    expect(stateModifierGetProductionMultiplier(dragon)).toBe(1.0);
+    expect(stateModifierGetAttackMultiplier(dragon)).toBe(1.0);
+    expect(stateModifierGetDefenseMultiplier(dragon)).toBe(1.0);
+  });
+
+  it('should stack with state-based reduction (hungry + discontented)', () => {
+    registerDef('dragon', {
+      stateModifiers: {
+        hungry: {
+          productionMultiplier: 0.5,
+          foodConsumptionMultiplier: 1.0,
+          attackMultiplier: 0.8,
+          defenseMultiplier: 0.8,
+        },
+      },
+    });
+    const dragon = makeInhabitant({
+      definitionId: 'dragon' as InhabitantId,
+      state: 'hungry',
+      discontentedTicks: 3,
+    });
+    // 0.5 * 0.25 = 0.125
+    expect(stateModifierGetProductionMultiplier(dragon)).toBeCloseTo(0.125);
+    // 0.8 * 0.5 = 0.4
+    expect(stateModifierGetAttackMultiplier(dragon)).toBeCloseTo(0.4);
+    // 0.8 * 0.5 = 0.4
+    expect(stateModifierGetDefenseMultiplier(dragon)).toBeCloseTo(0.4);
   });
 });

@@ -1,4 +1,9 @@
 import { contentGetEntry } from '@helpers/content';
+import {
+  LEGENDARY_DISCONTENTED_ATTACK_MULTIPLIER,
+  LEGENDARY_DISCONTENTED_DEFENSE_MULTIPLIER,
+  LEGENDARY_DISCONTENTED_PRODUCTION_MULTIPLIER,
+} from '@helpers/legendary-inhabitant';
 import type {
   InhabitantInstance,
   InhabitantState,
@@ -78,12 +83,17 @@ export function stateModifierGet(
 
 /**
  * Get the production multiplier for a specific inhabitant in its current state.
+ * Applies an additional penalty when the legendary is discontented.
  */
 export function stateModifierGetProductionMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
   const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
-  return modifier.productionMultiplier;
+  const base = modifier.productionMultiplier;
+  if ((inhabitant.discontentedTicks ?? 0) > 0) {
+    return base * LEGENDARY_DISCONTENTED_PRODUCTION_MULTIPLIER;
+  }
+  return base;
 }
 
 /**
@@ -99,23 +109,33 @@ export function stateModifierGetFoodConsumptionMultiplier(
 /**
  * Get the attack multiplier for a specific inhabitant in its current state.
  * Returns 1.0 if no combat modifier is defined.
+ * Applies an additional penalty when the legendary is discontented.
  */
 export function stateModifierGetAttackMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
   const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
-  return modifier.attackMultiplier ?? 1.0;
+  const base = modifier.attackMultiplier ?? 1.0;
+  if ((inhabitant.discontentedTicks ?? 0) > 0) {
+    return base * LEGENDARY_DISCONTENTED_ATTACK_MULTIPLIER;
+  }
+  return base;
 }
 
 /**
  * Get the defense multiplier for a specific inhabitant in its current state.
  * Returns 1.0 if no combat modifier is defined.
+ * Applies an additional penalty when the legendary is discontented.
  */
 export function stateModifierGetDefenseMultiplier(
   inhabitant: InhabitantInstance,
 ): number {
   const modifier = stateModifierGet(inhabitant.definitionId, inhabitant.state);
-  return modifier.defenseMultiplier ?? 1.0;
+  const base = modifier.defenseMultiplier ?? 1.0;
+  if ((inhabitant.discontentedTicks ?? 0) > 0) {
+    return base * LEGENDARY_DISCONTENTED_DEFENSE_MULTIPLIER;
+  }
+  return base;
 }
 
 // --- Per-creature conditional modifier for production pipeline ---

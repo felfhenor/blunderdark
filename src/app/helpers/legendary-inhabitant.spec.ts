@@ -125,6 +125,14 @@ vi.mock('@helpers/game-time', () => ({
   GAME_TIME_TICKS_PER_MINUTE: 1,
 }));
 
+const mockNotify = vi.fn();
+const mockNotifyWarning = vi.fn();
+
+vi.mock('@helpers/notify', () => ({
+  notify: (...args: unknown[]) => mockNotify(...args),
+  notifyWarning: (...args: unknown[]) => mockNotifyWarning(...args),
+}));
+
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetPaths: vi.fn((roomTypeId: string) => {
     if (roomTypeId === 'room-altar') {
@@ -164,7 +172,6 @@ vi.mock('@helpers/resources', () => ({
 }));
 
 import {
-  LEGENDARY_DISCONTENTED_DEPARTURE_TICKS,
   legendaryInhabitantCanRecruit,
   legendaryInhabitantIsAuraActive,
   legendaryInhabitantIsDiscontented,
@@ -686,26 +693,10 @@ describe('legendaryInhabitantUpkeepProcess', () => {
     });
   });
 
-  describe('legendary departure', () => {
-    it('should remove legendary after 5 minutes of discontent', () => {
+  describe('no departure (discontented legendaries stay)', () => {
+    it('should never remove a legendary regardless of discontented ticks', () => {
       const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
-      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
-      const state = makeGameState({
-        inhabitants: [dragon],
-        resources: {
-          gold: { current: 0, max: 1000 },
-          food: { current: 0, max: 500 },
-        },
-      });
-
-      legendaryInhabitantUpkeepProcess(state);
-
-      expect(state.world.inhabitants).toHaveLength(0);
-    });
-
-    it('should not remove legendary before 5 minutes of discontent', () => {
-      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
-      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 2;
+      dragon.discontentedTicks = 9999;
       const state = makeGameState({
         inhabitants: [dragon],
         resources: {
@@ -717,12 +708,13 @@ describe('legendaryInhabitantUpkeepProcess', () => {
       legendaryInhabitantUpkeepProcess(state);
 
       expect(state.world.inhabitants).toHaveLength(1);
+      expect(state.world.inhabitants[0].discontentedTicks).toBe(10000);
     });
 
-    it('should also remove from floor inhabitants', () => {
+    it('should keep legendary on floor even when heavily discontented', () => {
       const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
       dragon.assignedRoomId = 'room-placed-0' as PlacedRoomId;
-      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
+      dragon.discontentedTicks = 500;
 
       const floor = makeFloor([{ roomTypeId: 'room-treasure-vault' }]);
       floor.inhabitants = [{ ...dragon }];
@@ -738,27 +730,83 @@ describe('legendaryInhabitantUpkeepProcess', () => {
 
       legendaryInhabitantUpkeepProcess(state);
 
-      expect(state.world.inhabitants).toHaveLength(0);
-      expect(state.world.floors[0].inhabitants).toHaveLength(0);
+      expect(state.world.inhabitants).toHaveLength(1);
+      expect(state.world.floors[0].inhabitants).toHaveLength(1);
     });
+  });
 
-    it('should keep non-legendary inhabitants when legendary departs', () => {
+  describe('notifications', () => {
+    it('should warn when legendary transitions to discontented', () => {
       const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
-      dragon.discontentedTicks = LEGENDARY_DISCONTENTED_DEPARTURE_TICKS - 1;
-      const goblin = makeInhabitant(GOBLIN_ID, 'Goblin');
-
+      dragon.discontentedTicks = 0;
       const state = makeGameState({
-        inhabitants: [dragon, goblin],
+        inhabitants: [dragon],
         resources: {
           gold: { current: 0, max: 1000 },
           food: { current: 0, max: 500 },
         },
       });
 
+      mockNotifyWarning.mockClear();
       legendaryInhabitantUpkeepProcess(state);
 
-      expect(state.world.inhabitants).toHaveLength(1);
-      expect(state.world.inhabitants[0].name).toBe('Goblin');
+      expect(mockNotifyWarning).toHaveBeenCalledWith(
+        'Dragon is discontented! Upkeep cannot be paid — stats reduced.',
+      );
+    });
+
+    it('should not warn when legendary is already discontented', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = 5;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 0, max: 1000 },
+          food: { current: 0, max: 500 },
+        },
+      });
+
+      mockNotifyWarning.mockClear();
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(mockNotifyWarning).not.toHaveBeenCalled();
+    });
+
+    it('should notify when legendary becomes content again', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = 5;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 100, max: 1000 },
+          food: { current: 100, max: 500 },
+        },
+      });
+
+      mockNotify.mockClear();
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(mockNotify).toHaveBeenCalledWith(
+        'Legendary',
+        'Dragon is content again.',
+      );
+    });
+
+    it('should not notify content when already content', () => {
+      const dragon = makeInhabitant(DRAGON_ID, 'Dragon');
+      dragon.discontentedTicks = 0;
+      const state = makeGameState({
+        inhabitants: [dragon],
+        resources: {
+          gold: { current: 100, max: 1000 },
+          food: { current: 100, max: 500 },
+        },
+      });
+
+      mockNotify.mockClear();
+      legendaryInhabitantUpkeepProcess(state);
+
+      expect(mockNotify).not.toHaveBeenCalled();
     });
   });
 });

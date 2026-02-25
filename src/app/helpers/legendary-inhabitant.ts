@@ -1,5 +1,6 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { notify, notifyWarning } from '@helpers/notify';
 import {
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
@@ -18,9 +19,14 @@ import type {
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 
-/** Ticks of discontent before a legendary inhabitant leaves (5 game-minutes). */
-export const LEGENDARY_DISCONTENTED_DEPARTURE_TICKS =
-  5 * GAME_TIME_TICKS_PER_MINUTE;
+/** Production multiplier applied when a legendary is discontented. */
+export const LEGENDARY_DISCONTENTED_PRODUCTION_MULTIPLIER = 0.25;
+
+/** Attack multiplier applied when a legendary is discontented. */
+export const LEGENDARY_DISCONTENTED_ATTACK_MULTIPLIER = 0.5;
+
+/** Defense multiplier applied when a legendary is discontented. */
+export const LEGENDARY_DISCONTENTED_DEFENSE_MULTIPLIER = 0.5;
 
 export type LegendaryRequirementCheck = {
   requirement: RecruitmentRequirement;
@@ -272,56 +278,39 @@ function legendaryInhabitantPayUpkeep(def: InhabitantContent, numTicks = 1): voi
 }
 
 /**
- * Remove an inhabitant from world and floor inhabitant arrays.
- * Mutates state in-place.
- */
-function legendaryInhabitantRemoveFromState(
-  state: GameState,
-  instanceId: string,
-): void {
-  state.world.inhabitants = state.world.inhabitants.filter(
-    (i) => i.instanceId !== instanceId,
-  );
-  for (const floor of state.world.floors) {
-    floor.inhabitants = floor.inhabitants.filter(
-      (i) => i.instanceId !== instanceId,
-    );
-  }
-}
-
-/**
  * Process legendary inhabitant upkeep each tick.
  * Called from the game loop inside updateGamestate — mutates state in-place.
  *
  * 1. For each legendary inhabitant, try to pay per-tick upkeep
- * 2. If paid: reset discontentedTicks
- * 3. If not paid: increment discontentedTicks
- * 4. If discontented for 5+ minutes: remove the legendary permanently
+ * 2. If paid: reset discontentedTicks (notify if transitioning from discontented)
+ * 3. If not paid: increment discontentedTicks (notify if transitioning to discontented)
+ *
+ * Discontented legendaries never leave — they suffer stat reductions instead
+ * (applied via state-modifiers).
  */
 export function legendaryInhabitantUpkeepProcess(state: GameState, numTicks = 1): void {
-  const toRemove: string[] = [];
-
   for (const inhabitant of state.world.inhabitants) {
     const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
     if (!def?.upkeepCost || Object.keys(def.upkeepCost).length === 0) continue;
 
+    const wasBefore = inhabitant.discontentedTicks ?? 0;
+
     if (legendaryInhabitantCanPayUpkeep(def, state.world.resources, numTicks)) {
       legendaryInhabitantPayUpkeep(def, numTicks);
       inhabitant.discontentedTicks = 0;
+
+      if (wasBefore > 0) {
+        notify('Legendary', `${def.name} is content again.`);
+      }
     } else {
       inhabitant.discontentedTicks = (inhabitant.discontentedTicks ?? 0) + numTicks;
 
-      if (
-        inhabitant.discontentedTicks >= LEGENDARY_DISCONTENTED_DEPARTURE_TICKS
-      ) {
-        toRemove.push(inhabitant.instanceId);
+      if (wasBefore === 0) {
+        notifyWarning(
+          `${def.name} is discontented! Upkeep cannot be paid — stats reduced.`,
+        );
       }
     }
-  }
-
-  // Remove departed legendaries
-  for (const id of toRemove) {
-    legendaryInhabitantRemoveFromState(state, id);
   }
 
   // Sync discontentedTicks to floor inhabitants
