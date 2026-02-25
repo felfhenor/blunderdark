@@ -17,7 +17,7 @@
 #   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall + Corruption Chamber
 #   Arcane Facility Mastery (T4) [Workshop Mastery + Quarters & Arena] → Amplified Nexus + Binding Circle
 #   Abyssal Waters (T5) [Deep Water + Resonant] → Dark Waters + Dragon's Hoard
-#   Ascendant Altar (T5) [Deep Water + Resonant] → Ascendant Altar + Forbidden Archives
+#   Altar Ascension (T5) [Deep Water + Resonant] → Ascendant Altar + Forbidden Archives
 #   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dread Chamber + Dark Pool + Expanded Laboratory
 #   Architectural Mastery (T6) → capstone passive
 
@@ -284,7 +284,7 @@
   requiredTicks: 750
 
 - id: 3984163b-6561-4de2-be72-0d4535b09341
-  name: Ascendant Altar
+  name: Altar Ascension
   description: Reconstruct the altar with transcendent architecture and expand the library with forbidden knowledge sections.
   branch: architecture
   cost:
@@ -335,7 +335,7 @@
     crystals: 60
   prerequisiteResearchIds:
     - Abyssal Waters
-    - Ascendant Altar
+    - Altar Ascension
   unlocks:
     - type: passive_bonus
       bonusType: architectureMastery

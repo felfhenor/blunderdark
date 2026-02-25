@@ -69,6 +69,8 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Skeleton
+    - type: roomfeature
+      targetFeatureId: Coffins
   tier: 2
   requiredTicks: 150
 
@@ -86,6 +88,8 @@
       targetBiome: corrupted
     - type: roomfeature
       targetFeatureId: Fungal Network
+    - type: roomfeature
+      targetFeatureId: Bioluminescent Moss
   tier: 2
   requiredTicks: 150
 

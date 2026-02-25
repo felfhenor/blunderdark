@@ -20,7 +20,7 @@
       target: 1
 
 - id: 8a6c42bb-690f-4c60-a781-b91fbf3c4864
-  name: Dragon's Hoard
+  name: Hoardmaster
   description: "Amass incredible wealth and live in peace. Build a magnificent dungeon, recruit a Dragon guardian, and enjoy 30 days of uninterrupted prosperity."
   conditions:
     - id: hoard_gold
