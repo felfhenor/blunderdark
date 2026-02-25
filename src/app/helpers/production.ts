@@ -35,6 +35,10 @@ import {
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
+import {
+  synergyCalculateProductionBonus,
+  synergyEvaluateAll,
+} from '@helpers/synergy';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
@@ -237,6 +241,7 @@ export function productionCalculateTotal(
   season?: Season,
 ): RoomProduction {
   const totalProduction: RoomProduction = {};
+  const activeSynergies = synergyEvaluateAll(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -325,6 +330,11 @@ export function productionCalculateTotal(
           room,
           resourceType,
         );
+        const synergyBonus = synergyCalculateProductionBonus(
+          room.id,
+          resourceType,
+          activeSynergies,
+        );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const final =
           baseAmount *
@@ -332,7 +342,8 @@ export function productionCalculateTotal(
             inhabitantBonus +
             adjacencyBonus +
             featureAdjacentBonus +
-            featureProductionBonus) *
+            featureProductionBonus +
+            synergyBonus) *
           stateModifier *
           envModifier *
           depthModifier *
@@ -444,6 +455,7 @@ export function productionCalculateSingleRoom(
     room,
     floor.inhabitants,
   );
+  const activeSynergies = synergyEvaluateAll(floors ?? [floor]);
   const envModifier =
     hour !== undefined
       ? productionModifierCalculate({
@@ -477,6 +489,11 @@ export function productionCalculateSingleRoom(
       room,
       resourceType,
     );
+    const synergyBonus = synergyCalculateProductionBonus(
+      room.id,
+      resourceType,
+      activeSynergies,
+    );
     const researchMultiplier = productionGetResearchMultiplier(resourceType);
     production[resourceType] =
       baseAmount *
@@ -484,7 +501,8 @@ export function productionCalculateSingleRoom(
         inhabitantBonus +
         adjacencyBonus +
         featureAdjacentBonus +
-        featureProductionBonus) *
+        featureProductionBonus +
+        synergyBonus) *
       stateModifier *
       envModifier *
       depthModifier *
@@ -561,6 +579,7 @@ export function productionCalculateBreakdowns(
   season?: Season,
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
+  const activeSynergies = synergyEvaluateAll(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -648,6 +667,11 @@ export function productionCalculateBreakdowns(
           room,
           resourceType,
         );
+        const synergyBonusVal = synergyCalculateProductionBonus(
+          room.id,
+          resourceType,
+          activeSynergies,
+        );
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const modifier =
           stateModifier *
@@ -662,7 +686,8 @@ export function productionCalculateBreakdowns(
             inhabitantBonus +
             adjacencyBonusVal +
             featureAdjacentBonus +
-            featureProductionBonus);
+            featureProductionBonus +
+            synergyBonusVal);
         const afterModifiers = withBonuses * modifier;
         const finalAmount = afterModifiers * researchMultiplier;
 
@@ -732,6 +757,7 @@ export function productionCalculateDetailedBreakdown(
   season?: Season,
 ): RoomProductionDetail[] {
   const details: RoomProductionDetail[] = [];
+  const activeSynergies = synergyEvaluateAll(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -953,11 +979,17 @@ export function productionCalculateDetailedBreakdown(
         seasonMod *
         creatureModifier;
 
+      const synergyBonusVal = synergyCalculateProductionBonus(
+        room.id,
+        resourceType,
+        activeSynergies,
+      );
       const totalBonus =
         inhabitantBonusVal +
         adjacencyBonusVal +
         featureAdjacentBonus +
-        featureProductionBonus;
+        featureProductionBonus +
+        synergyBonusVal;
       const withBonuses = effectiveBase * (1 + totalBonus);
       const afterModifiers = withBonuses * combinedModifier;
       const researchMultiplier = productionGetResearchMultiplier(resourceType);
@@ -1004,6 +1036,7 @@ export function productionCalculateDetailedBreakdown(
         adjacencyBonus:
           effectiveBase * (adjacencyBonusVal + featureAdjacentBonus),
         featureBonus: effectiveBase * featureProductionBonus,
+        synergyBonus: effectiveBase * synergyBonusVal,
         researchBonus: afterResearch - afterModifiers,
         modifierEffect: afterModifiers - withBonuses,
         modifierDetails,

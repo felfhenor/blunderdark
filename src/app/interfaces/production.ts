@@ -44,6 +44,7 @@ export type RoomProductionDetail = {
   workerCount: number;
   adjacencyBonus: number;
   featureBonus: number;
+  synergyBonus: number;
   researchBonus: number;
   modifierEffect: number;
   modifierDetails: ModifierDetail[];

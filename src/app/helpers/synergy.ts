@@ -226,6 +226,27 @@ export function synergyGetPotentialForRoom(
   return potentials;
 }
 
+export function synergyCalculateProductionBonus(
+  roomId: PlacedRoomId,
+  resourceType: string,
+  activeSynergies: Map<string, SynergyContent[]>,
+): number {
+  const synergies = activeSynergies.get(roomId);
+  if (!synergies) return 0;
+
+  let bonus = 0;
+  for (const synergy of synergies) {
+    for (const effect of synergy.effects) {
+      if (effect.type === 'productionBonus') {
+        if (!effect.resource || effect.resource === resourceType) {
+          bonus += effect.value;
+        }
+      }
+    }
+  }
+  return bonus;
+}
+
 export function synergyFormatEffect(effect: SynergyEffect): string {
   if (effect.type === 'productionBonus') {
     const pct = Math.round(effect.value * 100);
