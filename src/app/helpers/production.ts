@@ -35,6 +35,7 @@ import {
 import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
+import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
   Floor,
@@ -61,7 +62,19 @@ import type {
 function productionGetResearchMultiplier(resourceType: string): number {
   const resourceBonus = researchUnlockGetPassiveBonusWithMastery(`${resourceType}Production`);
   const allBonus = researchUnlockGetPassiveBonusWithMastery('allProduction');
-  return 1 + resourceBonus + allBonus;
+
+  // Throne room ruler production bonuses
+  const floors = gamestate()?.world?.floors;
+  let rulerBonus = 0;
+  if (floors) {
+    if (resourceType === 'flux') {
+      rulerBonus = throneRoomGetRulerBonusValue(floors, 'fluxProduction');
+    } else if (resourceType === 'food') {
+      rulerBonus = throneRoomGetRulerBonusValue(floors, 'foodProduction');
+    }
+  }
+
+  return 1 + resourceBonus + allBonus + rulerBonus;
 }
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {

@@ -10,7 +10,7 @@ import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shape
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
-import { throneRoomGetFearLevel } from '@helpers/throne-room';
+import { throneRoomGetFearLevel, throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import type {
   Floor,
   InhabitantInstance,
@@ -46,7 +46,8 @@ export const FEAR_LEVEL_LABELS: Record<number, string> = {
 // --- Pure functions ---
 
 export function fearLevelGetLabel(level: number): string {
-  return FEAR_LEVEL_LABELS[level] ?? 'Unknown';
+  if (level > FEAR_LEVEL_MAX) return 'Terror';
+  return FEAR_LEVEL_LABELS[level] ?? 'Terror';
 }
 
 export function fearLevelCalculateInhabitantModifier(
@@ -96,7 +97,7 @@ export function fearLevelCalculateEffective(
   researchReduction: number = 0,
 ): number {
   const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction - researchReduction + propagatedFear;
-  return Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw));
+  return Math.floor(Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw)));
 }
 
 /**
@@ -248,10 +249,19 @@ export function fearLevelGetForRoom(
   roomDef: RoomContent,
   throneRoomFear?: number,
 ): FearLevelBreakdown {
-  const baseFear =
+  let baseFear =
     roomDef.fearLevel === 'variable'
       ? (throneRoomFear ?? 0)
       : roomDef.fearLevel;
+
+  // Throne room ruler fear bonus (multiplicative on base fear)
+  const floors = gamestate()?.world?.floors;
+  if (floors) {
+    const throneRulerFearBonus = throneRoomGetRulerBonusValue(floors, 'fear');
+    if (throneRulerFearBonus !== 0) {
+      baseFear *= 1 + throneRulerFearBonus;
+    }
+  }
 
   const inhabitantModifier = fearLevelCalculateInhabitantModifier(
     placedRoom.id,

@@ -41,6 +41,10 @@ vi.mock('@helpers/day-night-modifiers', () => ({
   dayNightGetResourceModifier: vi.fn(() => 1.0),
 }));
 
+vi.mock('@helpers/throne-room', () => ({
+  throneRoomGetRulerBonusValue: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/floor-modifiers', () => ({
   floorModifierGetObjectiveCorruptionRate: vi.fn((depth: number) => {
     if (depth >= 1 && depth <= 3) return 0;

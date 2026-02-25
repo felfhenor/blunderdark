@@ -40,6 +40,7 @@ import {
   moraleIsRetreating,
 } from '@helpers/morale';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
+import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import {
   pathfindingBuildDungeonGraph,
   pathfindingFindPath,
@@ -569,6 +570,12 @@ export function invasionStart(
     moraleApply('research_penalty', -researchMoralePenalty, 0, 'Dungeon wards');
   }
 
+  // 7c. Apply throne room ruler morale penalty
+  const rulerMoralePenalty = throneRoomGetRulerBonusValue(state.world.floors, 'invaderMorale');
+  if (rulerMoralePenalty !== 0) {
+    moraleApply('ruler_presence', Math.round(rulerMoralePenalty * 100), 0, "Ruler's presence");
+  }
+
   // 8. Build invader HP map
   const invaderHpMap: Record<string, number> = {};
   for (const inv of invaders) {
@@ -823,6 +830,11 @@ export function invasionProcess(state: GameState): void {
         for (const inv of livingInvaders) {
           const invDef = invaderGetDefinitionById(inv.definitionId);
           totalDamage += invDef?.baseStats.attack ?? 5;
+        }
+        // Throne room ruler durability bonus reduces incoming altar damage
+        const durabilityBonus = throneRoomGetRulerBonusValue(state.world.floors, 'roomDurability');
+        if (durabilityBonus > 0) {
+          totalDamage = Math.max(1, Math.round(totalDamage * (1 - durabilityBonus)));
         }
         invasion.invasionState = invasionWinLossDamageAltar(invasion.invasionState, totalDamage);
         invasion.battleLog.push({

@@ -106,7 +106,9 @@ export const throneRoomSeatedRuler = computed<InhabitantInstance | undefined>(
  * The active ruler bonuses as a reactive signal.
  */
 export const throneRoomActiveRulerBonuses = computed<RulerBonuses>(() => {
-  return throneRoomGetActiveRulerBonuses(gamestate().world.floors);
+  const floors = gamestate()?.world?.floors;
+  if (!floors) return {};
+  return throneRoomGetActiveRulerBonuses(floors);
 });
 
 /**

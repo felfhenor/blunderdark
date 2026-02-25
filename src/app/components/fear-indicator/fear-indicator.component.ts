@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
+import { FEAR_LEVEL_MAX, fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
 import type { PlacedRoomId } from '@interfaces';
 import type { FearLevelBreakdown } from '@interfaces/fear';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -20,13 +20,13 @@ import { TippyDirective } from '@ngneat/helipopper';
     @if (fearLevel() > 0) {
       <span
         class="inline-flex items-center px-1 rounded leading-3.5 whitespace-nowrap cursor-default text-xs font-bold"
-        [class.bg-success]="fearLevel() === 1"
-        [class.text-success-content]="fearLevel() === 1"
-        [class.bg-warning]="fearLevel() === 2"
-        [class.text-warning-content]="fearLevel() === 2"
-        [class.fear-high]="fearLevel() === 3"
-        [class.bg-error]="fearLevel() === 4"
-        [class.text-error-content]="fearLevel() === 4"
+        [class.bg-success]="fearLevel() > 0 && fearLevel() < 2"
+        [class.text-success-content]="fearLevel() > 0 && fearLevel() < 2"
+        [class.bg-warning]="fearLevel() >= 2 && fearLevel() < 3"
+        [class.text-warning-content]="fearLevel() >= 2 && fearLevel() < 3"
+        [class.fear-high]="fearLevel() >= 3 && fearLevel() < 4"
+        [class.bg-error]="fearLevel() >= 4"
+        [class.text-error-content]="fearLevel() >= 4"
         [tp]="fearTip"
         [tpDelay]="250"
       >
@@ -101,17 +101,12 @@ export class FearIndicatorComponent {
   public fearLabel = computed(() => fearLevelGetLabel(this.fearLevel()));
 
   public fearEffect = computed(() => {
-    switch (this.fearLevel()) {
-      case 1:
-        return 'Low fear: minor unease';
-      case 2:
-        return 'Medium fear: some inhabitants may be scared';
-      case 3:
-        return 'High fear: scared inhabitants produce -50%';
-      case 4:
-        return 'Very High fear: most inhabitants scared';
-      default:
-        return '';
-    }
+    const level = this.fearLevel();
+    if (level > FEAR_LEVEL_MAX) return 'Terror: maximum fear reached';
+    if (level >= 4) return 'Very High fear: most inhabitants scared';
+    if (level >= 3) return 'High fear: scared inhabitants produce -50%';
+    if (level >= 2) return 'Medium fear: some inhabitants may be scared';
+    if (level >= 1) return 'Low fear: minor unease';
+    return '';
   });
 }

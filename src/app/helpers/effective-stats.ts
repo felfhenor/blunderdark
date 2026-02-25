@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
+import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type { InhabitantStats } from '@interfaces/inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
@@ -77,6 +78,12 @@ export function effectiveStatsCalculate(
   const defBonus = researchUnlockGetPassiveBonusWithMastery('defenseBonus');
   if (defBonus > 0) {
     defense *= 1 + defBonus;
+  }
+
+  // Throne room ruler attack bonus
+  const rulerAttackBonus = throneRoomRulerBonus('attack');
+  if (rulerAttackBonus !== 0) {
+    attack *= 1 + rulerAttackBonus;
   }
 
   const undeadBonus =

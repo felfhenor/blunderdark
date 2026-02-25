@@ -201,10 +201,10 @@ describe('fearLevelGetLabel', () => {
     expect(fearLevelGetLabel(4)).toBe('Very High');
   });
 
-  it('should return Unknown for out-of-range values', () => {
-    expect(fearLevelGetLabel(-1)).toBe('Unknown');
-    expect(fearLevelGetLabel(5)).toBe('Unknown');
-    expect(fearLevelGetLabel(99)).toBe('Unknown');
+  it('should return Terror for values exceeding max', () => {
+    expect(fearLevelGetLabel(5)).toBe('Terror');
+    expect(fearLevelGetLabel(99)).toBe('Terror');
+    expect(fearLevelGetLabel(-1)).toBe('Terror');
   });
 });
 

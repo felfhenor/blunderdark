@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
+import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import {
   featureCalculateCorruptionGenerationPerTick,
   featureGetCorruptionSealedRoomIds,
@@ -190,7 +191,10 @@ export function corruptionGenerationProcess(state: GameState, numTicks = 1): voi
     'corruption',
   );
   const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
-  const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus);
+  const throneCorruptionBonus = state.world.floors
+    ? throneRoomGetRulerBonusValue(state.world.floors, 'corruptionGeneration')
+    : 0;
+  const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus + throneCorruptionBonus);
 
   resourceAdd('corruption', finalPerTick * numTicks);
 }

@@ -35,6 +35,7 @@ import { PanelRoomSelectComponent } from '@components/panel-room-select/panel-ro
 import { PanelRosterComponent } from '@components/panel-roster/panel-roster.component';
 import { PanelSummoningCircleComponent } from '@components/panel-summoning-circle/panel-summoning-circle.component';
 import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
+import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
@@ -103,6 +104,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     ResourceBreakdownModalComponent,
     VictoryMenuComponent,
     PanelReputationComponent,
+    PanelThroneRoomComponent,
     ResourceBarTopComponent,
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
@@ -168,6 +170,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private torturePanel = viewChild('torturePanel', { read: TemplateRef });
   private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
+  private thronePanel = viewChild('thronePanel', { read: TemplateRef });
   private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
 
   private hasRoomOfRole(role: string): boolean {
@@ -178,6 +181,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     );
   }
 
+  public hasThrone = computed(() => this.hasRoomOfRole('throne'));
   public hasTrainingGrounds = computed(() =>
     this.hasRoomOfRole('trainingGrounds'),
   );
@@ -196,6 +200,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
 
   private readonly roleToTabId: Record<string, string> = {
+    throne: 'throne',
     altar: 'altar',
     trainingGrounds: 'training',
     summoningCircle: 'summoning',
@@ -413,6 +418,15 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         hotkey: 'a',
         isModal: false,
         templateRef: this.altarPanel() ?? placeholder,
+      },
+      {
+        id: 'throne',
+        label: 'Throne',
+        icon: 'gameThroneKing',
+        hotkey: 'k',
+        isModal: false,
+        templateRef: this.thronePanel() ?? placeholder,
+        condition: this.hasThrone,
       },
       {
         id: 'training',
