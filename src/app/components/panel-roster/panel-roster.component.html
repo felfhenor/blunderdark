@@ -149,6 +149,14 @@
             </button>
           }
 
+          <!-- Release button -->
+          <button
+            class="btn btn-xs btn-error w-full mt-1"
+            (click)="onRelease(entry.instance.instanceId, entry.instance.name)"
+          >
+            Release
+          </button>
+
           <!-- Reassign list -->
           <div class="mt-1">
             <span class="text-xs opacity-50">Assign to:</span>
@@ -196,3 +204,4 @@
 }
 
 <swal #renameSwal></swal>
+<swal #releaseSwal></swal>

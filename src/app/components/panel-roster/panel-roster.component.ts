@@ -11,6 +11,7 @@ import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   inhabitantAssignToRoom,
   inhabitantRename,
+  inhabitantRemove,
   assignmentCanAssignToRoom,
   contentGetEntry,
   productionGetRoomDefinition,
@@ -52,6 +53,7 @@ type RosterEntry = {
 })
 export class PanelRosterComponent {
   private renameSwal = viewChild<SwalComponent>('renameSwal');
+  private releaseSwal = viewChild<SwalComponent>('releaseSwal');
 
   public activeFilter = signal<RosterFilter>('all');
   public selectedInhabitantId = signal<string | undefined>(undefined);
@@ -244,6 +246,30 @@ export class PanelRosterComponent {
       } else {
         notifyError('Failed to rename creature');
       }
+    }
+  }
+
+  public async onRelease(instanceId: string, instanceName: string): Promise<void> {
+    const swal = this.releaseSwal();
+    if (!swal) return;
+
+    swal.swalOptions = {
+      title: 'Release Creature',
+      text: `Release ${instanceName}? This cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Release',
+    };
+
+    const result = await swal.fire();
+    if (result.isConfirmed) {
+      const entry = this.selectedEntry();
+      if (entry?.instance.assignedRoomId) {
+        await inhabitantUnassignFromRoom(instanceId);
+      }
+      await inhabitantRemove(instanceId);
+      this.selectedInhabitantId.set(undefined);
+      notifySuccess(`${instanceName} has been released`);
     }
   }
 
