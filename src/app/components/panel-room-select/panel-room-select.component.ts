@@ -57,7 +57,7 @@ export class PanelRoomSelectComponent {
     sortBy(
       contentGetEntriesByType<RoomContent>('room').filter(
         (r) =>
-          !r.autoPlace &&
+          !(r.autoPlace && r.isUnique) &&
           !this.isResearchLocked(r) &&
           !this.isReputationLocked(r) &&
           !this.TRANSPORT_ROLES.has(r.role ?? ''),

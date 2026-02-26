@@ -270,12 +270,13 @@
   description: A natural seam of gold ore running through the dungeon rock. Produces a trickle of gold without workers.
   shapeId: Square 2x2
   reputationAction: Mine Gold Vein
-  cost: {}
+  cost:
+    crystals: 50
   production:
     gold: 0.4
   requiresWorkers: false
   autoPlace: true
-  isUnique: true
+  isUnique: false
   removable: true
   maxInhabitants: 0
   maxFeatures: 0
