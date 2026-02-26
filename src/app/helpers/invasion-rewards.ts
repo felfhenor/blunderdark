@@ -294,7 +294,7 @@ export function invasionRewardHandleConvert(
   return {
     action: 'convert',
     success,
-    resourceChanges: { corruption: 5 },
+    resourceChanges: {},
     reputationChange: 0,
     corruptionChange: 5,
     fearChange: 0,
@@ -316,7 +316,7 @@ export function invasionRewardHandleSacrifice(
   return {
     action: 'sacrifice',
     success: true,
-    resourceChanges: { [boonResource]: boonAmount, corruption: 5 },
+    resourceChanges: { [boonResource]: boonAmount },
     reputationChange: 2,
     corruptionChange: 5,
     fearChange: 0,
@@ -340,7 +340,7 @@ export function invasionRewardHandleExperiment(
   return {
     action: 'experiment',
     success: true,
-    resourceChanges: { research: researchGain, corruption: 3 },
+    resourceChanges: { research: researchGain },
     reputationChange: 0,
     corruptionChange: 3,
     fearChange: 0,

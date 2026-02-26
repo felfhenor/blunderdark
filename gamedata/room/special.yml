@@ -76,7 +76,7 @@
     crystals: 40
     essence: 15
   production:
-    corruption: -0.3
+    corruption: -3.0
   requiresWorkers: false
   maxInhabitants: 2
   maxFeatures: 1
@@ -88,17 +88,17 @@
     weight: 8
   adjacencyBonuses:
     - adjacentRoomId: Soul Well
-      bonus: 0.1
-      description: Soul energy from the Well enhances purification (+0.1/min drain).
-    - adjacentRoomId: Shadow Library
-      bonus: 0.1
-      description: Arcane knowledge from the Library refines the purification ritual (+0.1/min drain).
-    - adjacentRoomId: Torture Chamber
-      bonus: 0.1
-      description: Suffering extracted in the Torture Chamber fuels corruption cleansing (+0.1/min drain).
-    - adjacentRoomId: Altar Room
       bonus: 0.15
-      description: The Altar's divine resonance greatly amplifies purification (+0.15/min drain and aura synergy).
+      description: Soul energy from the Well enhances purification (+0.15/min drain).
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Arcane knowledge from the Library refines the purification ritual (+0.15/min drain).
+    - adjacentRoomId: Torture Chamber
+      bonus: 0.15
+      description: Suffering extracted in the Torture Chamber fuels corruption cleansing (+0.15/min drain).
+    - adjacentRoomId: Altar Room
+      bonus: 0.25
+      description: The Altar's divine resonance greatly amplifies purification (+0.25/min drain and aura synergy).
   roomUpgradeIds:
     - Sanctified Basin
     - Warding Pillars

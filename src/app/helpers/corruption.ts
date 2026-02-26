@@ -1,18 +1,10 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
-import { dayNightGetResourceModifier } from '@helpers/day-night-modifiers';
-import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
-import {
-  featureCalculateCorruptionGenerationPerTick,
-  featureGetCorruptionSealedRoomIds,
-} from '@helpers/features';
 import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { productionCalculateTotal } from '@helpers/production';
-import { resourceAdd } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Floor, GameState, InhabitantInstance } from '@interfaces';
+import type { Floor, InhabitantInstance } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type { CorruptionLevel } from '@interfaces/corruption';
@@ -155,73 +147,3 @@ export function corruptionCalculateDeepObjectiveRate(
   return totalPerMinute / GAME_TIME_TICKS_PER_MINUTE;
 }
 
-/**
- * Process inhabitant-based corruption generation each tick.
- * Applies day/night modifier (night +50%) to inhabitant-generated corruption.
- * Room-based corruption production is handled by the standard production pipeline.
- * Mutates state in-place (same pattern as productionProcess/hungerProcess).
- */
-export function corruptionGenerationProcess(state: GameState, numTicks = 1): void {
-  const inhabitantPerTick = corruptionGenerationCalculateInhabitantRate(
-    state.world.inhabitants,
-  );
-
-  const sealedRoomIds = featureGetCorruptionSealedRoomIds(
-    state.world.floors ?? [],
-  );
-
-  let featurePerTick = 0;
-  for (const floor of state.world.floors ?? []) {
-    const unsealedRooms =
-      sealedRoomIds.size > 0
-        ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
-        : floor.rooms;
-    featurePerTick += featureCalculateCorruptionGenerationPerTick(
-      unsealedRooms,
-      GAME_TIME_TICKS_PER_MINUTE,
-    );
-  }
-
-  const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(state.world.floors ?? []);
-
-  // Include room-based corruption production (positive and negative, e.g. Purification Chamber)
-  const roomProduction = productionCalculateTotal(
-    state.world.floors,
-    state.clock.hour,
-    state.world.season.currentSeason,
-  );
-  const roomCorruptionPerTick = roomProduction['corruption'] ?? 0;
-
-  const basePerTick = inhabitantPerTick + featurePerTick + deepObjectivePerTick + roomCorruptionPerTick;
-
-  const dayNightMod = dayNightGetResourceModifier(
-    state.clock.hour,
-    'corruption',
-  );
-  const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
-  const throneCorruptionBonus = state.world.floors
-    ? throneRoomGetRulerBonusValue(state.world.floors, 'corruptionGeneration')
-    : 0;
-  const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus + throneCorruptionBonus);
-
-  if (finalPerTick > 0) {
-    resourceAdd('corruption', finalPerTick * numTicks);
-  } else if (finalPerTick < 0) {
-    // Net negative: purification exceeds generation, drain corruption
-    state.world.resources.corruption.current = Math.max(
-      0,
-      state.world.resources.corruption.current + finalPerTick * numTicks,
-    );
-  }
-}
-
-/**
- * Calculate total corruption generation per minute from all sources (for UI display).
- * Combines room-based production (from productionRates) and inhabitant-based generation.
- */
-export function corruptionGenerationCalculateTotalPerMinute(
-  inhabitantRatePerTick: number,
-  roomRatePerTick: number,
-): number {
-  return (inhabitantRatePerTick + roomRatePerTick) * GAME_TIME_TICKS_PER_MINUTE;
-}

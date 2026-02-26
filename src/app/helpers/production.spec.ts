@@ -207,6 +207,30 @@ vi.mock('@helpers/content', () => {
     effects: [{ type: 'secondaryProduction', value: 0.2, resource: 'flux' }],
   });
 
+  entries.set('room-soul-well', {
+    id: 'room-soul-well',
+    name: 'Soul Well',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1' as RoomShapeId,
+    cost: {},
+    production: { essence: 0.3, corruption: 0.4 },
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
+  entries.set('room-purification-chamber', {
+    id: 'room-purification-chamber',
+    name: 'Purification Chamber',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1' as RoomShapeId,
+    cost: {},
+    production: { corruption: -3.0 },
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
   return {
     contentGetEntry: vi.fn((id: string) => entries.get(id)),
     contentGetEntriesByType: vi.fn((type: string) =>
@@ -1706,5 +1730,109 @@ describe('upgrade effects in production', () => {
     expect(breakdowns['flux']).toBeDefined();
     expect(breakdowns['flux'].base).toBeCloseTo(0.2);
     expect(breakdowns['flux'].final).toBeCloseTo(0.2);
+  });
+});
+
+describe('Purification Chamber negative corruption production', () => {
+  it('productionCalculateTotal should return negative corruption when purification exceeds sources', () => {
+    const soulWell: PlacedRoom = {
+      id: 'placed-soul-well' as PlacedRoomId,
+      roomTypeId: 'room-soul-well' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const purification: PlacedRoom = {
+      id: 'placed-purification' as PlacedRoomId,
+      roomTypeId: 'room-purification-chamber' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 4,
+      anchorY: 0,
+    };
+    const floor = makeFloor([soulWell, purification]);
+    const production = productionCalculateTotal([floor]);
+    // Soul Well: corruption +0.4, Purification Chamber: corruption -3.0
+    // Net: -2.6
+    expect(production['corruption']).toBeCloseTo(-2.6);
+  });
+
+  it('productionCalculateBreakdowns should return negative corruption matching total', () => {
+    const soulWell: PlacedRoom = {
+      id: 'placed-soul-well' as PlacedRoomId,
+      roomTypeId: 'room-soul-well' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const purification: PlacedRoom = {
+      id: 'placed-purification' as PlacedRoomId,
+      roomTypeId: 'room-purification-chamber' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 4,
+      anchorY: 0,
+    };
+    const floor = makeFloor([soulWell, purification]);
+    const breakdowns = productionCalculateBreakdowns([floor]);
+    // Should show net negative corruption
+    expect(breakdowns['corruption']).toBeDefined();
+    expect(breakdowns['corruption'].final).toBeCloseTo(-2.6);
+  });
+
+  it('productionProcess should decrease corruption when net production is negative', () => {
+    const soulWell: PlacedRoom = {
+      id: 'placed-soul-well' as PlacedRoomId,
+      roomTypeId: 'room-soul-well' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const purification: PlacedRoom = {
+      id: 'placed-purification' as PlacedRoomId,
+      roomTypeId: 'room-purification-chamber' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 4,
+      anchorY: 0,
+    };
+    const floor = makeFloor([soulWell, purification]);
+    const state = makeGameState([floor], {
+      corruption: { current: 100, max: 1000 },
+    });
+    productionProcess(state);
+    // Net corruption is -2.6 per tick, so 100 - 2.6 = 97.4
+    expect(state.world.resources.corruption.current).toBeCloseTo(97.4);
+  });
+
+  it('productionProcess should not reduce corruption below 0', () => {
+    const purification: PlacedRoom = {
+      id: 'placed-purification' as PlacedRoomId,
+      roomTypeId: 'room-purification-chamber' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([purification]);
+    const state = makeGameState([floor], {
+      corruption: { current: 0.3, max: 1000 },
+    });
+    productionProcess(state);
+    // Purification: -3.0, current 0.3, should clamp to 0
+    expect(state.world.resources.corruption.current).toBe(0);
+  });
+
+  it('productionProcess should add corruption when net production is positive', () => {
+    const soulWell: PlacedRoom = {
+      id: 'placed-soul-well' as PlacedRoomId,
+      roomTypeId: 'room-soul-well' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([soulWell]);
+    const state = makeGameState([floor], {
+      corruption: { current: 50, max: 1000 },
+    });
+    productionProcess(state);
+    // Soul Well: corruption +0.4
+    expect(state.world.resources.corruption.current).toBeCloseTo(50.4);
   });
 });

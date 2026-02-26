@@ -1,7 +1,6 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
-import { corruptionGenerationProcess } from '@helpers/corruption';
 import { corruptionEffectProcess } from '@helpers/corruption-effects';
 import { corruptionThresholdProcess } from '@helpers/corruption-thresholds';
 import { gameEventProcess } from '@helpers/game-events';
@@ -79,7 +78,6 @@ export async function gameloop(totalTicks: number): Promise<void> {
     resourceStorageProcess(state);
     hungerProcess(state, numTicks);
     productionProcess(state, numTicks);
-    corruptionGenerationProcess(state, numTicks);
     corruptionEffectProcess(state);
     corruptionThresholdProcess(state);
     researchProcess(state, numTicks);

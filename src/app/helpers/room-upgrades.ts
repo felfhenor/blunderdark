@@ -180,15 +180,23 @@ export function roomUpgradeGetSecondaryProduction(
 /**
  * Extract productionMultiplier effects from a room's applied upgrade
  * and return the combined multiplier. Returns 1.0 if no multiplier effects.
+ *
+ * When resourceType is provided, only effects with no resource field (global)
+ * or a matching resource field are included. This prevents upgrades targeting
+ * a specific resource (e.g. essence) from incorrectly multiplying other
+ * resources (e.g. corruption) produced by the same room.
  */
 export function roomUpgradeGetProductionMultiplier(
   placedRoom: PlacedRoom,
+  resourceType?: string,
 ): number {
   const effects = roomUpgradeGetAppliedEffects(placedRoom);
   let multiplier = 1.0;
   for (const effect of effects) {
     if (effect.type === 'productionMultiplier') {
-      multiplier *= effect.value;
+      if (!effect.resource || effect.resource === resourceType) {
+        multiplier *= effect.value;
+      }
     }
   }
   return multiplier;

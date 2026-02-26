@@ -10,10 +10,16 @@ import {
   dayNightGetResourceModifier,
 } from '@helpers/day-night-modifiers';
 import {
+  corruptionGenerationCalculateInhabitantRate,
+  corruptionCalculateDeepObjectiveRate,
+} from '@helpers/corruption';
+import {
   featureApplyResourceConversion,
   featureCalculateAdjacentProductionBonus,
+  featureCalculateCorruptionGenerationPerTick,
   featureCalculateFlatProduction,
   featureCalculateProductionBonus,
+  featureGetCorruptionSealedRoomIds,
   featureGetResourceConverterEfficiency,
 } from '@helpers/features';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
@@ -96,6 +102,83 @@ function productionGetReputationMultiplier(resourceType: string): number {
   const reputation = gamestate()?.world?.reputation;
   if (!reputation) return 1.0;
   return reputationEffectGetProductionMultiplier(resourceType, reputation);
+}
+
+type NonRoomCorruptionResult = {
+  /** Per-tick corruption from stationed inhabitants */
+  inhabitantPerTick: number;
+  /** Per-tick corruption from features */
+  featurePerTick: number;
+  /** Per-tick corruption from deep objective rooms */
+  deepObjectivePerTick: number;
+  /** Day/night multiplier for corruption */
+  dayNightMultiplier: number;
+  /** Combined research + throne multiplier (1 + bonuses) */
+  researchThroneMultiplier: number;
+  /** Total non-room corruption per tick after all modifiers */
+  final: number;
+};
+
+/**
+ * Collect inhabitants from all floors, deduplicating by instanceId.
+ * Multiple floors can share the same inhabitants array reference
+ * (e.g. after spawning/breeding syncs floor.inhabitants = state.world.inhabitants),
+ * which causes flatMap to count the same inhabitants multiple times.
+ */
+function collectUniqueInhabitants(floors: Floor[]): InhabitantInstance[] {
+  const seen = new Set<string>();
+  const result: InhabitantInstance[] = [];
+  for (const floor of floors) {
+    for (const inst of floor.inhabitants) {
+      if (!seen.has(inst.instanceId)) {
+        seen.add(inst.instanceId);
+        result.push(inst);
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Calculate non-room corruption sources: stationed inhabitants, corruption features,
+ * and deep objective rooms. Returns separated components with modifiers.
+ */
+function productionCalculateNonRoomCorruption(
+  floors: Floor[],
+  hour?: number,
+): NonRoomCorruptionResult {
+  const allInhabitants = collectUniqueInhabitants(floors);
+  const inhabitantPerTick = corruptionGenerationCalculateInhabitantRate(allInhabitants);
+
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
+  let featurePerTick = 0;
+  for (const floor of floors) {
+    const unsealedRooms = sealedRoomIds.size > 0
+      ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
+      : floor.rooms;
+    featurePerTick += featureCalculateCorruptionGenerationPerTick(
+      unsealedRooms,
+      GAME_TIME_TICKS_PER_MINUTE,
+    );
+  }
+
+  const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(floors);
+
+  const total = inhabitantPerTick + featurePerTick + deepObjectivePerTick;
+  if (total === 0) {
+    return { inhabitantPerTick: 0, featurePerTick: 0, deepObjectivePerTick: 0, dayNightMultiplier: 1, researchThroneMultiplier: 1, final: 0 };
+  }
+
+  const dayNightMultiplier = hour !== undefined
+    ? dayNightGetResourceModifier(hour, 'corruption')
+    : 1.0;
+  const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
+  const throneCorruptionBonus = throneRoomGetRulerBonusValue(floors, 'corruptionGeneration');
+  const researchThroneMultiplier = 1 + researchCorruptionBonus + throneCorruptionBonus;
+
+  const final = total * dayNightMultiplier * researchThroneMultiplier;
+
+  return { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, final };
 }
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
@@ -259,7 +342,7 @@ export function productionCalculateTotal(
 ): RoomProduction {
   const totalProduction: RoomProduction = {};
   const activeSynergies = synergyEvaluateAll(floors);
-  const allInhabitants = floors.flatMap((f) => f.inhabitants);
+  const allInhabitants = collectUniqueInhabitants(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -391,10 +474,10 @@ export function productionCalculateTotal(
       // Apply resource conversion if active
       roomProduction = featureApplyResourceConversion(roomProduction, room);
 
-      // Apply production multiplier from upgrades
-      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
-      if (upgradeMultiplier !== 1.0) {
-        for (const key of Object.keys(roomProduction)) {
+      // Apply production multiplier from upgrades (per-resource to respect resource targeting)
+      for (const key of Object.keys(roomProduction)) {
+        const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room, key);
+        if (upgradeMultiplier !== 1.0) {
           roomProduction[key] = (roomProduction[key] ?? 0) * upgradeMultiplier;
         }
       }
@@ -413,6 +496,13 @@ export function productionCalculateTotal(
           (totalProduction[resourceType] ?? 0) + amount;
       }
     }
+  }
+
+  // Add non-room corruption sources (inhabitants, features, deep objectives)
+  const nonRoomCorruption = productionCalculateNonRoomCorruption(floors, hour);
+  if (nonRoomCorruption.final !== 0) {
+    totalProduction['corruption'] =
+      (totalProduction['corruption'] ?? 0) + nonRoomCorruption.final;
   }
 
   return totalProduction;
@@ -442,7 +532,7 @@ export function productionCalculateSingleRoom(
 
   if (roomDef.requiresWorkers && !hasWorkers) return {};
 
-  const allInhabitants = (floors ?? [floor]).flatMap((f) => f.inhabitants);
+  const allInhabitants = collectUniqueInhabitants(floors ?? [floor]);
 
   const roomTiles = new Map<string, TileOffset[]>();
   for (const r of floor.rooms) {
@@ -553,10 +643,10 @@ export function productionCalculateSingleRoom(
   // Apply resource conversion if active
   production = featureApplyResourceConversion(production, room);
 
-  // Apply production multiplier from upgrades
-  const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
-  if (upgradeMultiplier !== 1.0) {
-    for (const key of Object.keys(production)) {
+  // Apply production multiplier from upgrades (per-resource to respect resource targeting)
+  for (const key of Object.keys(production)) {
+    const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room, key);
+    if (upgradeMultiplier !== 1.0) {
       production[key] = (production[key] ?? 0) * upgradeMultiplier;
     }
   }
@@ -608,7 +698,7 @@ export function productionCalculateBreakdowns(
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
   const activeSynergies = synergyEvaluateAll(floors);
-  const allInhabitantsForAura = floors.flatMap((f) => f.inhabitants);
+  const allInhabitantsForAura = collectUniqueInhabitants(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -678,6 +768,9 @@ export function productionCalculateBreakdowns(
               room.id,
             )
           : 1.0;
+      // Track each room's final contribution per resource for upgrade multiplier
+      let roomFinals: Record<string, number> = {};
+
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
 
@@ -724,6 +817,8 @@ export function productionCalculateBreakdowns(
         const afterReputation = afterResearch * reputationMultiplier;
         const finalAmount = afterReputation * legendaryAuraMultiplier;
 
+        roomFinals[resourceType] = finalAmount;
+
         if (!breakdowns[resourceType]) {
           breakdowns[resourceType] = {
             base: 0,
@@ -747,16 +842,73 @@ export function productionCalculateBreakdowns(
         breakdowns[resourceType].final += finalAmount;
       }
 
-      // Apply production multiplier from upgrades to breakdown finals
-      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
-      if (upgradeMultiplier !== 1.0) {
-        for (const [resourceType, baseAmount] of Object.entries(base)) {
-          if (!baseAmount || !breakdowns[resourceType]) continue;
-          const prevFinal = breakdowns[resourceType].final;
-          breakdowns[resourceType].final =
-            prevFinal * upgradeMultiplier;
-          breakdowns[resourceType].modifierEffect +=
-            prevFinal * (upgradeMultiplier - 1);
+      // Add flat production from features (must match productionCalculateTotal)
+      const flatProduction = featureCalculateFlatProduction(
+        room,
+        GAME_TIME_TICKS_PER_MINUTE,
+      );
+      for (const [resourceType, amount] of Object.entries(flatProduction)) {
+        if (!amount) continue;
+        roomFinals[resourceType] = (roomFinals[resourceType] ?? 0) + amount;
+        if (!breakdowns[resourceType]) {
+          breakdowns[resourceType] = {
+            base: 0,
+            inhabitantBonus: 0,
+            adjacencyBonus: 0,
+            modifierEffect: 0,
+            researchBonus: 0,
+            reputationBonus: 0,
+            final: 0,
+          };
+        }
+        breakdowns[resourceType].base += amount;
+        breakdowns[resourceType].final += amount;
+      }
+
+      // Apply resource conversion if active (must match productionCalculateTotal)
+      const conversionEfficiency = featureGetResourceConverterEfficiency(room);
+      if (conversionEfficiency !== undefined && room.convertedOutputResource) {
+        const targetResource = room.convertedOutputResource;
+        let totalPositive = 0;
+        for (const val of Object.values(roomFinals)) {
+          if (val && val > 0) totalPositive += val;
+        }
+        if (totalPositive > 0) {
+          // Remove existing contributions from breakdowns (they get converted)
+          for (const [rt, val] of Object.entries(roomFinals)) {
+            if (breakdowns[rt]) {
+              breakdowns[rt].final -= val;
+              breakdowns[rt].base -= val;
+            }
+          }
+          // Add converted output
+          const convertedAmount = totalPositive * conversionEfficiency;
+          roomFinals = { [targetResource]: convertedAmount };
+          if (!breakdowns[targetResource]) {
+            breakdowns[targetResource] = {
+              base: 0,
+              inhabitantBonus: 0,
+              adjacencyBonus: 0,
+              modifierEffect: 0,
+              researchBonus: 0,
+              reputationBonus: 0,
+              final: 0,
+            };
+          }
+          breakdowns[targetResource].base += convertedAmount;
+          breakdowns[targetResource].final += convertedAmount;
+        }
+      }
+
+      // Apply production multiplier from upgrades (per-resource to respect targeting)
+      for (const resourceType of Object.keys(roomFinals)) {
+        if (!breakdowns[resourceType]) continue;
+        const roomFinal = roomFinals[resourceType] ?? 0;
+        const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room, resourceType);
+        if (upgradeMultiplier !== 1.0) {
+          const upgradeDelta = roomFinal * (upgradeMultiplier - 1);
+          breakdowns[resourceType].final += upgradeDelta;
+          breakdowns[resourceType].modifierEffect += upgradeDelta;
         }
       }
 
@@ -784,6 +936,35 @@ export function productionCalculateBreakdowns(
     }
   }
 
+  // Add non-room corruption sources to breakdown
+  const nonRoomCorruption = productionCalculateNonRoomCorruption(floors, hour);
+  if (nonRoomCorruption.final !== 0) {
+    if (!breakdowns['corruption']) {
+      breakdowns['corruption'] = {
+        base: 0,
+        inhabitantBonus: 0,
+        adjacencyBonus: 0,
+        modifierEffect: 0,
+        researchBonus: 0,
+        reputationBonus: 0,
+        final: 0,
+      };
+    }
+
+    const { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier } = nonRoomCorruption;
+    const nonInhabitantBase = featurePerTick + deepObjectivePerTick;
+    const totalBase = inhabitantPerTick + nonInhabitantBase;
+
+    // Inhabitant corruption shows as worker bonus; features/objectives show as base
+    breakdowns['corruption'].base += nonInhabitantBase;
+    breakdowns['corruption'].inhabitantBonus += inhabitantPerTick;
+    // Modifier and research effects apply to the combined total
+    const afterModifier = totalBase * dayNightMultiplier;
+    breakdowns['corruption'].modifierEffect += afterModifier - totalBase;
+    breakdowns['corruption'].researchBonus += afterModifier * researchThroneMultiplier - afterModifier;
+    breakdowns['corruption'].final += nonRoomCorruption.final;
+  }
+
   return breakdowns;
 }
 
@@ -795,7 +976,7 @@ export function productionCalculateDetailedBreakdown(
 ): RoomProductionDetail[] {
   const details: RoomProductionDetail[] = [];
   const activeSynergies = synergyEvaluateAll(floors);
-  const allInhabitantsForAura = floors.flatMap((f) => f.inhabitants);
+  const allInhabitantsForAura = collectUniqueInhabitants(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -1067,8 +1248,8 @@ export function productionCalculateDetailedBreakdown(
       );
       const flatForType = flatProduction[resourceType] ?? 0;
 
-      // Upgrade multiplier
-      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room);
+      // Upgrade multiplier (per-resource to respect resource targeting)
+      const upgradeMultiplier = roomUpgradeGetProductionMultiplier(room, resourceType);
       let finalAmount =
         (hasConversion && room.convertedOutputResource === resourceType
           ? conversionAdjusted
@@ -1105,6 +1286,120 @@ export function productionCalculateDetailedBreakdown(
     }
   }
 
+  // Add non-room corruption sources as detail entries
+  if (resourceType === 'corruption') {
+    const dayNightMod = hour !== undefined
+      ? dayNightGetResourceModifier(hour, 'corruption')
+      : 1.0;
+    const researchCorruptionBonus = researchUnlockGetPassiveBonusWithMastery('corruptionGeneration');
+    const throneCorruptionBonus = throneRoomGetRulerBonusValue(floors, 'corruptionGeneration');
+    const researchThroneMultiplier = 1 + researchCorruptionBonus + throneCorruptionBonus;
+
+    const corruptionModifierDetails: ModifierDetail[] = [];
+    if (dayNightMod !== 1.0) {
+      corruptionModifierDetails.push({ name: 'Time of Day', multiplier: dayNightMod });
+    }
+    if (researchCorruptionBonus !== 0) {
+      corruptionModifierDetails.push({ name: 'Research (Corruption Gen.)', multiplier: 1 + researchCorruptionBonus });
+    }
+    if (throneCorruptionBonus !== 0) {
+      corruptionModifierDetails.push({ name: 'Throne Room', multiplier: 1 + throneCorruptionBonus });
+    }
+
+    // Per-room inhabitant corruption generation (shows in Workers tab)
+    for (const floor of floors) {
+      const roomCorruptionWorkers = new Map<string, { count: number; perTick: number }>();
+
+      for (const inst of floor.inhabitants) {
+        if (!inst.assignedRoomId) continue;
+        const def = productionGetInhabitantDefinition(inst.definitionId);
+        if (!def) continue;
+        const rate = def.corruptionGeneration ?? 0;
+        if (rate <= 0) continue;
+
+        const existing = roomCorruptionWorkers.get(inst.assignedRoomId) ?? { count: 0, perTick: 0 };
+        existing.count += 1;
+        existing.perTick += rate / GAME_TIME_TICKS_PER_MINUTE;
+        roomCorruptionWorkers.set(inst.assignedRoomId, existing);
+      }
+
+      for (const [roomId, data] of roomCorruptionWorkers) {
+        const room = floor.rooms.find((r) => r.id === roomId);
+        if (!room) continue;
+
+        const afterModifier = data.perTick * dayNightMod;
+        const finalAmount = afterModifier * researchThroneMultiplier;
+
+        details.push({
+          roomId: `${roomId}-corruption-gen` as PlacedRoomId,
+          roomName: roomGetDisplayName(room),
+          floorDepth: floor.depth,
+          base: 0,
+          inhabitantBonus: finalAmount,
+          workerCount: data.count,
+          adjacencyBonus: 0,
+          featureBonus: 0,
+          synergyBonus: 0,
+          researchBonus: 0,
+          reputationBonus: 0,
+          modifierEffect: 0,
+          modifierDetails: corruptionModifierDetails,
+          flatFeatureProduction: 0,
+          upgradeSecondaryProduction: 0,
+          upgradeMultiplier: 1,
+          final: finalAmount,
+        });
+      }
+    }
+
+    // Feature corruption and deep objective rooms (shows in Base tab)
+    const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
+    let featurePerTick = 0;
+    for (const floor of floors) {
+      const unsealedRooms = sealedRoomIds.size > 0
+        ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
+        : floor.rooms;
+      featurePerTick += featureCalculateCorruptionGenerationPerTick(
+        unsealedRooms,
+        GAME_TIME_TICKS_PER_MINUTE,
+      );
+    }
+
+    const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(floors);
+
+    const baseSources = [
+      { name: 'Corruption Features', base: featurePerTick },
+      { name: 'Deep Objective Rooms', base: deepObjectivePerTick },
+    ];
+
+    for (const source of baseSources) {
+      if (source.base === 0) continue;
+
+      const afterModifier = source.base * dayNightMod;
+      const finalAmount = afterModifier * researchThroneMultiplier;
+
+      details.push({
+        roomId: '' as PlacedRoomId,
+        roomName: source.name,
+        floorDepth: 0,
+        base: source.base,
+        inhabitantBonus: 0,
+        workerCount: 0,
+        adjacencyBonus: 0,
+        featureBonus: 0,
+        synergyBonus: 0,
+        researchBonus: finalAmount - afterModifier,
+        reputationBonus: 0,
+        modifierEffect: afterModifier - source.base,
+        modifierDetails: corruptionModifierDetails,
+        flatFeatureProduction: 0,
+        upgradeSecondaryProduction: 0,
+        upgradeMultiplier: 1,
+        final: finalAmount,
+      });
+    }
+  }
+
   return details;
 }
 
@@ -1125,12 +1420,17 @@ export function productionProcess(state: GameState, numTicks = 1): void {
   );
 
   for (const [type, amount] of Object.entries(production)) {
-    if (!amount || amount <= 0) continue;
-    // Corruption is handled by corruptionGenerationProcess to combine
-    // room production with inhabitant/feature generation into a single net rate
-    if (type === 'corruption') continue;
+    if (!amount) continue;
     const resourceType = type as ResourceType;
 
-    resourceAdd(resourceType, amount * numTicks);
+    if (amount > 0) {
+      resourceAdd(resourceType, amount * numTicks);
+    } else if (amount < 0) {
+      // Net negative production (e.g., purification drains more corruption than sources generate)
+      state.world.resources[resourceType].current = Math.max(
+        0,
+        state.world.resources[resourceType].current + amount * numTicks,
+      );
+    }
   }
 }

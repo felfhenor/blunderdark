@@ -519,20 +519,36 @@ describe('roomUpgradeGetProductionMultiplier', () => {
     expect(result).toBe(1.0);
   });
 
-  it('should return 1.5 for efficiency upgrade', () => {
+  it('should return 1.5 for efficiency upgrade when matching resource', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-efficiency' as RoomUpgradeId,
     });
-    const result = roomUpgradeGetProductionMultiplier(room);
+    const result = roomUpgradeGetProductionMultiplier(room, 'crystals');
     expect(result).toBe(1.5);
   });
 
-  it('should return 2.0 for dark upgrade', () => {
+  it('should return 1.0 for efficiency upgrade when resource does not match', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-efficiency' as RoomUpgradeId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room, 'corruption');
+    expect(result).toBe(1.0);
+  });
+
+  it('should return 2.0 for dark upgrade when matching resource', () => {
     const room = createPlacedRoom({
       appliedUpgradePathId: 'upgrade-dark' as RoomUpgradeId,
     });
-    const result = roomUpgradeGetProductionMultiplier(room);
+    const result = roomUpgradeGetProductionMultiplier(room, 'crystals');
     expect(result).toBe(2.0);
+  });
+
+  it('should return 1.0 for dark upgrade when resource does not match', () => {
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-dark' as RoomUpgradeId,
+    });
+    const result = roomUpgradeGetProductionMultiplier(room, 'gold');
+    expect(result).toBe(1.0);
   });
 
   it('should return 1.0 for upgrade with no production multiplier', () => {
@@ -549,5 +565,24 @@ describe('roomUpgradeGetProductionMultiplier', () => {
     });
     const result = roomUpgradeGetProductionMultiplier(room);
     expect(result).toBe(1.0);
+  });
+
+  it('should apply global multiplier (no resource) to any resource type', () => {
+    // Create a global multiplier upgrade (no resource field)
+    const globalUpgrade: RoomUpgradeContent = {
+      id: 'upgrade-global' as RoomUpgradeId,
+      name: 'Global Boost',
+      __type: 'roomupgrade',
+      description: 'Boosts all production.',
+      cost: {},
+      effects: [{ type: 'productionMultiplier', value: 1.5 }],
+    };
+    mockContent.set('upgrade-global', globalUpgrade);
+    const room = createPlacedRoom({
+      appliedUpgradePathId: 'upgrade-global' as RoomUpgradeId,
+    });
+    expect(roomUpgradeGetProductionMultiplier(room, 'crystals')).toBe(1.5);
+    expect(roomUpgradeGetProductionMultiplier(room, 'corruption')).toBe(1.5);
+    expect(roomUpgradeGetProductionMultiplier(room, 'essence')).toBe(1.5);
   });
 });

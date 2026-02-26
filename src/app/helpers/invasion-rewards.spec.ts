@@ -421,9 +421,10 @@ describe('invasion-rewards', () => {
         expect(resourceKeys.length).toBeGreaterThan(0);
       });
 
-      it('should add corruption resource change', () => {
+      it('should not duplicate corruption in resourceChanges (handled by corruptionChange)', () => {
         const result = invasionRewardHandleSacrifice(fixedRng(0.5));
-        expect(result.resourceChanges.corruption).toBe(5);
+        expect(result.resourceChanges.corruption).toBeUndefined();
+        expect(result.corruptionChange).toBe(5);
       });
     });
 

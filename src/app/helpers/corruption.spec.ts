@@ -8,7 +8,6 @@ import type {
   PlacedRoomId,
   ResourceMap,
 } from '@interfaces';
-import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { Floor, FloorId } from '@interfaces/floor';
 import type { PlacedRoom } from '@interfaces/room-shape';
 import type { RoomId } from '@interfaces/content-room';
@@ -37,14 +36,6 @@ vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/day-night-modifiers', () => ({
-  dayNightGetResourceModifier: vi.fn(() => 1.0),
-}));
-
-vi.mock('@helpers/throne-room', () => ({
-  throneRoomGetRulerBonusValue: vi.fn(() => 0),
-}));
-
 vi.mock('@helpers/floor-modifiers', () => ({
   floorModifierGetObjectiveCorruptionRate: vi.fn((depth: number) => {
     if (depth >= 1 && depth <= 3) return 0;
@@ -55,10 +46,6 @@ vi.mock('@helpers/floor-modifiers', () => ({
   }),
 }));
 
-vi.mock('@helpers/production', () => ({
-  productionCalculateTotal: vi.fn(() => ({})),
-}));
-
 const {
   corruptionAdd,
   corruptionSpend,
@@ -66,17 +53,11 @@ const {
   corruptionGetLevel,
   corruptionGetLevelDescription,
   corruptionGenerationCalculateInhabitantRate,
-  corruptionGenerationProcess,
-  corruptionGenerationCalculateTotalPerMinute,
   corruptionCalculateDeepObjectiveRate,
   CORRUPTION_THRESHOLD_MEDIUM,
   CORRUPTION_THRESHOLD_HIGH,
   CORRUPTION_THRESHOLD_CRITICAL,
 } = await import('@helpers/corruption');
-
-const { dayNightGetResourceModifier } = await import(
-  '@helpers/day-night-modifiers'
-);
 
 describe('corruptionAdd', () => {
   beforeEach(() => {
@@ -288,278 +269,6 @@ describe('corruptionGenerationCalculateInhabitantRate', () => {
     const def = makeDef();
     const rate = corruptionGenerationCalculateInhabitantRate([inst], () => def);
     expect(rate).toBe(0);
-  });
-});
-
-describe('corruptionGenerationProcess', () => {
-  function makeState(
-    inhabitants: InhabitantInstance[],
-    hour = 12,
-    corruptionCurrent = 0,
-  ): GameState {
-    const state = {
-      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour, minute: 0 },
-      world: {
-        resources: {
-          ...defaultResources(),
-          corruption: { current: corruptionCurrent, max: Number.MAX_SAFE_INTEGER },
-        },
-        inhabitants,
-        floors: [],
-        season: { currentSeason: 'spring' },
-      },
-    } as unknown as GameState;
-    mockResources = state.world.resources;
-    return state;
-  }
-
-  function makeInst(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
-    return {
-      instanceId: 'inst-1' as InhabitantInstanceId,
-      definitionId: 'skeleton-def' as InhabitantId,
-      name: 'Skeleton',
-      state: 'normal',
-      assignedRoomId: 'room-1' as PlacedRoomId,
-      ...overrides,
-    };
-  }
-
-  beforeEach(() => {
-    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.0);
-  });
-
-  it('should do nothing with no inhabitants', () => {
-    const state = makeState([]);
-    corruptionGenerationProcess(state);
-    expect(state.world.resources.corruption.current).toBe(0);
-  });
-
-  it('should add corruption from stationed Skeleton (1/min)', async () => {
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockReturnValue({
-      id: 'skeleton-def',
-      name: 'Skeleton',
-      __type: 'inhabitant',
-      type: 'undead',
-      tier: 1,
-      description: '',
-      cost: {},
-      stats: { hp: 40, attack: 12, defense: 15, speed: 6, workerEfficiency: 0.7 },
-      traits: [],
-      restrictionTags: [],
-      rulerBonuses: {},
-      rulerFearLevel: 0,
-      corruptionGeneration: 1,
-    } as unknown as ReturnType<typeof contentGetEntry>);
-
-    const state = makeState([makeInst()]);
-    corruptionGenerationProcess(state);
-    // 1/min / 1 tick/min = 1.0 per tick
-    expect(state.world.resources.corruption.current).toBeCloseTo(1.0);
-  });
-
-  it('should apply night modifier (+50%)', async () => {
-    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.5);
-
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockReturnValue({
-      id: 'skeleton-def',
-      name: 'Skeleton',
-      __type: 'inhabitant',
-      type: 'undead',
-      tier: 1,
-      description: '',
-      cost: {},
-      stats: { hp: 40, attack: 12, defense: 15, speed: 6, workerEfficiency: 0.7 },
-      traits: [],
-      restrictionTags: [],
-      rulerBonuses: {},
-      rulerFearLevel: 0,
-      corruptionGeneration: 1,
-    } as unknown as ReturnType<typeof contentGetEntry>);
-
-    const state = makeState([makeInst()], 22);
-    corruptionGenerationProcess(state);
-    // 1.0 per tick * 1.5 night = 1.5
-    expect(state.world.resources.corruption.current).toBeCloseTo(1.5);
-  });
-
-  it('should not add corruption from unstationed inhabitants', async () => {
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockReturnValue({
-      id: 'skeleton-def',
-      name: 'Skeleton',
-      __type: 'inhabitant',
-      corruptionGeneration: 1,
-    } as unknown as ReturnType<typeof contentGetEntry>);
-
-    const state = makeState([makeInst({ assignedRoomId: undefined })]);
-    corruptionGenerationProcess(state);
-    expect(state.world.resources.corruption.current).toBe(0);
-  });
-});
-
-describe('corruptionGenerationCalculateTotalPerMinute', () => {
-  it('should combine inhabitant and room rates into per-minute', () => {
-    // 0.2 per tick (inhabitant) + 0.4 per tick (room) = 0.6 per tick
-    // 0.6 * 1 = 0.6 per minute
-    const total = corruptionGenerationCalculateTotalPerMinute(0.2, 0.4);
-    expect(total).toBeCloseTo(0.6);
-  });
-
-  it('should return 0 when both rates are 0', () => {
-    expect(corruptionGenerationCalculateTotalPerMinute(0, 0)).toBe(0);
-  });
-});
-
-describe('Corruption Seal', () => {
-  const BLOOD_ALTAR_FID = 'blood-altar-fid' as FeatureId;
-  const SEAL_FID = 'seal-fid' as FeatureId;
-
-  const bloodAltarFeature: FeatureContent = {
-    id: BLOOD_ALTAR_FID,
-    name: 'Blood Altar',
-    __type: 'feature',
-    description: '',
-    category: 'environmental',
-    cost: {},
-    bonuses: [
-      { type: 'corruption_generation', value: 2, description: '' },
-    ],
-  };
-
-  const corruptionSealFeature: FeatureContent = {
-    id: SEAL_FID,
-    name: 'Corruption Seal',
-    __type: 'feature',
-    description: '',
-    category: 'functional',
-    cost: {},
-    bonuses: [
-      { type: 'corruption_seal', value: 1, description: '' },
-    ],
-  };
-
-  function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
-    return {
-      id: 'room-1' as PlacedRoomId,
-      roomTypeId: 'room-type-1' as RoomId,
-      shapeId: 'shape-1' as RoomShapeId,
-      anchorX: 0,
-      anchorY: 0,
-      ...overrides,
-    };
-  }
-
-  function makeFloor(overrides: Partial<Floor> = {}): Floor {
-    return {
-      id: 'floor-1' as FloorId,
-      name: 'Floor 1',
-      depth: 0,
-      biome: 'neutral',
-      grid: [],
-      rooms: [],
-      hallways: [],
-      inhabitants: [],
-      connections: [],
-      traps: [],
-      ...overrides,
-    };
-  }
-
-  beforeEach(() => {
-    vi.mocked(dayNightGetResourceModifier).mockReturnValue(1.0);
-  });
-
-  it('should prevent corruption generation from features in sealed rooms', async () => {
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockImplementation((id) => {
-      if (id === BLOOD_ALTAR_FID) return bloodAltarFeature as ReturnType<typeof contentGetEntry>;
-      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
-      return undefined;
-    });
-
-    // Room has both Blood Altar (generates corruption) and Corruption Seal (blocks it)
-    const room = makeRoom({ featureIds: [BLOOD_ALTAR_FID, SEAL_FID] });
-    const floor = makeFloor({ rooms: [room] });
-
-    const state = {
-      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
-      world: {
-        resources: {
-          ...defaultResources(),
-          corruption: { current: 10, max: Number.MAX_SAFE_INTEGER },
-        },
-        inhabitants: [],
-        floors: [floor],
-        season: { currentSeason: 'spring' },
-      },
-    } as unknown as GameState;
-    mockResources = state.world.resources;
-
-    corruptionGenerationProcess(state);
-    // Sealed room should not generate corruption — existing value preserved
-    expect(state.world.resources.corruption.current).toBe(10);
-  });
-
-  it('should still allow corruption from unsealed rooms', async () => {
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockImplementation((id) => {
-      if (id === BLOOD_ALTAR_FID) return bloodAltarFeature as ReturnType<typeof contentGetEntry>;
-      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
-      return undefined;
-    });
-
-    const sealedRoom = makeRoom({ id: 'sealed' as PlacedRoomId, featureIds: [BLOOD_ALTAR_FID, SEAL_FID] });
-    const unsealedRoom = makeRoom({ id: 'unsealed' as PlacedRoomId, featureIds: [BLOOD_ALTAR_FID] });
-    const floor = makeFloor({ rooms: [sealedRoom, unsealedRoom] });
-
-    const state = {
-      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
-      world: {
-        resources: {
-          ...defaultResources(),
-          corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
-        },
-        inhabitants: [],
-        floors: [floor],
-        season: { currentSeason: 'spring' },
-      },
-    } as unknown as GameState;
-    mockResources = state.world.resources;
-
-    corruptionGenerationProcess(state);
-    // Only unsealed room generates: 2/min / 1 = 2.0/tick
-    expect(state.world.resources.corruption.current).toBeCloseTo(2.0);
-  });
-
-  it('should not remove existing corruption, only prevent new generation', async () => {
-    const { contentGetEntry } = vi.mocked(await import('@helpers/content'));
-    contentGetEntry.mockImplementation((id) => {
-      if (id === SEAL_FID) return corruptionSealFeature as ReturnType<typeof contentGetEntry>;
-      return undefined;
-    });
-
-    const room = makeRoom({ featureIds: [SEAL_FID] });
-    const floor = makeFloor({ rooms: [room] });
-
-    const state = {
-      clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 12, minute: 0 },
-      world: {
-        resources: {
-          ...defaultResources(),
-          corruption: { current: 50, max: Number.MAX_SAFE_INTEGER },
-        },
-        inhabitants: [],
-        floors: [floor],
-        season: { currentSeason: 'spring' },
-      },
-    } as unknown as GameState;
-    mockResources = state.world.resources;
-
-    corruptionGenerationProcess(state);
-    // Existing corruption preserved
-    expect(state.world.resources.corruption.current).toBe(50);
   });
 });
 
