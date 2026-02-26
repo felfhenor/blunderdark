@@ -48,6 +48,7 @@ import {
   roomPlacementUpdatePreviewPosition,
   roomUpgradeGetEffectiveMaxInhabitants,
   uiIsAnyModalOpen,
+  uiIsInputFocused,
   verticalTransportGetGroupsOnFloor,
 } from '@helpers';
 import { corruptionActiveGridClasses } from '@helpers/corruption-effects';
@@ -816,6 +817,8 @@ export class GridComponent implements AfterViewInit {
   }
 
   public async onKeydown(event: KeyboardEvent): Promise<void> {
+    if (uiIsInputFocused()) return;
+
     switch (event.key) {
       case 'r':
         if (roomPlacementPreviewShape()) {
@@ -826,14 +829,6 @@ export class GridComponent implements AfterViewInit {
         await this.onEscapeKey();
         break;
       case 'Home': {
-        const target = event.target as HTMLElement;
-        if (
-          target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable
-        ) {
-          break;
-        }
         if (uiIsAnyModalOpen()) break;
         event.preventDefault();
         cameraReset();

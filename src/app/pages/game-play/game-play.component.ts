@@ -53,6 +53,7 @@ import {
   hallwayPlacementBuildStep,
   optionsGet,
   roomPlacementSelectedTypeId,
+  uiIsInputFocused,
 } from '@helpers';
 import {
   roomShapeGetAbsoluteTiles,
@@ -556,6 +557,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   }
 
   public navigateFloorUp(event?: Event): void {
+    if (uiIsInputFocused()) return;
     event?.preventDefault();
     const currentIdx = floorCurrentIndex();
     if (currentIdx > 0) {
@@ -564,6 +566,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   }
 
   public navigateFloorDown(event?: Event): void {
+    if (uiIsInputFocused()) return;
     event?.preventDefault();
     const currentIdx = floorCurrentIndex();
     const total = floorAll().length;

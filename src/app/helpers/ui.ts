@@ -17,6 +17,17 @@ export const uiIsAnyModalOpen = computed(() => uiModalOpenCount() > 0);
 
 export const uiIsShowingAnyMenu = computed(() => uiShowOptionsMenu());
 
+export function uiIsInputFocused(): boolean {
+  const el = document.activeElement;
+  if (!el) return false;
+  return (
+    el.tagName === 'INPUT' ||
+    el.tagName === 'TEXTAREA' ||
+    el.tagName === 'SELECT' ||
+    (el as HTMLElement).isContentEditable
+  );
+}
+
 export function uiCloseAllMenus(smart = false) {
   if (smart && uiShowAnySubmenu()) {
     uiShowAnySubmenu.set(false);
