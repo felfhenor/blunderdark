@@ -389,8 +389,6 @@ function ensureSummonRecipe(
     __type: 'summonrecipe',
     description: recipe.description ?? '',
     resultInhabitantId: recipe.resultInhabitantId ?? ('' as InhabitantId),
-    summonType: recipe.summonType ?? 'permanent',
-    duration: recipe.duration ?? undefined,
     cost: recipe.cost ?? {},
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
     statBonuses: recipe.statBonuses ?? {},

@@ -75,7 +75,6 @@ export class PanelFusionComponent {
   public availableInhabitants = computed(() => {
     const inhabitants = gamestate().world.inhabitants;
     const filtered = inhabitants.filter((i) => {
-      if (i.isTemporary) return false;
       if (i.travelTicksRemaining && i.travelTicksRemaining > 0) return false;
       return true;
     });
@@ -196,13 +195,11 @@ export class PanelFusionComponent {
       const hasParentA = inhabitants.some(
         (i) =>
           i.definitionId === recipe.firstInhabitantId &&
-          !i.isTemporary &&
           !(i.travelTicksRemaining && i.travelTicksRemaining > 0),
       );
       const hasParentB = inhabitants.some(
         (i) =>
           i.definitionId === recipe.secondInhabitantId &&
-          !i.isTemporary &&
           !(i.travelTicksRemaining && i.travelTicksRemaining > 0),
       );
       const canAfford = resourceCanAfford(recipe.cost);

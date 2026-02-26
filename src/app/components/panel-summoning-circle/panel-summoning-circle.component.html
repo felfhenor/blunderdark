@@ -49,15 +49,6 @@
                 <span class="text-xs font-semibold">
                   {{ entry.recipe.name }}
                 </span>
-                <span
-                  class="badge badge-xs"
-                  [class.badge-info]="entry.recipe.summonType === 'permanent'"
-                  [class.badge-warning]="
-                    entry.recipe.summonType === 'temporary'
-                  "
-                >
-                  {{ entry.recipe.summonType }}
-                </span>
               </div>
               <span class="text-xs opacity-60">
                 {{ entry.recipe.description }}
@@ -76,11 +67,6 @@
                   </span>
                 }
               }
-              @if (entry.duration) {
-                <span class="text-xs opacity-50">
-                  Duration: {{ entry.duration | number: '1.0-0' }} sec
-                </span>
-              }
               <button
                 class="btn btn-xs btn-primary mt-1"
                 [disabled]="!entry.canAfford"
@@ -98,23 +84,6 @@
                   Not enough resources
                 }
               </button>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Active Temporary Summons -->
-      @if (temporaryInhabitants().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">
-          Active Temporary Summons
-        </div>
-        <div class="flex flex-col gap-2">
-          @for (temp of temporaryInhabitants(); track temp.name) {
-            <div class="flex items-center justify-between">
-              <span class="text-xs">{{ temp.name }}</span>
-              <span class="text-xs opacity-50">
-                {{ temp.secondsRemaining | number: '1.0-0' }} sec left
-              </span>
             </div>
           }
         </div>

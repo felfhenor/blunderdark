@@ -14,10 +14,8 @@ import {
   summoningCanStart,
   summoningCompleted$,
   summoningDismissed$,
-  summoningExpired$,
   summoningGetAdjacentRoomTypeIds,
   summoningGetAvailableRecipes,
-  summoningGetEffectiveDuration,
   summoningGetEffectiveTicks,
   summoningGetStatBonuses,
   updateGamestate,
@@ -44,17 +42,11 @@ export class PanelSummoningCircleComponent {
   private subscriptions = [
     summoningCompleted$.subscribe((evt) => {
       const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
-      const detail = evt.summonType === 'permanent'
-        ? `${label} has permanently joined your dungeon!`
-        : `${label} has been temporarily summoned.`;
-      notify('Summoning', detail);
+      notify('Summoning', `${label} has joined your dungeon!`);
     }),
     summoningDismissed$.subscribe((evt) => {
       const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
       notify('Summoning', `${label} was dismissed — roster is full.`);
-    }),
-    summoningExpired$.subscribe((evt) => {
-      notify('Summoning', `${evt.inhabitantName} has faded away.`);
     }),
   ];
 
@@ -97,10 +89,6 @@ export class PanelSummoningCircleComponent {
     const entries = recipes.map((recipe) => {
       const ticks = summoningGetEffectiveTicks(room, adjacentTypes, recipe.timeMultiplier);
       const statBonuses = summoningGetStatBonuses(room, adjacentTypes, recipe);
-      const durationTicks = recipe.summonType === 'temporary' && recipe.duration
-        ? summoningGetEffectiveDuration(room, recipe.duration)
-        : undefined;
-      const duration = durationTicks !== undefined ? ticksToRealSeconds(durationTicks) : undefined;
       const canAfford = resourceCanAfford(recipe.cost);
 
       return {
@@ -108,7 +96,6 @@ export class PanelSummoningCircleComponent {
         ticks,
         timeSeconds: ticksToRealSeconds(ticks),
         statBonuses,
-        duration,
         canAfford,
       };
     });
@@ -123,17 +110,6 @@ export class PanelSummoningCircleComponent {
     const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
     const recipe = contentGetEntry<SummonRecipeContent>(job.recipeId);
     return { percent, recipeName: recipe?.name ?? 'Unknown', ticksRemaining: job.ticksRemaining };
-  });
-
-  public temporaryInhabitants = computed(() => {
-    const state = gamestate();
-    return state.world.inhabitants
-      .filter((i) => i.isTemporary && i.temporaryTicksRemaining !== undefined)
-      .map((i) => ({
-        name: i.name,
-        ticksRemaining: i.temporaryTicksRemaining!,
-        secondsRemaining: Math.ceil(ticksToRealSeconds(i.temporaryTicksRemaining!)),
-      }));
   });
 
   public formatStatBonuses(bonuses: Partial<InhabitantStats>): string {

@@ -532,19 +532,6 @@ describe('fusion', () => {
       expect(fusionHasAvailableCreatures()).toBe(false);
     });
 
-    it('should exclude temporary inhabitants', async () => {
-      mockInhabitants = [
-        makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A'),
-        makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
-          isTemporary: true,
-          temporaryTicksRemaining: 100,
-        }),
-      ];
-
-      const { fusionHasAvailableCreatures } = await import('./fusion');
-      expect(fusionHasAvailableCreatures()).toBe(false);
-    });
-
     it('should exclude traveling inhabitants', async () => {
       mockInhabitants = [
         makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A'),

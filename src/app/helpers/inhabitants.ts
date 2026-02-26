@@ -109,8 +109,6 @@ export function inhabitantDeserialize(
     isHybrid: i.isHybrid ?? false,
     hybridParentIds: i.hybridParentIds ?? undefined,
     isSummoned: i.isSummoned ?? undefined,
-    isTemporary: i.isTemporary ?? undefined,
-    temporaryTicksRemaining: i.temporaryTicksRemaining ?? undefined,
     travelTicksRemaining: i.travelTicksRemaining ?? undefined,
     discontentedTicks: i.discontentedTicks ?? undefined,
   };

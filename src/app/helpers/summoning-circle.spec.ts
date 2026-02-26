@@ -56,10 +56,9 @@ const bindingMasteryPath: RoomUpgradeContent = {
   id: 'upgrade-binding-mastery' as RoomUpgradeId,
   __type: 'roomupgrade',
   name: 'Binding Mastery',
-  description: 'Longer temp, +1 stats.',
+  description: '+1 stats.',
   cost: { gold: 180, essence: 60, flux: 40 },
   effects: [
-    { type: 'summonDurationMultiplier', value: 1.5 },
     { type: 'summonStatBonus', value: 1 },
   ],
 };
@@ -174,7 +173,6 @@ const fireRecipe: SummonRecipeContent = {
   __type: 'summonrecipe',
   description: 'Summon a fire elemental.',
   resultInhabitantId: FIRE_ELEMENTAL_ID as InhabitantId,
-  summonType: 'permanent',
   cost: { essence: 100, crystals: 50 },
   timeMultiplier: 1.0,
   statBonuses: { attack: 5 },
@@ -185,10 +183,8 @@ const spectralRecipe: SummonRecipeContent = {
   id: RECIPE_SPECTRAL_ID as SummonRecipeId,
   name: 'Summon Spectral Servant',
   __type: 'summonrecipe',
-  description: 'Summon a temp servant.',
+  description: 'Summon a spectral servant.',
   resultInhabitantId: SPECTRAL_SERVANT_ID as InhabitantId,
-  summonType: 'temporary',
-  duration: 50,
   cost: { essence: 30 },
   timeMultiplier: 0.5,
   statBonuses: {},
@@ -201,7 +197,6 @@ const advancedRecipe: SummonRecipeContent = {
   __type: 'summonrecipe',
   description: 'An advanced recipe.',
   resultInhabitantId: FIRE_ELEMENTAL_ID as InhabitantId,
-  summonType: 'permanent',
   cost: { essence: 200 },
   timeMultiplier: 1.5,
   statBonuses: { attack: 10 },
@@ -402,7 +397,6 @@ import {
   summoningCanStart,
   summoningCreateInhabitant,
   summoningGetAvailableRecipes,
-  summoningGetEffectiveDuration,
   summoningGetEffectiveTicks,
   summoningGetStatBonuses,
   summoningCircleProcess,
@@ -540,22 +534,6 @@ describe('Stat Bonus Calculation', () => {
   });
 });
 
-describe('Duration Calculation', () => {
-  it('should return base duration without upgrade', () => {
-    const room = makeRoom();
-    const duration = summoningGetEffectiveDuration(room, 50);
-    expect(duration).toBe(50);
-  });
-
-  it('should apply Binding Mastery multiplier', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-binding-mastery' as RoomUpgradeId,
-    });
-    const duration = summoningGetEffectiveDuration(room, 50);
-    expect(duration).toBe(75); // 50 * 1.5
-  });
-});
-
 describe('Summoning Can Start', () => {
   it('should return true when inhabitant is assigned and no active job', () => {
     const room = makeRoom();
@@ -589,27 +567,11 @@ describe('Inhabitant Creation', () => {
       fireElementalDef,
       fireRecipe,
       { attack: 5 },
-      false,
     );
     expect(inh.isSummoned).toBe(true);
-    expect(inh.isTemporary).toBeUndefined();
-    expect(inh.temporaryTicksRemaining).toBeUndefined();
     expect(inh.definitionId).toBe(FIRE_ELEMENTAL_ID);
     expect(inh.name).toBe('Test Fantasy Name');
     expect(inh.instanceStatBonuses?.attack).toBe(5);
-  });
-
-  it('should create a temporary summoned inhabitant', () => {
-    const inh = summoningCreateInhabitant(
-      spectralServantDef,
-      spectralRecipe,
-      {},
-      true,
-      50,
-    );
-    expect(inh.isSummoned).toBe(true);
-    expect(inh.isTemporary).toBe(true);
-    expect(inh.temporaryTicksRemaining).toBe(50);
   });
 
   it('should not set instanceStatBonuses when empty', () => {
@@ -617,8 +579,6 @@ describe('Inhabitant Creation', () => {
       spectralServantDef,
       spectralRecipe,
       {},
-      true,
-      50,
     );
     expect(inh.instanceStatBonuses).toBeUndefined();
   });
@@ -666,7 +626,7 @@ describe('summoningCircleProcess', () => {
     expect(room.summonJob).toBeUndefined();
   });
 
-  it('should create temporary inhabitant with duration for temp recipe', () => {
+  it('should create permanent inhabitant for all recipes', () => {
     const room = makeRoom();
     room.summonJob = {
       recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId,
@@ -682,42 +642,7 @@ describe('summoningCircleProcess', () => {
     summoningCircleProcess(state);
 
     const summoned = state.world.inhabitants[1];
-    expect(summoned.isTemporary).toBe(true);
-    expect(summoned.temporaryTicksRemaining).toBe(50);
-  });
-
-  it('should decrement temporary inhabitant ticks', () => {
-    const room = makeRoom();
-    const tempInh = makeInhabitant({
-      instanceId: 'temp-1' as InhabitantInstanceId,
-      isTemporary: true,
-      temporaryTicksRemaining: 10,
-      isSummoned: true,
-    });
-    const floor = makeFloor([room], [tempInh]);
-    const state = makeGameState({ floors: [floor] });
-    state.world.inhabitants = [tempInh];
-
-    summoningCircleProcess(state);
-
-    expect(state.world.inhabitants[0].temporaryTicksRemaining).toBe(9);
-  });
-
-  it('should remove temporary inhabitant when ticks reach 0', () => {
-    const room = makeRoom();
-    const tempInh = makeInhabitant({
-      instanceId: 'temp-1' as InhabitantInstanceId,
-      isTemporary: true,
-      temporaryTicksRemaining: 1,
-      isSummoned: true,
-    });
-    const floor = makeFloor([room], [tempInh]);
-    const state = makeGameState({ floors: [floor] });
-    state.world.inhabitants = [tempInh];
-
-    summoningCircleProcess(state);
-
-    expect(state.world.inhabitants).toHaveLength(0);
+    expect(summoned.isSummoned).toBe(true);
   });
 
   it('should sync floor inhabitants after summon completion', () => {
@@ -732,23 +657,6 @@ describe('summoningCircleProcess', () => {
     const floor = makeFloor([room], [summoner]);
     const state = makeGameState({ floors: [floor] });
     state.world.inhabitants = [summoner];
-
-    summoningCircleProcess(state);
-
-    expect(state.world.floors[0].inhabitants).toBe(state.world.inhabitants);
-  });
-
-  it('should sync floor inhabitants after temporary expiry', () => {
-    const room = makeRoom();
-    const tempInh = makeInhabitant({
-      instanceId: 'temp-1' as InhabitantInstanceId,
-      isTemporary: true,
-      temporaryTicksRemaining: 1,
-      isSummoned: true,
-    });
-    const floor = makeFloor([room], [tempInh]);
-    const state = makeGameState({ floors: [floor] });
-    state.world.inhabitants = [tempInh];
 
     summoningCircleProcess(state);
 
@@ -788,11 +696,7 @@ describe('Upgrade Effects', () => {
     });
   });
 
-  it('Binding Mastery: duration multiplier and stat bonus', () => {
-    expect(bindingMasteryPath.effects).toContainEqual({
-      type: 'summonDurationMultiplier',
-      value: 1.5,
-    });
+  it('Binding Mastery: stat bonus', () => {
     expect(bindingMasteryPath.effects).toContainEqual({
       type: 'summonStatBonus',
       value: 1,

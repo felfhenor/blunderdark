@@ -59,8 +59,6 @@ export type InhabitantInstance = {
   isHybrid?: boolean;
   hybridParentIds?: InhabitantInstanceId[];
   isSummoned?: boolean;
-  isTemporary?: boolean;
-  temporaryTicksRemaining?: number;
   travelTicksRemaining?: number;
   discontentedTicks?: number;
   xp?: number;

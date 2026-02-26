@@ -25,7 +25,6 @@ import type { RoomContent } from '@interfaces/content-room';
 import type {
   SummoningCompletedEvent,
   SummoningDismissedEvent,
-  SummoningExpiredEvent,
 } from '@interfaces/summoning';
 import { Subject } from 'rxjs';
 
@@ -35,9 +34,6 @@ export const SUMMONING_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 20 ticks 
 
 const summoningCompletedSubject = new Subject<SummoningCompletedEvent>();
 export const summoningCompleted$ = summoningCompletedSubject.asObservable();
-
-const summoningExpiredSubject = new Subject<SummoningExpiredEvent>();
-export const summoningExpired$ = summoningExpiredSubject.asObservable();
 
 const summoningDismissedSubject = new Subject<SummoningDismissedEvent>();
 export const summoningDismissed$ = summoningDismissedSubject.asObservable();
@@ -141,23 +137,6 @@ export function summoningGetStatBonuses(
 }
 
 /**
- * Calculate effective duration for temporary summons, accounting for Binding Mastery upgrade.
- */
-export function summoningGetEffectiveDuration(
-  room: PlacedRoom,
-  baseDuration: number,
-): number {
-  const effects = roomUpgradeGetAppliedEffects(room);
-  let multiplier = 1.0;
-  for (const effect of effects) {
-    if (effect.type === 'summonDurationMultiplier') {
-      multiplier = effect.value;
-    }
-  }
-  return Math.round(baseDuration * multiplier);
-}
-
-/**
  * Check if summoning can start: needs at least 1 assigned inhabitant and no active job.
  */
 export function summoningCanStart(
@@ -176,8 +155,6 @@ export function summoningCreateInhabitant(
   def: InhabitantContent,
   recipe: SummonRecipeContent,
   statBonuses: Partial<InhabitantStats>,
-  isTemporary: boolean,
-  duration?: number,
 ): InhabitantInstance {
   const instanceStatBonuses: Partial<InhabitantStats> = {};
   const statKeys = Object.keys(statBonuses) as Array<keyof InhabitantStats>;
@@ -201,8 +178,6 @@ export function summoningCreateInhabitant(
     instanceStatBonuses:
       Object.keys(instanceStatBonuses).length > 0 ? instanceStatBonuses : undefined,
     isSummoned: true,
-    isTemporary: isTemporary || undefined,
-    temporaryTicksRemaining: isTemporary ? duration : undefined,
   };
 }
 
@@ -244,7 +219,6 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
   if (!summoningCircleTypeId) return;
 
   let inhabitantsChanged = false;
-  const newTemporaryIds = new Set<string>();
 
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
@@ -274,18 +248,11 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
                 adjacentTypes,
                 recipe,
               );
-              const isTemporary = recipe.summonType === 'temporary';
-              const duration =
-                isTemporary && recipe.duration
-                  ? summoningGetEffectiveDuration(room, recipe.duration)
-                  : undefined;
 
               const summoned = summoningCreateInhabitant(
                 def,
                 recipe,
                 statBonuses,
-                isTemporary,
-                duration,
               );
 
               // Check global roster cap before adding
@@ -298,17 +265,12 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
                 state.world.inhabitants = [...state.world.inhabitants, summoned];
                 inhabitantsChanged = true;
 
-                if (isTemporary) {
-                  newTemporaryIds.add(summoned.instanceId);
-                }
-
                 reputationAwardInPlace(state, 'Summon Wraith');
 
                 summoningCompletedSubject.next({
                   roomId: room.id,
                   inhabitantName: summoned.name,
                   inhabitantType: def.type,
-                  summonType: recipe.summonType,
                 });
               }
             }
@@ -317,24 +279,6 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
           room.summonJob = undefined;
         }
       }
-    }
-  }
-
-  // Process temporary inhabitant expiry (across all inhabitants, not just summoning circle rooms)
-  // Skip newly created temporaries — they should not tick down on the same tick they spawn
-  for (let i = state.world.inhabitants.length - 1; i >= 0; i--) {
-    const inh = state.world.inhabitants[i];
-    if (!inh.isTemporary || inh.temporaryTicksRemaining === undefined) continue;
-    if (newTemporaryIds.has(inh.instanceId)) continue;
-
-    inh.temporaryTicksRemaining -= numTicks;
-
-    if (inh.temporaryTicksRemaining <= 0) {
-      summoningExpiredSubject.next({ inhabitantName: inh.name });
-      state.world.inhabitants = state.world.inhabitants.filter(
-        (_, idx) => idx !== i,
-      );
-      inhabitantsChanged = true;
     }
   }
 

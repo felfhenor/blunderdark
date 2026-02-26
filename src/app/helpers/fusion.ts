@@ -391,7 +391,6 @@ export function fusionHasAvailableCreatures(): boolean {
   let count = 0;
 
   for (const i of inhabitants) {
-    if (i.isTemporary) continue;
     if (i.travelTicksRemaining && i.travelTicksRemaining > 0) continue;
     count++;
     if (count >= 2) return true;

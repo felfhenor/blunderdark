@@ -10,8 +10,6 @@ export type SummonRecipeContent = IsContentItem &
   HasDescription & {
     id: SummonRecipeId;
     resultInhabitantId: InhabitantId;
-    summonType: 'permanent' | 'temporary';
-    duration?: number;
     cost: Partial<Record<ResourceType, number>>;
     timeMultiplier: number;
     statBonuses: Partial<InhabitantStats>;
