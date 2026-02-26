@@ -15,8 +15,16 @@ import {
   invasionCompositionGetPartySize,
   invasionCompositionSelectParty,
   invasionCompositionResetCache,
+  invasionCompositionGenerateParty,
+  LEADER_MIN_PARTY_SIZE,
+  LEADER_CLASS_PRIORITY,
 } from '@helpers/invasion-composition';
+import { invaderGetAllDefinitions } from '@helpers/invaders';
+import { contentGetEntriesByType } from '@helpers/content';
 import seedrandom from 'seedrandom';
+
+const mockInvaderGetAllDefinitions = vi.mocked(invaderGetAllDefinitions);
+const mockContentGetEntriesByType = vi.mocked(contentGetEntriesByType);
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(() => ({})),
@@ -43,11 +51,16 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/invaders', () => ({
   invaderGetAllDefinitions: vi.fn(() => []),
+  invaderGetDefinitionById: vi.fn((id: string) => {
+    const def = allDefs.find((d) => d.id === id);
+    return def;
+  }),
   invaderCreateInstance: vi.fn((def: InvaderContent) => ({
     id: `instance-${def.id}`,
     definitionId: def.id,
     currentHp: def.baseStats.hp,
     maxHp: def.baseStats.hp,
+    isLeader: false,
     statusEffects: [],
     abilityStates: [],
   })),
@@ -626,6 +639,79 @@ describe('invasion-composition', () => {
 
       const ratio = totalMageRanger / totalPartySize;
       expect(ratio).toBeGreaterThan(0.4);
+    });
+  });
+
+  // --- Leader assignment ---
+
+  describe('leader assignment in invasionCompositionGenerateParty', () => {
+    beforeEach(() => {
+      mockInvaderGetAllDefinitions.mockReturnValue(allDefs);
+      mockContentGetEntriesByType.mockImplementation((type: string) => {
+        if (type === 'room') return mockRoomDefs as never[];
+        if (type === 'invasion') return [defaultWeightConfig] as never[];
+        return [];
+      });
+    });
+
+    it('should assign a leader for parties of size >= 6', () => {
+      const profile = makeProfile({ size: 15 }); // medium → 6-10
+      const party = invasionCompositionGenerateParty(profile, 'leader-test-1');
+      expect(party.length).toBeGreaterThanOrEqual(LEADER_MIN_PARTY_SIZE);
+      const leaders = party.filter((inv) => inv.isLeader);
+      expect(leaders).toHaveLength(1);
+    });
+
+    it('should not assign a leader for parties of size < 6', () => {
+      const profile = makeProfile({ size: 5 }); // small → 3-5
+      const party = invasionCompositionGenerateParty(profile, 'leader-test-2');
+      expect(party.length).toBeLessThan(LEADER_MIN_PARTY_SIZE);
+      const leaders = party.filter((inv) => inv.isLeader);
+      expect(leaders).toHaveLength(0);
+    });
+
+    it('should prefer paladin as leader over other classes', () => {
+      // Run multiple times to check class priority
+      let paladinLeaderCount = 0;
+      const runs = 20;
+      for (let i = 0; i < runs; i++) {
+        const profile = makeProfile({ size: 15 });
+        const party = invasionCompositionGenerateParty(profile, `priority-test-${i}`);
+        if (party.length < LEADER_MIN_PARTY_SIZE) continue;
+        const leader = party.find((inv) => inv.isLeader);
+        if (!leader) continue;
+        const leaderDef = allDefs.find((d) => d.id === leader.definitionId);
+        const hasPaladin = party.some((inv) => {
+          const def = allDefs.find((d) => d.id === inv.definitionId);
+          return def?.invaderClass === 'paladin';
+        });
+        if (hasPaladin && leaderDef?.invaderClass === 'paladin') {
+          paladinLeaderCount++;
+        }
+      }
+      // When paladin is present, it should always be chosen as leader
+      expect(paladinLeaderCount).toBeGreaterThan(0);
+    });
+
+    it('should have exactly one leader per party', () => {
+      for (let i = 0; i < 20; i++) {
+        const profile = makeProfile({ size: 20 });
+        const party = invasionCompositionGenerateParty(profile, `one-leader-${i}`);
+        const leaders = party.filter((inv) => inv.isLeader);
+        if (party.length >= LEADER_MIN_PARTY_SIZE) {
+          expect(leaders).toHaveLength(1);
+        } else {
+          expect(leaders).toHaveLength(0);
+        }
+      }
+    });
+
+    it('LEADER_CLASS_PRIORITY should have paladin first', () => {
+      expect(LEADER_CLASS_PRIORITY[0]).toBe('paladin');
+    });
+
+    it('LEADER_MIN_PARTY_SIZE should be 6', () => {
+      expect(LEADER_MIN_PARTY_SIZE).toBe(6);
     });
   });
 });

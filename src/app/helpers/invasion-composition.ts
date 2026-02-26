@@ -2,6 +2,7 @@ import { contentGetEntriesByType } from '@helpers/content';
 import {
   invaderCreateInstance,
   invaderGetAllDefinitions,
+  invaderGetDefinitionById,
 } from '@helpers/invaders';
 import { rngChoice } from '@helpers/rng';
 import { invasionThreatBlend } from '@helpers/invasion-threat';
@@ -27,6 +28,17 @@ const INVADER_CLASSES: InvaderClassType[] = [
   'cleric',
   'paladin',
   'ranger',
+];
+
+export const LEADER_MIN_PARTY_SIZE = 6;
+
+export const LEADER_CLASS_PRIORITY: InvaderClassType[] = [
+  'paladin',
+  'warrior',
+  'cleric',
+  'ranger',
+  'mage',
+  'rogue',
 ];
 
 const PROFILE_THRESHOLD = 60;
@@ -364,5 +376,28 @@ export function invasionCompositionGenerateParty(
   const weights = invasionCompositionGetWeights(profile, config);
   const selected = invasionCompositionSelectParty(profile, invaderDefs, weights, seed, bonusSize);
 
-  return selected.map((def) => invaderCreateInstance(def));
+  const party = selected.map((def) => invaderCreateInstance(def));
+
+  // Assign a leader if party is large enough
+  if (party.length >= LEADER_MIN_PARTY_SIZE) {
+    // Find the best leader candidate by class priority
+    let leaderIdx = -1;
+    let bestPriority = LEADER_CLASS_PRIORITY.length;
+
+    for (let i = 0; i < party.length; i++) {
+      const def = invaderGetDefinitionById(party[i].definitionId);
+      if (!def) continue;
+      const priority = LEADER_CLASS_PRIORITY.indexOf(def.invaderClass);
+      if (priority !== -1 && priority < bestPriority) {
+        bestPriority = priority;
+        leaderIdx = i;
+      }
+    }
+
+    if (leaderIdx >= 0) {
+      party[leaderIdx] = { ...party[leaderIdx], isLeader: true };
+    }
+  }
+
+  return party;
 }

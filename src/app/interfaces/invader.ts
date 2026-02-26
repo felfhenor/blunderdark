@@ -21,6 +21,7 @@ export type InvaderInstance = {
   definitionId: InvaderId;
   currentHp: number;
   maxHp: number;
+  isLeader: boolean;
   statusEffects: StatusEffect[];
   abilityStates: AbilityState[];
 };

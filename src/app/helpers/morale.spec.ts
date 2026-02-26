@@ -14,6 +14,7 @@ import {
   MORALE_HIGH_FEAR_ROOM_THRESHOLD,
   MORALE_ROOM_CAPTURE_BONUS,
   MORALE_HIGH_VALUE_ROOM_CAPTURE_BONUS,
+  MORALE_LEADER_DEATH_PENALTY,
   moraleClamp,
   moraleCalculateAllyDeathPenalty,
   moraleCalculateTrapPenalty,
@@ -21,12 +22,15 @@ import {
   moraleCalculateRoomCaptureBonus,
   moraleApplyDelta,
   moralePartyHasPaladinAura,
+  moraleIsLeaderAlive,
+  moraleApplyLeaderModifier,
   moraleCurrent,
   moraleEventLog,
   moraleIsRetreating,
   moraleInit,
   moraleApply,
   moraleApplyAllyDeath,
+  moraleApplyLeaderDeath,
   moraleApplyTrapTrigger,
   moraleApplyFearRoomEntry,
   moraleApplyRoomCapture,
@@ -51,8 +55,19 @@ function makeInvader(
     definitionId: `def-${id}` as InvaderId,
     currentHp: hp,
     maxHp: hp,
+    isLeader: false,
     statusEffects,
     abilityStates: [],
+  };
+}
+
+function makeLeader(
+  id: string,
+  hp = 10,
+): InvaderInstance {
+  return {
+    ...makeInvader(id, hp),
+    isLeader: true,
   };
 }
 
@@ -426,6 +441,172 @@ describe('morale', () => {
       moraleCurrent.set(95);
       moraleApplyRoomCapture(false, 1);
       expect(moraleCurrent()).toBe(100);
+    });
+  });
+
+  // --- moraleIsLeaderAlive ---
+
+  describe('moraleIsLeaderAlive', () => {
+    it('should return false when no leader in party', () => {
+      const invaders = [makeInvader('a'), makeInvader('b')];
+      expect(moraleIsLeaderAlive(invaders)).toBe(false);
+    });
+
+    it('should return true when leader is alive', () => {
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      expect(moraleIsLeaderAlive(invaders)).toBe(true);
+    });
+
+    it('should return false when leader is dead', () => {
+      const invaders = [makeInvader('a'), makeLeader('b', 0)];
+      expect(moraleIsLeaderAlive(invaders)).toBe(false);
+    });
+  });
+
+  // --- moraleApplyLeaderModifier ---
+
+  describe('moraleApplyLeaderModifier', () => {
+    it('should halve negative penalty when leader is alive', () => {
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      expect(moraleApplyLeaderModifier(-10, invaders)).toBe(-5);
+    });
+
+    it('should not modify positive deltas', () => {
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      expect(moraleApplyLeaderModifier(10, invaders)).toBe(10);
+    });
+
+    it('should not modify when leader is dead', () => {
+      const invaders = [makeInvader('a'), makeLeader('b', 0)];
+      expect(moraleApplyLeaderModifier(-10, invaders)).toBe(-10);
+    });
+
+    it('should not modify when no leader', () => {
+      const invaders = [makeInvader('a'), makeInvader('b')];
+      expect(moraleApplyLeaderModifier(-10, invaders)).toBe(-10);
+    });
+
+    it('should use Math.ceil so odd penalties round toward zero', () => {
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      // -15 / 2 = -7.5, ceil = -7
+      expect(moraleApplyLeaderModifier(-15, invaders)).toBe(-7);
+    });
+
+    it('should return at least -1 for small penalties', () => {
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      // -1 / 2 = -0.5, ceil = 0, but min(-1) applies
+      expect(moraleApplyLeaderModifier(-1, invaders)).toBe(-1);
+    });
+  });
+
+  // --- moraleApplyLeaderDeath ---
+
+  describe('moraleApplyLeaderDeath', () => {
+    it('should apply -50 penalty', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Paladin',
+        description: '',
+        invaderClass: 'paladin',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      moraleApplyLeaderDeath(makeLeader('a'), 1);
+      expect(moraleCurrent()).toBe(50);
+    });
+
+    it('should log event type as leader_death', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Warrior',
+        description: '',
+        invaderClass: 'warrior',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      moraleApplyLeaderDeath(makeLeader('a'), 1);
+      const log = moraleEventLog();
+      expect(log).toHaveLength(1);
+      expect(log[0].eventType).toBe('leader_death');
+      expect(log[0].delta).toBe(MORALE_LEADER_DEATH_PENALTY);
+    });
+
+    it('should include class name in description', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Paladin',
+        description: '',
+        invaderClass: 'paladin',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      moraleApplyLeaderDeath(makeLeader('a'), 1);
+      expect(moraleEventLog()[0].description).toBe('Paladin leader fallen');
+    });
+  });
+
+  // --- Leader halving integration ---
+
+  describe('leader halving in ally death', () => {
+    it('should halve ally death penalty when leader is alive', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Warrior',
+        description: '',
+        invaderClass: 'warrior',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      moraleApplyAllyDeath(makeInvader('a'), 1, invaders);
+      // -10 halved to -5
+      expect(moraleCurrent()).toBe(95);
+    });
+
+    it('should apply full penalty when leader is dead', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Warrior',
+        description: '',
+        invaderClass: 'warrior',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      const invaders = [makeInvader('a'), makeLeader('b', 0)];
+      moraleApplyAllyDeath(makeInvader('a'), 1, invaders);
+      expect(moraleCurrent()).toBe(90);
+    });
+
+    it('should append halved annotation to description', () => {
+      mockInvaderGetDefinitionById.mockReturnValue({
+        id: 'def-a',
+        name: 'Warrior',
+        description: '',
+        invaderClass: 'warrior',
+        baseStats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+        combatAbilityIds: [],
+        sprite: '',
+        __type: 'invader',
+      } as never);
+
+      const invaders = [makeInvader('a'), makeLeader('b')];
+      moraleApplyAllyDeath(makeInvader('a'), 1, invaders);
+      expect(moraleEventLog()[0].description).toContain('(halved by leader)');
     });
   });
 

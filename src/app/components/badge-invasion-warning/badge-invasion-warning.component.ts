@@ -14,6 +14,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 type InvaderGroup = {
   className: string;
   count: number;
+  hasLeader: boolean;
 };
 
 type ObjectiveInfo = {
@@ -48,7 +49,7 @@ type ObjectiveInfo = {
         @if (invaderGroups().length > 0) {
           <div class="font-semibold mb-1">Invaders:</div>
           @for (group of invaderGroups(); track group.className) {
-            <div>{{ group.count }}x {{ group.className }}</div>
+            <div>{{ group.count }}x {{ group.className }}@if (group.hasLeader) { <span class="text-warning">(Leader)</span>}</div>
           }
         }
 
@@ -115,16 +116,19 @@ export class BadgeInvasionWarningComponent {
     const warning = invasionTriggerPendingWarning();
     if (!warning) return [];
 
-    const groupMap = new Map<string, number>();
+    const groupMap = new Map<string, { count: number; hasLeader: boolean }>();
     for (const invader of warning.invaders) {
       const def = invaderGetDefinitionById(invader.definitionId);
       const className = def?.invaderClass ?? 'Unknown';
-      groupMap.set(className, (groupMap.get(className) ?? 0) + 1);
+      const existing = groupMap.get(className) ?? { count: 0, hasLeader: false };
+      existing.count++;
+      if (invader.isLeader) existing.hasLeader = true;
+      groupMap.set(className, existing);
     }
 
     const groups: InvaderGroup[] = [];
-    for (const [className, count] of groupMap) {
-      groups.push({ className, count });
+    for (const [className, { count, hasLeader }] of groupMap) {
+      groups.push({ className, count, hasLeader });
     }
     return groups;
   });

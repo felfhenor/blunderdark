@@ -11,6 +11,7 @@ type InvaderHpInfo = {
   hp: number;
   maxHp: number;
   hpPercent: number;
+  isLeader: boolean;
 };
 
 type ObjectiveStatus = {
@@ -64,7 +65,7 @@ type ObjectiveStatus = {
             <div class="flex flex-col gap-0.5 max-h-24 overflow-y-auto">
               @for (inv of livingInvaders(); track inv.name + $index) {
                 <div class="flex items-center gap-2">
-                  <span class="text-xs truncate w-20">{{ inv.name }}</span>
+                  <span class="text-xs truncate w-20">@if (inv.isLeader) {<span class="text-warning">&#9733;</span> }{{ inv.name }}</span>
                   <progress
                     class="progress flex-1 h-1.5"
                     [class.progress-success]="inv.hpPercent > 60"
@@ -163,6 +164,7 @@ export class HudInvasionComponent {
         hp,
         maxHp: invader.maxHp,
         hpPercent: (hp / invader.maxHp) * 100,
+        isLeader: invader.isLeader,
       });
     }
     return result;

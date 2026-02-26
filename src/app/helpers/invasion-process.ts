@@ -36,6 +36,7 @@ import {
   moraleApply,
   moraleApplyAllyDeath,
   moraleApplyFearRoomEntry,
+  moraleApplyLeaderDeath,
   moraleApplyRoomCapture,
   moraleApplyTrapTrigger,
   moraleInit,
@@ -1028,12 +1029,16 @@ function processHallwayTraps(
       invasion.invaderHpMap[targetInvader.id] = newHp;
 
       const isFearGlyph = triggerResult.effectType === 'fear';
-      moraleApplyTrapTrigger(isFearGlyph, invasion.currentTurn);
+      moraleApplyTrapTrigger(isFearGlyph, invasion.currentTurn, invasion.invasionState.invaders);
 
       if (newHp <= 0) {
         invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
         invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
-        moraleApplyAllyDeath(targetInvader, invasion.currentTurn);
+        if (targetInvader.isLeader) {
+          moraleApplyLeaderDeath(targetInvader, invasion.currentTurn);
+        } else {
+          moraleApplyAllyDeath(targetInvader, invasion.currentTurn, invasion.invasionState.invaders);
+        }
         invasion.battleLog.push({
           turn: invasion.currentTurn,
           type: 'combat_kill',
@@ -1102,16 +1107,22 @@ function processCombatKill(
     const classDef = invDef ? invaderGetDefinitionById(invDef.definitionId) : undefined;
     invasion.killedInvaderClasses.push(classDef?.invaderClass ?? 'warrior');
 
-    // Check if allies have courage status before applying morale penalty
-    const aliveInvaders = invasion.currentRoomTurnQueue?.combatants.filter(
-      (c) => c.hp > 0 && c.side === 'invader' && c.id !== target.id,
-    ) ?? [];
-    const allHaveCourage = aliveInvaders.length > 0 && aliveInvaders.every((c) => combatantHasStatus(c, 'courage'));
-    if (!allHaveCourage) {
-      moraleApplyAllyDeath(
-        invDef ?? invasion.invasionState.invaders[0],
-        invasion.currentTurn,
-      );
+    // Check if the killed invader is the leader
+    if (invDef?.isLeader) {
+      moraleApplyLeaderDeath(invDef, invasion.currentTurn);
+    } else {
+      // Check if allies have courage status before applying morale penalty
+      const aliveInvaders = invasion.currentRoomTurnQueue?.combatants.filter(
+        (c) => c.hp > 0 && c.side === 'invader' && c.id !== target.id,
+      ) ?? [];
+      const allHaveCourage = aliveInvaders.length > 0 && aliveInvaders.every((c) => combatantHasStatus(c, 'courage'));
+      if (!allHaveCourage) {
+        moraleApplyAllyDeath(
+          invDef ?? invasion.invasionState.invaders[0],
+          invasion.currentTurn,
+          invasion.invasionState.invaders,
+        );
+      }
     }
 
     const msg = sourceLabel

@@ -32,6 +32,7 @@ export function invaderCreateInstance(
     definitionId: definition.id,
     currentHp: definition.baseStats.hp,
     maxHp: definition.baseStats.hp,
+    isLeader: false,
     statusEffects: [],
     abilityStates: definition.combatAbilityIds.map((abilityName) => {
       const ability = contentGetEntry<CombatAbilityContent>(

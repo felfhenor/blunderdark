@@ -1,5 +1,6 @@
 export type MoraleEventType =
   | 'ally_death'
+  | 'leader_death'
   | 'trap_trigger'
   | 'high_fear_room'
   | 'room_capture'

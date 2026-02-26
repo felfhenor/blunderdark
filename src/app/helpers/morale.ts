@@ -16,6 +16,8 @@ export const MORALE_PALADIN_DEATH_PENALTY = -15;
 export const MORALE_TRAP_TRIGGER_PENALTY = -5;
 export const MORALE_FEAR_GLYPH_PENALTY = -10;
 
+export const MORALE_LEADER_DEATH_PENALTY = -50;
+
 export const MORALE_HIGH_FEAR_ROOM_PENALTY = -15;
 export const MORALE_HIGH_FEAR_ROOM_THRESHOLD = 3;
 
@@ -114,6 +116,28 @@ export function moraleGetInvaderClass(
   return def?.invaderClass;
 }
 
+/**
+ * Check if the party leader is alive.
+ */
+export function moraleIsLeaderAlive(invaders: InvaderInstance[]): boolean {
+  return invaders.some((inv) => inv.isLeader && inv.currentHp > 0);
+}
+
+/**
+ * Halve a morale penalty if the leader is alive.
+ * Uses Math.ceil to keep the value negative (e.g. -5 / 2 = -2.5 → -2).
+ * Minimum result is -1 for non-zero penalties.
+ */
+export function moraleApplyLeaderModifier(
+  delta: number,
+  invaders: InvaderInstance[],
+): number {
+  if (delta >= 0) return delta;
+  if (!moraleIsLeaderAlive(invaders)) return delta;
+  const halved = Math.ceil(delta / 2);
+  return Math.min(halved, -1);
+}
+
 // --- Signal mutation functions ---
 
 /**
@@ -158,35 +182,67 @@ export function moraleApply(
 /**
  * Apply morale penalty for an ally death during invasion.
  * Looks up invader class to determine penalty amount.
+ * If invaders are provided and the leader is alive, halves the penalty.
  */
 export function moraleApplyAllyDeath(
   invader: InvaderInstance,
   turn: number,
+  invaders?: InvaderInstance[],
 ): number {
   const invaderClass = moraleGetInvaderClass(invader);
-  const penalty = moraleCalculateAllyDeathPenalty(invaderClass ?? 'warrior');
+  let penalty = moraleCalculateAllyDeathPenalty(invaderClass ?? 'warrior');
   const classLabel =
     invaderClass === 'cleric' || invaderClass === 'paladin'
       ? `${invaderClass.charAt(0).toUpperCase() + invaderClass.slice(1)} fallen`
       : 'Ally fallen';
-  return moraleApply('ally_death', penalty, turn, classLabel);
+  let desc = classLabel;
+  if (invaders) {
+    penalty = moraleApplyLeaderModifier(penalty, invaders);
+    if (moraleIsLeaderAlive(invaders)) {
+      desc += ' (halved by leader)';
+    }
+  }
+  return moraleApply('ally_death', penalty, turn, desc);
+}
+
+/**
+ * Apply morale penalty for leader death. Always -50, bypasses courage check.
+ */
+export function moraleApplyLeaderDeath(
+  invader: InvaderInstance,
+  turn: number,
+): number {
+  const invaderClass = moraleGetInvaderClass(invader);
+  const classLabel = invaderClass
+    ? `${invaderClass.charAt(0).toUpperCase() + invaderClass.slice(1)} leader fallen`
+    : 'Leader fallen';
+  return moraleApply('leader_death', MORALE_LEADER_DEATH_PENALTY, turn, classLabel);
 }
 
 /**
  * Apply morale penalty for a trap trigger during invasion.
+ * If invaders are provided and the leader is alive, halves the penalty.
  */
 export function moraleApplyTrapTrigger(
   isFearGlyph: boolean,
   turn: number,
+  invaders?: InvaderInstance[],
 ): number {
-  const penalty = moraleCalculateTrapPenalty(isFearGlyph);
-  const desc = isFearGlyph ? 'Fear Glyph triggered' : 'Trap triggered';
+  let penalty = moraleCalculateTrapPenalty(isFearGlyph);
+  let desc = isFearGlyph ? 'Fear Glyph triggered' : 'Trap triggered';
+  if (invaders) {
+    penalty = moraleApplyLeaderModifier(penalty, invaders);
+    if (moraleIsLeaderAlive(invaders)) {
+      desc += ' (halved by leader)';
+    }
+  }
   return moraleApply('trap_trigger', penalty, turn, desc);
 }
 
 /**
  * Apply morale penalty for entering a high-fear room.
  * Returns the new morale value, or current value if no penalty applied.
+ * If the leader is alive, halves the penalty.
  */
 export function moraleApplyFearRoomEntry(
   roomFearLevel: number,
@@ -194,9 +250,14 @@ export function moraleApplyFearRoomEntry(
   turn: number,
 ): number {
   const hasPaladinAura = moralePartyHasPaladinAura(invaders);
-  const penalty = moraleCalculateFearRoomPenalty(roomFearLevel, hasPaladinAura);
+  let penalty = moraleCalculateFearRoomPenalty(roomFearLevel, hasPaladinAura);
   if (penalty === 0) return moraleCurrent();
-  return moraleApply('high_fear_room', penalty, turn, 'Entered terrifying room');
+  let desc = 'Entered terrifying room';
+  penalty = moraleApplyLeaderModifier(penalty, invaders);
+  if (moraleIsLeaderAlive(invaders)) {
+    desc += ' (halved by leader)';
+  }
+  return moraleApply('high_fear_room', penalty, turn, desc);
 }
 
 /**
