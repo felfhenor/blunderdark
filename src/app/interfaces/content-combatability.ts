@@ -4,13 +4,17 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type CombatAbilityId = Branded<string, 'CombatAbilityId'>;
 
+export type CombatAbilityEffect = {
+  effectType: string;
+  value: number;
+  targetType: AbilityTargetType;
+  duration: number;
+};
+
 export type CombatAbilityContent = IsContentItem &
   HasDescription & {
     id: CombatAbilityId;
-    effectType: string;
-    value: number;
     chance: number;
     cooldown: number;
-    targetType: AbilityTargetType;
-    duration: number;
+    effects: CombatAbilityEffect[];
   };

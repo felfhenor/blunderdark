@@ -26,10 +26,14 @@ export type InvaderInstance = {
   abilityStates: AbilityState[];
 };
 
-export type AbilityResult = {
+export type AbilityResultEffect = {
   effectType: string;
   value: number;
   duration: number;
   targetIds: CombatantId[];
+};
+
+export type AbilityResult = {
+  effects: AbilityResultEffect[];
   cooldownApplied: number;
 };

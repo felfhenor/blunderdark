@@ -1,11 +1,12 @@
 import type {
   AbilityActivation,
+  AbilityActivationEffect,
   AbilityState,
   CombatAbilityId,
   CombatUnit,
 } from '@interfaces';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
-import type { CombatAbilityContent } from '@interfaces/content-combatability';
+import type { CombatAbilityContent, CombatAbilityEffect } from '@interfaces/content-combatability';
 
 import { contentGetEntry } from '@helpers/content';
 
@@ -67,18 +68,28 @@ export function combatAbilityIsReady(
 }
 
 /**
- * Look up the AbilityEffectContent for an ability's effectType.
- * effectType on CombatAbilityContent stores the name of the effect (e.g. "Damage").
+ * Look up the AbilityEffectContent for a single combat ability effect entry.
  */
 function getEffectDefinition(
-  ability: CombatAbilityContent,
+  effect: CombatAbilityEffect,
 ): AbilityEffectContent | undefined {
-  return contentGetEntry<AbilityEffectContent>(ability.effectType);
+  return contentGetEntry<AbilityEffectContent>(effect.effectType);
+}
+
+/**
+ * Look up all AbilityEffectContent definitions for an ability's effects.
+ */
+export function getEffectDefinitions(
+  ability: CombatAbilityContent,
+): AbilityEffectContent[] {
+  return ability.effects
+    .map((e) => getEffectDefinition(e))
+    .filter((e): e is AbilityEffectContent => e !== undefined);
 }
 
 /**
  * Try to activate an ability based on its proc chance.
- * Returns null if the ability doesn't proc or is on cooldown.
+ * Returns undefined if the ability doesn't proc or is on cooldown.
  */
 export function combatAbilityTryActivate(
   ability: CombatAbilityContent,
@@ -93,51 +104,66 @@ export function combatAbilityTryActivate(
   const roll = rng() * 100;
   if (roll > ability.chance) return undefined;
 
-  const effect = getEffectDefinition(ability);
-  if (!effect) return undefined;
+  const activationEffects: AbilityActivationEffect[] = [];
+  let maxDuration = 0;
 
-  let damage = 0;
-  let statusApplied: string | undefined = undefined;
-  let statusDuration = 0;
-  let targetsHit = 1;
+  for (const abilityEffect of ability.effects) {
+    const effectDef = getEffectDefinition(abilityEffect);
+    if (!effectDef) continue;
 
-  if (effect.dealsDamage) {
-    damage = Math.round(attacker.attack * (ability.value / 100));
-    if (ability.targetType === 'aoe') {
-      targetsHit = targetCount;
+    let damage = 0;
+    let statusApplied: string | undefined = undefined;
+    let statusDuration = 0;
+    let targetsHit = 1;
+
+    if (effectDef.dealsDamage) {
+      damage = Math.round(attacker.attack * (abilityEffect.value / 100));
+      if (abilityEffect.targetType === 'aoe') {
+        targetsHit = targetCount;
+      }
     }
+
+    if (effectDef.statusName) {
+      statusApplied = effectDef.statusName;
+      statusDuration = abilityEffect.duration;
+    }
+
+    if (effectDef.overrideTargetsHit !== undefined) {
+      targetsHit = effectDef.overrideTargetsHit;
+      damage = 0;
+    }
+
+    if (abilityEffect.duration > maxDuration) {
+      maxDuration = abilityEffect.duration;
+    }
+
+    activationEffects.push({
+      effectType: abilityEffect.effectType,
+      targetType: abilityEffect.targetType,
+      damage,
+      targetsHit,
+      statusApplied,
+      statusDuration,
+      targetIds: [],
+    });
   }
 
-  if (effect.statusName) {
-    statusApplied = effect.statusName;
-    statusDuration = ability.duration;
-  }
-
-  if (effect.overrideTargetsHit !== undefined) {
-    targetsHit = effect.overrideTargetsHit;
-    damage = 0;
-  }
+  if (activationEffects.length === 0) return undefined;
 
   const activation: AbilityActivation = {
     abilityId: ability.id as CombatAbilityId,
     abilityName: ability.name,
-    effectType: ability.effectType,
-    targetType: ability.targetType,
-    damage,
-    targetsHit,
-    statusApplied,
-    statusDuration,
-    targetIds: [],
+    effects: activationEffects,
   };
 
-  // Put ability on cooldown and mark active if it has duration
+  // Put ability on cooldown and mark active if any effect has duration
   const updatedStates = states.map((s) => {
     if (s.abilityId !== ability.id) return s;
     return {
       ...s,
       currentCooldown: ability.cooldown,
-      isActive: ability.duration > 0,
-      remainingDuration: ability.duration,
+      isActive: maxDuration > 0,
+      remainingDuration: maxDuration,
       passiveActivated: s.passiveActivated,
     };
   });
@@ -155,8 +181,8 @@ export function combatAbilityCheckEvasion(
   rng: () => number,
 ): boolean {
   const evasionAbility = abilities.find((a) => {
-    const effect = getEffectDefinition(a);
-    return effect?.overrideTargetsHit === 0;
+    const effects = getEffectDefinitions(a);
+    return effects.some((e) => e.overrideTargetsHit === 0);
   });
   if (!evasionAbility) return false;
 
@@ -176,17 +202,23 @@ export function combatAbilityApplyBerserkBuff(
   unit: CombatUnit,
 ): number {
   const berserkAbility = abilities.find((a) => {
-    const effect = getEffectDefinition(a);
-    return effect?.statusName === 'berserk';
+    const effects = getEffectDefinitions(a);
+    return effects.some((e) => e.statusName === 'berserk');
   });
   if (!berserkAbility) return baseAttack;
 
+  const berserkEffect = berserkAbility.effects.find((e) => {
+    const def = getEffectDefinition(e);
+    return def?.statusName === 'berserk';
+  });
+  if (!berserkEffect) return baseAttack;
+
   // Check if berserk should be active (HP below threshold)
-  // value represents the attack bonus percentage, chance represents the HP threshold
+  // chance represents the HP threshold, value represents the attack bonus percentage
   const hpPercent = (unit.hp / unit.maxHp) * 100;
   if (hpPercent > berserkAbility.chance) return baseAttack;
 
-  return Math.round(baseAttack * (1 + berserkAbility.value / 100));
+  return Math.round(baseAttack * (1 + berserkEffect.value / 100));
 }
 
 /**
@@ -199,13 +231,19 @@ export function combatAbilityApplyShieldBuff(
   states: AbilityState[],
 ): number {
   const shieldAbility = abilities.find((a) => {
-    const effect = getEffectDefinition(a);
-    return effect?.statusName === 'shielded';
+    const effects = getEffectDefinitions(a);
+    return effects.some((e) => e.statusName === 'shielded');
   });
   if (!shieldAbility) return baseDefense;
 
   const state = states.find((s) => s.abilityId === shieldAbility.id);
   if (!state?.isActive) return baseDefense;
 
-  return Math.round(baseDefense * (1 + shieldAbility.value / 100));
+  const shieldEffect = shieldAbility.effects.find((e) => {
+    const def = getEffectDefinition(e);
+    return def?.statusName === 'shielded';
+  });
+  if (!shieldEffect) return baseDefense;
+
+  return Math.round(baseDefense * (1 + shieldEffect.value / 100));
 }

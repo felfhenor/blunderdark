@@ -30,9 +30,7 @@ export type AbilityState = {
   passiveActivated: boolean;
 };
 
-export type AbilityActivation = {
-  abilityId: CombatAbilityId;
-  abilityName: string;
+export type AbilityActivationEffect = {
   effectType: string;
   targetType: AbilityTargetType;
   damage: number;
@@ -40,4 +38,10 @@ export type AbilityActivation = {
   statusApplied: string | undefined;
   statusDuration: number;
   targetIds: string[];
+};
+
+export type AbilityActivation = {
+  abilityId: CombatAbilityId;
+  abilityName: string;
+  effects: AbilityActivationEffect[];
 };

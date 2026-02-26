@@ -102,12 +102,11 @@ const breathWeapon: CombatAbilityContent = {
   name: 'Breath Weapon',
   __type: 'combatability',
   description: 'AOE fire damage',
-  effectType: 'Damage',
-  value: 150, // 150% of attack
-  chance: 100, // always fires when off cooldown
+  chance: 100,
   cooldown: 3,
-  targetType: 'aoe',
-  duration: 0,
+  effects: [
+    { effectType: 'Damage', value: 150, targetType: 'aoe', duration: 0 },
+  ],
 };
 
 const petrifyingGaze: CombatAbilityContent = {
@@ -115,12 +114,11 @@ const petrifyingGaze: CombatAbilityContent = {
   name: 'Petrifying Gaze',
   __type: 'combatability',
   description: 'Stuns a single target',
-  effectType: 'Stun',
-  value: 0,
-  chance: 10, // 10% proc
+  chance: 10,
   cooldown: 0,
-  targetType: 'single',
-  duration: 3,
+  effects: [
+    { effectType: 'Stun', value: 0, targetType: 'single', duration: 3 },
+  ],
 };
 
 const wraithEvasion: CombatAbilityContent = {
@@ -128,12 +126,11 @@ const wraithEvasion: CombatAbilityContent = {
   name: 'Intangible',
   __type: 'combatability',
   description: '50% chance to evade physical attacks',
-  effectType: 'Evasion',
-  value: 0,
   chance: 50,
   cooldown: 0,
-  targetType: 'self',
-  duration: 0,
+  effects: [
+    { effectType: 'Evasion', value: 0, targetType: 'self', duration: 0 },
+  ],
 };
 
 const berserkRage: CombatAbilityContent = {
@@ -141,12 +138,11 @@ const berserkRage: CombatAbilityContent = {
   name: 'Berserk Rage',
   __type: 'combatability',
   description: '+100% attack when below 50% HP',
-  effectType: 'Buff Attack',
-  value: 100, // +100% attack
-  chance: 50, // HP threshold: 50%
+  chance: 50,
   cooldown: 0,
-  targetType: 'self',
-  duration: 0, // lasts until combat ends
+  effects: [
+    { effectType: 'Buff Attack', value: 100, targetType: 'self', duration: 0 },
+  ],
 };
 
 const lichShield: CombatAbilityContent = {
@@ -154,12 +150,11 @@ const lichShield: CombatAbilityContent = {
   name: 'Arcane Shield',
   __type: 'combatability',
   description: '+50% defense for 3 turns',
-  effectType: 'Buff Defense',
-  value: 50,
   chance: 100,
   cooldown: 4,
-  targetType: 'self',
-  duration: 3,
+  effects: [
+    { effectType: 'Buff Defense', value: 50, targetType: 'self', duration: 3 },
+  ],
 };
 
 const deathBolt: CombatAbilityContent = {
@@ -167,12 +162,11 @@ const deathBolt: CombatAbilityContent = {
   name: 'Death Bolt',
   __type: 'combatability',
   description: 'Single target 200% magic damage',
-  effectType: 'Damage',
-  value: 200,
   chance: 100,
   cooldown: 2,
-  targetType: 'single',
-  duration: 0,
+  effects: [
+    { effectType: 'Damage', value: 200, targetType: 'single', duration: 0 },
+  ],
 };
 
 // --- Tests ---
@@ -263,9 +257,9 @@ describe('combatAbilityTryActivate: damage abilities', () => {
     const result = combatAbilityTryActivate(breathWeapon, states, attacker, 3, fixedRng(0.5));
     expect(result).toBeDefined();
     expect(result!.activation.abilityName).toBe('Breath Weapon');
-    expect(result!.activation.damage).toBe(120); // 80 * 150/100
-    expect(result!.activation.targetsHit).toBe(3);
-    expect(result!.activation.targetType).toBe('aoe');
+    expect(result!.activation.effects[0].damage).toBe(120); // 80 * 150/100
+    expect(result!.activation.effects[0].targetsHit).toBe(3);
+    expect(result!.activation.effects[0].targetType).toBe('aoe');
   });
 
   it('should put ability on cooldown after activation', () => {
@@ -290,8 +284,8 @@ describe('combatAbilityTryActivate: damage abilities', () => {
     const attacker = makeUnit({ attack: 40 });
     const result = combatAbilityTryActivate(deathBolt, states, attacker, 5, fixedRng(0.5));
     expect(result).toBeDefined();
-    expect(result!.activation.damage).toBe(80); // 40 * 200/100
-    expect(result!.activation.targetsHit).toBe(1); // single target
+    expect(result!.activation.effects[0].damage).toBe(80); // 40 * 200/100
+    expect(result!.activation.effects[0].targetsHit).toBe(1); // single target
   });
 });
 
@@ -302,8 +296,8 @@ describe('combatAbilityTryActivate: stun (petrifying gaze)', () => {
     // 10% chance, roll 5 (5 <= 10, success)
     const result = combatAbilityTryActivate(petrifyingGaze, states, attacker, 1, fixedRng(0.05));
     expect(result).toBeDefined();
-    expect(result!.activation.statusApplied).toBe('stunned');
-    expect(result!.activation.statusDuration).toBe(3);
+    expect(result!.activation.effects[0].statusApplied).toBe('stunned');
+    expect(result!.activation.effects[0].statusDuration).toBe(3);
   });
 
   it('should not proc when roll exceeds chance', () => {
@@ -321,7 +315,7 @@ describe('combatAbilityTryActivate: shield buff', () => {
     const attacker = makeUnit();
     const result = combatAbilityTryActivate(lichShield, states, attacker, 0, fixedRng(0.5));
     expect(result).toBeDefined();
-    expect(result!.activation.statusApplied).toBe('shielded');
+    expect(result!.activation.effects[0].statusApplied).toBe('shielded');
     const shieldState = result!.updatedStates.find((s) => s.abilityId === 'ability-shield');
     expect(shieldState!.isActive).toBe(true);
     expect(shieldState!.remainingDuration).toBe(3);

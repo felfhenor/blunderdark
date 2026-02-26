@@ -1,62 +1,68 @@
 - id: 27f875c7-7603-4a90-aeb9-e1588f42eef0
   name: Breath Weapon
   description: AOE fire damage
-  effectType: Damage
-  value: 150
   chance: 100
   cooldown: 3
-  targetType: aoe
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 150
+      targetType: aoe
+      duration: 0
 
 - id: bd9bebcb-561e-43de-b0a7-16e95b0e716c
   name: Petrifying Gaze
   description: Stuns a single target
-  effectType: Stun
-  value: 0
   chance: 10
   cooldown: 0
-  targetType: single
-  duration: 3
+  effects:
+    - effectType: Stun
+      value: 0
+      targetType: single
+      duration: 3
 
 - id: 24610e73-cd2b-4043-bdfa-a87803f7fbb0
   name: Death Bolt
   description: Single target 200% magic damage
-  effectType: Damage
-  value: 200
   chance: 100
   cooldown: 2
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 200
+      targetType: single
+      duration: 0
 
 - id: d29b48e2-e2e1-4d8d-8563-049588faeab1
   name: Wraith Evasion
   description: 50% chance to evade physical attacks
-  effectType: Evasion
-  value: 0
   chance: 50
   cooldown: 0
-  targetType: self
-  duration: 0
+  effects:
+    - effectType: Evasion
+      value: 0
+      targetType: self
+      duration: 0
 
 - id: 6e64aaa6-5243-4687-be4d-d50af1dfe62e
   name: Berserk Rage
   description: +100% attack when below 50% HP
-  effectType: Buff Attack
-  value: 100
   chance: 50
   cooldown: 0
-  targetType: self
-  duration: 0
+  effects:
+    - effectType: Buff Attack
+      value: 100
+      targetType: self
+      duration: 0
 
 - id: 826d95b6-1ae2-4f2b-95a4-78f4fc38d0bf
   name: Lich Shield
   description: +50% defense for 3 turns
-  effectType: Buff Defense
-  value: 50
   chance: 100
   cooldown: 4
-  targetType: self
-  duration: 3
+  effects:
+    - effectType: Buff Defense
+      value: 50
+      targetType: self
+      duration: 3
 
 # --- Invader combat abilities ---
 
@@ -64,166 +70,182 @@
 - id: 97bade63-8c5e-4f96-92bd-717dfb0ab7b1
   name: Shield Wall
   description: Reduces incoming damage by 25% for 2 turns
-  effectType: Buff Defense
-  value: 25
   chance: 100
   cooldown: 4
-  targetType: self
-  duration: 2
+  effects:
+    - effectType: Buff Defense
+      value: 25
+      targetType: self
+      duration: 2
 
 # Rogue abilities
 - id: cff58377-2009-4109-ae17-e530aab4af33
   name: Disarm Trap
   description: 60% chance to disarm a trap before triggering
-  effectType: Disarm
-  value: 60
   chance: 100
   cooldown: 0
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Disarm
+      value: 60
+      targetType: single
+      duration: 0
 
 - id: 3409c363-5f6e-4aae-9ae5-499d2ff7b4dc
   name: Backstab
   description: Deals double damage to a single target
-  effectType: Damage
-  value: 200
   chance: 100
   cooldown: 3
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 200
+      targetType: single
+      duration: 0
 
 # Mage abilities
 - id: defb78c8-5c5e-4fb6-a800-65b7dde3a226
   name: Arcane Bolt
   description: Magical attack that ignores physical defense
-  effectType: Magic Damage
-  value: 150
   chance: 100
   cooldown: 2
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Magic Damage
+      value: 150
+      targetType: single
+      duration: 0
 
 - id: c1946537-3ae0-4e7d-8838-ad5a74de56a3
   name: Dispel
   description: Removes all active buffs from a target
-  effectType: Dispel
-  value: 0
   chance: 100
   cooldown: 3
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Dispel
+      value: 0
+      targetType: single
+      duration: 0
 
 # Cleric abilities
 - id: 03d7a2f3-91a1-4c50-b610-64fe51c72c0f
   name: Heal
   description: Restores 20% of max HP to a single target
-  effectType: Heal
-  value: 20
   chance: 100
   cooldown: 3
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Heal
+      value: 20
+      targetType: single
+      duration: 0
 
 - id: 144d71fb-fb84-4606-894b-264e60118494
   name: Turn Undead
   description: Deals 150% bonus damage to undead creatures
-  effectType: Damage
-  value: 150
   chance: 100
   cooldown: 2
-  targetType: aoe
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 150
+      targetType: aoe
+      duration: 0
 
 # Paladin abilities
 - id: 332bca0a-1294-4253-9b4a-ab04d10b1c82
   name: Smite Evil
   description: Deals 200% bonus damage to corrupted targets
-  effectType: Damage
-  value: 200
   chance: 100
   cooldown: 2
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 200
+      targetType: single
+      duration: 0
 
 - id: e4ba0ac8-7bc5-4733-8b7b-203c36bc3926
   name: Aura of Courage
   description: Grants fear immunity to all nearby allies
-  effectType: Fear Immunity
-  value: 0
   chance: 100
   cooldown: 0
-  targetType: aoe
-  duration: 0
+  effects:
+    - effectType: Fear Immunity
+      value: 0
+      targetType: aoe
+      duration: 0
 
 # Ranger abilities
 - id: 4af7403d-697d-4233-90a8-68128dd96760
   name: Scout
   description: Reveals 2 rooms ahead on the invasion path
-  effectType: Scout
-  value: 2
   chance: 100
   cooldown: 0
-  targetType: self
-  duration: 0
+  effects:
+    - effectType: Scout
+      value: 2
+      targetType: self
+      duration: 0
 
 - id: 2d58ca2c-4a40-4207-9450-488602079f99
   name: Mark Target
   description: Marks a target for +20% damage for 3 turns
-  effectType: Mark
-  value: 20
   chance: 100
   cooldown: 0
-  targetType: single
-  duration: 3
+  effects:
+    - effectType: Mark
+      value: 20
+      targetType: single
+      duration: 3
 
 # --- Defender combat abilities ---
 
 - id: 30e6dc88-8a33-43c9-b8a2-e6106f9c5637
   name: Dungeon Ward
   description: Dungeon magic shields the defender, +30% defense for 3 turns
-  effectType: Buff Defense
-  value: 30
   chance: 100
   cooldown: 4
-  targetType: self
-  duration: 3
+  effects:
+    - effectType: Buff Defense
+      value: 30
+      targetType: self
+      duration: 3
 
 - id: 26277f35-cbf1-4cbc-8e3d-09574a4232d4
   name: Shadow Slash
   description: Strikes from the shadows for 180% damage
-  effectType: Damage
-  value: 180
   chance: 100
   cooldown: 3
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 180
+      targetType: single
+      duration: 0
 
 - id: 89d3a992-e242-4cdd-bc03-905ca8fe1c4f
   name: Venom Spit
   description: Spits venom at all enemies for 120% damage
-  effectType: Damage
-  value: 120
   chance: 100
   cooldown: 3
-  targetType: aoe
-  duration: 0
+  effects:
+    - effectType: Damage
+      value: 120
+      targetType: aoe
+      duration: 0
 
 - id: 424297a0-b550-4e6c-86ac-9d8c04bd0bf6
   name: Dark Healing
   description: Dark magic restores 25% of max HP
-  effectType: Heal
-  value: 25
   chance: 100
   cooldown: 4
-  targetType: single
-  duration: 0
+  effects:
+    - effectType: Heal
+      value: 25
+      targetType: single
+      duration: 0
 
 - id: 7c20c78f-1fd5-4401-888e-9e1fb5b59dfe
   name: Terrifying Roar
   description: A terrifying roar stuns a single target for 2 turns
-  effectType: Stun
-  value: 0
   chance: 40
   cooldown: 4
-  targetType: single
-  duration: 2
+  effects:
+    - effectType: Stun
+      value: 0
+      targetType: single
+      duration: 2

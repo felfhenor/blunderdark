@@ -5,14 +5,16 @@ import {
   combatAbilityCheckEvasion,
   combatAbilityTickStates,
   combatAbilityTryActivate,
+  getEffectDefinitions,
 } from '@helpers/combat-abilities';
 import { combatResolve } from '@helpers/combat';
 import { contentGetEntry } from '@helpers/content';
 import { gridManhattanDistance } from '@helpers/grid-math';
 import type { AbilityState, StatusEffect } from '@interfaces/combat';
-import type { CombatAbilityId } from '@interfaces/content-combatability';
-import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
-import type { CombatAbilityContent } from '@interfaces/content-combatability';
+import type {
+  CombatAbilityContent,
+  CombatAbilityId,
+} from '@interfaces/content-combatability';
 import type {
   ActionResult,
   Combatant,
@@ -262,24 +264,28 @@ function resolveAbilityContent(abilityId: CombatAbilityId): CombatAbilityContent
 }
 
 /**
- * Look up the AbilityEffectContent for an ability's effectType.
- */
-function resolveEffectContent(ability: CombatAbilityContent): AbilityEffectContent | undefined {
-  return contentGetEntry<AbilityEffectContent>(ability.effectType);
-}
-
-/**
  * Classify an ability's role for AI decision-making.
+ * Checks all effects and returns the highest-priority classification.
  */
 function classifyAbility(ability: CombatAbilityContent): 'heal' | 'buff' | 'debuff' | 'damage' | 'scout' | 'other' {
-  const effect = resolveEffectContent(ability);
-  if (!effect) return 'other';
+  const effectDefs = getEffectDefinitions(ability);
+  if (effectDefs.length === 0) return 'other';
 
-  if (effect.statusName === 'healing' || effect.statusName === 'resurrected') return 'heal';
-  if (effect.statusName === 'shielded' || effect.statusName === 'courage') return 'buff';
-  if (effect.statusName === 'stunned' || effect.statusName === 'marked' || effect.statusName === 'dispel') return 'debuff';
-  if (effect.statusName === 'scouting') return 'scout';
-  if (effect.dealsDamage) return 'damage';
+  for (const effect of effectDefs) {
+    if (effect.statusName === 'healing' || effect.statusName === 'resurrected') return 'heal';
+  }
+  for (const effect of effectDefs) {
+    if (effect.statusName === 'shielded' || effect.statusName === 'courage') return 'buff';
+  }
+  for (const effect of effectDefs) {
+    if (effect.statusName === 'stunned' || effect.statusName === 'marked' || effect.statusName === 'dispel') return 'debuff';
+  }
+  for (const effect of effectDefs) {
+    if (effect.statusName === 'scouting') return 'scout';
+  }
+  for (const effect of effectDefs) {
+    if (effect.dealsDamage) return 'damage';
+  }
 
   return 'other';
 }
@@ -296,10 +302,6 @@ export function combatantHasStatus(combatant: Combatant, statusName: string): bo
  * Returns 0 if not marked.
  */
 function getMarkAmplification(combatant: Combatant): number {
-  // The mark value is stored as the ability.value when applied.
-  // We find the ability that applied it to get the value.
-  // For simplicity, check all combatant's incoming marks — the mark status stores the name,
-  // and we look up the Mark ability's value from content.
   if (!combatantHasStatus(combatant, 'marked')) return 0;
   // Default 20% amplification (matching Mark Target's value in YAML)
   return 20;
@@ -376,8 +378,8 @@ export function invasionCombatExecuteAttack(
     const updatedCombatants = queue.combatants.map((c) => {
       if (c.id !== defender.id) return c;
       const evasionAbility = defenderAbilities.find((a) => {
-        const effect = resolveEffectContent(a);
-        return effect?.overrideTargetsHit === 0;
+        const effects = getEffectDefinitions(a);
+        return effects.some((e) => e.overrideTargetsHit === 0);
       });
       if (!evasionAbility) return c;
       const wasActivated = c.abilityStates.find((s) => s.abilityId === evasionAbility.id)?.passiveActivated ?? false;
@@ -441,8 +443,8 @@ export function invasionCombatExecuteAttack(
     if (c.id !== actorId) return c;
     // Check if berserk just triggered for first time
     const berserkAbility = attackerAbilities.find((a) => {
-      const effect = resolveEffectContent(a);
-      return effect?.statusName === 'berserk';
+      const effects = getEffectDefinitions(a);
+      return effects.some((e) => e.statusName === 'berserk');
     });
     if (!berserkAbility) return c;
     const hpPercent = (c.hp / c.maxHp) * 100;
@@ -490,7 +492,7 @@ export function invasionCombatExecuteWait(actorId: CombatantId): ActionResult {
 }
 
 /**
- * Execute an ability action. Resolves ability activation and applies effects.
+ * Execute an ability action. Resolves ability activation and applies all effects.
  * Does not mutate inputs.
  */
 export function invasionCombatExecuteAbility(
@@ -507,32 +509,24 @@ export function invasionCombatExecuteAbility(
     return { queue, result: invasionCombatExecuteWait(actorId) };
   }
 
-  const effect = resolveEffectContent(ability);
-  if (!effect) {
+  const effectDefs = getEffectDefinitions(ability);
+  if (effectDefs.length === 0) {
     return { queue, result: invasionCombatExecuteWait(actorId) };
   }
 
-  // Determine targets
   const enemies = queue.combatants.filter((c) => c.hp > 0 && c.side !== actor.side);
   const allies = queue.combatants.filter((c) => c.hp > 0 && c.side === actor.side);
   const deadAllies = queue.combatants.filter((c) => c.hp <= 0 && c.side === actor.side);
   const abilityClass = classifyAbility(ability);
 
-  let targets: Combatant[] = [];
-  if (ability.targetType === 'self') {
-    targets = [actor];
-  } else if (ability.targetType === 'aoe') {
-    targets = abilityClass === 'buff' || abilityClass === 'heal' ? allies : enemies;
-  } else {
-    // single target
-    if (effect.statusName === 'resurrected') {
-      targets = deadAllies.length > 0 ? [deadAllies[0]] : [];
-    } else if (abilityClass === 'heal') {
-      const target = allies.find((c) => c.id === targetId);
-      targets = target ? [target] : [];
+  // Determine targets for each effect based on its own targetType
+  // For the proc roll, we use the largest target count
+  let maxTargetCount = 0;
+  for (const abilityEffect of ability.effects) {
+    if (abilityEffect.targetType === 'aoe') {
+      maxTargetCount = Math.max(maxTargetCount, abilityClass === 'buff' || abilityClass === 'heal' ? allies.length : enemies.length);
     } else {
-      const target = enemies.find((c) => c.id === targetId) ?? queue.combatants.find((c) => c.id === targetId);
-      targets = target ? [target] : [];
+      maxTargetCount = Math.max(maxTargetCount, 1);
     }
   }
 
@@ -541,7 +535,7 @@ export function invasionCombatExecuteAbility(
     ability,
     actor.abilityStates,
     { attack: actor.attack, defense: actor.defense, hp: actor.hp, maxHp: actor.maxHp },
-    targets.length,
+    maxTargetCount,
     rng,
   );
 
@@ -563,102 +557,153 @@ export function invasionCombatExecuteAbility(
     };
   }
 
-  const activation = {
-    ...activationResult.activation,
-    targetIds: targets.map((t) => t.id as string),
-  };
+  // Resolve targets per effect and assign targetIds
+  const activation = activationResult.activation;
+  for (let i = 0; i < activation.effects.length; i++) {
+    const actEffect = activation.effects[i];
+    const targets = resolveTargetsForEffect(actEffect, actor, enemies, allies, deadAllies, abilityClass, targetId, queue);
+    actEffect.targetIds = targets.map((t) => t.id as string);
+  }
 
   // Apply effects to combatants
   let updatedCombatants = queue.combatants.map((c) =>
     c.id === actorId ? { ...c, abilityStates: activationResult.updatedStates } : c,
   );
 
-  // Apply damage
-  if (activation.damage > 0) {
-    const damagePerTarget = activation.damage;
-    updatedCombatants = updatedCombatants.map((c) => {
-      if (!targets.some((t) => t.id === c.id)) return c;
-      // Magic damage ignores defense, physical damage reduced by defense
-      let finalDamage = damagePerTarget;
-      if (effect.dealsDamage && ability.effectType !== 'Magic Damage') {
-        finalDamage = Math.max(1, damagePerTarget - c.defense);
-      }
-      // Mark amplification
-      if (combatantHasStatus(c, 'marked')) {
-        finalDamage = Math.round(finalDamage * (1 + getMarkAmplification(c) / 100));
-      }
-      const newHp = Math.max(0, c.hp - finalDamage);
-      return { ...c, hp: newHp };
-    });
-  }
+  // Apply each effect
+  for (let i = 0; i < activation.effects.length; i++) {
+    const actEffect = activation.effects[i];
+    const abilityEffect = ability.effects[i];
+    const effectDef = effectDefs[i];
+    if (!effectDef || !abilityEffect) continue;
 
-  // Apply status effects
-  if (activation.statusApplied && activation.statusDuration > 0) {
-    updatedCombatants = updatedCombatants.map((c) => {
-      if (!targets.some((t) => t.id === c.id)) return c;
-      const existing = c.statusEffects.find((s) => s.name === activation.statusApplied);
-      if (existing) {
+    const effectTargetIds = new Set(actEffect.targetIds);
+
+    // Apply damage
+    if (actEffect.damage > 0) {
+      const damagePerTarget = actEffect.damage;
+      updatedCombatants = updatedCombatants.map((c) => {
+        if (!effectTargetIds.has(c.id as string)) return c;
+        let finalDamage = damagePerTarget;
+        if (effectDef.dealsDamage && abilityEffect.effectType !== 'Magic Damage') {
+          finalDamage = Math.max(1, damagePerTarget - c.defense);
+        }
+        if (combatantHasStatus(c, 'marked')) {
+          finalDamage = Math.round(finalDamage * (1 + getMarkAmplification(c) / 100));
+        }
+        const newHp = Math.max(0, c.hp - finalDamage);
+        return { ...c, hp: newHp };
+      });
+    }
+
+    // Apply status effects
+    if (actEffect.statusApplied && actEffect.statusDuration > 0) {
+      updatedCombatants = updatedCombatants.map((c) => {
+        if (!effectTargetIds.has(c.id as string)) return c;
+        const existing = c.statusEffects.find((s) => s.name === actEffect.statusApplied);
+        if (existing) {
+          return {
+            ...c,
+            statusEffects: c.statusEffects.map((s) =>
+              s.name === actEffect.statusApplied ? { ...s, remainingDuration: actEffect.statusDuration } : s,
+            ),
+          };
+        }
         return {
           ...c,
-          statusEffects: c.statusEffects.map((s) =>
-            s.name === activation.statusApplied ? { ...s, remainingDuration: activation.statusDuration } : s,
-          ),
+          statusEffects: [...c.statusEffects, { name: actEffect.statusApplied!, remainingDuration: actEffect.statusDuration }],
         };
-      }
-      return {
-        ...c,
-        statusEffects: [...c.statusEffects, { name: activation.statusApplied!, remainingDuration: activation.statusDuration }],
-      };
-    });
+      });
+    }
+
+    // Special: Heal (no status, just HP restore)
+    if (effectDef.statusName === 'healing') {
+      updatedCombatants = updatedCombatants.map((c) => {
+        if (!effectTargetIds.has(c.id as string)) return c;
+        const healAmount = Math.round(c.maxHp * (abilityEffect.value / 100));
+        return { ...c, hp: Math.min(c.maxHp, c.hp + healAmount) };
+      });
+    }
+
+    // Special: Resurrect
+    if (effectDef.statusName === 'resurrected' && deadAllies.length > 0) {
+      const reviveTarget = deadAllies[0];
+      const reviveHp = Math.round(reviveTarget.maxHp * (abilityEffect.value / 100));
+      updatedCombatants = updatedCombatants.map((c) =>
+        c.id === reviveTarget.id ? { ...c, hp: Math.max(1, reviveHp) } : c,
+      );
+    }
+
+    // Special: Dispel (remove all status effects from target)
+    if (effectDef.statusName === 'dispel') {
+      updatedCombatants = updatedCombatants.map((c) => {
+        if (!effectTargetIds.has(c.id as string)) return c;
+        return { ...c, statusEffects: [] };
+      });
+    }
+
+    // Special: Fear Immunity (apply courage to all allies)
+    if (effectDef.statusName === 'courage') {
+      updatedCombatants = updatedCombatants.map((c) => {
+        if (c.side !== actor.side || c.hp <= 0) return c;
+        if (c.statusEffects.some((s) => s.name === 'courage')) return c;
+        return { ...c, statusEffects: [...c.statusEffects, { name: 'courage', remainingDuration: 999 }] };
+      });
+    }
   }
 
-  // Special: Heal (no status, just HP restore)
-  if (effect.statusName === 'healing') {
-    updatedCombatants = updatedCombatants.map((c) => {
-      if (!targets.some((t) => t.id === c.id)) return c;
-      const healAmount = Math.round(c.maxHp * (ability.value / 100));
-      return { ...c, hp: Math.min(c.maxHp, c.hp + healAmount) };
-    });
-  }
-
-  // Special: Resurrect
-  if (effect.statusName === 'resurrected' && deadAllies.length > 0) {
-    const reviveTarget = deadAllies[0];
-    const reviveHp = Math.round(reviveTarget.maxHp * (ability.value / 100));
-    updatedCombatants = updatedCombatants.map((c) =>
-      c.id === reviveTarget.id ? { ...c, hp: Math.max(1, reviveHp) } : c,
-    );
-  }
-
-  // Special: Dispel (remove all status effects from target)
-  if (effect.statusName === 'dispel') {
-    updatedCombatants = updatedCombatants.map((c) => {
-      if (!targets.some((t) => t.id === c.id)) return c;
-      return { ...c, statusEffects: [] };
-    });
-  }
-
-  // Special: Fear Immunity (apply courage to all allies)
-  if (effect.statusName === 'courage') {
-    updatedCombatants = updatedCombatants.map((c) => {
-      if (c.side !== actor.side || c.hp <= 0) return c;
-      if (c.statusEffects.some((s) => s.name === 'courage')) return c;
-      // Permanent for the combat (high duration)
-      return { ...c, statusEffects: [...c.statusEffects, { name: 'courage', remainingDuration: 999 }] };
-    });
-  }
+  // Find first target for the action result
+  const allTargetIds = activation.effects.flatMap((e) => e.targetIds);
+  const firstTargetId = allTargetIds.length > 0 ? allTargetIds[0] as CombatantId : undefined;
 
   return {
     queue: { ...queue, combatants: updatedCombatants },
     result: {
       action: 'ability',
       actorId,
-      targetId: targets.length > 0 ? targets[0].id : undefined,
+      targetId: firstTargetId,
       targetPosition: undefined,
       combatResult: undefined,
       abilityActivation: activation,
     },
   };
+}
+
+/**
+ * Resolve targets for a single activation effect based on its targetType.
+ */
+function resolveTargetsForEffect(
+  actEffect: { targetType: string },
+  actor: Combatant,
+  enemies: Combatant[],
+  allies: Combatant[],
+  deadAllies: Combatant[],
+  abilityClass: string,
+  targetId: CombatantId | undefined,
+  queue: TurnQueue,
+): Combatant[] {
+  if (actEffect.targetType === 'self') {
+    return [actor];
+  }
+
+  if (actEffect.targetType === 'aoe') {
+    return abilityClass === 'buff' || abilityClass === 'heal' ? allies : enemies;
+  }
+
+  // single target
+  // Check for resurrect — target dead allies
+  if (deadAllies.length > 0) {
+    const isResurrect = enemies.length === 0 && deadAllies.length > 0;
+    if (isResurrect) return [deadAllies[0]];
+  }
+
+  if (abilityClass === 'heal') {
+    const target = allies.find((c) => c.id === targetId);
+    return target ? [target] : [];
+  }
+
+  const target = enemies.find((c) => c.id === targetId) ?? queue.combatants.find((c) => c.id === targetId);
+  return target ? [target] : [];
 }
 
 // --- AI decision making ---
@@ -685,19 +730,19 @@ export function invasionCombatResolveAiAction(
   for (const state of readyAbilities) {
     const ability = resolveAbilityContent(state.abilityId);
     if (!ability) continue;
-    const effect = resolveEffectContent(ability);
-    if (!effect) continue;
+    const effectDefs = getEffectDefinitions(ability);
+    if (effectDefs.length === 0) continue;
     const abilityClass = classifyAbility(ability);
 
     // Skip passives (evasion, berserk) — they trigger automatically, not via AI choice
-    if (effect.overrideTargetsHit === 0) continue; // evasion
-    if (effect.statusName === 'berserk') continue; // berserk
+    if (effectDefs.some((e) => e.overrideTargetsHit === 0)) continue; // evasion
+    if (effectDefs.some((e) => e.statusName === 'berserk')) continue; // berserk
 
     // Skip disarm — handled at room entry, not during combat
-    if (effect.statusName === 'disarm') continue;
+    if (effectDefs.some((e) => e.statusName === 'disarm')) continue;
 
     // 1. Heal — if any ally below 50% HP
-    if (abilityClass === 'heal' && effect.statusName === 'healing') {
+    if (abilityClass === 'heal' && effectDefs.some((e) => e.statusName === 'healing')) {
       const injuredAlly = sortBy(
         allies.filter((c) => c.hp / c.maxHp < 0.5),
         [(c) => c.hp / c.maxHp],
@@ -708,7 +753,7 @@ export function invasionCombatResolveAiAction(
     }
 
     // Resurrect — if any dead ally
-    if (effect.statusName === 'resurrected' && deadAllies.length > 0) {
+    if (effectDefs.some((e) => e.statusName === 'resurrected') && deadAllies.length > 0) {
       return { action: 'ability', targetId: deadAllies[0].id, targetPosition: undefined, abilityId: state.abilityId };
     }
   }
@@ -719,12 +764,13 @@ export function invasionCombatResolveAiAction(
     if (!ability) continue;
     const abilityClass = classifyAbility(ability);
     if (abilityClass !== 'buff') continue;
-    const effect = resolveEffectContent(ability);
-    if (!effect) continue;
-    // Skip if already has the buff status
-    if (effect.statusName && combatantHasStatus(actor, effect.statusName)) continue;
+    const effectDefs = getEffectDefinitions(ability);
+    if (effectDefs.length === 0) continue;
     // Skip berserk (passive)
-    if (effect.statusName === 'berserk') continue;
+    if (effectDefs.some((e) => e.statusName === 'berserk')) continue;
+    // Skip if already has any of the buff statuses
+    const alreadyBuffed = effectDefs.some((e) => e.statusName && combatantHasStatus(actor, e.statusName));
+    if (alreadyBuffed) continue;
 
     return { action: 'ability', targetId: actor.id, targetPosition: undefined, abilityId: state.abilityId };
   }
@@ -737,8 +783,12 @@ export function invasionCombatResolveAiAction(
     if (abilityClass !== 'debuff') continue;
     if (enemies.length === 0) continue;
 
-    // Stun: prefer highest-attack enemy that isn't already stunned
-    const target = enemies.find((e) => !combatantHasStatus(e, ability.effectType === 'Stun' ? 'stunned' : ability.effectType === 'Mark' ? 'marked' : ''));
+    const effectDefs = getEffectDefinitions(ability);
+    // Determine which status this debuff applies
+    const hasStun = effectDefs.some((e) => e.statusName === 'stunned');
+    const hasMark = effectDefs.some((e) => e.statusName === 'marked');
+    const statusToCheck = hasStun ? 'stunned' : hasMark ? 'marked' : '';
+    const target = enemies.find((e) => !combatantHasStatus(e, statusToCheck));
     if (target) {
       return { action: 'ability', targetId: target.id, targetPosition: undefined, abilityId: state.abilityId };
     }
@@ -748,11 +798,13 @@ export function invasionCombatResolveAiAction(
   for (const state of readyAbilities) {
     const ability = resolveAbilityContent(state.abilityId);
     if (!ability) continue;
-    const effect = resolveEffectContent(ability);
-    if (!effect?.dealsDamage) continue;
+    const effectDefs = getEffectDefinitions(ability);
+    if (!effectDefs.some((e) => e.dealsDamage)) continue;
     if (enemies.length === 0) continue;
 
-    if (ability.targetType === 'aoe') {
+    // Check if any effect is AOE
+    const hasAoe = ability.effects.some((e) => e.targetType === 'aoe');
+    if (hasAoe) {
       return { action: 'ability', targetId: enemies[0].id, targetPosition: undefined, abilityId: state.abilityId };
     }
     // Single target: pick highest HP enemy (don't waste on nearly dead)
@@ -766,8 +818,8 @@ export function invasionCombatResolveAiAction(
   for (const state of readyAbilities) {
     const ability = resolveAbilityContent(state.abilityId);
     if (!ability) continue;
-    const effect = resolveEffectContent(ability);
-    if (effect?.statusName !== 'scouting') continue;
+    const effectDefs = getEffectDefinitions(ability);
+    if (!effectDefs.some((e) => e.statusName === 'scouting')) continue;
     return { action: 'ability', targetId: actor.id, targetPosition: undefined, abilityId: state.abilityId };
   }
 

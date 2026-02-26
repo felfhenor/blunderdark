@@ -36,6 +36,7 @@ import type {
 } from '@interfaces/content-abilityeffect';
 import type {
   CombatAbilityContent,
+  CombatAbilityEffect,
   CombatAbilityId,
 } from '@interfaces/content-combatability';
 import type {
@@ -528,6 +529,17 @@ function ensureAbilityEffect(
   };
 }
 
+function ensureCombatAbilityEffect(
+  effect: Partial<CombatAbilityEffect>,
+): CombatAbilityEffect {
+  return {
+    effectType: effect.effectType ?? '',
+    value: effect.value ?? 0,
+    targetType: effect.targetType ?? 'single',
+    duration: effect.duration ?? 0,
+  };
+}
+
 function ensureCombatAbility(
   ability: Partial<CombatAbilityContent>,
 ): CombatAbilityContent {
@@ -536,12 +548,9 @@ function ensureCombatAbility(
     name: ability.name ?? 'UNKNOWN',
     __type: 'combatability',
     description: ability.description ?? '',
-    effectType: ability.effectType ?? '',
-    value: ability.value ?? 0,
     chance: ability.chance ?? 0,
     cooldown: ability.cooldown ?? 0,
-    targetType: ability.targetType ?? 'single',
-    duration: ability.duration ?? 0,
+    effects: (ability.effects ?? []).map(ensureCombatAbilityEffect),
   };
 }
 

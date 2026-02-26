@@ -76,12 +76,11 @@ function makeAbility(
     name: 'Test Ability',
     __type: 'combatability',
     description: 'test',
-    effectType: 'Damage',
-    value: 100,
     chance: 100,
     cooldown: 0,
-    targetType: 'single',
-    duration: 0,
+    effects: [
+      { effectType: 'Damage', value: 100, targetType: 'single', duration: 0 },
+    ],
     ...overrides,
   };
 }
@@ -147,102 +146,78 @@ const markEffect = makeEffect({
 const shieldWallAbility = makeAbility({
   id: SHIELD_WALL_ID,
   name: 'Shield Wall',
-  effectType: 'Buff Defense',
-  value: 25,
   cooldown: 4,
-  targetType: 'self',
-  duration: 2,
+  effects: [{ effectType: 'Buff Defense', value: 25, targetType: 'self', duration: 2 }],
 });
 
 const disarmTrapAbility = makeAbility({
   id: DISARM_TRAP_ID,
   name: 'Disarm Trap',
-  effectType: 'Disarm',
-  value: 60,
   cooldown: 0,
-  targetType: 'single',
+  effects: [{ effectType: 'Disarm', value: 60, targetType: 'single', duration: 0 }],
 });
 
 const backstabAbility = makeAbility({
   id: BACKSTAB_ID,
   name: 'Backstab',
-  effectType: 'Damage',
-  value: 200,
   cooldown: 3,
-  targetType: 'single',
+  effects: [{ effectType: 'Damage', value: 200, targetType: 'single', duration: 0 }],
 });
 
 const arcaneBoltAbility = makeAbility({
   id: ARCANE_BOLT_ID,
   name: 'Arcane Bolt',
-  effectType: 'Magic Damage',
-  value: 150,
   cooldown: 2,
-  targetType: 'single',
+  effects: [{ effectType: 'Magic Damage', value: 150, targetType: 'single', duration: 0 }],
 });
 
 const dispelAbility = makeAbility({
   id: DISPEL_ID,
   name: 'Dispel',
-  effectType: 'Dispel',
-  value: 0,
   cooldown: 3,
-  targetType: 'single',
+  effects: [{ effectType: 'Dispel', value: 0, targetType: 'single', duration: 0 }],
 });
 
 const healAbility = makeAbility({
   id: HEAL_ID,
   name: 'Heal',
-  effectType: 'Heal',
-  value: 20,
   cooldown: 3,
-  targetType: 'single',
+  effects: [{ effectType: 'Heal', value: 20, targetType: 'single', duration: 0 }],
 });
 
 const turnUndeadAbility = makeAbility({
   id: TURN_UNDEAD_ID,
   name: 'Turn Undead',
-  effectType: 'Damage',
-  value: 150,
   cooldown: 2,
-  targetType: 'aoe',
+  effects: [{ effectType: 'Damage', value: 150, targetType: 'aoe', duration: 0 }],
 });
 
 const smiteEvilAbility = makeAbility({
   id: SMITE_EVIL_ID,
   name: 'Smite Evil',
-  effectType: 'Damage',
-  value: 200,
   cooldown: 2,
-  targetType: 'single',
+  effects: [{ effectType: 'Damage', value: 200, targetType: 'single', duration: 0 }],
 });
 
 const auraOfCourageAbility = makeAbility({
   id: AURA_OF_COURAGE_ID,
   name: 'Aura of Courage',
-  effectType: 'Fear Immunity',
-  value: 0,
   cooldown: 0,
-  targetType: 'aoe',
+  effects: [{ effectType: 'Fear Immunity', value: 0, targetType: 'aoe', duration: 0 }],
 });
 
 const scoutAbility = makeAbility({
   id: SCOUT_ID,
   name: 'Scout',
-  effectType: 'Scout',
-  value: 2,
   cooldown: 0,
-  targetType: 'self',
+  effects: [{ effectType: 'Scout', value: 2, targetType: 'self', duration: 0 }],
 });
 
 const markTargetAbility = makeAbility({
   id: MARK_TARGET_ID,
   name: 'Mark Target',
-  effectType: 'Mark',
-  value: 20,
   cooldown: 0,
-  targetType: 'single',
-  duration: 3,
+  effects: [{ effectType: 'Mark', value: 20, targetType: 'single', duration: 3 }],
 });
 
 // --- Invader definitions ---
@@ -499,10 +474,10 @@ describe('invaderResolveAbility', () => {
     const invader = makeInvaderInstance();
     const result = invaderResolveAbility(invader, shieldWallAbility, ['enemy-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Buff Defense');
-    expect(result!.value).toBe(25);
-    expect(result!.duration).toBe(2);
-    expect(result!.targetIds).toEqual([invader.id]);
+    expect(result!.effects[0].effectType).toBe('Buff Defense');
+    expect(result!.effects[0].value).toBe(25);
+    expect(result!.effects[0].duration).toBe(2);
+    expect(result!.effects[0].targetIds).toEqual([invader.id]);
     expect(result!.cooldownApplied).toBe(4);
   });
 
@@ -516,8 +491,8 @@ describe('invaderResolveAbility', () => {
     const result = invaderResolveAbility(invader, backstabAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     // Rogue attack = 6, value = 200% → 6 * 2 = 12
-    expect(result!.value).toBe(12);
-    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
+    expect(result!.effects[0].value).toBe(12);
+    expect(result!.effects[0].targetIds).toEqual(['target-1' as CombatantId]);
   });
 
   it('Arcane Bolt deals magic damage based on mage attack', () => {
@@ -530,8 +505,8 @@ describe('invaderResolveAbility', () => {
     const result = invaderResolveAbility(invader, arcaneBoltAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
     // Mage attack = 10, value = 150% → 10 * 1.5 = 15
-    expect(result!.value).toBe(15);
-    expect(result!.effectType).toBe('Magic Damage');
+    expect(result!.effects[0].value).toBe(15);
+    expect(result!.effects[0].effectType).toBe('Magic Damage');
   });
 
   it('Turn Undead deals AOE damage to all targets', () => {
@@ -545,8 +520,8 @@ describe('invaderResolveAbility', () => {
     const result = invaderResolveAbility(invader, turnUndeadAbility, targets);
     expect(result).toBeDefined();
     // Cleric attack = 4, value = 150% → 4 * 1.5 = 6
-    expect(result!.value).toBe(6);
-    expect(result!.targetIds).toEqual(targets);
+    expect(result!.effects[0].value).toBe(6);
+    expect(result!.effects[0].targetIds).toEqual(targets);
   });
 
   it('Aura of Courage targets all allies', () => {
@@ -559,8 +534,8 @@ describe('invaderResolveAbility', () => {
     const allies = ['ally-1' as CombatantId, 'ally-2' as CombatantId];
     const result = invaderResolveAbility(invader, auraOfCourageAbility, allies);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Fear Immunity');
-    expect(result!.targetIds).toEqual(allies);
+    expect(result!.effects[0].effectType).toBe('Fear Immunity');
+    expect(result!.effects[0].targetIds).toEqual(allies);
   });
 
   it('Scout targets self with rooms-to-reveal value', () => {
@@ -572,9 +547,9 @@ describe('invaderResolveAbility', () => {
     });
     const result = invaderResolveAbility(invader, scoutAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Scout');
-    expect(result!.value).toBe(2);
-    expect(result!.targetIds).toEqual([invader.id]);
+    expect(result!.effects[0].effectType).toBe('Scout');
+    expect(result!.effects[0].value).toBe(2);
+    expect(result!.effects[0].targetIds).toEqual([invader.id]);
   });
 
   it('Mark Target applies damage amplification with duration', () => {
@@ -586,10 +561,10 @@ describe('invaderResolveAbility', () => {
     });
     const result = invaderResolveAbility(invader, markTargetAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Mark');
-    expect(result!.value).toBe(20);
-    expect(result!.duration).toBe(3);
-    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
+    expect(result!.effects[0].effectType).toBe('Mark');
+    expect(result!.effects[0].value).toBe(20);
+    expect(result!.effects[0].duration).toBe(3);
+    expect(result!.effects[0].targetIds).toEqual(['target-1' as CombatantId]);
   });
 
   it('Dispel returns dispel effect with zero value', () => {
@@ -601,9 +576,9 @@ describe('invaderResolveAbility', () => {
     });
     const result = invaderResolveAbility(invader, dispelAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Dispel');
-    expect(result!.value).toBe(0);
-    expect(result!.targetIds).toEqual(['target-1' as CombatantId]);
+    expect(result!.effects[0].effectType).toBe('Dispel');
+    expect(result!.effects[0].value).toBe(0);
+    expect(result!.effects[0].targetIds).toEqual(['target-1' as CombatantId]);
   });
 });
 
@@ -622,8 +597,8 @@ describe('Rogue disarm', () => {
     // rng returns 0.3 → roll = 30 → 30 <= 60 → success
     const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1' as CombatantId], () => 0.3);
     expect(result).toBeDefined();
-    expect(result!.effectType).toBe('Disarm');
-    expect(result!.value).toBe(1);
+    expect(result!.effects[0].effectType).toBe('Disarm');
+    expect(result!.effects[0].value).toBe(1);
   });
 
   it('returns failure (value=0) on failed roll', () => {
@@ -636,7 +611,7 @@ describe('Rogue disarm', () => {
     // rng returns 0.8 → roll = 80 → 80 > 60 → failure
     const result = invaderResolveAbility(invader, disarmTrapAbility, ['trap-1' as CombatantId], () => 0.8);
     expect(result).toBeDefined();
-    expect(result!.value).toBe(0);
+    expect(result!.effects[0].value).toBe(0);
   });
 });
 
@@ -653,8 +628,8 @@ describe('Cleric heal', () => {
     const result = invaderResolveAbility(invader, healAbility, ['ally-1' as CombatantId]);
     expect(result).toBeDefined();
     // maxHp = 20, value = 20% → 20 * 0.2 = 4
-    expect(result!.value).toBe(4);
-    expect(result!.effectType).toBe('Heal');
+    expect(result!.effects[0].value).toBe(4);
+    expect(result!.effects[0].effectType).toBe('Heal');
   });
 
   it('invaderApplyHealing caps at maxHp', () => {
@@ -745,9 +720,9 @@ describe('Paladin Smite Evil', () => {
     const result = invaderResolveAbility(invader, smiteEvilAbility, ['corrupted-1' as CombatantId]);
     expect(result).toBeDefined();
     // Paladin attack = 7, value = 200% → 7 * 2 = 14
-    expect(result!.value).toBe(14);
-    expect(result!.effectType).toBe('Damage');
-    expect(result!.targetIds).toEqual(['corrupted-1' as CombatantId]);
+    expect(result!.effects[0].value).toBe(14);
+    expect(result!.effects[0].effectType).toBe('Damage');
+    expect(result!.effects[0].targetIds).toEqual(['corrupted-1' as CombatantId]);
     expect(result!.cooldownApplied).toBe(2);
   });
 });

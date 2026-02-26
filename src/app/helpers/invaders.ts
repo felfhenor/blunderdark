@@ -5,6 +5,7 @@ import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-
 import type { InvaderContent } from '@interfaces/content-invader';
 import type {
   AbilityResult,
+  AbilityResultEffect,
   InvaderInstance,
   InvaderInstanceId,
 } from '@interfaces/invader';
@@ -66,54 +67,54 @@ export function invaderResolveAbility(
   const state = invader.abilityStates.find((s) => s.abilityId === ability.id);
   if (!state || state.currentCooldown > 0) return undefined;
 
-  // Look up effect definition by ability's effectType (name-based lookup)
-  const effect = contentGetEntry<AbilityEffectContent>(
-    ability.effectType,
-  );
-  if (!effect) return undefined;
+  const resultEffects: AbilityResultEffect[] = [];
 
-  let value = 0;
+  for (const abilityEffect of ability.effects) {
+    const effectDef = contentGetEntry<AbilityEffectContent>(abilityEffect.effectType);
+    if (!effectDef) continue;
 
-  if (effect.dealsDamage) {
-    // Damage abilities: value based on invader attack * ability value percentage
-    const definition = invaderGetDefinitionById(invader.definitionId);
-    const attack = definition?.baseStats.attack ?? 0;
-    value = Math.round(attack * (ability.value / 100));
-  } else if (effect.statusName === 'healing') {
-    // Heal: value is percentage of target's max HP (use invader's maxHp for self-heal)
-    value = Math.round(invader.maxHp * (ability.value / 100));
-  } else if (effect.statusName === 'disarm') {
-    // Disarm: roll for success. value = 1 (success) or 0 (failure)
-    const roll = rng() * 100;
-    value = roll <= ability.value ? 1 : 0;
-  } else if (effect.statusName === 'marked') {
-    // Mark: value is the damage amplification percentage
-    value = ability.value;
-  } else if (effect.statusName === 'shielded') {
-    // Shield/damage reduction: value is the defense buff percentage
-    value = ability.value;
-  } else if (effect.statusName === 'scouting') {
-    // Scout: value is rooms to reveal
-    value = ability.value;
+    let value = 0;
+
+    if (effectDef.dealsDamage) {
+      const definition = invaderGetDefinitionById(invader.definitionId);
+      const attack = definition?.baseStats.attack ?? 0;
+      value = Math.round(attack * (abilityEffect.value / 100));
+    } else if (effectDef.statusName === 'healing') {
+      value = Math.round(invader.maxHp * (abilityEffect.value / 100));
+    } else if (effectDef.statusName === 'disarm') {
+      const roll = rng() * 100;
+      value = roll <= abilityEffect.value ? 1 : 0;
+    } else if (effectDef.statusName === 'marked') {
+      value = abilityEffect.value;
+    } else if (effectDef.statusName === 'shielded') {
+      value = abilityEffect.value;
+    } else if (effectDef.statusName === 'scouting') {
+      value = abilityEffect.value;
+    }
+    // courage, dispel: value stays 0
+
+    // Determine affected targets per effect
+    const affectedTargetIds: CombatantId[] = [];
+    if (abilityEffect.targetType === 'self') {
+      affectedTargetIds.push(invader.id as unknown as CombatantId);
+    } else if (abilityEffect.targetType === 'aoe') {
+      affectedTargetIds.push(...targetIds);
+    } else if (targetIds.length > 0) {
+      affectedTargetIds.push(targetIds[0]);
+    }
+
+    resultEffects.push({
+      effectType: abilityEffect.effectType,
+      value,
+      duration: abilityEffect.duration,
+      targetIds: affectedTargetIds,
+    });
   }
-  // courage, dispel: value stays 0
 
-  // Determine affected targets
-  const affectedTargetIds: CombatantId[] = [];
-  if (ability.targetType === 'self') {
-    affectedTargetIds.push(invader.id as unknown as CombatantId);
-  } else if (ability.targetType === 'aoe') {
-    affectedTargetIds.push(...targetIds);
-  } else if (targetIds.length > 0) {
-    // single target — first target
-    affectedTargetIds.push(targetIds[0]);
-  }
+  if (resultEffects.length === 0) return undefined;
 
   return {
-    effectType: ability.effectType,
-    value,
-    duration: ability.duration,
-    targetIds: affectedTargetIds,
+    effects: resultEffects,
     cooldownApplied: ability.cooldown,
   };
 }
