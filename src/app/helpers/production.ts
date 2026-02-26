@@ -780,6 +780,7 @@ export function productionCalculateBreakdowns(
         breakdowns[resourceType].base += amount;
         breakdowns[resourceType].final += amount;
       }
+
     }
   }
 
@@ -892,9 +893,9 @@ export function productionCalculateDetailedBreakdown(
         effectiveBase = totalBase;
       }
 
-      // Skip rooms with no relevant production
+      // Skip rooms with no relevant production (but allow negative production like drain)
       if (
-        effectiveBase <= 0 &&
+        effectiveBase === 0 &&
         !hasConversion
       ) {
         const flatProd = featureCalculateFlatProduction(
@@ -1124,9 +1125,15 @@ export function productionProcess(state: GameState, numTicks = 1): void {
   );
 
   for (const [type, amount] of Object.entries(production)) {
-    if (!amount || amount <= 0) continue;
+    if (!amount) continue;
     const resourceType = type as ResourceType;
 
-    resourceAdd(resourceType, amount * numTicks);
+    if (amount > 0) {
+      resourceAdd(resourceType, amount * numTicks);
+    } else {
+      // Handle negative production (e.g. Purification Chamber reducing corruption)
+      const resource = state.world.resources[resourceType];
+      resource.current = Math.max(0, resource.current + amount * numTicks);
+    }
   }
 }

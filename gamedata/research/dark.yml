@@ -7,7 +7,10 @@
 #   │   └── Soul Well Mastery (T3)
 #   ├── Shadow Magic (T2) [+Blighted Grove]
 #   │   └── Corruption Control (T3) [+Corrupted Mine]
-#   │       └── Shadow Weaving (T4) [+Shadow Magic]
+#   │       ├── Shadow Weaving (T4) [+Shadow Magic]
+#   │       └── Purification Rites (T4) [+Purification Chamber]
+#   │           ├── Purification Mastery (T5) [+Sanctified Basin, +Warding Pillars]
+#   │           └── Abyssal Purification (T5) [+Abyssal Filter]
 #   ├── Necromancy (T2)
 #   │   └── Undead Mastery (T3)
 #   │       └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
@@ -191,6 +194,22 @@
   tier: 4
   requiredTicks: 500
 
+- id: 72b0062a-ac4e-452a-a8e0-a1d6f54d50cb
+  name: Purification Rites
+  description: Discover the ancient rites of purification, enabling the construction of chambers that drain corruption from the dungeon.
+  branch: dark
+  cost:
+    research: 100
+    essence: 30
+    corruption: 10
+  prerequisiteResearchIds:
+    - Corruption Control
+  unlocks:
+    - type: room
+      targetRoomId: Purification Chamber
+  tier: 4
+  requiredTicks: 500
+
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge
   description: Forge captured souls into powerful artifacts, imbue minions with stolen life force, and channel abyssal energies through the soul well.
@@ -281,6 +300,40 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Medusa
+  tier: 5
+  requiredTicks: 750
+
+- id: d5d60545-90a0-4f52-9000-ec2e6a7c63e2
+  name: Purification Mastery
+  description: Perfect the art of purification, unlocking advanced upgrades that enhance the chamber's drain rate and suppression aura.
+  branch: dark
+  cost:
+    research: 200
+    essence: 45
+    corruption: 20
+  prerequisiteResearchIds:
+    - Purification Rites
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Sanctified Basin
+    - type: roomupgrade
+      targetRoomupgradeId: Warding Pillars
+  tier: 5
+  requiredTicks: 600
+
+- id: c7f82a5e-cc60-4c23-bffb-935176664593
+  name: Abyssal Purification
+  description: Harness the power of the abyss to fuel purification, unlocking a dark upgrade that doubles drain rate and converts drained corruption into essence.
+  branch: dark
+  cost:
+    research: 200
+    essence: 60
+    corruption: 30
+  prerequisiteResearchIds:
+    - Purification Rites
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Abyssal Filter
   tier: 5
   requiredTicks: 750
 

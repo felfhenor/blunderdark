@@ -1,0 +1,34 @@
+- id: be85408d-2c41-4ebc-ac06-64d92877999c
+  name: Sanctified Basin
+  description: Line the chamber floor with blessed basins that collect and neutralize corruption more efficiently, boosting purification by 50%.
+  cost:
+    gold: 100
+    crystals: 50
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+- id: 319dd304-5eef-40e8-af3a-162f5e48dd9f
+  name: Warding Pillars
+  description: Erect enchanted pillars around the chamber that strengthen its purification power and allow one more worker to assist.
+  cost:
+    gold: 120
+    essence: 30
+  effects:
+    - type: productionMultiplier
+      value: 1.25
+    - type: maxInhabitantBonus
+      value: 1
+- id: ea877a6f-77d2-4aed-b453-12e77275b1b2
+  name: Abyssal Filter
+  description: Install a void-touched filter that harnesses corruption itself to fuel the purification process, doubling purification rate and converting a fraction into essence.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 150
+    crystals: 60
+    corruption: 10
+  effects:
+    - type: productionMultiplier
+      value: 2.0
+    - type: secondaryProduction
+      value: 0.15
+      resource: essence
