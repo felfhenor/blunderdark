@@ -3,6 +3,7 @@ import type { CapturedPrisoner, PrisonerAction } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-prisoners-phase',
+  host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
       <div class="text-center mb-4">

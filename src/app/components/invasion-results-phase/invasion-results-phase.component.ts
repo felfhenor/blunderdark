@@ -16,6 +16,7 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
 
 @Component({
   selector: 'app-invasion-results-phase',
+  host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
       @if (result(); as res) {
@@ -64,10 +65,8 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
           </div>
         </div>
 
-        <div class="text-center mt-3">
-          <span class="badge badge-sm">
-            End reason: {{ endReasonLabel(res.detailedResult.endReason) }}
-          </span>
+        <div class="alert mt-4 max-w-md mx-auto" [class.alert-success]="isVictory()" [class.alert-error]="!isVictory()">
+          <span>{{ endReasonLabel(res.detailedResult.endReason) }}</span>
         </div>
       }
     </div>
