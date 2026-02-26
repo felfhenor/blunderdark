@@ -372,11 +372,11 @@ describe('Lich Scholarly trait: 40% research bonus', () => {
     ];
 
     const result = productionCalculateInhabitantBonus(library, inhabitants);
-    // Lich: workerEfficiency (1.0 - 1.0) = 0
+    // Lich: workerEfficiency 1.0
     // Scholarly: +0.4 (targetResourceType: research, library produces research)
     // Library Specialist: +0.2 (targetRoomId: Shadow Library, matches)
-    // Total: 0.6
-    expect(result.bonus).toBeCloseTo(0.6);
+    // Total: 1.6
+    expect(result.bonus).toBeCloseTo(1.6);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -392,10 +392,10 @@ describe('Lich Scholarly trait: 40% research bonus', () => {
     ];
 
     const result = productionCalculateInhabitantBonus(mine, inhabitants);
-    // Lich: workerEfficiency (1.0 - 1.0) = 0
+    // Lich: workerEfficiency 1.0
     // Scholarly: NOT applied (crystal mine doesn't produce research)
     // Room-targeted traits: NOT applied (not matching rooms)
-    expect(result.bonus).toBeCloseTo(0);
+    expect(result.bonus).toBeCloseTo(1.0);
   });
 });
 
@@ -661,8 +661,8 @@ describe('Lich Throne Room interaction: +10% Research', () => {
     //   BUT Throne Room doesn't produce research, so this bonus doesn't apply through production
     // Library Specialist: NOT applied (wrong room)
     // Soul Siphon: NOT applied (wrong room, wrong resource)
-    // workerEfficiency: (1.0 - 1.0) = 0
-    expect(result.bonus).toBeCloseTo(0);
+    // workerEfficiency: 1.0
+    expect(result.bonus).toBeCloseTo(1.0);
   });
 });
 
@@ -683,9 +683,9 @@ describe('Lich Shadow Library interaction: total +60% Research', () => {
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // Scholarly: +0.4 (research production present)
     // Library Specialist: +0.2 (targetRoomId matches Shadow Library)
-    // workerEfficiency: (1.0 - 1.0) = 0
-    // Total: 0.6 (60%)
-    expect(result.bonus).toBeCloseTo(0.6);
+    // workerEfficiency: 1.0
+    // Total: 1.6
+    expect(result.bonus).toBeCloseTo(1.6);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -703,8 +703,8 @@ describe('Lich Shadow Library interaction: total +60% Research', () => {
 
     const result = productionCalculateInhabitantBonus(throne, inhabitants);
     // Throne Room produces gold, not research
-    // No research-related traits apply
-    expect(result.bonus).toBeCloseTo(0);
+    // No research-related traits apply, but workerEfficiency 1.0
+    expect(result.bonus).toBeCloseTo(1.0);
   });
 });
 
@@ -729,8 +729,8 @@ describe('Lich Soul Well interaction: double essence', () => {
     const result = productionCalculateInhabitantBonus(soulWell, inhabitants);
     // Soul Siphon: +1.0 (targetRoomId = Soul Well, targetResourceType = essence, room produces essence)
     // Scholarly: NOT applied (Soul Well doesn't produce research)
-    // workerEfficiency: (1.0 - 1.0) = 0
-    expect(result.bonus).toBeCloseTo(1.0);
+    // workerEfficiency: 1.0
+    expect(result.bonus).toBeCloseTo(2.0);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -748,6 +748,7 @@ describe('Lich Soul Well interaction: double essence', () => {
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // In Shadow Library: only Scholarly (+0.4) and Library Specialist (+0.2) apply
     // Soul Siphon: NOT applied (not Soul Well)
-    expect(result.bonus).toBeCloseTo(0.6);
+    // workerEfficiency: 1.0
+    expect(result.bonus).toBeCloseTo(1.6);
   });
 });

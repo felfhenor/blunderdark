@@ -384,8 +384,8 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Goblin: workerEfficiency 1.0 → (1.0 - 1.0) = 0, plus production_bonus 0.2 = 0.2
-    expect(result.bonus).toBeCloseTo(0.2);
+    // Goblin: workerEfficiency 1.0, plus production_bonus 0.2 = 1.2
+    expect(result.bonus).toBeCloseTo(1.2);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -407,8 +407,8 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Two Goblins: (0 + 0.2) * 2 = 0.4
-    expect(result.bonus).toBeCloseTo(0.4);
+    // Two Goblins: (1.0 + 0.2) * 2 = 2.4
+    expect(result.bonus).toBeCloseTo(2.4);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -430,14 +430,14 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Goblin: (1.0-1.0) + 0.2 = 0.2
-    // Myconid: (1.3-1.0) + 0.15 = 0.45
-    // Total: 0.65
-    expect(result.bonus).toBeCloseTo(0.65);
+    // Goblin: 1.0 + 0.2 = 1.2
+    // Myconid: 1.3 + 0.15 = 1.45
+    // Total: 2.65
+    expect(result.bonus).toBeCloseTo(2.65);
     expect(result.hasWorkers).toBe(true);
   });
 
-  it('should include workerEfficiency below 1.0 as negative bonus', () => {
+  it('should include workerEfficiency below 1.0 as positive bonus', () => {
     const inhabitants: InhabitantInstance[] = [
       {
         instanceId: 'inst-1' as InhabitantInstanceId,
@@ -448,8 +448,8 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Skeleton: (0.7-1.0) = -0.3, no production_bonus trait (defense_bonus ignored)
-    expect(result.bonus).toBeCloseTo(-0.3);
+    // Skeleton: workerEfficiency 0.7, no production_bonus trait (defense_bonus ignored)
+    expect(result.bonus).toBeCloseTo(0.7);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -465,8 +465,8 @@ describe('productionCalculateInhabitantBonus', () => {
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
     // Skeleton has defense_bonus trait, not production_bonus — should be ignored
-    // Only workerEfficiency contributes: (0.7 - 1.0) = -0.3
-    expect(result.bonus).toBeCloseTo(-0.3);
+    // Only workerEfficiency contributes: 0.7
+    expect(result.bonus).toBeCloseTo(0.7);
   });
 
   it('should skip inhabitants with unknown definitions', () => {
@@ -509,8 +509,8 @@ describe('Wraith Scholar trait in research rooms', () => {
       shadowLibrary,
       inhabitants,
     );
-    // Wraith: workerEfficiency (1.1 - 1.0) = 0.1, plus Scholar production_bonus 0.2 = 0.3
-    expect(result.bonus).toBeCloseTo(0.3);
+    // Wraith: workerEfficiency 1.1, plus Scholar production_bonus 0.2 = 1.3
+    expect(result.bonus).toBeCloseTo(1.3);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -535,8 +535,8 @@ describe('Wraith Scholar trait in research rooms', () => {
       crystalMineRoom,
       inhabitants,
     );
-    // Wraith in crystal mine: workerEfficiency (1.1 - 1.0) = 0.1, Scholar does NOT apply (research != crystals)
-    expect(result.bonus).toBeCloseTo(0.1);
+    // Wraith in crystal mine: workerEfficiency 1.1, Scholar does NOT apply (research != crystals)
+    expect(result.bonus).toBeCloseTo(1.1);
   });
 
   it('should stack Scholar bonus with other inhabitants', () => {
@@ -560,10 +560,10 @@ describe('Wraith Scholar trait in research rooms', () => {
       shadowLibrary,
       inhabitants,
     );
-    // Wraith: (1.1 - 1.0) + 0.2 = 0.3
-    // Goblin: (1.0 - 1.0) + 0.2 = 0.2 (Goblin's production_bonus has no targetResourceType, applies to all)
-    // Total: 0.5
-    expect(result.bonus).toBeCloseTo(0.5);
+    // Wraith: 1.1 + 0.2 = 1.3
+    // Goblin: 1.0 + 0.2 = 1.2 (Goblin's production_bonus has no targetResourceType, applies to all)
+    // Total: 2.5
+    expect(result.bonus).toBeCloseTo(2.5);
   });
 });
 
@@ -984,8 +984,8 @@ describe('productionCalculateTotal', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateTotal([floor]);
-    // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 modifier = 1.2
-    expect(production['crystals']).toBeCloseTo(1.2);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait) * 1.0 modifier = 2.2
+    expect(production['crystals']).toBeCloseTo(2.2);
   });
 
   it('should sum production across multiple rooms', () => {
@@ -1045,10 +1045,10 @@ describe('productionCalculateTotal', () => {
     ];
     const floor = makeFloor([mine, forge], inhabitants);
     const production = productionCalculateTotal([floor]);
-    // Mine: base 1.0 * (1 + (-0.3 skeleton) + 0.1 adj) * 1.0 = 1.0 * 0.8 = 0.8
-    // Forge: base 1.2 * (1 + (-0.3 skeleton) + 0.15 adj) * 1.0 = 1.2 * 0.85 = 1.02
-    expect(production['crystals']).toBeCloseTo(0.8);
-    expect(production['gold']).toBeCloseTo(1.02);
+    // Mine: base 1.0 * (1 + 0.7 skeleton + 0.1 adj) * 1.0 = 1.0 * 1.8 = 1.8
+    // Forge: base 1.2 * (1 + 0.7 skeleton + 0.15 adj) * 1.0 = 1.2 * 1.85 = 2.22
+    expect(production['crystals']).toBeCloseTo(1.8);
+    expect(production['gold']).toBeCloseTo(2.22);
   });
 });
 
@@ -1147,8 +1147,8 @@ describe('productionCalculateSingleRoom', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateSingleRoom(mine, floor);
-    // Base 1.0 * (1 + 0.2 goblin bonus) * 1.0 = 1.2
-    expect(production['crystals']).toBeCloseTo(1.2);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait) * 1.0 = 2.2
+    expect(production['crystals']).toBeCloseTo(2.2);
   });
 
   it('should include adjacency bonus when adjacent rooms exist', () => {
@@ -1177,8 +1177,8 @@ describe('productionCalculateSingleRoom', () => {
     ];
     const floor = makeFloor([mine, forge], inhabitants);
     const production = productionCalculateSingleRoom(mine, floor);
-    // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
-    expect(production['crystals']).toBeCloseTo(1.3);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait + 0.1 adj) * 1.0 = 2.3
+    expect(production['crystals']).toBeCloseTo(2.3);
   });
 
   it('should return empty for non-existent room type', () => {
@@ -1224,7 +1224,7 @@ describe('production changes on assignment state changes', () => {
       ],
     );
     const prodAssigned = productionCalculateSingleRoom(mine, floorAssigned);
-    expect(prodAssigned['crystals']).toBeCloseTo(1.2);
+    expect(prodAssigned['crystals']).toBeCloseTo(2.2);
   });
 
   it('should reduce production when inhabitant is unassigned from a multi-worker room', () => {
@@ -1257,8 +1257,8 @@ describe('production changes on assignment state changes', () => {
       ],
     );
     const prodTwo = productionCalculateSingleRoom(mine, floorTwo);
-    // Base 1.0 * (1 + 0.2 + 0.2) = 1.4
-    expect(prodTwo['crystals']).toBeCloseTo(1.4);
+    // Base 1.0 * (1 + 1.0+0.2 + 1.0+0.2) = 3.4
+    expect(prodTwo['crystals']).toBeCloseTo(3.4);
 
     // Unassign one (only one remains)
     const floorOne = makeFloor(
@@ -1281,8 +1281,8 @@ describe('production changes on assignment state changes', () => {
       ],
     );
     const prodOne = productionCalculateSingleRoom(mine, floorOne);
-    // Base 1.0 * (1 + 0.2) = 1.2
-    expect(prodOne['crystals']).toBeCloseTo(1.2);
+    // Base 1.0 * (1 + 1.0 + 0.2) = 2.2
+    expect(prodOne['crystals']).toBeCloseTo(2.2);
   });
 
   it('should reflect assignment changes in total production across floors', () => {
@@ -1315,7 +1315,7 @@ describe('production changes on assignment state changes', () => {
       ),
     ];
     const totalAssigned = productionCalculateTotal(floorsAssigned);
-    expect(totalAssigned['crystals']).toBeCloseTo(1.2);
+    expect(totalAssigned['crystals']).toBeCloseTo(2.2);
   });
 });
 
@@ -1447,14 +1447,14 @@ describe('adjacency bonus deactivation on removal', () => {
     // With forge adjacent: bonus applies
     const floorWithForge = makeFloor([mine, forge], inhabitants);
     const prodWith = productionCalculateSingleRoom(mine, floorWithForge);
-    // Base 1.0 * (1 + 0.2 goblin + 0.1 adj) * 1.0 = 1.3
-    expect(prodWith['crystals']).toBeCloseTo(1.3);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait + 0.1 adj) * 1.0 = 2.3
+    expect(prodWith['crystals']).toBeCloseTo(2.3);
 
     // After removing forge: bonus gone
     const floorWithoutForge = makeFloor([mine], inhabitants);
     const prodWithout = productionCalculateSingleRoom(mine, floorWithoutForge);
-    // Base 1.0 * (1 + 0.2 goblin) * 1.0 = 1.2
-    expect(prodWithout['crystals']).toBeCloseTo(1.2);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait) * 1.0 = 2.2
+    expect(prodWithout['crystals']).toBeCloseTo(2.2);
   });
 
   it('should not share adjacency bonuses across floors', () => {
@@ -1487,8 +1487,8 @@ describe('adjacency bonus deactivation on removal', () => {
     const floor2 = makeFloor([forge]);
     const production = productionCalculateTotal([floor1, floor2]);
     // Mine gets NO adjacency bonus (forge is on different floor)
-    // Base 1.0 * (1 + 0.2 goblin) = 1.2
-    expect(production['crystals']).toBeCloseTo(1.2);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.2 trait) = 2.2
+    expect(production['crystals']).toBeCloseTo(2.2);
   });
 });
 
@@ -1537,8 +1537,8 @@ describe('productionCalculateBreakdowns', () => {
     const floor = makeFloor([mine], inhabitants);
     const breakdowns = productionCalculateBreakdowns([floor]);
     expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
-    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
-    expect(breakdowns['crystals'].final).toBeCloseTo(1.2);
+    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(1.2);
+    expect(breakdowns['crystals'].final).toBeCloseTo(2.2);
   });
 
   it('should include adjacency bonus in breakdown', () => {
@@ -1574,11 +1574,11 @@ describe('productionCalculateBreakdowns', () => {
     ];
     const floor = makeFloor([mine, forge], inhabitants);
     const breakdowns = productionCalculateBreakdowns([floor]);
-    // Mine: base 1.0, iBonus 0.2, aBonus 0.1, final = 1.0 * (1 + 0.2 + 0.1) = 1.3
+    // Mine: base 1.0, iBonus 1.2, aBonus 0.1, final = 1.0 * (1 + 1.2 + 0.1) = 2.3
     expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
-    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(0.2);
+    expect(breakdowns['crystals'].inhabitantBonus).toBeCloseTo(1.2);
     expect(breakdowns['crystals'].adjacencyBonus).toBeCloseTo(0.1);
-    expect(breakdowns['crystals'].final).toBeCloseTo(1.3);
+    expect(breakdowns['crystals'].final).toBeCloseTo(2.3);
   });
 });
 
@@ -1603,8 +1603,8 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateSingleRoom(mine, floor);
-    // Base 1.0 * (1 + 0.2 goblin bonus) = 1.2, then * 1.5 multiplier = 1.8
-    expect(production['crystals']).toBeCloseTo(1.8);
+    // Base 1.0 * (1 + 1.0 + 0.2 goblin) = 2.2, then * 1.5 multiplier = 3.3
+    expect(production['crystals']).toBeCloseTo(3.3);
   });
 
   it('should add secondaryProduction from upgrade to single room production', () => {
@@ -1627,9 +1627,9 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateSingleRoom(mine, floor);
-    // Base crystals: 1.0 * (1 + 0.2) = 1.2
+    // Base crystals: 1.0 * (1 + 1.0 + 0.2) = 2.2
     // Secondary flux: 0.2 (flat bonus from upgrade)
-    expect(production['crystals']).toBeCloseTo(1.2);
+    expect(production['crystals']).toBeCloseTo(2.2);
     expect(production['flux']).toBeCloseTo(0.2);
   });
 
@@ -1653,7 +1653,7 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateTotal([floor]);
-    expect(production['crystals']).toBeCloseTo(1.2);
+    expect(production['crystals']).toBeCloseTo(2.2);
     expect(production['flux']).toBeCloseTo(0.2);
   });
 
@@ -1676,8 +1676,8 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const production = productionCalculateSingleRoom(mine, floor);
-    // No upgrade: base 1.0 * (1 + 0.2) = 1.2, no flux
-    expect(production['crystals']).toBeCloseTo(1.2);
+    // No upgrade: base 1.0 * (1 + 1.0 + 0.2) = 2.2, no flux
+    expect(production['crystals']).toBeCloseTo(2.2);
     expect(production['flux']).toBeUndefined();
   });
 
@@ -1701,9 +1701,9 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const breakdowns = productionCalculateBreakdowns([floor]);
-    // Base 1.0 * (1 + 0.2) = 1.2, then * 1.5 = 1.8
+    // Base 1.0 * (1 + 1.0 + 0.2) = 2.2, then * 1.5 = 3.3
     expect(breakdowns['crystals'].base).toBeCloseTo(1.0);
-    expect(breakdowns['crystals'].final).toBeCloseTo(1.8);
+    expect(breakdowns['crystals'].final).toBeCloseTo(3.3);
   });
 
   it('should include secondaryProduction in breakdowns', () => {
@@ -1726,7 +1726,7 @@ describe('upgrade effects in production', () => {
     ];
     const floor = makeFloor([mine], inhabitants);
     const breakdowns = productionCalculateBreakdowns([floor]);
-    expect(breakdowns['crystals'].final).toBeCloseTo(1.2);
+    expect(breakdowns['crystals'].final).toBeCloseTo(2.2);
     expect(breakdowns['flux']).toBeDefined();
     expect(breakdowns['flux'].base).toBeCloseTo(0.2);
     expect(breakdowns['flux'].final).toBeCloseTo(0.2);

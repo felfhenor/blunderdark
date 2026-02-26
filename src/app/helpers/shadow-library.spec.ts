@@ -290,8 +290,8 @@ describe('Shadow Library: base production', () => {
     ];
     const floor = makeFloor([library], inhabitants);
     const production = productionCalculateTotal([floor]);
-    // Base 0.6 * (1 + (0.7 - 1.0) workerEfficiency) = 0.6 * 0.7 = 0.42
-    expect(production['research']).toBeCloseTo(0.42);
+    // Base 0.6 * (1 + 0.7 workerEfficiency) = 0.6 * 1.7 = 1.02
+    expect(production['research']).toBeCloseTo(1.02);
   });
 });
 
@@ -488,7 +488,7 @@ describe('Shadow Library: full production with adjacency', () => {
     ];
     const floor = makeFloor([library, well], inhabitants);
     const production = productionCalculateSingleRoom(library, floor);
-    // Base 0.6 * (1 + (0.7-1.0) workerEff + 0.15 adjacency) = 0.6 * 0.85 = 0.51
-    expect(production['research']).toBeCloseTo(0.51);
+    // Base 0.6 * (1 + 0.7 workerEff + 0.15 adjacency) = 0.6 * 1.85 = 1.11
+    expect(production['research']).toBeCloseTo(1.11);
   });
 });

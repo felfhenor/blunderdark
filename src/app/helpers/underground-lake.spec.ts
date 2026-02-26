@@ -284,8 +284,8 @@ describe('Underground Lake: base production', () => {
     ];
     const floor = makeFloor([lake], inhabitants);
     const production = productionCalculateTotal([floor]);
-    // Base 1.0 * (1 + 0 goblin no traits) * 1.0 = 1.0
-    expect(production['food']).toBeCloseTo(1.0);
+    // Base 1.0 * (1 + 1.0 workerEff, no traits) * 1.0 = 2.0
+    expect(production['food']).toBeCloseTo(2.0);
   });
 });
 
@@ -466,7 +466,7 @@ describe('Underground Lake: full production with adjacency', () => {
     ];
     const floor = makeFloor([lake, grove], inhabitants);
     const production = productionCalculateSingleRoom(lake, floor);
-    // Base 1.0 * (1 + 0 goblin + 0.3 adjacency) * 1.0 = 1.0 * 1.3 = 1.3
-    expect(production['food']).toBeCloseTo(1.3);
+    // Base 1.0 * (1 + 1.0 workerEff + 0.3 adjacency) * 1.0 = 1.0 * 2.3 = 2.3
+    expect(production['food']).toBeCloseTo(2.3);
   });
 });

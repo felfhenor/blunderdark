@@ -325,12 +325,12 @@ describe('efficiencyCalculateInhabitantContribution', () => {
     );
     expect(result).toBeDefined();
     expect(result!.name).toBe('Goblin');
-    // workerEfficiency: 1.0 → 0 bonus, Miner trait matches crystals: +0.2
-    expect(result!.workerEfficiencyBonus).toBe(0);
+    // workerEfficiency: 1.0, Miner trait matches crystals: +0.2
+    expect(result!.workerEfficiencyBonus).toBe(1.0);
     expect(result!.traitBonuses).toHaveLength(1);
     expect(result!.traitBonuses[0].applies).toBe(true);
     expect(result!.traitBonuses[0].bonus).toBe(0.2);
-    expect(result!.totalBonus).toBeCloseTo(0.2);
+    expect(result!.totalBonus).toBeCloseTo(1.2);
   });
 
   it('should return 0 trait bonus for non-matching trait', () => {
@@ -348,8 +348,8 @@ describe('efficiencyCalculateInhabitantContribution', () => {
     );
     expect(result).toBeDefined();
     expect(result!.traitBonuses[0].applies).toBe(false);
-    // Only workerEfficiency bonus: 1.0 - 1.0 = 0
-    expect(result!.totalBonus).toBeCloseTo(0);
+    // Only workerEfficiency bonus: 1.0
+    expect(result!.totalBonus).toBeCloseTo(1.0);
   });
 
   it('should include workerEfficiency bonus regardless of trait match', () => {
@@ -360,15 +360,15 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       state: 'normal',
       assignedRoomId: 'room-1' as PlacedRoomId,
     };
-    // Myconid in crystal mine: workerEfficiency 1.3 → 0.3, but Farmer targets food → no match
+    // Myconid in crystal mine: workerEfficiency 1.3, but Farmer targets food → no match
     const result = efficiencyCalculateInhabitantContribution(
       instance,
       crystalProduction,
     );
     expect(result).toBeDefined();
-    expect(result!.workerEfficiencyBonus).toBeCloseTo(0.3);
+    expect(result!.workerEfficiencyBonus).toBeCloseTo(1.3);
     expect(result!.traitBonuses[0].applies).toBe(false);
-    expect(result!.totalBonus).toBeCloseTo(0.3);
+    expect(result!.totalBonus).toBeCloseTo(1.3);
   });
 
   it('should return null for unknown definition', () => {
@@ -399,10 +399,10 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       crystalProduction,
     );
     expect(result).toBeDefined();
-    // workerEfficiency 0.7 → -0.3, no production_bonus traits
-    expect(result!.workerEfficiencyBonus).toBeCloseTo(-0.3);
+    // workerEfficiency 0.7, no production_bonus traits
+    expect(result!.workerEfficiencyBonus).toBeCloseTo(0.7);
     expect(result!.traitBonuses).toHaveLength(0);
-    expect(result!.totalBonus).toBeCloseTo(-0.3);
+    expect(result!.totalBonus).toBeCloseTo(0.7);
   });
 
   it('should apply "all" trait to any room', () => {
@@ -418,14 +418,14 @@ describe('efficiencyCalculateInhabitantContribution', () => {
       crystalProduction,
     );
     expect(resultCrystal!.traitBonuses[0].applies).toBe(true);
-    expect(resultCrystal!.totalBonus).toBeCloseTo(0.1);
+    expect(resultCrystal!.totalBonus).toBeCloseTo(1.1);
 
     const resultFood = efficiencyCalculateInhabitantContribution(
       instance,
       foodProduction,
     );
     expect(resultFood!.traitBonuses[0].applies).toBe(true);
-    expect(resultFood!.totalBonus).toBeCloseTo(0.1);
+    expect(resultFood!.totalBonus).toBeCloseTo(1.1);
   });
 });
 
@@ -472,11 +472,11 @@ describe('efficiencyCalculateRoom', () => {
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
-    // Goblin in crystal mine: 0 workerEff + 0.2 trait = 0.2
-    // totalMultiplier = 1.0 + 0.2 = 1.2
+    // Goblin in crystal mine: 1.0 workerEff + 0.2 trait = 1.2
+    // totalMultiplier = 1.0 + 1.2 = 2.2
     expect(result.baseEfficiency).toBe(1.0);
     expect(result.inhabitantBonuses).toHaveLength(1);
-    expect(result.totalMultiplier).toBeCloseTo(1.2);
+    expect(result.totalMultiplier).toBeCloseTo(2.2);
   });
 
   it('should not apply mismatched trait bonus', () => {
@@ -491,8 +491,8 @@ describe('efficiencyCalculateRoom', () => {
     ];
     // Goblin Miner targets crystals, but Mushroom Grove produces food
     const result = efficiencyCalculateRoom(mushroomGrove, inhabitants);
-    // workerEfficiency 1.0 → 0, trait doesn't match → 0
-    expect(result.totalMultiplier).toBeCloseTo(1.0);
+    // workerEfficiency 1.0, trait doesn't match → 0
+    expect(result.totalMultiplier).toBeCloseTo(2.0);
   });
 
   it('should stack bonuses additively for multiple workers', () => {
@@ -513,10 +513,10 @@ describe('efficiencyCalculateRoom', () => {
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
-    // Two goblins: (0 + 0.2) * 2 = 0.4
-    // totalMultiplier = 1.0 + 0.4 = 1.4
+    // Two goblins: (1.0 + 0.2) * 2 = 2.4
+    // totalMultiplier = 1.0 + 2.4 = 3.4
     expect(result.inhabitantBonuses).toHaveLength(2);
-    expect(result.totalMultiplier).toBeCloseTo(1.4);
+    expect(result.totalMultiplier).toBeCloseTo(3.4);
   });
 
   it('should handle mixed workers with different trait matches', () => {
@@ -537,10 +537,10 @@ describe('efficiencyCalculateRoom', () => {
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
-    // Goblin: 0 workerEff + 0.2 crystal trait = 0.2
-    // Myconid: 0.3 workerEff + 0 food trait (doesn't match crystals) = 0.3
-    // Total = 0.5, multiplier = 1.5
-    expect(result.totalMultiplier).toBeCloseTo(1.5);
+    // Goblin: 1.0 workerEff + 0.2 crystal trait = 1.2
+    // Myconid: 1.3 workerEff + 0 food trait (doesn't match crystals) = 1.3
+    // Total = 2.5, multiplier = 3.5
+    expect(result.totalMultiplier).toBeCloseTo(3.5);
   });
 
   it('should ignore inhabitants assigned to other rooms', () => {
@@ -569,10 +569,10 @@ describe('efficiencyCalculateRoom', () => {
       },
     ];
     const result = efficiencyCalculateRoom(barracks, inhabitants);
-    // Goblin in barracks: workerEff 0, Miner trait targets crystals → barracks has no production → no match
+    // Goblin in barracks: workerEff 1.0, Miner trait targets crystals → barracks has no production → no match
     expect(result.inhabitantBonuses).toHaveLength(1);
-    expect(result.inhabitantBonuses[0].totalBonus).toBeCloseTo(0);
-    expect(result.totalMultiplier).toBeCloseTo(1.0);
+    expect(result.inhabitantBonuses[0].totalBonus).toBeCloseTo(1.0);
+    expect(result.totalMultiplier).toBeCloseTo(2.0);
   });
 
   it('should handle worker with below-1.0 efficiency and no matching traits', () => {
@@ -586,9 +586,9 @@ describe('efficiencyCalculateRoom', () => {
       },
     ];
     const result = efficiencyCalculateRoom(crystalMine, inhabitants);
-    // Skeleton: workerEff 0.7 → -0.3, defense_bonus trait not production_bonus → 0
-    // totalMultiplier = 1.0 + (-0.3) = 0.7
-    expect(result.totalMultiplier).toBeCloseTo(0.7);
+    // Skeleton: workerEff 0.7, defense_bonus trait not production_bonus → 0
+    // totalMultiplier = 1.0 + 0.7 = 1.7
+    expect(result.totalMultiplier).toBeCloseTo(1.7);
   });
 });
 
@@ -629,8 +629,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
       crystalMine,
       inhabitants,
     );
-    // Goblin in crystal mine: 0 workerEff + 0.2 Miner (crystals match) = 0.2
-    expect(result.bonus).toBeCloseTo(0.2);
+    // Goblin in crystal mine: 1.0 workerEff + 0.2 Miner (crystals match) = 1.2
+    expect(result.bonus).toBeCloseTo(1.2);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -649,7 +649,7 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
       mushroomGrove,
       inhabitants,
     );
-    expect(result.bonus).toBeCloseTo(0);
+    expect(result.bonus).toBeCloseTo(1.0);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -667,8 +667,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
       mushroomGrove,
       inhabitants,
     );
-    // Myconid: 0.3 workerEff + 0.15 Farmer (food match) = 0.45
-    expect(result.bonus).toBeCloseTo(0.45);
+    // Myconid: 1.3 workerEff + 0.15 Farmer (food match) = 1.45
+    expect(result.bonus).toBeCloseTo(1.45);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -686,8 +686,8 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
       crystalMine,
       inhabitants,
     );
-    // workerEff 0 + 0.1 (all) = 0.1
-    expect(result.bonus).toBeCloseTo(0.1);
+    // workerEff 1.0 + 0.1 (all) = 1.1
+    expect(result.bonus).toBeCloseTo(1.1);
     expect(result.hasWorkers).toBe(true);
   });
 });
@@ -730,8 +730,8 @@ describe('efficiencyTotalBonusForResource', () => {
     } as unknown as ReturnType<typeof gamestate>);
 
     const bonus = efficiencyTotalBonusForResource('crystals');
-    // Crystal mine with goblin: multiplier = 1.2, bonus = 0.2
-    expect(bonus).toBeCloseTo(0.2);
+    // Crystal mine with goblin: multiplier = 2.2, bonus = 1.2
+    expect(bonus).toBeCloseTo(1.2);
   });
 
   it('should return 0 when no rooms produce the given resource', () => {
@@ -818,7 +818,7 @@ describe('efficiencyTotalBonusForResource', () => {
     } as unknown as ReturnType<typeof gamestate>);
 
     const bonus = efficiencyTotalBonusForResource('crystals');
-    // Two mines, each with a goblin: 0.2 + 0.2 = 0.4
-    expect(bonus).toBeCloseTo(0.4);
+    // Two mines, each with a goblin: 1.2 + 1.2 = 2.4
+    expect(bonus).toBeCloseTo(2.4);
   });
 });

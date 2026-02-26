@@ -312,7 +312,8 @@ describe('Ley Line Nexus: base production', () => {
     ];
     const floor = makeFloor([nexus], inhabitants);
     const production = productionCalculateTotal([floor]);
-    expect(production['flux']).toBeCloseTo(2.0);
+    // Base 2.0 * (1 + 1.0 workerEfficiency) = 4.0
+    expect(production['flux']).toBeCloseTo(4.0);
   });
 });
 
@@ -495,7 +496,7 @@ describe('Ley Line Nexus: full production with adjacency', () => {
     ];
     const floor = makeFloor([nexus, library], inhabitants);
     const production = productionCalculateSingleRoom(nexus, floor);
-    // Base 2.0 * (1 + 0 goblin + 0.2 adjacency) * 1.0 = 2.0 * 1.2 = 2.4
-    expect(production['flux']).toBeCloseTo(2.4);
+    // Base 2.0 * (1 + 1.0 goblin + 0.2 adjacency) * 1.0 = 2.0 * 2.2 = 4.4
+    expect(production['flux']).toBeCloseTo(4.4);
   });
 });

@@ -457,8 +457,8 @@ describe('Soul Well: full production with adjacency', () => {
     const floor = makeFloor([well], inhabitants);
     const production = productionCalculateTotal([floor]);
     // Passive room (requiresWorkers: false) still produces with or without workers
-    // Worker efficiency: 0.7 - 1.0 = -0.3 bonus
-    // Base 0.3 * (1 + (-0.3)) = 0.3 * 0.7 = 0.21
-    expect(production['essence']).toBeCloseTo(0.21);
+    // Worker efficiency: 0.7
+    // Base 0.3 * (1 + 0.7) = 0.3 * 1.7 = 0.51
+    expect(production['essence']).toBeCloseTo(0.51);
   });
 });

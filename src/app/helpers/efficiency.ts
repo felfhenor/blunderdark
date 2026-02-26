@@ -58,7 +58,7 @@ export function efficiencyCalculateInhabitantContribution(
   if (!def) return undefined;
 
   const stats = effectiveStatsCalculate(def, instance);
-  const workerEfficiencyBonus = stats.workerEfficiency - 1.0;
+  const workerEfficiencyBonus = stats.workerEfficiency;
 
   const traitBonuses = def.traits
     .filter((t) => t.effectType === 'production_bonus')
@@ -146,7 +146,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
     if (!def) continue;
 
     const stats = effectiveStatsCalculate(def, inst);
-    totalBonus += stats.workerEfficiency - 1.0;
+    totalBonus += stats.workerEfficiency;
 
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {

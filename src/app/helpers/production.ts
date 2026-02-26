@@ -222,7 +222,7 @@ export function productionCalculateInhabitantBonus(
     const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
     if (!def) continue;
 
-    totalBonus += def.stats.workerEfficiency - 1.0;
+    totalBonus += def.stats.workerEfficiency;
 
     for (const trait of def.traits) {
       if (trait.effectType === 'production_bonus') {

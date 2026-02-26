@@ -289,8 +289,8 @@ describe('Mushroom Grove: base production', () => {
     ];
     const floor = makeFloor([grove], inhabitants);
     const production = productionCalculateTotal([floor]);
-    // Base 1.6 * (1 + 0.2 goblin bonus) * 1.0 = 1.92
-    expect(production['food']).toBeCloseTo(1.92);
+    // Base 1.6 * (1 + 1.0 workerEff + 0.2 goblin trait) * 1.0 = 1.6 * 2.2 = 3.52
+    expect(production['food']).toBeCloseTo(3.52);
   });
 });
 
@@ -517,7 +517,7 @@ describe('Mushroom Grove: full production with adjacency', () => {
     ];
     const floor = makeFloor([grove, well], inhabitants);
     const production = productionCalculateSingleRoom(grove, floor);
-    // Base 1.6 * (1 + 0.2 goblin + 0.4 adjacency) * 1.0 = 1.6 * 1.6 = 2.56
-    expect(production['food']).toBeCloseTo(2.56);
+    // Base 1.6 * (1 + 1.0 workerEff + 0.2 goblin trait + 0.4 adjacency) * 1.0 = 1.6 * 2.6 = 4.16
+    expect(production['food']).toBeCloseTo(4.16);
   });
 });
