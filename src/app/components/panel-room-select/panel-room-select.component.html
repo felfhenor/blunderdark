@@ -61,7 +61,8 @@
           [class.btn-active]="
             isTransportActive() && activeTransportType() === 'stair'
           "
-          [disabled]="isInvasionActive()"
+          [class.room-unaffordable]="!isTransportAffordable('stair')"
+          [disabled]="isInvasionActive() || !isTransportAffordable('stair')"
           (click)="toggleTransportMode('stair')"
         >
           <div class="flex items-center gap-2 w-full">
@@ -87,7 +88,8 @@
             [class.btn-active]="
               isTransportActive() && activeTransportType() === 'elevator'
             "
-            [disabled]="isInvasionActive()"
+            [class.room-unaffordable]="!isTransportAffordable('elevator')"
+            [disabled]="isInvasionActive() || !isTransportAffordable('elevator')"
             (click)="toggleTransportMode('elevator')"
           >
             <div class="flex items-center gap-2 w-full">
@@ -117,7 +119,8 @@
             [class.btn-active]="
               isTransportActive() && activeTransportType() === 'portal'
             "
-            [disabled]="isInvasionActive()"
+            [class.room-unaffordable]="!isTransportAffordable('portal')"
+            [disabled]="isInvasionActive() || !isTransportAffordable('portal')"
             (click)="toggleTransportMode('portal')"
           >
             <div class="flex items-center gap-2 w-full">
@@ -178,7 +181,8 @@
             isUniqueAndPlaced(room) ||
             isBiomeRestricted(room) ||
             isAtGlobalLimit(room) ||
-            !hasAltar()
+            !hasAltar() ||
+            !isAffordable(room)
           "
           [tp]="getRoomTooltip(room)"
           tpPlacement="right"

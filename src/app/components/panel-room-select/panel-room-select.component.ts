@@ -207,6 +207,9 @@ export class PanelRoomSelectComponent {
     if (!this.hasAltar()) {
       return 'Requires Altar';
     }
+    if (!this.isAffordable(room)) {
+      return 'Not enough resources';
+    }
     return room.description;
   }
 
@@ -263,6 +266,13 @@ export class PanelRoomSelectComponent {
   public stairCostEntries = computed(() => this.getCostEntriesForRole('stair'));
   public elevatorCostEntries = computed(() => this.getCostEntriesForRole('elevator'));
   public portalCostEntries = computed(() => this.getCostEntriesForRole('portal'));
+
+  public isTransportAffordable(role: string): boolean {
+    const defs = this.transportRoomDefs();
+    const def = defs[role as keyof typeof defs];
+    if (!def) return false;
+    return resourceCanAfford(def.cost);
+  }
 
   private getCostEntriesForRole(role: string): { type: ResourceType; amount: number }[] {
     const defs = this.transportRoomDefs();
