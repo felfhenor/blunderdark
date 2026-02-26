@@ -9,6 +9,7 @@ export function optionsDefault(): GameOptions {
     debugConsoleLogStateUpdates: false,
     debugGameloopTimerUpdates: false,
     debugAllowBackgroundOperations: false,
+    debugForceMerchantPresent: false,
     debugTickMultiplier: 1,
     debugSaveInterval: 15,
 

@@ -111,5 +111,49 @@
     </div>
   </div>
 
-  <div class="flex-1"></div>
+  <div class="flex-1">
+    <div class="card bg-base-100 foreground shadow-xl">
+      <div class="card-body">
+        <div class="card-title">Merchant</div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('debugForceMerchantPresent') === true"
+              class="checkbox checkbox-secondary"
+              appAnalyticsClick="Options:Debug:ForceMerchantPresent"
+              (click)="
+                optionsSet(
+                  'debugForceMerchantPresent',
+                  !optionsGet('debugForceMerchantPresent')
+                )
+              "
+            />
+            <span class="label-text">Force Merchant Present</span>
+          </label>
+        </div>
+
+        <div class="flex flex-row gap-2">
+          <button
+            class="btn btn-secondary btn-sm"
+            appAnalyticsClick="Options:Debug:ForceMerchantArrival"
+            [disabled]="isMerchantPresent()"
+            (click)="forceArrival()"
+          >
+            Force Arrival
+          </button>
+
+          <button
+            class="btn btn-secondary btn-sm"
+            appAnalyticsClick="Options:Debug:MerchantRestock"
+            [disabled]="!isMerchantPresent()"
+            (click)="restock()"
+          >
+            Restock All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

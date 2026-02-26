@@ -4,6 +4,7 @@ import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { optionsGet } from '@helpers/state-options';
 import type {
   GameState,
   MerchantState,
@@ -208,6 +209,41 @@ export function merchantResetLastProcessedDay(): void {
   merchantLastProcessedDay = 0;
 }
 
+// --- Debug helpers ---
+
+export function merchantDebugRestock(): void {
+  const inventory = gamestate().world.merchant.inventory;
+  if (inventory.length === 0) return;
+
+  const restocked = inventory.map((offer) => {
+    const trade = contentGetEntry<MerchantTradeContent>(offer.tradeId);
+    return { ...offer, stock: trade?.maxStock ?? offer.stock };
+  });
+
+  updateGamestate((state) => ({
+    ...state,
+    world: {
+      ...state.world,
+      merchant: { ...state.world.merchant, inventory: restocked },
+    },
+  }));
+}
+
+export function merchantDebugForceArrival(): void {
+  if (gamestate().world.merchant.isPresent) return;
+
+  const allTrades =
+    contentGetEntriesByType<MerchantTradeContent>('merchanttrade');
+  const arrived = merchantArrival(gamestate().clock.day, allTrades);
+
+  updateGamestate((state) => ({
+    ...state,
+    world: { ...state.world, merchant: arrived },
+  }));
+
+  merchantEventSubject.next({ type: 'arrival' });
+}
+
 // --- Process function (called from gameloop) ---
 
 export function merchantProcess(state: GameState): void {
@@ -218,19 +254,27 @@ export function merchantProcess(state: GameState): void {
 
   const merchant = state.world.merchant;
   const season = state.world.season.currentSeason;
+  const forcePresent = optionsGet('debugForceMerchantPresent');
 
   if (merchant.isPresent) {
-    merchant.departureDayRemaining--;
+    if (!forcePresent) {
+      merchant.departureDayRemaining--;
 
-    if (merchantShouldDepart(merchant)) {
-      const departed = merchantDeparture();
-      state.world.merchant = departed;
-      merchantEventSubject.next({ type: 'departure' });
-      return;
+      if (merchantShouldDepart(merchant)) {
+        const departed = merchantDeparture();
+        state.world.merchant = departed;
+        merchantEventSubject.next({ type: 'departure' });
+        return;
+      }
     }
   }
 
-  if (merchantShouldArrive(merchant, season)) {
+  if (forcePresent && !merchant.isPresent) {
+    const allTrades =
+      contentGetEntriesByType<MerchantTradeContent>('merchanttrade');
+    state.world.merchant = merchantArrival(currentDay, allTrades);
+    merchantEventSubject.next({ type: 'arrival' });
+  } else if (merchantShouldArrive(merchant, season)) {
     const allTrades =
       contentGetEntriesByType<MerchantTradeContent>('merchanttrade');
     state.world.merchant = merchantArrival(currentDay, allTrades);

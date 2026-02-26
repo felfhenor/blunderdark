@@ -5,6 +5,7 @@ export type GameOption =
   | 'debugConsoleLogStateUpdates'
   | 'debugGameloopTimerUpdates'
   | 'debugAllowBackgroundOperations'
+  | 'debugForceMerchantPresent'
   | 'sfxPlay'
   | 'bgmPlay'
   | 'gameloopPaused'
