@@ -50,7 +50,7 @@ import { startCase } from 'es-toolkit';
         @case ('storageSpecialization') {
           +{{ effect().value }} max
           <app-currency-name [type]="$any(effect().resource)" />
-          storage
+          capacity
         }
         @default {
           {{ formatEffectType(effect().type) }}: {{ effect().value }}
