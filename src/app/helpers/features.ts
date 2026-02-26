@@ -207,14 +207,13 @@ export function featureCalculateCorruptionGenerationPerTick(
 // --- Storage Bonus ---
 
 /**
- * Calculate the total storage bonus multiplier from all rooms across all floors.
- * Each storage_bonus feature adds its value (e.g. 1.0 = +100%) to the multiplier.
- * Returns a multiplier >= 1.0 (e.g. 2.0 for one storage expansion with value 1.0).
+ * Calculate the total flat storage bonus from all rooms across all floors.
+ * Each storage_bonus feature adds its value (e.g. 100) as a flat increase.
  *
  * When resourceType is provided, only bonuses with no targetType (global) or
  * matching targetType are included. When omitted, all bonuses are included.
  */
-export function featureCalculateStorageBonusMultiplier(
+export function featureCalculateStorageFlatBonus(
   floors: Floor[],
   resourceType?: string,
 ): number {
@@ -229,7 +228,7 @@ export function featureCalculateStorageBonusMultiplier(
       }
     }
   }
-  return 1 + totalBonus;
+  return totalBonus;
 }
 
 /**

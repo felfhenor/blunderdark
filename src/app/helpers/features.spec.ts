@@ -23,7 +23,7 @@ import {
   featureAttachToSlot,
   featureRemoveFromSlot,
   featureRemoveAllFromRoom,
-  featureCalculateStorageBonusMultiplier,
+  featureCalculateStorageFlatBonus,
   featureGetCorruptionSealedRoomIds,
   featureCalculateTrainingXpPerTick,
   featureGetResourceConverterEfficiency,
@@ -146,7 +146,7 @@ const storageContent: FeatureContent = {
   category: 'functional',
   cost: { gold: 100 },
   bonuses: [
-    { type: 'storage_bonus', value: 1.0, description: '+100% storage capacity' },
+    { type: 'storage_bonus', value: 100, description: '+100 storage capacity' },
   ],
 };
 
@@ -232,7 +232,7 @@ const dragonHoardContent: FeatureContent = {
   cost: { gold: 800 },
   bonuses: [
     { type: 'flat_production', value: 5, targetType: 'gold', description: '+5 Gold/min' },
-    { type: 'storage_bonus', value: 1.0, targetType: 'gold', description: '+100% Gold storage' },
+    { type: 'storage_bonus', value: 100, targetType: 'gold', description: '+100 Gold storage' },
   ],
 };
 
@@ -809,17 +809,17 @@ describe('featureRemoveAllFromRoom', () => {
 
 // --- Functional Features ---
 
-describe('featureCalculateStorageBonusMultiplier', () => {
-  it('returns 1.0 when no rooms have storage features', () => {
+describe('featureCalculateStorageFlatBonus', () => {
+  it('returns 0 when no rooms have storage features', () => {
     const floor = makeFloor({ rooms: [makeRoom()] });
-    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(1);
+    expect(featureCalculateStorageFlatBonus([floor])).toBe(0);
   });
 
-  it('returns 2.0 when one room has Storage Expansion (+100%)', () => {
+  it('returns 100 when one room has Storage Expansion (+100)', () => {
     vi.mocked(contentGetEntry).mockReturnValue(storageContent);
     const room = makeRoom({ featureIds: [STORAGE_ID] });
     const floor = makeFloor({ rooms: [room] });
-    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(2.0);
+    expect(featureCalculateStorageFlatBonus([floor])).toBe(100);
   });
 
   it('stacks across multiple rooms', () => {
@@ -827,7 +827,7 @@ describe('featureCalculateStorageBonusMultiplier', () => {
     const room1 = makeRoom({ featureIds: [STORAGE_ID] });
     const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureIds: [STORAGE_ID] });
     const floor = makeFloor({ rooms: [room1, room2] });
-    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(3.0);
+    expect(featureCalculateStorageFlatBonus([floor])).toBe(200);
   });
 
   it('stacks across multiple floors', () => {
@@ -836,14 +836,14 @@ describe('featureCalculateStorageBonusMultiplier', () => {
     const room2 = makeRoom({ id: 'room-2' as PlacedRoomId, featureIds: [STORAGE_ID] });
     const floor1 = makeFloor({ rooms: [room1] });
     const floor2 = makeFloor({ id: 'floor-2' as FloorId, rooms: [room2] });
-    expect(featureCalculateStorageBonusMultiplier([floor1, floor2])).toBe(3.0);
+    expect(featureCalculateStorageFlatBonus([floor1, floor2])).toBe(200);
   });
 
   it('ignores non-storage features', () => {
     vi.mocked(contentGetEntry).mockReturnValue(mossContent);
     const room = makeRoom({ featureIds: [MOSS_ID] });
     const floor = makeFloor({ rooms: [room] });
-    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(1);
+    expect(featureCalculateStorageFlatBonus([floor])).toBe(0);
   });
 });
 
@@ -1164,21 +1164,21 @@ describe("Dragon's Hoard Core (prestige flat_production + storage_bonus)", () =>
     vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
     const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
     const floor = makeFloor({ rooms: [room] });
-    expect(featureCalculateStorageBonusMultiplier([floor], 'gold')).toBe(2.0);
+    expect(featureCalculateStorageFlatBonus([floor], 'gold')).toBe(100);
   });
 
   it('does not provide storage bonus for non-gold resources', () => {
     vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
     const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
     const floor = makeFloor({ rooms: [room] });
-    expect(featureCalculateStorageBonusMultiplier([floor], 'crystals')).toBe(1.0);
+    expect(featureCalculateStorageFlatBonus([floor], 'crystals')).toBe(0);
   });
 
   it('provides storage bonus when no resourceType filter is passed', () => {
     vi.mocked(contentGetEntry).mockReturnValue(dragonHoardContent);
     const room = makeRoom({ featureIds: [DRAGON_HOARD_ID] });
     const floor = makeFloor({ rooms: [room] });
-    expect(featureCalculateStorageBonusMultiplier([floor])).toBe(2.0);
+    expect(featureCalculateStorageFlatBonus([floor])).toBe(100);
   });
 });
 

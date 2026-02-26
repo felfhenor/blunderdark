@@ -1,14 +1,14 @@
 - id: f30a70a5-9853-4ccd-bb8f-d68dc99c2c7b
   name: Storage Expansion
-  description: "Magical containers that double the room's resource storage capacity. Enchanted chests expand to hold far more than their physical size suggests."
+  description: "Magical containers that expand the room's resource storage capacity by 100. Enchanted chests hold far more than their physical size suggests."
   category: functional
   cost:
     gold: 100
     crystals: 25
   bonuses:
     - type: storage_bonus
-      value: 1.0
-      description: "+100% resource storage capacity"
+      value: 100
+      description: "+100 resource storage capacity"
 
 - id: d3ab3554-56a1-4a88-a9e7-392004e5b023
   name: Efficiency Enchantment

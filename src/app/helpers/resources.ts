@@ -1,6 +1,6 @@
 import { computed, type Signal } from '@angular/core';
 import { defaultResources } from '@helpers/defaults';
-import { featureCalculateStorageBonusMultiplier } from '@helpers/features';
+import { featureCalculateStorageFlatBonus } from '@helpers/features';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -180,8 +180,8 @@ export function resourceEffectiveMax(
 ): number {
   if (resourceType === 'corruption') return baseMax;
   const flatBonus = storageRoomFlatBonus(floors, resourceType);
-  const multiplier = featureCalculateStorageBonusMultiplier(floors, resourceType);
-  return Math.floor((baseMax + flatBonus) * multiplier);
+  const featureBonus = featureCalculateStorageFlatBonus(floors, resourceType);
+  return Math.floor(baseMax + flatBonus + featureBonus);
 }
 
 /**

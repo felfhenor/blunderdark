@@ -116,7 +116,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 - **Category**: `'functional'` on `FeatureContent`, defined in `gamedata/feature/functional.yml`
 - **Additional bonus types**: `storage_bonus`, `corruption_seal`, `training_xp`, `resource_converter`
-- **Storage Expansion**: `storage_bonus` value is added to a global multiplier via `featureCalculateStorageBonusMultiplier(floors)` → `resourceEffectiveMax()` in resources.ts; excludes corruption; used in `productionProcess()`
+- **Storage Expansion**: `storage_bonus` value is a flat additive bonus via `featureCalculateStorageFlatBonus(floors)` → `resourceEffectiveMax()` in resources.ts; excludes corruption; used in `productionProcess()`
 - **Efficiency Enchantment**: uses existing `production_bonus` type (value: 0.20) — no new code needed
 - **Fear Ward**: uses existing `fear_reduction` type (value: 2) — no new code needed
 - **Corruption Seal**: `corruption_seal` bonus → `featureGetCorruptionSealedRoomIds(floors)` returns `Set<string>` of sealed room IDs; `corruptionGenerationProcess` filters out sealed rooms before calculating feature corruption

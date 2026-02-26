@@ -68,6 +68,6 @@
       targetType: gold
       description: "+5 Gold per minute"
     - type: storage_bonus
-      value: 1.0
+      value: 100
       targetType: gold
-      description: "+100% Gold storage capacity"
+      description: "+100 Gold storage capacity"

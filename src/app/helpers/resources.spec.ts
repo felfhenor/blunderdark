@@ -10,7 +10,7 @@ import type {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
-let mockStorageMultiplier = 1;
+let mockStorageFlatBonus = 0;
 
 const STORAGE_ROOM_TYPE_ID = 'test-storage-room-type' as RoomId;
 const OTHER_ROOM_TYPE_ID = 'test-other-room-type' as RoomId;
@@ -18,7 +18,7 @@ const OTHER_ROOM_TYPE_ID = 'test-other-room-type' as RoomId;
 let mockAppliedEffects: Map<string, RoomUpgradeEffect[]> = new Map();
 
 vi.mock('@helpers/features', () => ({
-  featureCalculateStorageBonusMultiplier: vi.fn(() => mockStorageMultiplier),
+  featureCalculateStorageFlatBonus: vi.fn(() => mockStorageFlatBonus),
 }));
 
 vi.mock('@helpers/room-roles', () => ({
@@ -405,49 +405,49 @@ describe('storageRoomFlatBonus', () => {
 
 describe('resourceEffectiveMax', () => {
   beforeEach(() => {
-    mockStorageMultiplier = 1;
+    mockStorageFlatBonus = 0;
     mockAppliedEffects = new Map();
   });
 
-  it('returns base max when no storage bonus (multiplier 1)', () => {
-    mockStorageMultiplier = 1;
+  it('returns base max when no storage bonus', () => {
+    mockStorageFlatBonus = 0;
     expect(resourceEffectiveMax(1000, 'gold', [])).toBe(1000);
   });
 
-  it('doubles max when storage bonus multiplier is 2', () => {
-    mockStorageMultiplier = 2;
-    expect(resourceEffectiveMax(500, 'crystals', [])).toBe(1000);
+  it('adds flat feature bonus to base max', () => {
+    mockStorageFlatBonus = 100;
+    expect(resourceEffectiveMax(500, 'crystals', [])).toBe(600);
   });
 
-  it('triples max when storage bonus multiplier is 3', () => {
-    mockStorageMultiplier = 3;
-    expect(resourceEffectiveMax(200, 'flux', [])).toBe(600);
+  it('stacks multiple flat feature bonuses', () => {
+    mockStorageFlatBonus = 200;
+    expect(resourceEffectiveMax(200, 'flux', [])).toBe(400);
   });
 
   it('always returns base max for corruption regardless of bonus', () => {
-    mockStorageMultiplier = 5;
+    mockStorageFlatBonus = 500;
     expect(resourceEffectiveMax(Number.MAX_SAFE_INTEGER, 'corruption', [])).toBe(Number.MAX_SAFE_INTEGER);
   });
 
   it('floors the result to integer', () => {
-    mockStorageMultiplier = 1.5;
-    // 200 * 1.5 = 300
-    expect(resourceEffectiveMax(200, 'essence', [])).toBe(300);
+    mockStorageFlatBonus = 50;
+    // 200 + 50 = 250
+    expect(resourceEffectiveMax(200, 'essence', [])).toBe(250);
   });
 
-  it('applies flat bonus before multiplier: (base + flat) * multiplier', () => {
+  it('adds both storage room flat bonus and feature flat bonus', () => {
     const room = makeRoom('s1', STORAGE_ROOM_TYPE_ID);
     const floors = [makeFloor([room])];
-    mockStorageMultiplier = 2;
-    // (1000 + 200) * 2 = 2400
-    expect(resourceEffectiveMax(1000, 'gold', floors)).toBe(2400);
+    mockStorageFlatBonus = 100;
+    // 1000 + 200 (storage room) + 100 (feature) = 1300
+    expect(resourceEffectiveMax(1000, 'gold', floors)).toBe(1300);
   });
 });
 
 describe('resourceStorageProcess', () => {
   beforeEach(() => {
     mockResources = defaultResources();
-    mockStorageMultiplier = 1;
+    mockStorageFlatBonus = 0;
   });
 
   it('leaves maxes at defaults when no storage bonus', () => {
@@ -461,20 +461,20 @@ describe('resourceStorageProcess', () => {
     expect(state.world.resources.essence.max).toBe(200);
   });
 
-  it('doubles all maxes when storage multiplier is 2', () => {
-    mockStorageMultiplier = 2;
+  it('adds flat bonus to all maxes', () => {
+    mockStorageFlatBonus = 100;
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
-    expect(state.world.resources.gold.max).toBe(2000);
-    expect(state.world.resources.crystals.max).toBe(1000);
-    expect(state.world.resources.food.max).toBe(1000);
-    expect(state.world.resources.flux.max).toBe(400);
-    expect(state.world.resources.research.max).toBe(600);
-    expect(state.world.resources.essence.max).toBe(400);
+    expect(state.world.resources.gold.max).toBe(1100);
+    expect(state.world.resources.crystals.max).toBe(600);
+    expect(state.world.resources.food.max).toBe(600);
+    expect(state.world.resources.flux.max).toBe(300);
+    expect(state.world.resources.research.max).toBe(400);
+    expect(state.world.resources.essence.max).toBe(300);
   });
 
-  it('does not change corruption max regardless of multiplier', () => {
-    mockStorageMultiplier = 3;
+  it('does not change corruption max regardless of bonus', () => {
+    mockStorageFlatBonus = 300;
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
     expect(state.world.resources.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
@@ -483,7 +483,7 @@ describe('resourceStorageProcess', () => {
   it('clamps current to new max when max decreases', () => {
     mockResources.gold.current = 900;
     mockResources.gold.max = 2000;
-    mockStorageMultiplier = 1; // back to base: 1000
+    mockStorageFlatBonus = 0; // back to base: 1000
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
     expect(state.world.resources.gold.max).toBe(1000);
@@ -493,7 +493,7 @@ describe('resourceStorageProcess', () => {
   it('clamps current when it exceeds new reduced max', () => {
     mockResources.gold.current = 1500;
     mockResources.gold.max = 2000;
-    mockStorageMultiplier = 1; // back to base: 1000
+    mockStorageFlatBonus = 0; // back to base: 1000
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
     expect(state.world.resources.gold.max).toBe(1000);
@@ -502,10 +502,10 @@ describe('resourceStorageProcess', () => {
 
   it('preserves current when below new max', () => {
     mockResources.gold.current = 500;
-    mockStorageMultiplier = 2;
+    mockStorageFlatBonus = 100;
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
-    expect(state.world.resources.gold.max).toBe(2000);
+    expect(state.world.resources.gold.max).toBe(1100);
     expect(state.world.resources.gold.current).toBe(500);
   });
 });
