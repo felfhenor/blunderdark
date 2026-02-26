@@ -116,14 +116,12 @@ export type DetailedInvasionResult = {
 export type DefenseRewards = {
   reputationGain: number;
   experienceGain: number;
-  goldGain: number;
   resourceGains: Partial<Record<ResourceType, number>>;
   capturedPrisoners: CapturedPrisoner[];
 };
 
 export type DefensePenalties = {
   reputationLoss: number;
-  goldLost: number;
   resourceLosses: Partial<Record<ResourceType, number>>;
   killedInhabitantIds: InhabitantInstanceId[];
 };

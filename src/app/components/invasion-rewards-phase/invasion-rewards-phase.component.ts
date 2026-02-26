@@ -5,11 +5,12 @@ import {
   input,
   output,
 } from '@angular/core';
+import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import type { InvasionOrchestratorResult } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-rewards-phase',
-  imports: [DecimalPipe, KeyValuePipe, PercentPipe],
+  imports: [CurrencyNameComponent, DecimalPipe, KeyValuePipe, PercentPipe],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -19,14 +20,6 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             <div class="text-xl font-bold text-success">Spoils of War</div>
           </div>
           <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
-            @if (res.rewards.goldGain > 0) {
-              <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                <div class="text-xs opacity-50">Gold</div>
-                <div class="text-lg font-bold text-warning">
-                  +{{ res.rewards.goldGain }}
-                </div>
-              </div>
-            }
             @if (res.rewards.reputationGain > 0) {
               <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
                 <div class="text-xs opacity-50">Reputation</div>
@@ -49,7 +42,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             ) {
               @if (entry.value && entry.value > 0) {
                 <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">{{ entry.key }}</div>
+                  <div class="text-xs opacity-50"><app-currency-name [type]="$any(entry.key)" /></div>
                   <div class="text-lg font-bold text-success">
                     +{{ entry.value }}
                   </div>
@@ -71,14 +64,6 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
-            @if (res.penalties.goldLost > 0) {
-              <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                <div class="text-xs opacity-50">Gold Lost</div>
-                <div class="text-lg font-bold text-error">
-                  -{{ res.penalties.goldLost }}
-                </div>
-              </div>
-            }
             @if (res.penalties.reputationLoss > 0) {
               <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
                 <div class="text-xs opacity-50">Reputation Lost</div>
@@ -93,7 +78,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             ) {
               @if (entry.value && entry.value > 0) {
                 <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                  <div class="text-xs opacity-50">{{ entry.key }}</div>
+                  <div class="text-xs opacity-50"><app-currency-name [type]="$any(entry.key)" /></div>
                   <div class="text-lg font-bold text-error">
                     -{{ entry.value }}
                   </div>

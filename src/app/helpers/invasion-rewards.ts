@@ -148,24 +148,24 @@ export function invasionRewardCalculateDefenseRewards(
   );
 
   // Loot from killed invaders
-  let goldGain = 0;
   const resourceGains: Partial<Record<ResourceType, number>> = {};
 
   for (const invaderClass of killedInvaderClasses) {
     const loot = CLASS_LOOT[invaderClass];
-    goldGain += rollRange(loot.goldMin, loot.goldMax, rng);
+    resourceGains.gold = (resourceGains.gold ?? 0) + rollRange(loot.goldMin, loot.goldMax, rng);
     const bonus = rollRange(loot.bonusMin, loot.bonusMax, rng);
     resourceGains[loot.bonusResource] =
       (resourceGains[loot.bonusResource] ?? 0) + bonus;
   }
 
   // Apply reward multiplier to gold
-  goldGain = Math.round(goldGain * result.rewardMultiplier);
+  if (resourceGains.gold) {
+    resourceGains.gold = Math.round(resourceGains.gold * result.rewardMultiplier);
+  }
 
   return {
     reputationGain,
     experienceGain,
-    goldGain,
     resourceGains,
     capturedPrisoners: [],
   };
@@ -213,12 +213,8 @@ export function invasionRewardCalculateDefensePenalties(
       (resourceLosses.essence ?? 0) + result.objectivesCompleted * 5;
   }
 
-  // goldLost mirrors the gold entry in resourceLosses for backward compat
-  const goldLost = resourceLosses.gold ?? 0;
-
   return {
     reputationLoss,
-    goldLost,
     resourceLosses,
     killedInhabitantIds: [],
   };

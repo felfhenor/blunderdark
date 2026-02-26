@@ -190,7 +190,7 @@ describe('invasion-rewards', () => {
         ['warrior', 'rogue'],
         fixedRng(0.5),
       );
-      expect(rewards.goldGain).toBeGreaterThan(0);
+      expect(rewards.resourceGains.gold).toBeGreaterThan(0);
     });
 
     it('should roll class-based bonus resource loot', () => {
@@ -208,7 +208,7 @@ describe('invasion-rewards', () => {
       const result2 = makeResult({ rewardMultiplier: 2.0 });
       const rewards1 = invasionRewardCalculateDefenseRewards(result1, ['warrior'], fixedRng(0.5));
       const rewards2 = invasionRewardCalculateDefenseRewards(result2, ['warrior'], fixedRng(0.5));
-      expect(rewards2.goldGain).toBe(rewards1.goldGain * 2);
+      expect(rewards2.resourceGains.gold).toBe(rewards1.resourceGains.gold! * 2);
     });
 
     it('should start with empty prisoners', () => {
@@ -234,7 +234,6 @@ describe('invasion-rewards', () => {
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
       // floor(1000 * 0.4 * 0.5) = 200
       expect(penalties.resourceLosses.gold).toBe(200);
-      expect(penalties.goldLost).toBe(200);
     });
 
     it('should scale all non-corruption resources with depth', () => {
@@ -260,7 +259,6 @@ describe('invasion-rewards', () => {
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
       expect(penalties.resourceLosses.gold).toBeUndefined();
       expect(penalties.resourceLosses.food).toBeUndefined();
-      expect(penalties.goldLost).toBe(0);
     });
 
     it('should cap losses at current amount', () => {
@@ -315,7 +313,6 @@ describe('invasion-rewards', () => {
       const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
       const penalties = invasionRewardCalculateDefensePenalties(result, {});
       expect(penalties.resourceLosses.gold).toBeUndefined();
-      expect(penalties.goldLost).toBe(0);
     });
 
     it('should start with empty killed inhabitants', () => {

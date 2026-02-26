@@ -27,12 +27,8 @@ export async function invasionRewardApplyVictory(
   const rewards = result.rewards;
   if (!rewards) return;
 
-  // Add gold + bonus resources in a single batch
-  const resourceGains: Partial<Record<ResourceType, number>> = { ...rewards.resourceGains };
-  if (rewards.goldGain > 0) {
-    resourceGains.gold = (resourceGains.gold ?? 0) + rewards.goldGain;
-  }
-  await resourceApplyMap(resourceGains);
+  // Add all resource gains (including gold) in a single batch
+  await resourceApplyMap(rewards.resourceGains);
 
   // Reputation + victory tracking + threat adjustment
   await updateGamestate((state) => {
