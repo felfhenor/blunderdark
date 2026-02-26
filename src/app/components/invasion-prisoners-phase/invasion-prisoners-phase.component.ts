@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import type { CapturedPrisoner, PrisonerAction } from '@interfaces';
+import { IconComponent } from '@components/icon/icon.component';
+import { TippyDirective } from '@ngneat/helipopper';
+import type { CapturedPrisoner, Icon, PrisonerAction } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-prisoners-phase',
+  imports: [IconComponent, TippyDirective],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -23,19 +26,21 @@ import type { CapturedPrisoner, PrisonerAction } from '@interfaces';
                 HP {{ prisoner.stats.hp }} / ATK {{ prisoner.stats.attack }} / DEF {{ prisoner.stats.defense }}
               </div>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex gap-2">
               @for (action of prisonerActions; track action) {
                 <button
-                  class="btn btn-xs"
+                  class="btn btn-sm btn-square"
                   [class.btn-error]="action === 'execute'"
                   [class.btn-warning]="action === 'ransom'"
                   [class.btn-info]="action === 'convert'"
                   [class.btn-accent]="action === 'sacrifice'"
                   [class.btn-secondary]="action === 'experiment'"
+                  [tp]="getActionTooltip(action)"
+                  tpPlacement="top"
+                  tpClassName="game-tooltip"
                   (click)="handlePrisoner.emit({ prisoner, action })"
                 >
-                  <span>{{ getPrisonerActionLabel(action) }}</span>
-                  <span class="text-xs opacity-70 ml-1">({{ getPrisonerActionDescription(action) }})</span>
+                  <app-icon [name]="getActionIcon(action)" size="1.2em" />
                 </button>
               }
             </div>
@@ -74,25 +79,27 @@ export class InvasionPrisonersPhaseComponent {
     'experiment',
   ];
 
-  public getPrisonerActionLabel(action: PrisonerAction): string {
-    const labels: Record<PrisonerAction, string> = {
-      execute: 'Execute',
-      ransom: 'Ransom',
-      convert: 'Convert',
-      sacrifice: 'Sacrifice',
-      experiment: 'Experiment',
-    };
-    return labels[action];
+  private readonly actionIcons: Record<PrisonerAction, Icon> = {
+    execute: 'gameChoppedSkull',
+    ransom: 'gameTwoCoins',
+    convert: 'gameMinions',
+    sacrifice: 'gameStarAltar',
+    experiment: 'gameFizzingFlask',
+  };
+
+  private readonly actionTooltips: Record<PrisonerAction, string> = {
+    execute: 'Execute — +2 Fear, +1 Reputation',
+    ransom: 'Ransom — Gold based on class',
+    convert: 'Convert — Chance to join, +5 Corruption',
+    sacrifice: 'Sacrifice — Random boon, +5 Corruption',
+    experiment: 'Experiment — Research points, +3 Corruption',
+  };
+
+  public getActionIcon(action: PrisonerAction): Icon {
+    return this.actionIcons[action];
   }
 
-  public getPrisonerActionDescription(action: PrisonerAction): string {
-    const descriptions: Record<PrisonerAction, string> = {
-      execute: '+2 Fear, +1 Reputation',
-      ransom: 'Gold based on class',
-      convert: 'Chance to join, +5 Corruption',
-      sacrifice: 'Random boon, +5 Corruption',
-      experiment: 'Research points, +3 Corruption',
-    };
-    return descriptions[action];
+  public getActionTooltip(action: PrisonerAction): string {
+    return this.actionTooltips[action];
   }
 }
