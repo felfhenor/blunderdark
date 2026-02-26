@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   model,
+  untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
@@ -158,8 +159,10 @@ export class PanelVictoryComponent {
   constructor() {
     effect(() => {
       if (victoryShowPanel()) {
-        optionsSet('gameloopPaused', true);
-        this.visible.set(true);
+        untracked(() => {
+          optionsSet('gameloopPaused', true);
+          this.visible.set(true);
+        });
       }
     });
   }

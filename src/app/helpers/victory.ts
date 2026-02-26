@@ -37,6 +37,12 @@ export function victoryDismissPanel(): void {
   _victoryShowPanel.set(false);
 }
 
+export function victoryDebugShowPanel(): void {
+  if (_victoryAchievedPathId() !== undefined) {
+    _victoryShowPanel.set(true);
+  }
+}
+
 export function victoryIsPathComplete(pathId: VictoryPathId): boolean {
   return _victoryProgressMap().get(pathId)?.complete ?? false;
 }

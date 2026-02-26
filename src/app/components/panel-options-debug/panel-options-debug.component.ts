@@ -6,6 +6,7 @@ import {
   merchantDebugRestock,
   merchantIsPresent,
 } from '@helpers/merchant';
+import { victoryDebugShowPanel, victoryIsAchieved } from '@helpers/victory';
 
 @Component({
   selector: 'app-panel-options-debug',
@@ -16,6 +17,7 @@ import {
 })
 export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public isMerchantPresent = merchantIsPresent;
+  public isVictoryAchieved = victoryIsAchieved;
 
   public forceArrival(): void {
     merchantDebugForceArrival();
@@ -23,5 +25,9 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public restock(): void {
     merchantDebugRestock();
+  }
+
+  public showVictoryPanel(): void {
+    victoryDebugShowPanel();
   }
 }
