@@ -1,16 +1,14 @@
+import type { CorruptionEffectId } from '@interfaces/content-corruptioneffect';
+
 export type CorruptionEffectState = {
-  darkUpgradeUnlocked: boolean;
-  lastMutationCorruption: number | undefined;
-  lastCrusadeCorruption: number | undefined;
-  warnedThresholds: number[];
+  firedOneTimeEffects: CorruptionEffectId[];
+  lastIntervalValues: Record<string, number>;
+  lastTriggerTimes: Record<string, number>;
+  retriggeredEffects: Record<string, boolean>;
 };
 
-export type CorruptionEffectEventType =
-  | 'dark_upgrade_unlocked'
-  | 'mutation_applied'
-  | 'crusade_triggered';
-
 export type CorruptionEffectEvent = {
-  type: CorruptionEffectEventType;
+  title: string;
   description: string;
+  severity: 'info' | 'warning' | 'error';
 };

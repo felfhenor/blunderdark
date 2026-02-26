@@ -23,6 +23,7 @@ import {
   resourceDisplayGetPercent,
   resourceDisplayIsFull,
 } from '@helpers';
+import { corruptionProgressBarClass } from '@helpers/corruption-effects';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type { ResourceType } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -57,6 +58,7 @@ export class PanelResourcesComponent {
     resourceDisplayGetCorruptionColorClass;
   public readonly getCorruptionBadgeClass =
     resourceDisplayGetCorruptionBadgeClass;
+  public readonly getCorruptionProgressBarClass = corruptionProgressBarClass;
   public corruptionInfo = computed(() => resourceDisplayGetCorruptionInfo());
 
   public foodWarning = computed(() => {

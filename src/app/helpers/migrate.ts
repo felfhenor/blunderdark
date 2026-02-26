@@ -1,5 +1,9 @@
 import { contentGetEntry } from '@helpers/content';
-import { defaultGameState, defaultUnlockedContent } from '@helpers/defaults';
+import {
+  defaultCorruptionEffectState,
+  defaultGameState,
+  defaultUnlockedContent,
+} from '@helpers/defaults';
 import { floorMigrate } from '@helpers/floor';
 import { researchUnlockApplyEffects } from '@helpers/research-unlocks';
 import { resourceMigrate } from '@helpers/resources';
@@ -11,7 +15,8 @@ import {
   gamestateSet,
 } from '@helpers/state-game';
 import { optionsDefault, options, optionsSetAll } from '@helpers/state-options';
-import type { ResearchContent } from '@interfaces';
+import type { CorruptionEffectState, ResearchContent } from '@interfaces';
+import type { CorruptionEffectContent } from '@interfaces/content-corruptioneffect';
 import { merge } from 'es-toolkit/compat';
 
 /**
@@ -34,6 +39,47 @@ function reconcileResearchUnlocks(state: ReturnType<typeof gamestate>): void {
   state.world.research.unlockedContent = content;
 }
 
+/**
+ * Migrate old corruption effect state (darkUpgradeUnlocked, lastMutationCorruption, etc.)
+ * to the new generic format (firedOneTimeEffects, lastIntervalValues, etc.).
+ */
+function migrateCorruptionEffects(
+  effects: CorruptionEffectState & Record<string, unknown>,
+): CorruptionEffectState {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const old = effects as any;
+
+  // Already migrated — has the new fields and no old ones
+  if (old.darkUpgradeUnlocked === undefined && Array.isArray(effects.firedOneTimeEffects)) {
+    return effects;
+  }
+
+  const newState = defaultCorruptionEffectState();
+
+  if (old.darkUpgradeUnlocked === true) {
+    const entry = contentGetEntry<CorruptionEffectContent>('Dark Upgrade Unlock');
+    if (entry) {
+      newState.firedOneTimeEffects.push(entry.id);
+    }
+  }
+
+  if (old.lastMutationCorruption !== undefined && old.lastMutationCorruption > 0) {
+    const entry = contentGetEntry<CorruptionEffectContent>('Corruption Mutation');
+    if (entry) {
+      newState.lastIntervalValues[entry.id] = old.lastMutationCorruption;
+    }
+  }
+
+  if (old.lastCrusadeCorruption !== undefined && old.lastCrusadeCorruption >= 200) {
+    const entry = contentGetEntry<CorruptionEffectContent>('Crusade Invasion');
+    if (entry) {
+      newState.retriggeredEffects[entry.id] = false;
+    }
+  }
+
+  return newState;
+}
+
 export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
@@ -41,6 +87,9 @@ export function migrateGameState() {
   const { floors, currentFloorIndex } = floorMigrate(state.world);
   newState.world.floors = floors;
   newState.world.currentFloorIndex = currentFloorIndex;
+  newState.world.corruptionEffects = migrateCorruptionEffects(
+    newState.world.corruptionEffects as CorruptionEffectState & Record<string, unknown>,
+  );
   reconcileResearchUnlocks(newState);
   gamestateSet(newState);
   gamestateTickStart();

@@ -38,6 +38,10 @@ import type {
   CombatAbilityContent,
   CombatAbilityId,
 } from '@interfaces/content-combatability';
+import type {
+  CorruptionEffectContent,
+  CorruptionEffectId,
+} from '@interfaces/content-corruptioneffect';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type {
   InhabitantContent,
@@ -79,6 +83,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   alchemyrecipe: ensureAlchemyRecipe,
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
+  corruptioneffect: ensureCorruptionEffect,
   feature: ensureFeature,
   forgerecipe: ensureForgeRecipe,
   fusionrecipe: ensureFusionRecipe,
@@ -167,6 +172,29 @@ function ensureFusionRecipe(
     secondInhabitantId: recipe.secondInhabitantId ?? ('' as InhabitantId),
     resultInhabitantId: recipe.resultInhabitantId ?? ('' as InhabitantId),
     cost: recipe.cost ?? {},
+  };
+}
+
+function ensureCorruptionEffect(
+  effect: Partial<CorruptionEffectContent>,
+): CorruptionEffectContent {
+  return {
+    id: (effect.id ?? 'UNKNOWN') as CorruptionEffectId,
+    name: effect.name ?? 'UNKNOWN',
+    __type: 'corruptioneffect',
+    description: effect.description ?? '',
+    triggerType: effect.triggerType ?? 'threshold',
+    triggerValue: effect.triggerValue ?? 0,
+    oneTime: effect.oneTime ?? undefined,
+    retriggerable: effect.retriggerable ?? undefined,
+    probability: effect.probability ?? undefined,
+    cooldownMinutes: effect.cooldownMinutes ?? undefined,
+    conditions: effect.conditions ?? undefined,
+    behavior: effect.behavior ?? 'event',
+    effectType: effect.effectType ?? 'visual',
+    effectParams: effect.effectParams ?? undefined,
+    notification: effect.notification ?? undefined,
+    visualEffect: effect.visualEffect ?? undefined,
   };
 }
 

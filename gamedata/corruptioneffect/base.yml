@@ -1,0 +1,50 @@
+# =============================================================================
+# Corruption Effects — Migrated existing effects
+# =============================================================================
+
+# Dark Upgrade Unlock — one-time unlock at corruption 50
+- id: 037b5219-9a3c-404c-960b-e525b6eeb570
+  name: Dark Upgrade Unlock
+  description: Unlocks dark room upgrades when corruption reaches 50.
+  triggerType: threshold
+  triggerValue: 50
+  oneTime: true
+  behavior: event
+  effectType: unlock
+  effectParams:
+    feature: dark_upgrades
+  notification:
+    title: Dark Upgrades Unlocked
+    message: Dark upgrades have been unlocked!
+    severity: info
+
+# Crusade Invasion — triggers when corruption crosses 200, retriggerable
+- id: f2f2547f-b9dc-4c89-a4bd-d01cd0f941f4
+  name: Crusade Invasion
+  description: A holy crusade is triggered by overwhelming corruption.
+  triggerType: threshold
+  triggerValue: 200
+  retriggerable: true
+  behavior: event
+  effectType: trigger_invasion
+  effectParams:
+    invasionType: crusade
+  notification:
+    title: Crusade Triggered
+    message: A holy crusade has been triggered by overwhelming corruption!
+    severity: warning
+
+# Corruption Mutation — every 500 corruption, random mutation
+- id: 43e711e2-b0d2-40ff-b614-946d8d08b127
+  name: Corruption Mutation
+  description: Corruption mutates a random inhabitant every 500 corruption.
+  triggerType: interval
+  triggerValue: 500
+  behavior: event
+  effectType: mutate_inhabitant
+  effectParams:
+    includeNegative: true
+  notification:
+    title: Corruption Mutation
+    message: An inhabitant has been mutated by corruption!
+    severity: info

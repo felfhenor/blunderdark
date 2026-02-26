@@ -1,50 +1,15 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
-import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, InhabitantInstance } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
-import type { CorruptionLevel } from '@interfaces/corruption';
-
-export const CORRUPTION_THRESHOLD_LOW = 0;
-export const CORRUPTION_THRESHOLD_MEDIUM = 50;
-export const CORRUPTION_THRESHOLD_HIGH = 100;
-export const CORRUPTION_THRESHOLD_CRITICAL = 200;
 
 export const corruptionCurrent = computed(
   () => gamestate().world.resources.corruption.current,
 );
-
-export const corruptionLevel = computed((): CorruptionLevel => {
-  return corruptionGetLevel(corruptionCurrent());
-});
-
-export function corruptionGetLevel(value: number): CorruptionLevel {
-  const resistance = researchUnlockGetPassiveBonusWithMastery('corruptionResistance');
-  const scaledCritical = CORRUPTION_THRESHOLD_CRITICAL * (1 + resistance);
-  const scaledHigh = CORRUPTION_THRESHOLD_HIGH * (1 + resistance);
-  const scaledMedium = CORRUPTION_THRESHOLD_MEDIUM * (1 + resistance);
-  if (value >= scaledCritical) return 'critical';
-  if (value >= scaledHigh) return 'high';
-  if (value >= scaledMedium) return 'medium';
-  return 'low';
-}
-
-export function corruptionGetLevelDescription(level: CorruptionLevel): string {
-  switch (level) {
-    case 'low':
-      return 'Corruption is under control. No adverse effects.';
-    case 'medium':
-      return 'Corruption is rising. Minor production penalties may occur.';
-    case 'high':
-      return 'Corruption is dangerous. Significant penalties to production and morale.';
-    case 'critical':
-      return 'Corruption is overwhelming. Severe penalties and catastrophic events possible.';
-  }
-}
 
 export async function corruptionAdd(amount: number): Promise<number> {
   if (amount <= 0) return 0;
@@ -146,4 +111,3 @@ export function corruptionCalculateDeepObjectiveRate(
   }
   return totalPerMinute / GAME_TIME_TICKS_PER_MINUTE;
 }
-

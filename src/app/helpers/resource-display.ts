@@ -1,13 +1,17 @@
 import {
   consumptionBreakdowns,
-  corruptionGetLevel,
-  corruptionGetLevelDescription,
   gamestate,
   productionBreakdowns,
   productionPerMinute,
 } from '@helpers';
-import type { CorruptionLevel } from '@interfaces/corruption';
+import {
+  corruptionActivePassiveEffects,
+  corruptionBadgeClass,
+  corruptionColorClass,
+  corruptionNextEffect,
+} from '@helpers/corruption-effects';
 import type { ResourceType } from '@interfaces';
+import type { CorruptionEffectContent } from '@interfaces/content-corruptioneffect';
 import type {
   ResourceConsumptionBreakdown,
   ResourceProductionBreakdown,
@@ -117,39 +121,29 @@ export function resourceDisplayFormatBreakdownRate(perTick: number): string {
   return '0';
 }
 
-export function resourceDisplayGetCorruptionInfo(): {
+export type CorruptionDisplayInfo = {
   value: number;
-  level: CorruptionLevel;
-  description: string;
-} {
+  colorClass: string;
+  badgeClass: string;
+  activeEffects: CorruptionEffectContent[];
+  nextEffect: { effect: CorruptionEffectContent; scaledTriggerValue: number } | undefined;
+};
+
+export function resourceDisplayGetCorruptionInfo(): CorruptionDisplayInfo {
   const value = resourceDisplayGetCurrent('corruption');
-  const level = corruptionGetLevel(value);
-  const description = corruptionGetLevelDescription(level);
-  return { value, level, description };
+  return {
+    value,
+    colorClass: corruptionColorClass(),
+    badgeClass: corruptionBadgeClass(),
+    activeEffects: corruptionActivePassiveEffects(),
+    nextEffect: corruptionNextEffect(),
+  };
 }
 
-export function resourceDisplayGetCorruptionColorClass(level: CorruptionLevel): string {
-  switch (level) {
-    case 'low':
-      return 'text-success';
-    case 'medium':
-      return 'text-warning';
-    case 'high':
-      return 'text-orange-400';
-    case 'critical':
-      return 'text-error';
-  }
+export function resourceDisplayGetCorruptionColorClass(): string {
+  return corruptionColorClass();
 }
 
-export function resourceDisplayGetCorruptionBadgeClass(level: CorruptionLevel): string {
-  switch (level) {
-    case 'low':
-      return 'badge-success';
-    case 'medium':
-      return 'badge-warning';
-    case 'high':
-      return 'badge-ghost bg-orange-400/20 text-orange-400';
-    case 'critical':
-      return 'badge-error';
-  }
+export function resourceDisplayGetCorruptionBadgeClass(): string {
+  return corruptionBadgeClass();
 }

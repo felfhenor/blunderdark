@@ -19,10 +19,18 @@ Reusable patterns and learnings for agents working on Blunderdark.
 
 ## Content Pipeline
 
-- New content types need: (1) `ContentType` union in `identifiable.ts`, (2) `ensureX()` in `content-initializers.ts`, (3) `gamedata/[type]/` YAML folder
+- **Adding a new content type — full checklist:**
+  1. Create `gamedata/[type]/` YAML folder (auto-discovered by build script)
+  2. Create `src/app/interfaces/content-[type].ts` with branded ID type + `{Type}Content` extending `IsContentItem` (auto-discovered by schema generator)
+  3. Export from `src/app/interfaces/index.ts` barrel
+  4. Add `'[type]'` to `ContentType` union in `identifiable.ts`
+  5. Add `ensure{Type}()` function + entry in `initializers` record in `content-initializers.ts` (TypeScript enforces this — missing keys cause compile errors)
+  6. If the type has cross-references to other types, add validation checks in `scripts/content-verify.ts` (load the type array, verify referenced IDs/names exist). Check 0 (global id/name uniqueness) runs automatically for all types.
 - Content retrieved via `contentGetEntry<T>` uses `T & IsContentItem` constraint
 - Build script auto-discovers `gamedata/` folders. `public/json/` is gitignored.
 - Every content type has `content-{type}.ts` with branded ID + `{Type}Content` type extending `IsContentItem` (and `HasDescription`/`HasSprite`/`HasAnimation` as needed)
+- **Auto-discovered** (no registration needed): gamedata folders, `content-*.ts` interface files (by schema generator), `ContentService` loading (iterates all keys in `all.json`)
+- **`content-verify.ts` checks** (13 checks): global id/name uniqueness (auto for all types), room upgrades unlocked by research, room upgrades belong to rooms, features unlocked by research, inhabitants reachable, research reachable from roots, research has unlocks, research tier limits, breeding/summon/fusion recipe references exist, synergy room refs exist, reputation effect room targets exist, no duplicate research unlocks
 
 ### Content Type Reference
 

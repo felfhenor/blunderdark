@@ -1,0 +1,83 @@
+# =============================================================================
+# Corruption Effects — Positive effects (benefits of corruption)
+# =============================================================================
+
+# Dark Empowerment — passive +10% essence production at corruption 75
+- id: d5ff1773-95a3-4ba6-8ce0-5a1a5397a8f6
+  name: Dark Empowerment
+  description: Corruption empowers dark essence production by 10%.
+  triggerType: threshold
+  triggerValue: 75
+  behavior: passive
+  effectType: production_modifier
+  effectParams:
+    resource: essence
+    multiplier: 1.10
+  notification:
+    title: Dark Empowerment
+    message: Corruption empowers your essence production!
+    severity: info
+
+# Corrupted Vigor — passive +10% combat stats at corruption 150
+- id: 3c3847b1-d996-4505-bdd8-73bb5d2e19f8
+  name: Corrupted Vigor
+  description: Corruption strengthens inhabitants, granting +10% combat stats.
+  triggerType: threshold
+  triggerValue: 150
+  behavior: passive
+  effectType: combat_modifier
+  effectParams:
+    stat: all
+    multiplier: 1.10
+  notification:
+    title: Corrupted Vigor
+    message: Your inhabitants are strengthened by corruption!
+    severity: info
+
+# Abyssal Harvest — event, 50% chance to grant 10 essence every 400 corruption
+- id: 446d6bc1-e26d-4945-b3d7-dd09b00a625a
+  name: Abyssal Harvest
+  description: Corruption periodically yields bonus essence.
+  triggerType: interval
+  triggerValue: 400
+  probability: 0.5
+  behavior: event
+  effectType: resource_grant
+  effectParams:
+    resource: essence
+    amount: 10
+  notification:
+    title: Abyssal Harvest
+    message: Corruption yields a harvest of dark essence!
+    severity: info
+
+# Corruption Mastery — passive +15% dark research speed at corruption 500
+- id: c6ef8822-531a-491d-ae10-e78a4bdf3bba
+  name: Corruption Mastery
+  description: Deep corruption accelerates dark research by 15%.
+  triggerType: threshold
+  triggerValue: 500
+  behavior: passive
+  effectType: research_modifier
+  effectParams:
+    branch: dark
+    multiplier: 1.15
+  notification:
+    title: Corruption Mastery
+    message: Deep corruption accelerates your dark research!
+    severity: info
+
+# Dark Magnetism — passive +10% rare trait chance at corruption 1000
+- id: 72733ede-ea7d-44d6-8a3d-0b186e2c172e
+  name: Dark Magnetism
+  description: Extreme corruption attracts rare traits to newly recruited inhabitants.
+  triggerType: threshold
+  triggerValue: 1000
+  behavior: passive
+  effectType: recruitment_modifier
+  effectParams:
+    rareTraitChance: 0.10
+  notification:
+    title: Dark Magnetism
+    message: Extreme corruption draws rare creatures to your dungeon!
+    severity: info

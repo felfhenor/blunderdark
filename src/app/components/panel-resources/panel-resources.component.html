@@ -39,9 +39,13 @@
         @if (res.type === 'corruption') {
           <span
             class="badge badge-xs"
-            [ngClass]="getCorruptionBadgeClass(corruptionInfo().level)"
+            [ngClass]="corruptionInfo().badgeClass"
           >
-            {{ corruptionInfo().level | uppercase }}
+            @if (corruptionInfo().activeEffects.length > 0) {
+              {{ corruptionInfo().activeEffects.length }} active
+            } @else {
+              NONE
+            }
           </span>
         }
       </div>
@@ -72,8 +76,8 @@
           class="progress w-full h-2 mb-2"
           [ngClass]="
             res.type === 'corruption'
-              ? getCorruptionColorClass(corruptionInfo().level) +
-                (corruptionInfo().level === 'critical'
+              ? getCorruptionProgressBarClass() +
+                (corruptionInfo().activeEffects.length >= 3
                   ? ' corruption-pulse'
                   : '')
               : res.color
@@ -95,22 +99,30 @@
         </div>
 
         @if (res.type === 'corruption') {
-          <div class="flex justify-between text-xs mb-1">
-            <span class="opacity-70">Level:</span>
-            <span
-              class="font-semibold"
-              [ngClass]="getCorruptionColorClass(corruptionInfo().level)"
-            >
-              {{ corruptionInfo().level | uppercase }}
-            </span>
-          </div>
-        }
-
-        @if (res.type === 'corruption') {
-          <div class="divider my-1 h-0"></div>
-          <div class="text-xs opacity-80">
-            {{ corruptionInfo().description }}
-          </div>
+          @if (corruptionInfo().activeEffects.length > 0) {
+            <div class="divider my-1 h-0"></div>
+            <div class="text-xs font-semibold mb-1">Active Effects</div>
+            <ul class="list-none flex flex-col gap-1 text-xs">
+              @for (effect of corruptionInfo().activeEffects; track effect.id) {
+                @if (effect.effectType !== 'visual') {
+                  <li class="flex items-start gap-1.5">
+                    <span class="shrink-0 mt-0.5" [ngClass]="corruptionInfo().colorClass">&#9670;</span>
+                    <div class="flex justify-between flex-1 min-w-0">
+                      <span class="font-semibold truncate">{{ effect.name }}</span>
+                      <span class="opacity-70 shrink-0 ml-2">{{ effect.description }}</span>
+                    </div>
+                  </li>
+                }
+              }
+            </ul>
+          }
+          @if (corruptionInfo().nextEffect; as next) {
+            <div class="divider my-1 h-0"></div>
+            <div class="text-xs opacity-80">
+              Next at {{ next.scaledTriggerValue | number: '1.0-0' }}:
+              {{ next.effect.name }}
+            </div>
+          }
         }
 
         @if (getResourceBreakdown(res.type); as info) {

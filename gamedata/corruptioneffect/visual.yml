@@ -1,0 +1,39 @@
+# =============================================================================
+# Corruption Effects — Visual effects (replacing hardcoded corruption levels)
+# =============================================================================
+
+# Corruption Aura I — subtle purple tint at corruption 50
+- id: 64c597bc-4b78-4143-a03e-6f6bf222b159
+  name: Corruption Aura I
+  description: A faint purple aura seeps through the dungeon.
+  triggerType: threshold
+  triggerValue: 50
+  behavior: passive
+  effectType: visual
+  visualEffect:
+    gridClass: corruption-aura-1
+    progressBarClass: progress-warning
+
+# Corruption Aura II — medium purple overlay at corruption 100
+- id: e797aeb1-d118-4298-93ab-ff1d0b346cae
+  name: Corruption Aura II
+  description: Purple veins of corruption spread across the dungeon walls.
+  triggerType: threshold
+  triggerValue: 100
+  behavior: passive
+  effectType: visual
+  visualEffect:
+    gridClass: corruption-aura-2
+    progressBarClass: progress-warning
+
+# Corruption Aura III — heavy purple overlay with pulsing at corruption 200
+- id: ad1e7779-8c66-4a4c-ab74-780688c0188c
+  name: Corruption Aura III
+  description: Overwhelming corruption pulses through every surface.
+  triggerType: threshold
+  triggerValue: 200
+  behavior: passive
+  effectType: visual
+  visualEffect:
+    gridClass: corruption-aura-3
+    progressBarClass: progress-error

@@ -15,10 +15,7 @@ import type {
   UnlockContentType,
   UnlockEffect,
 } from '@interfaces';
-import type {
-  CorruptionEffectEvent,
-  CorruptionEffectEventType,
-} from '@interfaces/corruption-effect';
+import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
 import type { ReputationLevelUpEvent } from '@interfaces/reputation';
 import { getUnlockTargetId } from '@interfaces/research';
 import { LoggerService } from '@services/logger.service';
@@ -68,28 +65,21 @@ export class NotifyService {
   }
 
   private showCorruptionEffect(event: CorruptionEffectEvent): void {
-    const titles: Record<CorruptionEffectEventType, string> = {
-      dark_upgrade_unlocked: 'Dark Upgrades Unlocked',
-      mutation_applied: 'Corruption Mutation',
-      crusade_triggered: 'Crusade Triggered',
-    };
-
-    const title = titles[event.type];
     this.logger.debug(
       'Notify:CorruptionEffect',
-      `${title} - ${event.description}`,
+      `${event.title} - ${event.description}`,
     );
 
-    const isWarning = event.type === 'crusade_triggered';
+    const isWarning = event.severity === 'warning' || event.severity === 'error';
     if (isWarning) {
-      this.toast.warning(event.description, title, {
+      this.toast.warning(event.description, event.title, {
         timeOut: 8000,
         extendedTimeOut: 2000,
         tapToDismiss: true,
         progressBar: true,
       });
     } else {
-      this.toast.info(event.description, title, {
+      this.toast.info(event.description, event.title, {
         timeOut: 5000,
         extendedTimeOut: 1000,
         tapToDismiss: true,

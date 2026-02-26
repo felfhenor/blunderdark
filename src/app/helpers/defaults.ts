@@ -134,10 +134,10 @@ export function defaultInvasionSchedule(): InvasionSchedule {
 
 export function defaultCorruptionEffectState(): CorruptionEffectState {
   return {
-    darkUpgradeUnlocked: false,
-    lastMutationCorruption: undefined,
-    lastCrusadeCorruption: undefined,
-    warnedThresholds: [],
+    firedOneTimeEffects: [],
+    lastIntervalValues: {},
+    lastTriggerTimes: {},
+    retriggeredEffects: {},
   };
 }
 

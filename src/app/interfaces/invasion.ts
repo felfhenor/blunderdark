@@ -16,7 +16,7 @@ export type BattlePhase = 'results' | 'rewards' | 'prisoners';
 export type PrisonerId = Branded<string, 'PrisonerId'>;
 export type CombatantId = Branded<string, 'CombatantId'>;
 
-export type SpecialInvasionType = 'crusade' | 'raid' | 'bounty_hunter';
+export type SpecialInvasionType = 'crusade' | 'raid' | 'bounty_hunter' | 'shadow_rift';
 
 export type PendingInvasionWarning = {
   seed: string;

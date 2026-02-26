@@ -12,7 +12,7 @@
     [class.camera-animating]="cameraIsAnimating()"
     [class.hallway-mode]="isHallwayMode()"
     [class.transport-mode]="isTransportMode()"
-    [ngClass]="'corruption-' + corruptionLevel()"
+    [ngClass]="corruptionGridClasses()"
     [style.transform]="cameraTransform()"
     (mouseleave)="onGridLeave()"
     (contextmenu)="onRightClick($event)"

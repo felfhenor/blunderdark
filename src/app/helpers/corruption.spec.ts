@@ -50,13 +50,8 @@ const {
   corruptionAdd,
   corruptionSpend,
   corruptionCanAfford,
-  corruptionGetLevel,
-  corruptionGetLevelDescription,
   corruptionGenerationCalculateInhabitantRate,
   corruptionCalculateDeepObjectiveRate,
-  CORRUPTION_THRESHOLD_MEDIUM,
-  CORRUPTION_THRESHOLD_HIGH,
-  CORRUPTION_THRESHOLD_CRITICAL,
 } = await import('@helpers/corruption');
 
 describe('corruptionAdd', () => {
@@ -142,49 +137,6 @@ describe('corruptionCanAfford', () => {
 
   it('should return true when checking exact amount', () => {
     expect(corruptionCanAfford(75)).toBe(true);
-  });
-});
-
-describe('corruptionGetLevel', () => {
-  it('should return low for 0-49', () => {
-    expect(corruptionGetLevel(0)).toBe('low');
-    expect(corruptionGetLevel(25)).toBe('low');
-    expect(corruptionGetLevel(49)).toBe('low');
-  });
-
-  it('should return medium for 50-99', () => {
-    expect(corruptionGetLevel(CORRUPTION_THRESHOLD_MEDIUM)).toBe('medium');
-    expect(corruptionGetLevel(75)).toBe('medium');
-    expect(corruptionGetLevel(99)).toBe('medium');
-  });
-
-  it('should return high for 100-199', () => {
-    expect(corruptionGetLevel(CORRUPTION_THRESHOLD_HIGH)).toBe('high');
-    expect(corruptionGetLevel(150)).toBe('high');
-    expect(corruptionGetLevel(199)).toBe('high');
-  });
-
-  it('should return critical for 200+', () => {
-    expect(corruptionGetLevel(CORRUPTION_THRESHOLD_CRITICAL)).toBe('critical');
-    expect(corruptionGetLevel(300)).toBe('critical');
-    expect(corruptionGetLevel(1000)).toBe('critical');
-  });
-});
-
-describe('corruptionGetLevelDescription', () => {
-  it('should return a description for each level', () => {
-    expect(corruptionGetLevelDescription('low')).toBeTruthy();
-    expect(corruptionGetLevelDescription('medium')).toBeTruthy();
-    expect(corruptionGetLevelDescription('high')).toBeTruthy();
-    expect(corruptionGetLevelDescription('critical')).toBeTruthy();
-  });
-
-  it('should return different descriptions for different levels', () => {
-    const low = corruptionGetLevelDescription('low');
-    const medium = corruptionGetLevelDescription('medium');
-    const high = corruptionGetLevelDescription('high');
-    const critical = corruptionGetLevelDescription('critical');
-    expect(new Set([low, medium, high, critical]).size).toBe(4);
   });
 });
 

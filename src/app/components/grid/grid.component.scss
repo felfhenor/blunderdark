@@ -23,9 +23,9 @@
     transition: transform 0.3s ease-out;
   }
 
-  // --- Corruption visual effects ---
-  // Medium (50-99): Subtle dark tinting on dungeon edges
-  &.corruption-medium {
+  // --- Corruption visual effects (data-driven from corruption effects) ---
+  // Aura 1 (threshold 50): Subtle dark tinting on dungeon edges
+  &.corruption-aura-1 {
     box-shadow: inset 0 0 40px 10px oklch(0.2 0.15 300 / 0.3);
 
     .grid-tile:not(.room-tile):not(.occupied) {
@@ -33,8 +33,8 @@
     }
   }
 
-  // High (100-199): Purple veins on tiles
-  &.corruption-high {
+  // Aura 2 (threshold 100): Purple veins on tiles
+  &.corruption-aura-2 {
     box-shadow: inset 0 0 60px 20px oklch(0.2 0.2 300 / 0.5);
 
     .grid-tile:not(.room-tile):not(.occupied) {
@@ -57,8 +57,8 @@
     }
   }
 
-  // Critical (200+): Heavy corruption overlay, pulsing effects
-  &.corruption-critical {
+  // Aura 3 (threshold 200): Heavy corruption overlay, pulsing effects
+  &.corruption-aura-3 {
     box-shadow: inset 0 0 80px 30px oklch(0.15 0.25 300 / 0.6);
     animation: corruption-pulse 3s ease-in-out infinite;
 

@@ -3,6 +3,7 @@ export type ContentType =
   | 'alchemyrecipe'
   | 'breedingrecipe'
   | 'combatability'
+  | 'corruptioneffect'
   | 'feature'
   | 'forgerecipe'
   | 'fusionrecipe'

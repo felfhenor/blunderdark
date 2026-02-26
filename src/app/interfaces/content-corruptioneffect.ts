@@ -1,0 +1,54 @@
+import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { HasDescription } from '@interfaces/traits';
+
+export type CorruptionEffectId = Branded<string, 'CorruptionEffectId'>;
+
+export type CorruptionEffectTriggerType = 'threshold' | 'interval';
+export type CorruptionEffectBehavior = 'passive' | 'event';
+export type CorruptionEffectNotificationSeverity = 'info' | 'warning' | 'error';
+
+export type CorruptionEffectType =
+  | 'unlock'
+  | 'trigger_invasion'
+  | 'mutate_inhabitant'
+  | 'production_modifier'
+  | 'combat_modifier'
+  | 'research_modifier'
+  | 'recruitment_modifier'
+  | 'resource_grant'
+  | 'inhabitant_debuff'
+  | 'visual';
+
+export type CorruptionEffectConditions = {
+  requiresResearch?: string[];
+  minFloorDepth?: number;
+  minInhabitants?: number;
+};
+
+export type CorruptionEffectNotification = {
+  title: string;
+  message: string;
+  severity: CorruptionEffectNotificationSeverity;
+};
+
+export type CorruptionEffectVisual = {
+  gridClass?: string;
+  progressBarClass?: string;
+};
+
+export type CorruptionEffectContent = IsContentItem &
+  HasDescription & {
+    id: CorruptionEffectId;
+    triggerType: CorruptionEffectTriggerType;
+    triggerValue: number;
+    oneTime?: boolean;
+    retriggerable?: boolean;
+    probability?: number;
+    cooldownMinutes?: number;
+    conditions?: CorruptionEffectConditions;
+    behavior: CorruptionEffectBehavior;
+    effectType: CorruptionEffectType;
+    effectParams?: Record<string, unknown>;
+    notification?: CorruptionEffectNotification;
+    visualEffect?: CorruptionEffectVisual;
+  };

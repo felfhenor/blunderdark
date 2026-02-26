@@ -63,6 +63,7 @@ import {
   verticalTransportGetGroupsOnFloor,
   synergyGetDefinitions,
 } from '@helpers';
+import { corruptionEffectIsDarkUpgradeUnlocked } from '@helpers/corruption-effects';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { STORAGE_ROOM_BASE_BONUS } from '@helpers/resources';
@@ -294,9 +295,9 @@ export class PanelRoomInfoComponent {
   public visibleUpgrades = computed(() => {
     const room = this.selectedRoom();
     if (!room) return [];
-    const darkUpgradeUnlocked =
-      gamestate().world.corruptionEffects.darkUpgradeUnlocked;
-    return roomUpgradeGetVisible(room.placedRoom, darkUpgradeUnlocked);
+    const darkUnlocked =
+      corruptionEffectIsDarkUpgradeUnlocked(gamestate().world.corruptionEffects);
+    return roomUpgradeGetVisible(room.placedRoom, darkUnlocked);
   });
 
   public appliedUpgrade = computed(() => {
@@ -375,12 +376,12 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const darkUpgradeUnlocked =
-      gamestate().world.corruptionEffects.darkUpgradeUnlocked;
+    const darkUnlocked =
+      corruptionEffectIsDarkUpgradeUnlocked(gamestate().world.corruptionEffects);
     const validation = roomUpgradeCanApply(
       room.placedRoom,
       path.id,
-      darkUpgradeUnlocked,
+      darkUnlocked,
     );
     if (!validation.valid) {
       notifyError(validation.reason ?? 'Cannot apply upgrade');

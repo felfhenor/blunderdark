@@ -1,0 +1,35 @@
+# =============================================================================
+# Corruption Effects — Negative effects (dangers of corruption)
+# =============================================================================
+
+# Corruption Sickness — passive, one random inhabitant loses 15% efficiency
+- id: 1afae65d-2d1c-4dcc-9146-f58b289b603c
+  name: Corruption Sickness
+  description: High corruption sickens inhabitants, reducing efficiency by 15%.
+  triggerType: threshold
+  triggerValue: 300
+  behavior: passive
+  effectType: inhabitant_debuff
+  effectParams:
+    efficiencyMultiplier: 0.85
+    targetCount: 1
+  notification:
+    title: Corruption Sickness
+    message: An inhabitant has fallen ill from excessive corruption!
+    severity: warning
+
+# Shadow Rift — event, 75% chance to trigger a mini shadow invasion every 750 corruption
+- id: b4cbd163-fd54-42f8-92b6-f0514124c506
+  name: Shadow Rift
+  description: Corruption tears open a rift, allowing shadow creatures to invade.
+  triggerType: interval
+  triggerValue: 750
+  probability: 0.75
+  behavior: event
+  effectType: trigger_invasion
+  effectParams:
+    invasionType: shadow_rift
+  notification:
+    title: Shadow Rift
+    message: A shadow rift has opened in your dungeon!
+    severity: warning

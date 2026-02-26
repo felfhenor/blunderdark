@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass, UpperCasePipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,12 +19,19 @@ import {
   resourceDisplayGetPercent,
   resourceDisplayIsFull,
 } from '@helpers';
+import { corruptionProgressBarClass } from '@helpers/corruption-effects';
 import type { ResourceType } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-resource-bar-top',
-  imports: [DecimalPipe, NgClass, UpperCasePipe, CurrencyCostComponent, CurrencyNameComponent, TippyDirective],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    CurrencyCostComponent,
+    CurrencyNameComponent,
+    TippyDirective,
+  ],
   host: {
     class: 'block pointer-events-auto',
   },
@@ -41,8 +48,11 @@ export class ResourceBarTopComponent {
   public readonly isFull = resourceDisplayIsFull;
   public readonly getResourceBreakdown = resourceDisplayGetBreakdown;
   public readonly formatBreakdownRate = resourceDisplayFormatBreakdownRate;
-  public readonly getCorruptionColorClass = resourceDisplayGetCorruptionColorClass;
-  public readonly getCorruptionBadgeClass = resourceDisplayGetCorruptionBadgeClass;
+  public readonly getCorruptionColorClass =
+    resourceDisplayGetCorruptionColorClass;
+  public readonly getCorruptionBadgeClass =
+    resourceDisplayGetCorruptionBadgeClass;
+  public readonly getCorruptionProgressBarClass = corruptionProgressBarClass;
   public corruptionInfo = computed(() => resourceDisplayGetCorruptionInfo());
 
   public resourceClick = output<ResourceType>();

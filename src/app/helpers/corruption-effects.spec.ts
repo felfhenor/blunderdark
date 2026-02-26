@@ -10,6 +10,10 @@ import type {
   MutationTraitContent,
   MutationTraitId,
 } from '@interfaces';
+import type {
+  CorruptionEffectContent,
+  CorruptionEffectId,
+} from '@interfaces/content-corruptioneffect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
 
@@ -28,6 +32,14 @@ vi.mock('@helpers/invasion-triggers', () => ({
       ],
     }),
   ),
+}));
+
+vi.mock('@helpers/reputation', () => ({
+  reputationAwardInPlace: vi.fn(),
+}));
+
+vi.mock('@helpers/research-unlocks', () => ({
+  researchUnlockGetPassiveBonusWithMastery: vi.fn(() => 0),
 }));
 
 const mockTraits: MutationTraitContent[] = [
@@ -50,19 +62,86 @@ const mockTraits: MutationTraitContent[] = [
   },
 ];
 
+// --- Mock effects that mimic the gamedata definitions ---
+
+const EFFECT_DARK_UPGRADE: CorruptionEffectContent = {
+  id: 'eff-dark-upgrade' as CorruptionEffectId,
+  __type: 'corruptioneffect',
+  name: 'Dark Upgrade Unlock',
+  description: '',
+  triggerType: 'threshold',
+  triggerValue: 50,
+  oneTime: true,
+  behavior: 'event',
+  effectType: 'unlock',
+  effectParams: { feature: 'dark_upgrades' },
+  notification: { title: 'Dark Upgrades', message: 'Unlocked!', severity: 'info' },
+};
+
+const EFFECT_CRUSADE: CorruptionEffectContent = {
+  id: 'eff-crusade' as CorruptionEffectId,
+  __type: 'corruptioneffect',
+  name: 'Crusade Invasion',
+  description: '',
+  triggerType: 'threshold',
+  triggerValue: 200,
+  retriggerable: true,
+  behavior: 'event',
+  effectType: 'trigger_invasion',
+  effectParams: { invasionType: 'crusade' },
+  notification: { title: 'Crusade!', message: 'A crusade approaches!', severity: 'warning' },
+};
+
+const EFFECT_MUTATION: CorruptionEffectContent = {
+  id: 'eff-mutation' as CorruptionEffectId,
+  __type: 'corruptioneffect',
+  name: 'Corruption Mutation',
+  description: '',
+  triggerType: 'interval',
+  triggerValue: 500,
+  behavior: 'event',
+  effectType: 'mutate_inhabitant',
+  notification: { title: 'Mutation', message: 'An inhabitant mutated', severity: 'warning' },
+};
+
+const EFFECT_RESOURCE_GRANT: CorruptionEffectContent = {
+  id: 'eff-resource' as CorruptionEffectId,
+  __type: 'corruptioneffect',
+  name: 'Abyssal Harvest',
+  description: '',
+  triggerType: 'interval',
+  triggerValue: 400,
+  probability: 1, // always fires in tests
+  behavior: 'event',
+  effectType: 'resource_grant',
+  effectParams: { resource: 'essence', amount: 50 },
+  notification: { title: 'Harvest', message: 'Essence granted', severity: 'info' },
+};
+
+let mockEffects: CorruptionEffectContent[] = [];
+
 vi.mock('@helpers/content', () => ({
-  contentGetEntriesByType: vi.fn(() => mockTraits),
+  contentGetEntriesByType: vi.fn(() => {
+    // Return mutation traits when asked for mutationtrait, corruption effects for corruptioneffect
+    return mockEffects;
+  }),
   contentGetEntry: vi.fn(() => undefined),
 }));
+
+// Override contentGetEntriesByType to handle both types
+const { contentGetEntriesByType } = vi.mocked(await import('@helpers/content'));
+contentGetEntriesByType.mockImplementation((type: string) => {
+  if (type === 'corruptioneffect') return mockEffects as never;
+  if (type === 'mutationtrait') return mockTraits as never;
+  return [] as never;
+});
 
 const {
   corruptionEffectSelectMutationTarget,
   corruptionEffectApplyMutationTrait,
-  corruptionEffectProcess,
+  corruptionEffectProcessAll,
   corruptionEffectEvent$,
-  CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE,
-  CORRUPTION_EFFECT_THRESHOLD_MUTATION,
-  CORRUPTION_EFFECT_THRESHOLD_CRUSADE,
+  corruptionEffectIsDarkUpgradeUnlocked,
 } = await import('@helpers/corruption-effects');
 
 const { invasionTriggerAddSpecial } = await import(
@@ -87,13 +166,14 @@ function makeGameState(overrides: {
   inhabitants?: InhabitantInstance[];
   corruptionEffects?: Partial<CorruptionEffectState>;
   day?: number;
+  numTicks?: number;
   schedule?: Partial<InvasionSchedule>;
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test-game' as GameId,
     clock: {
-      numTicks: 0,
+      numTicks: overrides.numTicks ?? 0,
       lastSaveTick: 0,
       day: overrides.day ?? 1,
       hour: 0,
@@ -190,173 +270,64 @@ describe('corruptionEffectApplyMutationTrait', () => {
   });
 });
 
-describe('corruptionEffectProcess — dark upgrades', () => {
+describe('corruptionEffectProcessAll — one-time threshold (dark upgrade)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEffects = [EFFECT_DARK_UPGRADE];
   });
 
-  it('should unlock dark upgrades at 50 corruption', () => {
+  it('should fire one-time effect when corruption meets threshold', () => {
     const state = makeGameState({ corruption: 50 });
     const rng = seedrandom('dark-50');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(true);
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toContain(EFFECT_DARK_UPGRADE.id);
   });
 
-  it('should not unlock below 50', () => {
+  it('should not fire below threshold', () => {
     const state = makeGameState({ corruption: 49 });
     const rng = seedrandom('dark-49');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(false);
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toHaveLength(0);
   });
 
-  it('should stay unlocked permanently', () => {
-    const state = makeGameState({
-      corruption: 10,
-      corruptionEffects: { darkUpgradeUnlocked: true },
-    });
-    const rng = seedrandom('dark-permanent');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(true);
-  });
-
-  it('should not re-trigger event when already unlocked', () => {
+  it('should not re-fire when already in firedOneTimeEffects', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const state = makeGameState({
       corruption: 100,
-      corruptionEffects: { darkUpgradeUnlocked: true },
+      corruptionEffects: {
+        firedOneTimeEffects: [EFFECT_DARK_UPGRADE.id],
+      },
     });
     const rng = seedrandom('no-retrigger');
-    corruptionEffectProcess(state, rng);
-    const darkCalls = nextSpy.mock.calls.filter(
-      ([e]) => e.type === 'dark_upgrade_unlocked',
-    );
-    expect(darkCalls).toHaveLength(0);
+    corruptionEffectProcessAll(state, rng);
+    expect(nextSpy).not.toHaveBeenCalled();
     nextSpy.mockRestore();
   });
 
-  it('should emit dark_upgrade_unlocked event', () => {
+  it('should emit notification event on first trigger', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const state = makeGameState({ corruption: 50 });
     const rng = seedrandom('dark-event');
-    corruptionEffectProcess(state, rng);
+    corruptionEffectProcessAll(state, rng);
     expect(nextSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'dark_upgrade_unlocked' }),
+      expect.objectContaining({ title: 'Dark Upgrades' }),
     );
     nextSpy.mockRestore();
   });
 });
 
-describe('corruptionEffectProcess — mutations', () => {
+describe('corruptionEffectProcessAll — retriggerable threshold (crusade)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEffects = [EFFECT_CRUSADE];
   });
 
-  it('should fire mutation on crossing 500', () => {
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 500, inhabitants });
-    const rng = seedrandom('mutation-500');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
-  });
-
-  it('should not fire below 500', () => {
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 499, inhabitants });
-    const rng = seedrandom('below-500');
-    corruptionEffectProcess(state, rng);
-    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
-  });
-
-  it('should not fire when already at same milestone and tracked', () => {
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({
-      corruption: 650,
-      inhabitants,
-      corruptionEffects: { lastMutationCorruption: 500 },
-    });
-    const rng = seedrandom('no-refire');
-    corruptionEffectProcess(state, rng);
-    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
-  });
-
-  it('should fire again at next 500 milestone', () => {
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 500, inhabitants });
-    const rng1 = seedrandom('milestone-1');
-    corruptionEffectProcess(state, rng1);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-
-    // Not yet at 1000
-    state.world.resources.corruption.current = 800;
-    const rng2 = seedrandom('milestone-2');
-    corruptionEffectProcess(state, rng2);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-
-    // Reaches 1000
-    state.world.resources.corruption.current = 1000;
-    const rng3 = seedrandom('milestone-3');
-    corruptionEffectProcess(state, rng3);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(1000);
-  });
-
-  it('should not re-fire when corruption drops and returns to same milestone', () => {
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 500, inhabitants });
-    const rng1 = seedrandom('drop-1');
-    corruptionEffectProcess(state, rng1);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-
-    // Drop below 500
-    state.world.resources.corruption.current = 300;
-    const rng2 = seedrandom('drop-2');
-    corruptionEffectProcess(state, rng2);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-
-    // Back above 500 but below 1000
-    state.world.resources.corruption.current = 600;
-    const rng3 = seedrandom('drop-3');
-    corruptionEffectProcess(state, rng3);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-  });
-
-  it('should handle no inhabitants gracefully', () => {
-    const state = makeGameState({ corruption: 500 });
-    const rng = seedrandom('no-inhabitants');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-  });
-
-  it('should emit mutation_applied event with trait name', () => {
-    const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
-
-    const inhabitants = [makeInhabitant()];
-    const state = makeGameState({ corruption: 500, inhabitants });
-    const rng = seedrandom('mutation-event');
-    corruptionEffectProcess(state, rng);
-
-    const mutationCalls = nextSpy.mock.calls.filter(
-      ([e]) => e.type === 'mutation_applied',
-    );
-    expect(mutationCalls).toHaveLength(1);
-    expect(mutationCalls[0][0].description).toContain('gained');
-
-    nextSpy.mockRestore();
-  });
-});
-
-describe('corruptionEffectProcess — crusade', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should trigger crusade on crossing 200', () => {
+  it('should trigger invasion when corruption meets threshold', () => {
     const state = makeGameState({ corruption: 200, day: 10 });
     const rng = seedrandom('crusade-200');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBe(200);
+    corruptionEffectProcessAll(state, rng);
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledWith(
       expect.anything(),
       'crusade',
@@ -364,64 +335,206 @@ describe('corruptionEffectProcess — crusade', () => {
     );
   });
 
-  it('should not trigger below 200', () => {
+  it('should not trigger below threshold', () => {
     const state = makeGameState({ corruption: 199 });
     const rng = seedrandom('no-crusade');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBeUndefined();
+    corruptionEffectProcessAll(state, rng);
     expect(vi.mocked(invasionTriggerAddSpecial)).not.toHaveBeenCalled();
   });
 
-  it('should re-fire on re-crossing', () => {
+  it('should re-arm after corruption drops below threshold', () => {
     const state = makeGameState({ corruption: 200, day: 10 });
-    const rng1 = seedrandom('recross-crusade-1');
-    corruptionEffectProcess(state, rng1);
+    const rng1 = seedrandom('recross-1');
+    corruptionEffectProcessAll(state, rng1);
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledTimes(1);
 
-    // Drop below
+    // Drop below threshold — should arm the effect
     state.world.resources.corruption.current = 150;
-    const rng2 = seedrandom('recross-crusade-2');
-    corruptionEffectProcess(state, rng2);
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBeUndefined();
+    const rng2 = seedrandom('recross-2');
+    corruptionEffectProcessAll(state, rng2);
+    expect(state.world.corruptionEffects.retriggeredEffects[EFFECT_CRUSADE.id]).toBe(true);
 
-    // Back above
+    // Back above — should fire again
     vi.mocked(invasionTriggerAddSpecial).mockClear();
     state.world.resources.corruption.current = 250;
-    const rng3 = seedrandom('recross-crusade-3');
-    corruptionEffectProcess(state, rng3);
+    const rng3 = seedrandom('recross-3');
+    corruptionEffectProcessAll(state, rng3);
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledTimes(1);
   });
 
-  it('should not re-trigger when already above and tracked', () => {
+  it('should not re-trigger while still above threshold', () => {
     const state = makeGameState({
       corruption: 300,
-      corruptionEffects: { lastCrusadeCorruption: 250 },
+      corruptionEffects: {
+        retriggeredEffects: { [EFFECT_CRUSADE.id]: false },
+      },
     });
     const rng = seedrandom('no-retrigger-crusade');
-    corruptionEffectProcess(state, rng);
+    corruptionEffectProcessAll(state, rng);
     expect(vi.mocked(invasionTriggerAddSpecial)).not.toHaveBeenCalled();
-  });
-
-  it('should emit crusade_triggered event', () => {
-    const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
-
-    const state = makeGameState({ corruption: 200, day: 5 });
-    const rng = seedrandom('crusade-event');
-    corruptionEffectProcess(state, rng);
-
-    expect(nextSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'crusade_triggered' }),
-    );
-    nextSpy.mockRestore();
   });
 });
 
-describe('corruptionEffectProcess — combined thresholds', () => {
+describe('corruptionEffectProcessAll — interval (mutation)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockEffects = [EFFECT_MUTATION];
+  });
+
+  it('should fire mutation at interval milestone', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({ corruption: 500, inhabitants });
+    const rng = seedrandom('mutation-500');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(500);
+    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
+  });
+
+  it('should not fire below first interval', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({ corruption: 499, inhabitants });
+    const rng = seedrandom('below-500');
+    corruptionEffectProcessAll(state, rng);
+    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
+  });
+
+  it('should not fire when already at same milestone', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({
+      corruption: 650,
+      inhabitants,
+      corruptionEffects: {
+        lastIntervalValues: { [EFFECT_MUTATION.id]: 500 },
+      },
+    });
+    const rng = seedrandom('no-refire');
+    corruptionEffectProcessAll(state, rng);
+    expect(inhabitants[0].mutationTraitIds).toBeUndefined();
+  });
+
+  it('should fire again at next interval milestone', () => {
+    const inhabitants = [makeInhabitant()];
+    const state = makeGameState({ corruption: 500, inhabitants });
+    const rng1 = seedrandom('milestone-1');
+    corruptionEffectProcessAll(state, rng1);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(500);
+
+    // Not yet at 1000
+    state.world.resources.corruption.current = 800;
+    const rng2 = seedrandom('milestone-2');
+    corruptionEffectProcessAll(state, rng2);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(500);
+
+    // Reaches 1000
+    state.world.resources.corruption.current = 1000;
+    const rng3 = seedrandom('milestone-3');
+    corruptionEffectProcessAll(state, rng3);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(1000);
+  });
+
+  it('should handle no inhabitants gracefully', () => {
+    const state = makeGameState({ corruption: 500 });
+    const rng = seedrandom('no-inhabitants');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(500);
+  });
+});
+
+describe('corruptionEffectProcessAll — resource grant', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockEffects = [EFFECT_RESOURCE_GRANT];
+  });
+
+  it('should grant resources at interval milestone', () => {
+    const state = makeGameState({ corruption: 400 });
+    const rng = seedrandom('resource-grant');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.resources.essence.current).toBe(50);
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_RESOURCE_GRANT.id]).toBe(400);
+  });
+
+  it('should cap resource grant to max', () => {
+    const state = makeGameState({ corruption: 400 });
+    state.world.resources.essence.current = state.world.resources.essence.max - 10;
+    const rng = seedrandom('resource-cap');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.resources.essence.current).toBe(state.world.resources.essence.max);
+  });
+});
+
+describe('corruptionEffectProcessAll — conditions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should handle 0 → 500 crossing all thresholds at once', () => {
+  it('should skip effect when minFloorDepth condition is not met', () => {
+    const conditionedEffect: CorruptionEffectContent = {
+      ...EFFECT_DARK_UPGRADE,
+      id: 'eff-conditioned' as CorruptionEffectId,
+      conditions: { minFloorDepth: 3 },
+    };
+    mockEffects = [conditionedEffect];
+
+    const state = makeGameState({ corruption: 100 });
+    const rng = seedrandom('no-depth');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toHaveLength(0);
+  });
+
+  it('should skip effect when minInhabitants condition is not met', () => {
+    const conditionedEffect: CorruptionEffectContent = {
+      ...EFFECT_DARK_UPGRADE,
+      id: 'eff-min-inh' as CorruptionEffectId,
+      conditions: { minInhabitants: 5 },
+    };
+    mockEffects = [conditionedEffect];
+
+    const state = makeGameState({ corruption: 100 });
+    const rng = seedrandom('no-inhabitants');
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toHaveLength(0);
+  });
+});
+
+describe('corruptionEffectProcessAll — passive effects are skipped', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should not process passive effects during tick processing', () => {
+    const passiveEffect: CorruptionEffectContent = {
+      id: 'eff-passive' as CorruptionEffectId,
+      __type: 'corruptioneffect',
+      name: 'Passive Bonus',
+      description: '',
+      triggerType: 'threshold',
+      triggerValue: 10,
+      behavior: 'passive',
+      effectType: 'production_modifier',
+      effectParams: { multiplier: 1.1 },
+    };
+    mockEffects = [passiveEffect];
+
+    const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
+    const state = makeGameState({ corruption: 100 });
+    const rng = seedrandom('passive');
+    corruptionEffectProcessAll(state, rng);
+
+    // Passive effects should NOT be processed as events
+    expect(nextSpy).not.toHaveBeenCalled();
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toHaveLength(0);
+    nextSpy.mockRestore();
+  });
+});
+
+describe('corruptionEffectProcessAll — combined effects', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockEffects = [EFFECT_DARK_UPGRADE, EFFECT_CRUSADE, EFFECT_MUTATION];
+  });
+
+  it('should process multiple effects in one pass', () => {
     const nextSpy = vi.spyOn(corruptionEffectEvent$, 'next');
 
     const inhabitants = [makeInhabitant()];
@@ -431,41 +544,50 @@ describe('corruptionEffectProcess — combined thresholds', () => {
       day: 15,
     });
     const rng = seedrandom('combined');
-    corruptionEffectProcess(state, rng);
+    corruptionEffectProcessAll(state, rng);
 
-    // All thresholds should fire
-    expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(true);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBe(500);
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBe(500);
-    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
+    // Dark upgrade (one-time threshold at 50) should fire
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toContain(EFFECT_DARK_UPGRADE.id);
+
+    // Crusade (retriggerable threshold at 200) should fire
     expect(vi.mocked(invasionTriggerAddSpecial)).toHaveBeenCalledWith(
       expect.anything(),
       'crusade',
       15,
     );
 
-    const eventTypes = nextSpy.mock.calls.map(([e]) => e.type);
-    expect(eventTypes).toContain('dark_upgrade_unlocked');
-    expect(eventTypes).toContain('mutation_applied');
-    expect(eventTypes).toContain('crusade_triggered');
+    // Mutation (interval at 500) should fire
+    expect(state.world.corruptionEffects.lastIntervalValues[EFFECT_MUTATION.id]).toBe(500);
+    expect(inhabitants[0].mutationTraitIds?.length).toBeGreaterThan(0);
 
+    expect(nextSpy).toHaveBeenCalled();
     nextSpy.mockRestore();
   });
 
   it('should do nothing at 0 corruption', () => {
     const state = makeGameState({ corruption: 0 });
     const rng = seedrandom('zero');
-    corruptionEffectProcess(state, rng);
-    expect(state.world.corruptionEffects.darkUpgradeUnlocked).toBe(false);
-    expect(state.world.corruptionEffects.lastMutationCorruption).toBeUndefined();
-    expect(state.world.corruptionEffects.lastCrusadeCorruption).toBeUndefined();
+    corruptionEffectProcessAll(state, rng);
+    expect(state.world.corruptionEffects.firedOneTimeEffects).toHaveLength(0);
+    expect(Object.keys(state.world.corruptionEffects.lastIntervalValues)).toHaveLength(0);
   });
 });
 
-describe('constants', () => {
-  it('should have correct threshold values', () => {
-    expect(CORRUPTION_EFFECT_THRESHOLD_DARK_UPGRADE).toBe(50);
-    expect(CORRUPTION_EFFECT_THRESHOLD_MUTATION).toBe(500);
-    expect(CORRUPTION_EFFECT_THRESHOLD_CRUSADE).toBe(200);
+describe('corruptionEffectIsDarkUpgradeUnlocked', () => {
+  beforeEach(() => {
+    mockEffects = [EFFECT_DARK_UPGRADE];
+  });
+
+  it('should return true when dark upgrade effect has been fired', () => {
+    const effects: CorruptionEffectState = {
+      ...defaultCorruptionEffectState(),
+      firedOneTimeEffects: [EFFECT_DARK_UPGRADE.id],
+    };
+    expect(corruptionEffectIsDarkUpgradeUnlocked(effects)).toBe(true);
+  });
+
+  it('should return false when dark upgrade effect has not been fired', () => {
+    const effects = defaultCorruptionEffectState();
+    expect(corruptionEffectIsDarkUpgradeUnlocked(effects)).toBe(false);
   });
 });

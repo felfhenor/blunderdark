@@ -21,7 +21,6 @@ import {
   cameraUpdateViewport,
   cameraZoomAt,
   connectivityDisconnectedRoomIds,
-  corruptionLevel,
   featureGetForSlot,
   featureGetSlotCount,
   floorCurrent,
@@ -51,6 +50,7 @@ import {
   uiIsAnyModalOpen,
   verticalTransportGetGroupsOnFloor,
 } from '@helpers';
+import { corruptionActiveGridClasses } from '@helpers/corruption-effects';
 import {
   invasionCurrentRoomId,
   invasionEntryRoomId,
@@ -134,7 +134,7 @@ export class GridComponent implements AfterViewInit {
   public grid = computed(() => floorCurrent()?.grid ?? gridCreateEmpty());
   public gridSelectedTile = gridSelectedTile;
   public roomPlacementPreview = roomPlacementPreview;
-  public corruptionLevel = corruptionLevel;
+  public corruptionGridClasses = corruptionActiveGridClasses;
   public disconnectedRoomIds = connectivityDisconnectedRoomIds;
   public invasionEntryRoomId = invasionEntryRoomId;
   public invasionCurrentRoomId = invasionCurrentRoomId;
