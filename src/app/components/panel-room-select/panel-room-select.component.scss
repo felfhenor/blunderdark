@@ -12,6 +12,30 @@
   }
 }
 
+.room-entry-layout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.shape-preview-container {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.room-entry-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .shape-preview {
   display: grid;
   grid-template-columns: repeat(var(--grid-size), 8px);

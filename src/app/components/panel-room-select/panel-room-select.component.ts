@@ -194,6 +194,22 @@ export class PanelRoomSelectComponent {
     return max + 1;
   }
 
+  public getRoomTooltip(room: RoomContent): string {
+    if (this.isBiomeRestricted(room)) {
+      return this.getBiomeRestrictionTooltip(room);
+    }
+    if (this.isUniqueAndPlaced(room)) {
+      return 'Already built (unique room)';
+    }
+    if (this.isAtGlobalLimit(room)) {
+      return 'Maximum built across dungeon';
+    }
+    if (!this.hasAltar()) {
+      return 'Requires Altar';
+    }
+    return room.description;
+  }
+
   public selectRoom(room: RoomContent): void {
     if (this.isSelected(room.id)) {
       roomPlacementExitMode();

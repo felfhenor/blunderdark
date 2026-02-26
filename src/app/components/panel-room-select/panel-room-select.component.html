@@ -169,7 +169,7 @@
     >
       @for (room of rooms(); track room.id) {
         <button
-          class="room-entry btn btn-sm h-auto py-2 flex-col items-start gap-2"
+          class="room-entry btn btn-sm h-auto py-1"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
           [class.room-biome-restricted]="isBiomeRestricted(room)"
@@ -180,54 +180,57 @@
             isAtGlobalLimit(room) ||
             !hasAltar()
           "
-          [tp]="
-            isBiomeRestricted(room)
-              ? getBiomeRestrictionTooltip(room)
-              : isUniqueAndPlaced(room)
-                ? 'Already built (unique room)'
-                : isAtGlobalLimit(room)
-                  ? 'Maximum built across dungeon'
-                  : !hasAltar()
-                    ? 'Requires Altar'
-                    : ''
-          "
+          [tp]="getRoomTooltip(room)"
+          tpPlacement="right"
           (click)="selectRoom(room)"
         >
-          <div class="flex items-center gap-2 w-full">
-            <span class="room-name flex-1 text-left text-xs font-semibold">
-              {{ room.name }}
-            </span>
-            @if (getBiomeLimitLabel(room); as limitLabel) {
-              <span class="badge badge-sm badge-outline">{{ limitLabel }}</span>
-            }
-            @if (getGlobalLimitLabel(room); as globalLabel) {
-              <span class="badge badge-sm badge-outline">
-                {{ globalLabel }}
-              </span>
-            }
-            <div
-              class="shape-preview"
-              [style.--grid-size]="getShapeGridSize(room)"
-            >
-              @for (tile of getShapeTiles(room); track tile.key) {
-                <div
-                  class="shape-tile"
-                  [style.--tile-col]="tile.x + 1"
-                  [style.--tile-row]="tile.y + 1"
-                ></div>
-              }
+          <div class="room-entry-layout">
+            <div class="shape-preview-container">
+              <div
+                class="shape-preview"
+                [style.--grid-size]="getShapeGridSize(room)"
+              >
+                @for (tile of getShapeTiles(room); track tile.key) {
+                  <div
+                    class="shape-tile"
+                    [style.--tile-col]="tile.x + 1"
+                    [style.--tile-row]="tile.y + 1"
+                  ></div>
+                }
+              </div>
             </div>
-          </div>
 
-          <div class="cost-row flex gap-2 w-full">
-            @for (cost of getCostEntries(room); track cost.type) {
-              <span class="text-xs opacity-70">
-                <app-currency-cost [type]="cost.type" [amount]="cost.amount" />
-              </span>
-            }
-            @if (getCostEntries(room).length === 0) {
-              <span class="text-xs opacity-70">Free</span>
-            }
+            <div class="room-entry-info">
+              <div class="flex items-center gap-2">
+                <span class="room-name flex-1 text-left text-xs font-semibold">
+                  {{ room.name }}
+                </span>
+                @if (getBiomeLimitLabel(room); as limitLabel) {
+                  <span class="badge badge-xs badge-outline">{{
+                    limitLabel
+                  }}</span>
+                }
+                @if (getGlobalLimitLabel(room); as globalLabel) {
+                  <span class="badge badge-xs badge-outline">{{
+                    globalLabel
+                  }}</span>
+                }
+              </div>
+
+              <div class="cost-row flex gap-2">
+                @for (cost of getCostEntries(room); track cost.type) {
+                  <span class="text-xs opacity-70">
+                    <app-currency-cost
+                      [type]="cost.type"
+                      [amount]="cost.amount"
+                    />
+                  </span>
+                }
+                @if (getCostEntries(room).length === 0) {
+                  <span class="text-xs opacity-70">Free</span>
+                }
+              </div>
+            </div>
           </div>
         </button>
       }
