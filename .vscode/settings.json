@@ -25,6 +25,7 @@
     "./schemas/alchemyrecipe.schema.json": "gamedata/alchemyrecipe/*.yml",
     "./schemas/breedingrecipe.schema.json": "gamedata/breedingrecipe/*.yml",
     "./schemas/combatability.schema.json": "gamedata/combatability/*.yml",
+    "./schemas/corruptioneffect.schema.json": "gamedata/corruptioneffect/*.yml",
     "./schemas/feature.schema.json": "gamedata/feature/*.yml",
     "./schemas/forgerecipe.schema.json": "gamedata/forgerecipe/*.yml",
     "./schemas/fusionrecipe.schema.json": "gamedata/fusionrecipe/*.yml",
