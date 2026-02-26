@@ -115,7 +115,7 @@ const wealthVaultUpgrades = makeEffect({
   name: 'Wealth - Treasure Vault Upgrades',
   reputationType: 'wealth',
   minimumLevel: 'high',
-  effectType: 'unlock_room',
+  effectType: 'unlock_room_upgrades',
   effectValue: 1,
   targetId: 'Treasure Vault',
 });
@@ -450,7 +450,7 @@ describe('Wealth effects thresholds', () => {
 
   it('should unlock Treasure Vault upgrades at High Wealth', () => {
     const state = { ...freshState(), wealth: 350 };
-    const unlocks = reputationEffectGetByType('unlock_room', state, allEffects);
+    const unlocks = reputationEffectGetByType('unlock_room_upgrades', state, allEffects);
     expect(unlocks.some((e) => e.targetId === 'Treasure Vault')).toBe(true);
   });
 

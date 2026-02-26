@@ -162,6 +162,33 @@ export function reputationEffectIsRoomUnlocked(
 }
 
 /**
+ * Pure function: check if a room's upgrades are unlocked by reputation effects.
+ * Returns true if no unlock_room_upgrades effect targets this room name, or if the targeting effect is active.
+ */
+export function reputationEffectIsRoomUpgradesUnlocked(
+  roomName: string,
+  reputation?: Record<ReputationType, number>,
+  allEffects?: ReputationEffectContent[],
+): boolean {
+  const effects =
+    allEffects ??
+    contentGetEntriesByType<ReputationEffectContent>('reputationeffect');
+
+  const unlockEffects = effects.filter(
+    (e) => e.effectType === 'unlock_room_upgrades' && e.targetId === roomName,
+  );
+
+  // If no unlock_room_upgrades effect targets this room, upgrades are not reputation-gated
+  if (unlockEffects.length === 0) return true;
+
+  const rep = reputation ?? gamestate()?.world?.reputation;
+  if (!rep) return true;
+
+  const activeEffects = reputationEffectGetActive(rep, effects);
+  return unlockEffects.some((ue) => activeEffects.some((ae) => ae.id === ue.id));
+}
+
+/**
  * Pure function: get the maximum creature attraction level from active effects.
  * Returns 0 if no attraction effects are active. effectValue 1 = basic, 2 = legendary.
  */

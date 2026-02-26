@@ -18,6 +18,10 @@ vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
 }));
 
+vi.mock('@helpers/reputation-effects', () => ({
+  reputationEffectIsRoomUpgradesUnlocked: () => true,
+}));
+
 vi.mock('@helpers/research-unlocks', () => ({
   researchUnlockIsUnlocked: (_type: string, id: string) =>
     mockResearchUnlocked.has(id),

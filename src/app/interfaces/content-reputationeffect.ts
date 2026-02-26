@@ -6,6 +6,7 @@ export type ReputationEffectId = Branded<string, 'ReputationEffectId'>;
 
 export type ReputationEffectType =
   | 'unlock_room'
+  | 'unlock_room_upgrades'
   | 'modify_event_rate'
   | 'attract_creature'
   | 'modify_production'

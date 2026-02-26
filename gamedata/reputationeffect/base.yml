@@ -1,5 +1,5 @@
 # Reputation effects define gameplay consequences at reputation level thresholds.
-# effectType: unlock_room, modify_event_rate, attract_creature, modify_production, modify_invasion_rate
+# effectType: unlock_room, unlock_room_upgrades, modify_event_rate, attract_creature, modify_production, modify_invasion_rate
 # effectValue: multiplier (1.25 = +25%), flat bonus, or boolean (1 = enabled)
 
 # --- TERROR effects ---
@@ -23,7 +23,7 @@
   name: Terror - Unlock Torture Chamber
   description: Your reputation for cruelty unlocks the ability to build a Torture Chamber.
   reputationType: terror
-  minimumLevel: high
+  minimumLevel: medium
   effectType: unlock_room
   effectValue: 1
   targetId: Torture Chamber
@@ -50,7 +50,7 @@
   description: Your wealth reputation unlocks advanced Treasure Vault room upgrades.
   reputationType: wealth
   minimumLevel: high
-  effectType: unlock_room
+  effectType: unlock_room_upgrades
   effectValue: 1
   targetId: Treasure Vault
 
