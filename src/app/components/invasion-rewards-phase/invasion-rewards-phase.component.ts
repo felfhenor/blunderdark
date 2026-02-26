@@ -28,14 +28,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
                 </div>
               </div>
             }
-            @if (res.rewards.experienceGain > 0) {
-              <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                <div class="text-xs opacity-50">Experience</div>
-                <div class="text-lg font-bold text-accent">
-                  +{{ res.rewards.experienceGain }}
-                </div>
-              </div>
-            }
+
             @for (
               entry of res.rewards.resourceGains | keyvalue;
               track entry.key

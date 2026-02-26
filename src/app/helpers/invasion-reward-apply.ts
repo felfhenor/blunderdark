@@ -19,7 +19,7 @@ import type {
 
 /**
  * Apply victory rewards to the game state.
- * Awards gold, resources, reputation, experience to survivors, and adds prisoners.
+ * Awards gold, resources, reputation to survivors, and adds prisoners.
  */
 export async function invasionRewardApplyVictory(
   result: InvasionOrchestratorResult,
@@ -34,17 +34,6 @@ export async function invasionRewardApplyVictory(
   await updateGamestate((state) => {
     reputationAwardInPlace(state, 'Defeat Invader');
     victoryRecordDefenseWin(state);
-
-    // Distribute XP to surviving defenders
-    if (rewards.experienceGain > 0) {
-      const xpPerDefender = Math.max(
-        1,
-        Math.floor(rewards.experienceGain / Math.max(1, state.world.inhabitants.length)),
-      );
-      for (const inhabitant of state.world.inhabitants) {
-        inhabitant.xp = (inhabitant.xp ?? 0) + xpPerDefender;
-      }
-    }
 
     // Add captured prisoners
     if (result.capturedPrisoners.length > 0) {

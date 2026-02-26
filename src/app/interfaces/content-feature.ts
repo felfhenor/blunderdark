@@ -16,7 +16,7 @@ export type FeatureBonusType =
   | 'combat_bonus'
   | 'storage_bonus'
   | 'corruption_seal'
-  | 'training_xp'
+
   | 'resource_converter'
   | 'speed_multiplier'
   | 'daily_summon'

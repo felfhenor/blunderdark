@@ -23,7 +23,6 @@ import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import {
   featureMaintenanceProcess,
   featureSacrificeProcess,
-  featureTrainingStationProcess,
 } from '@helpers/features';
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { merchantProcess } from '@helpers/merchant';
@@ -100,7 +99,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);
-    featureTrainingStationProcess(state.world.floors, state.world.inhabitants, numTicks);
+
     for (const floor of state.world.floors) {
       featureSacrificeProcess(floor.rooms, numTicks);
     }

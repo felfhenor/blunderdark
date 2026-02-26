@@ -8,7 +8,6 @@ import type { InvaderClassType, InvaderInstance } from '@interfaces/invader';
 import {
   INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS,
   INVASION_REWARD_ALTAR_REBUILD_COST,
-  INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER,
   INVASION_REWARD_BASE_REPUTATION_GAIN,
   INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX,
   INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN,
@@ -173,14 +172,6 @@ describe('invasion-rewards', () => {
       const result = makeResult({ invadersKilled: 1, objectivesCompleted: 0, objectivesTotal: 0 });
       const rewards = invasionRewardCalculateDefenseRewards(result, [], fixedRng(0.5));
       expect(rewards.reputationGain).toBe(INVASION_REWARD_BASE_REPUTATION_GAIN + INVASION_REWARD_REPUTATION_PER_KILL);
-    });
-
-    it('should calculate experience scaled by reward multiplier', () => {
-      const result = makeResult({ invaderCount: 5, rewardMultiplier: 1.5 });
-      const rewards = invasionRewardCalculateDefenseRewards(result, [], fixedRng(0.5));
-      expect(rewards.experienceGain).toBe(
-        Math.round(5 * INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER * 1.5),
-      );
     });
 
     it('should roll class-based gold loot', () => {

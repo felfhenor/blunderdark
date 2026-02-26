@@ -35,7 +35,6 @@ export const INVASION_REWARD_DEFEAT_RESOURCE_MAX_LOSS: Partial<
   essence: 0.2,
   flux: 0.15,
 };
-export const INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER = 10;
 
 export const INVASION_REWARD_ALTAR_REBUILD_COST: Partial<
   Record<ResourceType, number>
@@ -126,7 +125,7 @@ const RANSOM_GOLD: Record<InvaderClassType, number> = {
  * Calculate defense rewards for a successful invasion defense.
  * Reputation: +5 base, +1 per kill, +3 if all secondaries prevented.
  * Gold/resources: class-based loot from killed invaders.
- * Experience: 10 per invader, scaled by reward multiplier.
+
  */
 export function invasionRewardCalculateDefenseRewards(
   result: DetailedInvasionResult,
@@ -139,13 +138,6 @@ export function invasionRewardCalculateDefenseRewards(
   if (result.objectivesCompleted === 0 && result.objectivesTotal > 0) {
     reputationGain += INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS;
   }
-
-  // Experience
-  const experienceGain = Math.round(
-    result.invaderCount *
-      INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER *
-      result.rewardMultiplier,
-  );
 
   // Loot from killed invaders
   const resourceGains: Partial<Record<ResourceType, number>> = {};
@@ -165,7 +157,7 @@ export function invasionRewardCalculateDefenseRewards(
 
   return {
     reputationGain,
-    experienceGain,
+
     resourceGains,
     capturedPrisoners: [],
   };

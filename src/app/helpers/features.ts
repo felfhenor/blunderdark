@@ -251,19 +251,6 @@ export function featureGetCorruptionSealedRoomIds(
   return sealed;
 }
 
-/**
- * Calculate XP gain per tick from training_xp features on a room.
- */
-export function featureCalculateTrainingXpPerTick(
-  placedRoom: PlacedRoom,
-): number {
-  const bonuses = featureGetBonuses(placedRoom, 'training_xp');
-  let total = 0;
-  for (const b of bonuses) {
-    total += b.value;
-  }
-  return total;
-}
 
 // --- Speed Multiplier (Time Dilation Field) ---
 
@@ -375,26 +362,6 @@ export function featureApplyResourceConversion(
   return { [targetResource]: totalProduction * efficiency };
 }
 
-// --- Training Station ---
-
-/**
- * Process passive XP gain from Training Station features each tick.
- * Inhabitants assigned to rooms with Training Station features gain XP.
- * Mutates state in-place.
- */
-export function featureTrainingStationProcess(floors: Floor[], allInhabitants: InhabitantInstance[], numTicks = 1): void {
-  for (const floor of floors) {
-    for (const room of floor.rooms) {
-      const xpPerTick = featureCalculateTrainingXpPerTick(room);
-      if (xpPerTick <= 0) continue;
-
-      for (const inhabitant of allInhabitants) {
-        if (inhabitant.assignedRoomId !== room.id) continue;
-        inhabitant.xp = (inhabitant.xp ?? 0) + xpPerTick * numTicks;
-      }
-    }
-  }
-}
 
 // --- Blood Altar Sacrifice ---
 

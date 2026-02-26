@@ -61,7 +61,7 @@ export type InhabitantInstance = {
   isSummoned?: boolean;
   travelTicksRemaining?: number;
   discontentedTicks?: number;
-  xp?: number;
+
   abilityStates?: AbilityState[];
   statusEffects?: StatusEffect[];
 };

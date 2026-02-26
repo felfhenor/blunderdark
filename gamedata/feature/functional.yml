@@ -46,17 +46,6 @@
       value: 1
       description: "Prevents all corruption generation in this room"
 
-- id: f8c1a7ee-8364-4aa3-a6a1-baafdb35ab41
-  name: Training Station
-  description: "Practice dummies, weapon racks, and training manuals that allow inhabitants to hone their skills passively while working."
-  category: functional
-  cost:
-    gold: 90
-    crystals: 15
-  bonuses:
-    - type: training_xp
-      value: 1
-      description: "Inhabitants gain passive XP each tick"
 
 - id: bebc8602-b0e8-4c90-985c-ff60d1ef52de
   name: Resource Converter
