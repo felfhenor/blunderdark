@@ -19,9 +19,6 @@
           </span>
         }
       </div>
-      @if (showHybridBadge() && instance().isHybrid) {
-        <span class="badge badge-xs badge-secondary">Hybrid</span>
-      }
       @if (showAssignment() && instance().assignedRoomId) {
         <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
       }
@@ -78,9 +75,6 @@
             </span>
           }
         </div>
-        @if (showHybridBadge() && instance().isHybrid) {
-          <span class="badge badge-xs badge-secondary">Hybrid</span>
-        }
       </div>
       <div class="flex items-center gap-2">
         @if (synergyInfo(); as reasons) {

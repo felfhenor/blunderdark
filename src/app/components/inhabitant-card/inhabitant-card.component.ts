@@ -49,7 +49,6 @@ export class InhabitantCardComponent {
   public showWorkerEfficiency = input(true);
   public showInstanceName = input(true);
   public showDefinitionName = input(true);
-  public showHybridBadge = input(false);
   public showHunger = input(false);
   public showTier = input(true);
   public synergyRoomId = input<PlacedRoomId | undefined>(undefined);
