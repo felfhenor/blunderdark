@@ -126,14 +126,17 @@ export class ResourceBreakdownModalComponent {
   public sortedProduction = computed<RoomProductionDetail[]>(() => {
     const bd = this.breakdown();
     if (!bd) return [];
-    return sortBy(bd.production, [(r) => -r.final]);
+    return sortBy(
+      bd.production.filter((r) => r.final !== 0),
+      [(r) => -r.final],
+    );
   });
 
   public roomsWithWorkers = computed<RoomProductionDetail[]>(() => {
     const bd = this.breakdown();
     if (!bd) return [];
     return sortBy(
-      bd.production.filter((r) => r.workerCount > 0),
+      bd.production.filter((r) => r.workerCount > 0 && r.inhabitantBonus !== 0),
       [(r) => -r.inhabitantBonus],
     );
   });
@@ -143,7 +146,7 @@ export class ResourceBreakdownModalComponent {
     if (!bd) return [];
     return bd.production.filter(
       (r) =>
-        r.modifierDetails.length > 0 ||
+        r.modifierDetails.some((m) => m.multiplier !== 1) ||
         r.adjacencyBonus !== 0 ||
         r.featureBonus !== 0 ||
         r.synergyBonus !== 0 ||
@@ -156,13 +159,16 @@ export class ResourceBreakdownModalComponent {
   public alchemyProductionDetails = computed<AlchemyConversionDetail[]>(() => {
     const bd = this.breakdown();
     if (!bd) return [];
-    return bd.alchemyProduction;
+    return bd.alchemyProduction.filter((a) => a.perTick !== 0);
   });
 
   public consumptionDetails = computed<ConsumptionDetail[]>(() => {
     const bd = this.breakdown();
     if (!bd) return [];
-    return sortBy(bd.consumption, [(c) => -c.amount]);
+    return sortBy(
+      bd.consumption.filter((c) => c.amount !== 0),
+      [(c) => -c.amount],
+    );
   });
 
   public formatRate(perTick: number): string {

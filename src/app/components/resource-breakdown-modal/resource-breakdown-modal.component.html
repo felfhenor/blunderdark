@@ -191,18 +191,20 @@
                   </tr>
                 }
                 @for (mod of room.modifierDetails; track mod.name) {
-                  <tr>
-                    <td>{{ room.roomName }}</td>
-                    <td class="text-right">{{ room.floorDepth }}</td>
-                    <td>{{ mod.name }}</td>
-                    <td
-                      class="text-right"
-                      [class.text-success]="mod.multiplier > 1"
-                      [class.text-error]="mod.multiplier < 1"
-                    >
-                      {{ formatMultiplier(mod.multiplier) }}
-                    </td>
-                  </tr>
+                  @if (mod.multiplier !== 1) {
+                    <tr>
+                      <td>{{ room.roomName }}</td>
+                      <td class="text-right">{{ room.floorDepth }}</td>
+                      <td>{{ mod.name }}</td>
+                      <td
+                        class="text-right"
+                        [class.text-success]="mod.multiplier > 1"
+                        [class.text-error]="mod.multiplier < 1"
+                      >
+                        {{ formatMultiplier(mod.multiplier) }}
+                      </td>
+                    </tr>
+                  }
                 }
                 @if (room.upgradeMultiplier !== 1) {
                   <tr>
