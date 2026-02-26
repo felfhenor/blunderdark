@@ -6,7 +6,7 @@
     crystals: 150
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: crystals
 
 - id: 3a78cfc8-d58d-49cc-8d88-2a36b2e80e79
@@ -17,7 +17,7 @@
     food: 150
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: food
 
 - id: 853de897-85a5-414a-a8a9-e50dc5818067
@@ -27,7 +27,7 @@
     gold: 225
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: gold
 
 - id: 6d7ca369-2b4f-4074-845a-25beb3fc3f8c
@@ -38,7 +38,7 @@
     flux: 150
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: flux
 
 - id: 8baa6d60-6454-4135-a357-634174393bd1
@@ -49,7 +49,7 @@
     research: 150
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: research
 
 - id: eb08e4a2-9030-4e3a-a94d-007dfe84810f
@@ -60,5 +60,5 @@
     essence: 150
   effects:
     - type: storageSpecialization
-      value: 500
+      value: 1500
       resource: essence

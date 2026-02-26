@@ -129,7 +129,7 @@ export function resourceIsFull(type: ResourceType): Signal<boolean> {
 }
 
 export const STORAGE_ROOM_BASE_BONUS = 200;
-export const STORAGE_ROOM_SPECIALIZED_BONUS = 500;
+export const STORAGE_ROOM_SPECIALIZED_BONUS = 1500;
 
 /**
  * Calculate the flat storage bonus from all Storage Rooms for a given resource type.
