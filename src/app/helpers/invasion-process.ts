@@ -50,7 +50,7 @@ import {
   pathfindingFindWithObjectives,
 } from '@helpers/pathfinding';
 import { roomRoleFindById } from '@helpers/room-roles';
-import { trapApplyTrigger, trapGetDefinition, trapGetInHallway, trapRollTrigger } from '@helpers/traps';
+import { trapApplyTrigger, trapGetAtTile, trapGetDefinition, trapRollTrigger } from '@helpers/traps';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { gamestate } from '@helpers/state-game';
@@ -65,6 +65,7 @@ import type {
   DungeonProfile,
   Floor,
   GameState,
+  HallwayTraversalState,
   InhabitantInstanceId,
   InvasionObjective,
   InvasionOrchestratorResult,
@@ -120,6 +121,15 @@ export const invasionBattleLog = computed(() => {
   const inv = gamestate().world.activeInvasion;
   if (!inv) return [];
   return inv.battleLog;
+});
+
+export const invasionCurrentHallwayTile = computed((): { x: number; y: number; floorIndex: number } | undefined => {
+  const inv = gamestate().world.activeInvasion;
+  if (!inv || inv.completed || !inv.hallwayTraversal) return undefined;
+  const { tiles, currentTileIndex, floorIndex } = inv.hallwayTraversal;
+  if (currentTileIndex < 0 || currentTileIndex >= tiles.length) return undefined;
+  const tile = tiles[currentTileIndex];
+  return { x: tile.x, y: tile.y, floorIndex };
 });
 
 // --- Anti-turtling: count unreachable objectives ---
@@ -627,6 +637,7 @@ export function invasionStart(
     currentRoomDefenderIds: firstRoomDefenders.map((i) => i.instanceId),
     battleLog,
     currentTurn: 0,
+    hallwayTraversal: undefined,
     scoutedRoomIds: [],
     roomFearLevels,
     unreachableObjectiveCount,
@@ -645,6 +656,14 @@ export function invasionProcess(state: GameState): void {
   if (!invasion || invasion.completed) return;
 
   const rng = seedrandom(`${invasion.seed}-tick-${invasion.currentTurn}`);
+
+  // Hallway traversal phase: invaders step one tile per tick
+  if (invasion.hallwayTraversal) {
+    invasion.currentTurn++;
+    invasion.invasionState = { ...invasion.invasionState, currentTurn: invasion.currentTurn };
+    processHallwayTraversalTick(state, invasion, rng);
+    return;
+  }
 
   invasion.currentRoomTicksElapsed++;
   invasion.currentTurn++;
@@ -669,25 +688,6 @@ export function invasionProcess(state: GameState): void {
 
   // --- First tick: entering room ---
   if (isFirstTick) {
-    // Process hallway traps when entering (except for first room)
-    if (invasion.currentRoomIndex > 0) {
-      processHallwayTraps(state, invasion, rng);
-
-      // Check end after traps
-      const endAfterTraps = invasionWinLossCheckEnd(invasion.invasionState);
-      if (endAfterTraps || moraleIsRetreating()) {
-        if (moraleIsRetreating()) {
-          invasion.battleLog.push({
-            turn: invasion.currentTurn,
-            type: 'retreat',
-            message: 'Invaders lose their nerve and retreat!',
-          });
-        }
-        invasionProcessComplete(state, invasion, rng);
-        return;
-      }
-    }
-
     if (!invasion.isAltarLooping) {
       invasion.battleLog.push({
         turn: invasion.currentTurn,
@@ -881,26 +881,8 @@ export function invasionProcess(state: GameState): void {
       return;
     }
 
-    // Advance to next room
-    invasion.currentRoomIndex++;
-    if (invasion.currentRoomIndex >= invasion.path.length) {
-      // Reached end of path — stay at altar and keep attacking each tick
-      invasion.currentRoomIndex = invasion.path.length - 1;
-      invasion.isAltarLooping = true;
-      invasion.currentRoomTicksElapsed = 0;
-      invasion.currentRoomTicksTotal = INVASION_BASE_TICKS_PER_ROOM;
-      invasion.currentRoomTurnQueue = undefined;
-      return;
-    }
-
-    // Calculate ticks for next room
-    const nextRoomId = invasion.path[invasion.currentRoomIndex];
-    const nextRoomDefenders = state.world.inhabitants.filter(
-      (i) => i.assignedRoomId === nextRoomId && !invasion.killedDefenderIds.includes(i.instanceId),
-    );
-    invasion.currentRoomTicksElapsed = 0;
-    invasion.currentRoomTicksTotal = calculateRoomTicks(nextRoomDefenders.length);
-    invasion.currentRoomTurnQueue = undefined;
+    // Start hallway traversal to next room (or advance directly if no hallway)
+    startHallwayTraversal(state, invasion);
   }
 }
 
@@ -919,150 +901,6 @@ function initAbilityStatesFromContent(content: InhabitantContent | undefined): A
     .map((id) => contentGetEntry<CombatAbilityContent>(id))
     .filter((a): a is CombatAbilityContent => a !== undefined);
   return combatAbilityInitStates(abilities);
-}
-
-function processHallwayTraps(
-  state: GameState,
-  invasion: ActiveInvasion,
-  rng: seedrandom.PRNG,
-): void {
-  const prevRoomId = invasion.path[invasion.currentRoomIndex - 1];
-  const roomId = invasion.path[invasion.currentRoomIndex];
-
-  // Scouted rooms: invaders know what's coming, skip trap triggers
-  if (invasion.scoutedRoomIds.includes(roomId)) {
-    invasion.battleLog.push({
-      turn: invasion.currentTurn,
-      type: 'ability_scout',
-      roomId,
-      message: `The party bypasses traps in a scouted room.`,
-    });
-    return;
-  }
-
-  // Both rooms must be on the same floor for hallway traps to apply
-  const prevFloorIndex = invasion.roomFloorMap[prevRoomId] ?? 0;
-  const curFloorIndex = invasion.roomFloorMap[roomId] ?? 0;
-  if (prevFloorIndex !== curFloorIndex) return;
-
-  const floorIdx = curFloorIndex;
-  let currentFloor = state.world.floors[floorIdx];
-  if (!currentFloor) return;
-
-  const connection = currentFloor.connections.find(
-    (c) =>
-      (c.roomAId === prevRoomId && c.roomBId === roomId) ||
-      (c.roomAId === roomId && c.roomBId === prevRoomId),
-  );
-
-  if (!connection) return;
-
-  const hallway = currentFloor.hallways.find(
-    (h) =>
-      (h.startRoomId === prevRoomId && h.endRoomId === roomId) ||
-      (h.startRoomId === roomId && h.endRoomId === prevRoomId),
-  );
-
-  if (!hallway) return;
-
-  // Check for Disarm Trap ability on any living invader (room-entry passive)
-  const disarmInvader = findDisarmInvader(invasion);
-
-  const traps = trapGetInHallway(currentFloor, hallway.id);
-  for (const trap of traps) {
-    if (!trap.isArmed || trap.remainingCharges <= 0) continue;
-
-    // Disarm passive: invader with Disarm Trap rolls to disarm before the trap fires
-    if (disarmInvader) {
-      const disarmRoll = rng() * 100;
-      if (disarmRoll <= disarmInvader.chance) {
-        const trapDef = trapGetDefinition(trap.trapTypeId);
-        const trapName = trapDef?.name ?? 'a trap';
-        // Disarm success — consume the trap charge without triggering
-        currentFloor = trapApplyTrigger(currentFloor, trap.id, {
-          triggered: false,
-          disarmed: true,
-          trapName,
-          damage: 0,
-          effectType: '',
-          duration: 0,
-          trapDestroyed: false,
-          moralePenalty: 0,
-        });
-        state.world.floors[floorIdx] = currentFloor;
-
-        invasion.battleLog.push({
-          turn: invasion.currentTurn,
-          type: 'ability_disarm',
-          roomId,
-          message: `${disarmInvader.invaderName} disarms ${trapName}!`,
-          details: { abilityName: 'Disarm Trap', effectType: 'Disarm' },
-        });
-        continue;
-      }
-    }
-
-    const livingInvaders = invasion.invasionState.invaders.filter(
-      (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
-    );
-    if (livingInvaders.length === 0) break;
-
-    const targetInvader = livingInvaders[Math.floor(rng() * livingInvaders.length)];
-    const targetDef = invaderGetDefinitionById(targetInvader.definitionId);
-    const isRogue = targetDef?.invaderClass === 'rogue';
-    const roll = rng();
-
-    const triggerResult = trapRollTrigger(trap, isRogue, roll);
-    currentFloor = trapApplyTrigger(currentFloor, trap.id, triggerResult);
-
-    // Update floor in state
-    state.world.floors[floorIdx] = currentFloor;
-
-    if (triggerResult.disarmed) {
-      invasion.battleLog.push({
-        turn: invasion.currentTurn,
-        type: 'trap_disarm',
-        roomId,
-        message: `${targetDef?.name ?? 'Invader'} disarmed ${triggerResult.trapName}!`,
-      });
-    } else if (triggerResult.triggered) {
-      const newHp = Math.max(0, (invasion.invaderHpMap[targetInvader.id] ?? 0) - triggerResult.damage);
-      invasion.invaderHpMap[targetInvader.id] = newHp;
-
-      const isFearGlyph = triggerResult.effectType === 'fear';
-      moraleApplyTrapTrigger(isFearGlyph, invasion.currentTurn, invasion.invasionState.invaders);
-
-      if (newHp <= 0) {
-        invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
-        invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
-        if (targetInvader.isLeader) {
-          moraleApplyLeaderDeath(targetInvader, invasion.currentTurn);
-        } else {
-          moraleApplyAllyDeath(targetInvader, invasion.currentTurn, invasion.invasionState.invaders);
-        }
-        invasion.battleLog.push({
-          turn: invasion.currentTurn,
-          type: 'combat_kill',
-          roomId,
-          message: `${triggerResult.trapName} killed ${targetDef?.name ?? 'Invader'}! (${triggerResult.damage} damage)`,
-        });
-      } else {
-        invasion.battleLog.push({
-          turn: invasion.currentTurn,
-          type: 'trap_trigger',
-          roomId,
-          message: `${triggerResult.trapName} hit ${targetDef?.name ?? 'Invader'} for ${triggerResult.damage} damage.`,
-        });
-      }
-    } else {
-      invasion.battleLog.push({
-        turn: invasion.currentTurn,
-        type: 'trap_miss',
-        roomId,
-        message: `${targetDef?.name ?? 'Invader'} avoided ${triggerResult.trapName}.`,
-      });
-    }
-  }
 }
 
 /**
@@ -1092,6 +930,269 @@ function findDisarmInvader(
   }
 
   return undefined;
+}
+
+// --- Hallway traversal ---
+
+/**
+ * Begin tile-by-tile hallway traversal from the current room to the next room.
+ * Falls back to direct advanceToRoom() if no hallway exists or rooms are on different floors.
+ */
+function startHallwayTraversal(
+  state: GameState,
+  invasion: ActiveInvasion,
+): void {
+  const nextRoomIndex = invasion.currentRoomIndex + 1;
+
+  // End of path — enter altar looping
+  if (nextRoomIndex >= invasion.path.length) {
+    invasion.currentRoomIndex = invasion.path.length - 1;
+    invasion.isAltarLooping = true;
+    invasion.currentRoomTicksElapsed = 0;
+    invasion.currentRoomTicksTotal = INVASION_BASE_TICKS_PER_ROOM;
+    invasion.currentRoomTurnQueue = undefined;
+    return;
+  }
+
+  const currentRoomId = invasion.path[invasion.currentRoomIndex];
+  const nextRoomId = invasion.path[nextRoomIndex];
+
+  // Cross-floor transitions skip hallway traversal
+  const currentFloorIndex = invasion.roomFloorMap[currentRoomId] ?? 0;
+  const nextFloorIndex = invasion.roomFloorMap[nextRoomId] ?? 0;
+  if (currentFloorIndex !== nextFloorIndex) {
+    advanceToRoom(state, invasion, nextRoomIndex);
+    return;
+  }
+
+  const floor = state.world.floors[currentFloorIndex];
+  if (!floor) {
+    advanceToRoom(state, invasion, nextRoomIndex);
+    return;
+  }
+
+  // Find hallway connecting the two rooms
+  const hallway = floor.hallways.find(
+    (h) =>
+      (h.startRoomId === currentRoomId && h.endRoomId === nextRoomId) ||
+      (h.startRoomId === nextRoomId && h.endRoomId === currentRoomId),
+  );
+
+  if (!hallway || hallway.tiles.length === 0) {
+    advanceToRoom(state, invasion, nextRoomIndex);
+    return;
+  }
+
+  // Order tiles by travel direction: if hallway goes from current→next, use as-is;
+  // if hallway goes from next→current, reverse the tiles
+  const tiles = hallway.startRoomId === currentRoomId
+    ? [...hallway.tiles]
+    : [...hallway.tiles].reverse();
+
+  // Log scouted hallway bypass
+  if (invasion.scoutedRoomIds.includes(nextRoomId)) {
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'ability_scout',
+      message: `The party bypasses traps in a scouted hallway.`,
+    });
+  }
+
+  const traversal: HallwayTraversalState = {
+    hallwayId: hallway.id,
+    floorIndex: currentFloorIndex,
+    tiles,
+    currentTileIndex: -1,
+    destinationRoomIndex: nextRoomIndex,
+  };
+
+  invasion.hallwayTraversal = traversal;
+  invasion.battleLog.push({
+    turn: invasion.currentTurn,
+    type: 'hallway_enter',
+    message: `Invaders enter the hallway (${tiles.length} tiles).`,
+  });
+}
+
+/**
+ * Process one tick of hallway traversal: advance one tile and trigger traps.
+ */
+function processHallwayTraversalTick(
+  state: GameState,
+  invasion: ActiveInvasion,
+  rng: seedrandom.PRNG,
+): void {
+  const traversal = invasion.hallwayTraversal;
+  if (!traversal) return;
+
+  traversal.currentTileIndex++;
+
+  // Reached end of hallway
+  if (traversal.currentTileIndex >= traversal.tiles.length) {
+    completeHallwayTraversal(state, invasion);
+    return;
+  }
+
+  // Process trap at this tile (skip if destination room is scouted)
+  const destRoomId = invasion.path[traversal.destinationRoomIndex];
+  if (!invasion.scoutedRoomIds.includes(destRoomId)) {
+    processHallwayTrapAtTile(state, invasion, rng, traversal);
+  }
+
+  // Check end after trap
+  const endAfterTraps = invasionWinLossCheckEnd(invasion.invasionState);
+  if (endAfterTraps || moraleIsRetreating()) {
+    if (moraleIsRetreating() && !endAfterTraps) {
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'retreat',
+        message: 'Invaders lose their nerve and retreat!',
+      });
+    }
+    invasion.hallwayTraversal = undefined;
+    invasionProcessComplete(state, invasion, rng);
+  }
+}
+
+/**
+ * Process a single trap at the current hallway tile.
+ */
+function processHallwayTrapAtTile(
+  state: GameState,
+  invasion: ActiveInvasion,
+  rng: seedrandom.PRNG,
+  traversal: HallwayTraversalState,
+): void {
+  const tile = traversal.tiles[traversal.currentTileIndex];
+  let floor = state.world.floors[traversal.floorIndex];
+  if (!floor) return;
+
+  const trap = trapGetAtTile(floor, tile.x, tile.y);
+  if (!trap || !trap.isArmed || trap.remainingCharges <= 0) return;
+
+  const destRoomId = invasion.path[traversal.destinationRoomIndex];
+
+  // Check for Disarm Trap ability
+  const disarmInvader = findDisarmInvader(invasion);
+  if (disarmInvader) {
+    const disarmRoll = rng() * 100;
+    if (disarmRoll <= disarmInvader.chance) {
+      const trapDef = trapGetDefinition(trap.trapTypeId);
+      const trapName = trapDef?.name ?? 'a trap';
+      floor = trapApplyTrigger(floor, trap.id, {
+        triggered: false,
+        disarmed: true,
+        trapName,
+        damage: 0,
+        effectType: '',
+        duration: 0,
+        trapDestroyed: false,
+        moralePenalty: 0,
+      });
+      state.world.floors[traversal.floorIndex] = floor;
+
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'ability_disarm',
+        roomId: destRoomId,
+        message: `${disarmInvader.invaderName} disarms ${trapName}!`,
+        details: { abilityName: 'Disarm Trap', effectType: 'Disarm' },
+      });
+      return;
+    }
+  }
+
+  const livingInvaders = invasion.invasionState.invaders.filter(
+    (i) => i.currentHp > 0 && (invasion.invaderHpMap[i.id] ?? 0) > 0,
+  );
+  if (livingInvaders.length === 0) return;
+
+  const targetInvader = livingInvaders[Math.floor(rng() * livingInvaders.length)];
+  const targetDef = invaderGetDefinitionById(targetInvader.definitionId);
+  const isRogue = targetDef?.invaderClass === 'rogue';
+  const roll = rng();
+
+  const triggerResult = trapRollTrigger(trap, isRogue, roll);
+  floor = trapApplyTrigger(floor, trap.id, triggerResult);
+  state.world.floors[traversal.floorIndex] = floor;
+
+  if (triggerResult.disarmed) {
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'trap_disarm',
+      roomId: destRoomId,
+      message: `${targetDef?.name ?? 'Invader'} disarmed ${triggerResult.trapName}!`,
+    });
+  } else if (triggerResult.triggered) {
+    const newHp = Math.max(0, (invasion.invaderHpMap[targetInvader.id] ?? 0) - triggerResult.damage);
+    invasion.invaderHpMap[targetInvader.id] = newHp;
+
+    const isFearGlyph = triggerResult.effectType === 'fear';
+    moraleApplyTrapTrigger(isFearGlyph, invasion.currentTurn, invasion.invasionState.invaders);
+
+    if (newHp <= 0) {
+      invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
+      invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
+      if (targetInvader.isLeader) {
+        moraleApplyLeaderDeath(targetInvader, invasion.currentTurn);
+      } else {
+        moraleApplyAllyDeath(targetInvader, invasion.currentTurn, invasion.invasionState.invaders);
+      }
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'combat_kill',
+        roomId: destRoomId,
+        message: `${triggerResult.trapName} killed ${targetDef?.name ?? 'Invader'}! (${triggerResult.damage} damage)`,
+      });
+    } else {
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'trap_trigger',
+        roomId: destRoomId,
+        message: `${triggerResult.trapName} hit ${targetDef?.name ?? 'Invader'} for ${triggerResult.damage} damage.`,
+      });
+    }
+  } else {
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'trap_miss',
+      roomId: destRoomId,
+      message: `${targetDef?.name ?? 'Invader'} avoided ${triggerResult.trapName}.`,
+    });
+  }
+}
+
+/**
+ * Complete hallway traversal and advance to the destination room.
+ */
+function completeHallwayTraversal(
+  state: GameState,
+  invasion: ActiveInvasion,
+): void {
+  const destIndex = invasion.hallwayTraversal?.destinationRoomIndex;
+  invasion.hallwayTraversal = undefined;
+
+  if (destIndex !== undefined) {
+    advanceToRoom(state, invasion, destIndex);
+  }
+}
+
+/**
+ * Advance invasion to a specific room index, setting up ticks for the new room.
+ */
+function advanceToRoom(
+  state: GameState,
+  invasion: ActiveInvasion,
+  roomIndex: number,
+): void {
+  invasion.currentRoomIndex = roomIndex;
+  const nextRoomId = invasion.path[roomIndex];
+  const nextRoomDefenders = state.world.inhabitants.filter(
+    (i) => i.assignedRoomId === nextRoomId && !invasion.killedDefenderIds.includes(i.instanceId),
+  );
+  invasion.currentRoomTicksElapsed = 0;
+  invasion.currentRoomTicksTotal = calculateRoomTicks(nextRoomDefenders.length);
+  invasion.currentRoomTurnQueue = undefined;
 }
 
 function processCombatKill(
@@ -1598,6 +1699,7 @@ function createEmptyCompletedInvasion(
     currentRoomDefenderIds: [],
     battleLog: [{ turn: 0, type: 'invasion_end', message: 'No invaders appeared.' }],
     currentTurn: 0,
+    hallwayTraversal: undefined,
     scoutedRoomIds: [],
     roomFearLevels: {},
     unreachableObjectiveCount: 0,

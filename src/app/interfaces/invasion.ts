@@ -1,5 +1,6 @@
 import type { InvasionId } from '@interfaces/content-invasion';
 import type { AbilityActivation, AbilityState, CombatResult, StatusEffect } from '@interfaces/combat';
+import type { HallwayId } from '@interfaces/hallway';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type {
@@ -7,7 +8,7 @@ import type {
   InvaderClassType,
   InvaderStats,
 } from '@interfaces/invader';
-import type { PlacedRoomId } from '@interfaces/room-shape';
+import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import type { ResourceType } from '@interfaces/resource';
 
@@ -195,6 +196,7 @@ export type TurnQueue = {
 
 export type BattleLogEntryType =
   | 'room_enter'
+  | 'hallway_enter'
   | 'trap_trigger'
   | 'trap_disarm'
   | 'trap_miss'
@@ -236,6 +238,16 @@ export type InvasionOrchestratorResult = {
   survivingInvaders: InvaderInstance[];
 };
 
+// --- Hallway traversal state ---
+
+export type HallwayTraversalState = {
+  hallwayId: HallwayId;
+  floorIndex: number;
+  tiles: TileOffset[];
+  currentTileIndex: number;
+  destinationRoomIndex: number;
+};
+
 // --- Active invasion (tick-based) ---
 
 export type ActiveInvasion = {
@@ -271,6 +283,9 @@ export type ActiveInvasion = {
   // Battle log (grows each tick)
   battleLog: BattleLogEntry[];
   currentTurn: number;
+
+  // Hallway traversal (tile-by-tile movement between rooms)
+  hallwayTraversal?: HallwayTraversalState;
 
   // Scouted rooms (trap triggers skipped for these rooms)
   scoutedRoomIds: string[];

@@ -24,6 +24,7 @@ import {
   featureGetForSlot,
   featureGetSlotCount,
   floorCurrent,
+  floorCurrentIndex,
   gridDeselectTile,
   gridSelectedTile,
   gridSelectTile,
@@ -53,6 +54,7 @@ import {
 } from '@helpers';
 import { corruptionActiveGridClasses } from '@helpers/corruption-effects';
 import {
+  invasionCurrentHallwayTile,
   invasionCurrentRoomId,
   invasionEntryRoomId,
   invasionPathRoomIds,
@@ -154,6 +156,12 @@ export class GridComponent implements AfterViewInit {
   public isInvasionPath(roomId: string | undefined): boolean {
     if (!roomId) return false;
     return this.invasionPathRoomIds().has(roomId as PlacedRoomId);
+  }
+
+  public isInvasionHallwayTile(x: number, y: number): boolean {
+    const tile = invasionCurrentHallwayTile();
+    if (!tile) return false;
+    return tile.x === x && tile.y === y && tile.floorIndex === floorCurrentIndex();
   }
 
   ngAfterViewInit(): void {
