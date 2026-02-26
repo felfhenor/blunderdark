@@ -236,6 +236,7 @@ All room-specific systems follow the same pattern:
 - **Use Tailwind's `hidden` class for hiding** — never reimplement `display: none` per-component (e.g. `:host.hidden { display: none }`). Tailwind's built-in `hidden` utility class already provides this globally. Use `[class.hidden]="condition"` on host or elements.
 - **Section dividers** — section headers within cards/panels use the daisyUI divider pattern: `<div class="divider my-2 text-xs opacity-60">Label</div>`. Remove trailing colons from labels. Do NOT use `<h4>` with `font-semibold opacity-70 mb-1` for section dividers.
 - **Icons over entities/emoji** — use `<app-icon name="tablerXxx" />` (`IconComponent`) instead of HTML entities (`&check;`, `&times;`, etc.) or emoji. Available icons are registered in `ICON_ALL` (`src/app/helpers/icons.ts`). If unsure which icon to use, ask the user.
+- **All modals must have an X close button in the top right.** For standard card-layout modals, use `[showCloseButton]="true"` on `<app-modal>`. For replacement-layout modals (custom headers), add `<app-button-close (click)="close()" />` in the header area and import `ButtonCloseComponent`. Never use a plain text "Close" button as the only dismiss mechanism in a modal header.
 
 ## Naming Conventions
 

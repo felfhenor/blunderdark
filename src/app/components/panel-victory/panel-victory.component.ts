@@ -32,7 +32,9 @@ import type {
     <app-modal
       [(visible)]="visible"
       [allowEscToClose]="false"
+      [showCloseButton]="true"
       widthClass="max-w-2xl"
+      (modalClose)="continuePlaying()"
     >
       <div title class="text-xl">Victory Achieved!</div>
 

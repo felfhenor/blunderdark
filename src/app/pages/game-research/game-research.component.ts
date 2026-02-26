@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -45,6 +46,7 @@ type NodeState = ResearchNodeState;
 @Component({
   selector: 'app-game-research',
   imports: [
+    ButtonCloseComponent,
     DecimalPipe,
     CurrencyCostListComponent,
     ModalComponent,

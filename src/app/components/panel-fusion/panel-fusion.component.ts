@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
@@ -52,7 +53,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TabBarComponent, TippyDirective],
+  imports: [ButtonCloseComponent, DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TabBarComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

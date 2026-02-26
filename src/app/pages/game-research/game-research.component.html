@@ -13,7 +13,7 @@
           <span class="text-sm opacity-70">
             Speed: {{ speedModifier() * 100 | number: '1.0-0' }}%
           </span>
-          <button class="btn btn-sm btn-ghost" (click)="close()">Close</button>
+          <app-button-close (click)="close()" />
         </div>
       </div>
 
