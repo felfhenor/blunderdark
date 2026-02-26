@@ -5,9 +5,9 @@ import { JobProgressComponent } from '@components/job-progress/job-progress.comp
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
-  findRoomByRole,
   floorCurrent,
   gamestate,
+  gridSelectedTile,
   notify,
   resourceCanAfford,
   resourcePayCost,
@@ -51,7 +51,20 @@ export class PanelSummoningCircleComponent {
   ];
 
   public summoningRoom = computed(() => {
-    return findRoomByRole('summoningCircle')?.room;
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return undefined;
+
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    if (!gridTile?.roomId) return undefined;
+
+    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    if (!room) return undefined;
+
+    const def = contentGetEntry<RoomContent>(room.roomTypeId);
+    if (def?.role !== 'summoningCircle') return undefined;
+
+    return room;
   });
 
   public roomDef = computed(() => {

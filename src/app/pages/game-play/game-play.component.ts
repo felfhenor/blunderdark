@@ -441,11 +441,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'summoning',
         label: 'Summon',
-        icon: 'gameMagicGate',
-        hotkey: 's',
         isModal: false,
         templateRef: this.summoningPanel() ?? placeholder,
         condition: this.hasSummoningCircle,
+        hidden: true,
       },
       {
         id: 'forge',

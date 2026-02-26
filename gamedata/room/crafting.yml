@@ -91,7 +91,6 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 3
-  isUnique: true
   roomUpgradeIds:
     - Greater Circle
     - Dual Circle
