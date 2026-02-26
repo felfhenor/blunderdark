@@ -6,7 +6,7 @@
 #   ├── Soul Manipulation (T2)
 #   │   └── Soul Well Mastery (T3)
 #   ├── Shadow Magic (T2) [+Blighted Grove]
-#   │   └── Corruption Control (T3) [+Corrupted Mine]
+#   │   └── Corruption Control (T3) [+Corrupted Mine, +Blighted Ore]
 #   │       ├── Shadow Weaving (T4) [+Shadow Magic]
 #   │       └── Purification Rites (T4) [+Purification Chamber]
 #   │           ├── Purification Mastery (T5) [+Sanctified Basin, +Warding Pillars]
@@ -149,6 +149,8 @@
       description: Corruption thresholds increased by 10%
     - type: roomupgrade
       targetRoomupgradeId: Corrupted Mine
+    - type: roomupgrade
+      targetRoomupgradeId: Blighted Ore
   tier: 3
   requiredTicks: 300
 

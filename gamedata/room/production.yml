@@ -273,7 +273,7 @@
   cost:
     crystals: 50
   production:
-    gold: 0.4
+    gold: 1
   requiresWorkers: false
   autoPlace: true
   isUnique: false
@@ -281,4 +281,8 @@
   maxInhabitants: 0
   maxFeatures: 0
   fearLevel: 0
+  roomUpgradeIds:
+    - Rich Vein
+    - Crystalline Deposits
+    - Blighted Ore
   adjacencyBonuses: []

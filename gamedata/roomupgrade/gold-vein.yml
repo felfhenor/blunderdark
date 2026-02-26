@@ -1,0 +1,39 @@
+- id: 089d3618-13d2-4721-8d2c-859f62bafe53
+  name: Rich Vein
+  description: The ore seam runs deeper than expected, yielding richer deposits. Gold production increased by 50%.
+  cost:
+    gold: 40
+    crystals: 30
+  effects:
+    - type: productionMultiplier
+      value: 1.5
+      resource: gold
+- id: 2bc0a25b-31b7-4eb0-ba70-84852d64ce74
+  name: Crystalline Deposits
+  description: Mineral formations in the vein produce trace amounts of crystals alongside gold, and their calming glow soothes nearby creatures.
+  cost:
+    gold: 60
+    crystals: 20
+  effects:
+    - type: secondaryProduction
+      value: 0.1
+      resource: crystals
+    - type: fearReduction
+      value: 1
+- id: 7a78f046-943c-4152-a9ca-52c945d84e82
+  name: Blighted Ore
+  description: Dark magic accelerates gold extraction but taints the surrounding stone. Gold production doubled, at the cost of spreading corruption.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 50
+    crystals: 50
+    essence: 15
+  effects:
+    - type: productionMultiplier
+      value: 2.0
+      resource: gold
+    - type: secondaryProduction
+      value: 0.05
+      resource: corruption
+    - type: fearIncrease
+      value: 1

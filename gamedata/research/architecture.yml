@@ -5,8 +5,8 @@
 #
 # Tree structure (max 4 per tier):
 #   Structural Mastery (T1, root)
-#   ├── Resource Room Design (T2) → Expanded Tunnels + Expanded Grove + Crystal Vault
-#   │   ├── Deep Extraction (T3) → Deep Vein Mine + Bountiful Grove + Cold Storage
+#   ├── Resource Room Design (T2) → Expanded Tunnels + Expanded Grove + Crystal Vault + Crystalline Deposits
+#   │   ├── Deep Extraction (T3) → Deep Vein Mine + Bountiful Grove + Cold Storage + Rich Vein
 #   │   └── Aquatic & Soul Engineering (T3) → Expanded Lake + Necrotic Well + Purified Well + Essence Reservoir
 #   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault + Gold Treasury
 #   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Grand Arena
@@ -58,6 +58,8 @@
       targetRoomupgradeId: Expanded Grove
     - type: roomupgrade
       targetRoomupgradeId: Crystal Vault
+    - type: roomupgrade
+      targetRoomupgradeId: Crystalline Deposits
   tier: 2
   requiredTicks: 150
 
@@ -149,6 +151,8 @@
       targetRoomupgradeId: Bountiful Grove
     - type: roomupgrade
       targetRoomupgradeId: Cold Storage
+    - type: roomupgrade
+      targetRoomupgradeId: Rich Vein
   tier: 3
   requiredTicks: 300
 
