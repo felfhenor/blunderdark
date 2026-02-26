@@ -149,80 +149,98 @@
             No modifiers active for this resource.
           </div>
         } @else {
-          <div class="flex flex-col gap-4">
-            @for (room of roomsWithModifiers(); track room.roomId) {
-              <div class="bg-base-200/50 rounded-lg p-3">
-                <div class="font-semibold text-sm mb-1">
-                  {{ room.roomName }}
-                  <span class="opacity-50">(Floor {{ room.floorDepth }})</span>
-                </div>
-                <div class="flex flex-col gap-0.5 text-xs">
-                  @if (room.adjacencyBonus !== 0) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Adjacency</span>
-                      <span class="text-success">
-                        {{ formatRate(room.adjacencyBonus) }}/min
-                      </span>
-                    </div>
-                  }
-                  @if (room.featureBonus !== 0) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Feature Bonus</span>
-                      <span class="text-success">
-                        {{ formatRate(room.featureBonus) }}/min
-                      </span>
-                    </div>
-                  }
-                  @if (room.synergyBonus !== 0) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Synergy Bonus</span>
-                      <span class="text-success">
-                        {{ formatRate(room.synergyBonus) }}/min
-                      </span>
-                    </div>
-                  }
-                  @for (mod of room.modifierDetails; track mod.name) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">{{ mod.name }}</span>
-                      <span
-                        [class.text-success]="mod.multiplier > 1"
-                        [class.text-error]="mod.multiplier < 1"
-                      >
-                        {{ formatMultiplier(mod.multiplier) }}
-                      </span>
-                    </div>
-                  }
-                  @if (room.upgradeMultiplier !== 1) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Upgrade</span>
-                      <span
-                        [class.text-success]="room.upgradeMultiplier > 1"
-                        [class.text-error]="room.upgradeMultiplier < 1"
-                      >
-                        {{ formatMultiplier(room.upgradeMultiplier) }}
-                      </span>
-                    </div>
-                  }
-                  @if (room.flatFeatureProduction !== 0) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Feature Flat Bonus</span>
-                      <span class="text-success">
-                        {{ formatRate(room.flatFeatureProduction) }}/min
-                      </span>
-                    </div>
-                  }
-                  @if (room.upgradeSecondaryProduction !== 0) {
-                    <div class="flex justify-between">
-                      <span class="opacity-70">Upgrade Secondary</span>
-                      <span class="text-success">
-                        {{ formatRate(room.upgradeSecondaryProduction) }}/min
-                      </span>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
+          <table class="table table-xs w-full">
+            <thead class="sticky top-0 bg-base-100 z-10">
+              <tr>
+                <th>Room</th>
+                <th class="text-right">Floor</th>
+                <th>Modifier</th>
+                <th class="text-right">Effect</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (room of roomsWithModifiers(); track room.roomId) {
+                @if (room.adjacencyBonus !== 0) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Adjacency</td>
+                    <td class="text-right text-success">
+                      {{ formatRate(room.adjacencyBonus) }}/min
+                    </td>
+                  </tr>
+                }
+                @if (room.featureBonus !== 0) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Feature Bonus</td>
+                    <td class="text-right text-success">
+                      {{ formatRate(room.featureBonus) }}/min
+                    </td>
+                  </tr>
+                }
+                @if (room.synergyBonus !== 0) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Synergy Bonus</td>
+                    <td class="text-right text-success">
+                      {{ formatRate(room.synergyBonus) }}/min
+                    </td>
+                  </tr>
+                }
+                @for (mod of room.modifierDetails; track mod.name) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>{{ mod.name }}</td>
+                    <td
+                      class="text-right"
+                      [class.text-success]="mod.multiplier > 1"
+                      [class.text-error]="mod.multiplier < 1"
+                    >
+                      {{ formatMultiplier(mod.multiplier) }}
+                    </td>
+                  </tr>
+                }
+                @if (room.upgradeMultiplier !== 1) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Upgrade</td>
+                    <td
+                      class="text-right"
+                      [class.text-success]="room.upgradeMultiplier > 1"
+                      [class.text-error]="room.upgradeMultiplier < 1"
+                    >
+                      {{ formatMultiplier(room.upgradeMultiplier) }}
+                    </td>
+                  </tr>
+                }
+                @if (room.flatFeatureProduction !== 0) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Feature Flat Bonus</td>
+                    <td class="text-right text-success">
+                      {{ formatRate(room.flatFeatureProduction) }}/min
+                    </td>
+                  </tr>
+                }
+                @if (room.upgradeSecondaryProduction !== 0) {
+                  <tr>
+                    <td>{{ room.roomName }}</td>
+                    <td class="text-right">{{ room.floorDepth }}</td>
+                    <td>Upgrade Secondary</td>
+                    <td class="text-right text-success">
+                      {{ formatRate(room.upgradeSecondaryProduction) }}/min
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
         }
       }
 

@@ -146,7 +146,10 @@ export class ResourceBreakdownModalComponent {
         r.modifierDetails.length > 0 ||
         r.adjacencyBonus !== 0 ||
         r.featureBonus !== 0 ||
-        r.synergyBonus !== 0,
+        r.synergyBonus !== 0 ||
+        r.upgradeMultiplier !== 1 ||
+        r.flatFeatureProduction !== 0 ||
+        r.upgradeSecondaryProduction !== 0,
     );
   });
 
