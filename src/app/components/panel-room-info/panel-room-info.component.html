@@ -374,12 +374,14 @@
           <div class="flex gap-2">
             <button
               class="btn btn-xs btn-outline btn-success flex-1"
+              [disabled]="isInvasionActive()"
               (click)="onExtendElevator('up')"
             >
               Extend Up
             </button>
             <button
               class="btn btn-xs btn-outline btn-success flex-1"
+              [disabled]="isInvasionActive()"
               (click)="onExtendElevator('down')"
             >
               Extend Down
@@ -389,12 +391,14 @@
             <div class="flex gap-2 mt-1">
               <button
                 class="btn btn-xs btn-outline btn-warning flex-1"
+                [disabled]="isInvasionActive()"
                 (click)="onShrinkElevator(tInfo.connectedFloors[0])"
               >
                 Shrink Top (F{{ tInfo.connectedFloors[0] }})
               </button>
               <button
                 class="btn btn-xs btn-outline btn-warning flex-1"
+                [disabled]="isInvasionActive()"
                 (click)="
                   onShrinkElevator(
                     tInfo.connectedFloors[tInfo.connectedFloors.length - 1]
@@ -433,7 +437,7 @@
         </button>
       }
 
-      @if (transportInfo()) {
+      @if (transportInfo() && !isInvasionActive()) {
         <button
           class="btn btn-sm btn-error btn-outline w-full"
           [swal]="removeSwal"
@@ -516,10 +520,7 @@
                       {{ entry.feature.description }}
                     </p>
                     <div class="flex flex-wrap gap-2 mt-1">
-                      @for (
-                        bonus of entry.feature.bonuses;
-                        track bonus.description
-                      ) {
+                      @for (bonus of entry.feature.bonuses; track $index) {
                         <span
                           class="badge badge-xs badge-success badge-outline"
                         >

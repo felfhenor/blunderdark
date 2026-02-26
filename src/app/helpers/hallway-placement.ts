@@ -7,6 +7,7 @@ import {
   hallwayFindAdjacentHallways,
   hallwayMergeOnFloor,
 } from '@helpers/hallways';
+import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { generateHallwaySuffix } from '@helpers/suffix';
@@ -245,6 +246,8 @@ export const hallwayPlacementStatusMessage = computed(() => {
  * Returns true on success, false if the build could not be completed.
  */
 export async function hallwayPlacementConfirm(): Promise<boolean> {
+  if (invasionIsActive()) return false;
+
   const path = hallwayPlacementPreviewPath();
   if (!path || path.length === 0) return false;
 

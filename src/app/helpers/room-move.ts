@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { connectionRemoveRoomFromFloor } from '@helpers/connections';
+import { invasionIsActive } from '@helpers/invasion-process';
 import {
   roomPlacementEnterMode,
   roomPlacementExitMode,
@@ -19,6 +20,8 @@ const roomMoveOriginalConnections = signal<Connection[]>([]);
 export const roomMoveActive = computed(() => roomMoveRoomId() !== undefined);
 
 export async function roomMoveEnter(roomId: PlacedRoomId): Promise<void> {
+  if (invasionIsActive()) return;
+
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];

@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceAdd } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { PlacedRoom, PlacedRoomId, ResourceType } from '@interfaces';
@@ -87,6 +88,10 @@ export function transportRemovalGetInfo(roomId: PlacedRoomId): TransportRemovalI
 export async function transportRemovalExecute(
   roomId: PlacedRoomId,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot remove transport during an invasion' };
+  }
+
   const info = transportRemovalGetInfo(roomId);
   if (!info.canRemove) {
     return { success: false, error: info.reason };

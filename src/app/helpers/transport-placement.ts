@@ -3,6 +3,7 @@ import { sortBy } from 'es-toolkit/compat';
 import { contentGetEntriesByType } from '@helpers/content';
 import { floorCurrent } from '@helpers/floor';
 import { hallwayPlacementExit } from '@helpers/hallway-placement';
+import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { roomPlacementExitMode } from '@helpers/room-placement';
@@ -158,6 +159,10 @@ export async function transportStairExecute(
   x: number,
   y: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot build transport during an invasion' };
+  }
+
   const state = gamestate();
   const currentFloor = floorCurrent();
   if (!currentFloor) return { success: false, error: 'No active floor' };
@@ -215,6 +220,10 @@ export async function transportElevatorExecute(
   x: number,
   y: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot build transport during an invasion' };
+  }
+
   const state = gamestate();
   const currentFloor = floorCurrent();
   if (!currentFloor) return { success: false, error: 'No active floor' };
@@ -274,6 +283,10 @@ export async function transportElevatorExtendExecute(
   groupId: TransportGroupId,
   direction: 'up' | 'down',
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot modify transport during an invasion' };
+  }
+
   const state = gamestate();
 
   const roomDef = getTransportRoomDef('elevator');
@@ -339,6 +352,10 @@ export async function transportElevatorShrinkExecute(
   groupId: TransportGroupId,
   floorDepth: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot modify transport during an invasion' };
+  }
+
   const state = gamestate();
 
   // Find all rooms in this elevator group
@@ -410,6 +427,10 @@ export async function transportPortalExecute(
   destX: number,
   destY: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot build transport during an invasion' };
+  }
+
   const state = gamestate();
   const sourceFloorDepth = transportPortalSourceFloorDepth();
   const sourcePos = transportPortalSourcePosition();

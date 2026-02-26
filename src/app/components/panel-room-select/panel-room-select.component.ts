@@ -16,6 +16,7 @@ import {
   hallwayPlacementPreviewCost,
   hallwayPlacementPreviewPath,
   hallwayPlacementStatusMessage,
+  invasionIsActive,
   researchUnlockIsFeatureUnlocked,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
@@ -65,6 +66,7 @@ export class PanelRoomSelectComponent {
     ),
   );
 
+  public isInvasionActive = invasionIsActive;
   public hasAltar = altarRoomHas;
 
   public selectedId = roomPlacementSelectedTypeId;

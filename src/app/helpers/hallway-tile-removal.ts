@@ -2,6 +2,7 @@ import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { floorCurrent } from '@helpers/floor';
 import { gridGetTile } from '@helpers/grid';
 import { hallwayRemove, hallwayRemoveFromGrid } from '@helpers/hallways';
+import { invasionIsActive } from '@helpers/invasion-process';
 import { updateGamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
 
@@ -14,6 +15,10 @@ export async function hallwayTileRemove(
   x: number,
   y: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot remove corridors during an invasion' };
+  }
+
   const floor = floorCurrent();
   if (!floor) return { success: false, error: 'No active floor' };
 

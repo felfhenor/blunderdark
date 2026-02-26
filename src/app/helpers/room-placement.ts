@@ -3,6 +3,7 @@ import { altarRoomFind } from '@helpers/altar-room';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
 import { floorCurrent } from '@helpers/floor';
+import { invasionIsActive } from '@helpers/invasion-process';
 import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
@@ -287,6 +288,10 @@ export async function roomPlacementExecute(
   x: number,
   y: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot build rooms during an invasion' };
+  }
+
   const shape = roomPlacementPreviewShape();
   const roomTypeId = roomPlacementSelectedTypeId();
   if (!shape || !roomTypeId) return { success: false };

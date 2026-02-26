@@ -34,6 +34,7 @@ import {
   roomRemovalGetInfo,
   connectionGetRoomConnections,
   getEntityName,
+  invasionIsActive,
   productionGetRoomDefinition,
   productionGetRoomRates,
   roomMoveEnter,
@@ -632,9 +633,12 @@ export class PanelRoomInfoComponent {
     }
   }
 
+  public isInvasionActive = invasionIsActive;
+
   public canMoveRoom = computed(() => {
     const room = this.selectedRoom();
     if (!room) return false;
+    if (invasionIsActive()) return false;
     if (!roomPlacementIsRemovable(room.roomTypeId)) return false;
     if (room.placedRoom.transportType) return false;
     return true;
@@ -649,6 +653,7 @@ export class PanelRoomInfoComponent {
   public canRemoveRoom = computed(() => {
     const room = this.selectedRoom();
     if (!room) return false;
+    if (invasionIsActive()) return false;
     return roomPlacementIsRemovable(room.roomTypeId);
   });
 

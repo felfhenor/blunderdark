@@ -9,6 +9,7 @@ import {
   gridDeselectTile,
   gridSelectedTile,
   hallwayTileRemove,
+  invasionIsActive,
   notifyError,
   notifySuccess,
   productionGetRoomDefinition,
@@ -85,6 +86,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
 
           <button
             class="btn btn-sm btn-error btn-outline w-full"
+            [disabled]="isInvasionActive()"
             (click)="onRemoveHallway()"
           >
             Remove Corridor
@@ -95,6 +97,8 @@ function formatRoomName(name: string, suffix: string | undefined): string {
   `,
 })
 export class PanelHallwayInfoComponent {
+  public isInvasionActive = invasionIsActive;
+
   public selectedHallwayTile = computed(() => {
     const tile = gridSelectedTile();
     const floor = floorCurrent();

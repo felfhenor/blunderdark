@@ -1,5 +1,6 @@
 import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { contentGetEntry } from '@helpers/content';
+import { invasionIsActive } from '@helpers/invasion-process';
 import {
   roomPlacementIsRemovable,
   roomPlacementRemoveFromFloor,
@@ -82,6 +83,10 @@ export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefine
 export async function roomRemovalExecute(
   roomId: PlacedRoomId,
 ): Promise<{ success: boolean; error?: string; displacedNames?: string[] }> {
+  if (invasionIsActive()) {
+    return { success: false, error: 'Cannot remove rooms during an invasion' };
+  }
+
   const state = gamestate();
   const floorIndex = state.world.currentFloorIndex;
   const floor = state.world.floors[floorIndex];
