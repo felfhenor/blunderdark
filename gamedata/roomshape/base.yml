@@ -119,6 +119,20 @@
     - { x: 1, y: 2 }
     - { x: 1, y: 3 }
 
+- id: 8876f1a8-d4e8-4655-a637-a12bd6ce8e9a
+  name: Hollow Circle
+  width: 5
+  height: 5
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+
 - id: 3f345116-aa1b-499b-9ded-d21f8b2b787c
   name: Step 5x5
   width: 5

@@ -80,7 +80,7 @@
 - id: 8f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c
   name: Summoning Circle
   description: A ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
-  shapeId: L-Shape
+  shapeId: Hollow Circle
   cost:
     gold: 150
     essence: 80
