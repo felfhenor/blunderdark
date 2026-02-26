@@ -132,6 +132,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   public isPaused = computed(() => optionsGet('gameloopPaused'));
+  public showMerchant = signal(false);
   public showResearch = signal(false);
   public showFusion = signal(false);
   public showVictoryMenu = signal(false);
@@ -172,8 +173,6 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private thronePanel = viewChild('thronePanel', { read: TemplateRef });
-  private merchantPanel = viewChild('merchantPanel', { read: TemplateRef });
-
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
     if (!roomTypeId) return false;
@@ -480,19 +479,19 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         condition: this.hasBreedingPits,
         hidden: true,
       },
-      {
-        id: 'merchant',
-        label: 'Merchant',
-        icon: 'gamePouchWithBeads',
-        hotkey: 'm',
-        isModal: false,
-        templateRef: this.merchantPanel() ?? placeholder,
-        condition: this.isMerchantPresent,
-      },
     ];
   });
 
   public modalTabDefinitions = computed<SideTabDefinition[]>(() => [
+    {
+      id: 'merchant',
+      label: 'Merchant',
+      icon: 'gamePouchWithBeads',
+      hotkey: 'm',
+      iconGlow: this.isMerchantPresent,
+      isModal: true,
+      condition: this.isMerchantPresent,
+    },
     {
       id: 'research',
       label: 'Research',
@@ -525,6 +524,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
 
   public onModalTabClick(tabId: string): void {
     switch (tabId) {
+      case 'merchant':
+        this.showMerchant.set(true);
+        break;
       case 'research':
         this.showResearch.set(true);
         break;

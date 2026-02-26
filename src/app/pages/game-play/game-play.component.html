@@ -80,12 +80,6 @@
   </div>
 </ng-template>
 
-<ng-template #merchantPanel>
-  <div class="p-2">
-    <app-panel-merchant />
-  </div>
-</ng-template>
-
 <div class="game-container">
   <div class="resource-bar-wrapper">
     <app-resource-bar-top (resourceClick)="openResourceBreakdown($event)" />
@@ -132,6 +126,7 @@
   </div>
 }
 
+<app-panel-merchant [(visible)]="showMerchant" />
 <app-game-research [(visible)]="showResearch" />
 <app-panel-fusion [(visible)]="showFusion" />
 <app-panel-invasion-battle />
