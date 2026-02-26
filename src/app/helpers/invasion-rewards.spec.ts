@@ -10,8 +10,9 @@ import {
   INVASION_REWARD_ALTAR_REBUILD_COST,
   INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER,
   INVASION_REWARD_BASE_REPUTATION_GAIN,
-  INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT,
-  INVASION_REWARD_DEFEAT_REPUTATION_LOSS,
+  INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX,
+  INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN,
+  INVASION_REWARD_DEFEAT_RESOURCE_MAX_LOSS,
   INVASION_REWARD_PRISONER_CAPTURE_CHANCE,
   INVASION_REWARD_REPUTATION_PER_KILL,
   invasionRewardCalculateDefensePenalties,
@@ -56,6 +57,9 @@ function makeResult(overrides: Partial<DetailedInvasionResult> = {}): DetailedIn
     objectivesCompleted: 0,
     objectivesTotal: 2,
     rewardMultiplier: 1.5,
+    penetrationDepth: 0.5,
+    roomsReached: 4,
+    totalPathRooms: 8,
     ...overrides,
   };
 }
@@ -110,12 +114,19 @@ describe('invasion-rewards', () => {
       expect(INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS).toBe(3);
     });
 
-    it('should have correct defeat reputation loss', () => {
-      expect(INVASION_REWARD_DEFEAT_REPUTATION_LOSS).toBe(3);
+    it('should have correct defeat reputation loss range', () => {
+      expect(INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN).toBe(3);
+      expect(INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX).toBe(8);
     });
 
-    it('should have correct defeat gold loss percent', () => {
-      expect(INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT).toBe(0.2);
+    it('should have correct defeat resource max loss percentages', () => {
+      expect(INVASION_REWARD_DEFEAT_RESOURCE_MAX_LOSS).toEqual({
+        gold: 0.4,
+        food: 0.3,
+        crystals: 0.25,
+        essence: 0.2,
+        flux: 0.15,
+      });
     });
 
     it('should have correct prisoner capture chance', () => {
@@ -208,40 +219,108 @@ describe('invasion-rewards', () => {
   });
 
   describe('invasionRewardCalculateDefensePenalties', () => {
-    it('should calculate gold loss as 20% of current gold', () => {
-      const result = makeResult({ outcome: 'defeat' });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 500);
-      expect(penalties.goldLost).toBe(100);
+    const fullResources = {
+      gold: 1000,
+      food: 1000,
+      crystals: 1000,
+      essence: 1000,
+      flux: 1000,
+      research: 1000,
+      corruption: 1000,
+    };
+
+    it('should scale gold loss with penetration depth', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0.5 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      // floor(1000 * 0.4 * 0.5) = 200
+      expect(penalties.resourceLosses.gold).toBe(200);
+      expect(penalties.goldLost).toBe(200);
     });
 
-    it('should calculate gold loss correctly for small amounts', () => {
-      const result = makeResult({ outcome: 'defeat' });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 10);
-      expect(penalties.goldLost).toBe(2);
+    it('should scale all non-corruption resources with depth', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      // floor(1000 * maxPercent * 1.0)
+      expect(penalties.resourceLosses.gold).toBe(400);
+      expect(penalties.resourceLosses.food).toBe(300);
+      expect(penalties.resourceLosses.crystals).toBe(250);
+      expect(penalties.resourceLosses.essence).toBe(200);
+      expect(penalties.resourceLosses.flux).toBe(150);
     });
 
-    it('should apply fixed reputation loss', () => {
-      const result = makeResult({ outcome: 'defeat' });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 100);
-      expect(penalties.reputationLoss).toBe(INVASION_REWARD_DEFEAT_REPUTATION_LOSS);
+    it('should not lose research or corruption', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      expect(penalties.resourceLosses.research).toBeUndefined();
+      expect(penalties.resourceLosses.corruption).toBeUndefined();
     });
 
-    it('should calculate resource losses for completed objectives', () => {
-      const result = makeResult({ outcome: 'defeat', objectivesCompleted: 2 });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 100);
-      expect(penalties.resourceLosses.crystals).toBe(20);
-      expect(penalties.resourceLosses.essence).toBe(10);
+    it('should yield zero losses at zero depth', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      expect(penalties.resourceLosses.gold).toBeUndefined();
+      expect(penalties.resourceLosses.food).toBeUndefined();
+      expect(penalties.goldLost).toBe(0);
     });
 
-    it('should have no resource losses when no objectives completed', () => {
-      const result = makeResult({ outcome: 'defeat', objectivesCompleted: 0 });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 100);
-      expect(penalties.resourceLosses).toEqual({});
+    it('should cap losses at current amount', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
+      const smallResources = { gold: 5, food: 3, crystals: 2, essence: 1, flux: 0 };
+      const penalties = invasionRewardCalculateDefensePenalties(result, smallResources);
+      // floor(5 * 0.4 * 1.0) = 2
+      expect(penalties.resourceLosses.gold).toBe(2);
+      // floor(3 * 0.3 * 1.0) = 0 — omitted
+      expect(penalties.resourceLosses.food).toBeUndefined();
+      // floor(2 * 0.25 * 1.0) = 0 — omitted
+      expect(penalties.resourceLosses.crystals).toBeUndefined();
+    });
+
+    it('should scale reputation with depth (min at 0)', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      expect(penalties.reputationLoss).toBe(INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN);
+    });
+
+    it('should scale reputation with depth (max at 1.0)', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      expect(penalties.reputationLoss).toBe(INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX);
+    });
+
+    it('should scale reputation with depth (mid)', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0.5 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      // floor(3 + 5 * 0.5) = floor(5.5) = 5
+      expect(penalties.reputationLoss).toBe(5);
+    });
+
+    it('should stack secondary objective crystal/essence bonuses on top of depth losses', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0, objectivesCompleted: 2 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      // crystals: floor(1000 * 0.25 * 1.0) + 2 * 10 = 250 + 20 = 270
+      expect(penalties.resourceLosses.crystals).toBe(270);
+      // essence: floor(1000 * 0.2 * 1.0) + 2 * 5 = 200 + 10 = 210
+      expect(penalties.resourceLosses.essence).toBe(210);
+    });
+
+    it('should have no depth losses but still have objective losses when depth is 0', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0, objectivesCompleted: 1 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      expect(penalties.resourceLosses.crystals).toBe(10);
+      expect(penalties.resourceLosses.essence).toBe(5);
+      expect(penalties.resourceLosses.gold).toBeUndefined();
+    });
+
+    it('should handle missing resources gracefully', () => {
+      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0 });
+      const penalties = invasionRewardCalculateDefensePenalties(result, {});
+      expect(penalties.resourceLosses.gold).toBeUndefined();
+      expect(penalties.goldLost).toBe(0);
     });
 
     it('should start with empty killed inhabitants', () => {
       const result = makeResult({ outcome: 'defeat' });
-      const penalties = invasionRewardCalculateDefensePenalties(result, 100);
+      const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
       expect(penalties.killedInhabitantIds).toEqual([]);
     });
   });

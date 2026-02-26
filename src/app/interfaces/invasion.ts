@@ -106,6 +106,9 @@ export type DetailedInvasionResult = {
   objectivesCompleted: number;
   objectivesTotal: number;
   rewardMultiplier: number;
+  penetrationDepth: number;
+  roomsReached: number;
+  totalPathRooms: number;
 };
 
 // --- Rewards types ---

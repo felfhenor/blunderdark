@@ -477,7 +477,7 @@ describe('invasion-win-loss', () => {
         defendersLost: 1,
       });
 
-      const result = invasionWinLossResolveDetailedResult(state, 42, 'all_invaders_eliminated');
+      const result = invasionWinLossResolveDetailedResult(state, 42, 'all_invaders_eliminated', 0.5, 4, 8);
 
       expect(result.invasionId).toBe('inv-1');
       expect(result.day).toBe(42);
@@ -504,7 +504,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 10,
       });
 
-      const result = invasionWinLossResolveDetailedResult(state, 50, 'altar_destroyed');
+      const result = invasionWinLossResolveDetailedResult(state, 50, 'altar_destroyed', 1.0, 8, 8);
 
       expect(result.outcome).toBe('defeat');
       expect(result.endReason).toBe('altar_destroyed');
@@ -523,7 +523,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 20,
       });
 
-      const result = invasionWinLossResolveDetailedResult(state, 60, 'all_invaders_eliminated');
+      const result = invasionWinLossResolveDetailedResult(state, 60, 'all_invaders_eliminated', 0.5, 4, 8);
 
       expect(result.objectivesCompleted).toBe(1);
       expect(result.objectivesTotal).toBe(2);
@@ -535,7 +535,7 @@ describe('invasion-win-loss', () => {
         currentTurn: 30,
       });
 
-      const result = invasionWinLossResolveDetailedResult(state, 70, 'turn_limit_reached');
+      const result = invasionWinLossResolveDetailedResult(state, 70, 'turn_limit_reached', 0.25, 3, 10);
 
       expect(result.outcome).toBe('victory');
       expect(result.endReason).toBe('turn_limit_reached');
@@ -558,6 +558,9 @@ describe('invasion-win-loss', () => {
         objectivesCompleted: 0,
         objectivesTotal: 2,
         rewardMultiplier: 1.5,
+        penetrationDepth: 0.5,
+        roomsReached: 4,
+        totalPathRooms: 8,
       };
 
       const entry = invasionWinLossCreateHistoryEntry(result);
@@ -587,6 +590,9 @@ describe('invasion-win-loss', () => {
         objectivesCompleted: 1,
         objectivesTotal: 2,
         rewardMultiplier: 0,
+        penetrationDepth: 1.0,
+        roomsReached: 8,
+        totalPathRooms: 8,
       };
 
       const entry = invasionWinLossCreateHistoryEntry(result);
@@ -620,7 +626,7 @@ describe('invasion-win-loss', () => {
 
       // Resolve
       state = invasionWinLossEnd(state);
-      const result = invasionWinLossResolveDetailedResult(state, 35, endReason!);
+      const result = invasionWinLossResolveDetailedResult(state, 35, endReason!, 0.5, 4, 8);
       expect(result.outcome).toBe('victory');
       expect(result.turnsTaken).toBe(2);
       expect(result.invadersKilled).toBe(2);
@@ -646,7 +652,7 @@ describe('invasion-win-loss', () => {
       expect(endReason).toBe('altar_destroyed');
 
       state = invasionWinLossEnd(state);
-      const result = invasionWinLossResolveDetailedResult(state, 40, endReason!);
+      const result = invasionWinLossResolveDetailedResult(state, 40, endReason!, 1.0, 8, 8);
       expect(result.outcome).toBe('defeat');
       expect(result.endReason).toBe('altar_destroyed');
       expect(result.turnsTaken).toBe(10);
@@ -671,7 +677,7 @@ describe('invasion-win-loss', () => {
       expect(endReason).toBe('turn_limit_reached');
 
       state = invasionWinLossEnd(state);
-      const result = invasionWinLossResolveDetailedResult(state, 45, endReason!);
+      const result = invasionWinLossResolveDetailedResult(state, 45, endReason!, 0.25, 3, 10);
       expect(result.outcome).toBe('victory');
       expect(result.turnsTaken).toBe(INVASION_WIN_LOSS_MAX_TURNS);
     });

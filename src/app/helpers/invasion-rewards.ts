@@ -21,9 +21,20 @@ import type { ResourceType } from '@interfaces/resource';
 export const INVASION_REWARD_BASE_REPUTATION_GAIN = 5;
 export const INVASION_REWARD_REPUTATION_PER_KILL = 1;
 export const INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS = 3;
-export const INVASION_REWARD_DEFEAT_REPUTATION_LOSS = 3;
-export const INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT = 0.2;
+export const INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN = 3;
+export const INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX = 8;
 export const INVASION_REWARD_PRISONER_CAPTURE_CHANCE = 0.3;
+
+/** Max loss percentages at full penetration depth (1.0). Actual loss = floor(current * max% * depth). */
+export const INVASION_REWARD_DEFEAT_RESOURCE_MAX_LOSS: Partial<
+  Record<ResourceType, number>
+> = {
+  gold: 0.4,
+  food: 0.3,
+  crystals: 0.25,
+  essence: 0.2,
+  flux: 0.15,
+};
 export const INVASION_REWARD_BASE_EXPERIENCE_PER_INVADER = 10;
 
 export const INVASION_REWARD_ALTAR_REBUILD_COST: Partial<
@@ -162,23 +173,48 @@ export function invasionRewardCalculateDefenseRewards(
 
 /**
  * Calculate penalties for a failed defense.
- * 20% gold looted, -3 reputation, resource losses from completed secondaries.
+ * Losses scale with penetration depth — how far invaders got through the dungeon.
+ * Each resource has a max loss % at full penetration. Actual loss = floor(current * max% * depth).
+ * Reputation scales from 3 (min) to 8 (max) based on depth.
+ * Secondary objective bonuses still stack (+10 crystals, +5 essence per objective).
  */
 export function invasionRewardCalculateDefensePenalties(
   result: DetailedInvasionResult,
-  currentGold: number,
+  currentResources: Partial<Record<ResourceType, number>>,
 ): DefensePenalties {
-  const goldLost = Math.round(
-    currentGold * INVASION_REWARD_DEFEAT_GOLD_LOSS_PERCENT,
-  );
-  const reputationLoss = INVASION_REWARD_DEFEAT_REPUTATION_LOSS;
+  const depth = result.penetrationDepth;
 
-  // Resource losses scale with secondaries completed
+  // Reputation scales with depth: floor(3 + 5 * depth), range 3–8
+  const reputationLoss = Math.floor(
+    INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN +
+      (INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MAX -
+        INVASION_REWARD_DEFEAT_REPUTATION_LOSS_MIN) *
+        depth,
+  );
+
+  // Resource losses: floor(current * maxPercent * depth) for each resource
   const resourceLosses: Partial<Record<ResourceType, number>> = {};
-  if (result.objectivesCompleted > 0) {
-    resourceLosses.crystals = result.objectivesCompleted * 10;
-    resourceLosses.essence = result.objectivesCompleted * 5;
+  for (const [resource, maxPercent] of Object.entries(
+    INVASION_REWARD_DEFEAT_RESOURCE_MAX_LOSS,
+  ) as [ResourceType, number][]) {
+    const current = currentResources[resource] ?? 0;
+    if (current <= 0) continue;
+    const loss = Math.floor(current * maxPercent * depth);
+    if (loss > 0) {
+      resourceLosses[resource] = loss;
+    }
   }
+
+  // Secondary objective bonuses stack on top
+  if (result.objectivesCompleted > 0) {
+    resourceLosses.crystals =
+      (resourceLosses.crystals ?? 0) + result.objectivesCompleted * 10;
+    resourceLosses.essence =
+      (resourceLosses.essence ?? 0) + result.objectivesCompleted * 5;
+  }
+
+  // goldLost mirrors the gold entry in resourceLosses for backward compat
+  const goldLost = resourceLosses.gold ?? 0;
 
   return {
     reputationLoss,

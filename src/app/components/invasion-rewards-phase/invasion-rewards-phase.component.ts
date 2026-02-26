@@ -1,4 +1,4 @@
-import { KeyValuePipe } from '@angular/common';
+import { DecimalPipe, KeyValuePipe, PercentPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,7 +9,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-rewards-phase',
-  imports: [KeyValuePipe],
+  imports: [DecimalPipe, KeyValuePipe, PercentPipe],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -65,6 +65,10 @@ import type { InvasionOrchestratorResult } from '@interfaces';
         } @else if (!isVictory() && res.penalties) {
           <div class="text-center mb-4">
             <div class="text-xl font-bold text-error">Losses Suffered</div>
+            <div class="text-sm opacity-70 mt-1">
+              Penetration: {{ res.detailedResult.penetrationDepth | percent: '1.0-0' }}
+              ({{ res.detailedResult.roomsReached | number: '1.0-0' }}/{{ res.detailedResult.totalPathRooms | number: '1.0-0' }} rooms)
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
             @if (res.penalties.goldLost > 0) {

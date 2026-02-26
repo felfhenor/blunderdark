@@ -209,11 +209,15 @@ export function invasionWinLossEnd(state: InvasionState): InvasionState {
 /**
  * Resolve the final detailed result for an invasion.
  * Uses invasionObjectiveResolveOutcome from objectives system for reward multiplier.
+ * penetrationDepth, roomsReached, and totalPathRooms are passed from the caller (invasion-process).
  */
 export function invasionWinLossResolveDetailedResult(
   state: InvasionState,
   day: number,
   endReason: InvasionEndReason,
+  penetrationDepth: number,
+  roomsReached: number,
+  totalPathRooms: number,
 ): DetailedInvasionResult {
   const objectiveResult = invasionObjectiveResolveOutcome(state.objectives);
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
@@ -232,6 +236,9 @@ export function invasionWinLossResolveDetailedResult(
     objectivesCompleted: completedSecondaries,
     objectivesTotal: secondaries.length,
     rewardMultiplier: objectiveResult.rewardMultiplier,
+    penetrationDepth,
+    roomsReached,
+    totalPathRooms,
   };
 }
 

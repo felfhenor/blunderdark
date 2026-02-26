@@ -74,7 +74,8 @@ export async function invasionRewardApplyVictory(
 
 /**
  * Apply defeat penalties to the game state.
- * Removes gold/resources, killed defenders, and applies reputation loss.
+ * Subtracts all resource losses (including gold) via updateGamestate to clamp at 0,
+ * removes killed defenders, and applies reputation loss.
  */
 export async function invasionRewardApplyDefeat(
   result: InvasionOrchestratorResult,
@@ -82,20 +83,18 @@ export async function invasionRewardApplyDefeat(
   const penalties = result.penalties;
   if (!penalties) return;
 
-  // Subtract gold
-  if (penalties.goldLost > 0) {
-    resourceSubtract('gold', penalties.goldLost);
-  }
-
-  // Subtract resources
-  for (const [type, amount] of Object.entries(penalties.resourceLosses) as [ResourceType, number][]) {
-    if (amount > 0) {
-      resourceSubtract(type, amount);
-    }
-  }
-
-  // Remove killed defenders + apply reputation loss + threat adjustment
+  // All resource subtraction (including gold) happens inside updateGamestate for safe clamping
   await updateGamestate((state) => {
+    // Subtract all resource losses (gold is included in resourceLosses)
+    for (const [type, amount] of Object.entries(penalties.resourceLosses) as [ResourceType, number][]) {
+      if (amount > 0 && state.world.resources[type]) {
+        state.world.resources[type].current = Math.max(
+          0,
+          state.world.resources[type].current - amount,
+        );
+      }
+    }
+
     if (result.killedDefenderIds.length > 0) {
       const killedSet = new Set(result.killedDefenderIds);
       state.world.inhabitants = state.world.inhabitants.filter(

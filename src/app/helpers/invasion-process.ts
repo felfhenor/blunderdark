@@ -71,6 +71,7 @@ import type {
   PendingInvasionWarning,
   PlacedRoom,
   PlacedRoomId,
+  ResourceType,
   SpecialInvasionType,
 } from '@interfaces';
 import type { SecondaryObjective } from '@interfaces/pathfinding';
@@ -1458,10 +1459,20 @@ function invasionProcessComplete(
   const endReason = invasionWinLossCheckEnd(invasion.invasionState) ?? 'turn_limit_reached';
   invasion.invasionState = invasionWinLossEnd(invasion.invasionState);
 
+  // Calculate penetration depth: how far invaders got through the dungeon
+  const totalPathRooms = invasion.path.length;
+  const roomsReached = Math.min(invasion.currentRoomIndex + 1, totalPathRooms);
+  const penetrationDepth = invasion.isAltarLooping
+    ? 1.0
+    : Math.min(1.0, invasion.currentRoomIndex / Math.max(1, totalPathRooms - 1));
+
   const detailedResult = invasionWinLossResolveDetailedResult(
     invasion.invasionState,
     invasion.day,
     endReason,
+    penetrationDepth,
+    roomsReached,
+    totalPathRooms,
   );
 
   invasion.battleLog.push({
@@ -1483,9 +1494,13 @@ function invasionProcessComplete(
       rng,
     );
   } else {
+    const currentResources: Partial<Record<ResourceType, number>> = {};
+    for (const [key, val] of Object.entries(state.world.resources) as [ResourceType, { current: number; max: number }][]) {
+      currentResources[key] = val.current;
+    }
     penalties = invasionRewardCalculateDefensePenalties(
       detailedResult,
-      state.world.resources.gold?.current ?? 0,
+      currentResources,
     );
     penalties.killedInhabitantIds = [...invasion.killedDefenderIds];
   }
@@ -1535,6 +1550,9 @@ function createEmptyCompletedInvasion(
       objectivesCompleted: 0,
       objectivesTotal: 0,
       rewardMultiplier: 0.5,
+      penetrationDepth: 0,
+      roomsReached: 0,
+      totalPathRooms: 0,
     },
     battleLog: [{ turn: 0, type: 'invasion_end', message: 'No invaders appeared.' }],
     capturedPrisoners: [],

@@ -34,6 +34,9 @@ function makeResult(overrides: Partial<DetailedInvasionResult> = {}): DetailedIn
     objectivesCompleted: 0,
     objectivesTotal: 3,
     rewardMultiplier: 1,
+    penetrationDepth: 0.5,
+    roomsReached: 4,
+    totalPathRooms: 8,
     ...overrides,
   };
 }
