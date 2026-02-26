@@ -4,7 +4,15 @@ import {
   input,
   output,
 } from '@angular/core';
-import type { InvasionOrchestratorResult } from '@interfaces';
+import type { InvasionEndReason, InvasionOrchestratorResult } from '@interfaces';
+
+const END_REASON_LABELS: Record<InvasionEndReason, string> = {
+  all_invaders_eliminated: 'All invaders eliminated',
+  turn_limit_reached: 'Turn limit reached',
+  altar_destroyed: 'Altar destroyed',
+  objectives_completed: 'Objectives completed',
+  morale_broken: 'Invader morale broken',
+};
 
 @Component({
   selector: 'app-invasion-results-phase',
@@ -58,7 +66,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
 
         <div class="text-center mt-3">
           <span class="badge badge-sm">
-            End reason: {{ res.detailedResult.endReason }}
+            End reason: {{ endReasonLabel(res.detailedResult.endReason) }}
           </span>
         </div>
       }
@@ -79,4 +87,8 @@ export class InvasionResultsPhaseComponent {
   public result = input.required<InvasionOrchestratorResult>();
   public isVictory = input.required<boolean>();
   public advance = output();
+
+  public endReasonLabel(reason: InvasionEndReason): string {
+    return END_REASON_LABELS[reason];
+  }
 }
