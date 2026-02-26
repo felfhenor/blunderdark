@@ -13,6 +13,7 @@ import {
   resourcePayCost,
   summoningCanStart,
   summoningCompleted$,
+  summoningDismissed$,
   summoningExpired$,
   summoningGetAdjacentRoomTypeIds,
   summoningGetAvailableRecipes,
@@ -47,6 +48,10 @@ export class PanelSummoningCircleComponent {
         ? `${label} has permanently joined your dungeon!`
         : `${label} has been temporarily summoned.`;
       notify('Summoning', detail);
+    }),
+    summoningDismissed$.subscribe((evt) => {
+      const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
+      notify('Summoning', `${label} was dismissed — roster is full.`);
     }),
     summoningExpired$.subscribe((evt) => {
       notify('Summoning', `${evt.inhabitantName} has faded away.`);

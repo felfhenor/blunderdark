@@ -3,6 +3,7 @@ import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { recruitmentMaxInhabitantCount } from '@helpers/recruitment';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -23,6 +24,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type {
   SummoningCompletedEvent,
+  SummoningDismissedEvent,
   SummoningExpiredEvent,
 } from '@interfaces/summoning';
 import { Subject } from 'rxjs';
@@ -36,6 +38,9 @@ export const summoningCompleted$ = summoningCompletedSubject.asObservable();
 
 const summoningExpiredSubject = new Subject<SummoningExpiredEvent>();
 export const summoningExpired$ = summoningExpiredSubject.asObservable();
+
+const summoningDismissedSubject = new Subject<SummoningDismissedEvent>();
+export const summoningDismissed$ = summoningDismissedSubject.asObservable();
 
 // --- Pure helpers ---
 
@@ -283,21 +288,29 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
                 duration,
               );
 
-              state.world.inhabitants = [...state.world.inhabitants, summoned];
-              inhabitantsChanged = true;
+              // Check global roster cap before adding
+              if (state.world.inhabitants.length >= recruitmentMaxInhabitantCount()) {
+                summoningDismissedSubject.next({
+                  inhabitantName: summoned.name,
+                  inhabitantType: def.type,
+                });
+              } else {
+                state.world.inhabitants = [...state.world.inhabitants, summoned];
+                inhabitantsChanged = true;
 
-              if (isTemporary) {
-                newTemporaryIds.add(summoned.instanceId);
+                if (isTemporary) {
+                  newTemporaryIds.add(summoned.instanceId);
+                }
+
+                reputationAwardInPlace(state, 'Summon Wraith');
+
+                summoningCompletedSubject.next({
+                  roomId: room.id,
+                  inhabitantName: summoned.name,
+                  inhabitantType: def.type,
+                  summonType: recipe.summonType,
+                });
               }
-
-              reputationAwardInPlace(state, 'Summon Wraith');
-
-              summoningCompletedSubject.next({
-                roomId: room.id,
-                inhabitantName: summoned.name,
-                inhabitantType: def.type,
-                summonType: recipe.summonType,
-              });
             }
           }
 

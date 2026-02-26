@@ -10,3 +10,8 @@ export type SummoningCompletedEvent = {
 export type SummoningExpiredEvent = {
   inhabitantName: string;
 };
+
+export type SummoningDismissedEvent = {
+  inhabitantName: string;
+  inhabitantType: string;
+};
