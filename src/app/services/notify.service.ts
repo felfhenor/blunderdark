@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import {
   contentGetEntry,
   corruptionEffectEvent$,
+  merchantEvent$,
   notifyNotification$,
   reputationGetLevelLabel,
   reputationLevelUp$,
@@ -16,6 +17,7 @@ import type {
   UnlockEffect,
 } from '@interfaces';
 import type { CorruptionEffectEvent } from '@interfaces/corruption-effect';
+import type { MerchantEvent } from '@helpers/merchant';
 import type { ReputationLevelUpEvent } from '@interfaces/reputation';
 import { getUnlockTargetId } from '@interfaces/research';
 import { LoggerService } from '@services/logger.service';
@@ -61,6 +63,10 @@ export class NotifyService {
 
     researchUnlock$.subscribe((event) => {
       this.showResearchUnlock(event);
+    });
+
+    merchantEvent$.subscribe((event) => {
+      this.showMerchantEvent(event);
     });
   }
 
@@ -143,6 +149,26 @@ export class NotifyService {
       tapToDismiss: true,
       progressBar: true,
     });
+  }
+
+  private showMerchantEvent(event: MerchantEvent): void {
+    if (event.type === 'arrival') {
+      this.logger.debug('Notify:Merchant', 'Merchant has arrived');
+      this.toast.info('A travelling merchant has arrived at your dungeon!', 'Merchant Arrived', {
+        timeOut: 5000,
+        extendedTimeOut: 1000,
+        tapToDismiss: true,
+        progressBar: true,
+      });
+    } else {
+      this.logger.debug('Notify:Merchant', 'Merchant has departed');
+      this.toast.info('The merchant has packed up and left your dungeon.', 'Merchant Departed', {
+        timeOut: 5000,
+        extendedTimeOut: 1000,
+        tapToDismiss: true,
+        progressBar: true,
+      });
+    }
   }
 
   private showReputationLevelUp(event: ReputationLevelUpEvent): void {

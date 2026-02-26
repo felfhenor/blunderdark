@@ -211,6 +211,17 @@ export function merchantResetLastProcessedDay(): void {
 
 // --- Debug helpers ---
 
+export function merchantDebugForceDeparture(): void {
+  if (!gamestate().world.merchant.isPresent) return;
+
+  updateGamestate((state) => ({
+    ...state,
+    world: { ...state.world, merchant: merchantDeparture() },
+  }));
+
+  merchantEventSubject.next({ type: 'departure' });
+}
+
 export function merchantDebugRestock(): void {
   const inventory = gamestate().world.merchant.inventory;
   if (inventory.length === 0) return;

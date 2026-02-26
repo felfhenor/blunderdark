@@ -3,6 +3,7 @@ import { OptionsBaseComponent } from '@components/panel-options/option-base-page
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import {
   merchantDebugForceArrival,
+  merchantDebugForceDeparture,
   merchantDebugRestock,
   merchantIsPresent,
 } from '@helpers/merchant';
@@ -21,6 +22,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public forceArrival(): void {
     merchantDebugForceArrival();
+  }
+
+  public forceDeparture(): void {
+    merchantDebugForceDeparture();
   }
 
   public restock(): void {
