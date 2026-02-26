@@ -42,12 +42,15 @@ import type { InvasionOrchestratorResult } from '@interfaces';
                 </div>
               }
             }
+            @if (res.capturedPrisoners.length > 0) {
+              <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
+                <div class="text-xs opacity-50">Prisoners Captured</div>
+                <div class="text-lg font-bold text-warning">
+                  {{ res.capturedPrisoners.length }}
+                </div>
+              </div>
+            }
           </div>
-          @if (res.capturedPrisoners.length > 0) {
-            <div class="text-center mt-3 text-sm opacity-70">
-              {{ res.capturedPrisoners.length }} prisoner(s) captured
-            </div>
-          }
         } @else if (!isVictory() && res.penalties) {
           <div class="text-center mb-4">
             <div class="text-xl font-bold text-error">Losses Suffered</div>
