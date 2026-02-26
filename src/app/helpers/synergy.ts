@@ -3,6 +3,10 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { productionGetRoomDefinition } from '@helpers/production';
 import {
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+} from '@helpers/research-unlocks';
+import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
@@ -169,16 +173,21 @@ export const synergyActiveMap = computed(() => {
   return synergyEvaluateAll(gamestate().world.floors);
 });
 
+function describeRoomName(roomTypeId: RoomId): string {
+  const isGated = researchUnlockIsResearchGated('room', roomTypeId);
+  if (isGated && !researchUnlockIsUnlocked('room', roomTypeId)) {
+    return '???';
+  }
+  const def = productionGetRoomDefinition(roomTypeId);
+  return def?.name ?? 'a room';
+}
+
 function describeCondition(condition: SynergyCondition): string {
   switch (condition.type) {
-    case 'adjacentRoomType': {
-      const def = productionGetRoomDefinition(condition.roomTypeId!);
-      return `Place ${def?.name ?? 'a room'} adjacent`;
-    }
-    case 'connectedRoomType': {
-      const def = productionGetRoomDefinition(condition.roomTypeId!);
-      return `Connect to ${def?.name ?? 'a room'}`;
-    }
+    case 'adjacentRoomType':
+      return `Place ${describeRoomName(condition.roomTypeId!)} adjacent`;
+    case 'connectedRoomType':
+      return `Connect to ${describeRoomName(condition.roomTypeId!)}`;
     case 'inhabitantType':
       return `Assign a ${condition.inhabitantType} worker`;
     case 'minInhabitants':
