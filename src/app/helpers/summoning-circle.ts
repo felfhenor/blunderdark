@@ -295,6 +295,7 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
               summoningCompletedSubject.next({
                 roomId: room.id,
                 inhabitantName: summoned.name,
+                inhabitantType: def.type,
                 summonType: recipe.summonType,
               });
             }

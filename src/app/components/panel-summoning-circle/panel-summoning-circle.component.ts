@@ -1,9 +1,8 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
-import { ModalComponent } from '@components/modal/modal.component';
 import {
   contentGetEntry,
   findRoomByRole,
@@ -35,20 +34,19 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelSummoningCircleComponent {
-  public showSummonResult = signal(false);
-  public lastSummonResult = signal<{ name: string; summonType: string } | undefined>(undefined);
-
   private subscriptions = [
     summoningCompleted$.subscribe((evt) => {
-      this.lastSummonResult.set({ name: evt.inhabitantName, summonType: evt.summonType });
-      this.showSummonResult.set(true);
-      notify('Summoning', `Summoned: ${evt.inhabitantName}`);
+      const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
+      const detail = evt.summonType === 'permanent'
+        ? `${label} has permanently joined your dungeon!`
+        : `${label} has been temporarily summoned.`;
+      notify('Summoning', detail);
     }),
     summoningExpired$.subscribe((evt) => {
       notify('Summoning', `${evt.inhabitantName} has faded away.`);

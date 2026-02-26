@@ -122,29 +122,3 @@
     </div>
   </div>
 }
-
-<!-- Summon Result Modal -->
-<app-modal [(visible)]="showSummonResult">
-  <span title>Summoning Complete</span>
-  <div body>
-    @if (lastSummonResult(); as result) {
-      <div class="text-center">
-        <p class="text-lg font-semibold">{{ result.name }}</p>
-        @if (result.summonType === 'permanent') {
-          <p class="text-success mt-2">
-            A permanent creature has joined your dungeon!
-          </p>
-        } @else {
-          <p class="text-warning mt-2">
-            A temporary helper has been summoned. It will fade over time.
-          </p>
-        }
-      </div>
-    }
-  </div>
-  <div actions>
-    <button class="btn btn-sm" (click)="showSummonResult.set(false)">
-      Close
-    </button>
-  </div>
-</app-modal>
