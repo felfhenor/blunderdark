@@ -3,7 +3,7 @@
   <div class="compact-card">
     <div class="flex items-center gap-2">
       @if (showTier()) {
-        <span class="badge badge-xs badge-outline">
+        <span class="badge badge-xs" [ngClass]="tierClass()">
           T{{ definition().tier | number: '1.0-0' }}
         </span>
       }
@@ -59,7 +59,7 @@
     <div class="flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
         @if (showTier()) {
-          <span class="badge badge-xs badge-outline">
+          <span class="badge badge-xs" [ngClass]="tierClass()">
             T{{ definition().tier | number: '1.0-0' }}
           </span>
         }

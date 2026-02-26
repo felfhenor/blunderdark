@@ -54,6 +54,14 @@ export class InhabitantCardComponent {
   public synergyRoomId = input<PlacedRoomId | undefined>(undefined);
   public compact = input(false);
 
+  public tierClass = computed(() => {
+    const tier = this.definition().tier;
+    if (tier >= 4) return 'badge-error';
+    if (tier === 3) return 'badge-warning';
+    if (tier === 2) return 'badge-info';
+    return 'badge-outline';
+  });
+
   public effectiveStats = computed(() =>
     effectiveStatsCalculate(this.definition(), this.instance()),
   );
