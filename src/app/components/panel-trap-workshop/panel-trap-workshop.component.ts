@@ -137,7 +137,7 @@ import { sortBy } from 'es-toolkit/compat';
                     </span>
                   </div>
                   <button
-                    class="btn btn-xs btn-warning mt-1"
+                    class="btn btn-xs btn-primary mt-1"
                     [disabled]="!entry.canAfford"
                     (click)="
                       startCrafting(

@@ -70,7 +70,7 @@
               @if (canStartJob()) {
                 <div class="flex gap-2 mt-1">
                   <button
-                    class="btn btn-xs btn-warning flex-1"
+                    class="btn btn-xs btn-primary flex-1"
                     (click)="startExtraction(prisoner.id)"
                   >
                     Extract ({{ getExtractionTime() | number: '1.0-0' }} sec)
