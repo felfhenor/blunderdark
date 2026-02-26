@@ -1033,6 +1033,7 @@ function processHallwayTraps(
       if (newHp <= 0) {
         invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
         invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
+        moraleApplyAllyDeath(targetInvader, invasion.currentTurn);
         invasion.battleLog.push({
           turn: invasion.currentTurn,
           type: 'combat_kill',
