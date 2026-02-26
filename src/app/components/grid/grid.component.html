@@ -86,6 +86,9 @@
               <div class="doorway doorway-left"></div>
             }
           }
+          @if (hasTrap(colIdx, rowIdx)) {
+            <span class="trap-indicator">&#9906;</span>
+          }
           @if (getTransportInfo(colIdx, rowIdx); as tInfo) {
             @if (tInfo.type === 'stair') {
               <div class="stair-indicator">

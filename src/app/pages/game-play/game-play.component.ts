@@ -38,6 +38,7 @@ import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-tim
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
+import { PanelTrapWorkshopComponent } from '@components/panel-trap-workshop/panel-trap-workshop.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
@@ -113,6 +114,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     SideTabRailComponent,
     PanelTimeOfDayComponent,
     PanelTrainingGroundsComponent,
+    PanelTrapWorkshopComponent,
     PanelSummoningCircleComponent,
     PanelTortureChamberComponent,
   ],
@@ -173,6 +175,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private breedingPanel = viewChild('breedingPanel', { read: TemplateRef });
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private thronePanel = viewChild('thronePanel', { read: TemplateRef });
+  private trapsPanel = viewChild('trapsPanel', { read: TemplateRef });
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
     if (!roomTypeId) return false;
@@ -194,6 +197,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     this.hasRoomOfRole('tortureChamber'),
   );
   public hasBreedingPits = computed(() => this.hasRoomOfRole('breedingPits'));
+  public hasTrapWorkshop = computed(() => this.hasRoomOfRole('trapWorkshop'));
   public isMerchantPresent = merchantIsPresent;
   public hasNoActiveResearch = computed(
     () => !gamestate().world.research.activeResearch,
@@ -208,6 +212,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     alchemyLab: 'alchemy',
     tortureChamber: 'torture',
     breedingPits: 'breeding',
+    trapWorkshop: 'traps',
   };
 
   private selectedRoomTabId = computed(() => {
@@ -453,6 +458,14 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         isModal: false,
         templateRef: this.forgePanel() ?? placeholder,
         condition: this.hasDarkForge,
+      },
+      {
+        id: 'traps',
+        label: 'Traps',
+        isModal: false,
+        templateRef: this.trapsPanel() ?? placeholder,
+        condition: this.hasTrapWorkshop,
+        hidden: true,
       },
       {
         id: 'alchemy',

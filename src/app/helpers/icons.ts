@@ -1,4 +1,5 @@
 import {
+  gameMantrap,
   gameChoppedSkull,
   game3dStairs,
   gameAlarmClock,
@@ -40,6 +41,7 @@ import {
 } from '@ng-icons/tabler-icons';
 
 export const ICON_ALL = {
+  gameMantrap,
   gameChoppedSkull,
   game3dStairs,
   gameAlarmClock,

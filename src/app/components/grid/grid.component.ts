@@ -716,6 +716,21 @@ export class GridComponent implements AfterViewInit {
     }
   }
 
+  public trapTileSet = computed(() => {
+    const floor = floorCurrent();
+    if (!floor?.traps?.length) return new Set<string>();
+
+    const set = new Set<string>();
+    for (const trap of floor.traps) {
+      set.add(`${trap.tileX},${trap.tileY}`);
+    }
+    return set;
+  });
+
+  public hasTrap(x: number, y: number): boolean {
+    return this.trapTileSet().has(`${x},${y}`);
+  }
+
   public isHallwayMode = hallwayPlacementIsBuildMode;
   public isTransportMode = transportPlacementActive;
   public transportType = transportPlacementType;

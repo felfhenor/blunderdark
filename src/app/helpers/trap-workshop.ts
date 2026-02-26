@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -18,6 +19,14 @@ import type { TrapWorkshopInfo } from '@interfaces/trap-workshop';
 
 /** Base crafting time: 3 game-minutes = 15 ticks */
 export const TRAP_WORKSHOP_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3;
+
+type TrapWorkshopCompletedEvent = {
+  trapName: string;
+};
+
+const trapWorkshopCompletedSubject = new Subject<TrapWorkshopCompletedEvent>();
+export const trapWorkshopCompleted$ =
+  trapWorkshopCompletedSubject.asObservable();
 
 // --- Crafting cost/time helpers ---
 
@@ -178,11 +187,19 @@ export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
           state.world.trapInventory,
           job.trapTypeId,
         );
+
+        const trapDef = contentGetEntry<TrapContent>(job.trapTypeId);
         queue.jobs.shift();
 
         // Clean up empty queues
         if (queue.jobs.length === 0) {
           state.world.trapCraftingQueues.splice(queueIndex, 1);
+        }
+
+        if (trapDef) {
+          trapWorkshopCompletedSubject.next({
+            trapName: trapDef.name,
+          });
         }
       }
     }
