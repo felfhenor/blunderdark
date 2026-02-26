@@ -209,7 +209,6 @@
                         }
                       </div>
                     }
-
                   </div>
                 </div>
 
@@ -227,12 +226,7 @@
                   >
                     Fuse
                     @for (cost of p.costEntries; track cost.type) {
-                      <span
-                        [class.text-error]="!cost.sufficient"
-                        [tp]="
-                          'Have ' + cost.current + ' / Need ' + cost.amount
-                        "
-                      >
+                      <span [class.text-error]="!cost.sufficient">
                         <app-currency-cost
                           [type]="$any(cost.type)"
                           [amount]="cost.amount"
