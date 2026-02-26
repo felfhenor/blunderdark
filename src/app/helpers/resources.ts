@@ -111,6 +111,34 @@ export async function resourcePayCost(costs: ResourceCost): Promise<boolean> {
   return true;
 }
 
+/**
+ * Apply a map of resource changes in a single updateGamestate call.
+ * Positive values = gain (capped at max), negative values = loss (capped at 0).
+ * Prevents UI flickering from sequential resourceAdd/resourceSubtract calls.
+ */
+export async function resourceApplyMap(
+  changes: Partial<Record<ResourceType, number>>,
+): Promise<void> {
+  const hasChanges = Object.values(changes).some((v) => v && v !== 0);
+  if (!hasChanges) return;
+
+  await updateGamestate((state) => {
+    for (const [type, amount] of Object.entries(changes)) {
+      if (!amount || amount === 0) continue;
+      const resourceType = type as ResourceType;
+      const resource = state.world.resources[resourceType];
+      if (!resource) continue;
+
+      resource.current = Math.min(
+        resource.max,
+        Math.max(0, resource.current + amount),
+      );
+    }
+
+    return state;
+  });
+}
+
 export function resourceIsLow(
   type: ResourceType,
   threshold: number,
@@ -198,6 +226,23 @@ export function resourceStorageProcess(state: GameState): void {
     state.world.resources[type].max = effectiveMax;
     if (state.world.resources[type].current > effectiveMax) {
       state.world.resources[type].current = effectiveMax;
+    }
+  }
+}
+
+/**
+ * Clamp all resource current values to [0, max].
+ * Call at the end of each game tick so that intermediate over/under-shoots
+ * from multiple processes are resolved in a single pass.
+ * Mutates state in-place.
+ */
+export function resourceClampAll(state: GameState): void {
+  for (const type of Object.keys(state.world.resources) as ResourceType[]) {
+    const res = state.world.resources[type];
+    if (res.current > res.max) {
+      res.current = res.max;
+    } else if (res.current < 0) {
+      res.current = 0;
     }
   }
 }

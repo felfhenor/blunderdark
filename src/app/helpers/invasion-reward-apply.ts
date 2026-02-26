@@ -6,7 +6,7 @@ import {
   invasionThreatCalculatePerformanceScore,
 } from '@helpers/invasion-threat';
 import { reputationAwardInPlace } from '@helpers/reputation';
-import { resourceAdd, resourceSubtract } from '@helpers/resources';
+import { resourceApplyMap } from '@helpers/resources';
 import { updateGamestate } from '@helpers/state-game';
 import { victoryRecordDefenseWin } from '@helpers/victory';
 import type {
@@ -27,17 +27,12 @@ export async function invasionRewardApplyVictory(
   const rewards = result.rewards;
   if (!rewards) return;
 
-  // Add gold
+  // Add gold + bonus resources in a single batch
+  const resourceGains: Partial<Record<ResourceType, number>> = { ...rewards.resourceGains };
   if (rewards.goldGain > 0) {
-    resourceAdd('gold', rewards.goldGain);
+    resourceGains.gold = (resourceGains.gold ?? 0) + rewards.goldGain;
   }
-
-  // Add bonus resources
-  for (const [type, amount] of Object.entries(rewards.resourceGains) as [ResourceType, number][]) {
-    if (amount > 0) {
-      resourceAdd(type, amount);
-    }
-  }
+  await resourceApplyMap(resourceGains);
 
   // Reputation + victory tracking + threat adjustment
   await updateGamestate((state) => {
@@ -133,14 +128,8 @@ export async function invasionRewardApplyPrisonerAction(
 ): Promise<PrisonerHandlingResult> {
   const result = invasionRewardHandlePrisoner(action, prisoner, rng);
 
-  // Apply resource changes
-  for (const [type, amount] of Object.entries(result.resourceChanges) as [ResourceType, number][]) {
-    if (amount > 0) {
-      resourceAdd(type, amount);
-    } else if (amount < 0) {
-      resourceSubtract(type, Math.abs(amount));
-    }
-  }
+  // Apply resource changes in a single batch
+  await resourceApplyMap(result.resourceChanges);
 
   // Apply reputation + corruption + fear via state mutation
   await updateGamestate((state) => {

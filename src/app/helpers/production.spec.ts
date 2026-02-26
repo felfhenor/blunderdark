@@ -1081,8 +1081,8 @@ describe('productionProcess', () => {
       gold: { current: 999.8, max: 1000 },
     });
     productionProcess(state);
-    // Should cap at 1000, not 1000.3
-    expect(state.world.resources.gold.current).toBe(1000);
+    // Production no longer caps; resourceClampAll at end of tick handles capping
+    expect(state.world.resources.gold.current).toBe(1000.3);
   });
 
   it('should not modify resources for rooms with no production', () => {
@@ -1815,8 +1815,8 @@ describe('Purification Chamber negative corruption production', () => {
       corruption: { current: 0.3, max: 1000 },
     });
     productionProcess(state);
-    // Purification: -3.0, current 0.3, should clamp to 0
-    expect(state.world.resources.corruption.current).toBe(0);
+    // Production no longer clamps; resourceClampAll at end of tick handles clamping
+    expect(state.world.resources.corruption.current).toBeCloseTo(0.3 - 3.0);
   });
 
   it('productionProcess should add corruption when net production is positive', () => {

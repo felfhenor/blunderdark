@@ -710,7 +710,8 @@ describe('alchemy-lab', () => {
       });
       alchemyLabProcess(state);
 
-      expect(state.world.resources.flux.current).toBe(200);
+      // Process no longer caps; resourceClampAll at end of tick handles capping
+      expect(state.world.resources.flux.current).toBe(201);
     });
 
     it('should not process without assigned worker', async () => {

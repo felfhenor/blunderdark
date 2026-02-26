@@ -5,7 +5,6 @@ import {
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
-import { resourceSubtract } from '@helpers/resources';
 import { roomUpgradeGetPaths } from '@helpers/room-upgrades';
 import type {
   Floor,
@@ -288,26 +287,12 @@ function legendaryInhabitantCanPayUpkeep(
 }
 
 /**
- * Deduct per-tick upkeep cost from resources for one inhabitant.
- * Mutates resources in-place.
- */
-function legendaryInhabitantPayUpkeep(def: InhabitantContent, numTicks = 1): void {
-  if (!def.upkeepCost) return;
-
-  for (const [type, amountPerMinute] of Object.entries(def.upkeepCost)) {
-    const resourceType = type as ResourceType;
-    const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
-    resourceSubtract(resourceType, perTick * numTicks);
-  }
-}
-
-/**
  * Process legendary inhabitant upkeep each tick.
  * Called from the game loop inside updateGamestate — mutates state in-place.
  *
- * 1. For each legendary inhabitant, try to pay per-tick upkeep
- * 2. If paid: reset discontentedTicks (notify if transitioning from discontented)
- * 3. If not paid: increment discontentedTicks (notify if transitioning to discontented)
+ * Checks affordability and updates discontented state. Does NOT deduct
+ * resources — actual deduction is folded into productionProcess as part
+ * of the net delta so that production and costs are applied atomically.
  *
  * Discontented legendaries never leave — they suffer stat reductions instead
  * (applied via state-modifiers).
@@ -320,7 +305,6 @@ export function legendaryInhabitantUpkeepProcess(state: GameState, numTicks = 1)
     const wasBefore = inhabitant.discontentedTicks ?? 0;
 
     if (legendaryInhabitantCanPayUpkeep(def, state.world.resources, numTicks)) {
-      legendaryInhabitantPayUpkeep(def, numTicks);
       inhabitant.discontentedTicks = 0;
 
       if (wasBefore > 0) {

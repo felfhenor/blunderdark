@@ -4,6 +4,7 @@ import {
   connectivityGetConnectedRoomIds,
   connectivityGetDisconnectedRoomIds,
 } from '@helpers/connectivity';
+import { consumptionCalculateNonFoodTotals } from '@helpers/consumption';
 import { contentGetEntry } from '@helpers/content';
 import {
   dayNightCalculateCreatureProductionModifier,
@@ -29,7 +30,6 @@ import {
   productionModifierCalculate,
   productionModifierEvaluate,
 } from '@helpers/production-modifiers';
-import { resourceAdd } from '@helpers/resources';
 import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
@@ -1419,18 +1419,27 @@ export function productionProcess(state: GameState, numTicks = 1): void {
     state.world.season.currentSeason,
   );
 
-  for (const [type, amount] of Object.entries(production)) {
-    if (!amount) continue;
-    const resourceType = type as ResourceType;
+  // Compute non-food consumption (legendary upkeep + feature maintenance)
+  // and subtract from production to get a single net delta per resource.
+  const consumption = consumptionCalculateNonFoodTotals(
+    state.world.floors,
+    state.world.inhabitants,
+  );
 
-    if (amount > 0) {
-      resourceAdd(resourceType, amount * numTicks);
-    } else if (amount < 0) {
-      // Net negative production (e.g., purification drains more corruption than sources generate)
-      state.world.resources[resourceType].current = Math.max(
-        0,
-        state.world.resources[resourceType].current + amount * numTicks,
-      );
-    }
+  // Merge production and consumption into a net delta
+  const allTypes = new Set([
+    ...Object.keys(production),
+    ...Object.keys(consumption),
+  ]);
+
+  for (const type of allTypes) {
+    const resourceType = type as ResourceType;
+    const gain = production[resourceType] ?? 0;
+    const cost = consumption[resourceType] ?? 0;
+    const net = gain - cost;
+    if (!net) continue;
+
+    // Apply single net delta. resourceClampAll() at end of tick ensures [0, max].
+    state.world.resources[resourceType].current += net * numTicks;
   }
 }

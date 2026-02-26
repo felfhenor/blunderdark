@@ -44,6 +44,7 @@ import type { InhabitantInstance, InhabitantInstanceId } from '@interfaces/inhab
 import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
+import type { ResourceMap } from '@interfaces/resource';
 import type { PhylacteryRespawnEntry } from '@helpers/features';
 
 vi.mock('@helpers/content', () => ({
@@ -1206,20 +1207,20 @@ describe('featureMaintenanceProcess', () => {
     vi.mocked(contentGetEntry).mockReturnValue(elderRunesContent);
     const room = makeRoom({ featureIds: [ELDER_RUNES_ID] });
     const floor = makeFloor({ rooms: [room] });
-    const resources = { flux: 100 };
+    const resources = { flux: { current: 100, max: 200 } } as unknown as ResourceMap;
     featureMaintenanceProcess([floor], resources, 5);
-    expect(resources.flux).toBe(100);
+    expect(resources.flux.current).toBe(100);
     expect(room.maintenanceActive).toBeUndefined();
   });
 
-  it('deducts maintenance cost per tick when affordable', () => {
+  it('sets maintenanceActive to true when affordable (no deduction)', () => {
     vi.mocked(contentGetEntry).mockReturnValue(timeDilationContent);
     const room = makeRoom({ featureIds: [TIME_DILATION_ID] });
     const floor = makeFloor({ rooms: [room] });
-    const resources = { flux: 100 };
+    const resources = { flux: { current: 100, max: 200 } } as unknown as ResourceMap;
     featureMaintenanceProcess([floor], resources, 5);
-    // maintenanceCost: flux 2/min → 0.4/tick at 5 ticks/min
-    expect(resources.flux).toBeCloseTo(99.6);
+    // No deduction — costs are folded into productionProcess net delta
+    expect(resources.flux.current).toBe(100);
     expect(room.maintenanceActive).toBe(true);
   });
 
@@ -1227,9 +1228,9 @@ describe('featureMaintenanceProcess', () => {
     vi.mocked(contentGetEntry).mockReturnValue(timeDilationContent);
     const room = makeRoom({ featureIds: [TIME_DILATION_ID] });
     const floor = makeFloor({ rooms: [room] });
-    const resources = { flux: 0 };
+    const resources = { flux: { current: 0, max: 200 } } as unknown as ResourceMap;
     featureMaintenanceProcess([floor], resources, 5);
-    expect(resources.flux).toBe(0);
+    expect(resources.flux.current).toBe(0);
     expect(room.maintenanceActive).toBe(false);
   });
 
@@ -1237,10 +1238,11 @@ describe('featureMaintenanceProcess', () => {
     vi.mocked(contentGetEntry).mockReturnValue(timeDilationContent);
     const room = makeRoom({ featureIds: [TIME_DILATION_ID], maintenanceActive: false });
     const floor = makeFloor({ rooms: [room] });
-    const resources = { flux: 10 };
+    const resources = { flux: { current: 10, max: 200 } } as unknown as ResourceMap;
     featureMaintenanceProcess([floor], resources, 5);
     expect(room.maintenanceActive).toBe(true);
-    expect(resources.flux).toBeCloseTo(9.6);
+    // No deduction — costs are folded into productionProcess net delta
+    expect(resources.flux.current).toBe(10);
   });
 
   it('accumulates maintenance costs from multiple features', () => {
@@ -1252,10 +1254,10 @@ describe('featureMaintenanceProcess', () => {
     });
     const room = makeRoom({ featureIds: [TIME_DILATION_ID, 'td2' as FeatureId] });
     const floor = makeFloor({ rooms: [room] });
-    const resources = { flux: 100 };
+    const resources = { flux: { current: 100, max: 200 } } as unknown as ResourceMap;
     featureMaintenanceProcess([floor], resources, 5);
-    // Two features: flux 4/min → 0.8/tick
-    expect(resources.flux).toBeCloseTo(99.2);
+    // No deduction — costs are folded into productionProcess net delta
+    expect(resources.flux.current).toBe(100);
     expect(room.maintenanceActive).toBe(true);
   });
 });

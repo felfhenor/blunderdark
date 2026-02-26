@@ -3,13 +3,13 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { corruptionEffectProcessAll } from '@helpers/corruption-effects';
 import { gameEventProcess } from '@helpers/game-events';
-import { gameTimeAdvanceClock } from '@helpers/game-time';
+import { gameTimeAdvanceClock, GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { hungerProcess, hungerProcessWarnings } from '@helpers/hunger';
 import { invasionProcess } from '@helpers/invasion-process';
 import { invasionThreatDecayProcess } from '@helpers/invasion-threat';
 import { invasionTriggerProcessSchedule } from '@helpers/invasion-triggers';
 import { productionProcess } from '@helpers/production';
-import { resourceStorageProcess } from '@helpers/resources';
+import { resourceClampAll, resourceStorageProcess } from '@helpers/resources';
 import { researchProcess } from '@helpers/research-progress';
 import { trainingProcess } from '@helpers/training';
 import { breedingPitsProcess } from '@helpers/breeding-pits';
@@ -21,6 +21,7 @@ import { tortureChamberProcess } from '@helpers/torture-chamber';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import {
+  featureMaintenanceProcess,
   featureSacrificeProcess,
   featureTrainingStationProcess,
 } from '@helpers/features';
@@ -76,7 +77,15 @@ export async function gameloop(totalTicks: number): Promise<void> {
     state.clock = gameTimeAdvanceClock(state.clock, numTicks);
     resourceStorageProcess(state);
     hungerProcess(state, numTicks);
+
+    // Affordability checks run BEFORE production so they see pre-production resources.
+    // Actual resource deductions for upkeep/maintenance are folded into productionProcess.
+    legendaryInhabitantUpkeepProcess(state, numTicks);
+    featureMaintenanceProcess(state.world.floors, state.world.resources, GAME_TIME_TICKS_PER_MINUTE);
+
+    // Production applies a single net delta: gross production minus all non-food costs.
     productionProcess(state, numTicks);
+
     corruptionEffectProcessAll(state);
     researchProcess(state, numTicks);
     trainingProcess(state, numTicks);
@@ -91,7 +100,6 @@ export async function gameloop(totalTicks: number): Promise<void> {
     invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);
-    legendaryInhabitantUpkeepProcess(state, numTicks);
     featureTrainingStationProcess(state.world.floors, state.world.inhabitants, numTicks);
     for (const floor of state.world.floors) {
       featureSacrificeProcess(floor.rooms, numTicks);
@@ -100,6 +108,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     seasonProcess(state);
     merchantProcess(state);
     victoryProcess(state);
+    resourceClampAll(state);
     return state;
   });
 

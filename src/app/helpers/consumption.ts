@@ -163,6 +163,51 @@ export function consumptionCalculateDetailedBreakdown(
   return details;
 }
 
+/**
+ * Calculate total per-tick consumption for non-food resources
+ * (legendary upkeep + feature maintenance).
+ * Used by productionProcess to compute a single net delta.
+ */
+export function consumptionCalculateNonFoodTotals(
+  floors: Floor[],
+  inhabitants: InhabitantInstance[],
+): Partial<Record<ResourceType, number>> {
+  const totals: Partial<Record<ResourceType, number>> = {};
+
+  // Legendary upkeep
+  for (const inhabitant of inhabitants) {
+    const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
+    if (!def?.upkeepCost || Object.keys(def.upkeepCost).length === 0) continue;
+
+    for (const [type, amountPerMinute] of Object.entries(def.upkeepCost)) {
+      if (!amountPerMinute || amountPerMinute <= 0) continue;
+      const resourceType = type as ResourceType;
+      const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+      totals[resourceType] = (totals[resourceType] ?? 0) + perTick;
+    }
+  }
+
+  // Feature maintenance
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const features = featureGetAllForRoom(room);
+      for (const feature of features) {
+        if (!feature.maintenanceCost) continue;
+        for (const [type, amountPerMinute] of Object.entries(
+          feature.maintenanceCost,
+        )) {
+          if (!amountPerMinute || amountPerMinute <= 0) continue;
+          const resourceType = type as ResourceType;
+          const perTick = amountPerMinute / GAME_TIME_TICKS_PER_MINUTE;
+          totals[resourceType] = (totals[resourceType] ?? 0) + perTick;
+        }
+      }
+    }
+  }
+
+  return totals;
+}
+
 export const consumptionBreakdowns = computed(() => {
   const state = gamestate();
   return consumptionCalculateBreakdowns(

@@ -20,7 +20,7 @@ const mockGamestate = vi.fn();
 const mockUpdateGamestate = vi.fn();
 const mockCanAfford = vi.fn();
 const mockPayCost = vi.fn();
-const mockResourceAdd = vi.fn();
+const mockResourceApplyMap = vi.fn();
 const mockBiomeIsUnlocked = vi.fn();
 const mockBiomeRestrictionCanBuild = vi.fn();
 const mockContentGetEntry = vi.fn();
@@ -33,7 +33,7 @@ vi.mock('@helpers/state-game', () => ({
 vi.mock('@helpers/resources', () => ({
   resourceCanAfford: (...args: unknown[]) => mockCanAfford(...args),
   resourcePayCost: (...args: unknown[]) => mockPayCost(...args),
-  resourceAdd: (...args: unknown[]) => mockResourceAdd(...args),
+  resourceApplyMap: (...args: unknown[]) => mockResourceApplyMap(...args),
 }));
 
 vi.mock('@helpers/biome', () => ({
@@ -524,9 +524,8 @@ describe('floorRemove', () => {
     const result = await floorRemove();
     expect(result).toBe(true);
 
-    // Refund for depth 3: 75 crystals, 45 gold
-    expect(mockResourceAdd).toHaveBeenCalledWith('crystals', 75);
-    expect(mockResourceAdd).toHaveBeenCalledWith('gold', 45);
+    // Refund for depth 3: 75 crystals, 45 gold (batched)
+    expect(mockResourceApplyMap).toHaveBeenCalledWith({ crystals: 75, gold: 45 });
     expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
   });
 
@@ -587,7 +586,7 @@ describe('floorRemove', () => {
 
     const result = await floorRemove();
     expect(result).toBe(false);
-    expect(mockResourceAdd).not.toHaveBeenCalled();
+    expect(mockResourceApplyMap).not.toHaveBeenCalled();
     expect(mockUpdateGamestate).not.toHaveBeenCalled();
   });
 });

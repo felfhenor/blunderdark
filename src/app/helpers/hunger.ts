@@ -1,6 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { resourceSubtract } from '@helpers/resources';
 import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifiers';
 import type {
   GameState,
@@ -118,8 +117,10 @@ export function hungerProcess(state: GameState, numTicks = 1): void {
 
   if (totalConsumption > 0) {
     const scaledConsumption = totalConsumption * numTicks;
-    const actualSubtracted = resourceSubtract('food', scaledConsumption);
-    if (actualSubtracted < scaledConsumption) {
+    const food = state.world.resources.food;
+    if (food.current >= scaledConsumption) {
+      food.current -= scaledConsumption;
+    } else {
       foodSufficient = false;
     }
   }

@@ -4,7 +4,7 @@ import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
 import { defaultFloor } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
-import { resourceAdd, resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { resourceApplyMap, resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { ensureFloorSuffixes } from '@helpers/suffix';
 import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
@@ -281,8 +281,7 @@ export async function floorRemove(): Promise<boolean> {
 
   const refund = floorGetRemovalRefund();
 
-  if (refund.crystals) resourceAdd('crystals', refund.crystals);
-  if (refund.gold) resourceAdd('gold', refund.gold);
+  await resourceApplyMap(refund);
 
   await updateGamestate((state) => {
     const newFloors = state.world.floors.slice(0, -1);

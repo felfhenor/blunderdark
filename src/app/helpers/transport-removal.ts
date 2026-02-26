@@ -1,8 +1,8 @@
 import { contentGetEntry } from '@helpers/content';
 import { invasionIsActive } from '@helpers/invasion-process';
-import { resourceAdd } from '@helpers/resources';
+import { resourceApplyMap } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { PlacedRoom, PlacedRoomId, ResourceType } from '@interfaces';
+import type { PlacedRoom, PlacedRoomId } from '@interfaces';
 import type { TransportGroupId } from '@interfaces/room-shape';
 import type { RoomContent } from '@interfaces/content-room';
 
@@ -134,11 +134,7 @@ export async function transportRemovalExecute(
   });
 
   // Refund resources
-  for (const [type, amount] of Object.entries(info.refund)) {
-    if (amount > 0) {
-      await resourceAdd(type as ResourceType, amount);
-    }
-  }
+  await resourceApplyMap(info.refund);
 
   return { success: true };
 }

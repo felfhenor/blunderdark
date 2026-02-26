@@ -5,7 +5,7 @@ import {
   roomPlacementIsRemovable,
   roomPlacementRemoveFromFloor,
 } from '@helpers/room-placement';
-import { resourceAdd } from '@helpers/resources';
+import { resourceApplyMap } from '@helpers/resources';
 import { roomShapeGetRotated, roomShapeGet } from '@helpers/room-shapes';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -13,7 +13,6 @@ import type {
   IsContentItem,
   PlacedRoomId,
   ResourceCost,
-  ResourceType,
 } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import type { RemovalRefund, RemovalInfo } from '@interfaces/room-removal';
@@ -151,11 +150,7 @@ export async function roomRemovalExecute(
   });
 
   // Refund resources (capped at max)
-  for (const [type, amount] of Object.entries(refund)) {
-    if (amount > 0) {
-      await resourceAdd(type as ResourceType, amount);
-    }
-  }
+  await resourceApplyMap(refund);
 
   return { success: true, displacedNames };
 }

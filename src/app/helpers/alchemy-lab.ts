@@ -2,7 +2,6 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
-import { resourceAdd, resourceSubtract } from '@helpers/resources';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
   roomShapeGetAbsoluteTiles,
@@ -370,10 +369,10 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
 
         if (!canAfford) continue;
 
-        // Deduct resources
+        // Deduct resources (direct mutation; clamped at end of tick)
         for (const [resource, amount] of Object.entries(effectiveCost)) {
           if (!amount || amount <= 0) continue;
-          resourceSubtract(resource as ResourceType, amount);
+          state.world.resources[resource as ResourceType].current -= amount;
         }
 
         conversion.inputConsumed = true;
@@ -384,9 +383,9 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
 
       // Step 3: Complete the conversion
       if (conversion.progress >= conversion.targetTicks) {
-        // Add output resource
+        // Add output resource (direct mutation; clamped at end of tick)
         const outputType = recipe.outputResource as ResourceType;
-        resourceAdd(outputType, recipe.outputAmount);
+        state.world.resources[outputType].current += recipe.outputAmount;
 
         // Reset cycle for continuous conversion
         conversion.progress = 0;

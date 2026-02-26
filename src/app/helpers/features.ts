@@ -9,6 +9,7 @@ import type {
 import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type { Floor } from '@interfaces/floor';
+import type { ResourceMap, ResourceType } from '@interfaces/resource';
 import type {
   InhabitantInstance,
   InhabitantInstanceId,
@@ -284,15 +285,15 @@ export function featureCalculateSpeedMultiplier(
 }
 
 /**
- * Process maintenance costs for features with maintenanceCost.
- * For each room that has features with maintenanceCost, deducts resources per tick.
- * If resources are insufficient, the feature's bonuses are temporarily disabled
- * by setting `maintenanceActive: false` on the room.
+ * Process maintenance affordability for features with maintenanceCost.
+ * Checks whether resources can cover per-tick costs and sets `maintenanceActive`
+ * accordingly. Does NOT deduct resources — actual deduction is folded into
+ * productionProcess as part of the net delta.
  * Mutates state in-place.
  */
 export function featureMaintenanceProcess(
   floors: Floor[],
-  resources: Record<string, number>,
+  resources: ResourceMap,
   ticksPerMinute: number,
 ): void {
   for (const floor of floors) {
@@ -319,21 +320,14 @@ export function featureMaintenanceProcess(
       // Check if we can afford the maintenance
       let canAfford = true;
       for (const [resource, costPerTick] of Object.entries(totalCostPerTick)) {
-        if ((resources[resource] ?? 0) < costPerTick) {
+        const res = resources[resource as ResourceType];
+        if (!res || res.current < costPerTick) {
           canAfford = false;
           break;
         }
       }
 
-      if (canAfford) {
-        // Deduct resources
-        for (const [resource, costPerTick] of Object.entries(totalCostPerTick)) {
-          resources[resource] = (resources[resource] ?? 0) - costPerTick;
-        }
-        room.maintenanceActive = true;
-      } else {
-        room.maintenanceActive = false;
-      }
+      room.maintenanceActive = canAfford;
     }
   }
 }
