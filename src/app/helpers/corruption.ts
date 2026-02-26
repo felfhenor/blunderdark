@@ -9,6 +9,7 @@ import {
 } from '@helpers/features';
 import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { productionCalculateTotal } from '@helpers/production';
 import { resourceAdd } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, GameState, InhabitantInstance } from '@interfaces';
@@ -183,8 +184,15 @@ export function corruptionGenerationProcess(state: GameState, numTicks = 1): voi
 
   const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(state.world.floors ?? []);
 
-  const basePerTick = inhabitantPerTick + featurePerTick + deepObjectivePerTick;
-  if (basePerTick <= 0) return;
+  // Include room-based corruption production (positive and negative, e.g. Purification Chamber)
+  const roomProduction = productionCalculateTotal(
+    state.world.floors,
+    state.clock.hour,
+    state.world.season.currentSeason,
+  );
+  const roomCorruptionPerTick = roomProduction['corruption'] ?? 0;
+
+  const basePerTick = inhabitantPerTick + featurePerTick + deepObjectivePerTick + roomCorruptionPerTick;
 
   const dayNightMod = dayNightGetResourceModifier(
     state.clock.hour,
@@ -196,7 +204,15 @@ export function corruptionGenerationProcess(state: GameState, numTicks = 1): voi
     : 0;
   const finalPerTick = basePerTick * dayNightMod * (1 + researchCorruptionBonus + throneCorruptionBonus);
 
-  resourceAdd('corruption', finalPerTick * numTicks);
+  if (finalPerTick > 0) {
+    resourceAdd('corruption', finalPerTick * numTicks);
+  } else if (finalPerTick < 0) {
+    // Net negative: purification exceeds generation, drain corruption
+    state.world.resources.corruption.current = Math.max(
+      0,
+      state.world.resources.corruption.current + finalPerTick * numTicks,
+    );
+  }
 }
 
 /**

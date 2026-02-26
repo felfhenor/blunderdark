@@ -55,6 +55,10 @@ vi.mock('@helpers/floor-modifiers', () => ({
   }),
 }));
 
+vi.mock('@helpers/production', () => ({
+  productionCalculateTotal: vi.fn(() => ({})),
+}));
+
 const {
   corruptionAdd,
   corruptionSpend,
@@ -301,6 +305,8 @@ describe('corruptionGenerationProcess', () => {
           corruption: { current: corruptionCurrent, max: Number.MAX_SAFE_INTEGER },
         },
         inhabitants,
+        floors: [],
+        season: { currentSeason: 'spring' },
       },
     } as unknown as GameState;
     mockResources = state.world.resources;
@@ -486,6 +492,7 @@ describe('Corruption Seal', () => {
         },
         inhabitants: [],
         floors: [floor],
+        season: { currentSeason: 'spring' },
       },
     } as unknown as GameState;
     mockResources = state.world.resources;
@@ -516,6 +523,7 @@ describe('Corruption Seal', () => {
         },
         inhabitants: [],
         floors: [floor],
+        season: { currentSeason: 'spring' },
       },
     } as unknown as GameState;
     mockResources = state.world.resources;
@@ -544,6 +552,7 @@ describe('Corruption Seal', () => {
         },
         inhabitants: [],
         floors: [floor],
+        season: { currentSeason: 'spring' },
       },
     } as unknown as GameState;
     mockResources = state.world.resources;

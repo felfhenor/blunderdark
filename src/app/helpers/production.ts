@@ -1125,15 +1125,12 @@ export function productionProcess(state: GameState, numTicks = 1): void {
   );
 
   for (const [type, amount] of Object.entries(production)) {
-    if (!amount) continue;
+    if (!amount || amount <= 0) continue;
+    // Corruption is handled by corruptionGenerationProcess to combine
+    // room production with inhabitant/feature generation into a single net rate
+    if (type === 'corruption') continue;
     const resourceType = type as ResourceType;
 
-    if (amount > 0) {
-      resourceAdd(resourceType, amount * numTicks);
-    } else {
-      // Handle negative production (e.g. Purification Chamber reducing corruption)
-      const resource = state.world.resources[resourceType];
-      resource.current = Math.max(0, resource.current + amount * numTicks);
-    }
+    resourceAdd(resourceType, amount * numTicks);
   }
 }
