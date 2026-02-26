@@ -27,7 +27,7 @@
 
     @if (hasActiveEffects()) {
       <div class="divider my-2 text-xs opacity-60">Active Effects</div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 max-h-40 overflow-y-auto">
         @for (effect of activeEffects(); track effect.id) {
           <div class="py-0.5 border-b border-base-300/30 last:border-b-0">
             <div class="flex items-center gap-2">
