@@ -85,8 +85,8 @@ export class SideTabRailComponent {
     const key = event.key.toLowerCase();
     const tab = this.visibleTabs().find((t) => t.hotkey === key);
     if (tab) {
-      // Don't open a modal if one is already open
-      if (tab.isModal && uiIsAnyModalOpen()) return;
+      // Don't open a non-modal panel if a modal is already open
+      if (!tab.isModal && uiIsAnyModalOpen()) return;
 
       event.preventDefault();
       this.onTabClick(tab);

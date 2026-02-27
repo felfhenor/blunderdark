@@ -12,6 +12,7 @@ import {
   viewChild,
   type ElementRef,
   type OnInit,
+  type WritableSignal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
@@ -55,6 +56,7 @@ import {
   hallwayPlacementBuildStep,
   optionsGet,
   roomPlacementSelectedTypeId,
+  uiIsAnyModalOpen,
   uiIsInputFocused,
 } from '@helpers';
 import {
@@ -550,20 +552,26 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   }
 
   public onModalTabClick(tabId: string): void {
-    switch (tabId) {
-      case 'merchant':
-        this.showMerchant.set(true);
-        break;
-      case 'research':
-        this.showResearch.set(true);
-        break;
-      case 'fusion':
-        this.showFusion.set(true);
-        break;
-      case 'victory':
-        this.showVictoryMenu.set(true);
-        break;
+    const signals: Record<string, WritableSignal<boolean>> = {
+      merchant: this.showMerchant,
+      research: this.showResearch,
+      fusion: this.showFusion,
+      victory: this.showVictoryMenu,
+    };
+
+    const target = signals[tabId];
+    if (!target) return;
+
+    // Toggle: if this modal is already open, close it
+    if (target()) {
+      target.set(false);
+      return;
     }
+
+    // Don't open a new modal if a different one is already open
+    if (uiIsAnyModalOpen()) return;
+
+    target.set(true);
   }
 
   ngOnInit(): void {
