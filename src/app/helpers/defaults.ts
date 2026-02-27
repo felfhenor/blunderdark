@@ -49,6 +49,7 @@ export function defaultGameState(): GameState {
       forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
+      farplaneSouls: [],
       invasionSchedule: defaultInvasionSchedule(),
       playerThreat: 0,
       corruptionEffects: defaultCorruptionEffectState(),

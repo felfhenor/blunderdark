@@ -3,7 +3,7 @@ import type { SaveData, SaveMigrationResult } from '@interfaces';
 
 // --- Constants ---
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 // --- Types ---
 
@@ -24,6 +24,11 @@ export type SaveMigrationFn = (saveData: SaveData) => SaveData;
  *   });
  */
 export const saveMigrations: Map<number, SaveMigrationFn> = new Map();
+
+saveMigrations.set(1, (data) => {
+  data.gameState.world.farplaneSouls = data.gameState.world.farplaneSouls ?? [];
+  return data;
+});
 
 // --- Migration Pipeline ---
 

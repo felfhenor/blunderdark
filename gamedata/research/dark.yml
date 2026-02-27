@@ -12,8 +12,11 @@
 #   │           ├── Purification Mastery (T5) [+Sanctified Basin, +Warding Pillars]
 #   │           └── Abyssal Purification (T5) [+Abyssal Filter]
 #   ├── Necromancy (T2)
-#   │   └── Undead Mastery (T3)
-#   │       └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
+#   │   ├── Undead Mastery (T3)
+#   │   │   └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
+#   │   └── Farplane Studies (T3) [+Farplane]
+#   │       └── Soul Binding (T4) [+2 soul capacity]
+#   │           └── Ethereal Resonance (T5) [+2 soul capacity]
 #   └── Corrupted Biome (T2)
 #   Soul Forge (T4) [Soul Well Mastery + Undead Mastery, +Abyssal Conduit]
 #   Abyssal Gateway (T5) [Dark Rituals + Shadow Weaving]
@@ -154,6 +157,21 @@
   tier: 3
   requiredTicks: 300
 
+- id: 78ba7f10-7290-4e85-ab57-41543b257ab2
+  name: Farplane Studies
+  description: Uncover the secrets of the boundary between life and death, enabling the construction of a Farplane to capture the souls of fallen defenders.
+  branch: dark
+  cost:
+    research: 50
+    essence: 15
+  prerequisiteResearchIds:
+    - Necromancy
+  unlocks:
+    - type: room
+      targetRoomId: Farplane
+  tier: 3
+  requiredTicks: 300
+
 # --- TIER 4: Advanced combinations ---
 
 - id: 153fd103-9151-4b42-8d1a-8c39f69fd377
@@ -211,6 +229,40 @@
       targetRoomId: Purification Chamber
   tier: 4
   requiredTicks: 500
+
+- id: 9fdc4500-6479-4348-973a-159cb86bade3
+  name: Soul Binding
+  description: Master the art of binding departed souls to the Farplane, expanding its capacity to hold additional spirits.
+  branch: dark
+  cost:
+    research: 100
+    essence: 30
+  prerequisiteResearchIds:
+    - Farplane Studies
+  unlocks:
+    - type: passive_bonus
+      bonusType: farplaneSoulCapacity
+      value: 2
+      description: +2 Farplane soul capacity
+  tier: 4
+  requiredTicks: 500
+
+- id: 2398d825-9ddc-4a1a-b6c2-950ed0da4486
+  name: Ethereal Resonance
+  description: Attune the Farplane to deeper ethereal frequencies, further increasing its ability to shelter wayward souls.
+  branch: dark
+  cost:
+    research: 150
+    essence: 45
+  prerequisiteResearchIds:
+    - Soul Binding
+  unlocks:
+    - type: passive_bonus
+      bonusType: farplaneSoulCapacity
+      value: 2
+      description: +2 Farplane soul capacity
+  tier: 5
+  requiredTicks: 600
 
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge

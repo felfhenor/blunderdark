@@ -134,8 +134,6 @@
     - Enchantment
   unlocks:
     - type: roomfeature
-      targetFeatureId: Training Station
-    - type: roomfeature
       targetFeatureId: Corruption Seal
     - type: roomfeature
       targetFeatureId: Resource Converter

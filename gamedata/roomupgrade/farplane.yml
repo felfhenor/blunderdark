@@ -1,0 +1,20 @@
+- id: 3f23f19d-e802-415e-8de2-ffc9bf712c03
+  name: Spiritual Expansion
+  description: Widens the rift between worlds, allowing two additional souls to linger in the Farplane.
+  cost:
+    gold: 150
+    essence: 40
+  effects:
+    - type: soulCapacityBonus
+      value: 2
+
+- id: 642f8a63-0009-497f-b72d-52093e6a63f3
+  name: Ethereal Amplification
+  description: Amplifies the Farplane's ethereal resonance, greatly expanding its capacity to hold departed souls.
+  cost:
+    gold: 300
+    essence: 80
+    crystals: 40
+  effects:
+    - type: soulCapacityBonus
+      value: 3

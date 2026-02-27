@@ -25,6 +25,7 @@ export * from './defaults';
 export * from './discord';
 export * from './effective-stats';
 export * from './efficiency';
+export * from './farplane';
 export * from './fear-level';
 export * from './features';
 export * from './floor';

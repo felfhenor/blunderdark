@@ -103,3 +103,24 @@
     - Sanctified Basin
     - Warding Pillars
     - Abyssal Filter
+
+- id: 54143332-5605-4cf9-8598-c6f0a3259314
+  name: Farplane
+  description: A shimmering rift between worlds where the souls of fallen defenders linger. Souls captured here can be re-recruited at reduced cost, preserving their training, mutations, and experience.
+  shapeId: Cross 5x5
+  cost:
+    gold: 200
+    essence: 50
+    crystals: 30
+  production: {}
+  requiresWorkers: false
+  adjacencyBonuses: []
+  isUnique: true
+  removable: false
+  maxInhabitants: 0
+  maxFeatures: 0
+  fearLevel: 2
+  roomUpgradeIds:
+    - Spiritual Expansion
+    - Ethereal Amplification
+  role: farplane

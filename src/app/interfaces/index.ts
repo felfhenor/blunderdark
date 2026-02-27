@@ -37,6 +37,7 @@ export * from './corruption-effect';
 export * from './day-night';
 export * from './discord';
 export * from './efficiency';
+export * from './farplane';
 export * from './fear';
 export * from './floor';
 export * from './floor-modifier';

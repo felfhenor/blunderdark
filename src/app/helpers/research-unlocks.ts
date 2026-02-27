@@ -39,6 +39,7 @@ const RESEARCH_BONUS_BRANCH_MAP: Record<
   corruptionResistance: 'dark',
   fearReduction: 'dark',
   inhabitantStats: 'dark',
+  farplaneSoulCapacity: 'dark',
   fluxProduction: 'arcane',
   researchSpeed: 'arcane',
   allProduction: 'arcane',

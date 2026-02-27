@@ -1,3 +1,4 @@
+import { farplaneCaptureDefenderSouls } from '@helpers/farplane';
 import { invasionRewardHandlePrisoner } from '@helpers/invasion-rewards';
 import {
   THREAT_MAX,
@@ -76,6 +77,9 @@ export async function invasionRewardApplyDefeat(
     }
 
     if (result.killedDefenderIds.length > 0) {
+      // Capture souls before removing defenders (while instance data still available)
+      farplaneCaptureDefenderSouls(state, result.killedDefenderIds);
+
       const killedSet = new Set(result.killedDefenderIds);
       state.world.inhabitants = state.world.inhabitants.filter(
         (i) => !killedSet.has(i.instanceId),

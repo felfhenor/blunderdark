@@ -95,6 +95,7 @@ export async function worldgenGenerateWorld(): Promise<
     forgeCraftingQueues: [],
     alchemyConversions: [],
     prisoners: [],
+    farplaneSouls: [],
     invasionSchedule: defaultInvasionSchedule(),
     playerThreat: 0,
     corruptionEffects: defaultCorruptionEffectState(),

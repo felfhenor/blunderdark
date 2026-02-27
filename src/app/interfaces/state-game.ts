@@ -1,4 +1,5 @@
 import type { Branded } from '@interfaces/identifiable';
+import type { FarplaneSoul } from '@interfaces/farplane';
 import type { Floor } from '@interfaces/floor';
 import type { GridState } from '@interfaces/grid';
 import type { Hallway } from '@interfaces/hallway';
@@ -33,6 +34,7 @@ export interface GameStateWorld {
   forgeCraftingQueues: ForgeCraftingQueue[];
   alchemyConversions: AlchemyConversion[];
   prisoners: CapturedPrisoner[];
+  farplaneSouls: FarplaneSoul[];
   invasionSchedule: InvasionSchedule;
   playerThreat: number;
   activeInvasion?: ActiveInvasion;

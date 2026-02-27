@@ -1,0 +1,77 @@
+@if (farplaneRoom(); as room) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4">
+      <h3 class="card-title text-sm">
+        {{ roomDef()?.name ?? 'Farplane' }}
+      </h3>
+      <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
+
+      <div class="mt-2 flex items-center justify-between">
+        <span class="text-xs font-semibold">Souls</span>
+        <span class="badge badge-sm badge-ghost">
+          {{ souls().length }} / {{ soulCapacity() }}
+        </span>
+      </div>
+
+      @if (souls().length > 0) {
+        <div class="flex flex-col gap-2 mt-2">
+          @for (entry of soulEntries(); track entry.soul.soulId) {
+            <div class="p-2 bg-base-200 rounded flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold">{{ entry.soul.instanceName }}</span>
+                @if (entry.def) {
+                  <span class="badge badge-xs badge-ghost">
+                    T{{ entry.def.tier }} {{ entry.def.type }}
+                  </span>
+                }
+              </div>
+
+              @if (entry.def) {
+                <app-stat-row
+                  class="text-xs opacity-60"
+                  [stats]="entry.def.stats"
+                  [showWorkerEfficiency]="false"
+                />
+              }
+
+              <div class="flex flex-wrap gap-2 text-xs opacity-60">
+                @if (entry.soul.trained) {
+                  <span class="badge badge-xs badge-info">Trained</span>
+                }
+                @if (entry.soul.mutated) {
+                  <span class="badge badge-xs badge-warning">Mutated</span>
+                }
+                @if (entry.soul.isHybrid) {
+                  <span class="badge badge-xs badge-accent">Hybrid</span>
+                }
+                @if (entry.soul.isSummoned) {
+                  <span class="badge badge-xs badge-secondary">Summoned</span>
+                }
+              </div>
+
+              <div class="flex items-center justify-between mt-1">
+                <div class="flex gap-2 text-xs">
+                  @for (costEntry of entry.costEntries; track costEntry.type) {
+                    <app-currency-cost
+                      [type]="costEntry.type"
+                      [amount]="costEntry.amount"
+                    />
+                  }
+                </div>
+                <button
+                  class="btn btn-xs btn-primary"
+                  [disabled]="isRosterFull() || !canAfford(entry.cost)"
+                  (click)="recruitSoul(entry.soul.soulId)"
+                >
+                  Re-recruit
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-xs opacity-50 mt-2">No souls linger here...</p>
+      }
+    </div>
+  </div>
+}
