@@ -51,13 +51,28 @@
       @if (assignedInhabitants().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Assigned</div>
         <div class="flex flex-col gap-2">
-          @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
-            <app-inhabitant-card
-              [instance]="inh.instance"
-              [definition]="inh.def"
-              [compact]="true"
-              [showAssignment]="false"
-            />
+          @for (inh of assignedInhabitants(); track inh.instance.instanceId; let idx = $index) {
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-xs" [class.badge-primary]="idx === 0" [class.badge-ghost]="idx !== 0">
+                  {{ idx === 0 ? 'Primary' : 'Secondary' }}
+                </span>
+              </div>
+              <app-inhabitant-card
+                [instance]="inh.instance"
+                [definition]="inh.def"
+                [compact]="true"
+                [showAssignment]="false"
+              />
+            </div>
+          }
+          @if (assignedInhabitants().length === 2 && !breedingRoom()?.breedingJob && !breedingRoom()?.mutationJob) {
+            <button
+              class="btn btn-xs btn-outline btn-ghost"
+              (click)="swapBreedingOrder()"
+            >
+              Swap Primary
+            </button>
           }
         </div>
       } @else {

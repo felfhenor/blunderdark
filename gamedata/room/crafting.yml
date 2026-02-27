@@ -60,7 +60,7 @@
     essence: 30
   production: {}
   requiresWorkers: false
-  maxInhabitants: 4
+  maxInhabitants: 2
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 4

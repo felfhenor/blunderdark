@@ -44,7 +44,6 @@ const enhancedIncubatorsPath: RoomUpgradeContent = {
   cost: { gold: 150, crystals: 80, essence: 40 },
   effects: [
     { type: 'breedingTimeMultiplier', value: 0.7 },
-    { type: 'maxInhabitantBonus', value: 2 },
   ],
 };
 
@@ -187,7 +186,7 @@ const breedingPitsDef: RoomContent = {
   cost: { gold: 120, crystals: 60, essence: 30 },
   production: {},
   requiresWorkers: false,
-  maxInhabitants: 4,
+  maxInhabitants: 2,
   inhabitantRestriction: undefined,
   fearLevel: 4,
   fearReductionAura: 0,
@@ -421,7 +420,7 @@ beforeEach(() => {
 
 describe('Breeding Pits Room Definition', () => {
   it('should have correct definition properties', () => {
-    expect(breedingPitsDef.maxInhabitants).toBe(4);
+    expect(breedingPitsDef.maxInhabitants).toBe(2);
     expect(breedingPitsDef.fearLevel).toBe(4);
     expect(breedingPitsDef.role).toBe('breedingPits');
     expect(breedingPitsDef.requiresWorkers).toBe(false);
@@ -743,6 +742,10 @@ describe('breedingPitsProcess', () => {
       ticksRemaining: 1,
       targetTicks: 25,
     };
+    room.breedingInhabitantOrder = [
+      'g1' as InhabitantInstanceId,
+      'k1' as InhabitantInstanceId,
+    ];
 
     const goblin = makeInhabitant({
       instanceId: 'g1' as InhabitantInstanceId,
@@ -765,6 +768,8 @@ describe('breedingPitsProcess', () => {
     expect(state.world.inhabitants[0].isHybrid).toBe(true);
     expect(state.world.inhabitants[0].name).toBe('Test Fantasy Name');
     expect(room.breedingJob).toBeUndefined();
+    // Breeding order should be cleared
+    expect(room.breedingInhabitantOrder).toBeUndefined();
   });
 
   it('should remove both parents on breeding completion', () => {
@@ -982,14 +987,10 @@ describe('Hybrid Creation', () => {
 });
 
 describe('Upgrade Effects', () => {
-  it('Enhanced Incubators: reduces time by 0.7x and adds capacity', () => {
+  it('Enhanced Incubators: reduces time by 0.7x', () => {
     expect(enhancedIncubatorsPath.effects).toContainEqual({
       type: 'breedingTimeMultiplier',
       value: 0.7,
-    });
-    expect(enhancedIncubatorsPath.effects).toContainEqual({
-      type: 'maxInhabitantBonus',
-      value: 2,
     });
   });
 

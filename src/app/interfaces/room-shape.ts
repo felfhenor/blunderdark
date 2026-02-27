@@ -97,6 +97,7 @@ export type PlacedRoom = {
   sacrificeBuff?: SacrificeBuff;
   convertedOutputResource?: string;
   maintenanceActive?: boolean;
+  breedingInhabitantOrder?: InhabitantInstanceId[];
   phylacteryCharges?: number;
   voidGateLastSummonDay?: number;
   transportType?: TransportType;

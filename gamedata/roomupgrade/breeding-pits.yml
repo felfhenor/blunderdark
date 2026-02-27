@@ -1,6 +1,6 @@
 - id: 1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
   name: Incubation Chamber
-  description: Improved incubation chambers reduce hybrid breeding time by 30% and increase room capacity by 2.
+  description: Improved incubation chambers reduce hybrid breeding time by 30%.
   cost:
     gold: 150
     crystals: 80
@@ -8,8 +8,6 @@
   effects:
     - type: breedingTimeMultiplier
       value: 0.7
-    - type: maxInhabitantBonus
-      value: 2
 - id: 2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
   name: Mutagenic Pits
   description: Amplified mutagenic fields increase the chance of positive mutations by 15% and boost stat bonuses.

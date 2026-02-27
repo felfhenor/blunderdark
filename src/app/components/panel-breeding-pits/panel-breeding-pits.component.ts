@@ -98,6 +98,7 @@ export class PanelBreedingPitsComponent {
     if (!room) return [];
 
     const state = gamestate();
+    const order = room.breedingInhabitantOrder ?? [];
     const mapped = state.world.inhabitants
       .filter((i) => i.assignedRoomId === room.id)
       .map((i) => {
@@ -107,7 +108,13 @@ export class PanelBreedingPitsComponent {
       .filter(
         (e): e is typeof e & { def: InhabitantContent } => e.def !== undefined,
       );
-    return sortBy(mapped, [(e) => e.def.name]);
+    // Sort by breeding assignment order (first assigned = primary)
+    return sortBy(mapped, [
+      (e) => {
+        const idx = order.indexOf(e.instance.instanceId);
+        return idx >= 0 ? idx : Number.MAX_SAFE_INTEGER;
+      },
+    ]);
   });
 
   public availableRecipes = computed(() => {
@@ -279,6 +286,25 @@ export class PanelBreedingPitsComponent {
       recipe.resultInhabitantTraitId,
     );
     return trait?.name ?? recipe.name;
+  }
+
+  public async swapBreedingOrder(): Promise<void> {
+    const room = this.breedingRoom();
+    if (!room?.breedingInhabitantOrder || room.breedingInhabitantOrder.length < 2)
+      return;
+
+    await updateGamestate((state) => {
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target?.breedingInhabitantOrder) {
+          target.breedingInhabitantOrder = [
+            ...target.breedingInhabitantOrder,
+          ].reverse();
+          break;
+        }
+      }
+      return state;
+    });
   }
 
   public async startMutation(

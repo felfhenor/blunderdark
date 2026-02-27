@@ -153,8 +153,8 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
 ): number {
   if (roomDef.maxInhabitants < 0) return -1;
 
-  // Rooms with unique inhabitant restrictions have a hard cap
-  if (roomDef.inhabitantRestriction === 'unique')
+  // Rooms with unique inhabitant restrictions or breeding pits have a hard cap
+  if (roomDef.inhabitantRestriction === 'unique' || roomDef.role === 'breedingPits')
     return roomDef.maxInhabitants;
 
   const effects = roomUpgradeGetAppliedEffects(placedRoom);

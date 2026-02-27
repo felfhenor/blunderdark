@@ -372,6 +372,9 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
             state.world.inhabitants = [...state.world.inhabitants, hybrid];
             inhabitantsChanged = true;
 
+            // Clear breeding order since parents are consumed
+            room.breedingInhabitantOrder = undefined;
+
             breedingCompletedSubject.next({
               roomId: room.id,
               hybridName: hybrid.name,

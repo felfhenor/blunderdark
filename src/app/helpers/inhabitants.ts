@@ -12,6 +12,7 @@ import type {
   Floor,
   GameStateWorld,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
@@ -279,6 +280,22 @@ export async function inhabitantAssignToRoom(
           : i,
       ),
     };
+
+    // Track assignment order for breeding pits
+    if (roomDef.role === 'breedingPits' && placedRoom) {
+      for (const floor of world.floors) {
+        const target = floor.rooms.find((r) => r.id === roomId);
+        if (target) {
+          const order = target.breedingInhabitantOrder ?? [];
+          target.breedingInhabitantOrder = [
+            ...order,
+            instanceId as InhabitantInstanceId,
+          ];
+          break;
+        }
+      }
+    }
+
     return { ...s, world: syncFloorInhabitants(world) };
   });
 
@@ -297,6 +314,8 @@ export async function inhabitantUnassignFromRoom(
   );
   if (!instance || instance.assignedRoomId === undefined) return false;
 
+  const roomId = instance.assignedRoomId;
+
   await updateGamestate((s) => {
     const world = {
       ...s.world,
@@ -304,6 +323,20 @@ export async function inhabitantUnassignFromRoom(
         i.instanceId === instanceId ? { ...i, assignedRoomId: undefined } : i,
       ),
     };
+
+    // Remove from breeding pit order tracking
+    for (const floor of world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target?.breedingInhabitantOrder) {
+        target.breedingInhabitantOrder =
+          target.breedingInhabitantOrder.filter((id) => id !== instanceId);
+        if (target.breedingInhabitantOrder.length === 0) {
+          target.breedingInhabitantOrder = undefined;
+        }
+        break;
+      }
+    }
+
     return { ...s, world: syncFloorInhabitants(world) };
   });
 
