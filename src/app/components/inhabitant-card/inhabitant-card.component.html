@@ -40,9 +40,6 @@
       @if (equippedItemName(); as itemName) {
         <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName"><app-icon name="gameWarPick" size="12px" /></span>
       }
-      @for (trait of instanceTraits(); track trait.id) {
-        <span class="badge badge-xs badge-info flex-shrink-0" [tp]="trait.description">{{ trait.name }}</span>
-      }
       @if (showHunger()) {
         <app-hunger-indicator [inhabitantId]="instance().instanceId" />
       }
