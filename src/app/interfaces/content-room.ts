@@ -24,38 +24,52 @@ export type RoomContent = IsContentItem &
     fearReductionAura: number;
     autoPlace: boolean;
     roomUpgradeIds: RoomUpgradeId[];
-    role?: string;
-    timeOfDayBonus?: { period: 'day' | 'night'; bonus: number };
-    biomeBonuses?: Partial<Record<string, number>>;
-    invasionProfile?: { dimension: string; weight: number };
-    objectiveTypes?: string[];
-    trainingAdjacencyEffects?: { timeReduction?: number; statBonus?: number };
-    throneAdjacencyEffects?: { goldProductionBonus?: number };
-    spawnRate?: number;
-    spawnType?: string;
-    spawnCapacity?: number;
-    breedingAdjacencyEffects?: {
-      hybridTimeReduction?: number;
-      mutationOddsBonus?: number;
-      researchBonus?: number;
-    };
-    summoningAdjacencyEffects?: {
-      summonTimeReduction?: number;
-      summonStatBonus?: number;
-    };
-    forgingAdjacencyEffects?: {
-      forgingSpeedBonus?: number;
-      forgingStatBonus?: number;
-      forgingEffectivenessBonus?: number;
-    };
-    alchemyAdjacencyEffects?: {
-      alchemySpeedBonus?: number;
-      alchemyCostReduction?: number;
-    };
-    tortureAdjacencyEffects?: {
-      tortureSpeedBonus?: number;
-      tortureConversionBonus?: number;
-    };
-    reputationAction?: string;
-    queueSize?: number;
+    role: string | undefined;
+    timeOfDayBonus: { period: 'day' | 'night'; bonus: number } | undefined;
+    biomeBonuses: Partial<Record<string, number>> | undefined;
+    invasionProfile: { dimension: string; weight: number } | undefined;
+    objectiveTypes: string[] | undefined;
+    trainingAdjacencyEffects:
+      | { timeReduction?: number; statBonus?: number }
+      | undefined;
+    throneAdjacencyEffects:
+      | { goldProductionBonus?: number }
+      | undefined;
+    spawnRate: number | undefined;
+    spawnType: string | undefined;
+    spawnCapacity: number | undefined;
+    breedingAdjacencyEffects:
+      | {
+          hybridTimeReduction?: number;
+          mutationOddsBonus?: number;
+          researchBonus?: number;
+        }
+      | undefined;
+    summoningAdjacencyEffects:
+      | {
+          summonTimeReduction?: number;
+          summonStatBonus?: number;
+        }
+      | undefined;
+    forgingAdjacencyEffects:
+      | {
+          forgingSpeedBonus?: number;
+          forgingStatBonus?: number;
+          forgingEffectivenessBonus?: number;
+        }
+      | undefined;
+    alchemyAdjacencyEffects:
+      | {
+          alchemySpeedBonus?: number;
+          alchemyCostReduction?: number;
+        }
+      | undefined;
+    tortureAdjacencyEffects:
+      | {
+          tortureSpeedBonus?: number;
+          tortureConversionBonus?: number;
+        }
+      | undefined;
+    reputationAction: string | undefined;
+    queueSize: number | undefined;
   };

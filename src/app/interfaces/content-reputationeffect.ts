@@ -19,5 +19,5 @@ export type ReputationEffectContent = IsContentItem &
     minimumLevel: ReputationLevel;
     effectType: ReputationEffectType;
     effectValue: number;
-    targetId?: string;
+    targetId: string | undefined;
   };

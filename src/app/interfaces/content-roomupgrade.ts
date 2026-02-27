@@ -10,6 +10,6 @@ export type RoomUpgradeContent = IsContentItem &
     id: RoomUpgradeId;
     cost: ResourceCost;
     effects: RoomUpgradeEffect[];
-    upgradeLevel?: number;
-    requiresDarkUpgrade?: boolean;
+    upgradeLevel: number | undefined;
+    requiresDarkUpgrade: boolean;
   };

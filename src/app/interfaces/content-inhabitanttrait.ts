@@ -8,6 +8,6 @@ export type InhabitantTraitContent = IsContentItem &
     id: InhabitantTraitId;
     effectType: string;
     effectValue: number;
-    targetResourceType?: string;
-    targetRoomId?: string;
+    targetResourceType: string | undefined;
+    targetRoomId: string | undefined;
   };

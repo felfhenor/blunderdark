@@ -115,7 +115,7 @@ export function ensureContent<T extends IsContentItem>(content: T): T {
 
 function ensureAlchemyRecipe(
   recipe: Partial<AlchemyRecipeContent>,
-): AlchemyRecipeContent {
+): Required<AlchemyRecipeContent> {
   return {
     id: (recipe.id ?? 'UNKNOWN') as AlchemyRecipeId,
     name: recipe.name ?? 'UNKNOWN',
@@ -131,7 +131,7 @@ function ensureAlchemyRecipe(
 
 function ensureBreedingRecipe(
   recipe: Partial<BreedingRecipeContent>,
-): BreedingRecipeContent {
+): Required<BreedingRecipeContent> {
   return {
     id: (recipe.id ?? 'UNKNOWN') as BreedingRecipeId,
     name: recipe.name ?? 'UNKNOWN',
@@ -147,7 +147,7 @@ function ensureBreedingRecipe(
 
 function ensureForgeRecipe(
   recipe: Partial<ForgeRecipeContent>,
-): ForgeRecipeContent {
+): Required<ForgeRecipeContent> {
   return {
     id: (recipe.id ?? 'UNKNOWN') as ForgeRecipeId,
     name: recipe.name ?? 'UNKNOWN',
@@ -162,7 +162,7 @@ function ensureForgeRecipe(
 
 function ensureFusionRecipe(
   recipe: Partial<FusionRecipeContent>,
-): FusionRecipeContent {
+): Required<FusionRecipeContent> {
   return {
     id: (recipe.id ?? 'UNKNOWN') as FusionRecipeId,
     name: recipe.name ?? 'UNKNOWN',
@@ -177,7 +177,7 @@ function ensureFusionRecipe(
 
 function ensureCorruptionEffect(
   effect: Partial<CorruptionEffectContent>,
-): CorruptionEffectContent {
+): Required<CorruptionEffectContent> {
   return {
     id: (effect.id ?? 'UNKNOWN') as CorruptionEffectId,
     name: effect.name ?? 'UNKNOWN',
@@ -185,8 +185,8 @@ function ensureCorruptionEffect(
     description: effect.description ?? '',
     triggerType: effect.triggerType ?? 'threshold',
     triggerValue: effect.triggerValue ?? 0,
-    oneTime: effect.oneTime ?? undefined,
-    retriggerable: effect.retriggerable ?? undefined,
+    oneTime: effect.oneTime ?? false,
+    retriggerable: effect.retriggerable ?? false,
     probability: effect.probability ?? undefined,
     cooldownMinutes: effect.cooldownMinutes ?? undefined,
     conditions: effect.conditions ?? undefined,
@@ -198,7 +198,7 @@ function ensureCorruptionEffect(
   };
 }
 
-function ensureFeature(feature: Partial<FeatureContent>): FeatureContent {
+function ensureFeature(feature: Partial<FeatureContent>): Required<FeatureContent> {
   return {
     id: feature.id ?? ('UNKNOWN' as FeatureId),
     name: feature.name ?? 'UNKNOWN',
@@ -212,14 +212,14 @@ function ensureFeature(feature: Partial<FeatureContent>): FeatureContent {
       targetType: b.targetType ?? undefined,
       description: b.description ?? '',
     })),
-    unique: feature.unique ?? undefined,
+    unique: feature.unique ?? false,
     maintenanceCost: feature.maintenanceCost ?? undefined,
   };
 }
 
 function ensureReputationAction(
   action: Partial<ReputationActionContent>,
-): ReputationActionContent {
+): Required<ReputationActionContent> {
   return {
     id: action.id ?? ('UNKNOWN' as ReputationActionId),
     name: action.name ?? 'UNKNOWN',
@@ -231,7 +231,7 @@ function ensureReputationAction(
 
 function ensureReputationEffect(
   effect: Partial<ReputationEffectContent>,
-): ReputationEffectContent {
+): Required<ReputationEffectContent> {
   return {
     id: (effect.id ?? 'UNKNOWN') as ReputationEffectId,
     name: effect.name ?? 'UNKNOWN',
@@ -245,7 +245,7 @@ function ensureReputationEffect(
   };
 }
 
-function ensureResearch(node: Partial<ResearchContent>): ResearchContent {
+function ensureResearch(node: Partial<ResearchContent>): Required<ResearchContent> {
   return {
     id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',
@@ -318,7 +318,7 @@ function ensureUnlockEffect(effect: Partial<UnlockEffect>): UnlockEffect {
   }
 }
 
-function ensureRoom(room: Partial<RoomContent>): RoomContent {
+function ensureRoom(room: Partial<RoomContent>): Required<RoomContent> {
   return {
     id: room.id ?? ('UNKNOWN' as RoomId),
     name: room.name ?? 'UNKNOWN',
@@ -364,7 +364,7 @@ function ensureRoom(room: Partial<RoomContent>): RoomContent {
 
 function ensureRoomUpgrade(
   upgrade: Partial<RoomUpgradeContent>,
-): RoomUpgradeContent {
+): Required<RoomUpgradeContent> {
   return {
     id: (upgrade.id ?? 'UNKNOWN') as RoomUpgradeId,
     name: upgrade.name ?? 'UNKNOWN',
@@ -377,13 +377,13 @@ function ensureRoomUpgrade(
       resource: e.resource ?? undefined,
     })),
     upgradeLevel: upgrade.upgradeLevel ?? undefined,
-    requiresDarkUpgrade: upgrade.requiresDarkUpgrade ?? undefined,
+    requiresDarkUpgrade: upgrade.requiresDarkUpgrade ?? false,
   };
 }
 
 function ensureSummonRecipe(
   recipe: Partial<SummonRecipeContent>,
-): SummonRecipeContent {
+): Required<SummonRecipeContent> {
   return {
     id: (recipe.id ?? 'UNKNOWN') as SummonRecipeId,
     name: recipe.name ?? 'UNKNOWN',
@@ -397,7 +397,7 @@ function ensureSummonRecipe(
   };
 }
 
-function ensureSynergy(synergy: Partial<SynergyContent>): SynergyContent {
+function ensureSynergy(synergy: Partial<SynergyContent>): Required<SynergyContent> {
   return {
     id: synergy.id ?? ('UNKNOWN' as SynergyId),
     name: synergy.name ?? 'UNKNOWN',
@@ -410,7 +410,7 @@ function ensureSynergy(synergy: Partial<SynergyContent>): SynergyContent {
 
 function ensureInhabitantTrait(
   trait: Partial<InhabitantTraitContent>,
-): InhabitantTraitContent {
+): Required<InhabitantTraitContent> {
   return {
     id: (trait.id ?? 'UNKNOWN') as InhabitantTraitId,
     name: trait.name ?? 'UNKNOWN',
@@ -440,7 +440,7 @@ function defaultFusionPassChance(rarity: string, isNegative?: boolean): number {
 
 function ensureMutationTrait(
   trait: Partial<MutationTraitContent>,
-): MutationTraitContent {
+): Required<MutationTraitContent> {
   const rarity = trait.rarity ?? 'common';
   return {
     id: (trait.id ?? 'UNKNOWN') as MutationTraitId,
@@ -452,7 +452,7 @@ function ensureMutationTrait(
       bonus: m.bonus ?? 0,
     })),
     rarity,
-    isNegative: trait.isNegative ?? undefined,
+    isNegative: trait.isNegative ?? false,
     fusionPassChance:
       trait.fusionPassChance ??
       defaultFusionPassChance(rarity, trait.isNegative),
@@ -461,7 +461,7 @@ function ensureMutationTrait(
 
 function ensureInhabitant(
   inhabitant: Partial<InhabitantContent>,
-): InhabitantContent {
+): Required<InhabitantContent> {
   return {
     id: inhabitant.id ?? ('UNKNOWN' as InhabitantId),
     name: inhabitant.name ?? 'UNKNOWN',
@@ -482,20 +482,20 @@ function ensureInhabitant(
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},
     rulerFearLevel: inhabitant.rulerFearLevel ?? 0,
-    fearTolerance: inhabitant.fearTolerance,
+    fearTolerance: inhabitant.fearTolerance ?? undefined,
     fearModifier: inhabitant.fearModifier ?? 0,
     fearPropagationDistance: inhabitant.fearPropagationDistance ?? 1,
     foodConsumptionRate: inhabitant.foodConsumptionRate ?? 0,
     corruptionGeneration: inhabitant.corruptionGeneration ?? 0,
-    stateModifiers: inhabitant.stateModifiers,
-    upkeepCost: inhabitant.upkeepCost ?? undefined,
-    recruitmentRequirements: inhabitant.recruitmentRequirements ?? undefined,
-    statOverrides: inhabitant.statOverrides ?? undefined,
-    combatAbilityIds: inhabitant.combatAbilityIds,
+    stateModifiers: inhabitant.stateModifiers ?? {},
+    upkeepCost: inhabitant.upkeepCost ?? {},
+    recruitmentRequirements: inhabitant.recruitmentRequirements ?? [],
+    statOverrides: inhabitant.statOverrides ?? {},
+    combatAbilityIds: inhabitant.combatAbilityIds ?? [],
   };
 }
 
-function ensureInvader(invader: Partial<InvaderContent>): InvaderContent {
+function ensureInvader(invader: Partial<InvaderContent>): Required<InvaderContent> {
   return {
     id: invader.id ?? ('UNKNOWN' as InvaderId),
     name: invader.name ?? 'UNKNOWN',
@@ -508,7 +508,7 @@ function ensureInvader(invader: Partial<InvaderContent>): InvaderContent {
   };
 }
 
-function ensureRoomShape(shape: Partial<RoomShapeContent>): RoomShapeContent {
+function ensureRoomShape(shape: Partial<RoomShapeContent>): Required<RoomShapeContent> {
   return {
     id: shape.id ?? ('UNKNOWN' as RoomShapeId),
     name: shape.name ?? 'UNKNOWN',
@@ -521,7 +521,7 @@ function ensureRoomShape(shape: Partial<RoomShapeContent>): RoomShapeContent {
 
 function ensureAbilityEffect(
   effect: Partial<AbilityEffectContent>,
-): AbilityEffectContent {
+): Required<AbilityEffectContent> {
   return {
     id: (effect.id ?? 'UNKNOWN') as AbilityEffectId,
     name: effect.name ?? 'UNKNOWN',
@@ -545,7 +545,7 @@ function ensureCombatAbilityEffect(
 
 function ensureCombatAbility(
   ability: Partial<CombatAbilityContent>,
-): CombatAbilityContent {
+): Required<CombatAbilityContent> {
   return {
     id: (ability.id ?? 'UNKNOWN') as CombatAbilityId,
     name: ability.name ?? 'UNKNOWN',
@@ -557,7 +557,7 @@ function ensureCombatAbility(
   };
 }
 
-function ensureTrap(trap: Partial<TrapContent>): TrapContent {
+function ensureTrap(trap: Partial<TrapContent>): Required<TrapContent> {
   return {
     id: trap.id ?? ('UNKNOWN' as TrapId),
     name: trap.name ?? 'UNKNOWN',
@@ -585,7 +585,7 @@ const defaultWeights = {
 
 function ensureInvasion(
   config: Partial<CompositionWeightConfig & IsContentItem>,
-): CompositionWeightConfig & IsContentItem {
+): Required<CompositionWeightConfig & IsContentItem> {
   return {
     id: config.id ?? ('UNKNOWN' as InvasionId),
     name: config.name ?? 'UNKNOWN',
@@ -599,7 +599,7 @@ function ensureInvasion(
 
 function ensureMerchantTrade(
   trade: Partial<MerchantTradeContent>,
-): MerchantTradeContent {
+): Required<MerchantTradeContent> {
   return {
     id: trade.id ?? ('UNKNOWN' as MerchantTradeId),
     name: trade.name ?? 'UNKNOWN',
@@ -614,7 +614,7 @@ function ensureMerchantTrade(
 
 function ensureSeasonBonus(
   bonus: Partial<SeasonBonusContent>,
-): SeasonBonusContent {
+): Required<SeasonBonusContent> {
   return {
     id: bonus.id ?? ('UNKNOWN' as SeasonBonusId),
     name: bonus.name ?? 'UNKNOWN',
@@ -633,7 +633,7 @@ function ensureSeasonBonus(
 
 function ensureVictoryPath(
   path: Partial<VictoryPathContent>,
-): VictoryPathContent {
+): Required<VictoryPathContent> {
   return {
     id: path.id ?? ('UNKNOWN' as VictoryPathId),
     name: path.name ?? 'UNKNOWN',

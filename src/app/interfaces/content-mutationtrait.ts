@@ -14,6 +14,6 @@ export type MutationTraitContent = IsContentItem &
   HasRarity & {
     id: MutationTraitId;
     modifiers: MutationTraitModifier[];
-    isNegative?: boolean;
-    fusionPassChance?: number;
+    isNegative: boolean;
+    fusionPassChance: number;
   };

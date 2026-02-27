@@ -35,6 +35,6 @@ export type FeatureContent = IsContentItem &
     category: FeatureCategory;
     cost: ResourceCost;
     bonuses: FeatureBonus[];
-    unique?: boolean;
-    maintenanceCost?: ResourceCost;
+    unique: boolean;
+    maintenanceCost: ResourceCost | undefined;
   };
