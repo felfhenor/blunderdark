@@ -8,7 +8,6 @@ import {
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { MutationOutcomeTextComponent } from '@components/mutation-outcome-text/mutation-outcome-text.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   breedingCompleted$,
@@ -23,6 +22,7 @@ import {
   gridSelectedTile,
   mutationCompleted$,
   updateGamestate,
+  notify,
   MUTATION_BASE_TICKS,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
@@ -44,7 +44,6 @@ import { sortBy } from 'es-toolkit/compat';
     InhabitantCardComponent,
     JobProgressComponent,
     ModalComponent,
-    MutationOutcomeTextComponent,
     StatNameComponent,
   ],
   templateUrl: './panel-breeding-pits.component.html',
@@ -52,19 +51,16 @@ import { sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelBreedingPitsComponent {
-  public showMutationResult = signal(false);
-  public lastMutationResult = signal<
-    { name: string; outcome: string } | undefined
-  >(undefined);
-
   private subscriptions = [
     breedingCompleted$.subscribe(),
     mutationCompleted$.subscribe((evt) => {
-      this.lastMutationResult.set({
-        name: evt.inhabitantName,
-        outcome: evt.outcome,
-      });
-      this.showMutationResult.set(true);
+      const outcomeText =
+        evt.outcome === 'positive'
+          ? 'Positive mutation! Stats improved.'
+          : evt.outcome === 'negative'
+            ? 'Negative mutation. Stats decreased.'
+            : 'Neutral mutation. No significant change.';
+      notify('Breeding', `${evt.inhabitantName}: ${outcomeText}`);
     }),
   ];
 

@@ -187,21 +187,3 @@
     </button>
   </div>
 </app-modal>
-
-<!-- Mutation Result Modal -->
-<app-modal [(visible)]="showMutationResult">
-  <span title>Mutation Result</span>
-  <div body>
-    @if (lastMutationResult(); as result) {
-      <div class="text-center">
-        <p class="text-lg font-semibold">{{ result.name }}</p>
-        <app-mutation-outcome-text [outcome]="result.outcome" />
-      </div>
-    }
-  </div>
-  <div actions>
-    <button class="btn btn-sm" (click)="showMutationResult.set(false)">
-      Close
-    </button>
-  </div>
-</app-modal>
