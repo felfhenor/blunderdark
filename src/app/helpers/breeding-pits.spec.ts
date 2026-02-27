@@ -318,9 +318,7 @@ function makeGameState(overrides: { floors?: Floor[] }): GameState {
       floors: overrides.floors ?? [makeFloor()],
       currentFloorIndex: 0,
       trapInventory: [],
-      trapCraftingQueues: [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {

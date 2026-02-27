@@ -1,10 +1,11 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
+import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
-import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import {
   contentGetEntry,
+  craftingQueueGetMaxSize,
   floorCurrent,
   gamestate,
   gridSelectedTile,
@@ -12,11 +13,10 @@ import {
   resourceCanAfford,
   resourcePayCost,
   trapWorkshopAddJob,
-  trapWorkshopCanQueue,
   trapWorkshopCompleted$,
   trapWorkshopGetCraftingCost,
   trapWorkshopGetCraftingTicks,
-  trapWorkshopRemoveJob,
+  trapWorkshopRemoveJobGroup,
   updateGamestate,
 } from '@helpers';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -35,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
     DecimalPipe,
     CurrencyCostListComponent,
     InhabitantCardComponent,
-    JobProgressComponent,
+    CraftingQueueDisplayComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -56,39 +56,13 @@ import { sortBy } from 'es-toolkit/compat';
 
           <!-- Crafting Queue -->
           @if (queueState(); as qs) {
-            <div class="divider my-2 text-xs opacity-60">
-              Crafting Queue ({{ qs.jobs.length | number: '1.0-0' }})
-            </div>
-            <div class="flex flex-col gap-2">
-              @for (job of qs.jobs; track job.index) {
-                <div class="flex flex-col gap-2 p-1 bg-base-200 rounded">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs">{{ job.trapName }}</span>
-                    <div class="flex items-center gap-2">
-                      @if (job.isActive) {
-                        <span class="badge badge-xs badge-warning">
-                          Crafting
-                        </span>
-                      } @else {
-                        <span class="badge badge-xs badge-ghost">Queued</span>
-                      }
-                      <button
-                        class="btn btn-xs btn-ghost btn-circle"
-                        (click)="cancelJob(job.index)"
-                      >
-                        x
-                      </button>
-                    </div>
-                  </div>
-                  @if (job.isActive) {
-                    <app-job-progress
-                      [percent]="job.percent"
-                      colorClass="progress-warning"
-                    />
-                  }
-                </div>
-              }
-            </div>
+            <app-crafting-queue-display
+              [jobs]="qs.jobs"
+              [maxSize]="qs.maxSize"
+              activeLabel="Crafting"
+              progressColor="progress-warning"
+              (cancelGroup)="cancelGroup($event)"
+            />
           }
 
           <!-- Assigned Workers -->
@@ -122,7 +96,7 @@ import { sortBy } from 'es-toolkit/compat';
                   </span>
                   <span class="text-xs opacity-50">
                     Cost:
-                    <app-currency-cost-list [cost]="entry.adjustedCost" />
+                    <app-currency-cost-list [cost]="entry.totalCost" />
                   </span>
                   <span class="text-xs opacity-50">
                     Time: {{ entry.timeSeconds | number: '1.0-0' }} sec
@@ -136,23 +110,36 @@ import { sortBy } from 'es-toolkit/compat';
                       {{ entry.trap.triggerChance * 100 | number: '1.0-0' }}%
                     </span>
                   </div>
-                  <button
-                    class="btn btn-xs btn-primary mt-1"
-                    [disabled]="!entry.canAfford"
-                    (click)="
-                      startCrafting(
-                        entry.trap.id,
-                        entry.ticks,
-                        entry.adjustedCost
-                      )
-                    "
-                  >
-                    @if (entry.canAfford) {
-                      Craft
-                    } @else {
-                      Not enough resources
-                    }
-                  </button>
+                  <div class="flex items-center gap-2 mt-1">
+                    <input
+                      type="number"
+                      class="input input-xs w-16"
+                      [value]="entry.quantity"
+                      [max]="entry.maxQueueable"
+                      min="1"
+                      (input)="setQuantity(entry.trap.id, $event)"
+                    />
+                    <button
+                      class="btn btn-xs btn-primary flex-1"
+                      [disabled]="entry.queueFull || !entry.canAfford"
+                      (click)="
+                        startCraftingBulk(
+                          entry.trap.id,
+                          entry.ticks,
+                          entry.adjustedCost,
+                          entry.quantity
+                        )
+                      "
+                    >
+                      @if (entry.queueFull) {
+                        Queue full
+                      } @else if (entry.canAfford) {
+                        Craft x{{ entry.quantity | number: '1.0-0' }}
+                      } @else {
+                        Not enough resources
+                      }
+                    </button>
+                  </div>
                 </div>
               }
             </div>
@@ -181,6 +168,8 @@ export class PanelTrapWorkshopComponent {
   private subscription = trapWorkshopCompleted$.subscribe((evt) => {
     notify('Traps', `Crafted: ${evt.trapName}`);
   });
+
+  private quantities = signal<Record<string, number>>({});
 
   public workshopRoom = computed(() => {
     const tile = gridSelectedTile();
@@ -222,24 +211,60 @@ export class PanelTrapWorkshopComponent {
     return sortBy(mapped, [(e) => e.def.name]);
   });
 
+  public queueState = computed(() => {
+    const room = this.workshopRoom();
+    if (!room) return undefined;
+
+    // Touch gamestate to get reactivity
+    gamestate();
+
+    const trapJobs = room.trapJobs;
+    if (!trapJobs || trapJobs.length === 0) return undefined;
+
+    const maxSize = craftingQueueGetMaxSize(room);
+
+    const jobs = trapJobs.map((job) => {
+      const trapDef = contentGetEntry<TrapContent>(job.trapTypeId);
+      return {
+        recipeId: job.trapTypeId,
+        name: trapDef?.name ?? 'Unknown',
+        progress: job.progress,
+        targetTicks: job.targetTicks,
+      };
+    });
+
+    return { jobs, maxSize };
+  });
+
   public availableTraps = computed(() => {
     const room = this.workshopRoom();
     if (!room) return [];
 
-    const state = gamestate();
-    const { canQueue } = trapWorkshopCanQueue(
-      room.id,
-      state.world.floors,
-    );
-    if (!canQueue) return [];
+    const floor = floorCurrent();
+    if (!floor) return [];
+
+    // Need at least 1 worker assigned
+    const workerCount = this.assignedWorkers().length;
+    if (workerCount < 1) return [];
 
     const allTraps = contentGetEntriesByType<TrapContent>('trap');
-    const workerCount = this.assignedWorkers().length;
+    const maxSize = craftingQueueGetMaxSize(room);
+    const currentSize = (room.trapJobs ?? []).length;
+    const slotsRemaining = Math.max(0, maxSize - currentSize);
+    const qtys = this.quantities();
+
+    const queueFull = slotsRemaining === 0;
 
     const entries = allTraps.map((trap) => {
       const adjustedCost = trapWorkshopGetCraftingCost(room, trap.craftCost);
       const ticks = trapWorkshopGetCraftingTicks(room, workerCount);
-      const canAfford = resourceCanAfford(adjustedCost);
+      const rawQty = qtys[trap.id] ?? 1;
+      const quantity = queueFull ? 1 : Math.min(Math.max(1, rawQty), slotsRemaining);
+      const totalCost: Partial<Record<ResourceType, number>> = {};
+      for (const [type, amount] of Object.entries(adjustedCost)) {
+        totalCost[type as ResourceType] = (amount as number) * quantity;
+      }
+      const canAfford = resourceCanAfford(totalCost);
 
       return {
         trap,
@@ -247,36 +272,13 @@ export class PanelTrapWorkshopComponent {
         ticks,
         timeSeconds: ticksToRealSeconds(ticks),
         canAfford,
+        queueFull,
+        quantity,
+        maxQueueable: slotsRemaining,
+        totalCost,
       };
     });
     return sortBy(entries, [(e) => e.trap.name]);
-  });
-
-  public queueState = computed(() => {
-    const room = this.workshopRoom();
-    if (!room) return undefined;
-
-    const state = gamestate();
-    const queue = state.world.trapCraftingQueues.find(
-      (q) => q.roomId === room.id,
-    );
-    if (!queue || queue.jobs.length === 0) return undefined;
-
-    const jobs = queue.jobs.map((job, index) => {
-      const trapDef = contentGetEntry<TrapContent>(job.trapTypeId);
-      const percent = Math.min(
-        100,
-        Math.round((job.progress / job.targetTicks) * 100),
-      );
-      return {
-        index,
-        trapName: trapDef?.name ?? 'Unknown',
-        percent,
-        isActive: index === 0,
-      };
-    });
-
-    return { jobs };
   });
 
   public trapInventory = computed(() => {
@@ -292,38 +294,54 @@ export class PanelTrapWorkshopComponent {
     return sortBy(entries, [(e) => e.name]);
   });
 
-  public async startCrafting(
+  public setQuantity(trapId: string, event: Event): void {
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    this.quantities.update((q) => ({ ...q, [trapId]: isNaN(value) ? 1 : Math.max(1, value) }));
+  }
+
+  public async startCraftingBulk(
     trapTypeId: TrapId,
     targetTicks: number,
     cost: ResourceCost,
+    quantity: number,
   ): Promise<void> {
     const room = this.workshopRoom();
     if (!room) return;
 
-    const paid = await resourcePayCost(cost as Partial<Record<ResourceType, number>>);
+    const totalCost: Partial<Record<ResourceType, number>> = {};
+    for (const [type, amount] of Object.entries(cost)) {
+      totalCost[type as ResourceType] = amount * quantity;
+    }
+
+    const paid = await resourcePayCost(totalCost);
     if (!paid) return;
 
     await updateGamestate((state) => {
-      state.world.trapCraftingQueues = trapWorkshopAddJob(
-        state.world.trapCraftingQueues,
-        room.id,
-        trapTypeId,
-        targetTicks,
-      );
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          for (let i = 0; i < quantity; i++) {
+            trapWorkshopAddJob(target, trapTypeId, targetTicks);
+          }
+          break;
+        }
+      }
       return state;
     });
   }
 
-  public async cancelJob(jobIndex: number): Promise<void> {
+  public async cancelGroup(event: CancelGroupEvent): Promise<void> {
     const room = this.workshopRoom();
     if (!room) return;
 
     await updateGamestate((state) => {
-      state.world.trapCraftingQueues = trapWorkshopRemoveJob(
-        state.world.trapCraftingQueues,
-        room.id,
-        jobIndex,
-      );
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          trapWorkshopRemoveJobGroup(target, event.startIndex, event.count);
+          break;
+        }
+      }
       return state;
     });
   }

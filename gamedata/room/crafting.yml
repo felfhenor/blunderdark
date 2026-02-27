@@ -3,6 +3,7 @@
   description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
   shapeId: Square 2x2
   role: darkForge
+  queueSize: 5
   cost:
     gold: 60
     crystals: 20
@@ -12,10 +13,10 @@
   maxInhabitants: 2
   maxFeatures: 1
   fearLevel: 2
-  isUnique: true
   roomUpgradeIds:
     - Master Forge
     - Infernal Forge
+    - Forge Expansion
   biomeBonuses:
     volcanic: 0.5
   adjacencyBonuses:
@@ -96,6 +97,7 @@
     - Dual Circle
     - Binding Circle
   role: summoningCircle
+  queueSize: 3
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
       bonus: 0.15

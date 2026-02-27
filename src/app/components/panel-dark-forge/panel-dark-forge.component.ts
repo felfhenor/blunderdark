@@ -1,27 +1,27 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
-import { JobProgressComponent } from '@components/job-progress/job-progress.component';
+import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
+  craftingQueueGetMaxSize,
   darkForgeAddJob,
-  darkForgeCanQueue,
   darkForgeCompleted$,
   darkForgeGetAdjacentRoomTypeIds,
   darkForgeGetAvailableRecipes,
   darkForgeGetCraftingTicks,
   darkForgeGetStatBonuses,
-  darkForgeRemoveJob,
-  DARK_FORGE_MAX_QUEUE_SIZE,
-  findRoomByRole,
+  darkForgeRemoveJobGroup,
   floorCurrent,
   gamestate,
+  gridSelectedTile,
   notify,
   resourceCanAfford,
   resourcePayCost,
   updateGamestate,
 } from '@helpers';
+import { roomRoleFindById } from '@helpers/room-roles';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   ForgeRecipeContent,
@@ -35,7 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent],
+  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, CraftingQueueDisplayComponent],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,8 +45,23 @@ export class PanelDarkForgeComponent {
     notify('Forging', `Forged: ${evt.recipeName}`);
   });
 
+  private quantities = signal<Record<string, number>>({});
+
   public forgeRoom = computed(() => {
-    return findRoomByRole('darkForge')?.room;
+    const tile = gridSelectedTile();
+    const floor = floorCurrent();
+    if (!tile || !floor) return undefined;
+
+    const gridTile = floor.grid[tile.y]?.[tile.x];
+    if (!gridTile?.roomId) return undefined;
+
+    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    if (!room) return undefined;
+
+    const darkForgeTypeId = roomRoleFindById('darkForge');
+    if (room.roomTypeId !== darkForgeTypeId) return undefined;
+
+    return room;
   });
 
   public roomDef = computed(() => {
@@ -70,26 +85,61 @@ export class PanelDarkForgeComponent {
     return sortBy(mapped, [(e) => e.def.name]);
   });
 
+  public queueState = computed(() => {
+    const room = this.forgeRoom();
+    if (!room) return undefined;
+
+    // Touch gamestate to get reactivity
+    gamestate();
+
+    const forgeJobs = room.forgeJobs;
+    if (!forgeJobs || forgeJobs.length === 0) return undefined;
+
+    const maxSize = craftingQueueGetMaxSize(room);
+
+    const jobs = forgeJobs.map((job) => {
+      const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
+      return {
+        recipeId: job.recipeId,
+        name: recipe?.name ?? 'Unknown',
+        progress: job.progress,
+        targetTicks: job.targetTicks,
+      };
+    });
+
+    return { jobs, maxSize };
+  });
+
   public availableRecipes = computed(() => {
     const room = this.forgeRoom();
     if (!room) return [];
 
-    const state = gamestate();
-    const { canQueue } = darkForgeCanQueue(room.id, state.world.floors, state.world.forgeCraftingQueues);
-    if (!canQueue) return [];
+    const floor = floorCurrent();
+    if (!floor) return [];
+
+    // Need at least 1 worker assigned
+    const workerCount = this.assignedWorkers().length;
+    if (workerCount < 1) return [];
 
     const recipes = darkForgeGetAvailableRecipes(room);
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? darkForgeGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
+    const adjacentTypes = darkForgeGetAdjacentRoomTypeIds(room, floor);
+    const maxSize = craftingQueueGetMaxSize(room);
+    const currentSize = (room.forgeJobs ?? []).length;
+    const slotsRemaining = Math.max(0, maxSize - currentSize);
+    const qtys = this.quantities();
 
-    const workerCount = this.assignedWorkers().length;
+    const queueFull = slotsRemaining === 0;
 
     const entries = recipes.map((recipe) => {
       const ticks = darkForgeGetCraftingTicks(room, workerCount, recipe.timeMultiplier, adjacentTypes);
       const statBonuses = darkForgeGetStatBonuses(room, recipe, adjacentTypes);
-      const canAfford = resourceCanAfford(recipe.cost);
+      const rawQty = qtys[recipe.id] ?? 1;
+      const quantity = queueFull ? 1 : Math.min(Math.max(1, rawQty), slotsRemaining);
+      const totalCost: Partial<Record<ResourceType, number>> = {};
+      for (const [type, amount] of Object.entries(recipe.cost)) {
+        totalCost[type as ResourceType] = amount * quantity;
+      }
+      const canAfford = resourceCanAfford(totalCost);
 
       return {
         recipe,
@@ -97,31 +147,13 @@ export class PanelDarkForgeComponent {
         timeSeconds: ticksToRealSeconds(ticks),
         statBonuses,
         canAfford,
+        queueFull,
+        quantity,
+        maxQueueable: slotsRemaining,
+        totalCost,
       };
     });
     return sortBy(entries, [(e) => e.recipe.name]);
-  });
-
-  public queueState = computed(() => {
-    const room = this.forgeRoom();
-    if (!room) return undefined;
-
-    const state = gamestate();
-    const queue = state.world.forgeCraftingQueues.find((q) => q.roomId === room.id);
-    if (!queue || queue.jobs.length === 0) return undefined;
-
-    const jobs = queue.jobs.map((job, index) => {
-      const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
-      const percent = Math.min(100, Math.round((job.progress / job.targetTicks) * 100));
-      return {
-        index,
-        recipeName: recipe?.name ?? 'Unknown',
-        percent,
-        isActive: index === 0,
-      };
-    });
-
-    return { jobs, maxSize: DARK_FORGE_MAX_QUEUE_SIZE };
   });
 
   public forgeInventory = computed(() => {
@@ -145,34 +177,54 @@ export class PanelDarkForgeComponent {
       .join(', ');
   }
 
-  public async startCrafting(recipeId: ForgeRecipeId, targetTicks: number, cost: Partial<Record<ResourceType, number>>): Promise<void> {
+  public setQuantity(recipeId: string, event: Event): void {
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    this.quantities.update((q) => ({ ...q, [recipeId]: isNaN(value) ? 1 : Math.max(1, value) }));
+  }
+
+  public async startCraftingBulk(
+    recipeId: ForgeRecipeId,
+    targetTicks: number,
+    cost: Partial<Record<ResourceType, number>>,
+    quantity: number,
+  ): Promise<void> {
     const room = this.forgeRoom();
     if (!room) return;
 
-    const paid = await resourcePayCost(cost);
+    const totalCost: Partial<Record<ResourceType, number>> = {};
+    for (const [type, amount] of Object.entries(cost)) {
+      totalCost[type as ResourceType] = amount * quantity;
+    }
+
+    const paid = await resourcePayCost(totalCost);
     if (!paid) return;
 
     await updateGamestate((state) => {
-      state.world.forgeCraftingQueues = darkForgeAddJob(
-        state.world.forgeCraftingQueues,
-        room.id,
-        recipeId,
-        targetTicks,
-      );
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          for (let i = 0; i < quantity; i++) {
+            darkForgeAddJob(target, recipeId, targetTicks);
+          }
+          break;
+        }
+      }
       return state;
     });
   }
 
-  public async cancelJob(jobIndex: number): Promise<void> {
+  public async cancelGroup(event: CancelGroupEvent): Promise<void> {
     const room = this.forgeRoom();
     if (!room) return;
 
     await updateGamestate((state) => {
-      state.world.forgeCraftingQueues = darkForgeRemoveJob(
-        state.world.forgeCraftingQueues,
-        room.id,
-        jobIndex,
-      );
+      for (const floor of state.world.floors) {
+        const target = floor.rooms.find((r) => r.id === room.id);
+        if (target) {
+          darkForgeRemoveJobGroup(target, event.startIndex, event.count);
+          break;
+        }
+      }
       return state;
     });
   }

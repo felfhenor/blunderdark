@@ -1,8 +1,10 @@
 import type { BreedingRecipeId } from '@interfaces/content-breedingrecipe';
 import type { FeatureId } from '@interfaces/content-feature';
+import type { ForgeRecipeId } from '@interfaces/content-forgerecipe';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { SummonRecipeId } from '@interfaces/content-summonrecipe';
+import type { TrapId } from '@interfaces/content-trap';
 import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { PrisonerId } from '@interfaces/invasion';
@@ -35,7 +37,19 @@ export type MutationJob = {
 
 export type SummonJob = {
   recipeId: SummonRecipeId;
-  ticksRemaining: number;
+  progress: number;
+  targetTicks: number;
+};
+
+export type ForgeCraftingJob = {
+  recipeId: ForgeRecipeId;
+  progress: number;
+  targetTicks: number;
+};
+
+export type TrapCraftingJob = {
+  trapTypeId: TrapId;
+  progress: number;
   targetTicks: number;
 };
 
@@ -64,8 +78,10 @@ export type PlacedRoom = {
   spawnTicksRemaining?: number;
   breedingJob?: BreedingJob;
   mutationJob?: MutationJob;
-  summonJob?: SummonJob;
+  summonJobs?: SummonJob[];
   tortureJob?: TortureJob;
+  forgeJobs?: ForgeCraftingJob[];
+  trapJobs?: TrapCraftingJob[];
   featureIds?: FeatureId[];
   sacrificeBuff?: SacrificeBuff;
   convertedOutputResource?: string;

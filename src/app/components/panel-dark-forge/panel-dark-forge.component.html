@@ -8,39 +8,13 @@
 
       <!-- Active Queue -->
       @if (queueState(); as qs) {
-        <div class="divider my-2 text-xs opacity-60">
-          Crafting Queue ({{ qs.jobs.length | number: '1.0-0' }}/{{
-            qs.maxSize | number: '1.0-0'
-          }})
-        </div>
-        <div class="flex flex-col gap-2">
-          @for (job of qs.jobs; track job.index) {
-            <div class="flex flex-col gap-2 p-1 bg-base-200 rounded">
-              <div class="flex items-center justify-between">
-                <span class="text-xs">{{ job.recipeName }}</span>
-                <div class="flex items-center gap-2">
-                  @if (job.isActive) {
-                    <span class="badge badge-xs badge-warning">Forging</span>
-                  } @else {
-                    <span class="badge badge-xs badge-ghost">Queued</span>
-                  }
-                  <button
-                    class="btn btn-xs btn-ghost btn-circle"
-                    (click)="cancelJob(job.index)"
-                  >
-                    x
-                  </button>
-                </div>
-              </div>
-              @if (job.isActive) {
-                <app-job-progress
-                  [percent]="job.percent"
-                  colorClass="progress-warning"
-                />
-              }
-            </div>
-          }
-        </div>
+        <app-crafting-queue-display
+          [jobs]="qs.jobs"
+          [maxSize]="qs.maxSize"
+          activeLabel="Forging"
+          progressColor="progress-warning"
+          (cancelGroup)="cancelGroup($event)"
+        />
       }
 
       <!-- Assigned Workers -->
@@ -83,7 +57,7 @@
               </span>
               <span class="text-xs opacity-50">
                 Cost:
-                <app-currency-cost-list [cost]="entry.recipe.cost" />
+                <app-currency-cost-list [cost]="entry.totalCost" />
               </span>
               <span class="text-xs opacity-50">
                 Time: {{ entry.timeSeconds | number: '1.0-0' }} sec
@@ -98,19 +72,36 @@
                   </span>
                 }
               }
-              <button
-                class="btn btn-xs btn-primary mt-1"
-                [disabled]="!entry.canAfford"
-                (click)="
-                  startCrafting(entry.recipe.id, entry.ticks, entry.recipe.cost)
-                "
-              >
-                @if (entry.canAfford) {
-                  Start Crafting
-                } @else {
-                  Not enough resources
-                }
-              </button>
+              <div class="flex items-center gap-2 mt-1">
+                <input
+                  type="number"
+                  class="input input-xs w-16"
+                  [value]="entry.quantity"
+                  [max]="entry.maxQueueable"
+                  min="1"
+                  (input)="setQuantity(entry.recipe.id, $event)"
+                />
+                <button
+                  class="btn btn-xs btn-primary flex-1"
+                  [disabled]="entry.queueFull || !entry.canAfford"
+                  (click)="
+                    startCraftingBulk(
+                      entry.recipe.id,
+                      entry.ticks,
+                      entry.recipe.cost,
+                      entry.quantity
+                    )
+                  "
+                >
+                  @if (entry.queueFull) {
+                    Queue full
+                  } @else if (entry.canAfford) {
+                    Craft x{{ entry.quantity | number: '1.0-0' }}
+                  } @else {
+                    Not enough resources
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>

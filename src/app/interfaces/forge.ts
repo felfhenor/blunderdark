@@ -6,17 +6,6 @@ export type ForgeInventoryEntry = {
   count: number;
 };
 
-export type ForgeCraftingJob = {
-  recipeId: ForgeRecipeId;
-  progress: number;
-  targetTicks: number;
-};
-
-export type ForgeCraftingQueue = {
-  roomId: PlacedRoomId;
-  jobs: ForgeCraftingJob[];
-};
-
 export type DarkForgeCompletedEvent = {
   roomId: PlacedRoomId;
   recipeName: string;

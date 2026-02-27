@@ -64,6 +64,7 @@
   description: A crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
   shapeId: Square 2x2
   role: trapWorkshop
+  queueSize: 25
   cost:
     gold: 90
     crystals: 30
@@ -77,6 +78,7 @@
     - Master Trapworks
     - Streamlined Workshop
     - Arcane Trapworks
+    - Expanded Workshop
   forgingAdjacencyEffects:
     forgingEffectivenessBonus: 0.2
   adjacencyBonuses:

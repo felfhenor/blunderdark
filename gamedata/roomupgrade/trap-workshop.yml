@@ -31,3 +31,12 @@
   effects:
     - type: craftingBonusDamage
       value: 5
+- id: 6b858d7d-6334-4fdc-80c5-2dadab143a65
+  name: Expanded Workshop
+  description: Expand the workshop's assembly lines, allowing up to 10 additional traps to be queued at once.
+  cost:
+    gold: 100
+    crystals: 40
+  effects:
+    - type: craftingQueueSize
+      value: 10

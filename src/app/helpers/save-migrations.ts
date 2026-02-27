@@ -3,7 +3,7 @@ import type { SaveData, SaveMigrationResult } from '@interfaces';
 
 // --- Constants ---
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 // --- Types ---
 
@@ -27,6 +27,76 @@ export const saveMigrations: Map<number, SaveMigrationFn> = new Map();
 
 saveMigrations.set(1, (data) => {
   data.gameState.world.farplaneSouls = data.gameState.world.farplaneSouls ?? [];
+  return data;
+});
+
+saveMigrations.set(2, (data) => {
+  const world = data.gameState.world as unknown as Record<string, unknown>;
+
+  // Migrate forgeCraftingQueues → per-room forgeJobs
+  const forgeQueues = (world['forgeCraftingQueues'] ?? []) as Array<{
+    roomId: string;
+    jobs: Array<{ recipeId: string; progress: number; targetTicks: number }>;
+  }>;
+  for (const entry of forgeQueues) {
+    for (const floor of data.gameState.world.floors) {
+      const room = floor.rooms.find(
+        (r: { id: string }) => r.id === entry.roomId,
+      );
+      if (room) {
+        (room as Record<string, unknown>)['forgeJobs'] = entry.jobs;
+        break;
+      }
+    }
+  }
+  delete world['forgeCraftingQueues'];
+
+  // Migrate trapCraftingQueues → per-room trapJobs
+  const trapQueues = (world['trapCraftingQueues'] ?? []) as Array<{
+    roomId: string;
+    jobs: Array<{
+      trapTypeId: string;
+      progress: number;
+      targetTicks: number;
+    }>;
+  }>;
+  for (const entry of trapQueues) {
+    for (const floor of data.gameState.world.floors) {
+      const room = floor.rooms.find(
+        (r: { id: string }) => r.id === entry.roomId,
+      );
+      if (room) {
+        (room as Record<string, unknown>)['trapJobs'] = entry.jobs;
+        break;
+      }
+    }
+  }
+  delete world['trapCraftingQueues'];
+
+  // Migrate summonJob → summonJobs (single job to array, ticksRemaining → progress count-up)
+  for (const floor of data.gameState.world.floors) {
+    for (const room of floor.rooms) {
+      const r = room as Record<string, unknown>;
+      const oldJob = r['summonJob'] as
+        | {
+            recipeId: string;
+            ticksRemaining: number;
+            targetTicks: number;
+          }
+        | undefined;
+      if (oldJob) {
+        r['summonJobs'] = [
+          {
+            recipeId: oldJob.recipeId,
+            progress: oldJob.targetTicks - oldJob.ticksRemaining,
+            targetTicks: oldJob.targetTicks,
+          },
+        ];
+        delete r['summonJob'];
+      }
+    }
+  }
+
   return data;
 });
 

@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { GameId, GameState, SaveData } from '@interfaces';
+import type { Floor, GameId, GameState, SaveData } from '@interfaces';
 import {
   SAVE_VERSION,
   saveMigrations,
   saveMigrationDetectVersion,
   saveMigrationRun,
 } from '@helpers/save-migrations';
+
+// Save real migrations before the global beforeEach clears them
+const realMigrationV1 = saveMigrations.get(1);
+const realMigrationV2 = saveMigrations.get(2);
 
 // --- Mocks ---
 
@@ -66,9 +70,7 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
       floors: [],
       currentFloorIndex: 0,
       trapInventory: [],
-      trapCraftingQueues: [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {
@@ -307,8 +309,17 @@ describe('adding new fields migration', () => {
     saveMigrations.clear();
   });
 
+  // Helper: fill all migration slots from v1 to SAVE_VERSION with passthroughs,
+  // then override key 1 with the real test migration.
+  function registerWithPassthroughs(fn: (data: SaveData) => SaveData): void {
+    for (let v = 1; v < SAVE_VERSION; v++) {
+      saveMigrations.set(v, (data) => data);
+    }
+    saveMigrations.set(1, fn);
+  }
+
   it('should add default values for new fields', () => {
-    saveMigrations.set(1, (data) => {
+    registerWithPassthroughs((data) => {
       const world = data.gameState.world as unknown as Record<string, unknown>;
       if (world['newFeatureEnabled'] === undefined) {
         world['newFeatureEnabled'] = false;
@@ -331,7 +342,7 @@ describe('adding new fields migration', () => {
   });
 
   it('should preserve existing data when adding new fields', () => {
-    saveMigrations.set(1, (data) => {
+    registerWithPassthroughs((data) => {
       const world = data.gameState.world as unknown as Record<string, unknown>;
       world['addedField'] = 'default';
       return data;
@@ -357,8 +368,15 @@ describe('removing/renaming fields migration', () => {
     saveMigrations.clear();
   });
 
+  function registerWithPassthroughs(fn: (data: SaveData) => SaveData): void {
+    for (let v = 1; v < SAVE_VERSION; v++) {
+      saveMigrations.set(v, (data) => data);
+    }
+    saveMigrations.set(1, fn);
+  }
+
   it('should remove deprecated fields', () => {
-    saveMigrations.set(1, (data) => {
+    registerWithPassthroughs((data) => {
       const world = data.gameState.world as unknown as Record<string, unknown>;
       delete world['deprecatedField'];
       return data;
@@ -377,7 +395,7 @@ describe('removing/renaming fields migration', () => {
   });
 
   it('should rename fields preserving values', () => {
-    saveMigrations.set(1, (data) => {
+    registerWithPassthroughs((data) => {
       const world = data.gameState.world as unknown as Record<string, unknown>;
       if (world['oldName'] !== undefined) {
         world['newName'] = world['oldName'];
@@ -400,7 +418,7 @@ describe('removing/renaming fields migration', () => {
   });
 
   it('should maintain data integrity through rename', () => {
-    saveMigrations.set(1, (data) => {
+    registerWithPassthroughs((data) => {
       const world = data.gameState.world as unknown as Record<string, unknown>;
       if (world['renamedArray'] !== undefined) {
         world['newArray'] = world['renamedArray'];
@@ -472,5 +490,175 @@ describe('incompatible save handling', () => {
       expect(result.migrationsApplied).toBe(1);
       expect(result.error).toContain('Failed at v2->v3');
     }
+  });
+});
+
+// --- Real migration tests (v2→v3: crafting queue overhaul) ---
+
+describe('v2→v3 migration (crafting queue overhaul)', () => {
+  beforeEach(() => {
+    // Re-register the real migrations since the global beforeEach clears them
+    if (realMigrationV1) saveMigrations.set(1, realMigrationV1);
+    if (realMigrationV2) saveMigrations.set(2, realMigrationV2);
+  });
+
+  it('should migrate forgeCraftingQueues to per-room forgeJobs', () => {
+    const gs = makeGameState();
+    gs.world.floors = [
+      {
+        id: 'f1',
+        name: 'F1',
+        depth: 1,
+        biome: 'neutral',
+        grid: { tiles: [], width: 0, height: 0 },
+        rooms: [
+          { id: 'forge-1', roomTypeId: 'dark-forge', shapeId: 's', anchorX: 0, anchorY: 0 },
+        ],
+        hallways: [],
+        inhabitants: [],
+        connections: [],
+        traps: [],
+      } as unknown as Floor,
+    ];
+
+    // Add old-style world-level forge queue
+    const world = gs.world as unknown as Record<string, unknown>;
+    world['forgeCraftingQueues'] = [
+      {
+        roomId: 'forge-1',
+        jobs: [
+          { recipeId: 'recipe-sword', progress: 3, targetTicks: 10 },
+          { recipeId: 'recipe-shield', progress: 0, targetTicks: 15 },
+        ],
+      },
+    ];
+
+    const saveData = makeSaveData(2, gs);
+    const result = saveMigrationRun(saveData);
+
+    expect(result.success).toBe(true);
+    const migratedRoom = result.saveData.gameState.world.floors[0].rooms[0] as unknown as Record<string, unknown>;
+    expect(migratedRoom['forgeJobs']).toEqual([
+      { recipeId: 'recipe-sword', progress: 3, targetTicks: 10 },
+      { recipeId: 'recipe-shield', progress: 0, targetTicks: 15 },
+    ]);
+    // Old field should be deleted
+    const migratedWorld = result.saveData.gameState.world as unknown as Record<string, unknown>;
+    expect(migratedWorld['forgeCraftingQueues']).toBeUndefined();
+  });
+
+  it('should migrate trapCraftingQueues to per-room trapJobs', () => {
+    const gs = makeGameState();
+    gs.world.floors = [
+      {
+        id: 'f1',
+        name: 'F1',
+        depth: 1,
+        biome: 'neutral',
+        grid: { tiles: [], width: 0, height: 0 },
+        rooms: [
+          { id: 'workshop-1', roomTypeId: 'trap-workshop', shapeId: 's', anchorX: 0, anchorY: 0 },
+        ],
+        hallways: [],
+        inhabitants: [],
+        connections: [],
+        traps: [],
+      } as unknown as Floor,
+    ];
+
+    const world = gs.world as unknown as Record<string, unknown>;
+    world['trapCraftingQueues'] = [
+      {
+        roomId: 'workshop-1',
+        jobs: [
+          { trapTypeId: 'pit-trap', progress: 2, targetTicks: 5 },
+        ],
+      },
+    ];
+
+    const saveData = makeSaveData(2, gs);
+    const result = saveMigrationRun(saveData);
+
+    expect(result.success).toBe(true);
+    const migratedRoom = result.saveData.gameState.world.floors[0].rooms[0] as unknown as Record<string, unknown>;
+    expect(migratedRoom['trapJobs']).toEqual([
+      { trapTypeId: 'pit-trap', progress: 2, targetTicks: 5 },
+    ]);
+    const migratedWorld = result.saveData.gameState.world as unknown as Record<string, unknown>;
+    expect(migratedWorld['trapCraftingQueues']).toBeUndefined();
+  });
+
+  it('should migrate summonJob to summonJobs with count-up progress', () => {
+    const gs = makeGameState();
+    gs.world.floors = [
+      {
+        id: 'f1',
+        name: 'F1',
+        depth: 1,
+        biome: 'neutral',
+        grid: { tiles: [], width: 0, height: 0 },
+        rooms: [
+          {
+            id: 'circle-1',
+            roomTypeId: 'summoning-circle',
+            shapeId: 's',
+            anchorX: 0,
+            anchorY: 0,
+            summonJob: {
+              recipeId: 'recipe-fire',
+              ticksRemaining: 7,
+              targetTicks: 20,
+            },
+          },
+        ],
+        hallways: [],
+        inhabitants: [],
+        connections: [],
+        traps: [],
+      } as unknown as Floor,
+    ];
+
+    const saveData = makeSaveData(2, gs);
+    const result = saveMigrationRun(saveData);
+
+    expect(result.success).toBe(true);
+    const migratedRoom = result.saveData.gameState.world.floors[0].rooms[0] as unknown as Record<string, unknown>;
+    expect(migratedRoom['summonJob']).toBeUndefined();
+    expect(migratedRoom['summonJobs']).toEqual([
+      { recipeId: 'recipe-fire', progress: 13, targetTicks: 20 },
+    ]);
+  });
+
+  it('should handle rooms with no queues gracefully', () => {
+    const gs = makeGameState();
+    gs.world.floors = [
+      {
+        id: 'f1',
+        name: 'F1',
+        depth: 1,
+        biome: 'neutral',
+        grid: { tiles: [], width: 0, height: 0 },
+        rooms: [
+          { id: 'barracks-1', roomTypeId: 'barracks', shapeId: 's', anchorX: 0, anchorY: 0 },
+        ],
+        hallways: [],
+        inhabitants: [],
+        connections: [],
+        traps: [],
+      } as unknown as Floor,
+    ];
+
+    const world = gs.world as unknown as Record<string, unknown>;
+    world['forgeCraftingQueues'] = [];
+    world['trapCraftingQueues'] = [];
+
+    const saveData = makeSaveData(2, gs);
+    const result = saveMigrationRun(saveData);
+
+    expect(result.success).toBe(true);
+    const migratedRoom = result.saveData.gameState.world.floors[0].rooms[0] as unknown as Record<string, unknown>;
+    expect(migratedRoom['forgeJobs']).toBeUndefined();
+    expect(migratedRoom['trapJobs']).toBeUndefined();
+    expect(migratedRoom['summonJobs']).toBeUndefined();
   });
 });

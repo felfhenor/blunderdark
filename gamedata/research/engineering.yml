@@ -126,6 +126,8 @@
       description: +15% trap damage
     - type: roomupgrade
       targetRoomupgradeId: Streamlined Workshop
+    - type: roomupgrade
+      targetRoomupgradeId: Expanded Workshop
   tier: 3
   requiredTicks: 300
 
@@ -145,6 +147,8 @@
       description: +15% gold production from all sources
     - type: roomupgrade
       targetRoomupgradeId: Master Forge
+    - type: roomupgrade
+      targetRoomupgradeId: Forge Expansion
   tier: 3
   requiredTicks: 300
 

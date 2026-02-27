@@ -14,7 +14,7 @@ import type {
   RoomShapeId,
   RoomUpgradeContent,
   RoomUpgradeId,
-  TrapCraftingQueue,
+  TrapCraftingJob,
   TrapInventoryEntry,
 } from '@interfaces';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
@@ -138,6 +138,7 @@ const workshopDef: RoomContent = {
   isUnique: false,
   removable: true,
   autoPlace: false,
+  queueSize: 25,
   roomUpgradeIds: [
     'upgrade-master-trapper' as RoomUpgradeId,
     'upgrade-efficient-assembly' as RoomUpgradeId,
@@ -192,7 +193,6 @@ function makeFloor(
 function makeGameState(overrides: {
   floors?: Floor[];
   trapInventory?: TrapInventoryEntry[];
-  trapCraftingQueues?: TrapCraftingQueue[];
 }): GameState {
   return {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
@@ -229,9 +229,7 @@ function makeGameState(overrides: {
       floors: overrides.floors ?? [makeFloor()],
       currentFloorIndex: 0,
       trapInventory: overrides.trapInventory ?? [],
-      trapCraftingQueues: overrides.trapCraftingQueues ?? [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {
@@ -281,6 +279,7 @@ import {
   trapWorkshopProcess,
   trapWorkshopRemoveJob,
 } from '@helpers/trap-workshop';
+import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 
 // --- Setup ---
 
@@ -391,8 +390,6 @@ describe('Crafting Time', () => {
       appliedUpgradePathId: 'upgrade-efficient-assembly' as RoomUpgradeId,
     });
     const ticks = trapWorkshopGetCraftingTicks(room, 2);
-    // 0.7 upgrade * 0.8 worker: 15 * 0.7 = 10.5 → 11 (rounded from upgrade)
-    // Then 11 * 0.8 = 8.8 → 9 (rounded from worker)
     const afterUpgrade = Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * 0.7);
     expect(ticks).toBe(Math.round(afterUpgrade * 0.8));
   });
@@ -400,120 +397,85 @@ describe('Crafting Time', () => {
 
 describe('Queue Management', () => {
   describe('trapWorkshopGetQueue', () => {
-    it('should find queue for existing room', () => {
-      const queues: TrapCraftingQueue[] = [
-        { roomId: 'room-1' as PlacedRoomId, jobs: [] },
-        { roomId: 'room-2' as PlacedRoomId, jobs: [] },
-      ];
-      expect(
-        trapWorkshopGetQueue(queues, 'room-1' as PlacedRoomId)?.roomId,
-      ).toBe('room-1');
+    it('should return empty array when no jobs', () => {
+      const room = makeRoom();
+      expect(trapWorkshopGetQueue(room)).toEqual([]);
     });
 
-    it('should return undefined for missing room', () => {
-      expect(
-        trapWorkshopGetQueue([], 'nonexistent' as PlacedRoomId),
-      ).toBeUndefined();
+    it('should return jobs array when present', () => {
+      const jobs: TrapCraftingJob[] = [
+        { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 },
+      ];
+      const room = makeRoom({ trapJobs: jobs });
+      expect(trapWorkshopGetQueue(room)).toBe(jobs);
     });
   });
 
   describe('trapWorkshopAddJob', () => {
-    it('should create new queue entry for room without existing queue', () => {
-      const result = trapWorkshopAddJob(
-        [],
-        'room-1' as PlacedRoomId,
-        PIT_TRAP_ID,
-        15,
-      );
-      expect(result).toHaveLength(1);
-      expect(result[0].roomId).toBe('room-1');
-      expect(result[0].jobs).toHaveLength(1);
-      expect(result[0].jobs[0].trapTypeId).toBe(PIT_TRAP_ID);
-      expect(result[0].jobs[0].progress).toBe(0);
-      expect(result[0].jobs[0].targetTicks).toBe(15);
+    it('should add a job to a room with no existing queue', () => {
+      const room = makeRoom();
+      trapWorkshopAddJob(room, PIT_TRAP_ID, 15);
+      expect(room.trapJobs).toHaveLength(1);
+      expect(room.trapJobs![0].trapTypeId).toBe(PIT_TRAP_ID);
+      expect(room.trapJobs![0].progress).toBe(0);
+      expect(room.trapJobs![0].targetTicks).toBe(15);
     });
 
     it('should append job to existing queue', () => {
-      const queues: TrapCraftingQueue[] = [
-        {
-          roomId: 'room-1' as PlacedRoomId,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 5, targetTicks: 15 }],
-        },
-      ];
-      const result = trapWorkshopAddJob(
-        queues,
-        'room-1' as PlacedRoomId,
-        ARROW_TRAP_ID,
-        20,
-      );
-      expect(result[0].jobs).toHaveLength(2);
-      expect(result[0].jobs[1].trapTypeId).toBe(ARROW_TRAP_ID);
-    });
-
-    it('should not modify other room queues', () => {
-      const queues: TrapCraftingQueue[] = [
-        {
-          roomId: 'room-other' as PlacedRoomId,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
-        },
-      ];
-      const result = trapWorkshopAddJob(
-        queues,
-        'room-1' as PlacedRoomId,
-        ARROW_TRAP_ID,
-        20,
-      );
-      expect(result).toHaveLength(2);
-      expect(result[0].roomId).toBe('room-other');
-      expect(result[0].jobs).toHaveLength(1);
+      const room = makeRoom({
+        trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 5, targetTicks: 15 }],
+      });
+      trapWorkshopAddJob(room, ARROW_TRAP_ID, 20);
+      expect(room.trapJobs).toHaveLength(2);
+      expect(room.trapJobs![1].trapTypeId).toBe(ARROW_TRAP_ID);
     });
   });
 
   describe('trapWorkshopRemoveJob', () => {
     it('should remove job at specified index', () => {
-      const queues: TrapCraftingQueue[] = [
-        {
-          roomId: 'room-1' as PlacedRoomId,
-          jobs: [
-            { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 },
-            { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 20 },
-          ],
-        },
-      ];
-      const result = trapWorkshopRemoveJob(queues, 'room-1' as PlacedRoomId, 0);
-      expect(result[0].jobs).toHaveLength(1);
-      expect(result[0].jobs[0].trapTypeId).toBe(ARROW_TRAP_ID);
+      const room = makeRoom({
+        trapJobs: [
+          { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 },
+          { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 20 },
+        ],
+      });
+      trapWorkshopRemoveJob(room, 0);
+      expect(room.trapJobs).toHaveLength(1);
+      expect(room.trapJobs![0].trapTypeId).toBe(ARROW_TRAP_ID);
     });
 
-    it('should remove queue entry when last job removed', () => {
-      const queues: TrapCraftingQueue[] = [
-        {
-          roomId: 'room-1' as PlacedRoomId,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
-        },
-      ];
-      const result = trapWorkshopRemoveJob(queues, 'room-1' as PlacedRoomId, 0);
-      expect(result).toHaveLength(0);
+    it('should clear trapJobs when last job removed', () => {
+      const room = makeRoom({
+        trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 15 }],
+      });
+      trapWorkshopRemoveJob(room, 0);
+      expect(room.trapJobs).toBeUndefined();
     });
   });
 });
 
+describe('craftingQueueGetMaxSize', () => {
+  it('should return base queueSize from room definition', () => {
+    const room = makeRoom();
+    expect(craftingQueueGetMaxSize(room)).toBe(25);
+  });
+});
+
 describe('trapWorkshopCanQueue', () => {
-  it('should allow queuing with assigned worker', () => {
+  it('should allow queuing with assigned worker and space', () => {
     const workshop = makeRoom();
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
     const floor = makeFloor([workshop], [worker]);
 
-    const result = trapWorkshopCanQueue(workshop.id, [floor]);
+    const result = trapWorkshopCanQueue(workshop, floor);
     expect(result.canQueue).toBe(true);
-    expect(result.room).toBeDefined();
   });
 
   it('should reject when no workers assigned', () => {
     const workshop = makeRoom();
     const floor = makeFloor([workshop], []);
 
-    const result = trapWorkshopCanQueue(workshop.id, [floor]);
+    const result = trapWorkshopCanQueue(workshop, floor);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('inhabitant');
   });
@@ -523,108 +485,97 @@ describe('trapWorkshopCanQueue', () => {
     const worker = makeInhabitant({ assignedRoomId: room.id });
     const floor = makeFloor([room], [worker]);
 
-    const result = trapWorkshopCanQueue(room.id, [floor]);
+    const result = trapWorkshopCanQueue(room, floor);
     expect(result.canQueue).toBe(false);
     expect(result.reason).toContain('not a Trap Workshop');
   });
 
-  it('should return not found for missing room', () => {
-    const floor = makeFloor();
-    const result = trapWorkshopCanQueue('nonexistent' as PlacedRoomId, [floor]);
+  it('should reject when queue is full', () => {
+    const maxSize = craftingQueueGetMaxSize(makeRoom());
+    const workshop = makeRoom({
+      trapJobs: Array.from({ length: maxSize }, () => ({
+        trapTypeId: PIT_TRAP_ID,
+        progress: 0,
+        targetTicks: 15,
+      })),
+    });
+    const worker = makeInhabitant({ assignedRoomId: workshop.id });
+    const floor = makeFloor([workshop], [worker]);
+
+    const result = trapWorkshopCanQueue(workshop, floor);
     expect(result.canQueue).toBe(false);
-    expect(result.reason).toContain('not found');
+    expect(result.reason).toContain('full');
   });
 });
 
 describe('trapWorkshopProcess', () => {
   it('should advance progress on first job in queue', () => {
-    const workshop = makeRoom();
+    const workshop = makeRoom({
+      trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
+    });
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
     const floor = makeFloor([workshop], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
-        },
-      ],
-    });
+    const state = makeGameState({ floors: [floor] });
 
     trapWorkshopProcess(state);
 
-    const queue = state.world.trapCraftingQueues[0];
-    expect(queue.jobs[0].progress).toBe(1);
+    expect(workshop.trapJobs![0].progress).toBe(1);
   });
 
   it('should complete job and add to inventory when progress reaches target', () => {
-    const workshop = makeRoom();
+    const workshop = makeRoom({
+      trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 4, targetTicks: 5 }],
+    });
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
     const floor = makeFloor([workshop], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 4, targetTicks: 5 }],
-        },
-      ],
-    });
+    const state = makeGameState({ floors: [floor] });
 
     trapWorkshopProcess(state);
 
-    // Job should be removed, queue cleaned up
-    expect(state.world.trapCraftingQueues).toHaveLength(0);
-    // Trap added to inventory
+    expect(workshop.trapJobs).toBeUndefined();
     expect(state.world.trapInventory).toHaveLength(1);
     expect(state.world.trapInventory[0].trapTypeId).toBe(PIT_TRAP_ID);
     expect(state.world.trapInventory[0].count).toBe(1);
   });
 
   it('should not progress when no workers assigned', () => {
-    const workshop = makeRoom();
-    const floor = makeFloor([workshop], []);
-    const state = makeGameState({
-      floors: [floor],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
-        },
-      ],
+    const workshop = makeRoom({
+      trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
     });
+    const floor = makeFloor([workshop], []);
+    const state = makeGameState({ floors: [floor] });
 
     trapWorkshopProcess(state);
 
-    expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(0);
+    expect(workshop.trapJobs![0].progress).toBe(0);
   });
 
   it('should only progress the first job in queue', () => {
-    const workshop = makeRoom();
-    const worker = makeInhabitant({ assignedRoomId: workshop.id });
-    const floor = makeFloor([workshop], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [
-            { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 },
-            { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 },
-          ],
-        },
+    const workshop = makeRoom({
+      trapJobs: [
+        { trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 },
+        { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 },
       ],
     });
+    const worker = makeInhabitant({ assignedRoomId: workshop.id });
+    const floor = makeFloor([workshop], [worker]);
+    const state = makeGameState({ floors: [floor] });
 
     trapWorkshopProcess(state);
 
-    expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(1);
-    expect(state.world.trapCraftingQueues[0].jobs[1].progress).toBe(0);
+    expect(workshop.trapJobs![0].progress).toBe(1);
+    expect(workshop.trapJobs![1].progress).toBe(0);
   });
 
   it('should process multiple workshops across floors', () => {
-    const ws1 = makeRoom({ id: 'ws-1' as PlacedRoomId });
-    const ws2 = makeRoom({ id: 'ws-2' as PlacedRoomId });
+    const ws1 = makeRoom({
+      id: 'ws-1' as PlacedRoomId,
+      trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
+    });
+    const ws2 = makeRoom({
+      id: 'ws-2' as PlacedRoomId,
+      trapJobs: [{ trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 }],
+    });
     const w1 = makeInhabitant({
       instanceId: 'w1' as InhabitantInstanceId,
       assignedRoomId: 'ws-1' as PlacedRoomId,
@@ -637,39 +588,23 @@ describe('trapWorkshopProcess', () => {
     const floor2 = makeFloor([ws2], [w2]);
     floor2.id = 'floor-2' as FloorId;
 
-    const state = makeGameState({
-      floors: [floor1, floor2],
-      trapCraftingQueues: [
-        {
-          roomId: 'ws-1' as PlacedRoomId,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 0, targetTicks: 5 }],
-        },
-        {
-          roomId: 'ws-2' as PlacedRoomId,
-          jobs: [{ trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 }],
-        },
-      ],
-    });
+    const state = makeGameState({ floors: [floor1, floor2] });
 
     trapWorkshopProcess(state);
 
-    expect(state.world.trapCraftingQueues[0].jobs[0].progress).toBe(1);
-    expect(state.world.trapCraftingQueues[1].jobs[0].progress).toBe(1);
+    expect(ws1.trapJobs![0].progress).toBe(1);
+    expect(ws2.trapJobs![0].progress).toBe(1);
   });
 
   it('should accumulate inventory across completions', () => {
-    const workshop = makeRoom();
+    const workshop = makeRoom({
+      trapJobs: [{ trapTypeId: PIT_TRAP_ID, progress: 14, targetTicks: 15 }],
+    });
     const worker = makeInhabitant({ assignedRoomId: workshop.id });
     const floor = makeFloor([workshop], [worker]);
     const state = makeGameState({
       floors: [floor],
       trapInventory: [{ trapTypeId: PIT_TRAP_ID, count: 2 }],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [{ trapTypeId: PIT_TRAP_ID, progress: 14, targetTicks: 15 }],
-        },
-      ],
     });
 
     trapWorkshopProcess(state);
@@ -678,30 +613,20 @@ describe('trapWorkshopProcess', () => {
   });
 
   it('should advance to next job after completing first', () => {
-    const workshop = makeRoom();
-    const worker = makeInhabitant({ assignedRoomId: workshop.id });
-    const floor = makeFloor([workshop], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      trapCraftingQueues: [
-        {
-          roomId: workshop.id,
-          jobs: [
-            { trapTypeId: PIT_TRAP_ID, progress: 4, targetTicks: 5 },
-            { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 },
-          ],
-        },
+    const workshop = makeRoom({
+      trapJobs: [
+        { trapTypeId: PIT_TRAP_ID, progress: 4, targetTicks: 5 },
+        { trapTypeId: ARROW_TRAP_ID, progress: 0, targetTicks: 10 },
       ],
     });
+    const worker = makeInhabitant({ assignedRoomId: workshop.id });
+    const floor = makeFloor([workshop], [worker]);
+    const state = makeGameState({ floors: [floor] });
 
     trapWorkshopProcess(state);
 
-    // First job completed and removed
-    expect(state.world.trapCraftingQueues[0].jobs).toHaveLength(1);
-    expect(state.world.trapCraftingQueues[0].jobs[0].trapTypeId).toBe(
-      ARROW_TRAP_ID,
-    );
-    // Inventory updated
+    expect(workshop.trapJobs).toHaveLength(1);
+    expect(workshop.trapJobs![0].trapTypeId).toBe(ARROW_TRAP_ID);
     expect(state.world.trapInventory[0].trapTypeId).toBe(PIT_TRAP_ID);
   });
 });

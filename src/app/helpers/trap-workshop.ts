@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -11,7 +12,6 @@ import type {
   PlacedRoom,
   PlacedRoomId,
   TrapCraftingJob,
-  TrapCraftingQueue,
 } from '@interfaces';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type { ResourceCost } from '@interfaces/resource';
@@ -84,77 +84,68 @@ export function trapWorkshopGetCraftingTicks(
 
 // --- Queue management ---
 
-export function trapWorkshopGetQueue(
-  queues: TrapCraftingQueue[],
-  roomId: PlacedRoomId,
-): TrapCraftingQueue | undefined {
-  return queues.find((q) => q.roomId === roomId);
+export function trapWorkshopGetQueue(room: PlacedRoom): TrapCraftingJob[] {
+  return room.trapJobs ?? [];
 }
 
 export function trapWorkshopAddJob(
-  queues: TrapCraftingQueue[],
-  roomId: PlacedRoomId,
+  room: PlacedRoom,
   trapTypeId: TrapId,
   targetTicks: number,
-): TrapCraftingQueue[] {
-  const job: TrapCraftingJob = {
-    trapTypeId,
-    progress: 0,
-    targetTicks,
-  };
-
-  const existing = queues.find((q) => q.roomId === roomId);
-  if (existing) {
-    return queues.map((q) =>
-      q.roomId === roomId ? { ...q, jobs: [...q.jobs, job] } : q,
-    );
-  }
-
-  return [...queues, { roomId, jobs: [job] }];
+): void {
+  if (!room.trapJobs) room.trapJobs = [];
+  room.trapJobs.push({ trapTypeId, progress: 0, targetTicks });
 }
 
 export function trapWorkshopRemoveJob(
-  queues: TrapCraftingQueue[],
-  roomId: PlacedRoomId,
+  room: PlacedRoom,
   jobIndex: number,
-): TrapCraftingQueue[] {
-  return queues
-    .map((q) => {
-      if (q.roomId !== roomId) return q;
-      const jobs = q.jobs.filter((_, i) => i !== jobIndex);
-      return { ...q, jobs };
-    })
-    .filter((q) => q.jobs.length > 0);
+): void {
+  if (!room.trapJobs) return;
+  room.trapJobs.splice(jobIndex, 1);
+  if (room.trapJobs.length === 0) room.trapJobs = undefined;
+}
+
+export function trapWorkshopRemoveJobGroup(
+  room: PlacedRoom,
+  startIndex: number,
+  count: number,
+): void {
+  if (!room.trapJobs) return;
+  room.trapJobs.splice(startIndex, count);
+  if (room.trapJobs.length === 0) room.trapJobs = undefined;
 }
 
 // --- Validation ---
 
 export function trapWorkshopCanQueue(
-  roomId: PlacedRoomId,
-  floors: Floor[],
-): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
-  for (const floor of floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
-    if (!room) continue;
-
-    if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) {
-      return { canQueue: false, reason: 'Room is not a Trap Workshop' };
-    }
-
-    const assignedCount = floor.inhabitants.filter(
-      (i) => i.assignedRoomId === roomId,
-    ).length;
-    if (assignedCount < 1) {
-      return {
-        canQueue: false,
-        reason: 'At least 1 inhabitant must be assigned to craft traps',
-      };
-    }
-
-    return { canQueue: true, room };
+  room: PlacedRoom,
+  floor: Floor,
+): { canQueue: boolean; reason?: string } {
+  if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) {
+    return { canQueue: false, reason: 'Room is not a Trap Workshop' };
   }
 
-  return { canQueue: false, reason: 'Room not found' };
+  const assignedCount = floor.inhabitants.filter(
+    (i) => i.assignedRoomId === room.id,
+  ).length;
+  if (assignedCount < 1) {
+    return {
+      canQueue: false,
+      reason: 'At least 1 inhabitant must be assigned to craft traps',
+    };
+  }
+
+  const maxSize = craftingQueueGetMaxSize(room);
+  const currentSize = (room.trapJobs ?? []).length;
+  if (currentSize >= maxSize) {
+    return {
+      canQueue: false,
+      reason: `Queue is full (max ${maxSize})`,
+    };
+  }
+
+  return { canQueue: true };
 }
 
 // --- Tick processing ---
@@ -163,14 +154,7 @@ export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
       if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
-
-      const queueIndex = state.world.trapCraftingQueues.findIndex(
-        (q) => q.roomId === room.id,
-      );
-      if (queueIndex === -1) continue;
-
-      const queue = state.world.trapCraftingQueues[queueIndex];
-      if (queue.jobs.length === 0) continue;
+      if (!room.trapJobs || room.trapJobs.length === 0) continue;
 
       // Only the first job in the queue progresses
       const assignedCount = floor.inhabitants.filter(
@@ -178,7 +162,7 @@ export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
       ).length;
       if (assignedCount < 1) continue;
 
-      const job = queue.jobs[0];
+      const job = room.trapJobs[0];
       job.progress += numTicks;
 
       if (job.progress >= job.targetTicks) {
@@ -189,11 +173,11 @@ export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
         );
 
         const trapDef = contentGetEntry<TrapContent>(job.trapTypeId);
-        queue.jobs.shift();
+        room.trapJobs.shift();
 
-        // Clean up empty queues
-        if (queue.jobs.length === 0) {
-          state.world.trapCraftingQueues.splice(queueIndex, 1);
+        // Clean up empty arrays
+        if (room.trapJobs.length === 0) {
+          room.trapJobs = undefined;
         }
 
         if (trapDef) {
@@ -220,18 +204,13 @@ export function trapWorkshopGetInfo(
 
     const craftingTicks = trapWorkshopGetCraftingTicks(room, assignedWorkerCount);
 
-    const queueEntry = trapWorkshopGetQueue(
-      state.world.trapCraftingQueues,
-      roomId,
-    );
-
     const allTraps = contentGetEntriesByType<TrapContent>('trap');
 
     return {
       placedRoom: room,
       assignedWorkerCount,
       craftingTicks,
-      queue: queueEntry?.jobs ?? [],
+      queue: room.trapJobs ?? [],
       availableTraps: allTraps,
     };
   }

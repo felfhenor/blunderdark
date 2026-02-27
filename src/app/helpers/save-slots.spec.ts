@@ -116,9 +116,7 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
         ] as unknown as Floor[],
         currentFloorIndex: 0,
         trapInventory: [],
-        trapCraftingQueues: [],
         forgeInventory: [],
-        forgeCraftingQueues: [],
         alchemyConversions: [],
         prisoners: [],
         invasionSchedule: {

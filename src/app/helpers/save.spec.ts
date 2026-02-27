@@ -86,9 +86,7 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
       floors: [],
       currentFloorIndex: 0,
       trapInventory: [],
-      trapCraftingQueues: [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {

@@ -14,6 +14,7 @@ import type {
   RoomShapeId,
   RoomUpgradeContent,
   RoomUpgradeId,
+  SummonJob,
   SummonRecipeContent,
   SummonRecipeId,
 } from '@interfaces';
@@ -223,6 +224,7 @@ const summoningCircleDef: RoomContent = {
   removable: true,
   autoPlace: false,
   role: 'summoningCircle',
+  queueSize: 3,
   roomUpgradeIds: [
     greaterSummoningPath.id,
     dualCirclePath.id,
@@ -350,9 +352,7 @@ function makeGameState(overrides: { floors?: Floor[] }): GameState {
       floors: overrides.floors ?? [makeFloor()],
       currentFloorIndex: 0,
       trapInventory: [],
-      trapCraftingQueues: [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {
@@ -399,8 +399,12 @@ import {
   summoningGetAvailableRecipes,
   summoningGetEffectiveTicks,
   summoningGetStatBonuses,
+  summoningGetQueue,
+  summoningAddJob,
+  summoningRemoveJob,
   summoningCircleProcess,
 } from '@helpers/summoning-circle';
+import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 
 // --- Setup ---
 
@@ -534,8 +538,74 @@ describe('Stat Bonus Calculation', () => {
   });
 });
 
+describe('Queue Management', () => {
+  describe('summoningGetQueue', () => {
+    it('should return empty array when no jobs', () => {
+      const room = makeRoom();
+      expect(summoningGetQueue(room)).toEqual([]);
+    });
+
+    it('should return jobs array when present', () => {
+      const jobs: SummonJob[] = [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+      ];
+      const room = makeRoom({ summonJobs: jobs });
+      expect(summoningGetQueue(room)).toBe(jobs);
+    });
+  });
+
+  describe('summoningAddJob', () => {
+    it('should add a job to a room with no existing queue', () => {
+      const room = makeRoom();
+      summoningAddJob(room, RECIPE_FIRE_ID as SummonRecipeId, 20);
+      expect(room.summonJobs).toHaveLength(1);
+      expect(room.summonJobs![0].recipeId).toBe(RECIPE_FIRE_ID);
+      expect(room.summonJobs![0].progress).toBe(0);
+      expect(room.summonJobs![0].targetTicks).toBe(20);
+    });
+
+    it('should append job to existing queue', () => {
+      const room = makeRoom({
+        summonJobs: [{ recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 5, targetTicks: 20 }],
+      });
+      summoningAddJob(room, RECIPE_SPECTRAL_ID as SummonRecipeId, 10);
+      expect(room.summonJobs).toHaveLength(2);
+      expect(room.summonJobs![1].recipeId).toBe(RECIPE_SPECTRAL_ID);
+    });
+  });
+
+  describe('summoningRemoveJob', () => {
+    it('should remove job at specified index', () => {
+      const room = makeRoom({
+        summonJobs: [
+          { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+          { recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId, progress: 0, targetTicks: 10 },
+        ],
+      });
+      summoningRemoveJob(room, 0);
+      expect(room.summonJobs).toHaveLength(1);
+      expect(room.summonJobs![0].recipeId).toBe(RECIPE_SPECTRAL_ID);
+    });
+
+    it('should clear summonJobs when last job removed', () => {
+      const room = makeRoom({
+        summonJobs: [{ recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 }],
+      });
+      summoningRemoveJob(room, 0);
+      expect(room.summonJobs).toBeUndefined();
+    });
+  });
+});
+
+describe('craftingQueueGetMaxSize', () => {
+  it('should return base queueSize from room definition', () => {
+    const room = makeRoom();
+    expect(craftingQueueGetMaxSize(room)).toBe(3);
+  });
+});
+
 describe('Summoning Can Start', () => {
-  it('should return true when inhabitant is assigned and no active job', () => {
+  it('should return true when inhabitant is assigned and queue has space', () => {
     const room = makeRoom();
     const inhabitants = [makeInhabitant()];
     expect(summoningCanStart(room, inhabitants)).toBe(true);
@@ -549,15 +619,26 @@ describe('Summoning Can Start', () => {
     expect(summoningCanStart(room, inhabitants)).toBe(false);
   });
 
-  it('should return false when there is an active summon job', () => {
-    const room = makeRoom();
-    room.summonJob = {
-      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
-      ticksRemaining: 10,
-      targetTicks: 20,
-    };
+  it('should return false when queue is full', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+      ],
+    });
     const inhabitants = [makeInhabitant()];
     expect(summoningCanStart(room, inhabitants)).toBe(false);
+  });
+
+  it('should allow queuing when queue has partial jobs', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 5, targetTicks: 20 },
+      ],
+    });
+    const inhabitants = [makeInhabitant()];
+    expect(summoningCanStart(room, inhabitants)).toBe(true);
   });
 });
 
@@ -585,13 +666,12 @@ describe('Inhabitant Creation', () => {
 });
 
 describe('summoningCircleProcess', () => {
-  it('should decrement summon job ticks', () => {
-    const room = makeRoom();
-    room.summonJob = {
-      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
-      ticksRemaining: 10,
-      targetTicks: 20,
-    };
+  it('should advance progress on first job in queue', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 5, targetTicks: 20 },
+      ],
+    });
 
     const summoner = makeInhabitant();
     const floor = makeFloor([room], [summoner]);
@@ -600,16 +680,15 @@ describe('summoningCircleProcess', () => {
 
     summoningCircleProcess(state);
 
-    expect(room.summonJob!.ticksRemaining).toBe(9);
+    expect(room.summonJobs![0].progress).toBe(6);
   });
 
-  it('should complete summon job when ticks reach 0', () => {
-    const room = makeRoom();
-    room.summonJob = {
-      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
+  it('should complete summon job when progress reaches target', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 19, targetTicks: 20 },
+      ],
+    });
 
     const summoner = makeInhabitant();
     const floor = makeFloor([room], [summoner]);
@@ -623,16 +702,15 @@ describe('summoningCircleProcess', () => {
     const summoned = state.world.inhabitants[1];
     expect(summoned.isSummoned).toBe(true);
     expect(summoned.name).toBe('Test Fantasy Name');
-    expect(room.summonJob).toBeUndefined();
+    expect(room.summonJobs).toBeUndefined();
   });
 
   it('should create permanent inhabitant for all recipes', () => {
-    const room = makeRoom();
-    room.summonJob = {
-      recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId,
-      ticksRemaining: 1,
-      targetTicks: 10,
-    };
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId, progress: 9, targetTicks: 10 },
+      ],
+    });
 
     const summoner = makeInhabitant();
     const floor = makeFloor([room], [summoner]);
@@ -646,12 +724,11 @@ describe('summoningCircleProcess', () => {
   });
 
   it('should sync floor inhabitants after summon completion', () => {
-    const room = makeRoom();
-    room.summonJob = {
-      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 19, targetTicks: 20 },
+      ],
+    });
 
     const summoner = makeInhabitant();
     const floor = makeFloor([room], [summoner]);
@@ -664,12 +741,12 @@ describe('summoningCircleProcess', () => {
   });
 
   it('should not process rooms that are not summoning circles', () => {
-    const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
-    room.summonJob = {
-      recipeId: RECIPE_FIRE_ID as SummonRecipeId,
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
+    const room = makeRoom({
+      roomTypeId: 'other-room-type' as RoomId,
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 19, targetTicks: 20 },
+      ],
+    });
 
     const floor = makeFloor([room]);
     const state = makeGameState({ floors: [floor] });
@@ -677,7 +754,46 @@ describe('summoningCircleProcess', () => {
 
     summoningCircleProcess(state);
 
-    expect(room.summonJob!.ticksRemaining).toBe(1);
+    expect(room.summonJobs![0].progress).toBe(19);
+  });
+
+  it('should only progress first job in queue', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 0, targetTicks: 20 },
+        { recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId, progress: 0, targetTicks: 10 },
+      ],
+    });
+
+    const summoner = makeInhabitant();
+    const floor = makeFloor([room], [summoner]);
+    const state = makeGameState({ floors: [floor] });
+    state.world.inhabitants = [summoner];
+
+    summoningCircleProcess(state);
+
+    expect(room.summonJobs![0].progress).toBe(1);
+    expect(room.summonJobs![1].progress).toBe(0);
+  });
+
+  it('should advance to next job after completing first', () => {
+    const room = makeRoom({
+      summonJobs: [
+        { recipeId: RECIPE_FIRE_ID as SummonRecipeId, progress: 19, targetTicks: 20 },
+        { recipeId: RECIPE_SPECTRAL_ID as SummonRecipeId, progress: 0, targetTicks: 10 },
+      ],
+    });
+
+    const summoner = makeInhabitant();
+    const floor = makeFloor([room], [summoner]);
+    const state = makeGameState({ floors: [floor] });
+    state.world.inhabitants = [summoner];
+
+    summoningCircleProcess(state);
+
+    expect(room.summonJobs).toHaveLength(1);
+    expect(room.summonJobs![0].recipeId).toBe(RECIPE_SPECTRAL_ID);
+    expect(state.world.inhabitants).toHaveLength(2);
   });
 });
 

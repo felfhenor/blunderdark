@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
@@ -18,7 +19,9 @@ import type {
   InhabitantInstanceId,
   InhabitantStats,
   PlacedRoom,
+  SummonJob,
   SummonRecipeContent,
+  SummonRecipeId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
@@ -136,14 +139,50 @@ export function summoningGetStatBonuses(
   return bonuses;
 }
 
+// --- Queue management ---
+
+export function summoningGetQueue(room: PlacedRoom): SummonJob[] {
+  return room.summonJobs ?? [];
+}
+
+export function summoningAddJob(
+  room: PlacedRoom,
+  recipeId: SummonRecipeId,
+  targetTicks: number,
+): void {
+  if (!room.summonJobs) room.summonJobs = [];
+  room.summonJobs.push({ recipeId, progress: 0, targetTicks });
+}
+
+export function summoningRemoveJob(
+  room: PlacedRoom,
+  jobIndex: number,
+): void {
+  if (!room.summonJobs) return;
+  room.summonJobs.splice(jobIndex, 1);
+  if (room.summonJobs.length === 0) room.summonJobs = undefined;
+}
+
+export function summoningRemoveJobGroup(
+  room: PlacedRoom,
+  startIndex: number,
+  count: number,
+): void {
+  if (!room.summonJobs) return;
+  room.summonJobs.splice(startIndex, count);
+  if (room.summonJobs.length === 0) room.summonJobs = undefined;
+}
+
 /**
- * Check if summoning can start: needs at least 1 assigned inhabitant and no active job.
+ * Check if summoning can start: needs at least 1 assigned inhabitant and queue not full.
  */
 export function summoningCanStart(
   room: PlacedRoom,
   inhabitants: InhabitantInstance[],
 ): boolean {
-  if (room.summonJob) return false;
+  const maxSize = craftingQueueGetMaxSize(room);
+  const currentSize = (room.summonJobs ?? []).length;
+  if (currentSize >= maxSize) return false;
   const assigned = inhabitants.filter((i) => i.assignedRoomId === room.id);
   return assigned.length >= 1;
 }
@@ -224,14 +263,13 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
     for (const room of floor.rooms) {
       if (room.roomTypeId !== summoningCircleTypeId) continue;
 
-      // Process active summon job
-      if (room.summonJob) {
-        room.summonJob.ticksRemaining -= numTicks;
+      // Process active summon queue (first job only)
+      if (room.summonJobs && room.summonJobs.length > 0) {
+        const job = room.summonJobs[0];
+        job.progress += numTicks;
 
-        if (room.summonJob.ticksRemaining <= 0) {
-          const recipe = contentGetEntry<SummonRecipeContent>(
-            room.summonJob.recipeId,
-          );
+        if (job.progress >= job.targetTicks) {
+          const recipe = contentGetEntry<SummonRecipeContent>(job.recipeId);
 
           if (recipe) {
             const def = contentGetEntry<InhabitantContent>(
@@ -276,7 +314,10 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
             }
           }
 
-          room.summonJob = undefined;
+          room.summonJobs.shift();
+          if (room.summonJobs.length === 0) {
+            room.summonJobs = undefined;
+          }
         }
       }
     }

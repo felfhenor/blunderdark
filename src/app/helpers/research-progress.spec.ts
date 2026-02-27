@@ -222,9 +222,7 @@ function makeGameState(overrides: Partial<GameStateWorld> = {}): GameState {
       floors: [makeFloor()],
       currentFloorIndex: 0,
       trapInventory: [],
-      trapCraftingQueues: [],
       forgeInventory: [],
-      forgeCraftingQueues: [],
       alchemyConversions: [],
       prisoners: [],
       invasionSchedule: {

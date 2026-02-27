@@ -8,17 +8,15 @@
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
 
-      <!-- Active Summoning Job -->
-      @if (summoningProgress(); as sp) {
-        <div class="mt-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs">Summoning: {{ sp.recipeName }}</span>
-            <span class="badge badge-xs badge-primary">In Progress</span>
-          </div>
-          <div class="mt-1">
-            <app-job-progress [percent]="sp.percent" />
-          </div>
-        </div>
+      <!-- Summoning Queue -->
+      @if (queueState(); as qs) {
+        <app-crafting-queue-display
+          [jobs]="qs.jobs"
+          [maxSize]="qs.maxSize"
+          activeLabel="Summoning"
+          progressColor="progress-primary"
+          (cancelGroup)="cancelGroup($event)"
+        />
       }
 
       <!-- Assigned Inhabitants -->
@@ -54,7 +52,7 @@
               </span>
               <span class="text-xs opacity-50">
                 Cost:
-                <app-currency-cost-list [cost]="entry.recipe.cost" />
+                <app-currency-cost-list [cost]="entry.totalCost" />
               </span>
               <span class="text-xs opacity-50">
                 Time: {{ entry.timeSeconds | number: '1.0-0' }} sec
@@ -66,23 +64,36 @@
                   </span>
                 }
               }
-              <button
-                class="btn btn-xs btn-primary mt-1"
-                [disabled]="!entry.canAfford"
-                (click)="
-                  startSummoning(
-                    entry.recipe.id,
-                    entry.ticks,
-                    entry.recipe.cost
-                  )
-                "
-              >
-                @if (entry.canAfford) {
-                  Start Summoning
-                } @else {
-                  Not enough resources
-                }
-              </button>
+              <div class="flex items-center gap-2 mt-1">
+                <input
+                  type="number"
+                  class="input input-xs w-16"
+                  [value]="entry.quantity"
+                  [max]="entry.maxQueueable"
+                  min="1"
+                  (input)="setQuantity(entry.recipe.id, $event)"
+                />
+                <button
+                  class="btn btn-xs btn-primary flex-1"
+                  [disabled]="entry.queueFull || !entry.canAfford"
+                  (click)="
+                    startSummoningBulk(
+                      entry.recipe.id,
+                      entry.ticks,
+                      entry.recipe.cost,
+                      entry.quantity
+                    )
+                  "
+                >
+                  @if (entry.queueFull) {
+                    Queue full
+                  } @else if (entry.canAfford) {
+                    Summon x{{ entry.quantity | number: '1.0-0' }}
+                  } @else {
+                    Not enough resources
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>

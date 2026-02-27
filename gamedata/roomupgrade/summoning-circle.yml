@@ -10,13 +10,15 @@
       value: 1
 - id: ab3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
   name: Dual Circle
-  description: Inscribe a second summoning circle, allowing an additional summoner to work in parallel.
+  description: Inscribe a second summoning circle, doubling the summoning queue capacity and allowing an additional summoner.
   cost:
     gold: 150
     crystals: 80
   effects:
     - type: maxInhabitantBonus
       value: 1
+    - type: craftingQueueMultiplier
+      value: 2
 - id: bc4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
   name: Binding Circle
   description: Master the art of planar binding. Summoned creatures gain +1 to all stats.

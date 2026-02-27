@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
@@ -9,14 +10,12 @@ import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   Floor,
   ForgeCraftingJob,
-  ForgeCraftingQueue,
   ForgeInventoryEntry,
   ForgeRecipeContent,
   ForgeRecipeId,
   GameState,
   InhabitantStats,
   PlacedRoom,
-  PlacedRoomId,
 } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import type { DarkForgeCompletedEvent } from '@interfaces/forge';
@@ -26,8 +25,6 @@ import { Subject } from 'rxjs';
 
 /** Base crafting time: 4 game-minutes = 20 ticks */
 export const DARK_FORGE_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4;
-
-export const DARK_FORGE_MAX_QUEUE_SIZE = 5;
 
 const darkForgeCompletedSubject = new Subject<DarkForgeCompletedEvent>();
 export const darkForgeCompleted$ = darkForgeCompletedSubject.asObservable();
@@ -137,47 +134,36 @@ export function darkForgeGetStatBonuses(
 
 // --- Queue management ---
 
-export function darkForgeGetQueue(
-  queues: ForgeCraftingQueue[],
-  roomId: PlacedRoomId,
-): ForgeCraftingQueue | undefined {
-  return queues.find((q) => q.roomId === roomId);
+export function darkForgeGetQueue(room: PlacedRoom): ForgeCraftingJob[] {
+  return room.forgeJobs ?? [];
 }
 
 export function darkForgeAddJob(
-  queues: ForgeCraftingQueue[],
-  roomId: PlacedRoomId,
+  room: PlacedRoom,
   recipeId: ForgeRecipeId,
   targetTicks: number,
-): ForgeCraftingQueue[] {
-  const job: ForgeCraftingJob = {
-    recipeId,
-    progress: 0,
-    targetTicks,
-  };
-
-  const existing = queues.find((q) => q.roomId === roomId);
-  if (existing) {
-    return queues.map((q) =>
-      q.roomId === roomId ? { ...q, jobs: [...q.jobs, job] } : q,
-    );
-  }
-
-  return [...queues, { roomId, jobs: [job] }];
+): void {
+  if (!room.forgeJobs) room.forgeJobs = [];
+  room.forgeJobs.push({ recipeId, progress: 0, targetTicks });
 }
 
 export function darkForgeRemoveJob(
-  queues: ForgeCraftingQueue[],
-  roomId: PlacedRoomId,
+  room: PlacedRoom,
   jobIndex: number,
-): ForgeCraftingQueue[] {
-  return queues
-    .map((q) => {
-      if (q.roomId !== roomId) return q;
-      const jobs = q.jobs.filter((_, i) => i !== jobIndex);
-      return { ...q, jobs };
-    })
-    .filter((q) => q.jobs.length > 0);
+): void {
+  if (!room.forgeJobs) return;
+  room.forgeJobs.splice(jobIndex, 1);
+  if (room.forgeJobs.length === 0) room.forgeJobs = undefined;
+}
+
+export function darkForgeRemoveJobGroup(
+  room: PlacedRoom,
+  startIndex: number,
+  count: number,
+): void {
+  if (!room.forgeJobs) return;
+  room.forgeJobs.splice(startIndex, count);
+  if (room.forgeJobs.length === 0) room.forgeJobs = undefined;
 }
 
 // --- Inventory management ---
@@ -200,40 +186,33 @@ export function darkForgeAddToInventory(
 // --- Validation ---
 
 export function darkForgeCanQueue(
-  roomId: PlacedRoomId,
-  floors: Floor[],
-  queues: ForgeCraftingQueue[],
-): { canQueue: boolean; reason?: string; room?: PlacedRoom } {
-  for (const floor of floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
-    if (!room) continue;
-
-    if (room.roomTypeId !== roomRoleFindById('darkForge')) {
-      return { canQueue: false, reason: 'Room is not a Dark Forge' };
-    }
-
-    const assignedCount = floor.inhabitants.filter(
-      (i) => i.assignedRoomId === roomId,
-    ).length;
-    if (assignedCount < 1) {
-      return {
-        canQueue: false,
-        reason: 'At least 1 inhabitant must be assigned to forge items',
-      };
-    }
-
-    const queue = queues.find((q) => q.roomId === roomId);
-    if (queue && queue.jobs.length >= DARK_FORGE_MAX_QUEUE_SIZE) {
-      return {
-        canQueue: false,
-        reason: `Queue is full (max ${DARK_FORGE_MAX_QUEUE_SIZE})`,
-      };
-    }
-
-    return { canQueue: true, room };
+  room: PlacedRoom,
+  floor: Floor,
+): { canQueue: boolean; reason?: string } {
+  if (room.roomTypeId !== roomRoleFindById('darkForge')) {
+    return { canQueue: false, reason: 'Room is not a Dark Forge' };
   }
 
-  return { canQueue: false, reason: 'Room not found' };
+  const assignedCount = floor.inhabitants.filter(
+    (i) => i.assignedRoomId === room.id,
+  ).length;
+  if (assignedCount < 1) {
+    return {
+      canQueue: false,
+      reason: 'At least 1 inhabitant must be assigned to forge items',
+    };
+  }
+
+  const maxSize = craftingQueueGetMaxSize(room);
+  const currentSize = (room.forgeJobs ?? []).length;
+  if (currentSize >= maxSize) {
+    return {
+      canQueue: false,
+      reason: `Queue is full (max ${maxSize})`,
+    };
+  }
+
+  return { canQueue: true };
 }
 
 // --- Adjacency ---
@@ -278,14 +257,7 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
   for (const floor of state.world.floors) {
     for (const room of floor.rooms) {
       if (room.roomTypeId !== darkForgeTypeId) continue;
-
-      const queueIndex = state.world.forgeCraftingQueues.findIndex(
-        (q) => q.roomId === room.id,
-      );
-      if (queueIndex === -1) continue;
-
-      const queue = state.world.forgeCraftingQueues[queueIndex];
-      if (queue.jobs.length === 0) continue;
+      if (!room.forgeJobs || room.forgeJobs.length === 0) continue;
 
       // Only the first job in the queue progresses
       const assignedCount = floor.inhabitants.filter(
@@ -293,7 +265,7 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
       ).length;
       if (assignedCount < 1) continue;
 
-      const job = queue.jobs[0];
+      const job = room.forgeJobs[0];
       job.progress += numTicks;
 
       if (job.progress >= job.targetTicks) {
@@ -305,11 +277,11 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
 
         const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
 
-        queue.jobs.shift();
+        room.forgeJobs.shift();
 
-        // Clean up empty queues
-        if (queue.jobs.length === 0) {
-          state.world.forgeCraftingQueues.splice(queueIndex, 1);
+        // Clean up empty arrays
+        if (room.forgeJobs.length === 0) {
+          room.forgeJobs = undefined;
         }
 
         if (recipe) {
