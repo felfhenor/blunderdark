@@ -28,7 +28,7 @@ export function optionsDefault(): GameOptions {
     autosaveEnabled: true,
     autosaveIntervalMinutes: 5,
 
-    showResourceGainBubbles: true,
+    showResourceGainBubbles: false,
     showCraftCompletionBubbles: true,
   };
 }
