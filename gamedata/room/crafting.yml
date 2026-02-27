@@ -52,7 +52,7 @@
       description: Fresh mushroom substrate aids in reagent preparation.
 - id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
   name: Breeding Pits
-  description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign two compatible inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
+  description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
   shapeId: Square 3x3
   cost:
     gold: 120
