@@ -9,7 +9,9 @@ export type GameOption =
   | 'sfxPlay'
   | 'bgmPlay'
   | 'gameloopPaused'
-  | 'autosaveEnabled';
+  | 'autosaveEnabled'
+  | 'showResourceGainBubbles'
+  | 'showCraftCompletionBubbles';
 
 export type NotificationCategory = 'Error' | 'Success' | 'Warning' | 'Invasion' | 'Corruption' | 'Breeding' | 'Summoning' | 'Forging' | 'Alchemy' | 'Torture' | 'Merchant' | 'Legendary' | 'Traps' | 'Farplane';
 

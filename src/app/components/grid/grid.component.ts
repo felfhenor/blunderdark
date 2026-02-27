@@ -23,6 +23,8 @@ import {
   connectivityDisconnectedRoomIds,
   featureGetForSlot,
   featureGetSlotCount,
+  floatingBubbleRemove,
+  floatingBubbles,
   floorCurrent,
   floorCurrentIndex,
   gridDeselectTile,
@@ -878,5 +880,25 @@ export class GridComponent implements AfterViewInit {
     } else {
       gridDeselectTile();
     }
+  }
+
+  // --- Floating production bubbles ---
+
+  public activeBubbles = computed(() => {
+    const idx = floorCurrentIndex();
+    return floatingBubbles().filter((b) => b.floorIndex === idx);
+  });
+
+  public getBubbleLeft(bubble: { anchorX: number; centerOffsetPx: number }): number {
+    return bubble.anchorX * 65 + 32 + bubble.centerOffsetPx;
+  }
+
+  public getBubbleTop(bubble: { anchorY: number; stackOffset: number }): number {
+    // Position above anchor tile top edge, offset upward for label + stacking
+    return bubble.anchorY * 65 - 24 - bubble.stackOffset * 26;
+  }
+
+  public onBubbleAnimationEnd(id: number): void {
+    floatingBubbleRemove(id);
   }
 }

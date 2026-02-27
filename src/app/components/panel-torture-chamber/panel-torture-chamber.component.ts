@@ -9,7 +9,6 @@ import {
   findRoomByRole,
   floorCurrent,
   gamestate,
-  notify,
   tortureConversionComplete$,
   tortureExtractionComplete$,
   tortureGetAdjacentRoomTypeIds,
@@ -50,7 +49,6 @@ export class PanelTortureChamberComponent {
         researchGained: evt.researchGained,
       });
       this.showResult.set(true);
-      notify('Torture', `Extracted ${evt.researchGained} research from ${evt.prisonerName}`);
     }),
     tortureConversionComplete$.subscribe((evt) => {
       this.lastResult.set({
@@ -60,11 +58,6 @@ export class PanelTortureChamberComponent {
         inhabitantName: evt.inhabitantName,
       });
       this.showResult.set(true);
-      if (evt.success) {
-        notify('Torture', `Converted ${evt.prisonerName} into ${evt.inhabitantName}`);
-      } else {
-        notify('Torture', `Failed to convert ${evt.prisonerName}`);
-      }
     }),
   ];
 

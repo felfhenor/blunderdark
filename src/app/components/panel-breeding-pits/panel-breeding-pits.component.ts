@@ -20,7 +20,6 @@ import {
   gamestate,
   gridSelectedTile,
   mutationCompleted$,
-  notify,
   updateGamestate,
   MUTATION_BASE_TICKS,
 } from '@helpers';
@@ -55,16 +54,13 @@ export class PanelBreedingPitsComponent {
   >(undefined);
 
   private subscriptions = [
-    breedingCompleted$.subscribe((evt) => {
-      notify('Breeding', `Hybrid created: ${evt.hybridName}`);
-    }),
+    breedingCompleted$.subscribe(),
     mutationCompleted$.subscribe((evt) => {
       this.lastMutationResult.set({
         name: evt.inhabitantName,
         outcome: evt.outcome,
       });
       this.showMutationResult.set(true);
-      notify('Breeding', `Mutation ${evt.outcome}: ${evt.inhabitantName}`);
     }),
   ];
 

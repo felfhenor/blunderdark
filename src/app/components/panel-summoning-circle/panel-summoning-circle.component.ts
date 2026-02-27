@@ -42,10 +42,7 @@ import { sortBy } from 'es-toolkit/compat';
 })
 export class PanelSummoningCircleComponent {
   private subscriptions = [
-    summoningCompleted$.subscribe((evt) => {
-      const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
-      notify('Summoning', `${label} has joined your dungeon!`);
-    }),
+    summoningCompleted$.subscribe(),
     summoningDismissed$.subscribe((evt) => {
       const label = `${evt.inhabitantName} the ${evt.inhabitantType}`;
       notify('Summoning', `${label} was dismissed — roster is full.`);

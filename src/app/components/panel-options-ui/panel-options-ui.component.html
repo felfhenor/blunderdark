@@ -139,7 +139,29 @@
         <div class="card-body">
           <div class="card-title">Notifications</div>
 
-          Come back soon!
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <input
+                type="checkbox"
+                [checked]="optionsGet('showResourceGainBubbles')"
+                class="checkbox checkbox-secondary"
+                (click)="optionsSet('showResourceGainBubbles', !optionsGet('showResourceGainBubbles'))"
+              />
+              <span class="label-text">Show Resource Gain Bubbles</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <input
+                type="checkbox"
+                [checked]="optionsGet('showCraftCompletionBubbles')"
+                class="checkbox checkbox-secondary"
+                (click)="optionsSet('showCraftCompletionBubbles', !optionsGet('showCraftCompletionBubbles'))"
+              />
+              <span class="label-text">Show Craft Completion Bubbles</span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

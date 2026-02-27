@@ -2,7 +2,8 @@ import { computed, signal } from '@angular/core';
 import { altarRoomFind } from '@helpers/altar-room';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
-import { floorCurrent } from '@helpers/floor';
+import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
+import { floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
@@ -363,6 +364,14 @@ export async function roomPlacementExecute(
   if (roomDef.reputationAction) {
     reputationAwardForAction(roomDef.reputationAction);
   }
+
+  floatingBubblesEmitPlacement(
+    placed.id,
+    roomDef.name,
+    floorCurrentIndex(),
+    placed.anchorX,
+    placed.anchorY,
+  );
 
   return { success: true };
 }

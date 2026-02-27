@@ -33,6 +33,7 @@ import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';
 import { LoggerService, RollbarErrorHandler } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
+import { FloatingBubblesService } from '@services/floating-bubbles.service';
 import { NotifyService } from '@services/notify.service';
 import { SoundService } from '@services/sound.service';
 import { ThemeService } from '@services/theme.service';
@@ -119,6 +120,11 @@ export const appConfig: ApplicationConfig = {
       provide: ENVIRONMENT_INITIALIZER,
       multi: true,
       useValue: () => inject(NotifyService).init(),
+    },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => inject(FloatingBubblesService).init(),
     },
     {
       provide: ENVIRONMENT_INITIALIZER,

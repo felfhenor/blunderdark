@@ -29,6 +29,7 @@ export * from './efficiency';
 export * from './farplane';
 export * from './fear-level';
 export * from './features';
+export * from './floating-bubbles';
 export * from './floor';
 export * from './floor-modifiers';
 export * from './format';

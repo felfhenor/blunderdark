@@ -39,6 +39,7 @@ export * from './discord';
 export * from './efficiency';
 export * from './farplane';
 export * from './fear';
+export * from './floating-bubble';
 export * from './floor';
 export * from './floor-modifier';
 export * from './forge';

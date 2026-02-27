@@ -42,7 +42,7 @@ import { TippyDirective } from '@ngneat/helipopper';
         } @else {
           <div class="font-semibold text-xs mb-1">{{ hungerLabel() }}</div>
           <div class="text-xs opacity-70">
-            Consumes {{ consumptionRatePerHour().toFixed(1) }} Food/hr
+            Consumes {{ consumptionRatePerHour().toFixed(2) }} Food/hr
           </div>
           <div class="divider my-0.5 h-0"></div>
           <div class="text-xs opacity-60">{{ hungerEffect() }}</div>

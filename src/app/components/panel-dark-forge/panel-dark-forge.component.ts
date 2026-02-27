@@ -7,7 +7,6 @@ import {
   contentGetEntry,
   craftingQueueGetMaxSize,
   darkForgeAddJob,
-  darkForgeCompleted$,
   darkForgeGetAdjacentRoomTypeIds,
   darkForgeGetAvailableRecipes,
   darkForgeGetCraftingTicks,
@@ -16,7 +15,6 @@ import {
   floorCurrent,
   gamestate,
   gridSelectedTile,
-  notify,
   resourceCanAfford,
   resourcePayCost,
   updateGamestate,
@@ -41,9 +39,6 @@ import { sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelDarkForgeComponent {
-  private subscription = darkForgeCompleted$.subscribe((evt) => {
-    notify('Forging', `Forged: ${evt.recipeName}`);
-  });
 
   private quantities = signal<Record<string, number>>({});
 

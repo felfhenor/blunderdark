@@ -9,11 +9,9 @@ import {
   floorCurrent,
   gamestate,
   gridSelectedTile,
-  notify,
   resourceCanAfford,
   resourcePayCost,
   trapWorkshopAddJob,
-  trapWorkshopCompleted$,
   trapWorkshopGetCraftingCost,
   trapWorkshopGetCraftingTicks,
   trapWorkshopRemoveJobGroup,
@@ -165,9 +163,6 @@ import { sortBy } from 'es-toolkit/compat';
   `,
 })
 export class PanelTrapWorkshopComponent {
-  private subscription = trapWorkshopCompleted$.subscribe((evt) => {
-    notify('Traps', `Crafted: ${evt.trapName}`);
-  });
 
   private quantities = signal<Record<string, number>>({});
 

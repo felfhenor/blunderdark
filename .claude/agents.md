@@ -237,6 +237,7 @@ All room-specific systems follow the same pattern:
 - **Section dividers** — section headers within cards/panels use the daisyUI divider pattern: `<div class="divider my-2 text-xs opacity-60">Label</div>`. Remove trailing colons from labels. Do NOT use `<h4>` with `font-semibold opacity-70 mb-1` for section dividers.
 - **Icons over entities/emoji** — use `<app-icon name="tablerXxx" />` (`IconComponent`) instead of HTML entities (`&check;`, `&times;`, etc.) or emoji. Available icons are registered in `ICON_ALL` (`src/app/helpers/icons.ts`). If unsure which icon to use, ask the user.
 - **All modals must have an X close button in the top right.** For standard card-layout modals, use `[showCloseButton]="true"` on `<app-modal>`. For replacement-layout modals (custom headers), add `<app-button-close (click)="close()" />` in the header area and import `ButtonCloseComponent`. Never use a plain text "Close" button as the only dismiss mechanism in a modal header.
+- **Number formatting — 2 decimal places for all fractional values.** Use `| number: '1.0-2'` in templates and `.toFixed(2)` in TypeScript for rates, gains, efficiency, multipliers, fear, bonuses, and any other fractional value. Use `| number: '1.0-0'` only for inherently integer values (tiers, counts, levels, stock, max capacity). Never use `1.0-1` or `.toFixed(1)`. For floating bubbles specifically, use `parseFloat(amount.toFixed(2))` to strip trailing zeros.
 
 ## Naming Conventions
 

@@ -2,6 +2,8 @@ import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
 import { corruptionEffectProcessAll } from '@helpers/corruption-effects';
+import { floatingBubblesEmitProduction } from '@helpers/floating-bubbles';
+import { floorCurrentIndex } from '@helpers/floor';
 import { gameEventProcess } from '@helpers/game-events';
 import { gameTimeAdvanceClock, GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { hungerProcess, hungerProcessWarnings } from '@helpers/hunger';
@@ -112,6 +114,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
   });
 
   gameEventProcess(gamestate().clock);
+
+  // Emit floating production bubbles for the visible floor
+  floatingBubblesEmitProduction(floorCurrentIndex(), numTicks);
 
   // Check for pre-invasion autosave after state is updated
   autosaveCheckPreInvasion(gamestate().world.invasionSchedule.warningActive);

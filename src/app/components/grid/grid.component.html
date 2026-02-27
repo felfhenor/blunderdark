@@ -116,6 +116,22 @@
         </div>
       }
     }
+
+    @for (bubble of activeBubbles(); track bubble.id) {
+      <div
+        class="floating-bubble"
+        [class.variant-production]="bubble.variant === 'production'"
+        [class.variant-queue]="bubble.variant === 'queue'"
+        [class.variant-placement]="bubble.variant === 'placement'"
+        [style.left.px]="getBubbleLeft(bubble)"
+        [style.top.px]="getBubbleTop(bubble)"
+        (animationend)="onBubbleAnimationEnd(bubble.id)"
+      >
+        @for (entry of bubble.entries; track $index) {
+          <div class="bubble-entry">{{ entry.text }}</div>
+        }
+      </div>
+    }
   </div>
 
   <button
