@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
 import { combatAbilityInitStates } from '@helpers/combat-abilities';
 import { contentGetEntry } from '@helpers/content';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { fearLevelCalculateAllForFloor } from '@helpers/fear-level';
 import {
@@ -756,7 +757,7 @@ export function invasionProcess(state: GameState): void {
   const room = currentFloor.rooms.find((r) => r.id === roomId);
   const roomDef = room ? contentGetEntry<RoomContent>(room.roomTypeId) : undefined;
   const floorLabel = `F${floorIndex + 1}`;
-  const roomName = `${roomDef?.name ?? 'Unknown Room'} (${floorLabel})`;
+  const roomName = `${room ? roomGetDisplayName(room) : 'Unknown Room'} (${floorLabel})`;
 
   const tickInRoom = invasion.currentRoomTicksElapsed;
   const isFirstTick = tickInRoom === 1;

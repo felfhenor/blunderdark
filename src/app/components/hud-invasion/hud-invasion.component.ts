@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { contentGetEntry } from '@helpers/content';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { invasionIsActive } from '@helpers/invasion-process';
+import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
-import type { RoomContent } from '@interfaces/content-room';
 
 type InvaderHpInfo = {
   name: string;
@@ -135,14 +134,11 @@ export class HudInvasionComponent {
     const floorIndex = inv.roomFloorMap[roomId] ?? 0;
     const floor = state.world.floors[floorIndex];
     const room = floor?.rooms.find((r) => r.id === roomId);
-    const def = room
-      ? contentGetEntry<RoomContent>(room.roomTypeId)
-      : undefined;
 
     return {
       current: inv.currentRoomIndex + 1,
       total: inv.path.length,
-      roomName: def?.name ?? '',
+      roomName: room ? roomGetDisplayName(room) : '',
       floorLabel: `F${floorIndex + 1}`,
     };
   });
