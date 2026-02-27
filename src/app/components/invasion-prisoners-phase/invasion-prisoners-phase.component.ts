@@ -88,7 +88,7 @@ export class InvasionPrisonersPhaseComponent {
   };
 
   private readonly actionTooltips: Record<PrisonerAction, string> = {
-    execute: 'Execute — +2 Fear, +1 Reputation',
+    execute: 'Execute — +3 Reputation (Terror)',
     ransom: 'Ransom — Gold based on class',
     convert: 'Convert — Chance to join, +5 Corruption',
     sacrifice: 'Sacrifice — Random boon, +5 Corruption',

@@ -9,6 +9,7 @@ import {
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { resourceApplyMap } from '@helpers/resources';
 import { updateGamestate } from '@helpers/state-game';
+import { tortureCreateConvertedInhabitant } from '@helpers/torture-chamber';
 import { victoryRecordDefenseWin } from '@helpers/victory';
 import type {
   CapturedPrisoner,
@@ -122,10 +123,11 @@ export async function invasionRewardApplyPrisonerAction(
 
   // Apply reputation + corruption + fear via state mutation
   await updateGamestate((state) => {
-    if (result.reputationChange !== 0) {
+    const totalReputationChange = result.reputationChange + result.fearChange;
+    if (totalReputationChange !== 0) {
       state.world.reputation.terror = Math.max(
         0,
-        state.world.reputation.terror + result.reputationChange,
+        state.world.reputation.terror + totalReputationChange,
       );
     }
 
@@ -134,6 +136,17 @@ export async function invasionRewardApplyPrisonerAction(
         state.world.resources.corruption.max,
         Math.max(0, state.world.resources.corruption.current + result.corruptionChange),
       );
+    }
+
+    // Create converted inhabitant on successful conversion
+    if (result.action === 'convert' && result.success) {
+      const newInhabitant = tortureCreateConvertedInhabitant(prisoner);
+      if (newInhabitant) {
+        state.world.inhabitants = [...state.world.inhabitants, newInhabitant];
+        for (const floor of state.world.floors) {
+          floor.inhabitants = state.world.inhabitants;
+        }
+      }
     }
 
     // Remove prisoner from world state
