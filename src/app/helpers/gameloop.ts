@@ -2,6 +2,7 @@ import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
 import { corruptionEffectProcessAll } from '@helpers/corruption-effects';
+import { fearStateProcess } from '@helpers/fear-state';
 import { floatingBubblesEmitProduction } from '@helpers/floating-bubbles';
 import { floorCurrentIndex } from '@helpers/floor';
 import { gameEventProcess } from '@helpers/game-events';
@@ -78,6 +79,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     state.clock = gameTimeAdvanceClock(state.clock, numTicks);
     resourceStorageProcess(state);
     hungerProcess(state, numTicks);
+    fearStateProcess(state);
 
     // Affordability checks run BEFORE production so they see pre-production resources.
     // Actual resource deductions for upkeep/maintenance are folded into productionProcess.
