@@ -115,7 +115,7 @@
   (confirm)="goToHome()"
 ></swal>
 
-<app-modal [visible]="showPauseMenu()" [widthClass]="'max-w-[300px]'">
+<app-modal [visible]="showPauseMenu()" [widthClass]="'max-w-[300px]'" (modalClose)="closePauseMenu()">
   <span title>Game Paused</span>
 
   <div body class="flex flex-col gap-2">
