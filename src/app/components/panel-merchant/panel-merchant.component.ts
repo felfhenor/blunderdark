@@ -1,16 +1,14 @@
-import { DecimalPipe, NgClass } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   model,
-  signal,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
-import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import { contentGetEntry } from '@helpers/content';
+import { gameTimeDay } from '@helpers/game-time';
 import {
   merchantCanAffordTrade,
   merchantDaysRemaining,
@@ -22,7 +20,6 @@ import { notifyError, notifySuccess } from '@helpers/notify';
 import type {
   MerchantTradeContent,
   MerchantTradeId,
-  MerchantTradeType,
   ResourceCost,
   ResourceType,
 } from '@interfaces';
@@ -38,7 +35,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [DecimalPipe, NgClass, CurrencyCostComponent, ModalComponent, TabBarComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, ModalComponent],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +45,7 @@ export class PanelMerchantComponent {
 
   public isPresent = merchantIsPresent;
   public daysRemaining = merchantDaysRemaining;
-  public activeCategory = signal<string>('all');
+  public departureDay = computed(() => gameTimeDay() + this.daysRemaining());
 
   public tradeEntries = computed((): TradeEntry[] => {
     const inventory = merchantInventory();
@@ -84,33 +81,6 @@ export class PanelMerchantComponent {
     return sortBy(entries, [(e) => e.trade.name]);
   });
 
-  public filteredTrades = computed((): TradeEntry[] => {
-    const category = this.activeCategory();
-    const entries = this.tradeEntries();
-    if (category === 'all') return entries;
-    return entries.filter((e) => e.trade.type === category);
-  });
-
-  public categoryCounts = computed(() => {
-    const entries = this.tradeEntries();
-    return {
-      all: entries.length,
-      buy: entries.filter((e) => e.trade.type === 'buy').length,
-      sell: entries.filter((e) => e.trade.type === 'sell').length,
-      special: entries.filter((e) => e.trade.type === 'special').length,
-    };
-  });
-
-  public tabDefs = computed<TabDefinition[]>(() => {
-    const counts = this.categoryCounts();
-    return [
-      { id: 'all', label: 'All', count: counts.all },
-      { id: 'buy', label: 'Buy', count: counts.buy },
-      { id: 'sell', label: 'Sell', count: counts.sell },
-      { id: 'special', label: 'Special', count: counts.special },
-    ];
-  });
-
   public async executeTrade(tradeId: MerchantTradeId): Promise<void> {
     const result = await merchantExecuteTrade(tradeId);
     if (result.success) {
@@ -127,29 +97,6 @@ export class PanelMerchantComponent {
 
   public close(): void {
     this.visible.set(false);
-    this.activeCategory.set('all');
-  }
-
-  public getCategoryLabel(type: MerchantTradeType): string {
-    switch (type) {
-      case 'buy':
-        return 'Buy';
-      case 'sell':
-        return 'Sell';
-      case 'special':
-        return 'Special';
-    }
-  }
-
-  public getCategoryBadgeClass(type: MerchantTradeType): string {
-    switch (type) {
-      case 'buy':
-        return 'badge-info';
-      case 'sell':
-        return 'badge-success';
-      case 'special':
-        return 'badge-accent';
-    }
   }
 
   private formatCost(cost: ResourceCost): { type: ResourceType; amount: number }[] {
