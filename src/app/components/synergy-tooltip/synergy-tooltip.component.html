@@ -39,15 +39,8 @@
                 {{ getPotentialEffect(ps) }}
               </div>
               <div class="text-xs text-warning ml-4">
-                @for (
-                  cond of ps.missingConditions;
-                  track cond;
-                  let last = $last
-                ) {
-                  <span>{{ cond }}</span>
-                  @if (!last) {
-                    <span>,</span>
-                  }
+                @for (cond of ps.missingConditions; track cond) {
+                  <div>{{ cond }}</div>
                 }
               </div>
             </div>
