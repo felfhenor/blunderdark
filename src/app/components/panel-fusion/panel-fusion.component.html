@@ -179,6 +179,34 @@
                       </div>
                     }
 
+                    <!-- Instance Trait Inheritance -->
+                    @if (instanceTraitPreview().length > 0) {
+                      <div class="divider my-2 text-xs opacity-50">
+                        Breeding Trait Inheritance
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        @for (
+                          entry of instanceTraitPreview();
+                          track entry.trait.id
+                        ) {
+                          <span
+                            class="badge badge-xs badge-info"
+                            [tp]="
+                              entry.trait.description +
+                              ' (' +
+                              entry.passChance +
+                              '% chance to inherit)'
+                            "
+                          >
+                            {{ entry.trait.name }}
+                            <span class="ml-1 opacity-70">
+                              {{ entry.passChance }}%
+                            </span>
+                          </span>
+                        }
+                      </div>
+                    }
+
                     <!-- Mutation Trait Inheritance -->
                     @if (mutationTraitPreview().length > 0) {
                       <div class="divider my-2 text-xs opacity-50">

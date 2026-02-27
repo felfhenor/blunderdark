@@ -14,6 +14,8 @@ import type {
   FusionRecipeId,
   InhabitantUnlock,
   IsContentItem,
+  MutationTraitContent,
+  MutationTraitId,
   PassiveBonusUnlock,
   ReputationActionContent,
   ReputationEffectContent,
@@ -22,13 +24,11 @@ import type {
   RoomFeatureUnlock,
   RoomShapeContent,
   RoomUnlock,
+  RoomUpgradeUnlock,
   Season,
   SummonRecipeContent,
   SummonRecipeId,
   UnlockEffect,
-  MutationTraitContent,
-  MutationTraitId,
-  RoomUpgradeUnlock,
 } from '@interfaces';
 import type {
   AbilityEffectContent,
@@ -63,23 +63,23 @@ import type { ResearchId } from '@interfaces/content-research';
 import type { RoomContent, RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type {
+  RoomUpgradeContent,
+  RoomUpgradeId,
+} from '@interfaces/content-roomupgrade';
+import type {
   SeasonBonusContent,
   SeasonBonusId,
 } from '@interfaces/content-seasonbonus';
 import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
+import type {
+  TraitRuneContent,
+  TraitRuneId,
+} from '@interfaces/content-traitrune';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type {
   VictoryPathContent,
   VictoryPathId,
 } from '@interfaces/content-victorypath';
-import type {
-  RoomUpgradeContent,
-  RoomUpgradeId,
-} from '@interfaces/content-roomupgrade';
-import type {
-  TraitRuneContent,
-  TraitRuneId,
-} from '@interfaces/content-traitrune';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -144,9 +144,10 @@ function ensureBreedingRecipe(
     description: recipe.description ?? '',
     parentInhabitantAId: recipe.parentInhabitantAId ?? ('' as InhabitantId),
     parentInhabitantBId: recipe.parentInhabitantBId ?? ('' as InhabitantId),
-    resultName: recipe.resultName ?? '',
-    statBonuses: recipe.statBonuses ?? {},
+    resultInhabitantTraitId:
+      recipe.resultInhabitantTraitId ?? ('' as InhabitantTraitId),
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
+    inhabitantTraitIds: recipe.inhabitantTraitIds ?? [],
   };
 }
 
@@ -203,7 +204,9 @@ function ensureCorruptionEffect(
   };
 }
 
-function ensureFeature(feature: Partial<FeatureContent>): Required<FeatureContent> {
+function ensureFeature(
+  feature: Partial<FeatureContent>,
+): Required<FeatureContent> {
   return {
     id: feature.id ?? ('UNKNOWN' as FeatureId),
     name: feature.name ?? 'UNKNOWN',
@@ -250,7 +253,9 @@ function ensureReputationEffect(
   };
 }
 
-function ensureResearch(node: Partial<ResearchContent>): Required<ResearchContent> {
+function ensureResearch(
+  node: Partial<ResearchContent>,
+): Required<ResearchContent> {
   return {
     id: node.id ?? ('UNKNOWN' as ResearchId),
     name: node.name ?? 'UNKNOWN',
@@ -402,7 +407,9 @@ function ensureSummonRecipe(
   };
 }
 
-function ensureSynergy(synergy: Partial<SynergyContent>): Required<SynergyContent> {
+function ensureSynergy(
+  synergy: Partial<SynergyContent>,
+): Required<SynergyContent> {
   return {
     id: synergy.id ?? ('UNKNOWN' as SynergyId),
     name: synergy.name ?? 'UNKNOWN',
@@ -425,6 +432,7 @@ function ensureInhabitantTrait(
     effectValue: trait.effectValue ?? 0,
     targetResourceType: trait.targetResourceType ?? undefined,
     targetRoomId: trait.targetRoomId ?? undefined,
+    fusionPassChance: trait.fusionPassChance ?? 75,
   };
 }
 
@@ -500,7 +508,9 @@ function ensureInhabitant(
   };
 }
 
-function ensureInvader(invader: Partial<InvaderContent>): Required<InvaderContent> {
+function ensureInvader(
+  invader: Partial<InvaderContent>,
+): Required<InvaderContent> {
   return {
     id: invader.id ?? ('UNKNOWN' as InvaderId),
     name: invader.name ?? 'UNKNOWN',
@@ -513,7 +523,9 @@ function ensureInvader(invader: Partial<InvaderContent>): Required<InvaderConten
   };
 }
 
-function ensureRoomShape(shape: Partial<RoomShapeContent>): Required<RoomShapeContent> {
+function ensureRoomShape(
+  shape: Partial<RoomShapeContent>,
+): Required<RoomShapeContent> {
   return {
     id: shape.id ?? ('UNKNOWN' as RoomShapeId),
     name: shape.name ?? 'UNKNOWN',

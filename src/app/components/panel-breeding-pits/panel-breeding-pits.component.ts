@@ -8,7 +8,6 @@ import {
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   breedingCompleted$,
   breedingGetAdjacentRoomTypeIds,
@@ -31,10 +30,11 @@ import type {
   BreedingRecipeId,
   Floor,
   InhabitantInstanceId,
-  InhabitantStats,
+  InhabitantTraitContent,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
@@ -44,7 +44,7 @@ import { sortBy } from 'es-toolkit/compat';
     InhabitantCardComponent,
     JobProgressComponent,
     ModalComponent,
-    StatNameComponent,
+    TippyDirective,
   ],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
@@ -132,7 +132,9 @@ export class PanelBreedingPitsComponent {
         timeSeconds: ticksToRealSeconds(ticks),
       };
     });
-    return sortBy(entries, [(e) => e.recipe.resultName]);
+    return sortBy(entries, [
+      (e) => this.resolveResultName(e.recipe),
+    ]);
   });
 
   public mutatableInhabitants = computed(() => {
@@ -158,7 +160,9 @@ export class PanelBreedingPitsComponent {
     const recipe = contentGetEntry<BreedingRecipeContent>(job.recipeId);
     return {
       percent,
-      recipeName: recipe?.resultName ?? 'Unknown',
+      recipeName: recipe
+        ? this.resolveResultName(recipe)
+        : 'Unknown',
       ticksRemaining: job.ticksRemaining,
     };
   });
@@ -185,23 +189,27 @@ export class PanelBreedingPitsComponent {
             inhabitantDefIds.has(recipe.parentInhabitantAId) &&
             inhabitantDefIds.has(recipe.parentInhabitantBId);
 
-          const statBonusEntries = Object.entries(recipe.statBonuses)
-            .filter(([, v]) => v !== undefined && v !== 0)
-            .map(([key, value]) => ({
-              stat: key as keyof InhabitantStats,
-              value: value!,
-            }));
+          const resultTrait = contentGetEntry<InhabitantTraitContent>(
+            recipe.resultInhabitantTraitId,
+          );
+
+          const traits: InhabitantTraitContent[] = [];
+          for (const traitId of recipe.inhabitantTraitIds) {
+            const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+            if (trait) traits.push(trait);
+          }
 
           return {
             recipe,
             parentADef,
             parentBDef,
             hasParents,
-            statBonusEntries,
+            resultTrait,
+            traits,
           };
         })
         .filter((e) => e.parentADef && e.parentBDef),
-      [(e) => e.recipe.resultName],
+      [(e) => e.resultTrait?.name ?? e.recipe.name],
     );
   });
 
@@ -212,7 +220,9 @@ export class PanelBreedingPitsComponent {
 
     return all.filter(
       (e) =>
-        e.recipe.resultName.toLowerCase().includes(query) ||
+        (e.resultTrait?.name ?? e.recipe.name)
+          .toLowerCase()
+          .includes(query) ||
         e.parentADef!.name.toLowerCase().includes(query) ||
         e.parentBDef!.name.toLowerCase().includes(query),
     );
@@ -262,6 +272,13 @@ export class PanelBreedingPitsComponent {
       }
       return state;
     });
+  }
+
+  public resolveResultName(recipe: BreedingRecipeContent): string {
+    const trait = contentGetEntry<InhabitantTraitContent>(
+      recipe.resultInhabitantTraitId,
+    );
+    return trait?.name ?? recipe.name;
   }
 
   public async startMutation(

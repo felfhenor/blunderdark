@@ -40,6 +40,9 @@
       @if (equippedItemName(); as itemName) {
         <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName"><app-icon name="gameWarPick" size="12px" /></span>
       }
+      @for (trait of instanceTraits(); track trait.id) {
+        <span class="badge badge-xs badge-info flex-shrink-0" [tp]="trait.description">{{ trait.name }}</span>
+      }
       @if (showHunger()) {
         <app-hunger-indicator [inhabitantId]="instance().instanceId" />
       }
@@ -138,7 +141,7 @@
     }
 
     <!-- Traits -->
-    @if (showTraits() && definition().traits.length > 0) {
+    @if (showTraits() && (definition().traits.length > 0 || mutationTraits().length > 0 || instanceTraits().length > 0)) {
       <div class="flex flex-wrap gap-0.5 mt-0.5">
         @for (trait of definition().traits; track trait.id) {
           <span
@@ -148,12 +151,6 @@
             {{ trait.name }}
           </span>
         }
-      </div>
-    }
-
-    <!-- Mutation Traits -->
-    @if (showTraits() && mutationTraits().length > 0) {
-      <div class="flex flex-wrap gap-0.5 mt-0.5">
         @for (mt of mutationTraits(); track mt.id) {
           <span
             class="badge badge-xs"
@@ -163,6 +160,9 @@
           >
             {{ mt.name }}
           </span>
+        }
+        @for (it of instanceTraits(); track it.id) {
+          <span class="badge badge-xs badge-info" [tp]="it.description">{{ it.name }}</span>
         }
       </div>
     }

@@ -189,41 +189,27 @@ export function breedingGetMutationOdds(
 }
 
 /**
- * Calculate hybrid stats from averaged parents + recipe bonuses.
+ * Calculate hybrid stats from averaged parents.
  */
 export function breedingCalculateHybridStats(
   parentADef: InhabitantContent,
   parentBDef: InhabitantContent,
-  recipe: BreedingRecipeContent,
-  statBonusMultiplier = 1.0,
 ): InhabitantStats {
   const avg = (a: number, b: number) => Math.round((a + b) / 2);
 
-  const stats: InhabitantStats = {
+  return {
     hp: avg(parentADef.stats.hp, parentBDef.stats.hp),
     attack: avg(parentADef.stats.attack, parentBDef.stats.attack),
     defense: avg(parentADef.stats.defense, parentBDef.stats.defense),
     speed: avg(parentADef.stats.speed, parentBDef.stats.speed),
     workerEfficiency:
-      (parentADef.stats.workerEfficiency + parentBDef.stats.workerEfficiency) /
-      2,
+      Math.round(
+        ((parentADef.stats.workerEfficiency +
+          parentBDef.stats.workerEfficiency) /
+          2) *
+          100,
+      ) / 100,
   };
-
-  // Apply recipe stat bonuses
-  const bonusKeys = Object.keys(recipe.statBonuses) as Array<
-    keyof InhabitantStats
-  >;
-  for (const key of bonusKeys) {
-    const bonus = recipe.statBonuses[key];
-    if (bonus !== undefined) {
-      stats[key] += bonus * statBonusMultiplier;
-    }
-  }
-
-  // Round workerEfficiency to 2 decimal places
-  stats.workerEfficiency = Math.round(stats.workerEfficiency * 100) / 100;
-
-  return stats;
 }
 
 /**
@@ -233,7 +219,6 @@ export function breedingCreateHybrid(
   parentA: InhabitantInstance,
   parentB: InhabitantInstance,
   recipe: BreedingRecipeContent,
-  statBonusMultiplier = 1.0,
 ): InhabitantInstance {
   const parentADef = contentGetEntry<InhabitantContent>(
     parentA.definitionId,
@@ -245,12 +230,7 @@ export function breedingCreateHybrid(
     throw new Error('Parent definitions not found');
   }
 
-  const stats = breedingCalculateHybridStats(
-    parentADef,
-    parentBDef,
-    recipe,
-    statBonusMultiplier,
-  );
+  const stats = breedingCalculateHybridStats(parentADef, parentBDef);
   // Use parentA's definitionId as the base definition for the hybrid
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
@@ -276,6 +256,10 @@ export function breedingCreateHybrid(
     hybridParentIds: [
       parentA.definitionId as unknown as InhabitantInstanceId,
       parentB.definitionId as unknown as InhabitantInstanceId,
+    ],
+    instanceTraitIds: [
+      recipe.resultInhabitantTraitId,
+      ...(recipe.inhabitantTraitIds ?? []),
     ],
   };
 }
@@ -375,21 +359,7 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
           );
 
           if (recipe && parentA && parentB) {
-            // Get stat bonus multiplier from upgrades
-            let statBonusMultiplier = 1.0;
-            const effects = roomUpgradeGetAppliedEffects(room);
-            for (const effect of effects) {
-              if (effect.type === 'mutationStatBonus') {
-                statBonusMultiplier += effect.value;
-              }
-            }
-
-            const hybrid = breedingCreateHybrid(
-              parentA,
-              parentB,
-              recipe,
-              statBonusMultiplier,
-            );
+            const hybrid = breedingCreateHybrid(parentA, parentB, recipe);
 
             // Remove parents from roster
             state.world.inhabitants = state.world.inhabitants.filter(

@@ -16,10 +16,11 @@ import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
 import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
 import { contentGetEntry } from '@helpers/content';
-import type { FusionPreview, MutationTraitPreviewEntry } from '@helpers/fusion';
+import type { FusionPreview, InstanceTraitPreviewEntry, MutationTraitPreviewEntry } from '@helpers/fusion';
 import {
   fusionExecute,
   fusionGetAllRecipes,
+  fusionGetInstanceTraitPreview,
   fusionGetMutationTraitPreview,
   fusionGetPreview,
   fusionValidate,
@@ -177,6 +178,13 @@ export class PanelFusionComponent {
     const b = this.slotBEntry();
     if (!a || !b) return [];
     return fusionGetMutationTraitPreview(a.instance, b.instance);
+  });
+
+  public instanceTraitPreview = computed((): InstanceTraitPreviewEntry[] => {
+    const a = this.slotAEntry();
+    const b = this.slotBEntry();
+    if (!a || !b) return [];
+    return fusionGetInstanceTraitPreview(a.instance, b.instance);
   });
 
   public allRecipes = computed((): RecipeEntry[] => {

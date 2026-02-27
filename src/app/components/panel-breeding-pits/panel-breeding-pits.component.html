@@ -72,7 +72,7 @@
             <div class="flex flex-col gap-2 p-2 bg-base-200 rounded">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold">
-                  {{ entry.recipe.resultName }}
+                  {{ resolveResultName(entry.recipe) }}
                 </span>
                 <span class="text-xs opacity-50">
                   {{ entry.timeSeconds | number: '1.0-0' }} sec
@@ -149,7 +149,7 @@
                 </span>
                 <span class="opacity-40">=</span>
                 <span class="font-bold text-secondary">
-                  {{ entry.recipe.resultName }}
+                  {{ entry.resultTrait?.name ?? entry.recipe.name }}
                 </span>
               </div>
               @if (entry.hasParents) {
@@ -157,14 +157,10 @@
               }
             </div>
             <p class="text-xs opacity-60">{{ entry.recipe.description }}</p>
-            @if (entry.statBonusEntries.length > 0) {
+            @if (entry.traits.length > 0) {
               <div class="flex flex-wrap gap-2 mt-1">
-                @for (bonus of entry.statBonusEntries; track bonus.stat) {
-                  <app-stat-name
-                    [type]="bonus.stat"
-                    [value]="bonus.value"
-                    [prefix]="bonus.value > 0 ? '+' : ''"
-                  />
+                @for (trait of entry.traits; track trait.id) {
+                  <span class="badge badge-xs badge-info" [tp]="trait.description">{{ trait.name }}</span>
                 }
               </div>
             }

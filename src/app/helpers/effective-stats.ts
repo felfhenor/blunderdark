@@ -3,6 +3,7 @@ import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlo
 import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type { InhabitantStats } from '@interfaces/inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { InhabitantTraitContent } from '@interfaces/content-inhabitanttrait';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { MutationTraitContent } from '@interfaces/content-mutationtrait';
 
@@ -61,6 +62,22 @@ export function effectiveStatsCalculate(
             workerEfficiency += mod.bonus;
             break;
         }
+      }
+    }
+  }
+
+  // Instance trait bonuses (from breeding hybrids)
+  if (instance.instanceTraitIds) {
+    for (const traitId of instance.instanceTraitIds) {
+      const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!trait) continue;
+      switch (trait.effectType) {
+        case 'attack_bonus':
+          attack *= 1 + trait.effectValue;
+          break;
+        case 'defense_bonus':
+          defense *= 1 + trait.effectValue;
+          break;
       }
     }
   }

@@ -9,6 +9,7 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
+  InhabitantTraitId,
   MutationTraitContent,
   MutationTraitId,
   PlacedRoom,
@@ -165,14 +166,14 @@ const skeletonDef: InhabitantContent = {
 
 const goblinKoboldRecipe: BreedingRecipeContent = {
   id: RECIPE_GOBLIN_KOBOLD_ID as BreedingRecipeId,
-  name: 'Goblin Trapper',
+  name: 'Goblin Trapper Breeding',
   __type: 'breedingrecipe',
   description: 'A hybrid.',
   parentInhabitantAId: GOBLIN_ID as InhabitantId,
   parentInhabitantBId: KOBOLD_ID as InhabitantId,
-  resultName: 'Goblin Trapper',
-  statBonuses: { speed: 3, attack: 2 },
+  resultInhabitantTraitId: 'trait-goblin-trapper' as InhabitantTraitId,
   timeMultiplier: 1.0,
+  inhabitantTraitIds: [],
 };
 
 // --- Room definitions ---
@@ -436,13 +437,13 @@ describe('Recipe Matching', () => {
   it('should find recipe for Goblin + Kobold', () => {
     const recipe = breedingFindRecipe(GOBLIN_ID, KOBOLD_ID);
     expect(recipe).toBeDefined();
-    expect(recipe!.resultName).toBe('Goblin Trapper');
+    expect(recipe!.resultInhabitantTraitId).toBe('trait-goblin-trapper');
   });
 
   it('should find recipe in reverse order (Kobold + Goblin)', () => {
     const recipe = breedingFindRecipe(KOBOLD_ID, GOBLIN_ID);
     expect(recipe).toBeDefined();
-    expect(recipe!.resultName).toBe('Goblin Trapper');
+    expect(recipe!.resultInhabitantTraitId).toBe('trait-goblin-trapper');
   });
 
   it('should return undefined for invalid pair', () => {
@@ -464,7 +465,7 @@ describe('Available Recipes', () => {
 
     const recipes = breedingGetAvailableRecipes([goblin, kobold]);
     expect(recipes).toHaveLength(1);
-    expect(recipes[0].recipe.resultName).toBe('Goblin Trapper');
+    expect(recipes[0].recipe.resultInhabitantTraitId).toBe('trait-goblin-trapper');
   });
 
   it('should return empty when no valid pairs exist', () => {
@@ -579,33 +580,16 @@ describe('Hybrid Tick Calculation', () => {
 });
 
 describe('Hybrid Stat Calculation', () => {
-  it('should average parent stats and add recipe bonuses', () => {
-    const stats = breedingCalculateHybridStats(
-      goblinDef,
-      koboldDef,
-      goblinKoboldRecipe,
-    );
-    // hp: avg(30, 20) = 25, attack: avg(10, 8) + 2 = 11
-    // defense: avg(8, 5) = 7 (rounds), speed: avg(12, 18) + 3 = 18
+  it('should average parent stats', () => {
+    const stats = breedingCalculateHybridStats(goblinDef, koboldDef);
+    // hp: avg(30, 20) = 25, attack: avg(10, 8) = 9
+    // defense: avg(8, 5) = 7 (rounds), speed: avg(12, 18) = 15
     // workerEfficiency: (1.0 + 0.9) / 2 = 0.95
     expect(stats.hp).toBe(25);
-    expect(stats.attack).toBe(11);
+    expect(stats.attack).toBe(9);
     expect(stats.defense).toBe(7);
-    expect(stats.speed).toBe(18);
+    expect(stats.speed).toBe(15);
     expect(stats.workerEfficiency).toBe(0.95);
-  });
-
-  it('should apply statBonusMultiplier to recipe bonuses', () => {
-    const stats = breedingCalculateHybridStats(
-      goblinDef,
-      koboldDef,
-      goblinKoboldRecipe,
-      2.0,
-    );
-    // speed: avg(12, 18) + 3*2 = 15 + 6 = 21
-    // attack: avg(10, 8) + 2*2 = 9 + 4 = 13
-    expect(stats.speed).toBe(21);
-    expect(stats.attack).toBe(13);
   });
 });
 

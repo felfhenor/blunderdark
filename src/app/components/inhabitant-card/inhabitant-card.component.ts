@@ -24,6 +24,7 @@ import { synergyGetDefinitions } from '@helpers/synergy';
 import type {
   ForgeRecipeContent,
   InhabitantInstance,
+  InhabitantTraitContent,
   MutationTraitContent,
   PlacedRoomId,
   RoomId,
@@ -79,6 +80,17 @@ export class InhabitantCardComponent {
     const traits: MutationTraitContent[] = [];
     for (const id of ids) {
       const trait = contentGetEntry<MutationTraitContent>(id);
+      if (trait) traits.push(trait);
+    }
+    return traits;
+  });
+
+  public instanceTraits = computed(() => {
+    const ids = this.instance().instanceTraitIds;
+    if (!ids || ids.length === 0) return [];
+    const traits: InhabitantTraitContent[] = [];
+    for (const id of ids) {
+      const trait = contentGetEntry<InhabitantTraitContent>(id);
       if (trait) traits.push(trait);
     }
     return traits;

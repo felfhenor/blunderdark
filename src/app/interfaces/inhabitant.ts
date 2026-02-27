@@ -60,6 +60,7 @@ export type InhabitantInstance = {
   mutationTraitIds?: string[];
   isHybrid?: boolean;
   hybridParentIds?: InhabitantInstanceId[];
+  instanceTraitIds?: string[];
   isSummoned?: boolean;
   travelTicksRemaining?: number;
   discontentedTicks?: number;

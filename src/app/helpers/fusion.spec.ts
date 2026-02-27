@@ -6,9 +6,11 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantStats,
+  InhabitantTraitId,
   ResourceMap,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { InhabitantTraitContent } from '@interfaces/content-inhabitanttrait';
 import type { MutationTraitContent, MutationTraitId } from '@interfaces/content-mutationtrait';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -1509,6 +1511,173 @@ describe('fusion', () => {
       expect(result).toContain(MUTATION_TRAIT_COMMON_ID);
       expect(result).toContain(MUTATION_TRAIT_NEG_COMMON_ID);
       expect(result).toContain(MUTATION_TRAIT_RARE_ID);
+    });
+  });
+
+  // --- Instance Trait Inheritance Tests ---
+
+  const INSTANCE_TRAIT_A_ID = 'it-trait-001' as InhabitantTraitId;
+  const INSTANCE_TRAIT_B_ID = 'it-trait-002' as InhabitantTraitId;
+
+  const instanceTraitA: InhabitantTraitContent = {
+    id: INSTANCE_TRAIT_A_ID,
+    name: 'Goblin Trapper',
+    __type: 'inhabitanttrait',
+    description: 'A cunning hybrid.',
+    effectType: 'attack_bonus',
+    effectValue: 0.1,
+    targetResourceType: undefined,
+    targetRoomId: undefined,
+    fusionPassChance: 50,
+  };
+
+  const instanceTraitB: InhabitantTraitContent = {
+    id: INSTANCE_TRAIT_B_ID,
+    name: 'Acidic Runt',
+    __type: 'inhabitanttrait',
+    description: 'An aggressive hybrid.',
+    effectType: 'defense_bonus',
+    effectValue: 0.05,
+    targetResourceType: undefined,
+    targetRoomId: undefined,
+    fusionPassChance: 40,
+  };
+
+  describe('fusionGetInstanceTraitPreview', () => {
+    it('should return empty array when parents have no instance traits', async () => {
+      const { fusionGetInstanceTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A');
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const preview = fusionGetInstanceTraitPreview(parentA, parentB);
+      expect(preview).toEqual([]);
+    });
+
+    it('should return trait data with pass chances from one parent', async () => {
+      mockContent.set(INSTANCE_TRAIT_A_ID, instanceTraitA);
+
+      const { fusionGetInstanceTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const preview = fusionGetInstanceTraitPreview(parentA, parentB);
+      expect(preview).toHaveLength(1);
+      expect(preview[0].trait.name).toBe('Goblin Trapper');
+      expect(preview[0].passChance).toBe(50);
+    });
+
+    it('should deduplicate traits shared by both parents', async () => {
+      mockContent.set(INSTANCE_TRAIT_A_ID, instanceTraitA);
+
+      const { fusionGetInstanceTraitPreview } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+
+      const preview = fusionGetInstanceTraitPreview(parentA, parentB);
+      expect(preview).toHaveLength(1);
+    });
+  });
+
+  describe('fusionRollInstanceTraits', () => {
+    it('should return empty array when parents have no instance traits', async () => {
+      const { fusionRollInstanceTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A');
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollInstanceTraits(parentA, parentB);
+      expect(result).toEqual([]);
+    });
+
+    it('should return trait IDs when roll succeeds', async () => {
+      mockContent.set(INSTANCE_TRAIT_A_ID, instanceTraitA);
+      mockRngSucceedsChance = true;
+
+      const { fusionRollInstanceTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollInstanceTraits(parentA, parentB);
+      expect(result).toEqual([INSTANCE_TRAIT_A_ID]);
+    });
+
+    it('should return empty when roll fails', async () => {
+      mockContent.set(INSTANCE_TRAIT_A_ID, instanceTraitA);
+      mockRngSucceedsChance = false;
+
+      const { fusionRollInstanceTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B');
+
+      const result = fusionRollInstanceTraits(parentA, parentB);
+      expect(result).toEqual([]);
+    });
+
+    it('should collect traits from both parents', async () => {
+      mockContent.set(INSTANCE_TRAIT_A_ID, instanceTraitA);
+      mockContent.set(INSTANCE_TRAIT_B_ID, instanceTraitB);
+      mockRngSucceedsChance = true;
+
+      const { fusionRollInstanceTraits } = await import('./fusion');
+      const parentA = makeInstance(INSTANCE_A_ID, GOBLIN_ID, 'Goblin A', {
+        instanceTraitIds: [INSTANCE_TRAIT_A_ID],
+      });
+      const parentB = makeInstance(INSTANCE_B_ID, KOBOLD_ID, 'Kobold B', {
+        instanceTraitIds: [INSTANCE_TRAIT_B_ID],
+      });
+
+      const result = fusionRollInstanceTraits(parentA, parentB);
+      expect(result).toHaveLength(2);
+      expect(result).toContain(INSTANCE_TRAIT_A_ID);
+      expect(result).toContain(INSTANCE_TRAIT_B_ID);
+    });
+  });
+
+  describe('fusionCreateHybridInstance with instance traits', () => {
+    it('should set instanceTraitIds when inherited traits are provided', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+        [],
+        [INSTANCE_TRAIT_A_ID, INSTANCE_TRAIT_B_ID],
+      );
+
+      expect(instance.instanceTraitIds).toEqual([INSTANCE_TRAIT_A_ID, INSTANCE_TRAIT_B_ID]);
+    });
+
+    it('should not set instanceTraitIds when array is empty', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+        [],
+        [],
+      );
+
+      expect(instance.instanceTraitIds).toBeUndefined();
+    });
+
+    it('should not set instanceTraitIds when param is omitted', async () => {
+      const { fusionCreateHybridInstance } = await import('./fusion');
+      const instance = fusionCreateHybridInstance(
+        INSTANCE_A_ID,
+        INSTANCE_B_ID,
+        yamlHobgoblin,
+      );
+
+      expect(instance.instanceTraitIds).toBeUndefined();
     });
   });
 });

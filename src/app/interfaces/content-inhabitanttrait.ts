@@ -10,4 +10,5 @@ export type InhabitantTraitContent = IsContentItem &
     effectValue: number;
     targetResourceType: string | undefined;
     targetRoomId: string | undefined;
+    fusionPassChance: number;
   };
