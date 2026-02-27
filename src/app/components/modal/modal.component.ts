@@ -65,7 +65,7 @@ export class ModalComponent {
     this.visible.set(false);
     if (wasVisible) {
       uiModalOpenCount.update((c) => Math.max(0, c - 1));
+      this.modalClose.emit();
     }
-    this.modalClose.emit();
   }
 }
