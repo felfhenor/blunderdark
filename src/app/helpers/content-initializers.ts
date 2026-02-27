@@ -482,13 +482,16 @@ function ensureInhabitant(
     restrictionTags: inhabitant.restrictionTags ?? [],
     rulerBonuses: inhabitant.rulerBonuses ?? {},
     rulerFearLevel: inhabitant.rulerFearLevel ?? 0,
+    fearTolerance: inhabitant.fearTolerance,
     fearModifier: inhabitant.fearModifier ?? 0,
     fearPropagationDistance: inhabitant.fearPropagationDistance ?? 1,
     foodConsumptionRate: inhabitant.foodConsumptionRate ?? 0,
     corruptionGeneration: inhabitant.corruptionGeneration ?? 0,
+    stateModifiers: inhabitant.stateModifiers,
     upkeepCost: inhabitant.upkeepCost ?? undefined,
     recruitmentRequirements: inhabitant.recruitmentRequirements ?? undefined,
     statOverrides: inhabitant.statOverrides ?? undefined,
+    combatAbilityIds: inhabitant.combatAbilityIds,
   };
 }
 
