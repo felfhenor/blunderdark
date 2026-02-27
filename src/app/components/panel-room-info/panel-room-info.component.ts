@@ -5,11 +5,13 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { RoomConnectionsComponent } from '@components/room-connections/room-connections.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-tooltip.component';
 import { UpgradeEffectBadgeComponent } from '@components/upgrade-effect-badge/upgrade-effect-badge.component';
@@ -96,6 +98,7 @@ import { startCase } from 'es-toolkit';
     DecimalPipe,
     NgClass,
     SweetAlert2Module,
+    ButtonCloseComponent,
     CurrencyCostComponent,
     CurrencyNameComponent,
     FearBreakdownTooltipComponent,
@@ -103,6 +106,7 @@ import { startCase } from 'es-toolkit';
     StatNameComponent,
     TippyDirective,
     ModalComponent,
+    RoomConnectionsComponent,
     SynergyTooltipComponent,
     UpgradeEffectBadgeComponent,
   ],
@@ -460,11 +464,10 @@ export class PanelRoomInfoComponent {
       const otherId = conn.roomAId === room.id ? conn.roomBId : conn.roomAId;
       return {
         connectionId: conn.id,
-        otherRoomId: otherId,
-        otherRoomName: getEntityName(floor, otherId),
+        name: getEntityName(floor, otherId),
       };
     });
-    return sortBy(entries, [(e) => e.otherRoomName]);
+    return sortBy(entries, [(e) => e.name]);
   });
 
   // --- Feature slots ---

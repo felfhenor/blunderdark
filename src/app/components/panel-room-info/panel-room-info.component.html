@@ -228,13 +228,11 @@
                 >
                   {{ slot.feature.name }}
                 </span>
-                <button
-                  class="btn btn-xs btn-outline btn-error"
+                <app-button-close
+                  class="text-error"
                   [swal]="featureRemoveSwal"
                   (click)="featureRemoveSlotIndex = slot.index"
-                >
-                  Remove
-                </button>
+                ></app-button-close>
               </div>
             } @else {
               <button
@@ -288,12 +286,10 @@
                   [showAssignment]="false"
                   [showHunger]="true"
                 />
-                <button
-                  class="btn btn-xs btn-outline btn-error flex-shrink-0"
+                <app-button-close
+                  class="text-error flex-shrink-0"
                   (click)="onUnassignInhabitant(inh.instance.instanceId)"
-                >
-                  Remove
-                </button>
+                ></app-button-close>
               </div>
             }
           </div>
@@ -311,42 +307,12 @@
         }
       }
 
-      @if (adjacentUnconnected().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Connect to</div>
-        <div class="flex flex-col gap-2">
-          @for (adj of adjacentUnconnected(); track adj.id) {
-            <button
-              class="btn btn-xs btn-outline btn-success"
-              (click)="onConnect(adj.id)"
-            >
-              {{ adj.name }}
-            </button>
-          }
-        </div>
-      }
-
-      @if (activeConnections().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Connected</div>
-        <div class="flex flex-col gap-2">
-          @for (conn of activeConnections(); track conn.connectionId) {
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs">{{ conn.otherRoomName }}</span>
-              <button
-                class="btn btn-xs btn-outline btn-error"
-                (click)="onDisconnect(conn.connectionId)"
-              >
-                Disconnect
-              </button>
-            </div>
-          }
-        </div>
-      }
-
-      @if (
-        adjacentUnconnected().length === 0 && activeConnections().length === 0
-      ) {
-        <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
-      }
+      <app-room-connections
+        [connectTo]="adjacentUnconnected()"
+        [connections]="activeConnections()"
+        (connect)="onConnect($event)"
+        (disconnect)="onDisconnect($event)"
+      />
 
       <!-- Transport-specific info -->
       @if (transportInfo(); as tInfo) {

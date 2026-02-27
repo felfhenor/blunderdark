@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { RoomConnectionsComponent } from '@components/room-connections/room-connections.component';
 import {
   connectionCreate,
   connectionGetAdjacentUnconnected,
@@ -36,7 +37,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
 
 @Component({
   selector: 'app-panel-hallway-info',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, RoomConnectionsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (selectedHallwayTile(); as info) {
@@ -53,49 +54,12 @@ function formatRoomName(name: string, suffix: string | undefined): string {
             </div>
           }
 
-          @if (adjacentUnconnected().length > 0) {
-            <div class="mt-2">
-              <h4 class="text-xs font-semibold opacity-70 mb-1">Connect to:</h4>
-              <div class="flex flex-col gap-2">
-                @for (adj of adjacentUnconnected(); track adj.id) {
-                  <button
-                    class="btn btn-xs btn-outline btn-success"
-                    (click)="onConnect(adj.id)"
-                  >
-                    {{ adj.name }}
-                  </button>
-                }
-              </div>
-            </div>
-          }
-
-          @if (activeConnections().length > 0) {
-            <div class="mt-2">
-              <h4 class="text-xs font-semibold opacity-70 mb-1">Connected:</h4>
-              <div class="flex flex-col gap-2">
-                @for (conn of activeConnections(); track conn.connectionId) {
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs">{{ conn.otherName }}</span>
-                    <button
-                      class="btn btn-xs btn-outline btn-error"
-                      (click)="onDisconnect(conn.connectionId)"
-                    >
-                      Disconnect
-                    </button>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-
-          @if (
-            adjacentUnconnected().length === 0 &&
-            activeConnections().length === 0
-          ) {
-            <p class="text-xs opacity-50 mt-1">
-              No adjacent entities to connect.
-            </p>
-          }
+          <app-room-connections
+            [connectTo]="adjacentUnconnected()"
+            [connections]="activeConnections()"
+            (connect)="onConnect($event)"
+            (disconnect)="onDisconnect($event)"
+          />
 
           <!-- Trap Section -->
           @if (trapAtTile(); as placedTrap) {
@@ -243,8 +207,7 @@ export class PanelHallwayInfoComponent {
           : conn.roomAId;
       return {
         connectionId: conn.id,
-        otherId,
-        otherName: getEntityName(floor, otherId),
+        name: getEntityName(floor, otherId),
       };
     });
   });
