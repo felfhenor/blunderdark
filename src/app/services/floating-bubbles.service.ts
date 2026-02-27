@@ -7,6 +7,7 @@ import {
   findRoomByRole,
   floatingBubblesEmitQueue,
   mutationCompleted$,
+  optionsGet,
   researchCompleted$,
   spawningPoolSpawn$,
   summoningCompleted$,
@@ -38,6 +39,7 @@ export class FloatingBubblesService {
     });
 
     alchemyLabCompleted$.subscribe((e) => {
+      if (!optionsGet('showResourceGainBubbles')) return;
       floatingBubblesEmitQueue(
         e.roomId,
         `+${e.outputAmount} ${e.outputResource}`,
