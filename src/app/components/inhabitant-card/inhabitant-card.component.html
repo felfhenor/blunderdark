@@ -23,9 +23,19 @@
         <span class="badge badge-xs badge-outline opacity-60 flex-shrink-0">Assigned</span>
       }
       @if (showState()) {
-        <span class="badge badge-xs flex-shrink-0" [ngClass]="stateClass()">
+        <span class="badge badge-xs flex-shrink-0" [ngClass]="stateClass()" [tp]="stateTipCompact">
           {{ instance().state }}
         </span>
+        <ng-template #stateTipCompact>
+          <div class="font-semibold text-xs mb-0.5">{{ stateTooltip().title }}</div>
+          <div class="text-xs opacity-70">{{ stateTooltip().description }}</div>
+          @if (stateTooltip().lines.length > 0) {
+            <div class="divider my-0.5 h-0"></div>
+            @for (line of stateTooltip().lines; track line.label) {
+              <div class="text-xs opacity-60">{{ line.label }}: {{ line.value }}</div>
+            }
+          }
+        </ng-template>
       }
       @if (equippedItemName(); as itemName) {
         <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName">&#9876;</span>
@@ -91,9 +101,19 @@
           </ng-template>
         }
         @if (showState()) {
-          <span class="badge badge-xs" [ngClass]="stateClass()">
+          <span class="badge badge-xs" [ngClass]="stateClass()" [tp]="stateTipFull">
             {{ instance().state }}
           </span>
+          <ng-template #stateTipFull>
+            <div class="font-semibold text-xs mb-0.5">{{ stateTooltip().title }}</div>
+            <div class="text-xs opacity-70">{{ stateTooltip().description }}</div>
+            @if (stateTooltip().lines.length > 0) {
+              <div class="divider my-0.5 h-0"></div>
+              @for (line of stateTooltip().lines; track line.label) {
+                <div class="text-xs opacity-60">{{ line.label }}: {{ line.value }}</div>
+              }
+            }
+          </ng-template>
         }
         @if (equippedItemName(); as itemName) {
           <span class="badge badge-xs badge-warning" [tp]="'Equipped: ' + itemName">&#9876;</span>

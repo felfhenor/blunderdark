@@ -11,9 +11,15 @@ import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { efficiencyDoesTraitApply } from '@helpers/efficiency';
+import { fearLevelRoomMap } from '@helpers/fear-level';
+import { formatMultiplierAsPercentage } from '@helpers/format';
 import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
+import {
+  stateModifierGet,
+  stateModifierGetFearTolerance,
+} from '@helpers/state-modifiers';
 import { synergyGetDefinitions } from '@helpers/synergy';
 import type {
   ForgeRecipeContent,
@@ -88,6 +94,75 @@ export class InhabitantCardComponent {
     if (state === 'hungry') return 'badge-warning';
     if (state === 'starving') return 'badge-error';
     return 'badge-success';
+  });
+
+  public stateTooltip = computed(() => {
+    const inst = this.instance();
+    const state = inst.state;
+    const modifier = stateModifierGet(inst.definitionId, state);
+
+    const lines: { label: string; value: string }[] = [];
+
+    if (state === 'normal') {
+      return {
+        title: 'Normal',
+        description: 'No status effects.',
+        lines: [],
+      };
+    }
+
+    // Build effect lines
+    if (modifier.productionMultiplier !== 1.0) {
+      lines.push({
+        label: 'Production',
+        value: formatMultiplierAsPercentage(modifier.productionMultiplier),
+      });
+    }
+    if (modifier.attackMultiplier !== undefined && modifier.attackMultiplier !== 1.0) {
+      lines.push({
+        label: 'Attack',
+        value: formatMultiplierAsPercentage(modifier.attackMultiplier),
+      });
+    }
+    if (modifier.defenseMultiplier !== undefined && modifier.defenseMultiplier !== 1.0) {
+      lines.push({
+        label: 'Defense',
+        value: formatMultiplierAsPercentage(modifier.defenseMultiplier),
+      });
+    }
+    if (modifier.foodConsumptionMultiplier !== 1.0) {
+      lines.push({
+        label: 'Food consumption',
+        value: formatMultiplierAsPercentage(modifier.foodConsumptionMultiplier),
+      });
+    }
+
+    if (state === 'scared') {
+      const tolerance = stateModifierGetFearTolerance(inst.definitionId);
+      const roomFear = inst.assignedRoomId
+        ? (fearLevelRoomMap().get(inst.assignedRoomId) ?? 0)
+        : 0;
+      return {
+        title: 'Scared',
+        description: `Room fear (${roomFear}) exceeds tolerance (${tolerance}).`,
+        lines,
+      };
+    }
+
+    if (state === 'hungry') {
+      return {
+        title: 'Hungry',
+        description: 'Not enough food. Feed your inhabitants!',
+        lines,
+      };
+    }
+
+    // starving
+    return {
+      title: 'Starving',
+      description: 'Critically low on food!',
+      lines,
+    };
   });
 
   public synergyInfo = computed(() => {
