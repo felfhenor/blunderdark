@@ -80,6 +80,8 @@ export function farplaneCaptureDefenderSouls(
 
   const capacity = farplaneGetSoulCapacity();
 
+  let capturedCount = 0;
+
   for (const defenderId of killedDefenderIds) {
     const instance = state.world.inhabitants.find(
       (i) => i.instanceId === defenderId,
@@ -102,7 +104,12 @@ export function farplaneCaptureDefenderSouls(
     };
 
     state.world.farplaneSouls.push(soul);
-    notify('Farplane', `${instance.name}'s soul was captured in the Farplane`);
+    capturedCount++;
+  }
+
+  if (capturedCount > 0) {
+    const soulWord = capturedCount === 1 ? 'soul was' : 'souls were';
+    notify('Farplane', `${capturedCount} ${soulWord} captured in the Farplane`);
   }
 
   // Evict oldest souls if over capacity
