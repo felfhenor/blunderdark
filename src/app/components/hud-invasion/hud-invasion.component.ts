@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { IconComponent } from '@components/icon/icon.component';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
@@ -22,7 +23,7 @@ type ObjectiveStatus = {
 @Component({
   selector: 'app-hud-invasion',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, IconComponent],
   host: {
     class: 'block pointer-events-auto',
   },
@@ -72,7 +73,7 @@ type ObjectiveStatus = {
             <div class="flex flex-col gap-0.5 max-h-24 overflow-y-auto">
               @for (inv of livingInvaders(); track inv.name + $index) {
                 <div class="flex items-center gap-2">
-                  <span class="text-xs truncate w-20">@if (inv.isLeader) {<span class="text-warning">&#9733;</span> }{{ inv.name }}</span>
+                  <span class="text-xs truncate w-20">@if (inv.isLeader) {<span class="text-warning"><app-icon name="tablerStar" size="12px" /></span> }{{ inv.name }}</span>
                   <progress
                     class="progress flex-1 h-1.5"
                     [class.progress-success]="inv.hpPercent > 60"
@@ -99,9 +100,9 @@ type ObjectiveStatus = {
             @for (obj of objectives(); track obj.name) {
               <div class="flex items-center gap-2 text-xs">
                 @if (obj.isCompleted) {
-                  <span class="text-success">&#10003;</span>
+                  <span class="text-success"><app-icon name="tablerCheck" size="12px" /></span>
                 } @else {
-                  <span class="opacity-40">&#9675;</span>
+                  <span class="opacity-40"><app-icon name="tablerCircle" size="12px" /></span>
                 }
                 <span
                   [class.line-through]="obj.isCompleted"

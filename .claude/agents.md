@@ -16,6 +16,7 @@ Reusable patterns and learnings for agents working on Blunderdark.
 - **Prefer modals/popups over separate pages** for new features.
 - **Leverage `es-toolkit` in TypeScript** — for string utilities (`startCase`, `camelCase`, etc.) and collection functions (`sortBy`, `groupBy`, `uniq`, etc.), always prefer `es-toolkit` or `es-toolkit/compat` over manual implementations. Never hand-roll regex-based string transformations when `es-toolkit` provides the function. In templates, prefer Angular's built-in pipes (`titlecase`, `lowercase`, etc.) instead.
 - **NEVER show real (wall-clock) time** — all durations and countdowns must use in-game time units (days, hours, minutes). Never convert game time to real seconds via `ticksToRealSeconds` or `formatDurationSeconds` for display purposes.
+- **Never use HTML entities or raw unicode for icons** — do not use `&#9876;`, `&rarr;`, `&#x2714;`, or raw unicode symbols (×, ★, →, etc.) for decorative/icon purposes in templates. Always use `<app-icon name="iconName" size="..." />` from `IconComponent` (`@components/icon/icon.component`). Available icons are registered in `@helpers/icons.ts` (ICON_ALL) from `@ng-icons/game-icons` and `@ng-icons/tabler-icons`. Add new icons to `icons.ts` as needed. Plain text separators (like `&middot;` between values) are acceptable.
 
 ## Content Pipeline
 

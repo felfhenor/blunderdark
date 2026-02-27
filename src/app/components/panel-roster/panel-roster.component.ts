@@ -6,6 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   inhabitantAssignToRoom,
@@ -43,7 +44,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, InhabitantCardComponent, SweetAlert2Module],
+  imports: [DecimalPipe, IconComponent, InhabitantCardComponent, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

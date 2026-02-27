@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
+import { IconComponent } from '@components/icon/icon.component';
 import {
   CAMERA_ZOOM_STEP,
   cameraInit,
@@ -117,7 +118,7 @@ const CAMERA_DRAG_THRESHOLD = 5;
 
 @Component({
   selector: 'app-grid',
-  imports: [DecimalPipe, NgClass, FearIndicatorComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, FearIndicatorComponent, IconComponent, TippyDirective],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

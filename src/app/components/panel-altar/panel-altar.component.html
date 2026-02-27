@@ -147,8 +147,8 @@
             @if (entry.requirements.length > 0) {
               <div class="flex flex-col gap-0 mb-1">
                 @for (req of entry.requirements; track req.requirement.description) {
-                  <div class="text-xs" [class.text-success]="req.met" [class.text-error]="!req.met">
-                    {{ req.met ? '&#10003;' : '&#10007;' }} {{ req.requirement.description }}
+                  <div class="text-xs flex items-center gap-1" [class.text-success]="req.met" [class.text-error]="!req.met">
+                    <app-icon [name]="req.met ? 'tablerCheck' : 'tablerX'" size="12px" /> {{ req.requirement.description }}
                   </div>
                 }
               </div>

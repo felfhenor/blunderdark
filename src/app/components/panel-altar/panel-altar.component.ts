@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   altarRoomFearReductionAura,
@@ -59,7 +60,7 @@ type LegendaryEntry = {
 
 @Component({
   selector: 'app-panel-altar',
-  imports: [DecimalPipe, CurrencyCostComponent, StatRowComponent, TippyDirective],
+  imports: [DecimalPipe, CurrencyCostComponent, IconComponent, StatRowComponent, TippyDirective],
   templateUrl: './panel-altar.component.html',
   styleUrl: './panel-altar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

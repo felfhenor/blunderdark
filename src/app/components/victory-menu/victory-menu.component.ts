@@ -6,6 +6,7 @@ import {
   model,
   signal,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { VictoryConditionRowComponent } from '@components/victory-condition-row/victory-condition-row.component';
 import { contentGetEntriesByType } from '@helpers/content';
@@ -38,7 +39,7 @@ type PathViewModel = {
 
 @Component({
   selector: 'app-victory-menu',
-  imports: [DecimalPipe, ModalComponent, VictoryConditionRowComponent],
+  imports: [DecimalPipe, IconComponent, ModalComponent, VictoryConditionRowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal
@@ -59,7 +60,7 @@ type PathViewModel = {
               (click)="selectedPathId.set(path.id)"
             >
               @if (path.isAchieved) {
-                <span class="text-success text-xs">&#x2714;</span>
+                <span class="text-success text-xs"><app-icon name="tablerCheck" size="12px" /></span>
               }
               <span class="truncate text-xs">{{ path.name }}</span>
               <span

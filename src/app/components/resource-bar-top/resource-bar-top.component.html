@@ -74,7 +74,7 @@
               @for (effect of corruptionInfo().activeEffects; track effect.id) {
                 @if (effect.effectType !== 'visual') {
                   <li class="flex items-start gap-1.5">
-                    <span class="shrink-0 mt-0.5" [ngClass]="corruptionInfo().colorClass">&#9670;</span>
+                    <span class="shrink-0 mt-0.5" [ngClass]="corruptionInfo().colorClass"><app-icon name="tablerDiamond" size="12px" /></span>
                     <div>
                       <span class="font-semibold">{{ effect.name }}</span>
                       <span class="opacity-70 ml-1">{{ effect.description }}</span>

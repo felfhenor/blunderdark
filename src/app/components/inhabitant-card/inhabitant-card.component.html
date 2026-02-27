@@ -38,7 +38,7 @@
         </ng-template>
       }
       @if (equippedItemName(); as itemName) {
-        <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName">&#9876;</span>
+        <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName"><app-icon name="gameWarPick" size="12px" /></span>
       }
       @if (showHunger()) {
         <app-hunger-indicator [inhabitantId]="instance().instanceId" />
@@ -116,7 +116,7 @@
           </ng-template>
         }
         @if (equippedItemName(); as itemName) {
-          <span class="badge badge-xs badge-warning" [tp]="'Equipped: ' + itemName">&#9876;</span>
+          <span class="badge badge-xs badge-warning" [tp]="'Equipped: ' + itemName"><app-icon name="gameWarPick" size="12px" /></span>
         }
       </div>
     </div>

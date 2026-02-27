@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
   RESOURCE_DISPLAY,
@@ -30,6 +31,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     NgClass,
     CurrencyCostComponent,
     CurrencyNameComponent,
+    IconComponent,
     TippyDirective,
   ],
   host: {

@@ -6,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { IconComponent } from '@components/icon/icon.component';
 import {
   gamestate,
   hungerCalculateTotalConsumption,
@@ -38,6 +39,7 @@ const CRITICAL_THRESHOLD = 0.1;
     NgClass,
     UpperCasePipe,
     CurrencyNameComponent,
+    IconComponent,
     TippyDirective,
   ],
   templateUrl: './panel-resources.component.html',
