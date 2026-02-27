@@ -8,6 +8,13 @@
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
 
+      <button
+        class="btn btn-xs btn-outline btn-secondary mt-2"
+        (click)="showRecipeBrowser.set(true)"
+      >
+        Browse All Recipes
+      </button>
+
       <!-- Active Breeding Job -->
       @if (breedingProgress(); as bp) {
         <div class="mt-2">
@@ -112,6 +119,74 @@
     </div>
   </div>
 }
+
+<!-- Recipe Browser Modal -->
+<app-modal [(visible)]="showRecipeBrowser" [widthClass]="'max-w-3xl'" [showCloseButton]="true">
+  <span title>Breeding Recipes</span>
+  <div body>
+    <div class="mb-3">
+      <input
+        type="text"
+        placeholder="Search recipes..."
+        class="input input-sm input-bordered w-full max-w-xs"
+        [value]="recipeSearchQuery()"
+        (input)="recipeSearchQuery.set($any($event.target).value)"
+      />
+    </div>
+
+    <div class="overflow-y-auto max-h-[30vh] grid gap-2">
+      @for (entry of filteredRecipes(); track entry.recipe.id) {
+        <div class="card bg-base-200">
+          <div class="card-body p-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="font-semibold">
+                  {{ entry.parentADef?.name ?? '?' }}
+                </span>
+                <span class="opacity-40">+</span>
+                <span class="font-semibold">
+                  {{ entry.parentBDef?.name ?? '?' }}
+                </span>
+                <span class="opacity-40">=</span>
+                <span class="font-bold text-secondary">
+                  {{ entry.recipe.resultName }}
+                </span>
+              </div>
+              @if (entry.hasParents) {
+                <span class="badge badge-sm badge-success">Ready</span>
+              }
+            </div>
+            <p class="text-xs opacity-60">{{ entry.recipe.description }}</p>
+            @if (entry.statBonusEntries.length > 0) {
+              <div class="flex flex-wrap gap-2 mt-1">
+                @for (bonus of entry.statBonusEntries; track bonus.stat) {
+                  <app-stat-name
+                    [type]="bonus.stat"
+                    [value]="bonus.value"
+                    [prefix]="bonus.value > 0 ? '+' : ''"
+                  />
+                }
+              </div>
+            }
+            @if (entry.recipe.timeMultiplier !== 1) {
+              <div class="text-xs opacity-50 mt-1">
+                {{ entry.recipe.timeMultiplier }}x time
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @if (filteredRecipes().length === 0) {
+        <p class="text-sm opacity-50">No recipes found.</p>
+      }
+    </div>
+  </div>
+  <div actions>
+    <button class="btn btn-sm" (click)="showRecipeBrowser.set(false)">
+      Close
+    </button>
+  </div>
+</app-modal>
 
 <!-- Mutation Result Modal -->
 <app-modal [(visible)]="showMutationResult">

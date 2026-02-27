@@ -9,9 +9,11 @@ import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { MutationOutcomeTextComponent } from '@components/mutation-outcome-text/mutation-outcome-text.component';
+import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
   breedingCompleted$,
   breedingGetAdjacentRoomTypeIds,
+  breedingGetAllRecipes,
   breedingGetAvailableRecipes,
   breedingGetHybridTicks,
   breedingGetMutatableInhabitants,
@@ -29,6 +31,7 @@ import type {
   BreedingRecipeId,
   Floor,
   InhabitantInstanceId,
+  InhabitantStats,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
@@ -42,6 +45,7 @@ import { sortBy } from 'es-toolkit/compat';
     JobProgressComponent,
     ModalComponent,
     MutationOutcomeTextComponent,
+    StatNameComponent,
   ],
   templateUrl: './panel-breeding-pits.component.html',
   styleUrl: './panel-breeding-pits.component.scss',
@@ -161,6 +165,61 @@ export class PanelBreedingPitsComponent {
       recipeName: recipe?.resultName ?? 'Unknown',
       ticksRemaining: job.ticksRemaining,
     };
+  });
+
+  // --- Recipe Browser ---
+  public showRecipeBrowser = signal(false);
+  public recipeSearchQuery = signal('');
+
+  public allRecipes = computed(() => {
+    const recipes = breedingGetAllRecipes();
+    const inhabitants = gamestate().world.inhabitants;
+    const inhabitantDefIds = new Set(inhabitants.map((i) => i.definitionId));
+
+    return sortBy(
+      recipes
+        .map((recipe) => {
+          const parentADef = contentGetEntry<InhabitantContent>(
+            recipe.parentInhabitantAId,
+          );
+          const parentBDef = contentGetEntry<InhabitantContent>(
+            recipe.parentInhabitantBId,
+          );
+          const hasParents =
+            inhabitantDefIds.has(recipe.parentInhabitantAId) &&
+            inhabitantDefIds.has(recipe.parentInhabitantBId);
+
+          const statBonusEntries = Object.entries(recipe.statBonuses)
+            .filter(([, v]) => v !== undefined && v !== 0)
+            .map(([key, value]) => ({
+              stat: key as keyof InhabitantStats,
+              value: value!,
+            }));
+
+          return {
+            recipe,
+            parentADef,
+            parentBDef,
+            hasParents,
+            statBonusEntries,
+          };
+        })
+        .filter((e) => e.parentADef && e.parentBDef),
+      [(e) => e.recipe.resultName],
+    );
+  });
+
+  public filteredRecipes = computed(() => {
+    const query = this.recipeSearchQuery().toLowerCase().trim();
+    const all = this.allRecipes();
+    if (!query) return all;
+
+    return all.filter(
+      (e) =>
+        e.recipe.resultName.toLowerCase().includes(query) ||
+        e.parentADef!.name.toLowerCase().includes(query) ||
+        e.parentBDef!.name.toLowerCase().includes(query),
+    );
   });
 
   public mutationProgress = computed(() => {

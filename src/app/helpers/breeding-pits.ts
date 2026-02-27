@@ -52,6 +52,13 @@ export const mutationCompleted$ = mutationCompletedSubject.asObservable();
 // --- Pure helpers ---
 
 /**
+ * Get all breeding recipes.
+ */
+export function breedingGetAllRecipes(): BreedingRecipeContent[] {
+  return contentGetEntriesByType<BreedingRecipeContent>('breedingrecipe');
+}
+
+/**
  * Find a breeding recipe matching two parent definition IDs (order-independent).
  */
 export function breedingFindRecipe(
