@@ -219,6 +219,7 @@ All room-specific systems follow the same pattern:
 - **CSS variables** for DaisyUI 5 theme colors: `var(--color-primary)`, `var(--color-secondary)`, `var(--color-accent)`, `var(--color-info)`, `var(--color-success)`, `var(--color-warning)`, `var(--color-error)`, `var(--color-neutral)`. These resolve to full `oklch(...)` values and work directly as CSS colors. Do NOT use the old daisyUI 4 format (`oklch(var(--p))`, `oklch(var(--su))`, etc.) — those variables no longer exist.
 - **Tooltips**: `@ngneat/helipopper` (`[tp]="templateRef"` or `[tp]="'text'"`, `[tpDelay]="250"`, `[tpClassName]="'game-tooltip'"`)
 - **SweetAlert2**: `[swal]="templateRef"` on button + `<swal>` with `(confirm)`
+- **Inhabitant cards** — always use `<app-inhabitant-card>` to display inhabitant info (name, tier, state, stats, traits, etc.). Never render inhabitant properties inline. Supports `[compact]="true"` for list items and full mode for detail views. For non-InhabitantInstance data (e.g. FarplaneSoul), synthesize a minimal InhabitantInstance. Definition-only displays (altar recruitment previews) are exempt since the card requires an instance.
 - **Panel components**: card pattern (`card bg-base-100 shadow-xl` → `card-body p-4` → `card-title text-sm`), conditionally render via computed signal + `@if`
 - **Keyboard shortcuts**: `@ngneat/hotkeys` with `[hotkeys]`, `isGlobal`, `(hotkey)`
 - **Build mode mutual exclusion**: each mode has enter/exit signals; `enterX()` calls `exitY()` (one-way imports to avoid circular deps)

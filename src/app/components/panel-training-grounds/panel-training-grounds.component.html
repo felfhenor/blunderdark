@@ -46,17 +46,21 @@
       @if (trainees().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Trainees</div>
         <div class="flex flex-col gap-2">
-          @for (trainee of trainees(); track trainee.instanceId) {
+          @for (trainee of trainees(); track trainee.instance.instanceId) {
             <div class="flex flex-col gap-2">
-              <div class="flex items-center justify-between">
-                <div class="flex flex-col min-w-0">
-                  <span class="text-xs font-semibold truncate">{{ trainee.instanceName }}</span>
-                  <span class="text-xs opacity-50 truncate">{{ trainee.defName }}</span>
-                </div>
+              <div class="flex items-center justify-between gap-2">
+                <app-inhabitant-card
+                  class="min-w-0"
+                  [instance]="trainee.instance"
+                  [definition]="trainee.def"
+                  [compact]="true"
+                  [showAssignment]="false"
+                  [showStats]="false"
+                />
                 @if (trainee.trained) {
-                  <span class="badge badge-xs badge-success">Trained</span>
+                  <span class="badge badge-xs badge-success flex-shrink-0">Trained</span>
                 } @else {
-                  <span class="badge badge-xs badge-warning">Training</span>
+                  <span class="badge badge-xs badge-warning flex-shrink-0">Training</span>
                 }
               </div>
               @if (!trainee.trained) {

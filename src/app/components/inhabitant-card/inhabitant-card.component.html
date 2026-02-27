@@ -7,7 +7,7 @@
           T{{ definition().tier | number: '1.0-0' }}
         </span>
       }
-      <div class="flex flex-col min-w-0">
+      <div class="flex flex-col min-w-0 flex-1">
         @if (showInstanceName()) {
           <span class="text-xs font-semibold truncate">
             {{ instance().name }}
@@ -20,21 +20,21 @@
         }
       </div>
       @if (showAssignment() && instance().assignedRoomId) {
-        <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
+        <span class="badge badge-xs badge-outline opacity-60 flex-shrink-0">Assigned</span>
       }
       @if (showState()) {
-        <span class="badge badge-xs" [ngClass]="stateClass()">
+        <span class="badge badge-xs flex-shrink-0" [ngClass]="stateClass()">
           {{ instance().state }}
         </span>
       }
       @if (equippedItemName(); as itemName) {
-        <span class="badge badge-xs badge-warning" [tp]="'Equipped: ' + itemName">&#9876;</span>
+        <span class="badge badge-xs badge-warning flex-shrink-0" [tp]="'Equipped: ' + itemName">&#9876;</span>
       }
       @if (showHunger()) {
         <app-hunger-indicator [inhabitantId]="instance().instanceId" />
       }
       @if (synergyInfo(); as reasons) {
-        <span class="ml-auto text-success" [tp]="synergyTip">
+        <span class="text-success flex-shrink-0" [tp]="synergyTip">
           <app-icon name="tablerStar" size="14px" />
         </span>
         <ng-template #synergyTip>

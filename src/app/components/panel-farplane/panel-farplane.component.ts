@@ -1,7 +1,6 @@
-import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
-import { StatRowComponent } from '@components/stat-row/stat-row.component';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
   farplaneGetRecruitCost,
@@ -14,6 +13,8 @@ import {
 import { recruitmentIsRosterFull } from '@helpers/recruitment';
 import type {
   FarplaneSoulId,
+  InhabitantInstance,
+  InhabitantInstanceId,
   ResourceCost,
   ResourceType,
 } from '@interfaces';
@@ -22,7 +23,7 @@ import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-farplane',
-  imports: [CurrencyCostComponent, DecimalPipe, NgClass, StatRowComponent],
+  imports: [CurrencyCostComponent, InhabitantCardComponent],
   templateUrl: './panel-farplane.component.html',
   styleUrl: './panel-farplane.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,16 +59,24 @@ export class PanelFarplaneComponent {
           type: type as ResourceType,
           amount,
         }));
-      return { soul, def, cost, costEntries };
+      const syntheticInstance: InhabitantInstance = {
+        instanceId: soul.soulId as unknown as InhabitantInstanceId,
+        definitionId: soul.definitionId,
+        name: soul.instanceName,
+        state: 'normal',
+        assignedRoomId: undefined,
+        trained: soul.trained,
+        trainingBonuses: soul.trainingBonuses,
+        instanceStatBonuses: soul.instanceStatBonuses,
+        mutated: soul.mutated,
+        mutationTraitIds: soul.mutationTraitIds,
+        isHybrid: soul.isHybrid,
+        hybridParentIds: soul.hybridParentIds,
+        isSummoned: soul.isSummoned,
+      };
+      return { soul, def, cost, costEntries, syntheticInstance };
     });
   });
-
-  public tierClass(tier: number): string {
-    if (tier >= 4) return 'badge-error';
-    if (tier === 3) return 'badge-warning';
-    if (tier === 2) return 'badge-info';
-    return 'badge-outline';
-  }
 
   public canAfford(cost: ResourceCost): boolean {
     return resourceCanAfford(cost);

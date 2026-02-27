@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,7 +7,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
-import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   inhabitantAssignToRoom,
   inhabitantRename,
@@ -19,11 +18,9 @@ import {
   notifySuccess,
   inhabitantUnassignFromRoom,
 } from '@helpers';
-import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
-  MutationTraitContent,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
@@ -46,7 +43,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, NgClass, InhabitantCardComponent, StatRowComponent, SweetAlert2Module],
+  imports: [DecimalPipe, InhabitantCardComponent, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -121,25 +118,6 @@ export class PanelRosterComponent {
     const id = this.selectedInhabitantId();
     if (!id) return undefined;
     return this.allEntries().find((e) => e.instance.instanceId === id) ?? undefined;
-  });
-
-  public selectedEffectiveStats = computed(() => {
-    const entry = this.selectedEntry();
-    if (!entry) return undefined;
-    return effectiveStatsCalculate(entry.def, entry.instance);
-  });
-
-  public selectedMutationTraits = computed<MutationTraitContent[]>(() => {
-    const entry = this.selectedEntry();
-    if (!entry) return [];
-    const ids = entry.instance.mutationTraitIds;
-    if (!ids || ids.length === 0) return [];
-    const traits: MutationTraitContent[] = [];
-    for (const id of ids) {
-      const trait = contentGetEntry<MutationTraitContent>(id);
-      if (trait) traits.push(trait);
-    }
-    return traits;
   });
 
   public availableRooms = computed(() => {
@@ -273,9 +251,4 @@ export class PanelRosterComponent {
     }
   }
 
-  public getStateClass(state: string): string {
-    if (state === 'scared') return 'badge-error';
-    if (state === 'hungry') return 'badge-warning';
-    return 'badge-success';
-  }
 }

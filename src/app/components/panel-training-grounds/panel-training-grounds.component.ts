@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
@@ -11,6 +12,7 @@ import {
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
+  InhabitantInstance,
   TrainingBonuses,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -19,7 +21,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-training-grounds',
-  imports: [DecimalPipe, JobProgressComponent, StatNameComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, StatNameComponent],
   templateUrl: './panel-training-grounds.component.html',
   styleUrl: './panel-training-grounds.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,22 +50,22 @@ export class PanelTrainingGroundsComponent {
         const def = contentGetEntry<InhabitantContent>(
           i.definitionId,
         );
+        if (!def) return undefined;
         const progress = i.trainingProgress ?? 0;
         const percent = trainingGetProgressPercent(
           progress,
           info.targetTicks,
         );
         return {
-          instanceId: i.instanceId,
-          instanceName: i.name,
-          defName: def?.name ?? i.name,
+          instance: i,
+          def,
           trained: i.trained ?? false,
-          progress,
           percent,
-          bonuses: i.trainingBonuses ?? { defense: 0, attack: 0 },
+          bonuses: (i.trainingBonuses ?? { defense: 0, attack: 0 }) as TrainingBonuses,
         };
-      });
-    return sortBy(mapped, [(e) => e.defName]);
+      })
+      .filter((e): e is { instance: InhabitantInstance; def: InhabitantContent; trained: boolean; percent: number; bonuses: TrainingBonuses } => e !== undefined);
+    return sortBy(mapped, [(e) => e.def.name]);
   });
 
   public trainingTimeSeconds = computed(() => {

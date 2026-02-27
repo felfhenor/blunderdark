@@ -73,71 +73,17 @@
               &#10005;
             </button>
           </div>
-          <p class="text-xs opacity-50">{{ entry.def.name }}</p>
-          <p class="text-xs opacity-60">{{ entry.def.description }}</p>
-          <div class="text-xs mt-1">
-            <span class="opacity-70">Type:</span>
-            {{ entry.def.type }}
-            <span class="opacity-70 ml-2">Tier:</span>
-            {{ entry.def.tier | number: '1.0-0' }}
-            <span class="opacity-70 ml-2">State:</span>
-            <span
-              class="badge badge-xs"
-              [ngClass]="getStateClass(entry.instance.state)"
-            >
-              {{ entry.instance.state }}
-            </span>
-          </div>
 
-          <!-- Full stats -->
-          <app-stat-row
-            class="flex-wrap mt-1 text-xs"
-            [stats]="selectedEffectiveStats()!"
-            [baseStats]="entry.def.stats"
+          <app-inhabitant-card
+            [instance]="entry.instance"
+            [definition]="entry.def"
+            [showInstanceName]="false"
+            [showType]="true"
+            [showTraits]="true"
+            [showHunger]="true"
           />
 
-          <!-- Traits -->
-          @if (entry.def.traits.length > 0) {
-            <div class="mt-1">
-              <span class="text-xs opacity-50">Traits:</span>
-              @for (trait of entry.def.traits; track trait.id) {
-                <div class="text-xs ml-1">
-                  <span class="font-semibold">{{ trait.name }}</span>
-                  — {{ trait.description }}
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Mutation Traits -->
-          @if (selectedMutationTraits().length > 0) {
-            <div class="mt-1">
-              <span class="text-xs opacity-50">Mutations:</span>
-              @for (mt of selectedMutationTraits(); track mt.id) {
-                <div class="text-xs ml-1">
-                  <span
-                    class="font-semibold"
-                    [class.text-accent]="!mt.isNegative"
-                    [class.text-error]="!!mt.isNegative"
-                  >
-                    {{ mt.name }}
-                  </span>
-                  — {{ mt.description }}
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Current assignment -->
-          <div class="mt-1 text-xs">
-            <span class="opacity-50">Assigned:</span>
-            @if (entry.roomName) {
-              {{ entry.roomName }}
-              <span class="opacity-50">({{ entry.floorName }})</span>
-            } @else {
-              None
-            }
-          </div>
+          <p class="text-xs opacity-60 mt-1">{{ entry.def.description }}</p>
 
           <!-- Unassign button -->
           @if (entry.instance.assignedRoomId) {
