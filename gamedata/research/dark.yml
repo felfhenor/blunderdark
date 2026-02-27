@@ -16,13 +16,13 @@
 #   │   │   └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
 #   │   └── Farplane Studies (T3) [+Farplane]
 #   │       └── Soul Binding (T4) [+2 soul capacity]
-#   │           └── Ethereal Resonance (T5) [+2 soul capacity]
+#   │           └── Ethereal Resonance (T6) [+2 soul capacity]
 #   └── Corrupted Biome (T2)
 #   Soul Forge (T4) [Soul Well Mastery + Undead Mastery, +Abyssal Conduit]
 #   Abyssal Gateway (T5) [Dark Rituals + Shadow Weaving]
-#   Abyssal Summoning (T5) [Abyssal Gateway + Soul Forge]
 #   Necromantic Ascension (T5) [Soul Forge]
-#   Serpent's Gaze (T5) [Abyssal Gateway]
+#   Abyssal Summoning (T6) [Abyssal Gateway + Soul Forge]
+#   Serpent's Gaze (T6) [Abyssal Gateway]
 #   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
 
 # --- TIER 2: Four paths branch from Dark Arts Fundamentals ---
@@ -261,7 +261,7 @@
       bonusType: farplaneSoulCapacity
       value: 2
       description: +2 Farplane soul capacity
-  tier: 5
+  tier: 6
   requiredTicks: 600
 
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
@@ -322,7 +322,7 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Demon Lord
-  tier: 5
+  tier: 6
   requiredTicks: 750
 
 - id: 2a744cf1-30fe-45d1-a135-dfe3ca596bea
@@ -354,7 +354,7 @@
   unlocks:
     - type: inhabitant
       targetInhabitantId: Medusa
-  tier: 5
+  tier: 6
   requiredTicks: 750
 
 - id: d5d60545-90a0-4f52-9000-ec2e6a7c63e2
