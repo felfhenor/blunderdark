@@ -13,6 +13,7 @@
   inhabitantTraitIds: []
   restrictionTags:
     - converted
+  fearTolerance: 0
   fearModifier: 0
   foodConsumptionRate: 1
   corruptionGeneration: 0.1

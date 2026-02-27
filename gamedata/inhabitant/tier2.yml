@@ -64,7 +64,7 @@
   combatAbilityIds:
     - Dungeon Ward
     - Terrifying Roar
-  fearTolerance: 3
+  fearTolerance: 4
   fearModifier: 1
   foodConsumptionRate: 0
   stateModifiers:

@@ -56,7 +56,7 @@
   inhabitantTraitIds:
     - Rally Cry
     - Tactical Cunning
-  fearTolerance: 3
+  fearTolerance: 4
   fearModifier: 1
   foodConsumptionRate: 3
   restrictionTags:
@@ -220,7 +220,7 @@
     - Perfect Ambush
     - Furniture Form
     - Adaptive Form
-  fearTolerance: 3
+  fearTolerance: 4
   fearModifier: 0
   foodConsumptionRate: 2
   restrictionTags:
@@ -262,7 +262,7 @@
   inhabitantTraitIds:
     - Shadow Strike
     - Dark Vision
-  fearTolerance: 3
+  fearTolerance: 4
   fearModifier: 1
   foodConsumptionRate: 3
   restrictionTags:
