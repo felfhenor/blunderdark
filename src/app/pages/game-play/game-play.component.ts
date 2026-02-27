@@ -459,11 +459,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'forge',
         label: 'Forge',
-        icon: 'gameAnvilImpact',
-        hotkey: 'd',
         isModal: false,
         templateRef: this.forgePanel() ?? placeholder,
         condition: this.hasDarkForge,
+        hidden: true,
       },
       {
         id: 'traps',
