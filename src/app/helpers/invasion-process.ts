@@ -6,6 +6,10 @@ import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { fearLevelCalculateAllForFloor } from '@helpers/fear-level';
 import {
+  stateModifierGetAttackMultiplier,
+  stateModifierGetDefenseMultiplier,
+} from '@helpers/state-modifiers';
+import {
   combatantHasStatus,
   invasionCombatAdvanceTurn,
   invasionCombatBuildTurnQueue,
@@ -829,6 +833,13 @@ export function invasionProcess(state: GameState): void {
         const stats = defContent
           ? effectiveStatsCalculate(defContent, def)
           : { hp: 10, attack: 5, defense: 5, speed: 5, workerEfficiency: 1 };
+
+        // Apply state modifier penalties (scared/hungry/starving fight worse)
+        const attackMul = stateModifierGetAttackMultiplier(def);
+        const defenseMul = stateModifierGetDefenseMultiplier(def);
+        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul));
+        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul));
+
         // Initialize ability states from content definition if not already set
         const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);
         const defStatusEffects = def.statusEffects ?? [];
@@ -836,7 +847,7 @@ export function invasionProcess(state: GameState): void {
           def.instanceId as unknown as CombatantId,
           'defender',
           def.name,
-          { ...stats, maxHp: stats.hp },
+          { ...stats, attack: modifiedAttack, defense: modifiedDefense, maxHp: stats.hp },
           { x: idx, y: 0 },
           defAbilityStates,
           defStatusEffects,

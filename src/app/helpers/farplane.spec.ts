@@ -470,12 +470,14 @@ describe('farplaneCaptureDefenderSouls', () => {
   });
 
   it('should evict oldest souls when over capacity (FIFO)', () => {
-    const existingSouls: FarplaneSoul[] = Array.from({ length: 3 }, (_, i) =>
-      makeSoul({
-        soulId: `existing-${i}` as FarplaneSoulId,
-        instanceName: `Old Soul ${i}`,
-        capturedAtTick: 100 + i,
-      }),
+    const existingSouls: FarplaneSoul[] = Array.from(
+      { length: FARPLANE_BASE_SOUL_CAPACITY },
+      (_, i) =>
+        makeSoul({
+          soulId: `existing-${i}` as FarplaneSoulId,
+          instanceName: `Old Soul ${i}`,
+          capturedAtTick: 100 + i,
+        }),
     );
 
     const newDefender = makeInhabitant({
@@ -494,8 +496,10 @@ describe('farplaneCaptureDefenderSouls', () => {
       'inh-new' as InhabitantInstanceId,
     ]);
 
-    // Base capacity is 3, so with 4 total, oldest should be evicted
-    expect(state.world.farplaneSouls).toHaveLength(3);
+    // Adding 1 over base capacity should evict the oldest
+    expect(state.world.farplaneSouls).toHaveLength(
+      FARPLANE_BASE_SOUL_CAPACITY,
+    );
     // The oldest soul (capturedAtTick: 100) should be gone
     expect(
       state.world.farplaneSouls.find((s) => s.soulId === 'existing-0'),

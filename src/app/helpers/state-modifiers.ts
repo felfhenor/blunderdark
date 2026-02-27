@@ -21,14 +21,20 @@ const STATE_MODIFIER_DEFAULTS: Record<InhabitantState, StateModifier> = {
   scared: {
     productionMultiplier: 0.5,
     foodConsumptionMultiplier: 1.0,
+    attackMultiplier: 0.75,
+    defenseMultiplier: 0.75,
   },
   hungry: {
     productionMultiplier: 0.5,
     foodConsumptionMultiplier: 1.0,
+    attackMultiplier: 0.75,
+    defenseMultiplier: 0.75,
   },
   starving: {
     productionMultiplier: 0.1,
     foodConsumptionMultiplier: 0.5,
+    attackMultiplier: 0.5,
+    defenseMultiplier: 0.5,
   },
 };
 

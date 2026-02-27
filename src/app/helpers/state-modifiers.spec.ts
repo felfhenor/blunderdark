@@ -159,6 +159,8 @@ describe('stateModifierGet', () => {
     const result = stateModifierGet('goblin', 'scared');
     expect(result.productionMultiplier).toBe(0.5);
     expect(result.foodConsumptionMultiplier).toBe(1.0);
+    expect(result.attackMultiplier).toBe(0.75);
+    expect(result.defenseMultiplier).toBe(0.75);
   });
 
   it('should return default modifier when state not defined on creature', () => {
@@ -169,6 +171,8 @@ describe('stateModifierGet', () => {
     });
     const result = stateModifierGet('goblin', 'hungry');
     expect(result.productionMultiplier).toBe(0.5);
+    expect(result.attackMultiplier).toBe(0.75);
+    expect(result.defenseMultiplier).toBe(0.75);
   });
 
   it('should return default modifier when definition not found', () => {
@@ -181,6 +185,15 @@ describe('stateModifierGet', () => {
     const result = stateModifierGet('goblin', 'normal');
     expect(result.productionMultiplier).toBe(1.0);
     expect(result.foodConsumptionMultiplier).toBe(1.0);
+  });
+
+  it('should return starving defaults with severe combat penalties', () => {
+    registerDef('goblin', {});
+    const result = stateModifierGet('goblin', 'starving');
+    expect(result.productionMultiplier).toBe(0.1);
+    expect(result.foodConsumptionMultiplier).toBe(0.5);
+    expect(result.attackMultiplier).toBe(0.5);
+    expect(result.defenseMultiplier).toBe(0.5);
   });
 });
 
@@ -243,7 +256,7 @@ describe('stateModifierGetAttackMultiplier', () => {
     expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(0.7);
   });
 
-  it('should return 1.0 when attack multiplier not defined', () => {
+  it('should return 1.0 when attack multiplier not defined on creature-specific override', () => {
     registerDef('goblin', {
       stateModifiers: {
         scared: { productionMultiplier: 0.5, foodConsumptionMultiplier: 1.5 },
@@ -257,6 +270,24 @@ describe('stateModifierGetAttackMultiplier', () => {
     registerDef('goblin', {});
     const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'normal' });
     expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(1.0);
+  });
+
+  it('should return default 0.75 for scared state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'scared' });
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(0.75);
+  });
+
+  it('should return default 0.75 for hungry state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'hungry' });
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(0.75);
+  });
+
+  it('should return default 0.5 for starving state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'starving' });
+    expect(stateModifierGetAttackMultiplier(inhabitant)).toBe(0.5);
   });
 });
 
@@ -273,7 +304,7 @@ describe('stateModifierGetDefenseMultiplier', () => {
     expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(0.8);
   });
 
-  it('should return 1.0 when defense multiplier not defined', () => {
+  it('should return 1.0 when defense multiplier not defined on creature-specific override', () => {
     registerDef('goblin', {
       stateModifiers: {
         hungry: { productionMultiplier: 0.5, foodConsumptionMultiplier: 1.0 },
@@ -281,6 +312,24 @@ describe('stateModifierGetDefenseMultiplier', () => {
     });
     const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'hungry' });
     expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(1.0);
+  });
+
+  it('should return default 0.75 for scared state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'scared' });
+    expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(0.75);
+  });
+
+  it('should return default 0.75 for hungry state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'hungry' });
+    expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(0.75);
+  });
+
+  it('should return default 0.5 for starving state when no creature override', () => {
+    registerDef('goblin', {});
+    const inhabitant = makeInhabitant({ definitionId: 'goblin' as InhabitantId, state: 'starving' });
+    expect(stateModifierGetDefenseMultiplier(inhabitant)).toBe(0.5);
   });
 });
 

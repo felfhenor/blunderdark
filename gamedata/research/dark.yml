@@ -244,6 +244,8 @@
       bonusType: farplaneSoulCapacity
       value: 2
       description: +2 Farplane soul capacity
+    - type: roomupgrade
+      targetRoomupgradeId: Spiritual Expansion
   tier: 4
   requiredTicks: 500
 
@@ -261,6 +263,8 @@
       bonusType: farplaneSoulCapacity
       value: 2
       description: +2 Farplane soul capacity
+    - type: roomupgrade
+      targetRoomupgradeId: Ethereal Amplification
   tier: 6
   requiredTicks: 600
 

@@ -22,7 +22,7 @@
       @if (showAssignment() && instance().assignedRoomId) {
         <span class="badge badge-xs badge-outline opacity-60">Assigned</span>
       }
-      @if (showState() && instance().state !== 'normal') {
+      @if (showState()) {
         <span class="badge badge-xs" [ngClass]="stateClass()">
           {{ instance().state }}
         </span>
