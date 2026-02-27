@@ -44,6 +44,9 @@ import { startCase } from 'es-toolkit';
         @case ('maxInhabitantBonus') {
           +{{ effect().value }} max inhabitants
         }
+        @case ('globalMaxInhabitantBonus') {
+          +{{ effect().value }} global roster cap
+        }
         @case ('fearReduction') {
           -{{ effect().value }} fear
         }

@@ -13,6 +13,7 @@
     - Fortified Barracks
     - Comfortable Quarters
     - War Room
+    - Garrison Expansion
   role: barracks
   trainingAdjacencyEffects:
     timeReduction: 0.2

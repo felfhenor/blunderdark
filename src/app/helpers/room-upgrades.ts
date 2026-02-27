@@ -5,6 +5,7 @@ import {
   researchUnlockGetPassiveBonusWithMastery,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
+import { gamestate } from '@helpers/state-game';
 import type {
   PlacedRoom,
   RoomId,
@@ -213,4 +214,24 @@ export function roomUpgradeGetProductionMultiplier(
     }
   }
   return multiplier;
+}
+
+/**
+ * Sum all globalMaxInhabitantBonus effects from room upgrades across
+ * every placed room in the dungeon. This contributes to the global roster cap.
+ */
+export function roomUpgradeGetGlobalMaxInhabitantBonus(): number {
+  const floors = gamestate().world.floors;
+  let bonus = 0;
+  for (const floor of floors) {
+    for (const room of floor.rooms) {
+      const effects = roomUpgradeGetAppliedEffects(room);
+      for (const effect of effects) {
+        if (effect.type === 'globalMaxInhabitantBonus') {
+          bonus += effect.value;
+        }
+      }
+    }
+  }
+  return bonus;
 }

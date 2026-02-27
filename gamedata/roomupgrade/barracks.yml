@@ -26,3 +26,13 @@
   effects:
     - type: fearIncrease
       value: 1
+- id: a6f1c579-65e1-49f0-91fa-67cca7b252e2
+  name: Garrison Expansion
+  description: Expand the barracks into a full garrison complex with extended housing wings, increasing the dungeon's overall inhabitant capacity.
+  cost:
+    gold: 150
+    crystals: 60
+    food: 30
+  effects:
+    - type: globalMaxInhabitantBonus
+      value: 5

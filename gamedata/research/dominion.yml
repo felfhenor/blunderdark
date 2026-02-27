@@ -17,9 +17,11 @@
 #   Horde Tactics (T4) [Nature Attunement + Creature Quarters, +Incubation Chamber]
 #   Pack Mentality (T4) [Spirit Binding + Transmutation]
 #   Elite Training (T4) [Creature Quarters + Transmutation, +Mutagenic Pits]
+#   Garrison Command (T4) [Spirit Binding + Creature Quarters, +Garrison Expansion]
 #   Supreme Command (T5) [Horde Tactics + Pack Mentality]
 #   Creature Synergy (T5) [Elite Training + Horde Tactics]
 #   Forced March (T5) [Pack Mentality + Elite Training]
+#   Vast Dominion (T5) [Garrison Command + Horde Tactics]
 #   Sovereign's Will (T6) [Supreme Command + Creature Synergy]
 
 # --- TIER 2: Four paths branch from Creature Lore ---
@@ -217,6 +219,23 @@
   tier: 4
   requiredTicks: 500
 
+- id: 7b1bb0f6-6399-4174-81c0-fad6f7ca2ab2
+  name: Garrison Command
+  description: Establish a centralized command structure for barracks operations, unlocking garrison expansions that increase the dungeon's overall inhabitant capacity.
+  branch: dominion
+  cost:
+    research: 100
+    food: 30
+    gold: 15
+  prerequisiteResearchIds:
+    - Spirit Binding
+    - Creature Quarters
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Garrison Expansion
+  tier: 4
+  requiredTicks: 500
+
 # --- TIER 5: Pinnacle powers ---
 
 - id: f6087134-bc85-4d00-955f-d50b71e50ed8
@@ -273,6 +292,25 @@
       bonusType: recruitmentCostReduction
       value: 0.10
       description: -10% recruitment cost for all creatures
+  tier: 5
+  requiredTicks: 750
+
+- id: 9685b3eb-a200-42d6-8298-d83c08d6c95f
+  name: Vast Dominion
+  description: Extend your sovereign authority across the entire dungeon, dramatically increasing the number of creatures that can serve under your command.
+  branch: dominion
+  cost:
+    research: 200
+    food: 60
+    gold: 30
+  prerequisiteResearchIds:
+    - Garrison Command
+    - Horde Tactics
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 10
+      description: +10 maximum inhabitants
   tier: 5
   requiredTicks: 750
 

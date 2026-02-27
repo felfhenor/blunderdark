@@ -10,6 +10,7 @@ import {
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
 import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
+import { roomUpgradeGetGlobalMaxInhabitantBonus } from '@helpers/room-upgrades';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
@@ -49,8 +50,9 @@ export const recruitmentUnlockedTier = computed<number>(() => {
  * Signal for the maximum number of total inhabitants allowed.
  */
 export const recruitmentMaxInhabitantCount = computed<number>(() => {
-  const bonus = researchUnlockGetPassiveBonusWithMastery('maxInhabitants');
-  return RECRUITMENT_DEFAULT_MAX_INHABITANTS + Math.floor(bonus);
+  const researchBonus = researchUnlockGetPassiveBonusWithMastery('maxInhabitants');
+  const roomUpgradeBonus = roomUpgradeGetGlobalMaxInhabitantBonus();
+  return RECRUITMENT_DEFAULT_MAX_INHABITANTS + Math.floor(researchBonus) + roomUpgradeBonus;
 });
 
 /**

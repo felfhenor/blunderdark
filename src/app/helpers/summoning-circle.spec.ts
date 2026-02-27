@@ -96,6 +96,7 @@ vi.mock('@helpers/room-upgrades', async () => {
       const path = paths.find((p) => p.id === room.appliedUpgradePathId);
       return path?.effects ?? [];
     },
+    roomUpgradeGetGlobalMaxInhabitantBonus: () => 0,
   };
 });
 
