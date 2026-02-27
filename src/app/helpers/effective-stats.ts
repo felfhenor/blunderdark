@@ -65,6 +65,15 @@ export function effectiveStatsCalculate(
     }
   }
 
+  // Forge equipment bonuses (baked at craft time)
+  if (instance.equippedStatBonuses) {
+    hp += instance.equippedStatBonuses.hp ?? 0;
+    attack += instance.equippedStatBonuses.attack ?? 0;
+    defense += instance.equippedStatBonuses.defense ?? 0;
+    speed += instance.equippedStatBonuses.speed ?? 0;
+    workerEfficiency += instance.equippedStatBonuses.workerEfficiency ?? 0;
+  }
+
   // Research passive bonuses
   const statsBonus =
     researchUnlockGetPassiveBonusWithMastery('inhabitantStats');

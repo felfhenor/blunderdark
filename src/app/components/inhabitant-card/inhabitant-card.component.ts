@@ -16,6 +16,7 @@ import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import { synergyGetDefinitions } from '@helpers/synergy';
 import type {
+  ForgeRecipeContent,
   InhabitantInstance,
   MutationTraitContent,
   PlacedRoomId,
@@ -148,5 +149,12 @@ export class InhabitantCardComponent {
     }
 
     return reasons.length > 0 ? reasons : undefined;
+  });
+
+  public equippedItemName = computed(() => {
+    const recipeId = this.instance().equippedForgeItemRecipeId;
+    if (!recipeId) return undefined;
+    const recipe = contentGetEntry<ForgeRecipeContent>(recipeId);
+    return recipe?.name;
   });
 }

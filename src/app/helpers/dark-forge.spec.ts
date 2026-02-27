@@ -119,7 +119,6 @@ const ironSwordRecipe: ForgeRecipeContent = {
   name: 'Iron Sword',
   __type: 'forgerecipe',
   description: 'A sturdy iron blade.',
-  category: 'equipment',
   cost: { gold: 40, crystals: 20 },
   timeMultiplier: 1.0,
   statBonuses: { attack: 3 },
@@ -131,7 +130,6 @@ const darkShieldRecipe: ForgeRecipeContent = {
   name: 'Dark Shield',
   __type: 'forgerecipe',
   description: 'A shadow shield.',
-  category: 'equipment',
   cost: { gold: 50, crystals: 15 },
   timeMultiplier: 1.2,
   statBonuses: { defense: 3 },
@@ -143,7 +141,6 @@ const infernalBladeRecipe: ForgeRecipeContent = {
   name: 'Infernal Blade',
   __type: 'forgerecipe',
   description: 'A fearsome weapon.',
-  category: 'equipment',
   cost: { gold: 120, essence: 40 },
   timeMultiplier: 2.0,
   statBonuses: { attack: 6, speed: 2 },
@@ -341,6 +338,7 @@ function makeGameState(overrides: {
 import {
   darkForgeAddJob,
   darkForgeAddToInventory,
+  darkForgeAutoEquip,
   DARK_FORGE_BASE_CRAFTING_TICKS,
   darkForgeCanQueue,
   darkForgeGetAvailableRecipes,
@@ -348,6 +346,7 @@ import {
   darkForgeGetQueue,
   darkForgeGetStatBonuses,
   darkForgeProcess,
+  darkForgeRemoveFromInventory,
   darkForgeRemoveJob,
 } from '@helpers/dark-forge';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
@@ -602,30 +601,198 @@ describe('darkForgeCanQueue', () => {
 
 describe('Inventory Management', () => {
   it('should add new entry for first item', () => {
-    const result = darkForgeAddToInventory([], IRON_SWORD_ID);
+    const result = darkForgeAddToInventory([], IRON_SWORD_ID, { attack: 3 });
     expect(result).toHaveLength(1);
     expect(result[0].recipeId).toBe(IRON_SWORD_ID);
     expect(result[0].count).toBe(1);
+    expect(result[0].bakedStatBonuses).toEqual({ attack: 3 });
   });
 
-  it('should increment count for existing item', () => {
+  it('should increment count for existing item with matching bonuses', () => {
     const inventory: ForgeInventoryEntry[] = [
-      { recipeId: IRON_SWORD_ID, count: 2 },
+      { recipeId: IRON_SWORD_ID, count: 2, bakedStatBonuses: { attack: 3 } },
     ];
-    const result = darkForgeAddToInventory(inventory, IRON_SWORD_ID);
+    const result = darkForgeAddToInventory(inventory, IRON_SWORD_ID, { attack: 3 });
+    expect(result).toHaveLength(1);
     expect(result[0].count).toBe(3);
+  });
+
+  it('should create separate stack when same recipe has different bonuses', () => {
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+    ];
+    const result = darkForgeAddToInventory(inventory, IRON_SWORD_ID, { attack: 5 });
+    expect(result).toHaveLength(2);
+    expect(result[0].bakedStatBonuses).toEqual({ attack: 3 });
+    expect(result[1].bakedStatBonuses).toEqual({ attack: 5 });
   });
 
   it('should handle multiple items independently', () => {
     const inventory: ForgeInventoryEntry[] = [
-      { recipeId: IRON_SWORD_ID, count: 1 },
+      { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
     ];
-    const result = darkForgeAddToInventory(inventory, DARK_SHIELD_ID);
+    const result = darkForgeAddToInventory(inventory, DARK_SHIELD_ID, { defense: 3 });
     expect(result).toHaveLength(2);
     expect(result[0].recipeId).toBe(IRON_SWORD_ID);
     expect(result[0].count).toBe(1);
     expect(result[1].recipeId).toBe(DARK_SHIELD_ID);
     expect(result[1].count).toBe(1);
+  });
+});
+
+describe('darkForgeRemoveFromInventory', () => {
+  it('should decrement count for matching stack', () => {
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 3, bakedStatBonuses: { attack: 3 } },
+    ];
+    const result = darkForgeRemoveFromInventory(inventory, IRON_SWORD_ID, { attack: 3 });
+    expect(result).toHaveLength(1);
+    expect(result[0].count).toBe(2);
+  });
+
+  it('should remove entry when count reaches 0', () => {
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+    ];
+    const result = darkForgeRemoveFromInventory(inventory, IRON_SWORD_ID, { attack: 3 });
+    expect(result).toHaveLength(0);
+  });
+
+  it('should not modify inventory when no matching stack found', () => {
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 2, bakedStatBonuses: { attack: 3 } },
+    ];
+    const result = darkForgeRemoveFromInventory(inventory, IRON_SWORD_ID, { attack: 5 });
+    expect(result).toHaveLength(1);
+    expect(result[0].count).toBe(2);
+  });
+
+  it('should only remove from the matching bonus stack', () => {
+    const inventory: ForgeInventoryEntry[] = [
+      { recipeId: IRON_SWORD_ID, count: 2, bakedStatBonuses: { attack: 3 } },
+      { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 5 } },
+    ];
+    const result = darkForgeRemoveFromInventory(inventory, IRON_SWORD_ID, { attack: 5 });
+    expect(result).toHaveLength(1);
+    expect(result[0].count).toBe(2);
+    expect(result[0].bakedStatBonuses).toEqual({ attack: 3 });
+  });
+});
+
+describe('darkForgeAutoEquip', () => {
+  it('should equip unequipped inhabitants with best available items', () => {
+    const forge = makeRoom();
+    const inh1 = makeInhabitant({
+      instanceId: 'inh-1' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const inh2 = makeInhabitant({
+      instanceId: 'inh-2' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const floor = makeFloor([forge], [inh1, inh2]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+        { recipeId: INFERNAL_BLADE_ID, count: 1, bakedStatBonuses: { attack: 6, speed: 2 } },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    // Best item (infernal blade, sum=8) goes to first inhabitant
+    expect(inh1.equippedForgeItemRecipeId).toBe(INFERNAL_BLADE_ID);
+    expect(inh1.equippedStatBonuses).toEqual({ attack: 6, speed: 2 });
+
+    // Next best (iron sword, sum=3) goes to second
+    expect(inh2.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(inh2.equippedStatBonuses).toEqual({ attack: 3 });
+
+    // Inventory should be empty
+    expect(state.world.forgeInventory).toHaveLength(0);
+  });
+
+  it('should skip already equipped inhabitants', () => {
+    const forge = makeRoom();
+    const equippedInh = makeInhabitant({
+      instanceId: 'inh-1' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+      equippedForgeItemRecipeId: DARK_SHIELD_ID,
+      equippedStatBonuses: { defense: 3 },
+    });
+    const unequippedInh = makeInhabitant({
+      instanceId: 'inh-2' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const floor = makeFloor([forge], [equippedInh, unequippedInh]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    // Already equipped inhabitant unchanged
+    expect(equippedInh.equippedForgeItemRecipeId).toBe(DARK_SHIELD_ID);
+
+    // Unequipped inhabitant gets the item
+    expect(unequippedInh.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(state.world.forgeInventory).toHaveLength(0);
+  });
+
+  it('should do nothing with empty inventory', () => {
+    const forge = makeRoom();
+    const inh = makeInhabitant({ assignedRoomId: forge.id });
+    const floor = makeFloor([forge], [inh]);
+    const state = makeGameState({ floors: [floor], forgeInventory: [] });
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(inh.equippedForgeItemRecipeId).toBeUndefined();
+  });
+
+  it('should skip inhabitants without a room assignment', () => {
+    const forge = makeRoom();
+    const unassigned = makeInhabitant({
+      instanceId: 'inh-1' as InhabitantInstanceId,
+      assignedRoomId: undefined,
+    });
+    const floor = makeFloor([forge], [unassigned]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(unassigned.equippedForgeItemRecipeId).toBeUndefined();
+    expect(state.world.forgeInventory).toHaveLength(1);
+  });
+
+  it('should handle more inhabitants than inventory items', () => {
+    const forge = makeRoom();
+    const inh1 = makeInhabitant({ instanceId: 'inh-1' as InhabitantInstanceId, assignedRoomId: forge.id });
+    const inh2 = makeInhabitant({ instanceId: 'inh-2' as InhabitantInstanceId, assignedRoomId: forge.id });
+    const inh3 = makeInhabitant({ instanceId: 'inh-3' as InhabitantInstanceId, assignedRoomId: forge.id });
+    const floor = makeFloor([forge], [inh1, inh2, inh3]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 2, bakedStatBonuses: { attack: 3 } },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(inh1.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(inh2.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(inh3.equippedForgeItemRecipeId).toBeUndefined();
+    expect(state.world.forgeInventory).toHaveLength(0);
   });
 });
 
@@ -643,11 +810,16 @@ describe('darkForgeProcess', () => {
     expect(forge.forgeJobs![0].progress).toBe(1);
   });
 
-  it('should complete job and add to inventory when progress reaches target', () => {
+  it('should complete job and add to inventory with baked stat bonuses', () => {
     const forge = makeRoom({
       forgeJobs: [{ recipeId: IRON_SWORD_ID, progress: 4, targetTicks: 5 }],
     });
-    const worker = makeInhabitant({ assignedRoomId: forge.id });
+    // Worker is already equipped so auto-equip won't consume the new item
+    const worker = makeInhabitant({
+      assignedRoomId: forge.id,
+      equippedForgeItemRecipeId: DARK_SHIELD_ID,
+      equippedStatBonuses: { defense: 3 },
+    });
     const floor = makeFloor([forge], [worker]);
     const state = makeGameState({ floors: [floor] });
 
@@ -657,6 +829,23 @@ describe('darkForgeProcess', () => {
     expect(state.world.forgeInventory).toHaveLength(1);
     expect(state.world.forgeInventory[0].recipeId).toBe(IRON_SWORD_ID);
     expect(state.world.forgeInventory[0].count).toBe(1);
+    expect(state.world.forgeInventory[0].bakedStatBonuses).toEqual({ attack: 3 });
+  });
+
+  it('should auto-equip inhabitant after completing a forge job', () => {
+    const forge = makeRoom({
+      forgeJobs: [{ recipeId: IRON_SWORD_ID, progress: 4, targetTicks: 5 }],
+    });
+    const worker = makeInhabitant({ assignedRoomId: forge.id });
+    const floor = makeFloor([forge], [worker]);
+    const state = makeGameState({ floors: [floor] });
+
+    darkForgeProcess(state);
+
+    // Worker should be auto-equipped since they're unequipped and on the floor with a forge
+    expect(worker.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(worker.equippedStatBonuses).toEqual({ attack: 3 });
+    expect(state.world.forgeInventory).toHaveLength(0);
   });
 
   it('should not progress when no workers assigned', () => {
@@ -719,11 +908,15 @@ describe('darkForgeProcess', () => {
     const forge = makeRoom({
       forgeJobs: [{ recipeId: IRON_SWORD_ID, progress: 19, targetTicks: 20 }],
     });
-    const worker = makeInhabitant({ assignedRoomId: forge.id });
+    const worker = makeInhabitant({
+      assignedRoomId: forge.id,
+      equippedForgeItemRecipeId: DARK_SHIELD_ID,
+      equippedStatBonuses: { defense: 3 },
+    });
     const floor = makeFloor([forge], [worker]);
     const state = makeGameState({
       floors: [floor],
-      forgeInventory: [{ recipeId: IRON_SWORD_ID, count: 2 }],
+      forgeInventory: [{ recipeId: IRON_SWORD_ID, count: 2, bakedStatBonuses: { attack: 3 } }],
     });
 
     darkForgeProcess(state);
@@ -746,7 +939,8 @@ describe('darkForgeProcess', () => {
 
     expect(forge.forgeJobs).toHaveLength(1);
     expect(forge.forgeJobs![0].recipeId).toBe(DARK_SHIELD_ID);
-    expect(state.world.forgeInventory[0].recipeId).toBe(IRON_SWORD_ID);
+    // Worker gets auto-equipped with the completed item
+    expect(worker.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
   });
 });
 

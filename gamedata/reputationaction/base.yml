@@ -42,6 +42,13 @@
   reputationRewards:
     wealth: 8
 
+- id: 9154e80d-56e2-4171-a841-3a3a75b782a7
+  name: Forge Equipment
+  description: Crafting weapons and armor demonstrates martial preparation.
+  reputationRewards:
+    wealth: 6
+    terror: 3
+
 # --- KNOWLEDGE actions (research, discovery, magic) ---
 - id: 3df93d45-e8ea-4118-9eaf-7eb9c1eeba29
   name: Complete Research

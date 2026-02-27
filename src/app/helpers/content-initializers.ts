@@ -153,7 +153,6 @@ function ensureForgeRecipe(
     name: recipe.name ?? 'UNKNOWN',
     __type: 'forgerecipe',
     description: recipe.description ?? '',
-    category: recipe.category ?? 'equipment',
     cost: recipe.cost ?? {},
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
     statBonuses: recipe.statBonuses ?? {},

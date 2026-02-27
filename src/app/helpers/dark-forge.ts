@@ -168,19 +168,105 @@ export function darkForgeRemoveJobGroup(
 
 // --- Inventory management ---
 
+const STAT_KEYS: Array<keyof InhabitantStats> = [
+  'hp',
+  'attack',
+  'defense',
+  'speed',
+  'workerEfficiency',
+];
+
+function statBonusesEqual(
+  a: Partial<InhabitantStats>,
+  b: Partial<InhabitantStats>,
+): boolean {
+  for (const key of STAT_KEYS) {
+    if ((a[key] ?? 0) !== (b[key] ?? 0)) return false;
+  }
+  return true;
+}
+
+function statBonusSum(bonuses: Partial<InhabitantStats>): number {
+  let sum = 0;
+  for (const key of STAT_KEYS) {
+    sum += bonuses[key] ?? 0;
+  }
+  return sum;
+}
+
 export function darkForgeAddToInventory(
   inventory: ForgeInventoryEntry[],
   recipeId: ForgeRecipeId,
+  bakedStatBonuses: Partial<InhabitantStats>,
   count = 1,
 ): ForgeInventoryEntry[] {
   const updated = [...inventory];
-  const existing = updated.find((e) => e.recipeId === recipeId);
+  const existing = updated.find(
+    (e) => e.recipeId === recipeId && statBonusesEqual(e.bakedStatBonuses, bakedStatBonuses),
+  );
   if (existing) {
     existing.count += count;
   } else {
-    updated.push({ recipeId, count });
+    updated.push({ recipeId, count, bakedStatBonuses });
   }
   return updated;
+}
+
+export function darkForgeRemoveFromInventory(
+  inventory: ForgeInventoryEntry[],
+  recipeId: ForgeRecipeId,
+  bakedStatBonuses: Partial<InhabitantStats>,
+  count = 1,
+): ForgeInventoryEntry[] {
+  const updated = [...inventory];
+  const idx = updated.findIndex(
+    (e) => e.recipeId === recipeId && statBonusesEqual(e.bakedStatBonuses, bakedStatBonuses),
+  );
+  if (idx === -1) return updated;
+
+  updated[idx].count -= count;
+  if (updated[idx].count <= 0) {
+    updated.splice(idx, 1);
+  }
+  return updated;
+}
+
+// --- Auto-equip ---
+
+/**
+ * Auto-equip forge inventory items onto unequipped inhabitants on a floor.
+ * Best items (highest stat sum) are equipped first.
+ * Mutates inhabitants and inventory in-place.
+ */
+export function darkForgeAutoEquip(
+  state: GameState,
+  floor: Floor,
+): void {
+  if (state.world.forgeInventory.length === 0) return;
+
+  const unequipped = floor.inhabitants.filter(
+    (i) => !i.equippedForgeItemRecipeId && i.assignedRoomId,
+  );
+  if (unequipped.length === 0) return;
+
+  // Sort inventory by total stat sum (best first)
+  const sorted = [...state.world.forgeInventory]
+    .map((entry) => ({ entry, sum: statBonusSum(entry.bakedStatBonuses) }))
+    .sort((a, b) => b.sum - a.sum);
+
+  for (const inhabitant of unequipped) {
+    const bestIdx = sorted.findIndex((e) => e.entry.count > 0);
+    if (bestIdx === -1) break;
+
+    const best = sorted[bestIdx];
+    inhabitant.equippedForgeItemRecipeId = best.entry.recipeId;
+    inhabitant.equippedStatBonuses = { ...best.entry.bakedStatBonuses };
+
+    best.entry.count -= 1;
+  }
+
+  // Rebuild inventory, removing depleted stacks
+  state.world.forgeInventory = state.world.forgeInventory.filter((e) => e.count > 0);
 }
 
 // --- Validation ---
@@ -255,8 +341,11 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
   if (!darkForgeTypeId) return;
 
   for (const floor of state.world.floors) {
+    let floorHasForge = false;
+
     for (const room of floor.rooms) {
       if (room.roomTypeId !== darkForgeTypeId) continue;
+      floorHasForge = true;
       if (!room.forgeJobs || room.forgeJobs.length === 0) continue;
 
       // Only the first job in the queue progresses
@@ -269,13 +358,19 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
       job.progress += numTicks;
 
       if (job.progress >= job.targetTicks) {
-        // Job complete: add to inventory and remove from queue
+        // Job complete: compute baked bonuses and add to inventory
+        const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
+
+        const adjacentTypes = darkForgeGetAdjacentRoomTypeIds(room, floor);
+        const bakedBonuses = recipe
+          ? darkForgeGetStatBonuses(room, recipe, adjacentTypes)
+          : {};
+
         state.world.forgeInventory = darkForgeAddToInventory(
           state.world.forgeInventory,
           job.recipeId,
+          bakedBonuses,
         );
-
-        const recipe = contentGetEntry<ForgeRecipeContent>(job.recipeId);
 
         room.forgeJobs.shift();
 
@@ -285,15 +380,19 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
         }
 
         if (recipe) {
-          reputationAwardInPlace(state, 'Summon Demon');
+          reputationAwardInPlace(state, 'Forge Equipment');
 
           darkForgeCompletedSubject.next({
             roomId: room.id,
             recipeName: recipe.name,
-            category: recipe.category,
           });
         }
       }
+    }
+
+    // Auto-equip inhabitants on floors with a forge
+    if (floorHasForge) {
+      darkForgeAutoEquip(state, floor);
     }
   }
 }

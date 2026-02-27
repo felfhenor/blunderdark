@@ -44,13 +44,6 @@
                 <span class="text-xs font-semibold">
                   {{ entry.recipe.name }}
                 </span>
-                <span
-                  class="badge badge-xs"
-                  [class.badge-info]="entry.recipe.category === 'equipment'"
-                  [class.badge-secondary]="entry.recipe.category === 'upgrade'"
-                >
-                  {{ entry.recipe.category }}
-                </span>
               </div>
               <span class="text-xs opacity-60">
                 {{ entry.recipe.description }}
@@ -111,12 +104,21 @@
       @if (forgeInventory().length > 0) {
         <div class="divider my-2 text-xs opacity-60">Forge Inventory</div>
         <div class="flex flex-col gap-2">
-          @for (item of forgeInventory(); track item.recipeId) {
-            <div class="flex items-center justify-between">
-              <span class="text-xs">{{ item.name }}</span>
-              <span class="badge badge-xs badge-outline">
-                x{{ item.count | number: '1.0-0' }}
-              </span>
+          @for (item of forgeInventory(); track $index) {
+            <div class="flex flex-col gap-0 p-1 bg-base-200 rounded">
+              <div class="flex items-center justify-between">
+                <span class="text-xs">{{ item.name }}</span>
+                <span class="badge badge-xs badge-outline">
+                  x{{ item.count | number: '1.0-0' }}
+                </span>
+              </div>
+              @if (formatStatBonuses(item.bakedStatBonuses); as bonusStr) {
+                @if (bonusStr) {
+                  <span class="text-xs text-success opacity-70">
+                    {{ bonusStr }}
+                  </span>
+                }
+              }
             </div>
           }
         </div>

@@ -159,7 +159,7 @@ export class PanelDarkForgeComponent {
         recipeId: entry.recipeId,
         name: recipe?.name ?? 'Unknown',
         count: entry.count,
-        category: recipe?.category ?? 'equipment',
+        bakedStatBonuses: entry.bakedStatBonuses,
       };
     });
     return sortBy(entries, [(e) => e.name]);

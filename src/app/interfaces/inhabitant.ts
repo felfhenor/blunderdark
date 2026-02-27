@@ -1,5 +1,6 @@
 import type { AbilityState, StatusEffect } from '@interfaces/combat';
 import type { CombatStats } from '@interfaces/combat-stats';
+import type { ForgeRecipeId } from '@interfaces/content-forgerecipe';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId } from '@interfaces/room-shape';
@@ -61,6 +62,9 @@ export type InhabitantInstance = {
   isSummoned?: boolean;
   travelTicksRemaining?: number;
   discontentedTicks?: number;
+
+  equippedForgeItemRecipeId?: ForgeRecipeId;
+  equippedStatBonuses?: Partial<InhabitantStats>;
 
   abilityStates?: AbilityState[];
   statusEffects?: StatusEffect[];

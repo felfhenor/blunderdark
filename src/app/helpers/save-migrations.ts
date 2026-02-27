@@ -3,7 +3,7 @@ import type { SaveData, SaveMigrationResult } from '@interfaces';
 
 // --- Constants ---
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 // --- Types ---
 
@@ -97,6 +97,21 @@ saveMigrations.set(2, (data) => {
     }
   }
 
+  return data;
+});
+
+saveMigrations.set(3, (data) => {
+  const world = data.gameState.world as unknown as Record<string, unknown>;
+  const inventory = (world['forgeInventory'] ?? []) as Array<{
+    recipeId: string;
+    count: number;
+    bakedStatBonuses?: Record<string, number>;
+  }>;
+  for (const entry of inventory) {
+    if (!entry.bakedStatBonuses) {
+      entry.bakedStatBonuses = {};
+    }
+  }
   return data;
 });
 

@@ -8,7 +8,6 @@ export type ForgeRecipeId = Branded<string, 'ForgeRecipeId'>;
 export type ForgeRecipeContent = IsContentItem &
   HasDescription & {
     id: ForgeRecipeId;
-    category: 'equipment' | 'upgrade';
     cost: Partial<Record<ResourceType, number>>;
     timeMultiplier: number;
     statBonuses: Partial<InhabitantStats>;
