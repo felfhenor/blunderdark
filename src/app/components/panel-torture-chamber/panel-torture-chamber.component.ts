@@ -1,13 +1,13 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
-import { ModalComponent } from '@components/modal/modal.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   contentGetEntry,
   findRoomByRole,
   gamestate,
+  notify,
   PRISONER_ESCAPE_DAYS,
   TORTURE_BREAK_BASE_TICKS,
   TORTURE_EXTRACT_BASE_TICKS,
@@ -28,52 +28,37 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { sortBy } from 'es-toolkit/compat';
 
-type StageResult =
-  | { stage: 'interrogate'; prisonerName: string; attackBonus: number; defenseBonus: number }
-  | { stage: 'extract'; prisonerName: string; action: TortureExtractAction; researchGained?: number }
-  | { stage: 'break'; prisonerName: string; action: TortureBreakAction; success?: boolean; inhabitantName?: string; fearGained?: number; resourceGained?: { type: string; amount: number } };
-
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, ModalComponent, StatRowComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelTortureChamberComponent {
-  public showResult = signal(false);
-  public lastResult = signal<StageResult | undefined>(undefined);
-
   private subscriptions = [
     tortureInterrogateComplete$.subscribe((evt) => {
-      this.lastResult.set({
-        stage: 'interrogate',
-        prisonerName: evt.prisonerName,
-        attackBonus: evt.attackBonusPercent,
-        defenseBonus: evt.defenseBonusPercent,
-      });
-      this.showResult.set(true);
+      notify('Torture', `${evt.prisonerName}: Interrogation complete! +${evt.attackBonusPercent.toFixed(2)}% ATK, +${evt.defenseBonusPercent.toFixed(2)}% DEF buff`);
     }),
     tortureExtractComplete$.subscribe((evt) => {
-      this.lastResult.set({
-        stage: 'extract',
-        prisonerName: evt.prisonerName,
-        action: evt.action,
-        researchGained: evt.researchGained,
-      });
-      this.showResult.set(true);
+      if (evt.action === 'research') {
+        notify('Torture', `${evt.prisonerName}: Extracted ${evt.researchGained?.toFixed(2) ?? 0} research points`);
+      } else {
+        notify('Torture', `${evt.prisonerName}: Trait rune extracted`);
+      }
     }),
     tortureBreakComplete$.subscribe((evt) => {
-      this.lastResult.set({
-        stage: 'break',
-        prisonerName: evt.prisonerName,
-        action: evt.action,
-        success: evt.success,
-        inhabitantName: evt.inhabitantName,
-        fearGained: evt.fearGained,
-        resourceGained: evt.resourceGained,
-      });
-      this.showResult.set(true);
+      if (evt.action === 'convert') {
+        if (evt.success) {
+          notify('Torture', `${evt.prisonerName}: Conversion successful! ${evt.inhabitantName} has joined your dungeon`);
+        } else {
+          notify('Torture', `${evt.prisonerName}: Conversion failed`);
+        }
+      } else if (evt.action === 'execute') {
+        notify('Torture', `${evt.prisonerName}: Executed. +${evt.fearGained} Fear, +1 Terror reputation`);
+      } else if (evt.action === 'sacrifice' && evt.resourceGained) {
+        notify('Torture', `${evt.prisonerName}: Sacrificed. Gained ${evt.resourceGained.amount} ${evt.resourceGained.type}`);
+      }
     }),
   ];
 
