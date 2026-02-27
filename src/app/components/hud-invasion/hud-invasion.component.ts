@@ -36,6 +36,9 @@ type ObjectiveStatus = {
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-semibold text-warning">Invasion</span>
           <span class="text-xs opacity-70">
+            @if (pathProgress().floorLabel) {
+              {{ pathProgress().floorLabel }} —
+            }
             Room {{ pathProgress().current }} / {{ pathProgress().total }}
             @if (pathProgress().roomName) {
               — {{ pathProgress().roomName }}
@@ -47,7 +50,12 @@ type ObjectiveStatus = {
         <div class="mb-1">
           <div class="flex items-center justify-between text-xs mb-0.5">
             <span>Altar</span>
-            <span>{{ altarInfo().hp }}/{{ altarInfo().maxHp }}</span>
+            <span>
+              {{ altarInfo().hp }}/{{ altarInfo().maxHp }}
+              @if (altarInfo().isWeakened) {
+                <span class="text-warning opacity-70">(weakened from {{ altarInfo().originalMaxHp }})</span>
+              }
+            </span>
           </div>
           <progress
             class="progress progress-error w-full h-2"
@@ -121,7 +129,7 @@ export class HudInvasionComponent {
   public pathProgress = computed(() => {
     const state = gamestate();
     const inv = state.world.activeInvasion;
-    if (!inv || inv.completed) return { current: 0, total: 0, roomName: '' };
+    if (!inv || inv.completed) return { current: 0, total: 0, roomName: '', floorLabel: '' };
 
     const roomId = inv.path[inv.currentRoomIndex];
     const floorIndex = inv.roomFloorMap[roomId] ?? 0;
@@ -135,16 +143,21 @@ export class HudInvasionComponent {
       current: inv.currentRoomIndex + 1,
       total: inv.path.length,
       roomName: def?.name ?? '',
+      floorLabel: `F${floorIndex + 1}`,
     };
   });
 
   public altarInfo = computed(() => {
     const state = gamestate();
     const inv = state.world.activeInvasion;
-    if (!inv) return { hp: 0, maxHp: 0 };
+    if (!inv) return { hp: 0, maxHp: 0, originalMaxHp: 0, isWeakened: false };
+
+    const isWeakened = inv.altarMaxHpMultiplier < 1.0;
     return {
       hp: inv.invasionState.altarHp,
       maxHp: inv.invasionState.altarMaxHp,
+      originalMaxHp: 100,
+      isWeakened,
     };
   });
 

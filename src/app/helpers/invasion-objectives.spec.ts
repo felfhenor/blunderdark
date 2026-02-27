@@ -523,8 +523,8 @@ describe('invasion-objectives', () => {
         }),
       ];
       const result = invasionObjectiveResolveOutcome(objectives);
-      // 1.0 + 0*0.25 - 2*0.25 = 0.5
-      expect(result.rewardMultiplier).toBe(0.5);
+      // 1.0 + 0*0.25 - 2*0.15 = 0.7
+      expect(result.rewardMultiplier).toBe(0.7);
       expect(result.secondariesCompleted).toBe(2);
     });
 
@@ -545,8 +545,8 @@ describe('invasion-objectives', () => {
         }),
       ];
       const result = invasionObjectiveResolveOutcome(objectives);
-      // 1.0 + 1*0.25 - 1*0.25 = 1.0
-      expect(result.rewardMultiplier).toBe(1);
+      // 1.0 + 1*0.25 - 1*0.15 = 1.10
+      expect(result.rewardMultiplier).toBe(1.1);
       expect(result.secondariesCompleted).toBe(1);
     });
 

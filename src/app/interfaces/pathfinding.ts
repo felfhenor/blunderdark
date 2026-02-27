@@ -23,6 +23,9 @@ export type PathfindingOptions = {
   morale?: number;
   fearCostMultiplier?: number;
   blockedNodes?: Set<PlacedRoomId>;
+  noiseRng?: () => number;
+  noiseChance?: number;
+  maxNoiseFactor?: number;
 };
 
 export type SecondaryObjective = {

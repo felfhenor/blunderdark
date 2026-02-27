@@ -7,7 +7,7 @@ import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
 import { reputationEffectGetInvasionRateMultiplier } from '@helpers/reputation-effects';
 import type { GameTime } from '@interfaces/game-time';
 import { notify } from '@helpers/notify';
-import { rngNumberRange, rngRandom } from '@helpers/rng';
+import { rngNumberRange, rngRandom, rngSeeded } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
@@ -294,16 +294,19 @@ export function invasionTriggerGenerateWarning(
   const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS
     + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
-  const invaders = invasionCompositionGenerateParty(profile, seed, bonusSize);
-  const objectives = invasionObjectiveAssign(state, seed);
-  const entryRoom = invasionFindEntryRoom(state);
+  const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize);
+  const objectives = invasionObjectiveAssign(state, seed, partyResult.pairedObjectives);
+  const entryRng = rngSeeded(`${seed}-entry`);
+  const entryResult = invasionFindEntryRoom(state, entryRng);
 
   state.world.invasionSchedule.pendingWarning = {
     seed,
     invasionType,
-    invaders,
+    invaders: partyResult.invaders,
     objectives,
-    entryRoomId: (entryRoom?.id ?? '') as PlacedRoomId,
+    entryRoomId: (entryResult?.room.id ?? '') as PlacedRoomId,
+    entryFloorIndex: entryResult?.floorIndex ?? 0,
+    themedInvasionType: partyResult.themedInvasionType,
     profile,
   };
 }

@@ -47,6 +47,7 @@ export * from './inhabitants';
 export * from './invaders';
 export * from './invasion-combat';
 export * from './invasion-composition';
+export * from './invasion-events';
 export * from './invasion-objectives';
 export * from './invasion-process';
 export * from './invasion-reward-apply';

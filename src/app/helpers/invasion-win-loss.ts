@@ -13,8 +13,10 @@ import type { InvasionObjective } from '@interfaces/invasion-objective';
 // --- Constants ---
 
 export const INVASION_WIN_LOSS_ALTAR_MAX_HP = 100;
-export const INVASION_WIN_LOSS_MAX_TURNS = 30;
+export const INVASION_WIN_LOSS_MAX_TURNS = 60;
 export const INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY = 2;
+export const INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE = 0.15;
+export const INVASION_WIN_LOSS_ALTAR_MIN_MAX_HP_RATIO = 0.10;
 
 // --- State creation ---
 
@@ -97,7 +99,8 @@ export function invasionWinLossIsMoraleBroken(
 
 /**
  * Check if the invasion should end. Returns the end reason, or undefined if ongoing.
- * Priority: altar destroyed > objectives completed > morale broken > all invaders eliminated > turn limit.
+ * Priority: altar destroyed > all invaders eliminated > morale broken > turn limit.
+ * Note: secondary objectives no longer trigger instant defeat — they weaken the altar instead.
  */
 export function invasionWinLossCheckEnd(
   state: InvasionState,
@@ -106,8 +109,6 @@ export function invasionWinLossCheckEnd(
 
   // Invader victory conditions (checked first — losing takes priority)
   if (invasionWinLossIsAltarDestroyed(state)) return 'altar_destroyed';
-  if (invasionWinLossAreSecondaryObjectivesCompleted(state))
-    return 'objectives_completed';
 
   // Defender victory conditions
   if (invasionWinLossAreAllEliminated(state)) return 'all_invaders_eliminated';
@@ -194,6 +195,33 @@ export function invasionWinLossRecordDefenderLoss(
 }
 
 /**
+ * Apply altar debuff from a completed secondary objective.
+ * Reduces altar max HP by 15% per objective (stacking), minimum 10% of original.
+ * Returns new state and updated multiplier.
+ */
+export function invasionWinLossApplyObjectiveDebuff(
+  state: InvasionState,
+  currentMultiplier: number,
+): { state: InvasionState; newMultiplier: number } {
+  const newMultiplier = Math.max(
+    INVASION_WIN_LOSS_ALTAR_MIN_MAX_HP_RATIO,
+    currentMultiplier - INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE,
+  );
+
+  const newMaxHp = Math.max(1, Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP * newMultiplier));
+  const newHp = Math.min(state.altarHp, newMaxHp);
+
+  return {
+    state: {
+      ...state,
+      altarHp: newHp,
+      altarMaxHp: newMaxHp,
+    },
+    newMultiplier,
+  };
+}
+
+/**
  * End the invasion (mark as inactive).
  * Returns a new InvasionState (does not mutate).
  */
@@ -218,6 +246,7 @@ export function invasionWinLossResolveDetailedResult(
   penetrationDepth: number,
   roomsReached: number,
   totalPathRooms: number,
+  altarMaxHpMultiplier: number = 1.0,
 ): DetailedInvasionResult {
   const objectiveResult = invasionObjectiveResolveOutcome(state.objectives);
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
@@ -239,6 +268,7 @@ export function invasionWinLossResolveDetailedResult(
     penetrationDepth,
     roomsReached,
     totalPathRooms,
+    altarMaxHpMultiplier,
   };
 }
 

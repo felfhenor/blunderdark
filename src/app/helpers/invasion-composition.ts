@@ -11,9 +11,11 @@ import type {
   DungeonProfile,
   GameState,
   InvaderClassWeights,
+  InvasionThemeType,
   IsContentItem,
 } from '@interfaces';
 import type { InvaderContent } from '@interfaces/content-invader';
+import type { ObjectiveType } from '@interfaces/invasion-objective';
 import type { RoomContent } from '@interfaces/content-room';
 import type {
   InvaderClassType,
@@ -148,10 +150,12 @@ export function invasionCompositionGetWeightConfig():
  * High profiles (>60) use their corresponding weight set.
  * If multiple are high, weights are averaged.
  * If none are high (balanced), uses balanced weights.
+ * Optional rng applies +/-20% variance to each class weight.
  */
 export function invasionCompositionGetWeights(
   profile: DungeonProfile,
   config: CompositionWeightConfig,
+  rng?: () => number,
 ): InvaderClassWeights {
   type WeightKey = 'highCorruption' | 'highWealth' | 'highKnowledge';
   const highProfiles: WeightKey[] = [];
@@ -161,37 +165,49 @@ export function invasionCompositionGetWeights(
   if (profile.wealth > PROFILE_THRESHOLD) highProfiles.push('highWealth');
   if (profile.knowledge > PROFILE_THRESHOLD) highProfiles.push('highKnowledge');
 
-  if (highProfiles.length === 0) return { ...config.balanced };
+  let base: InvaderClassWeights;
 
-  const result: InvaderClassWeights = {
-    warrior: 0,
-    rogue: 0,
-    mage: 0,
-    cleric: 0,
-    paladin: 0,
-    ranger: 0,
-  };
+  if (highProfiles.length === 0) {
+    base = { ...config.balanced };
+  } else {
+    base = {
+      warrior: 0,
+      rogue: 0,
+      mage: 0,
+      cleric: 0,
+      paladin: 0,
+      ranger: 0,
+    };
 
-  for (const profileKey of highProfiles) {
-    const weights = config[profileKey];
+    for (const profileKey of highProfiles) {
+      const weights = config[profileKey];
+      for (const cls of INVADER_CLASSES) {
+        base[cls] += weights[cls];
+      }
+    }
+
     for (const cls of INVADER_CLASSES) {
-      result[cls] += weights[cls];
+      base[cls] = Math.round(base[cls] / highProfiles.length);
     }
   }
 
-  for (const cls of INVADER_CLASSES) {
-    result[cls] = Math.round(result[cls] / highProfiles.length);
+  // Apply +/-20% variance when rng is provided
+  if (rng) {
+    for (const cls of INVADER_CLASSES) {
+      const variance = 0.8 + rng() * 0.4; // 0.8 to 1.2
+      base[cls] = Math.max(1, Math.round(base[cls] * variance));
+    }
   }
 
-  return result;
+  return base;
 }
 
 // --- Party size ---
 
 /**
  * Determine party size based on dungeon room count.
- * Small (1-10): 3-5, Medium (11-25): 6-10, Large (26+): 11-15.
- * bonusSize adds extra invaders (from escalation mechanics).
+ * Small (1-10): 1-7, Medium (11-25): 4-12, Large (26+): 9-17.
+ * Clamps to minimum 2 (after bonus). bonusSize adds extra invaders (from escalation mechanics).
  */
 export function invasionCompositionGetPartySize(
   roomCount: number,
@@ -199,17 +215,17 @@ export function invasionCompositionGetPartySize(
   bonusSize: number = 0,
 ): number {
   let baseSize: number;
-  if (roomCount <= 10) baseSize = 3 + Math.floor(rng() * 3); // 3-5
-  else if (roomCount <= 25) baseSize = 6 + Math.floor(rng() * 5); // 6-10
-  else baseSize = 11 + Math.floor(rng() * 5); // 11-15
-  return baseSize + bonusSize;
+  if (roomCount <= 10) baseSize = 1 + Math.floor(rng() * 7); // 1-7
+  else if (roomCount <= 25) baseSize = 4 + Math.floor(rng() * 9); // 4-12
+  else baseSize = 9 + Math.floor(rng() * 9); // 9-17
+  return Math.max(2, baseSize + bonusSize);
 }
 
 // --- Party composition (pure function) ---
 
 /**
  * Select invader definitions for a party based on weights.
- * Guarantees: at least 1 warrior, no class >50%, balanced profiles have 3+ classes.
+ * Guarantees: at least 1 warrior (unless skipWarriorGuarantee), no class >50%, balanced profiles have 3+ classes.
  */
 export function invasionCompositionSelectParty(
   profile: DungeonProfile,
@@ -217,6 +233,7 @@ export function invasionCompositionSelectParty(
   weights: InvaderClassWeights,
   seed: string,
   bonusSize: number = 0,
+  skipWarriorGuarantee: boolean = false,
 ): InvaderContent[] {
   const rng = seedrandom(seed);
   const partySize = invasionCompositionGetPartySize(profile.size, rng, bonusSize);
@@ -241,11 +258,13 @@ export function invasionCompositionSelectParty(
   };
   const party: InvaderContent[] = [];
 
-  // Guarantee at least one warrior
-  const warriors = defsByClass.get('warrior') ?? [];
-  if (warriors.length > 0) {
-    party.push(rngChoice(warriors, rng));
-    classCounts.warrior++;
+  // Guarantee at least one warrior (unless themed invasion skips this)
+  if (!skipWarriorGuarantee) {
+    const warriors = defsByClass.get('warrior') ?? [];
+    if (warriors.length > 0) {
+      party.push(rngChoice(warriors, rng));
+      classCounts.warrior++;
+    }
   }
 
   // Fill remaining slots with weighted selection
@@ -358,23 +377,101 @@ function ensureClassDiversity(
   }
 }
 
+// --- Themed invasions ---
+
+export const INVASION_THEME_CHANCE = 0.125; // 12.5% chance
+
+type InvasionThemeConfig = {
+  type: InvasionThemeType;
+  dominantClass: InvaderClassType;
+  weightOverrides: Partial<InvaderClassWeights>;
+  pairedObjectives: ObjectiveType[];
+  skipWarriorGuarantee: boolean;
+};
+
+const INVASION_THEMES: InvasionThemeConfig[] = [
+  {
+    type: 'stealth_raid',
+    dominantClass: 'rogue',
+    weightOverrides: { rogue: 60, ranger: 20, warrior: 5, mage: 5, cleric: 5, paladin: 5 },
+    pairedObjectives: ['StealTreasure', 'ScoutDungeon'],
+    skipWarriorGuarantee: true,
+  },
+  {
+    type: 'crusade',
+    dominantClass: 'paladin',
+    weightOverrides: { paladin: 50, cleric: 25, warrior: 15, mage: 5, rogue: 0, ranger: 5 },
+    pairedObjectives: ['SealPortal', 'DefileLibrary'],
+    skipWarriorGuarantee: false,
+  },
+  {
+    type: 'arcane_assault',
+    dominantClass: 'mage',
+    weightOverrides: { mage: 55, cleric: 15, ranger: 10, warrior: 10, rogue: 5, paladin: 5 },
+    pairedObjectives: ['DefileLibrary', 'PlunderVault'],
+    skipWarriorGuarantee: true,
+  },
+  {
+    type: 'berserker_horde',
+    dominantClass: 'warrior',
+    weightOverrides: { warrior: 60, ranger: 15, paladin: 10, rogue: 10, mage: 0, cleric: 5 },
+    pairedObjectives: ['SlayMonster', 'RescuePrisoner'],
+    skipWarriorGuarantee: false,
+  },
+];
+
+/**
+ * Roll for a themed invasion. 12.5% chance to get one.
+ * Returns the theme config or undefined if no theme.
+ */
+export function invasionCompositionRollTheme(
+  rng: () => number,
+): InvasionThemeConfig | undefined {
+  if (rng() >= INVASION_THEME_CHANCE) return undefined;
+  return INVASION_THEMES[Math.floor(rng() * INVASION_THEMES.length)];
+}
+
 // --- Full party generation ---
+
+export type InvasionPartyResult = {
+  invaders: InvaderInstance[];
+  themedInvasionType?: InvasionThemeType;
+  pairedObjectives?: ObjectiveType[];
+};
 
 /**
  * Generate a full invasion party from dungeon profile.
- * Returns InvaderInstance[] ready for combat.
+ * Returns InvaderInstance[] and optional theme info.
+ * Rolls for themed invasion (12.5% chance) which overrides class weights.
  */
 export function invasionCompositionGenerateParty(
   profile: DungeonProfile,
   seed: string,
   bonusSize: number = 0,
-): InvaderInstance[] {
+): InvasionPartyResult {
   const invaderDefs = invaderGetAllDefinitions();
   const config = invasionCompositionGetWeightConfig();
-  if (!config || invaderDefs.length === 0) return [];
+  if (!config || invaderDefs.length === 0) return { invaders: [] };
 
-  const weights = invasionCompositionGetWeights(profile, config);
-  const selected = invasionCompositionSelectParty(profile, invaderDefs, weights, seed, bonusSize);
+  const themeRng = seedrandom(`${seed}-theme`);
+  const theme = invasionCompositionRollTheme(themeRng);
+
+  // Get weights — themed invasions override weights entirely
+  let weights: InvaderClassWeights;
+  if (theme) {
+    weights = {
+      warrior: 0, rogue: 0, mage: 0, cleric: 0, paladin: 0, ranger: 0,
+      ...theme.weightOverrides,
+    };
+  } else {
+    const weightRng = seedrandom(`${seed}-weights`);
+    weights = invasionCompositionGetWeights(profile, config, weightRng);
+  }
+
+  const selected = invasionCompositionSelectParty(
+    profile, invaderDefs, weights, seed, bonusSize,
+    theme?.skipWarriorGuarantee,
+  );
 
   const party = selected.map((def) => invaderCreateInstance(def));
 
@@ -399,5 +496,9 @@ export function invasionCompositionGenerateParty(
     }
   }
 
-  return party;
+  return {
+    invaders: party,
+    themedInvasionType: theme?.type,
+    pairedObjectives: theme?.pairedObjectives,
+  };
 }

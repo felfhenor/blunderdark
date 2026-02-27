@@ -160,10 +160,12 @@ const SECONDARY_OBJECTIVE_TEMPLATES: ObjectiveTemplate[] = [
  * Assign invasion objectives: 1 primary (Destroy Altar) + 2 secondary.
  * Secondary objectives are selected from eligible pool based on game state.
  * Seed ensures deterministic selection.
+ * Optional preferredObjectives sorts matching types first in the shuffle.
  */
 export function invasionObjectiveAssign(
   state: GameState,
   seed: string,
+  preferredObjectives?: ObjectiveType[],
 ): InvasionObjective[] {
   const rng = seedrandom(seed);
   const objectives: InvasionObjective[] = [];
@@ -186,8 +188,15 @@ export function invasionObjectiveAssign(
     t.isEligible(state),
   );
 
-  // Shuffle and pick up to 2 unique types
-  const shuffled = rngShuffle(eligible, rng);
+  // Shuffle eligible, then sort preferred types to front
+  let shuffled = rngShuffle(eligible, rng);
+  if (preferredObjectives?.length) {
+    const preferredSet = new Set(preferredObjectives);
+    const preferred = shuffled.filter((t) => preferredSet.has(t.type));
+    const rest = shuffled.filter((t) => !preferredSet.has(t.type));
+    shuffled = [...preferred, ...rest];
+  }
+
   const selectedTypes = new Set<ObjectiveType>();
 
   for (const template of shuffled) {
@@ -280,7 +289,7 @@ export function invasionObjectiveCalculateSealPortalProgress(
  * Resolve the outcome of an invasion based on objective completion.
  * - Altar destroyed = defeat (regardless of other outcomes)
  * - All invaders killed with Altar intact = victory
- * - Reward multiplier: 1.0 base, +0.25 per prevented secondary, -0.25 per completed secondary
+ * - Reward multiplier: 1.0 base, +0.25 per prevented secondary, -0.15 per completed secondary
  */
 export function invasionObjectiveResolveOutcome(
   objectives: InvasionObjective[],
@@ -306,7 +315,7 @@ export function invasionObjectiveResolveOutcome(
   const preventedCount = secondariesTotal - secondariesCompleted;
   const rewardMultiplier = Math.max(
     0,
-    1.0 + preventedCount * 0.25 - secondariesCompleted * 0.25,
+    1.0 + preventedCount * 0.25 - secondariesCompleted * 0.15,
   );
 
   return {

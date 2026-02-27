@@ -564,9 +564,8 @@ describe('pathfindingFindWithObjectives', () => {
   });
 
   it('skips secondary objective when detour exceeds threshold', () => {
-    //  spawn -- altar  (direct cost 1)
-    //  spawn -- A -- B -- C -- vault -- D -- altar  (detour cost 6)
-    //  Threshold: 2 * 1 = 2; 6 > 2 → no detour
+    //  spawn -- altar  (direct cost 1, ceiling = 3)
+    //  spawn -- A -- B -- C -- vault  (dead-end, cost 4 > ceiling)
     const graph = makeGraph(
       [
         ['spawn', 'spawn', 0, 0, 0],
@@ -574,7 +573,6 @@ describe('pathfindingFindWithObjectives', () => {
         ['B', 'generic', 4, 0, 0],
         ['C', 'generic', 6, 0, 0],
         ['vault', 'vault', 8, 0, 0],
-        ['D', 'generic', 8, 2, 0],
         ['altar', 'altar', 1, 0, 0],
       ],
       [
@@ -583,8 +581,6 @@ describe('pathfindingFindWithObjectives', () => {
         ['A', 'B'],
         ['B', 'C'],
         ['C', 'vault'],
-        ['vault', 'D'],
-        ['D', 'altar'],
       ],
     );
 
@@ -595,10 +591,11 @@ describe('pathfindingFindWithObjectives', () => {
     expect(path).toEqual(['spawn', 'altar']);
   });
 
-  it('picks highest priority secondary when multiple are reachable', () => {
+  it('visits all reachable secondary objectives', () => {
     //  spawn -- throne -- altar  (cost 2, priority 3)
     //  spawn -- vault -- altar   (cost 2, priority 8)
     //  spawn -- mid -- altar     (direct cost 2)
+    //  All objectives reachable within ceiling (2*3=6)
     const graph = makeGraph(
       [
         ['spawn', 'spawn', 0, 0, 0],
@@ -624,8 +621,8 @@ describe('pathfindingFindWithObjectives', () => {
         { roomId: 'vault' as PlacedRoomId, priority: 8 },
       ],
     );
-    // Vault has higher priority and same cost
-    expect(path).toEqual(['spawn', 'vault', 'altar']);
+    // Greedy nearest-neighbor visits both: throne first (same cost, first in list), then vault
+    expect(path).toEqual(['spawn', 'throne', 'spawn', 'vault', 'altar']);
   });
 
   it('returns empty when no path to primary goal exists', () => {

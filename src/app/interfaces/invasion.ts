@@ -19,12 +19,16 @@ export type CombatantId = Branded<string, 'CombatantId'>;
 
 export type SpecialInvasionType = 'crusade' | 'raid' | 'bounty_hunter' | 'shadow_rift';
 
+export type InvasionThemeType = 'stealth_raid' | 'crusade' | 'arcane_assault' | 'berserker_horde';
+
 export type PendingInvasionWarning = {
   seed: string;
   invasionType: 'scheduled' | SpecialInvasionType;
   invaders: InvaderInstance[];
   objectives: InvasionObjective[];
   entryRoomId: PlacedRoomId;
+  entryFloorIndex: number;
+  themedInvasionType?: InvasionThemeType;
   profile: DungeonProfile;
 };
 
@@ -110,6 +114,7 @@ export type DetailedInvasionResult = {
   penetrationDepth: number;
   roomsReached: number;
   totalPathRooms: number;
+  altarMaxHpMultiplier: number;
 };
 
 // --- Rewards types ---
@@ -216,7 +221,8 @@ export type BattleLogEntryType =
   | 'room_cleared'
   | 'altar_damage'
   | 'invasion_end'
-  | 'retreat';
+  | 'retreat'
+  | 'random_event';
 
 export type BattleLogEntry = {
   turn: number;
@@ -258,6 +264,7 @@ export type ActiveInvasion = {
   // Path state
   path: PlacedRoomId[];
   entryRoomId: PlacedRoomId;
+  entryFloorIndex: number;
   currentRoomIndex: number;
   currentRoomTicksElapsed: number;
   currentRoomTicksTotal: number;
@@ -295,6 +302,12 @@ export type ActiveInvasion = {
 
   // Anti-turtling: count of secondary objectives not on the invasion path
   unreachableObjectiveCount: number;
+
+  // Altar max HP multiplier (reduced by completed objectives)
+  altarMaxHpMultiplier: number;
+
+  // Themed invasion type (if applicable)
+  themedInvasionType?: InvasionThemeType;
 
   // Dungeon profile (captured at start for stat bonus during combat)
   profile: DungeonProfile;

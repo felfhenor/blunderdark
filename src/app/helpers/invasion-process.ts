@@ -15,15 +15,17 @@ import {
   invasionCombatIsRoundComplete,
   invasionCombatStartNewRound,
 } from '@helpers/invasion-combat';
+import { invasionEventTryTrigger } from '@helpers/invasion-events';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
 import { invasionThreatGetPartySizeBonus, invasionThreatGetStatBonus } from '@helpers/invasion-threat';
-import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
+import { invasionObjectiveAssign, invasionObjectiveUpdateProgress } from '@helpers/invasion-objectives';
 import {
   invasionRewardCalculateDefensePenalties,
   invasionRewardCalculateDefenseRewards,
   invasionRewardRollPrisonerCaptures,
 } from '@helpers/invasion-rewards';
 import {
+  invasionWinLossApplyObjectiveDebuff,
   invasionWinLossCheckEnd,
   invasionWinLossCreateState,
   invasionWinLossDamageAltar,
@@ -48,6 +50,7 @@ import {
   pathfindingBuildDungeonGraph,
   pathfindingFindPath,
   pathfindingFindWithObjectives,
+  pathfindingGetCost,
 } from '@helpers/pathfinding';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { trapApplyTrigger, trapGetAtTile, trapGetDefinition, trapRollTrigger } from '@helpers/traps';
@@ -69,20 +72,23 @@ import type {
   InhabitantInstanceId,
   InvasionObjective,
   InvasionOrchestratorResult,
+  InvasionThemeType,
+  ObjectiveType,
   PendingInvasionWarning,
   PlacedRoom,
   PlacedRoomId,
   ResourceType,
   SpecialInvasionType,
 } from '@interfaces';
+import type { InvaderInstance } from '@interfaces/invader';
 import type { SecondaryObjective } from '@interfaces/pathfinding';
 import seedrandom from 'seedrandom';
 
 // --- Constants ---
 
-const INVASION_BASE_TICKS_PER_ROOM = 2;
-const INVASION_TICKS_PER_DEFENDER = 2;
-const MAX_ROUNDS_PER_ROOM = 10;
+const INVASION_BASE_TICKS_PER_ROOM = 4;
+const INVASION_TICKS_PER_DEFENDER = 3;
+const MAX_ROUNDS_PER_ROOM = 15;
 
 export const FOCUSED_ASSAULT_ATTACK_BONUS = 2; // +2 attack per unreachable objective
 export const INVASION_ESCALATION_EXTRA_INVADERS = 1; // extra invaders per unreachable objective (from last invasion)
@@ -178,6 +184,39 @@ function findTransportToNextFloor(
 }
 
 /**
+ * Find a transport connection between two arbitrary floors.
+ * Walks floor-by-floor from currentFloorIndex toward targetFloorIndex,
+ * returning the first/last transport pair for a single hop.
+ */
+function findTransportBetweenFloors(
+  floors: Floor[],
+  currentFloorIndex: number,
+  targetFloorIndex: number,
+): { currentFloorRoom: PlacedRoom; nextFloorRoom: PlacedRoom } | undefined {
+  if (currentFloorIndex === targetFloorIndex) return undefined;
+
+  const step = currentFloorIndex < targetFloorIndex ? 1 : -1;
+  let fi = currentFloorIndex;
+
+  while (fi !== targetFloorIndex) {
+    const nextFi = fi + step;
+    if (nextFi < 0 || nextFi >= floors.length) return undefined;
+
+    const transport = findTransportToNextFloor(floors[fi], floors[nextFi]);
+    if (!transport) return undefined;
+
+    // For a single hop, return the first transport found
+    if (nextFi === targetFloorIndex || fi === currentFloorIndex) {
+      return transport;
+    }
+
+    fi = nextFi;
+  }
+
+  return undefined;
+}
+
+/**
  * Convert a FearLevelBreakdown map to a simple numeric map for pathfinding.
  */
 function fearBreakdownToNumericMap(
@@ -191,106 +230,83 @@ function fearBreakdownToNumericMap(
 }
 
 /**
- * Find the entry room on floor 0 for an invasion.
- * Picks the non-transport room farthest from the altar by graph distance,
- * or falls back to the top-left room if the altar isn't on floor 0.
+ * Find a random entry room on any floor for an invasion.
+ * Picks a random non-altar, non-transport room from all floors.
+ * Edge case: if no eligible rooms, returns altar room on its floor.
  */
-export function invasionFindEntryRoom(state: GameState): PlacedRoom | undefined {
+export function invasionFindEntryRoom(
+  state: GameState,
+  rng?: seedrandom.PRNG,
+): { room: PlacedRoom; floorIndex: number } | undefined {
   const floors = state.world.floors;
-  const floor0 = floors[0];
-  if (!floor0) return undefined;
+  if (floors.length === 0) return undefined;
 
-  const regularRooms = floor0.rooms.filter((r) => !r.transportType);
-  if (regularRooms.length === 0) return undefined;
-
-  // Find altar room
   const altarTypeId = roomRoleFindById('altar');
+
+  // Collect all eligible rooms across all floors
+  const candidates: { room: PlacedRoom; floorIndex: number }[] = [];
   let altarRoom: { room: PlacedRoom; floorIndex: number } | undefined;
+
   for (let fi = 0; fi < floors.length; fi++) {
     const floor = floors[fi];
-    const room = altarTypeId ? floor.rooms.find((r) => r.roomTypeId === altarTypeId) : undefined;
-    if (room) {
-      altarRoom = { room, floorIndex: fi };
-      break;
-    }
-  }
-
-  if (altarRoom && altarRoom.floorIndex === 0) {
-    const fearBreakdown0 = fearLevelCalculateAllForFloor(floor0);
-    const fearMap0 = fearBreakdownToNumericMap(fearBreakdown0);
-    const graph0 = pathfindingBuildDungeonGraph(floor0, fearMap0);
-
-    let bestRoom: PlacedRoom | undefined;
-    let bestDist = 0;
-    for (const room of regularRooms) {
-      if (room.id === altarRoom.room.id) continue;
-      const testPath = pathfindingFindPath(graph0, room.id, altarRoom.room.id);
-      if (testPath.length > bestDist) {
-        bestDist = testPath.length;
-        bestRoom = room;
+    for (const room of floor.rooms) {
+      // Track altar room as fallback
+      if (altarTypeId && room.roomTypeId === altarTypeId) {
+        altarRoom = { room, floorIndex: fi };
+        continue;
       }
+      // Exclude transport rooms
+      if (room.transportType) continue;
+      candidates.push({ room, floorIndex: fi });
     }
-    return bestRoom ?? altarRoom.room;
   }
 
-  return sortBy(regularRooms, [(r: PlacedRoom) => r.anchorX + r.anchorY])[0];
+  // Edge case: no eligible rooms, return altar room
+  if (candidates.length === 0) {
+    return altarRoom;
+  }
+
+  // Pick uniformly at random
+  if (rng) {
+    const idx = Math.floor(rng() * candidates.length);
+    return candidates[idx];
+  }
+
+  // Fallback: return first candidate if no rng provided
+  return candidates[0];
 }
 
 /**
- * Build a path through one or more dungeon floors from an entry room
- * (top-left on floor 0) to the altar room (possibly on a deeper floor).
+ * Build a path through one or more dungeon floors from an arbitrary entry room
+ * to the altar room. Visits secondary objective floors first, then paths to the altar.
  * Returns the full room path, a map of roomId → floorIndex, and fear levels.
  */
 function buildMultiFloorPath(
   state: GameState,
+  entryRoom: PlacedRoom,
+  entryFloorIndex: number,
   altarRoom: { room: PlacedRoom; floorIndex: number } | undefined,
   objectives: InvasionObjective[],
+  rng?: seedrandom.PRNG,
 ): {
   path: PlacedRoomId[];
   roomFloorMap: Record<string, number>;
   roomFearLevels: Record<string, number>;
 } {
   const floors = state.world.floors;
-  const floor0 = floors[0];
-  if (!floor0) return { path: [], roomFloorMap: {}, roomFearLevels: {} };
-
-  // Entry room on floor 0: non-transport, farthest from altar in graph
-  const regularRooms = floor0.rooms.filter((r) => !r.transportType);
-  if (regularRooms.length === 0) return { path: [], roomFloorMap: {}, roomFearLevels: {} };
+  const entryFloor = floors[entryFloorIndex];
+  if (!entryFloor) return { path: [], roomFloorMap: {}, roomFearLevels: {} };
 
   const roomFloorMap: Record<string, number> = {};
   const roomFearLevels: Record<string, number> = {};
   const altarFloorIndex = altarRoom?.floorIndex ?? 0;
-
-  // Build floor 0 graph early so we can pick the entry room by graph distance
-  const fearBreakdown0 = fearLevelCalculateAllForFloor(floor0);
-  const fearMap0 = fearBreakdownToNumericMap(fearBreakdown0);
-  const graph0 = pathfindingBuildDungeonGraph(floor0, fearMap0);
-
-  // Pick entry room: farthest connected non-transport room from altar, by path length.
-  // Fallback to top-left if altar not on floor 0 or no path found.
-  const altarOnFloor0 = altarFloorIndex === 0 && altarRoom;
-  let entryRoom: PlacedRoom;
-  if (altarOnFloor0) {
-    let bestRoom: PlacedRoom | undefined;
-    let bestDist = 0;
-    for (const room of regularRooms) {
-      if (room.id === altarRoom.room.id) continue;
-      const testPath = pathfindingFindPath(graph0, room.id, altarRoom.room.id);
-      if (testPath.length > bestDist) {
-        bestDist = testPath.length;
-        bestRoom = room;
-      }
-    }
-    // Fallback to altar room itself if no connected non-altar room exists
-    entryRoom = bestRoom ?? altarRoom.room;
-  } else {
-    entryRoom = sortBy(regularRooms, [(r: PlacedRoom) => r.anchorX + r.anchorY])[0];
-  }
-
   const goalRoomId = altarRoom?.room.id ?? entryRoom.id;
 
-  // Build per-floor objective map for detour pathfinding
+  // Noise options for suboptimal pathing
+  const noiseOptions: { noiseRng?: () => number; noiseChance?: number; maxNoiseFactor?: number } =
+    rng ? { noiseRng: rng, noiseChance: 0.25, maxNoiseFactor: 1.5 } : {};
+
+  // Build per-floor objective map
   const objectivesByFloor = new Map<number, SecondaryObjective[]>();
   for (const obj of objectives) {
     if (!obj.targetId || obj.isPrimary) continue;
@@ -306,188 +322,203 @@ function buildMultiFloorPath(
     }
   }
 
-  // --- Altar on floor 0: single-floor or roundtrip path ---
-  if (altarFloorIndex === 0) {
-    const deeperObjectiveFloors = sortBy(
-      [...objectivesByFloor.keys()].filter((f) => f > 0),
-      [(f: number) => f],
+  // Helper: build graph for a floor
+  function buildFloorGraph(fi: number): {
+    graph: ReturnType<typeof pathfindingBuildDungeonGraph>;
+    fearMap: Map<PlacedRoomId, number>;
+  } {
+    const floor = floors[fi];
+    const fearBreakdown = fearLevelCalculateAllForFloor(floor);
+    const fearMap = fearBreakdownToNumericMap(fearBreakdown);
+    const graph = pathfindingBuildDungeonGraph(floor, fearMap);
+    return { graph, fearMap };
+  }
+
+  // Helper: append a room to fullPath
+  function appendRoom(
+    fullPath: PlacedRoomId[],
+    rid: PlacedRoomId,
+    fi: number,
+    fearMap: Map<PlacedRoomId, number>,
+  ): void {
+    if (fullPath.length > 0 && fullPath[fullPath.length - 1] === rid) return;
+    fullPath.push(rid);
+    roomFloorMap[rid] = fi;
+    roomFearLevels[rid] = fearMap.get(rid) ?? 0;
+  }
+
+  // Collect floors that need to be visited for objectives (excluding altar floor for now)
+  const objectiveFloors = sortBy(
+    [...objectivesByFloor.keys()].filter((f) => f !== altarFloorIndex),
+    [(f: number) => Math.abs(f - entryFloorIndex)],
+  );
+
+  // Build ordered floor visit list: objective floors first, altar floor last
+  const floorVisitOrder: number[] = [];
+
+  // Always start on entry floor
+  // Add objective floors (sorted by proximity to entry floor)
+  for (const fi of objectiveFloors) {
+    if (!floorVisitOrder.includes(fi)) floorVisitOrder.push(fi);
+  }
+  // Add altar floor last (if not already visited)
+  if (!floorVisitOrder.includes(altarFloorIndex)) {
+    floorVisitOrder.push(altarFloorIndex);
+  }
+
+  // --- Single floor case (entry and altar on same floor, no objectives elsewhere) ---
+  if (entryFloorIndex === altarFloorIndex && objectiveFloors.length === 0) {
+    const { graph, fearMap } = buildFloorGraph(entryFloorIndex);
+    const floorObjectives = objectivesByFloor.get(entryFloorIndex) ?? [];
+    const path = pathfindingFindWithObjectives(
+      graph, entryRoom.id, goalRoomId, floorObjectives, noiseOptions,
     );
 
-    if (deeperObjectiveFloors.length === 0) {
-      // Pure single-floor path (no objectives on deeper floors)
-      const floorObjectives = objectivesByFloor.get(0) ?? [];
-      const path = pathfindingFindWithObjectives(graph0, entryRoom.id, goalRoomId, floorObjectives);
-
-      for (const rid of path) {
-        roomFloorMap[rid] = 0;
-        roomFearLevels[rid] = fearMap0.get(rid) ?? 0;
-      }
-
-      return { path, roomFloorMap, roomFearLevels };
-    }
-
-    // Roundtrip path: visit deeper objective floors before heading to altar
-    const fullPath: PlacedRoomId[] = [];
-    let currentPos = entryRoom.id;
-
-    for (const targetFloorIdx of deeperObjectiveFloors) {
-      const targetFloor = floors[targetFloorIdx];
-      if (!targetFloor) continue;
-
-      // Validate: transport down exists
-      const transportDown = findTransportToNextFloor(floor0, targetFloor);
-      if (!transportDown) continue;
-
-      // Validate: can path to transport on floor 0
-      const pathToTransport = pathfindingFindPath(graph0, currentPos, transportDown.currentFloorRoom.id);
-      if (pathToTransport.length === 0) continue;
-
-      // Validate: transport back to floor 0 exists
-      const transportUp = findTransportToNextFloor(targetFloor, floor0);
-      if (!transportUp) continue;
-
-      // Validate: can path on target floor
-      const targetFearBreakdown = fearLevelCalculateAllForFloor(targetFloor);
-      const targetFearMap = fearBreakdownToNumericMap(targetFearBreakdown);
-      const targetGraph = pathfindingBuildDungeonGraph(targetFloor, targetFearMap);
-
-      const floorObjectives = objectivesByFloor.get(targetFloorIdx) ?? [];
-      const targetPath = pathfindingFindWithObjectives(
-        targetGraph,
-        transportDown.nextFloorRoom.id,
-        transportUp.currentFloorRoom.id,
-        floorObjectives,
+    // Fallback with no noise if noisy path is too expensive
+    if (rng && path.length > 0) {
+      const optimalPath = pathfindingFindWithObjectives(
+        graph, entryRoom.id, goalRoomId, floorObjectives,
       );
-      if (targetPath.length === 0) continue;
-
-      // All checks passed — commit floor-0 segment to transport
-      for (const rid of pathToTransport) {
-        if (fullPath.length === 0 || fullPath[fullPath.length - 1] !== rid) {
-          fullPath.push(rid);
-          roomFloorMap[rid] = 0;
-          roomFearLevels[rid] = fearMap0.get(rid) ?? 0;
+      const optimalCost = pathfindingGetCost(graph, optimalPath);
+      const noisyCost = pathfindingGetCost(graph, path);
+      if (optimalCost > 0 && noisyCost > optimalCost * 1.5) {
+        for (const rid of optimalPath) {
+          appendRoom(optimalPath, rid, entryFloorIndex, fearMap);
         }
+        // Use optimal path
+        for (const rid of optimalPath) {
+          roomFloorMap[rid] = entryFloorIndex;
+          roomFearLevels[rid] = fearMap.get(rid) ?? 0;
+        }
+        return { path: optimalPath, roomFloorMap, roomFearLevels };
       }
-
-      // Cross to target floor
-      fullPath.push(transportDown.nextFloorRoom.id);
-      roomFloorMap[transportDown.nextFloorRoom.id] = targetFloorIdx;
-      roomFearLevels[transportDown.nextFloorRoom.id] = targetFearMap.get(transportDown.nextFloorRoom.id) ?? 0;
-
-      // Add target floor rooms (skip first if it duplicates transport landing)
-      for (const rid of targetPath) {
-        if (fullPath[fullPath.length - 1] === rid) continue;
-        fullPath.push(rid);
-        roomFloorMap[rid] = targetFloorIdx;
-        roomFearLevels[rid] = targetFearMap.get(rid) ?? 0;
-      }
-
-      // Cross back to floor 0
-      fullPath.push(transportUp.nextFloorRoom.id);
-      roomFloorMap[transportUp.nextFloorRoom.id] = 0;
-      roomFearLevels[transportUp.nextFloorRoom.id] = fearMap0.get(transportUp.nextFloorRoom.id) ?? 0;
-      currentPos = transportUp.nextFloorRoom.id;
     }
 
-    // Final segment: currentPos → altar on floor 0 (with floor-0 objectives)
-    const floor0Objectives = objectivesByFloor.get(0) ?? [];
-    const finalPath = pathfindingFindWithObjectives(graph0, currentPos, goalRoomId, floor0Objectives);
-
-    for (const rid of finalPath) {
-      if (fullPath.length > 0 && fullPath[fullPath.length - 1] === rid) continue;
-      fullPath.push(rid);
-      roomFloorMap[rid] = 0;
-      roomFearLevels[rid] = fearMap0.get(rid) ?? 0;
+    for (const rid of path) {
+      roomFloorMap[rid] = entryFloorIndex;
+      roomFearLevels[rid] = fearMap.get(rid) ?? 0;
     }
-
-    if (fullPath.length === 0) {
-      // Fallback: direct entry → altar
-      const fallbackPath = pathfindingFindPath(graph0, entryRoom.id, goalRoomId);
-      for (const rid of fallbackPath) {
-        roomFloorMap[rid] = 0;
-        roomFearLevels[rid] = fearMap0.get(rid) ?? 0;
-      }
-      return { path: fallbackPath.length > 0 ? fallbackPath : [entryRoom.id], roomFloorMap, roomFearLevels };
-    }
-
-    return { path: fullPath, roomFloorMap, roomFearLevels };
+    return { path: path.length > 0 ? path : [entryRoom.id], roomFloorMap, roomFearLevels };
   }
 
   // --- Multi-floor path ---
   const fullPath: PlacedRoomId[] = [];
+  let currentFloorIndex = entryFloorIndex;
+  let currentPos = entryRoom.id;
 
-  for (let fi = 0; fi <= altarFloorIndex; fi++) {
-    const floor = floors[fi];
-    if (!floor) break;
+  // First, handle objectives on the entry floor (before leaving it)
+  const entryFloorObjectives = objectivesByFloor.get(entryFloorIndex) ?? [];
 
-    const fearBreakdown = fearLevelCalculateAllForFloor(floor);
-    const fearMap = fearBreakdownToNumericMap(fearBreakdown);
-    const graph = pathfindingBuildDungeonGraph(floor, fearMap);
+  // Collect all floors to visit in order (objectives first, then altar)
+  const allFloorsToVisit: number[] = [];
+  for (const fi of objectiveFloors) {
+    if (fi !== entryFloorIndex && !allFloorsToVisit.includes(fi)) {
+      allFloorsToVisit.push(fi);
+    }
+  }
+  // Always end at altar floor
+  if (!allFloorsToVisit.includes(altarFloorIndex) && altarFloorIndex !== entryFloorIndex) {
+    allFloorsToVisit.push(altarFloorIndex);
+  }
 
-    // Determine start room on this floor
-    let startRoomId: PlacedRoomId;
-    if (fi === 0) {
-      startRoomId = entryRoom.id;
-    } else {
-      // Last room in fullPath is the transport-in on this floor
-      startRoomId = fullPath[fullPath.length - 1];
+  // Path through entry floor's objectives first, then to transport if needed
+  if (allFloorsToVisit.length === 0) {
+    // All objectives on entry floor, altar also on entry floor
+    const { graph, fearMap } = buildFloorGraph(entryFloorIndex);
+    const floorObjectives = objectivesByFloor.get(entryFloorIndex) ?? [];
+    const path = pathfindingFindWithObjectives(
+      graph, entryRoom.id, goalRoomId, floorObjectives, noiseOptions,
+    );
+    for (const rid of path) {
+      roomFloorMap[rid] = entryFloorIndex;
+      roomFearLevels[rid] = fearMap.get(rid) ?? 0;
+    }
+    return { path: path.length > 0 ? path : [entryRoom.id], roomFloorMap, roomFearLevels };
+  }
+
+  // Multi-floor traversal
+  for (let visitIdx = 0; visitIdx <= allFloorsToVisit.length; visitIdx++) {
+    const targetFloorIndex = visitIdx < allFloorsToVisit.length
+      ? allFloorsToVisit[visitIdx]
+      : altarFloorIndex;
+
+    const isLastVisit = visitIdx === allFloorsToVisit.length
+      || targetFloorIndex === altarFloorIndex;
+
+    const { graph: currentGraph, fearMap: currentFearMap } = buildFloorGraph(currentFloorIndex);
+    const currentFloorObjs = (currentFloorIndex === entryFloorIndex && fullPath.length === 0)
+      ? entryFloorObjectives
+      : (objectivesByFloor.get(currentFloorIndex) ?? []);
+
+    if (currentFloorIndex === targetFloorIndex) {
+      // Same floor — path to altar with objectives
+      const subPath = pathfindingFindWithObjectives(
+        currentGraph, currentPos, goalRoomId, currentFloorObjs, noiseOptions,
+      );
+      for (const rid of subPath) {
+        appendRoom(fullPath, rid, currentFloorIndex, currentFearMap);
+      }
+      break;
     }
 
-    // Determine end room on this floor
-    let endRoomId: PlacedRoomId;
-    let transportPair: { currentFloorRoom: PlacedRoom; nextFloorRoom: PlacedRoom } | undefined;
-
-    if (fi === altarFloorIndex) {
-      endRoomId = goalRoomId;
-    } else {
-      const nextFloor = floors[fi + 1];
-      if (!nextFloor) break;
-      transportPair = findTransportToNextFloor(floor, nextFloor);
-      if (!transportPair) break;
-      endRoomId = transportPair.currentFloorRoom.id;
+    // Find transport between floors (works bidirectionally)
+    const transportPair = findTransportBetweenFloors(floors, currentFloorIndex, targetFloorIndex);
+    if (!transportPair) {
+      // Can't reach target floor — path directly to altar on current floor if possible
+      if (currentFloorIndex === altarFloorIndex) {
+        const subPath = pathfindingFindWithObjectives(
+          currentGraph, currentPos, goalRoomId, currentFloorObjs, noiseOptions,
+        );
+        for (const rid of subPath) {
+          appendRoom(fullPath, rid, currentFloorIndex, currentFearMap);
+        }
+      }
+      break;
     }
 
-    // Pathfind within this floor
-    const floorObjectives = objectivesByFloor.get(fi) ?? [];
-    const subPath = pathfindingFindWithObjectives(graph, startRoomId, endRoomId, floorObjectives);
-    if (subPath.length === 0) break;
+    // Path from current position to transport (with current floor objectives)
+    const pathToTransport = pathfindingFindWithObjectives(
+      currentGraph, currentPos, transportPair.currentFloorRoom.id, currentFloorObjs, noiseOptions,
+    );
+    if (pathToTransport.length === 0) continue;
 
-    // Append sub-path (skip first if it overlaps with previous floor's last room)
-    const skipFirst = fi > 0 && fullPath.length > 0 && subPath[0] === fullPath[fullPath.length - 1];
-    for (let i = skipFirst ? 1 : 0; i < subPath.length; i++) {
-      fullPath.push(subPath[i]);
-      roomFloorMap[subPath[i]] = fi;
-      roomFearLevels[subPath[i]] = fearMap.get(subPath[i]) ?? 0;
+    for (const rid of pathToTransport) {
+      appendRoom(fullPath, rid, currentFloorIndex, currentFearMap);
     }
 
-    // Add transport-in room on the next floor
-    if (transportPair && fi < altarFloorIndex) {
-      const nextFloor = floors[fi + 1];
-      const nextFearBreakdown = fearLevelCalculateAllForFloor(nextFloor);
-      const nextFearMap = fearBreakdownToNumericMap(nextFearBreakdown);
+    // Cross to target floor via transport
+    const { fearMap: targetFearMap } = buildFloorGraph(targetFloorIndex);
+    appendRoom(fullPath, transportPair.nextFloorRoom.id, targetFloorIndex, targetFearMap);
 
-      fullPath.push(transportPair.nextFloorRoom.id);
-      roomFloorMap[transportPair.nextFloorRoom.id] = fi + 1;
-      roomFearLevels[transportPair.nextFloorRoom.id] = nextFearMap.get(transportPair.nextFloorRoom.id) ?? 0;
+    currentFloorIndex = targetFloorIndex;
+    currentPos = transportPair.nextFloorRoom.id;
+
+    // If this is the altar floor, path to altar with its objectives
+    if (isLastVisit && targetFloorIndex === altarFloorIndex) {
+      const { graph: altarGraph, fearMap: altarFearMap } = buildFloorGraph(altarFloorIndex);
+      const altarFloorObjs = objectivesByFloor.get(altarFloorIndex) ?? [];
+      const finalPath = pathfindingFindWithObjectives(
+        altarGraph, currentPos, goalRoomId, altarFloorObjs, noiseOptions,
+      );
+      for (const rid of finalPath) {
+        appendRoom(fullPath, rid, altarFloorIndex, altarFearMap);
+      }
+      break;
     }
   }
 
-  // Fallback: if multi-floor path failed, do single-floor on floor 0
+  // Fallback
   if (fullPath.length === 0) {
-    const fearBreakdown = fearLevelCalculateAllForFloor(floor0);
-    const fearMap = fearBreakdownToNumericMap(fearBreakdown);
-    const graph = pathfindingBuildDungeonGraph(floor0, fearMap);
+    const { graph, fearMap } = buildFloorGraph(entryFloorIndex);
     const path = pathfindingFindPath(graph, entryRoom.id, entryRoom.id);
-
     if (path.length > 0) {
-      for (const roomId of path) {
-        roomFloorMap[roomId] = 0;
-        roomFearLevels[roomId] = fearMap.get(roomId) ?? 0;
+      for (const rid of path) {
+        roomFloorMap[rid] = entryFloorIndex;
+        roomFearLevels[rid] = fearMap.get(rid) ?? 0;
       }
       return { path, roomFloorMap, roomFearLevels };
     }
-
-    roomFloorMap[entryRoom.id] = 0;
+    roomFloorMap[entryRoom.id] = entryFloorIndex;
     return { path: [entryRoom.id], roomFloorMap, roomFearLevels: {} };
   }
 
@@ -518,9 +549,19 @@ export function invasionStart(
     + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
   // 1. Generate invader party (use pre-computed from warning if available)
-  const invaders = warning?.invaders ?? invasionCompositionGenerateParty(
-    profile, seed, bonusSize,
-  );
+  let invaders: InvaderInstance[];
+  let partyTheme: InvasionThemeType | undefined;
+  let pairedObjectives: ObjectiveType[] | undefined;
+
+  if (warning?.invaders) {
+    invaders = warning.invaders;
+    partyTheme = warning.themedInvasionType;
+  } else {
+    const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize);
+    invaders = partyResult.invaders;
+    partyTheme = partyResult.themedInvasionType;
+    pairedObjectives = partyResult.pairedObjectives;
+  }
 
   if (invaders.length === 0) {
     state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
@@ -528,7 +569,7 @@ export function invasionStart(
   }
 
   // 2. Assign objectives (use pre-computed from warning if available)
-  const objectives = warning?.objectives ?? invasionObjectiveAssign(state, seed);
+  const objectives = warning?.objectives ?? invasionObjectiveAssign(state, seed, pairedObjectives);
 
   // 3. Find altar room across all floors
   const altarTypeId = roomRoleFindById('altar');
@@ -542,17 +583,34 @@ export function invasionStart(
     }
   }
 
-  const floor0 = state.world.floors[0];
-  if (!floor0) {
+  if (state.world.floors.length === 0) {
     state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
     return;
   }
 
+  // 3b. Find entry room (random from any floor)
+  const rng = seedrandom(seed);
+  const entryResult = warning
+    ? { room: state.world.floors[warning.entryFloorIndex]?.rooms.find((r) => r.id === warning.entryRoomId), floorIndex: warning.entryFloorIndex }
+    : invasionFindEntryRoom(state, rng);
+
+  if (!entryResult?.room) {
+    state.world.activeInvasion = createEmptyCompletedInvasion(seed, invasionType, day, profile);
+    return;
+  }
+
+  const entryRoom = entryResult.room;
+  const entryFloorIndex = entryResult.floorIndex;
+  const themedInvasionType = partyTheme;
+
   // 4. Build multi-floor invasion path
   const { path, roomFloorMap, roomFearLevels } = buildMultiFloorPath(
     state,
+    entryRoom,
+    entryFloorIndex,
     altarRoom,
     objectives,
+    rng,
   );
 
   if (path.length === 0) {
@@ -618,12 +676,28 @@ export function invasionStart(
     });
   }
 
+  // Log themed invasion
+  if (themedInvasionType) {
+    const themeLabels: Record<InvasionThemeType, string> = {
+      stealth_raid: 'A stealth raid approaches!',
+      crusade: 'A holy crusade marches on the dungeon!',
+      arcane_assault: 'An arcane assault force materializes!',
+      berserker_horde: 'A berserker horde charges in!',
+    };
+    battleLog.push({
+      turn: 0,
+      type: 'room_enter',
+      message: themeLabels[themedInvasionType],
+    });
+  }
+
   state.world.activeInvasion = {
     seed,
     invasionType,
     day,
     path,
     entryRoomId,
+    entryFloorIndex,
     currentRoomIndex: 0,
     currentRoomTicksElapsed: 0,
     currentRoomTicksTotal: firstRoomTicks,
@@ -641,6 +715,8 @@ export function invasionStart(
     scoutedRoomIds: [],
     roomFearLevels,
     unreachableObjectiveCount,
+    altarMaxHpMultiplier: 1.0,
+    themedInvasionType,
     profile,
     completed: false,
   };
@@ -695,6 +771,30 @@ export function invasionProcess(state: GameState): void {
         roomId,
         message: `Invaders enter ${roomName}.`,
       });
+    }
+
+    // Random mid-invasion events (skip on first room entry and altar looping)
+    if (invasion.currentRoomIndex > 0 && !invasion.isAltarLooping) {
+      const eventResult = invasionEventTryTrigger(invasion, rng);
+      if (eventResult) {
+        invasion.invasionState = eventResult.invasionState;
+        invasion.invaderHpMap = eventResult.invaderHpMap;
+        invasion.battleLog.push(...eventResult.logEntries);
+
+        // If reinforcements arrived, add them to the invasion state
+        if (eventResult.addedInvaders?.length) {
+          for (const added of eventResult.addedInvaders) {
+            invasion.invaderHpMap[added.id] = added.currentHp;
+          }
+        }
+
+        // Check if the event ended the invasion (all invaders dead)
+        const endReason = invasionWinLossCheckEnd(invasion.invasionState);
+        if (endReason) {
+          invasionProcessComplete(state, invasion, rng);
+          return;
+        }
+      }
     }
 
     // Fear room entry morale
@@ -829,6 +929,37 @@ export function invasionProcess(state: GameState): void {
         roomId,
         message: `Invaders pass through ${roomName}.`,
       });
+    }
+
+    // Check and complete secondary objectives when invaders clear a room
+    if (!invasion.isAltarLooping) {
+      const secondaryObjectives = invasion.invasionState.objectives.filter(
+        (o) => !o.isPrimary && !o.isCompleted && o.targetId === roomId,
+      );
+      for (const obj of secondaryObjectives) {
+        const updated = invasionObjectiveUpdateProgress(obj, 100);
+        invasion.invasionState = {
+          ...invasion.invasionState,
+          objectives: invasion.invasionState.objectives.map((o) =>
+            o.id === obj.id ? updated : o,
+          ),
+        };
+
+        // Apply altar debuff for completed secondary objective
+        const debuffResult = invasionWinLossApplyObjectiveDebuff(
+          invasion.invasionState,
+          invasion.altarMaxHpMultiplier,
+        );
+        invasion.invasionState = debuffResult.state;
+        invasion.altarMaxHpMultiplier = debuffResult.newMultiplier;
+
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'random_event',
+          roomId,
+          message: `Objective completed: ${obj.name}! The altar weakens... (${invasion.invasionState.altarMaxHp} max HP)`,
+        });
+      }
     }
 
     // Altar damage — find altar on the current room's floor
@@ -1582,6 +1713,7 @@ function invasionProcessComplete(
     penetrationDepth,
     roomsReached,
     totalPathRooms,
+    invasion.altarMaxHpMultiplier,
   );
 
   invasion.battleLog.push({
@@ -1662,6 +1794,7 @@ function createEmptyCompletedInvasion(
       penetrationDepth: 0,
       roomsReached: 0,
       totalPathRooms: 0,
+      altarMaxHpMultiplier: 1.0,
     },
     battleLog: [{ turn: 0, type: 'invasion_end', message: 'No invaders appeared.' }],
     capturedPrisoners: [],
@@ -1675,6 +1808,7 @@ function createEmptyCompletedInvasion(
     day,
     path: [],
     entryRoomId: '' as PlacedRoomId,
+    entryFloorIndex: 0,
     currentRoomIndex: 0,
     currentRoomTicksElapsed: 0,
     currentRoomTicksTotal: 0,
@@ -1703,6 +1837,7 @@ function createEmptyCompletedInvasion(
     scoutedRoomIds: [],
     roomFearLevels: {},
     unreachableObjectiveCount: 0,
+    altarMaxHpMultiplier: 1.0,
     profile,
     completed: true,
     result: emptyResult,

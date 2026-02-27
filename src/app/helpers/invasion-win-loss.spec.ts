@@ -4,10 +4,13 @@ import type { InvasionState } from '@interfaces/invasion';
 import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
+  INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE,
   INVASION_WIN_LOSS_ALTAR_MAX_HP,
+  INVASION_WIN_LOSS_ALTAR_MIN_MAX_HP_RATIO,
   INVASION_WIN_LOSS_MAX_TURNS,
   INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY,
   invasionWinLossAdvanceTurn,
+  invasionWinLossApplyObjectiveDebuff,
   invasionWinLossAreAllEliminated,
   invasionWinLossAreSecondaryObjectivesCompleted,
   invasionWinLossCheckEnd,
@@ -49,7 +52,7 @@ vi.mock('@helpers/invasion-objectives', () => ({
       altarDestroyed: false,
       secondariesCompleted: completedCount,
       secondariesTotal: secondaries.length,
-      rewardMultiplier: Math.max(0, 1.0 + prevented * 0.25 - completedCount * 0.25),
+      rewardMultiplier: Math.max(0, 1.0 + prevented * 0.25 - completedCount * 0.15),
     };
   },
 }));
@@ -125,8 +128,8 @@ describe('invasion-win-loss', () => {
       expect(INVASION_WIN_LOSS_ALTAR_MAX_HP).toBe(100);
     });
 
-    it('should have max invasion turns of 30', () => {
-      expect(INVASION_WIN_LOSS_MAX_TURNS).toBe(30);
+    it('should have max invasion turns of 60', () => {
+      expect(INVASION_WIN_LOSS_MAX_TURNS).toBe(60);
     });
 
     it('should require 2 secondary objectives for invader victory', () => {
@@ -252,17 +255,17 @@ describe('invasion-win-loss', () => {
 
   describe('invasionWinLossIsTurnLimitReached', () => {
     it('should return false before turn limit', () => {
-      const state = makeInvasionState({ currentTurn: 29 });
+      const state = makeInvasionState({ currentTurn: 59 });
       expect(invasionWinLossIsTurnLimitReached(state)).toBe(false);
     });
 
     it('should return true at turn limit', () => {
-      const state = makeInvasionState({ currentTurn: 30 });
+      const state = makeInvasionState({ currentTurn: 60 });
       expect(invasionWinLossIsTurnLimitReached(state)).toBe(true);
     });
 
     it('should return true past turn limit', () => {
-      const state = makeInvasionState({ currentTurn: 35 });
+      const state = makeInvasionState({ currentTurn: 65 });
       expect(invasionWinLossIsTurnLimitReached(state)).toBe(true);
     });
   });
@@ -283,7 +286,7 @@ describe('invasion-win-loss', () => {
       expect(invasionWinLossCheckEnd(state)).toBe('altar_destroyed');
     });
 
-    it('should return objectives_completed when 2 secondaries done', () => {
+    it('should NOT return objectives_completed when 2 secondaries done (debuff system instead)', () => {
       const state = makeInvasionState({
         objectives: [
           makePrimaryObjective(),
@@ -291,7 +294,8 @@ describe('invasion-win-loss', () => {
           makeSecondaryObjective('SlayMonster', true),
         ],
       });
-      expect(invasionWinLossCheckEnd(state)).toBe('objectives_completed');
+      // Objectives no longer cause instant defeat — they weaken the altar instead
+      expect(invasionWinLossCheckEnd(state)).toBeUndefined();
     });
 
     it('should return all_invaders_eliminated when all dead', () => {
@@ -302,7 +306,7 @@ describe('invasion-win-loss', () => {
     });
 
     it('should return turn_limit_reached at max turns', () => {
-      const state = makeInvasionState({ currentTurn: 30 });
+      const state = makeInvasionState({ currentTurn: 60 });
       expect(invasionWinLossCheckEnd(state)).toBe('turn_limit_reached');
     });
 
@@ -317,27 +321,15 @@ describe('invasion-win-loss', () => {
     it('should prioritize altar_destroyed over turn_limit_reached', () => {
       const state = makeInvasionState({
         altarHp: 0,
-        currentTurn: 30,
+        currentTurn: 60,
       });
       expect(invasionWinLossCheckEnd(state)).toBe('altar_destroyed');
-    });
-
-    it('should prioritize objectives_completed over all_invaders_eliminated', () => {
-      const state = makeInvasionState({
-        invaders: [makeInvader('a', 0)],
-        objectives: [
-          makePrimaryObjective(),
-          makeSecondaryObjective('StealTreasure', true),
-          makeSecondaryObjective('SlayMonster', true),
-        ],
-      });
-      expect(invasionWinLossCheckEnd(state)).toBe('objectives_completed');
     });
 
     it('should prioritize all_invaders_eliminated over turn_limit_reached', () => {
       const state = makeInvasionState({
         invaders: [makeInvader('a', 0)],
-        currentTurn: 30,
+        currentTurn: 60,
       });
       expect(invasionWinLossCheckEnd(state)).toBe('all_invaders_eliminated');
     });
@@ -527,7 +519,7 @@ describe('invasion-win-loss', () => {
 
       expect(result.objectivesCompleted).toBe(1);
       expect(result.objectivesTotal).toBe(2);
-      expect(result.rewardMultiplier).toBe(1.0);
+      expect(result.rewardMultiplier).toBe(1.1);
     });
 
     it('should produce victory on turn limit', () => {
@@ -561,6 +553,7 @@ describe('invasion-win-loss', () => {
         penetrationDepth: 0.5,
         roomsReached: 4,
         totalPathRooms: 8,
+        altarMaxHpMultiplier: 1.0,
       };
 
       const entry = invasionWinLossCreateHistoryEntry(result);
@@ -593,6 +586,7 @@ describe('invasion-win-loss', () => {
         penetrationDepth: 1.0,
         roomsReached: 8,
         totalPathRooms: 8,
+        altarMaxHpMultiplier: 1.0,
       };
 
       const entry = invasionWinLossCreateHistoryEntry(result);
@@ -680,6 +674,51 @@ describe('invasion-win-loss', () => {
       const result = invasionWinLossResolveDetailedResult(state, 45, endReason!, 0.25, 3, 10);
       expect(result.outcome).toBe('victory');
       expect(result.turnsTaken).toBe(INVASION_WIN_LOSS_MAX_TURNS);
+    });
+  });
+
+  describe('invasionWinLossApplyObjectiveDebuff', () => {
+    it('should reduce altar max HP by 15% per debuff', () => {
+      const state = makeInvasionState();
+      const { state: newState, newMultiplier } = invasionWinLossApplyObjectiveDebuff(state, 1.0);
+
+      expect(newMultiplier).toBe(1.0 - INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE);
+      expect(newState.altarMaxHp).toBe(Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP * newMultiplier));
+    });
+
+    it('should stack debuffs', () => {
+      let state = makeInvasionState();
+      let multiplier = 1.0;
+
+      // Apply two debuffs
+      const r1 = invasionWinLossApplyObjectiveDebuff(state, multiplier);
+      state = r1.state;
+      multiplier = r1.newMultiplier;
+
+      const r2 = invasionWinLossApplyObjectiveDebuff(state, multiplier);
+
+      expect(r2.newMultiplier).toBeCloseTo(1.0 - 2 * INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE);
+    });
+
+    it('should not reduce below minimum ratio (10%)', () => {
+      const state = makeInvasionState();
+      // Apply at a very low multiplier to test the floor
+      const { newMultiplier } = invasionWinLossApplyObjectiveDebuff(state, 0.15);
+
+      expect(newMultiplier).toBe(INVASION_WIN_LOSS_ALTAR_MIN_MAX_HP_RATIO);
+    });
+
+    it('should clamp altar HP to new max HP', () => {
+      const state = makeInvasionState({ altarHp: 100, altarMaxHp: 100 });
+      const { state: newState } = invasionWinLossApplyObjectiveDebuff(state, 1.0);
+
+      expect(newState.altarHp).toBeLessThanOrEqual(newState.altarMaxHp);
+    });
+
+    it('should not mutate original state', () => {
+      const state = makeInvasionState();
+      invasionWinLossApplyObjectiveDebuff(state, 1.0);
+      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
     });
   });
 });

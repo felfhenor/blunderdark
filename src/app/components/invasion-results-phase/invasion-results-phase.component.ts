@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import type { InvasionEndReason, InvasionOrchestratorResult } from '@interfaces';
 
 const END_REASON_LABELS: Record<InvasionEndReason, string> = {
@@ -16,6 +18,7 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
 
 @Component({
   selector: 'app-invasion-results-phase',
+  imports: [DecimalPipe],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -65,6 +68,30 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
           </div>
         </div>
 
+        <!-- Altar Status -->
+        @if (altarDebuffPercent() > 0) {
+          <div class="stat-box bg-base-200 rounded-lg p-3 text-center max-w-md mx-auto mt-4">
+            <div class="text-xs opacity-50">Altar Status</div>
+            <div class="text-lg font-bold text-warning">
+              -{{ altarDebuffPercent() | number: '1.0-0' }}% Max HP
+            </div>
+            <div class="text-xs opacity-50">from completed objectives</div>
+          </div>
+        }
+
+        <!-- Reward Multiplier -->
+        @if (isVictory()) {
+          <div class="stat-box bg-base-200 rounded-lg p-3 text-center max-w-md mx-auto mt-4">
+            <div class="text-xs opacity-50">Reward Multiplier</div>
+            <div class="text-lg font-bold"
+              [class.text-success]="res.detailedResult.rewardMultiplier >= 1.0"
+              [class.text-warning]="res.detailedResult.rewardMultiplier < 1.0"
+            >
+              {{ res.detailedResult.rewardMultiplier | number: '1.2-2' }}x
+            </div>
+          </div>
+        }
+
         <div class="alert mt-4 max-w-md mx-auto" [class.alert-success]="isVictory()" [class.alert-error]="!isVictory()">
           <span>{{ endReasonLabel(res.detailedResult.endReason) }}</span>
         </div>
@@ -86,6 +113,13 @@ export class InvasionResultsPhaseComponent {
   public result = input.required<InvasionOrchestratorResult>();
   public isVictory = input.required<boolean>();
   public advance = output();
+
+  public altarDebuffPercent = computed(() => {
+    const res = this.result();
+    if (!res?.detailedResult) return 0;
+    const multiplier = res.detailedResult.altarMaxHpMultiplier ?? 1.0;
+    return multiplier < 1.0 ? Math.round((1.0 - multiplier) * 100) : 0;
+  });
 
   public endReasonLabel(reason: InvasionEndReason): string {
     return END_REASON_LABELS[reason];

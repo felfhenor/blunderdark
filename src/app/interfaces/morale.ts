@@ -5,7 +5,9 @@ export type MoraleEventType =
   | 'high_fear_room'
   | 'room_capture'
   | 'research_penalty'
-  | 'ruler_presence';
+  | 'ruler_presence'
+  | 'infighting'
+  | 'desertion';
 
 export type MoraleEvent = {
   turn: number;

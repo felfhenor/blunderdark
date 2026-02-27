@@ -69,11 +69,22 @@ function getTraversalCost(
   const morale = options.morale ?? Infinity;
   const fearMultiplier = options.fearCostMultiplier ?? 3;
 
+  let cost = edge.baseCost;
+
   if (targetNode.fearLevel > 0 && morale < targetNode.fearLevel) {
-    return edge.baseCost * fearMultiplier;
+    cost = edge.baseCost * fearMultiplier;
   }
 
-  return edge.baseCost;
+  // Suboptimal pathing noise: randomly inflate edge costs
+  if (options.noiseRng) {
+    const chance = options.noiseChance ?? 0.25;
+    const maxFactor = options.maxNoiseFactor ?? 1.5;
+    if (options.noiseRng() < chance) {
+      cost *= 1 + options.noiseRng() * (maxFactor - 1);
+    }
+  }
+
+  return cost;
 }
 
 /**
@@ -163,8 +174,9 @@ export function pathfindingGetCost(
 }
 
 /**
- * Find a path that may detour through a secondary objective if cost-effective.
- * Detour threshold: path via secondary must be less than 2x the direct path cost.
+ * Find a path that visits ALL reachable secondary objectives before the primary goal.
+ * Uses greedy nearest-neighbor: from current position, pick closest objective, repeat.
+ * Cost ceiling: objectives exceeding 3x the direct path cost are treated as unreachable.
  */
 export function pathfindingFindWithObjectives(
   graph: DungeonGraph,
@@ -180,44 +192,70 @@ export function pathfindingFindWithObjectives(
     options,
   );
   if (directPath.length === 0) return [];
+  if (secondaryObjectives.length === 0) return directPath;
 
   const directCost = pathfindingGetCost(graph, directPath, options);
-  const detourThreshold = directCost * 2;
+  const costCeiling = directCost * 3;
 
-  let bestDetourPath: PlacedRoomId[] = [];
-  let bestDetourPriority = -1;
+  // Greedy nearest-neighbor: visit all reachable objectives
+  const remaining = [...secondaryObjectives];
+  const fullPath: PlacedRoomId[] = [];
+  let currentPos = startRoomId;
+  let totalCost = 0;
 
-  for (const objective of secondaryObjectives) {
-    const pathToObj = pathfindingFindPath(
-      graph,
-      startRoomId,
-      objective.roomId,
-      options,
-    );
-    if (pathToObj.length === 0) continue;
+  while (remaining.length > 0) {
+    // Find closest reachable objective from current position
+    let bestIdx = -1;
+    let bestCost = Infinity;
+    let bestPath: PlacedRoomId[] = [];
 
-    const pathFromObj = pathfindingFindPath(
-      graph,
-      objective.roomId,
-      primaryGoalId,
-      options,
-    );
-    if (pathFromObj.length === 0) continue;
+    for (let i = 0; i < remaining.length; i++) {
+      const pathToObj = pathfindingFindPath(
+        graph,
+        currentPos,
+        remaining[i].roomId,
+        options,
+      );
+      if (pathToObj.length === 0) continue;
 
-    const detourCost =
-      pathfindingGetCost(graph, pathToObj, options) +
-      pathfindingGetCost(graph, pathFromObj, options);
-
-    if (
-      detourCost < detourThreshold &&
-      objective.priority > bestDetourPriority
-    ) {
-      bestDetourPath = [...pathToObj, ...pathFromObj.slice(1)];
-      bestDetourPriority = objective.priority;
+      const cost = pathfindingGetCost(graph, pathToObj, options);
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestIdx = i;
+        bestPath = pathToObj;
+      }
     }
+
+    // No reachable objective found
+    if (bestIdx === -1) break;
+
+    // Check cost ceiling — skip if too expensive
+    if (totalCost + bestCost > costCeiling) {
+      remaining.splice(bestIdx, 1);
+      continue;
+    }
+
+    // Append path to this objective (skip first if it overlaps with current pos)
+    const startIdx = fullPath.length > 0 && bestPath[0] === fullPath[fullPath.length - 1] ? 1 : 0;
+    for (let i = startIdx; i < bestPath.length; i++) {
+      fullPath.push(bestPath[i]);
+    }
+
+    totalCost += bestCost;
+    currentPos = remaining[bestIdx].roomId;
+    remaining.splice(bestIdx, 1);
   }
 
-  return bestDetourPath.length > 0 ? bestDetourPath : directPath;
+  // Path from last objective (or start) to primary goal
+  const finalPath = pathfindingFindPath(graph, currentPos, primaryGoalId, options);
+  if (finalPath.length === 0) return directPath;
+
+  const finalStartIdx = fullPath.length > 0 && finalPath[0] === fullPath[fullPath.length - 1] ? 1 : 0;
+  for (let i = finalStartIdx; i < finalPath.length; i++) {
+    fullPath.push(finalPath[i]);
+  }
+
+  return fullPath.length > 0 ? fullPath : directPath;
 }
 
 // --- Dynamic recalculation ---

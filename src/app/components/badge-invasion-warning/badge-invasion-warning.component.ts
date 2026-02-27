@@ -46,6 +46,16 @@ type ObjectiveInfo = {
           Day {{ arrivalDay() }} 00:00 ({{ remainingTime() }})
         </div>
 
+        @if (entryFloorInfo(); as entry) {
+          <div class="mb-1">
+            Drilling into {{ entry.roomName }} on Floor {{ entry.floorLabel }}
+          </div>
+        }
+
+        @if (themedLabel(); as label) {
+          <div class="mb-1 text-warning font-semibold">{{ label }}</div>
+        }
+
         @if (invaderGroups().length > 0) {
           <div class="font-semibold mb-1">Invaders:</div>
           @for (group of invaderGroups(); track group.className) {
@@ -131,6 +141,30 @@ export class BadgeInvasionWarningComponent {
       groups.push({ className, count, hasLeader });
     }
     return groups;
+  });
+
+  public entryFloorInfo = computed(() => {
+    const warning = invasionTriggerPendingWarning();
+    if (!warning?.entryRoomId) return undefined;
+
+    const roomName = this.resolveTargetRoomName(warning.entryRoomId) ?? 'Unknown Room';
+    return {
+      roomName,
+      floorLabel: `${warning.entryFloorIndex + 1}`,
+    };
+  });
+
+  public themedLabel = computed(() => {
+    const warning = invasionTriggerPendingWarning();
+    if (!warning?.themedInvasionType) return undefined;
+
+    const labels: Record<string, string> = {
+      stealth_raid: 'Stealth Raid',
+      crusade: 'Holy Crusade',
+      arcane_assault: 'Arcane Assault',
+      berserker_horde: 'Berserker Horde',
+    };
+    return labels[warning.themedInvasionType] ?? undefined;
   });
 
   public objectiveInfos = computed((): ObjectiveInfo[] => {

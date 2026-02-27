@@ -33,13 +33,13 @@ vi.mock('@helpers/notify', () => ({
 const mockInvasionStart = vi.fn();
 vi.mock('@helpers/invasion-process', () => ({
   invasionStart: (...args: unknown[]) => mockInvasionStart(...args),
-  invasionFindEntryRoom: vi.fn(() => ({ id: 'entry-room-id' })),
+  invasionFindEntryRoom: vi.fn(() => ({ room: { id: 'entry-room-id' }, floorIndex: 0 })),
   INVASION_ESCALATION_EXTRA_INVADERS: 1,
 }));
 
 vi.mock('@helpers/invasion-composition', () => ({
   invasionCompositionCalculateDungeonProfile: vi.fn(() => ({ corruption: 0, wealth: 0, knowledge: 0, size: 1, threatLevel: 0 })),
-  invasionCompositionGenerateParty: vi.fn(() => []),
+  invasionCompositionGenerateParty: vi.fn(() => ({ invaders: [], themedInvasionType: undefined, pairedObjectives: undefined })),
 }));
 
 vi.mock('@helpers/invasion-objectives', () => ({
