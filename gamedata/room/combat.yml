@@ -42,7 +42,6 @@
   maxFeatures: 2
   inhabitantRestriction: null
   fearLevel: 1
-  isUnique: true
   roomUpgradeIds:
     - Elite Arena
     - Grand Arena

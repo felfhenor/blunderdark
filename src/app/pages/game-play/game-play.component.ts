@@ -443,11 +443,10 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       {
         id: 'training',
         label: 'Training',
-        icon: 'gameSwordClash',
-        hotkey: 'g',
         isModal: false,
         templateRef: this.trainingPanel() ?? placeholder,
         condition: this.hasTrainingGrounds,
+        hidden: true,
       },
       {
         id: 'summoning',

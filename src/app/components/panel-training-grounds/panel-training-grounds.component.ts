@@ -4,11 +4,10 @@ import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
 import {
-  findRoomByRole,
   gamestate,
   contentGetEntry,
   trainingGetProgressPercent,
-  trainingGetRoomInfo,
+  trainingSelectedRoom,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
@@ -27,11 +26,7 @@ import { sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelTrainingGroundsComponent {
-  public trainingRoom = computed(() => {
-    const room = findRoomByRole('trainingGrounds')?.room;
-    if (!room) return undefined;
-    return trainingGetRoomInfo(room.id);
-  });
+  public trainingRoom = trainingSelectedRoom;
 
   public roomDef = computed(() => {
     const info = this.trainingRoom();

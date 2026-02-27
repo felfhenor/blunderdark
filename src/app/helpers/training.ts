@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { gridSelectedTile } from '@helpers/grid';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
@@ -214,28 +215,28 @@ export function trainingGetRoomInfo(
 }
 
 /**
- * Reactive signal: selected tile's Training Grounds info (null if not a Training Grounds).
+ * Reactive signal: selected tile's Training Grounds info (undefined if selection is not a Training Grounds).
  */
 export const trainingSelectedRoom = computed<TrainingRoomInfo | undefined>(() => {
   const trainingGroundsId = roomRoleFindById('trainingGrounds');
   const state = gamestate();
+  const tile = gridSelectedTile();
   const floors = state.world.floors;
   const floorIndex = state.world.currentFloorIndex;
   const floor = floors[floorIndex];
-  if (!floor) return undefined;
+  if (!floor || !tile) return undefined;
 
-  // Find the training grounds room from the floor's rooms list
-  // We check all rooms to find if any is selected (via UI)
-  for (const room of floor.rooms) {
-    if (room.roomTypeId === trainingGroundsId) {
-      const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor);
-      return {
-        placedRoom: room,
-        floor,
-        targetTicks: trainingGetTicksForRoom(room, adjacentTypes),
-        bonuses: trainingGetBonusesForRoom(room, adjacentTypes),
-      };
-    }
-  }
-  return undefined;
+  const gridCell = floor.grid[tile.y]?.[tile.x];
+  if (!gridCell?.roomId) return undefined;
+
+  const room = floor.rooms.find((r) => r.id === gridCell.roomId);
+  if (!room || room.roomTypeId !== trainingGroundsId) return undefined;
+
+  const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor);
+  return {
+    placedRoom: room,
+    floor,
+    targetTicks: trainingGetTicksForRoom(room, adjacentTypes),
+    bonuses: trainingGetBonusesForRoom(room, adjacentTypes),
+  };
 });
