@@ -11,6 +11,7 @@ import {
   moraleIsRetreating,
   MORALE_MAX,
 } from '@helpers';
+import { invasionIsActive } from '@helpers/invasion-process';
 import type { MoraleEvent } from '@interfaces/morale';
 
 @Component({
@@ -107,10 +108,7 @@ export class MoraleBarComponent {
 
   public showLog = signal(false);
 
-  public isVisible = computed(() => {
-    const log = moraleEventLog();
-    return moraleCurrent() < MORALE_MAX || log.length > 0;
-  });
+  public isVisible = invasionIsActive;
 
   public eventLog = computed(() => {
     return [...moraleEventLog()].reverse();
