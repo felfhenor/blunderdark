@@ -11,7 +11,7 @@
 
   <app-tab-bar [tabs]="tabDefs()" [activeTab]="activeTab()" (activeTabChange)="changeActiveTab($event)" variant="boxed" />
 
-  <div class="p-3 max-h-[500px] min-h-[500px] overflow-y-auto">
+  <div class="p-3 flex-1 min-h-0 overflow-y-auto">
     @switch (currentTab) {
       @case ('UI') {
         <app-panel-options-ui></app-panel-options-ui>

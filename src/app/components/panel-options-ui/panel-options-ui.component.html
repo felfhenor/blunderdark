@@ -1,6 +1,6 @@
 <div class="flex flex-row gap-2">
-  <div class="flex-1">
-    <div class="card bg-base-100 foreground shadow-xl mt-3">
+  <div class="flex-1 flex flex-col">
+    <div class="card bg-base-100 foreground shadow-xl">
       <div class="card-body">
         <div class="card-title">Gameplay</div>
 
@@ -35,134 +35,134 @@
       </div>
     </div>
 
-    <div class="flex-1">
-      <div class="card bg-base-100 foreground shadow-xl mt-3">
-        <div class="card-body">
-          <div class="card-title">Audio</div>
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Notifications</div>
 
-          <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <input
-                type="checkbox"
-                [checked]="optionsGet('bgmPlay')"
-                class="checkbox checkbox-secondary"
-                (click)="optionsSet('bgmPlay', !optionsGet('bgmPlay'))"
-              />
-              <span class="label-text">Play Background Music</span>
-            </label>
-          </div>
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('showResourceGainBubbles')"
+              class="checkbox checkbox-secondary"
+              (click)="optionsSet('showResourceGainBubbles', !optionsGet('showResourceGainBubbles'))"
+            />
+            <span class="label-text">Show Resource Gain Bubbles</span>
+          </label>
+        </div>
 
-          @if (optionsGet('bgmPlay')) {
-            <div class="form-control">
-              <label class="label cursor-pointer label-checkbox">
-                <span class="label-text !ml-0 mr-2">
-                  Background Music Volume
-                </span>
-                <input
-                  #bgmVolume
-                  type="range"
-                  [min]="0"
-                  [max]="1"
-                  [step]="0.05"
-                  [value]="optionsGet('bgmVolume')"
-                  (change)="optionsSet('bgmVolume', bgmVolume.valueAsNumber)"
-                  class="range range-secondary"
-                />
-                <span class="ml-2">
-                  {{ optionsGet('bgmVolume') * 100 | number: '1.0-0' }}%
-                </span>
-              </label>
-            </div>
-          }
-
-          <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <input
-                type="checkbox"
-                [checked]="optionsGet('sfxPlay')"
-                class="checkbox checkbox-secondary"
-                (click)="optionsSet('sfxPlay', !optionsGet('sfxPlay'))"
-              />
-              <span class="label-text">Play Sound Effects</span>
-            </label>
-          </div>
-
-          @if (optionsGet('sfxPlay')) {
-            <div class="form-control">
-              <label class="label cursor-pointer label-checkbox">
-                <span class="label-text !ml-0 mr-2">Sound Effects Volume</span>
-                <input
-                  #sfxVolume
-                  type="range"
-                  [min]="0"
-                  [max]="1"
-                  [step]="0.05"
-                  [value]="optionsGet('sfxVolume')"
-                  (change)="optionsSet('sfxVolume', sfxVolume.valueAsNumber)"
-                  class="range range-secondary"
-                />
-                <span class="ml-2">
-                  {{ optionsGet('sfxVolume') * 100 | number: '1.0-0' }}%
-                </span>
-              </label>
-            </div>
-          }
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('showCraftCompletionBubbles')"
+              class="checkbox checkbox-secondary"
+              (click)="optionsSet('showCraftCompletionBubbles', !optionsGet('showCraftCompletionBubbles'))"
+            />
+            <span class="label-text">Show Craft Completion Bubbles</span>
+          </label>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="flex-1 flex flex-col">
-      <div class="card bg-base-100 foreground shadow-xl mt-3">
-        <div class="card-body">
-          <div class="card-title">UI Theme</div>
+  <div class="flex-1">
+    <div class="card bg-base-100 foreground shadow-xl">
+      <div class="card-body">
+        <div class="card-title">Audio</div>
 
-          <label class="label mb-3 whitespace-normal">
-            Change the visuals of the game. Not every theme is tested equally,
-            please report issues with specific themes.
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('bgmPlay')"
+              class="checkbox checkbox-secondary"
+              (click)="optionsSet('bgmPlay', !optionsGet('bgmPlay'))"
+            />
+            <span class="label-text">Play Background Music</span>
           </label>
-
-          <select
-            class="select select-bordered select-xs mx-1"
-            [(ngModel)]="currentTheme"
-            (ngModelChange)="optionsSet('uiTheme', $event)"
-          >
-            @for (theme of themes; track $index) {
-              <option [value]="theme.name">
-                {{ theme.name | titlecase }} ({{ theme.type }})
-              </option>
-            }
-          </select>
         </div>
+
+        @if (optionsGet('bgmPlay')) {
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <span class="label-text !ml-0 mr-2">
+                Background Music Volume
+              </span>
+              <input
+                #bgmVolume
+                type="range"
+                [min]="0"
+                [max]="1"
+                [step]="0.05"
+                [value]="optionsGet('bgmVolume')"
+                (change)="optionsSet('bgmVolume', bgmVolume.valueAsNumber)"
+                class="range range-secondary"
+              />
+              <span class="ml-2">
+                {{ optionsGet('bgmVolume') * 100 | number: '1.0-0' }}%
+              </span>
+            </label>
+          </div>
+        }
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="optionsGet('sfxPlay')"
+              class="checkbox checkbox-secondary"
+              (click)="optionsSet('sfxPlay', !optionsGet('sfxPlay'))"
+            />
+            <span class="label-text">Play Sound Effects</span>
+          </label>
+        </div>
+
+        @if (optionsGet('sfxPlay')) {
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <span class="label-text !ml-0 mr-2">Sound Effects Volume</span>
+              <input
+                #sfxVolume
+                type="range"
+                [min]="0"
+                [max]="1"
+                [step]="0.05"
+                [value]="optionsGet('sfxVolume')"
+                (change)="optionsSet('sfxVolume', sfxVolume.valueAsNumber)"
+                class="range range-secondary"
+              />
+              <span class="ml-2">
+                {{ optionsGet('sfxVolume') * 100 | number: '1.0-0' }}%
+              </span>
+            </label>
+          </div>
+        }
       </div>
+    </div>
+  </div>
 
-      <div class="card bg-base-100 foreground shadow-xl mt-3">
-        <div class="card-body">
-          <div class="card-title">Notifications</div>
+  <div class="flex-1">
+    <div class="card bg-base-100 foreground shadow-xl">
+      <div class="card-body">
+        <div class="card-title">UI Theme</div>
 
-          <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <input
-                type="checkbox"
-                [checked]="optionsGet('showResourceGainBubbles')"
-                class="checkbox checkbox-secondary"
-                (click)="optionsSet('showResourceGainBubbles', !optionsGet('showResourceGainBubbles'))"
-              />
-              <span class="label-text">Show Resource Gain Bubbles</span>
-            </label>
-          </div>
+        <label class="label mb-3 whitespace-normal">
+          Change the visuals of the game. Not every theme is tested equally,
+          please report issues with specific themes.
+        </label>
 
-          <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <input
-                type="checkbox"
-                [checked]="optionsGet('showCraftCompletionBubbles')"
-                class="checkbox checkbox-secondary"
-                (click)="optionsSet('showCraftCompletionBubbles', !optionsGet('showCraftCompletionBubbles'))"
-              />
-              <span class="label-text">Show Craft Completion Bubbles</span>
-            </label>
-          </div>
-        </div>
+        <select
+          class="select select-bordered select-xs mx-1"
+          [(ngModel)]="currentTheme"
+          (ngModelChange)="optionsSet('uiTheme', $event)"
+        >
+          @for (theme of themes; track $index) {
+            <option [value]="theme.name">
+              {{ theme.name | titlecase }} ({{ theme.type }})
+            </option>
+          }
+        </select>
       </div>
     </div>
   </div>
