@@ -1,7 +1,8 @@
-import { contentGetEntry } from '@helpers/content';
+import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
-import { rngUuid } from '@helpers/rng';
+import { recruitmentMaxInhabitantCount } from '@helpers/recruitment';
+import { rngChoice, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
@@ -9,6 +10,7 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   PlacedRoom,
+  PlacedRoomId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
@@ -19,9 +21,6 @@ import { Subject } from 'rxjs';
 
 export const SPAWNING_POOL_DEFAULT_RATE = GAME_TIME_TICKS_PER_MINUTE * 5; // 5 game-minutes
 export const SPAWNING_POOL_DEFAULT_CAPACITY = 10;
-
-// Dark Spawning upgrade changes spawn type to Skeleton
-const DARK_SPAWN_TYPE = 'Skeleton';
 
 const spawningPoolSpawn = new Subject<SpawningPoolEvent>();
 export const spawningPoolSpawn$ = spawningPoolSpawn.asObservable();
@@ -63,19 +62,41 @@ export function spawningPoolGetEffectiveCapacity(
 }
 
 /**
- * Get the spawn type name, accounting for Dark Spawning upgrade.
+ * Pick a spawn definition, accounting for Dark Spawning upgrade.
+ * Without upgrade: random tier-1 non-undead creature.
+ * With Dark Pool upgrade: Skeleton.
  */
-export function spawningPoolGetSpawnType(
+export function spawningPoolPickSpawnDefinition(
   room: PlacedRoom,
-  baseType: string,
-): string {
+): InhabitantContent | undefined {
   const effects = roomUpgradeGetAppliedEffects(room);
   for (const effect of effects) {
     if (effect.type === 'spawnTypeChange') {
-      return DARK_SPAWN_TYPE;
+      return contentGetEntry<InhabitantContent>('Skeleton');
     }
   }
-  return baseType;
+
+  const allInhabitants =
+    contentGetEntriesByType<InhabitantContent>('inhabitant');
+  const tier1NonUndead = allInhabitants.filter(
+    (i) => i.tier === 1 && i.type !== 'undead',
+  );
+  if (tier1NonUndead.length === 0) return undefined;
+  return rngChoice(tier1NonUndead);
+}
+
+/**
+ * Count workers assigned to a spawning pool, excluding those still traveling.
+ */
+export function spawningPoolGetWorkerCount(
+  roomId: PlacedRoomId,
+  inhabitants: InhabitantInstance[],
+): number {
+  return inhabitants.filter(
+    (i) =>
+      i.assignedRoomId === roomId &&
+      !(i.travelTicksRemaining !== undefined && i.travelTicksRemaining > 0),
+  ).length;
 }
 
 /**
@@ -123,7 +144,6 @@ export function spawningPoolProcess(state: GameState, numTicks = 1): void {
 
   const baseRate = roomDef.spawnRate ?? SPAWNING_POOL_DEFAULT_RATE;
   const baseCapacity = roomDef.spawnCapacity ?? SPAWNING_POOL_DEFAULT_CAPACITY;
-  const baseSpawnType = roomDef.spawnType ?? 'Goblin';
 
   let inhabitantsChanged = false;
 
@@ -131,7 +151,23 @@ export function spawningPoolProcess(state: GameState, numTicks = 1): void {
     for (const room of floor.rooms) {
       if (room.roomTypeId !== spawningPoolTypeId) continue;
 
-      const effectiveRate = spawningPoolGetEffectiveRate(room, baseRate);
+      // Count assigned workers (excluding travelers)
+      const workerCount = spawningPoolGetWorkerCount(
+        room.id,
+        floor.inhabitants,
+      );
+
+      // No workers assigned → reset timer and skip
+      if (workerCount === 0) {
+        room.spawnTicksRemaining = undefined;
+        continue;
+      }
+
+      const baseEffectiveRate = spawningPoolGetEffectiveRate(room, baseRate);
+      const effectiveRate = Math.max(
+        1,
+        Math.round(baseEffectiveRate / workerCount),
+      );
 
       // Initialize timer if not set
       if (room.spawnTicksRemaining === undefined) {
@@ -144,6 +180,13 @@ export function spawningPoolProcess(state: GameState, numTicks = 1): void {
       if (room.spawnTicksRemaining <= 0) {
         // Reset timer
         room.spawnTicksRemaining = effectiveRate;
+
+        // Check global roster cap
+        if (
+          state.world.inhabitants.length >= recruitmentMaxInhabitantCount()
+        ) {
+          continue;
+        }
 
         // Check capacity: unassigned count must be below spawn capacity
         const unassignedCount = spawningPoolCountUnassigned(
@@ -160,10 +203,7 @@ export function spawningPoolProcess(state: GameState, numTicks = 1): void {
         }
 
         // Determine spawn type
-        const spawnTypeName = spawningPoolGetSpawnType(room, baseSpawnType);
-        const spawnDef = contentGetEntry<InhabitantContent>(
-          spawnTypeName,
-        );
+        const spawnDef = spawningPoolPickSpawnDefinition(room);
         if (!spawnDef) continue;
 
         // Create and add the new inhabitant

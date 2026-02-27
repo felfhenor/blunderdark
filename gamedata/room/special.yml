@@ -56,7 +56,6 @@
     - Dark Pool
   role: spawningPool
   spawnRate: 25
-  spawnType: Goblin
   spawnCapacity: 10
   breedingAdjacencyEffects:
     hybridTimeReduction: 0.25
