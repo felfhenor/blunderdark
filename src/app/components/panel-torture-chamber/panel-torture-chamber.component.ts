@@ -7,24 +7,31 @@ import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import {
   contentGetEntry,
   findRoomByRole,
-  floorCurrent,
   gamestate,
-  tortureConversionComplete$,
-  tortureExtractionComplete$,
-  tortureGetAdjacentRoomTypeIds,
-  tortureGetConversionRate,
-  tortureGetConversionTicks,
-  tortureGetExtractionTicks,
+  PRISONER_ESCAPE_DAYS,
+  TORTURE_BREAK_BASE_TICKS,
+  TORTURE_EXTRACT_BASE_TICKS,
+  TORTURE_INTERROGATE_BASE_TICKS,
+  tortureBreakComplete$,
+  tortureExtractComplete$,
+  tortureInterrogateComplete$,
   updateGamestate,
 } from '@helpers';
+import { researchUnlockIsFeatureUnlocked } from '@helpers/research-unlocks';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
-  InvaderClassType,
   PrisonerId,
+  TortureBreakAction,
+  TortureExtractAction,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { sortBy } from 'es-toolkit/compat';
+
+type StageResult =
+  | { stage: 'interrogate'; prisonerName: string; attackBonus: number; defenseBonus: number }
+  | { stage: 'extract'; prisonerName: string; action: TortureExtractAction; researchGained?: number }
+  | { stage: 'break'; prisonerName: string; action: TortureBreakAction; success?: boolean; inhabitantName?: string; fearGained?: number; resourceGained?: { type: string; amount: number } };
 
 @Component({
   selector: 'app-panel-torture-chamber',
@@ -35,27 +42,36 @@ import { sortBy } from 'es-toolkit/compat';
 })
 export class PanelTortureChamberComponent {
   public showResult = signal(false);
-  public lastResult = signal<
-    | { type: 'extraction'; prisonerName: string; researchGained: number }
-    | { type: 'conversion'; prisonerName: string; success: boolean; inhabitantName?: string }
-    | undefined
-  >(undefined);
+  public lastResult = signal<StageResult | undefined>(undefined);
 
   private subscriptions = [
-    tortureExtractionComplete$.subscribe((evt) => {
+    tortureInterrogateComplete$.subscribe((evt) => {
       this.lastResult.set({
-        type: 'extraction',
+        stage: 'interrogate',
         prisonerName: evt.prisonerName,
+        attackBonus: evt.attackBonusPercent,
+        defenseBonus: evt.defenseBonusPercent,
+      });
+      this.showResult.set(true);
+    }),
+    tortureExtractComplete$.subscribe((evt) => {
+      this.lastResult.set({
+        stage: 'extract',
+        prisonerName: evt.prisonerName,
+        action: evt.action,
         researchGained: evt.researchGained,
       });
       this.showResult.set(true);
     }),
-    tortureConversionComplete$.subscribe((evt) => {
+    tortureBreakComplete$.subscribe((evt) => {
       this.lastResult.set({
-        type: 'conversion',
+        stage: 'break',
         prisonerName: evt.prisonerName,
+        action: evt.action,
         success: evt.success,
         inhabitantName: evt.inhabitantName,
+        fearGained: evt.fearGained,
+        resourceGained: evt.resourceGained,
       });
       this.showResult.set(true);
     }),
@@ -90,21 +106,35 @@ export class PanelTortureChamberComponent {
     const room = this.tortureRoom();
     if (!room || room.tortureJob) return [];
 
-    return sortBy(gamestate().world.prisoners, [(p) => p.name]);
+    const state = gamestate();
+    const currentDay = state.clock.day;
+
+    return sortBy(
+      state.world.prisoners.map((p) => ({
+        ...p,
+        daysRemaining: Math.max(0, PRISONER_ESCAPE_DAYS - (currentDay - p.captureDay)),
+      })),
+      [(p) => p.daysRemaining, (p) => p.name],
+    );
   });
 
-  public tortureProgress = computed(() => {
+  public tortureJob = computed(() => {
     const room = this.tortureRoom();
     if (!room?.tortureJob) return undefined;
     const job = room.tortureJob;
     const elapsed = job.targetTicks - job.ticksRemaining;
-    const percent = Math.min(100, Math.round((elapsed / job.targetTicks) * 100));
+    const percent = job.targetTicks > 0
+      ? Math.min(100, Math.round((elapsed / job.targetTicks) * 100))
+      : 100;
     const prisoner = gamestate().world.prisoners.find((p) => p.id === job.prisonerId);
+    const isWaitingForChoice = job.ticksRemaining <= 0 && job.currentStage !== 'interrogate' && !job.stageAction;
     return {
+      ...job,
       percent,
       prisonerName: prisoner?.name ?? 'Unknown',
-      action: job.action,
-      ticksRemaining: job.ticksRemaining,
+      prisonerClass: prisoner?.invaderClass ?? 'warrior',
+      isWaitingForChoice,
+      isProcessing: !isWaitingForChoice && job.ticksRemaining > 0,
     };
   });
 
@@ -116,47 +146,25 @@ export class PanelTortureChamberComponent {
     return hasWorker && hasPrisoners;
   });
 
-  public getConversionRate(invaderClass: InvaderClassType): number {
-    const room = this.tortureRoom();
-    if (!room) return 0;
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? tortureGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
-    return Math.round(tortureGetConversionRate(room, adjacentTypes, invaderClass) * 100);
+  public runeExtractionUnlocked = computed(() => {
+    return researchUnlockIsFeatureUnlocked('rune_extraction');
+  });
+
+  public getInterrogateTime(): number {
+    return ticksToRealSeconds(TORTURE_INTERROGATE_BASE_TICKS);
   }
 
-  public getExtractionTime(): number {
-    const room = this.tortureRoom();
-    if (!room) return 0;
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? tortureGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
-    const ticks = tortureGetExtractionTicks(room, adjacentTypes);
-    return ticksToRealSeconds(ticks);
+  public getExtractTime(): number {
+    return ticksToRealSeconds(TORTURE_EXTRACT_BASE_TICKS);
   }
 
-  public getConversionTime(): number {
-    const room = this.tortureRoom();
-    if (!room) return 0;
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? tortureGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
-    const ticks = tortureGetConversionTicks(room, adjacentTypes);
-    return ticksToRealSeconds(ticks);
+  public getBreakTime(): number {
+    return ticksToRealSeconds(TORTURE_BREAK_BASE_TICKS);
   }
 
-  public async startExtraction(prisonerId: PrisonerId): Promise<void> {
+  public async startProcessing(prisonerId: PrisonerId): Promise<void> {
     const room = this.tortureRoom();
     if (!room) return;
-
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? tortureGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
-    const targetTicks = tortureGetExtractionTicks(room, adjacentTypes);
 
     await updateGamestate((state) => {
       for (const flr of state.world.floors) {
@@ -164,9 +172,9 @@ export class PanelTortureChamberComponent {
         if (target) {
           target.tortureJob = {
             prisonerId,
-            action: 'extract',
-            ticksRemaining: targetTicks,
-            targetTicks,
+            currentStage: 'interrogate',
+            ticksRemaining: TORTURE_INTERROGATE_BASE_TICKS,
+            targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
           };
           break;
         }
@@ -175,26 +183,35 @@ export class PanelTortureChamberComponent {
     });
   }
 
-  public async startConversion(prisonerId: PrisonerId): Promise<void> {
+  public async setExtractAction(action: TortureExtractAction): Promise<void> {
     const room = this.tortureRoom();
-    if (!room) return;
-
-    const floor = floorCurrent();
-    const adjacentTypes = floor
-      ? tortureGetAdjacentRoomTypeIds(room, floor)
-      : new Set<string>();
-    const targetTicks = tortureGetConversionTicks(room, adjacentTypes);
+    if (!room?.tortureJob) return;
 
     await updateGamestate((state) => {
       for (const flr of state.world.floors) {
         const target = flr.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.tortureJob = {
-            prisonerId,
-            action: 'convert',
-            ticksRemaining: targetTicks,
-            targetTicks,
-          };
+        if (target?.tortureJob && target.tortureJob.currentStage === 'extract') {
+          target.tortureJob.stageAction = action;
+          target.tortureJob.ticksRemaining = TORTURE_EXTRACT_BASE_TICKS;
+          target.tortureJob.targetTicks = TORTURE_EXTRACT_BASE_TICKS;
+          break;
+        }
+      }
+      return state;
+    });
+  }
+
+  public async setBreakAction(action: TortureBreakAction): Promise<void> {
+    const room = this.tortureRoom();
+    if (!room?.tortureJob) return;
+
+    await updateGamestate((state) => {
+      for (const flr of state.world.floors) {
+        const target = flr.rooms.find((r) => r.id === room.id);
+        if (target?.tortureJob && target.tortureJob.currentStage === 'break') {
+          target.tortureJob.stageAction = action;
+          target.tortureJob.ticksRemaining = TORTURE_BREAK_BASE_TICKS;
+          target.tortureJob.targetTicks = TORTURE_BREAK_BASE_TICKS;
           break;
         }
       }

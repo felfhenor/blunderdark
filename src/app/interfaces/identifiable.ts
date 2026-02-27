@@ -22,6 +22,7 @@ export type ContentType =
   | 'seasonbonus'
   | 'summonrecipe'
   | 'synergy'
+  | 'traitrune'
   | 'trap'
   | 'victorypath';
 

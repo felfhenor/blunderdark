@@ -20,7 +20,8 @@ import { spawningPoolProcess } from '@helpers/spawning-pool';
 import { alchemyLabProcess } from '@helpers/alchemy-lab';
 import { darkForgeProcess } from '@helpers/dark-forge';
 import { verticalTransportTravelProcess } from '@helpers/vertical-transport';
-import { tortureChamberProcess } from '@helpers/torture-chamber';
+import { runeworkingProcess } from '@helpers/runeworking';
+import { prisonerEscapeProcess, tortureChamberProcess } from '@helpers/torture-chamber';
 import { summoningCircleProcess } from '@helpers/summoning-circle';
 import { trapWorkshopProcess } from '@helpers/trap-workshop';
 import {
@@ -98,7 +99,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
     summoningCircleProcess(state, numTicks);
     darkForgeProcess(state, numTicks);
     alchemyLabProcess(state, numTicks);
+    prisonerEscapeProcess(state);
     tortureChamberProcess(state, numTicks);
+    runeworkingProcess(state, numTicks);
     verticalTransportTravelProcess(state);
     invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);

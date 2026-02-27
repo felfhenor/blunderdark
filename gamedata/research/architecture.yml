@@ -10,17 +10,19 @@
 #   │   └── Aquatic & Soul Engineering (T3) → Expanded Lake + Necrotic Well + Purified Well + Essence Reservoir
 #   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault + Gold Treasury
 #   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Grand Arena
-#   │   └── Combat Specialization (T3) → Elite Arena + Inquisitor's Chamber + War Room
+#   │   └── Combat Specialization (T3) → Elite Arena + War Room
+#   │       └── Rune Extraction (T3) → feature_flag: rune_extraction
+#   │           └── Runeworking Techniques (T4) → Runeworking Chamber
 #   ├── Scholarly Design (T2) → Expanded Archives + Expanded Nexus + Research Archive
 #   │   └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle + Flux Capacitor
 #   └── Storage Design (T2) → Storage Room
 #   Resonant Design (T4) [Deep Extraction + Sanctum Design] → Resonant Mine + Tranquil Garden
 #   Deep Water & Financial Design (T4) [Aquatic & Soul + Sanctum Design] → Deepwater Lake + Investment Vault
-#   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall + Corruption Chamber
+#   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall
 #   Arcane Facility Mastery (T4) [Workshop Mastery + Quarters & Arena] → Amplified Nexus + Binding Circle
 #   Abyssal Waters (T5) [Deep Water + Resonant] → Dark Waters + Dragon's Hoard
 #   Altar Ascension (T5) [Deep Water + Resonant] → Ascendant Altar + Forbidden Archives
-#   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dread Chamber + Dark Pool + Expanded Laboratory
+#   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dark Pool + Expanded Laboratory
 #   Architectural Mastery (T6) → capstone passive
 
 # --- TIER 1: Root node ---
@@ -190,8 +192,6 @@
     - type: roomupgrade
       targetRoomupgradeId: Elite Arena
     - type: roomupgrade
-      targetRoomupgradeId: Inquisitor's Chamber
-    - type: roomupgrade
       targetRoomupgradeId: War Room
   tier: 3
   requiredTicks: 300
@@ -271,8 +271,6 @@
   unlocks:
     - type: roomupgrade
       targetRoomupgradeId: Drill Hall
-    - type: roomupgrade
-      targetRoomupgradeId: Corruption Chamber
   tier: 4
   requiredTicks: 500
 
@@ -348,8 +346,6 @@
     - Arcane Facility Mastery
   unlocks:
     - type: roomupgrade
-      targetRoomupgradeId: Dread Chamber
-    - type: roomupgrade
       targetRoomupgradeId: Dark Pool
     - type: roomupgrade
       targetRoomupgradeId: Expanded Laboratory
@@ -376,3 +372,38 @@
       description: +50% to all architecture branch bonuses
   tier: 6
   requiredTicks: 1000
+
+# --- Torture/Runeworking branch ---
+
+- id: 48465784-afc0-4fa8-936e-dfe932df4bfb
+  name: Rune Extraction
+  description: Discover techniques to extract trait runes from prisoners during the extraction stage of the torture pipeline, yielding permanent rune items tied to the invader's class.
+  branch: architecture
+  cost:
+    research: 60
+    gold: 20
+    essence: 10
+  prerequisiteResearchIds:
+    - Combat Specialization
+  unlocks:
+    - type: feature_flag
+      featureFlag: rune_extraction
+      description: Rune Extraction
+  tier: 3
+  requiredTicks: 350
+
+- id: 06e35397-21ce-4edd-9bdb-82f57e36fb7e
+  name: Runeworking Techniques
+  description: Learn to construct a Runeworking Chamber where trait runes can be permanently embedded into inhabitants, granting them powerful bonuses.
+  branch: architecture
+  cost:
+    research: 80
+    gold: 30
+    crystals: 15
+  prerequisiteResearchIds:
+    - Rune Extraction
+  unlocks:
+    - type: room
+      targetRoomId: Runeworking Chamber
+  tier: 4
+  requiredTicks: 450

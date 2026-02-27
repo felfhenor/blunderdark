@@ -893,6 +893,8 @@ function makeGameState(
       forgeInventory: [],
       alchemyConversions: [],
       prisoners: [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

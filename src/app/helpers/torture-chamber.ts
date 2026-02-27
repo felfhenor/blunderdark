@@ -1,55 +1,56 @@
-import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
-import {
-  roomShapeGetAbsoluteTiles,
-  roomShapeResolve,
-} from '@helpers/room-shapes';
-import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   CapturedPrisoner,
   GameState,
   InhabitantInstance,
   InhabitantInstanceId,
-  InvaderClassType,
   PlacedRoom,
+  ResourceType,
+  TraitRune,
+  TraitRuneInstanceId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
+import type { TraitRuneContent } from '@interfaces/content-traitrune';
 import type {
-  TortureConversionCompleteEvent,
-  TortureExtractionCompleteEvent,
+  InterrogationBuff,
+  TortureBreakAction,
+  TortureBreakCompleteEvent,
+  TortureExtractAction,
+  TortureExtractCompleteEvent,
+  TortureInterrogateCompleteEvent,
 } from '@interfaces/torture';
 import { Subject } from 'rxjs';
 
 // --- Constants ---
 
-export const TORTURE_EXTRACTION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 4 game-minutes
-export const TORTURE_CONVERSION_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 8; // 8 game-minutes
+export const TORTURE_INTERROGATE_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3; // 3 min
+export const TORTURE_EXTRACT_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 4 min
+export const TORTURE_BREAK_BASE_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4; // 4 min
 export const TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING = 0.12;
+export const TORTURE_BREAK_CONVERT_SUCCESS_RATE = 0.8;
+export const PRISONER_ESCAPE_DAYS = 3;
 
-export const TORTURE_CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {
-  warrior: 0.3,
-  rogue: 0.5,
-  mage: 0.2,
-  cleric: 0.1,
-  paladin: 0.05,
-  ranger: 0.35,
-};
+const BROKEN_PRISONER_NAME = 'Broken Prisoner';
 
-const CONVERTED_PRISONER_NAME = 'Converted Prisoner';
+// --- RxJS Subjects ---
 
-const tortureExtractionCompleteSubject =
-  new Subject<TortureExtractionCompleteEvent>();
-export const tortureExtractionComplete$ =
-  tortureExtractionCompleteSubject.asObservable();
+const tortureInterrogateCompleteSubject =
+  new Subject<TortureInterrogateCompleteEvent>();
+export const tortureInterrogateComplete$ =
+  tortureInterrogateCompleteSubject.asObservable();
 
-const tortureConversionCompleteSubject =
-  new Subject<TortureConversionCompleteEvent>();
-export const tortureConversionComplete$ =
-  tortureConversionCompleteSubject.asObservable();
+const tortureExtractCompleteSubject =
+  new Subject<TortureExtractCompleteEvent>();
+export const tortureExtractComplete$ =
+  tortureExtractCompleteSubject.asObservable();
+
+const tortureBreakCompleteSubject =
+  new Subject<TortureBreakCompleteEvent>();
+export const tortureBreakComplete$ =
+  tortureBreakCompleteSubject.asObservable();
 
 // --- Pure helpers ---
 
@@ -68,90 +69,6 @@ export function tortureCanStart(
 }
 
 /**
- * Calculate extraction ticks (base * upgrade multiplier * adjacency speed bonus).
- */
-export function tortureGetExtractionTicks(
-  placedRoom: PlacedRoom,
-  adjacentRoomTypeIds: Set<string>,
-): number {
-  let ticks = TORTURE_EXTRACTION_BASE_TICKS;
-
-  const effects = roomUpgradeGetAppliedEffects(placedRoom);
-  for (const effect of effects) {
-    if (effect.type === 'tortureSpeedMultiplier') {
-      ticks = Math.round(ticks * effect.value);
-    }
-  }
-
-  for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
-    if (adjDef?.tortureAdjacencyEffects?.tortureSpeedBonus) {
-      ticks = Math.round(
-        ticks * (1 - adjDef.tortureAdjacencyEffects.tortureSpeedBonus),
-      );
-    }
-  }
-
-  return Math.max(1, ticks);
-}
-
-/**
- * Calculate conversion ticks (base * upgrade multiplier * adjacency speed bonus).
- */
-export function tortureGetConversionTicks(
-  placedRoom: PlacedRoom,
-  adjacentRoomTypeIds: Set<string>,
-): number {
-  let ticks = TORTURE_CONVERSION_BASE_TICKS;
-
-  const effects = roomUpgradeGetAppliedEffects(placedRoom);
-  for (const effect of effects) {
-    if (effect.type === 'tortureSpeedMultiplier') {
-      ticks = Math.round(ticks * effect.value);
-    }
-  }
-
-  for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
-    if (adjDef?.tortureAdjacencyEffects?.tortureSpeedBonus) {
-      ticks = Math.round(
-        ticks * (1 - adjDef.tortureAdjacencyEffects.tortureSpeedBonus),
-      );
-    }
-  }
-
-  return Math.max(1, ticks);
-}
-
-/**
- * Get conversion success rate for a given invader class,
- * accounting for upgrade bonus and adjacency bonus, capped at 95%.
- */
-export function tortureGetConversionRate(
-  placedRoom: PlacedRoom,
-  adjacentRoomTypeIds: Set<string>,
-  invaderClass: InvaderClassType,
-): number {
-  let rate = TORTURE_CONVERT_SUCCESS_RATES[invaderClass];
-
-  const effects = roomUpgradeGetAppliedEffects(placedRoom);
-  for (const effect of effects) {
-    if (effect.type === 'tortureConversionBonus') {
-      rate += effect.value;
-    }
-  }
-
-  for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
-    if (adjDef?.tortureAdjacencyEffects?.tortureConversionBonus) {
-      rate += adjDef.tortureAdjacencyEffects.tortureConversionBonus;
-    }
-  }
-
-  return Math.min(0.95, rate);
-}
-
-/**
  * Calculate research gained from extracting a prisoner.
  */
 export function tortureCalculateExtractionReward(
@@ -162,48 +79,119 @@ export function tortureCalculateExtractionReward(
 }
 
 /**
- * Create a converted inhabitant from a prisoner.
+ * Calculate interrogation buff values from a prisoner's stats.
+ * Formula: (HP + ATK + DEF + SPD) / 10 as both attackBonusPercent and defenseBonusPercent.
  */
-export function tortureCreateConvertedInhabitant(
+export function tortureCalculateInterrogationBuff(
+  prisoner: CapturedPrisoner,
+): InterrogationBuff {
+  const total =
+    prisoner.stats.hp +
+    prisoner.stats.attack +
+    prisoner.stats.defense +
+    prisoner.stats.speed;
+  const bonusPercent = total / 10;
+  return {
+    attackBonusPercent: bonusPercent,
+    defenseBonusPercent: bonusPercent,
+    sourceInvaderClass: prisoner.invaderClass,
+  };
+}
+
+/**
+ * Sum all stacked interrogation buffs into a single total.
+ */
+export function interrogationBuffGetTotals(
+  buffs: InterrogationBuff[],
+): { attackBonusPercent: number; defenseBonusPercent: number } {
+  let attackBonusPercent = 0;
+  let defenseBonusPercent = 0;
+  for (const buff of buffs) {
+    attackBonusPercent += buff.attackBonusPercent;
+    defenseBonusPercent += buff.defenseBonusPercent;
+  }
+  return { attackBonusPercent, defenseBonusPercent };
+}
+
+/**
+ * Create a Broken Prisoner inhabitant from a prisoner (Break → Convert path).
+ * Tier-2 with 33% of prisoner's original stats as instanceStatBonuses (floored).
+ */
+export function tortureCreateBrokenInhabitant(
   prisoner: CapturedPrisoner,
 ): InhabitantInstance | undefined {
-  const def = contentGetEntry<InhabitantContent>(CONVERTED_PRISONER_NAME);
+  const def = contentGetEntry<InhabitantContent>(BROKEN_PRISONER_NAME);
   if (!def) return undefined;
 
   return {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
-    name: `${prisoner.name} (Converted)`,
+    name: `${prisoner.name} (Broken)`,
     state: 'normal',
     assignedRoomId: undefined,
+    instanceStatBonuses: {
+      attack: Math.floor(prisoner.stats.attack * 0.33),
+      defense: Math.floor(prisoner.stats.defense * 0.33),
+      speed: Math.floor(prisoner.stats.speed * 0.33),
+    },
   };
 }
 
 /**
- * Get adjacent room type IDs for a torture chamber room.
+ * Create a TraitRune from a prisoner's invader class.
  */
-export function tortureGetAdjacentRoomTypeIds(
-  room: PlacedRoom,
-  floor: { rooms: PlacedRoom[] },
-): Set<string> {
-  const tileMap = new Map<string, Array<{ x: number; y: number }>>();
-  for (const r of floor.rooms) {
-    const shape = roomShapeResolve(r);
-    tileMap.set(r.id, roomShapeGetAbsoluteTiles(shape, r.anchorX, r.anchorY));
-  }
+export function tortureCreateTraitRune(
+  prisoner: CapturedPrisoner,
+): TraitRune | undefined {
+  const allRunes =
+    contentGetEntry<TraitRuneContent>('traitrune') !== undefined;
 
-  const thisTiles = tileMap.get(room.id) ?? [];
-  const adjacentTypes = new Set<string>();
+  // Look up the rune definition by iterating content for the matching invader class
+  // We use the naming convention: "{Class}'s Rune"
+  const className =
+    prisoner.invaderClass.charAt(0).toUpperCase() +
+    prisoner.invaderClass.slice(1);
+  const runeName = `${className}'s Rune`;
+  const runeDef = contentGetEntry<TraitRuneContent>(runeName);
+  if (!runeDef && !allRunes) return undefined;
+  if (!runeDef) return undefined;
 
-  for (const other of floor.rooms) {
-    if (other.id === room.id) continue;
-    const otherTiles = tileMap.get(other.id) ?? [];
-    if (adjacencyAreRoomsAdjacent(thisTiles, otherTiles)) {
-      adjacentTypes.add(other.roomTypeId);
+  return {
+    id: rngUuid<TraitRuneInstanceId>(),
+    runeTypeId: runeDef.id,
+    sourceInvaderClass: prisoner.invaderClass,
+  };
+}
+
+/**
+ * Process prisoner escapes. Prisoners escape after PRISONER_ESCAPE_DAYS days
+ * unless they are currently being processed in a Torture Chamber.
+ * Returns names of escaped prisoners for notifications.
+ */
+export function prisonerEscapeProcess(state: GameState): string[] {
+  const currentDay = state.clock.day;
+
+  // Collect prisoner IDs currently being processed
+  const processingPrisonerIds = new Set<string>();
+  for (const floor of state.world.floors) {
+    for (const room of floor.rooms) {
+      if (room.tortureJob) {
+        processingPrisonerIds.add(room.tortureJob.prisonerId);
+      }
     }
   }
 
-  return adjacentTypes;
+  const escaped: string[] = [];
+  state.world.prisoners = state.world.prisoners.filter((prisoner) => {
+    if (processingPrisonerIds.has(prisoner.id)) return true;
+    if (currentDay - prisoner.captureDay >= PRISONER_ESCAPE_DAYS) {
+      escaped.push(prisoner.name);
+      return false;
+    }
+    return true;
+  });
+
+  return escaped;
 }
 
 // --- Tick processor ---
@@ -211,6 +199,14 @@ export function tortureGetAdjacentRoomTypeIds(
 /**
  * Process all Torture Chamber rooms each tick.
  * Called inside updateGamestate — mutates state in-place.
+ *
+ * The 3-stage pipeline works as follows:
+ * 1. Interrogate: always runs, no choice. On completion → advance to 'extract' stage with ticksRemaining = 0 (paused, waiting for player choice)
+ * 2. Extract: player sets stageAction ('research' or 'rune'), which starts the timer
+ * 3. Break: player sets stageAction ('convert', 'execute', or 'sacrifice'), which starts the timer
+ *
+ * When ticksRemaining reaches 0 and stageAction is set, the stage completes.
+ * When ticksRemaining reaches 0 and stageAction is NOT set, the job is paused waiting for player input.
  */
 export function tortureChamberProcess(state: GameState, numTicks = 1): void {
   const tortureChamberTypeId = roomRoleFindById('tortureChamber');
@@ -229,46 +225,93 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
       );
       if (!hasWorker) continue;
 
-      room.tortureJob.ticksRemaining -= numTicks;
+      const job = room.tortureJob;
 
-      // Add extra corruption while processing (direct mutation; clamped at end of tick)
-      state.world.resources.corruption.current +=
-        TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks;
+      // If we're in a stage waiting for player choice, don't process
+      if (job.ticksRemaining <= 0 && job.currentStage !== 'interrogate' && !job.stageAction) {
+        continue;
+      }
 
-      if (room.tortureJob.ticksRemaining <= 0) {
-        const job = room.tortureJob;
+      // Only decrement if ticks remain
+      if (job.ticksRemaining > 0) {
+        job.ticksRemaining -= numTicks;
+
+        // Add corruption while actively processing
+        state.world.resources.corruption.current +=
+          TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks;
+      }
+
+      // Check for stage completion
+      if (job.ticksRemaining <= 0) {
         const prisoner = state.world.prisoners.find(
           (p) => p.id === job.prisonerId,
         );
+        if (!prisoner) {
+          room.tortureJob = undefined;
+          continue;
+        }
 
-        if (prisoner) {
-          // Remove prisoner
-          state.world.prisoners = state.world.prisoners.filter(
-            (p) => p.id !== job.prisonerId,
-          );
+        if (job.currentStage === 'interrogate') {
+          // Stage 1 complete: always produces buff
+          const buff = tortureCalculateInterrogationBuff(prisoner);
+          state.world.interrogationBuffs.push(buff);
 
-          if (job.action === 'extract') {
+          tortureInterrogateCompleteSubject.next({
+            roomId: room.id,
+            prisonerName: prisoner.name,
+            attackBonusPercent: buff.attackBonusPercent,
+            defenseBonusPercent: buff.defenseBonusPercent,
+          });
+
+          // Advance to extract stage, paused (no stageAction yet)
+          job.currentStage = 'extract';
+          job.stageAction = undefined;
+          job.ticksRemaining = 0;
+          job.targetTicks = TORTURE_EXTRACT_BASE_TICKS;
+        } else if (job.currentStage === 'extract' && job.stageAction) {
+          // Stage 2 complete
+          const action = job.stageAction as TortureExtractAction;
+
+          if (action === 'research') {
             const researchGained = tortureCalculateExtractionReward(prisoner);
             state.world.resources.research.current += researchGained;
 
-            tortureExtractionCompleteSubject.next({
+            tortureExtractCompleteSubject.next({
               roomId: room.id,
               prisonerName: prisoner.name,
+              action: 'research',
               researchGained,
             });
           } else {
-            // convert
-            const adjacentTypes = tortureGetAdjacentRoomTypeIds(room, floor);
-            const rate = tortureGetConversionRate(
-              room,
-              adjacentTypes,
-              prisoner.invaderClass,
-            );
+            // rune
+            const rune = tortureCreateTraitRune(prisoner);
+            if (rune) {
+              state.world.traitRunes.push(rune);
+            }
+
+            tortureExtractCompleteSubject.next({
+              roomId: room.id,
+              prisonerName: prisoner.name,
+              action: 'rune',
+              runeTypeId: rune?.runeTypeId,
+            });
+          }
+
+          // Advance to break stage, paused
+          job.currentStage = 'break';
+          job.stageAction = undefined;
+          job.ticksRemaining = 0;
+          job.targetTicks = TORTURE_BREAK_BASE_TICKS;
+        } else if (job.currentStage === 'break' && job.stageAction) {
+          // Stage 3 complete — prisoner's final fate
+          const action = job.stageAction as TortureBreakAction;
+
+          if (action === 'convert') {
             const rng = rngRandom();
-            const success = rng() < rate;
+            const success = rng() < TORTURE_BREAK_CONVERT_SUCCESS_RATE;
 
             if (success) {
-              const newInhabitant = tortureCreateConvertedInhabitant(prisoner);
+              const newInhabitant = tortureCreateBrokenInhabitant(prisoner);
               if (newInhabitant) {
                 state.world.inhabitants = [
                   ...state.world.inhabitants,
@@ -276,24 +319,56 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
                 ];
                 inhabitantsChanged = true;
 
-                tortureConversionCompleteSubject.next({
+                tortureBreakCompleteSubject.next({
                   roomId: room.id,
                   prisonerName: prisoner.name,
+                  action: 'convert',
                   success: true,
                   inhabitantName: newInhabitant.name,
                 });
               }
             } else {
-              tortureConversionCompleteSubject.next({
+              tortureBreakCompleteSubject.next({
                 roomId: room.id,
                 prisonerName: prisoner.name,
+                action: 'convert',
                 success: false,
               });
             }
-          }
-        }
+          } else if (action === 'execute') {
+            // +2 fear, +1 terror reputation
+            state.world.reputation.terror += 1;
 
-        room.tortureJob = undefined;
+            tortureBreakCompleteSubject.next({
+              roomId: room.id,
+              prisonerName: prisoner.name,
+              action: 'execute',
+              fearGained: 2,
+            });
+          } else {
+            // sacrifice — random boon
+            const rng = rngRandom();
+            const boonTypes: ResourceType[] = ['flux', 'essence', 'research'];
+            const boonIndex = Math.floor(rng() * boonTypes.length);
+            const boonResource = boonTypes[boonIndex];
+            const boonAmount = Math.round(10 + rng() * 15);
+
+            state.world.resources[boonResource].current += boonAmount;
+
+            tortureBreakCompleteSubject.next({
+              roomId: room.id,
+              prisonerName: prisoner.name,
+              action: 'sacrifice',
+              resourceGained: { type: boonResource, amount: boonAmount },
+            });
+          }
+
+          // Remove prisoner and clear job
+          state.world.prisoners = state.world.prisoners.filter(
+            (p) => p.id !== job.prisonerId,
+          );
+          room.tortureJob = undefined;
+        }
       }
     }
   }

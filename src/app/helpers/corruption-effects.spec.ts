@@ -209,6 +209,8 @@ function makeGameState(overrides: {
       forgeInventory: [],
       alchemyConversions: [],
       prisoners: [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         ...defaultInvasionSchedule(),
         ...overrides.schedule,

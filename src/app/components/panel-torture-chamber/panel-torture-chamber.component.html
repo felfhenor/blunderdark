@@ -8,26 +8,99 @@
         <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
       </div>
 
-      <!-- Active Job -->
-      @if (tortureProgress(); as tp) {
+      <!-- Active Job: 3-Stage Pipeline -->
+      @if (tortureJob(); as job) {
         <div class="mt-2">
+          <!-- Stage Indicator -->
+          <ul class="steps steps-horizontal w-full text-xs mb-2">
+            <li
+              class="step"
+              [class.step-error]="job.currentStage === 'interrogate' || job.currentStage === 'extract' || job.currentStage === 'break'"
+            >
+              Interrogate
+            </li>
+            <li
+              class="step"
+              [class.step-error]="job.currentStage === 'extract' || job.currentStage === 'break'"
+            >
+              Extract
+            </li>
+            <li
+              class="step"
+              [class.step-error]="job.currentStage === 'break'"
+            >
+              Break
+            </li>
+          </ul>
+
           <div class="flex items-center justify-between">
-            <span class="text-xs">
-              @if (tp.action === 'extract') {
-                Extracting:
-              } @else {
-                Converting:
-              }
-              {{ tp.prisonerName }}
-            </span>
-            <span class="badge badge-xs badge-error">In Progress</span>
+            <span class="text-xs font-semibold">{{ job.prisonerName }}</span>
+            @if (job.isProcessing) {
+              <span class="badge badge-xs badge-error">Processing</span>
+            } @else if (job.isWaitingForChoice) {
+              <span class="badge badge-xs badge-warning">Choose Action</span>
+            }
           </div>
-          <div class="mt-1">
-            <app-job-progress
-              [percent]="tp.percent"
-              colorClass="progress-error"
-            />
-          </div>
+
+          <!-- Progress bar (only when actively processing) -->
+          @if (job.isProcessing) {
+            <div class="mt-1">
+              <app-job-progress
+                [percent]="job.percent"
+                colorClass="progress-error"
+              />
+            </div>
+          }
+
+          <!-- Extract Stage Choices -->
+          @if (job.isWaitingForChoice && job.currentStage === 'extract') {
+            <div class="mt-2 flex flex-col gap-2">
+              <div class="text-xs opacity-70">Choose extraction method:</div>
+              <div class="flex gap-2">
+                <button
+                  class="btn btn-xs btn-primary flex-1"
+                  (click)="setExtractAction('research')"
+                >
+                  Extract Research ({{ getExtractTime() | number: '1.0-0' }}s)
+                </button>
+                @if (runeExtractionUnlocked()) {
+                  <button
+                    class="btn btn-xs btn-accent flex-1"
+                    (click)="setExtractAction('rune')"
+                  >
+                    Extract Rune ({{ getExtractTime() | number: '1.0-0' }}s)
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Break Stage Choices -->
+          @if (job.isWaitingForChoice && job.currentStage === 'break') {
+            <div class="mt-2 flex flex-col gap-2">
+              <div class="text-xs opacity-70">Choose the prisoner's fate:</div>
+              <div class="flex gap-2">
+                <button
+                  class="btn btn-xs btn-info flex-1"
+                  (click)="setBreakAction('convert')"
+                >
+                  Convert ({{ getBreakTime() | number: '1.0-0' }}s)
+                </button>
+                <button
+                  class="btn btn-xs btn-error flex-1"
+                  (click)="setBreakAction('execute')"
+                >
+                  Execute ({{ getBreakTime() | number: '1.0-0' }}s)
+                </button>
+                <button
+                  class="btn btn-xs btn-warning flex-1"
+                  (click)="setBreakAction('sacrifice')"
+                >
+                  Sacrifice ({{ getBreakTime() | number: '1.0-0' }}s)
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
 
@@ -58,9 +131,18 @@
             <div class="flex flex-col gap-2 p-2 bg-base-200 rounded">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold">{{ prisoner.name }}</span>
-                <span class="badge badge-xs badge-ghost">
-                  {{ prisoner.invaderClass }}
-                </span>
+                <div class="flex gap-2 items-center">
+                  <span class="badge badge-xs badge-ghost">
+                    {{ prisoner.invaderClass }}
+                  </span>
+                  <span
+                    class="badge badge-xs"
+                    [class.badge-warning]="prisoner.daysRemaining <= 1"
+                    [class.badge-ghost]="prisoner.daysRemaining > 1"
+                  >
+                    {{ prisoner.daysRemaining | number: '1.0-0' }}d left
+                  </span>
+                </div>
               </div>
               <app-stat-row
                 class="text-xs opacity-60"
@@ -68,28 +150,17 @@
                 [showWorkerEfficiency]="false"
               />
               @if (canStartJob()) {
-                <div class="flex gap-2 mt-1">
-                  <button
-                    class="btn btn-xs btn-primary flex-1"
-                    (click)="startExtraction(prisoner.id)"
-                  >
-                    Extract ({{ getExtractionTime() | number: '1.0-0' }} sec)
-                  </button>
-                  <button
-                    class="btn btn-xs btn-error flex-1"
-                    (click)="startConversion(prisoner.id)"
-                  >
-                    Convert ({{
-                      getConversionRate(prisoner.invaderClass)
-                        | number: '1.0-2'
-                    }}%)
-                  </button>
-                </div>
+                <button
+                  class="btn btn-xs btn-primary w-full mt-1"
+                  (click)="startProcessing(prisoner.id)"
+                >
+                  Start Processing ({{ getInterrogateTime() | number: '1.0-0' }}s)
+                </button>
               }
             </div>
           }
         </div>
-      } @else if (!tortureProgress()) {
+      } @else if (!tortureJob()) {
         <p class="text-xs opacity-50 mt-2">No prisoners available.</p>
       }
     </div>
@@ -103,21 +174,46 @@
     @if (lastResult(); as result) {
       <div class="text-center">
         <p class="text-lg font-semibold">{{ result.prisonerName }}</p>
-        @if (result.type === 'extraction') {
-          <p class="text-warning mt-2">
-            Extracted {{ result.researchGained | number: '1.0-2' }} research
-            points.
+        @if (result.stage === 'interrogate') {
+          <p class="text-info mt-2">
+            Interrogation complete! Intel gathered on the next invasion.
           </p>
-        } @else {
-          @if (result.success) {
-            <p class="text-success mt-2">
-              Conversion successful! {{ result.inhabitantName }} has joined your
-              dungeon.
+          <p class="text-xs opacity-70 mt-1">
+            +{{ result.attackBonus | number: '1.0-2' }}% ATK,
+            +{{ result.defenseBonus | number: '1.0-2' }}% DEF buff for next invasion
+          </p>
+        } @else if (result.stage === 'extract') {
+          @if (result.action === 'research') {
+            <p class="text-warning mt-2">
+              Extracted {{ result.researchGained | number: '1.0-2' }} research points.
             </p>
           } @else {
-            <p class="text-error mt-2">
-              Conversion failed. The prisoner's will could not be broken.
+            <p class="text-accent mt-2">
+              A trait rune has been extracted and added to your inventory.
             </p>
+          }
+        } @else if (result.stage === 'break') {
+          @if (result.action === 'convert') {
+            @if (result.success) {
+              <p class="text-success mt-2">
+                Conversion successful! {{ result.inhabitantName }} has joined your dungeon.
+              </p>
+            } @else {
+              <p class="text-error mt-2">
+                Conversion failed. The prisoner's will could not be broken.
+              </p>
+            }
+          } @else if (result.action === 'execute') {
+            <p class="text-error mt-2">
+              Prisoner executed. +{{ result.fearGained }} Fear, +1 Terror reputation.
+            </p>
+          } @else if (result.action === 'sacrifice') {
+            @if (result.resourceGained) {
+              <p class="text-warning mt-2">
+                Prisoner sacrificed. Gained {{ result.resourceGained.amount | number: '1.0-0' }}
+                {{ result.resourceGained.type }}.
+              </p>
+            }
           }
         }
       </div>

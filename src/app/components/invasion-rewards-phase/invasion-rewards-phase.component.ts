@@ -107,11 +107,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
     </div>
     <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
       <button class="btn btn-sm btn-primary" (click)="advance.emit()">
-        @if (hasPrisoners()) {
-          Handle Prisoners ({{ prisonerCount() }})
-        } @else {
-          Dismiss
-        }
+        Dismiss
       </button>
     </div>
   `,
@@ -120,7 +116,5 @@ import type { InvasionOrchestratorResult } from '@interfaces';
 export class InvasionRewardsPhaseComponent {
   public result = input.required<InvasionOrchestratorResult>();
   public isVictory = input.required<boolean>();
-  public hasPrisoners = input.required<boolean>();
-  public prisonerCount = input.required<number>();
   public advance = output();
 }

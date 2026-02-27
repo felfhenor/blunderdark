@@ -1,5 +1,4 @@
 import { farplaneCaptureDefenderSouls } from '@helpers/farplane';
-import { invasionRewardHandlePrisoner } from '@helpers/invasion-rewards';
 import {
   THREAT_MAX,
   THREAT_MIN,
@@ -9,13 +8,9 @@ import {
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { resourceApplyMap } from '@helpers/resources';
 import { updateGamestate } from '@helpers/state-game';
-import { tortureCreateConvertedInhabitant } from '@helpers/torture-chamber';
 import { victoryRecordDefenseWin } from '@helpers/victory';
 import type {
-  CapturedPrisoner,
   InvasionOrchestratorResult,
-  PrisonerAction,
-  PrisonerHandlingResult,
   ResourceType,
 } from '@interfaces';
 
@@ -107,55 +102,3 @@ export async function invasionRewardApplyDefeat(
   });
 }
 
-/**
- * Handle a prisoner action: execute, ransom, convert, sacrifice, or experiment.
- * Applies resource/reputation/corruption changes and removes the prisoner.
- */
-export async function invasionRewardApplyPrisonerAction(
-  prisoner: CapturedPrisoner,
-  action: PrisonerAction,
-  rng: () => number = Math.random,
-): Promise<PrisonerHandlingResult> {
-  const result = invasionRewardHandlePrisoner(action, prisoner, rng);
-
-  // Apply resource changes in a single batch
-  await resourceApplyMap(result.resourceChanges);
-
-  // Apply reputation + corruption + fear via state mutation
-  await updateGamestate((state) => {
-    const totalReputationChange = result.reputationChange + result.fearChange;
-    if (totalReputationChange !== 0) {
-      state.world.reputation.terror = Math.max(
-        0,
-        state.world.reputation.terror + totalReputationChange,
-      );
-    }
-
-    if (result.corruptionChange !== 0) {
-      state.world.resources.corruption.current = Math.min(
-        state.world.resources.corruption.max,
-        Math.max(0, state.world.resources.corruption.current + result.corruptionChange),
-      );
-    }
-
-    // Create converted inhabitant on successful conversion
-    if (result.action === 'convert' && result.success) {
-      const newInhabitant = tortureCreateConvertedInhabitant(prisoner);
-      if (newInhabitant) {
-        state.world.inhabitants = [...state.world.inhabitants, newInhabitant];
-        for (const floor of state.world.floors) {
-          floor.inhabitants = state.world.inhabitants;
-        }
-      }
-    }
-
-    // Remove prisoner from world state
-    state.world.prisoners = state.world.prisoners.filter(
-      (p) => p.id !== prisoner.id,
-    );
-
-    return state;
-  });
-
-  return result;
-}

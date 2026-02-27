@@ -12,11 +12,8 @@ import type {
   PlacedRoomId,
   PrisonerId,
   ResourceMap,
-  RoomContent,
   RoomId,
   RoomShapeId,
-  RoomUpgradeContent,
-  RoomUpgradeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import seedrandom from 'seedrandom';
@@ -24,36 +21,9 @@ import seedrandom from 'seedrandom';
 // --- Constants ---
 
 const TORTURE_CHAMBER_ID = 'tc100001-0001-0001-0001-000000000001';
-const SOUL_WELL_ID = 'tc100001-0001-0001-0001-000000000002';
-const BARRACKS_ID = 'tc100001-0001-0001-0001-000000000003';
 const GOBLIN_ID = 'tc200001-0001-0001-0001-000000000001';
-const CONVERTED_PRISONER_ID = 'tc200001-0001-0001-0001-000000000099';
-
-// --- Upgrade paths ---
-
-const grandInquisitorPath: RoomUpgradeContent = {
-  id: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-  __type: 'roomupgrade',
-  name: 'Grand Inquisitor',
-  description: 'Speed and conversion bonus.',
-  cost: { gold: 120, essence: 40 },
-  effects: [
-    { type: 'tortureSpeedMultiplier', value: 0.5 },
-    { type: 'tortureConversionBonus', value: 0.25 },
-    { type: 'maxInhabitantBonus', value: 1 },
-  ],
-};
-
-const corruptionEnginePath: RoomUpgradeContent = {
-  id: 'upgrade-corruption-engine' as RoomUpgradeId,
-  __type: 'roomupgrade',
-  name: 'Corruption Engine',
-  description: 'Double corruption.',
-  cost: { gold: 100, flux: 30 },
-  effects: [
-    { type: 'productionMultiplier', value: 2.0, resource: 'corruption' },
-  ],
-};
+const BROKEN_PRISONER_ID = 'tc200001-0001-0001-0001-000000000099';
+const WARRIORS_RUNE_ID = 'rune-0001-0001-0001-000000000001';
 
 // --- Mock content ---
 
@@ -72,31 +42,9 @@ vi.mock('@helpers/room-roles', () => ({
   roomRoleResetCache: vi.fn(),
 }));
 
-vi.mock('@helpers/room-upgrades', async () => {
-  return {
-    roomUpgradeGetAppliedEffects: (room: PlacedRoom) => {
-      if (!room.appliedUpgradePathId) return [];
-      const paths = [grandInquisitorPath, corruptionEnginePath];
-      const path = paths.find((p) => p.id === room.appliedUpgradePathId);
-      return path?.effects ?? [];
-    },
-  };
-});
-
 vi.mock('@helpers/rng', () => ({
   rngUuid: () => 'test-uuid-' + Math.random().toString(36).slice(2, 8),
   rngRandom: () => seedrandom('test-seed'),
-}));
-
-vi.mock('@helpers/adjacency', () => ({
-  adjacencyAreRoomsAdjacent: () => false,
-}));
-
-vi.mock('@helpers/room-shapes', () => ({
-  roomShapeResolve: () => ({ tiles: [{ x: 0, y: 0 }], width: 1, height: 1 }),
-  roomShapeGetAbsoluteTiles: (_shape: unknown, x: number, y: number) => [
-    { x, y },
-  ],
 }));
 
 let mockResourceMap: ResourceMap;
@@ -119,69 +67,6 @@ vi.mock('@helpers/resources', () => ({
     return subtracted;
   }),
 }));
-
-// --- Room definitions ---
-
-const tortureChamberDef: RoomContent = {
-  id: TORTURE_CHAMBER_ID as RoomId,
-  name: 'Torture Chamber',
-  __type: 'room',
-  description: 'Tortures prisoners.',
-  shapeId: 'shape-l' as RoomShapeId,
-  cost: { gold: 120, crystals: 40, essence: 20 },
-  production: { corruption: 0.4 },
-  requiresWorkers: true,
-  maxInhabitants: 1,
-  inhabitantRestriction: undefined,
-  fearLevel: 4,
-  fearReductionAura: 0,
-  adjacencyBonuses: [],
-  isUnique: false,
-  removable: true,
-  autoPlace: false,
-  role: 'tortureChamber',
-  roomUpgradeIds: [grandInquisitorPath.id, corruptionEnginePath.id],
-};
-
-const soulWellDef: RoomContent = {
-  id: SOUL_WELL_ID as RoomId,
-  name: 'Soul Well',
-  __type: 'room',
-  description: 'Soul stuff.',
-  shapeId: 'shape-3x3' as RoomShapeId,
-  cost: {},
-  production: {},
-  requiresWorkers: false,
-  maxInhabitants: 2,
-  inhabitantRestriction: undefined,
-  fearLevel: 3,
-  fearReductionAura: 0,
-  adjacencyBonuses: [],
-  isUnique: false,
-  removable: true,
-  autoPlace: false,
-  tortureAdjacencyEffects: { tortureSpeedBonus: 0.15 },
-};
-
-const barracksDef: RoomContent = {
-  id: BARRACKS_ID as RoomId,
-  name: 'Barracks',
-  __type: 'room',
-  description: 'Barracks.',
-  shapeId: 'shape-bar' as RoomShapeId,
-  cost: {},
-  production: {},
-  requiresWorkers: false,
-  maxInhabitants: 6,
-  inhabitantRestriction: undefined,
-  fearLevel: 1,
-  fearReductionAura: 0,
-  adjacencyBonuses: [],
-  isUnique: false,
-  removable: true,
-  autoPlace: false,
-  tortureAdjacencyEffects: { tortureConversionBonus: 0.1 },
-};
 
 // --- Helpers ---
 
@@ -243,11 +128,18 @@ function makeFloor(
 function makeGameState(overrides: {
   floors?: Floor[];
   prisoners?: CapturedPrisoner[];
+  day?: number;
 }): GameState {
   const state = {
     meta: { version: 1, isSetup: true, isPaused: false, createdAt: 0 },
     gameId: 'test-game' as GameId,
-    clock: { numTicks: 0, lastSaveTick: 0, day: 1, hour: 0, minute: 0 },
+    clock: {
+      numTicks: 0,
+      lastSaveTick: 0,
+      day: overrides.day ?? 1,
+      hour: 0,
+      minute: 0,
+    },
     world: {
       grid: [] as unknown as GridState,
       resources: {
@@ -261,7 +153,11 @@ function makeGameState(overrides: {
       },
       inhabitants: [],
       hallways: [],
-      season: { currentSeason: 'growth', dayInSeason: 1, totalSeasonCycles: 0 },
+      season: {
+        currentSeason: 'growth',
+        dayInSeason: 1,
+        totalSeasonCycles: 0,
+      },
       research: {
         completedNodes: [],
         activeResearch: undefined,
@@ -282,6 +178,8 @@ function makeGameState(overrides: {
       forgeInventory: [],
       alchemyConversions: [],
       prisoners: overrides.prisoners ?? [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
@@ -322,16 +220,19 @@ function makeGameState(overrides: {
 // --- Import after mocks ---
 
 import {
-  TORTURE_EXTRACTION_BASE_TICKS,
-  TORTURE_CONVERSION_BASE_TICKS,
+  TORTURE_INTERROGATE_BASE_TICKS,
+  TORTURE_EXTRACT_BASE_TICKS,
+  TORTURE_BREAK_BASE_TICKS,
   TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING,
-  TORTURE_CONVERT_SUCCESS_RATES,
+  TORTURE_BREAK_CONVERT_SUCCESS_RATE,
+  PRISONER_ESCAPE_DAYS,
   tortureCanStart,
-  tortureGetExtractionTicks,
-  tortureGetConversionTicks,
-  tortureGetConversionRate,
   tortureCalculateExtractionReward,
-  tortureCreateConvertedInhabitant,
+  tortureCalculateInterrogationBuff,
+  interrogationBuffGetTotals,
+  tortureCreateBrokenInhabitant,
+  tortureCreateTraitRune,
+  prisonerEscapeProcess,
   tortureChamberProcess,
 } from '@helpers/torture-chamber';
 
@@ -339,29 +240,46 @@ import {
 
 beforeEach(() => {
   mockContent.clear();
-  mockContent.set(TORTURE_CHAMBER_ID, tortureChamberDef);
-  mockContent.set(SOUL_WELL_ID, soulWellDef);
-  mockContent.set(BARRACKS_ID, barracksDef);
-  mockContent.set('Converted Prisoner', {
-    id: CONVERTED_PRISONER_ID,
-    name: 'Converted Prisoner',
+  mockContent.set(TORTURE_CHAMBER_ID, {
+    id: TORTURE_CHAMBER_ID,
+    name: 'Torture Chamber',
+    __type: 'room',
+    role: 'tortureChamber',
+  });
+  mockContent.set('Broken Prisoner', {
+    id: BROKEN_PRISONER_ID,
+    name: 'Broken Prisoner',
     __type: 'inhabitant',
+  });
+  mockContent.set("Warrior's Rune", {
+    id: WARRIORS_RUNE_ID,
+    name: "Warrior's Rune",
+    __type: 'traitrune',
+    invaderClass: 'warrior',
+    effects: [],
   });
 });
 
 // --- Tests ---
 
-describe('Torture Chamber Definition', () => {
-  it('should have correct definition properties', () => {
-    expect(tortureChamberDef.maxInhabitants).toBe(1);
-    expect(tortureChamberDef.fearLevel).toBe(4);
-    expect(tortureChamberDef.role).toBe('tortureChamber');
-    expect(tortureChamberDef.requiresWorkers).toBe(true);
-    expect(tortureChamberDef.cost).toEqual({
-      gold: 120,
-      crystals: 40,
-      essence: 20,
-    });
+describe('Constants', () => {
+  it('should have correct stage durations', () => {
+    // 3 min, 4 min, 4 min
+    expect(TORTURE_INTERROGATE_BASE_TICKS).toBeGreaterThan(0);
+    expect(TORTURE_EXTRACT_BASE_TICKS).toBeGreaterThan(0);
+    expect(TORTURE_BREAK_BASE_TICKS).toBeGreaterThan(0);
+  });
+
+  it('should have correct corruption per tick', () => {
+    expect(TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING).toBe(0.12);
+  });
+
+  it('should have correct convert success rate', () => {
+    expect(TORTURE_BREAK_CONVERT_SUCCESS_RATE).toBe(0.8);
+  });
+
+  it('should have 3-day prisoner escape window', () => {
+    expect(PRISONER_ESCAPE_DAYS).toBe(3);
   });
 });
 
@@ -370,7 +288,7 @@ describe('tortureCanStart', () => {
     const room = makeRoom();
     room.tortureJob = {
       prisonerId: 'p1' as PrisonerId,
-      action: 'extract',
+      currentStage: 'interrogate',
       ticksRemaining: 10,
       targetTicks: 20,
     };
@@ -400,134 +318,7 @@ describe('tortureCanStart', () => {
   });
 });
 
-describe('Extraction Tick Calculation', () => {
-  it('should return base ticks with no upgrades or adjacency', () => {
-    const room = makeRoom();
-    const ticks = tortureGetExtractionTicks(room, new Set());
-    expect(ticks).toBe(TORTURE_EXTRACTION_BASE_TICKS);
-  });
-
-  it('should apply Grand Inquisitor upgrade (0.5x)', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const ticks = tortureGetExtractionTicks(room, new Set());
-    expect(ticks).toBe(Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5));
-  });
-
-  it('should apply adjacency speed bonus from Soul Well', () => {
-    const room = makeRoom();
-    const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
-    // 20 * (1 - 0.15) = 17
-    expect(ticks).toBe(Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.85));
-  });
-
-  it('should combine upgrade and adjacency', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
-    const afterUpgrade = Math.round(TORTURE_EXTRACTION_BASE_TICKS * 0.5);
-    expect(ticks).toBe(Math.round(afterUpgrade * 0.85));
-  });
-
-  it('should never go below 1 tick', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const ticks = tortureGetExtractionTicks(room, new Set([SOUL_WELL_ID]));
-    expect(ticks).toBeGreaterThanOrEqual(1);
-  });
-});
-
-describe('Conversion Tick Calculation', () => {
-  it('should return base ticks with no upgrades', () => {
-    const room = makeRoom();
-    const ticks = tortureGetConversionTicks(room, new Set());
-    expect(ticks).toBe(TORTURE_CONVERSION_BASE_TICKS);
-  });
-
-  it('should apply Grand Inquisitor upgrade (0.5x)', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const ticks = tortureGetConversionTicks(room, new Set());
-    expect(ticks).toBe(Math.round(TORTURE_CONVERSION_BASE_TICKS * 0.5));
-  });
-
-  it('should apply adjacency speed bonus', () => {
-    const room = makeRoom();
-    const ticks = tortureGetConversionTicks(room, new Set([SOUL_WELL_ID]));
-    expect(ticks).toBe(Math.round(TORTURE_CONVERSION_BASE_TICKS * 0.85));
-  });
-});
-
-describe('Conversion Rate Calculation', () => {
-  it('should return base rate for warrior with no bonuses', () => {
-    const room = makeRoom();
-    const rate = tortureGetConversionRate(room, new Set(), 'warrior');
-    expect(rate).toBeCloseTo(0.3, 5);
-  });
-
-  it('should return base rate for rogue with no bonuses', () => {
-    const room = makeRoom();
-    const rate = tortureGetConversionRate(room, new Set(), 'rogue');
-    expect(rate).toBeCloseTo(0.5, 5);
-  });
-
-  it('should return base rate for paladin with no bonuses', () => {
-    const room = makeRoom();
-    const rate = tortureGetConversionRate(room, new Set(), 'paladin');
-    expect(rate).toBeCloseTo(0.05, 5);
-  });
-
-  it('should apply Grand Inquisitor conversion bonus', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const rate = tortureGetConversionRate(room, new Set(), 'warrior');
-    expect(rate).toBeCloseTo(0.55, 5); // 0.30 + 0.25
-  });
-
-  it('should apply adjacency conversion bonus from Barracks', () => {
-    const room = makeRoom();
-    const rate = tortureGetConversionRate(
-      room,
-      new Set([BARRACKS_ID]),
-      'warrior',
-    );
-    expect(rate).toBeCloseTo(0.4, 5); // 0.30 + 0.10
-  });
-
-  it('should cap at 95%', () => {
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    // rogue base: 0.50 + 0.25 (upgrade) + 0.10 (barracks) = 0.85
-    const rate = tortureGetConversionRate(
-      room,
-      new Set([BARRACKS_ID]),
-      'rogue',
-    );
-    expect(rate).toBeLessThanOrEqual(0.95);
-    expect(rate).toBeCloseTo(0.85, 5);
-  });
-
-  it('should hard-cap even with extreme bonuses', () => {
-    // Even with stacking, can't exceed 0.95
-    const room = makeRoom({
-      appliedUpgradePathId: 'upgrade-grand-inquisitor' as RoomUpgradeId,
-    });
-    const rate = tortureGetConversionRate(
-      room,
-      new Set([BARRACKS_ID]),
-      'rogue',
-    );
-    expect(rate).toBeLessThanOrEqual(0.95);
-  });
-});
-
-describe('Extraction Reward Calculation', () => {
+describe('tortureCalculateExtractionReward', () => {
   it('should calculate research from prisoner stats', () => {
     const prisoner = makePrisoner({
       stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
@@ -545,225 +336,403 @@ describe('Extraction Reward Calculation', () => {
     // (100 + 50 + 40 + 30) / 3 = 73.33 → 73
     expect(reward).toBe(73);
   });
+});
 
-  it('should handle low stats', () => {
+describe('tortureCalculateInterrogationBuff', () => {
+  it('should calculate buff from prisoner stats', () => {
     const prisoner = makePrisoner({
-      stats: { hp: 10, attack: 5, defense: 3, speed: 2 },
+      stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
     });
-    const reward = tortureCalculateExtractionReward(prisoner);
-    // (10 + 5 + 3 + 2) / 3 = 6.67 → 7
-    expect(reward).toBe(7);
+    const buff = tortureCalculateInterrogationBuff(prisoner);
+    // (40 + 15 + 10 + 8) / 10 = 7.3
+    expect(buff.attackBonusPercent).toBeCloseTo(7.3, 5);
+    expect(buff.defenseBonusPercent).toBeCloseTo(7.3, 5);
+    expect(buff.sourceInvaderClass).toBe('warrior');
   });
 });
 
-describe('Converted Inhabitant Creation', () => {
-  it('should create inhabitant with correct definitionId', () => {
-    const prisoner = makePrisoner();
-    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+describe('interrogationBuffGetTotals', () => {
+  it('should sum multiple buffs', () => {
+    const totals = interrogationBuffGetTotals([
+      {
+        attackBonusPercent: 5,
+        defenseBonusPercent: 3,
+        sourceInvaderClass: 'warrior',
+      },
+      {
+        attackBonusPercent: 2,
+        defenseBonusPercent: 4,
+        sourceInvaderClass: 'rogue',
+      },
+    ]);
+    expect(totals.attackBonusPercent).toBe(7);
+    expect(totals.defenseBonusPercent).toBe(7);
+  });
+
+  it('should return zeros for empty array', () => {
+    const totals = interrogationBuffGetTotals([]);
+    expect(totals.attackBonusPercent).toBe(0);
+    expect(totals.defenseBonusPercent).toBe(0);
+  });
+});
+
+describe('tortureCreateBrokenInhabitant', () => {
+  it('should create inhabitant with correct name', () => {
+    const prisoner = makePrisoner({ name: 'Sir Lance' });
+    const inhabitant = tortureCreateBrokenInhabitant(prisoner);
     expect(inhabitant).toBeDefined();
-    expect(inhabitant!.definitionId).toBe(CONVERTED_PRISONER_ID);
+    expect(inhabitant!.name).toContain('Sir Lance');
+    expect(inhabitant!.name).toContain('Broken');
   });
 
   it('should set state to normal', () => {
     const prisoner = makePrisoner();
-    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+    const inhabitant = tortureCreateBrokenInhabitant(prisoner);
     expect(inhabitant).toBeDefined();
     expect(inhabitant!.state).toBe('normal');
   });
 
-  it('should include prisoner name in inhabitant name', () => {
-    const prisoner = makePrisoner({ name: 'Sir Lance' });
-    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+  it('should include 33% stat inheritance floored', () => {
+    const prisoner = makePrisoner({
+      stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
+    });
+    const inhabitant = tortureCreateBrokenInhabitant(prisoner);
     expect(inhabitant).toBeDefined();
-    expect(inhabitant!.name).toContain('Sir Lance');
-    expect(inhabitant!.name).toContain('Converted');
+    expect(inhabitant!.instanceStatBonuses).toEqual({
+      attack: Math.floor(15 * 0.33), // 4
+      defense: Math.floor(10 * 0.33), // 3
+      speed: Math.floor(8 * 0.33), // 2
+    });
   });
 
   it('should not have an assigned room', () => {
     const prisoner = makePrisoner();
-    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+    const inhabitant = tortureCreateBrokenInhabitant(prisoner);
     expect(inhabitant).toBeDefined();
     expect(inhabitant!.assignedRoomId).toBeUndefined();
   });
 
   it('should return undefined when content not found', () => {
-    mockContent.delete('Converted Prisoner');
+    mockContent.delete('Broken Prisoner');
     const prisoner = makePrisoner();
-    const inhabitant = tortureCreateConvertedInhabitant(prisoner);
+    const inhabitant = tortureCreateBrokenInhabitant(prisoner);
     expect(inhabitant).toBeUndefined();
   });
 });
 
+describe('tortureCreateTraitRune', () => {
+  it('should create rune for warrior class', () => {
+    const prisoner = makePrisoner({ invaderClass: 'warrior' });
+    const rune = tortureCreateTraitRune(prisoner);
+    expect(rune).toBeDefined();
+    expect(rune!.runeTypeId).toBe(WARRIORS_RUNE_ID);
+    expect(rune!.sourceInvaderClass).toBe('warrior');
+  });
+
+  it('should return undefined for unknown class rune', () => {
+    const prisoner = makePrisoner({ invaderClass: 'mage' });
+    const rune = tortureCreateTraitRune(prisoner);
+    // "Mage's Rune" not in mockContent
+    expect(rune).toBeUndefined();
+  });
+});
+
+describe('prisonerEscapeProcess', () => {
+  it('should remove prisoners after PRISONER_ESCAPE_DAYS', () => {
+    const prisoner = makePrisoner({ captureDay: 1 });
+    const state = makeGameState({ prisoners: [prisoner], day: 4 });
+    // day 4 - captureDay 1 = 3 >= PRISONER_ESCAPE_DAYS (3)
+    const escaped = prisonerEscapeProcess(state);
+    expect(escaped).toHaveLength(1);
+    expect(escaped[0]).toBe('Captured Warrior');
+    expect(state.world.prisoners).toHaveLength(0);
+  });
+
+  it('should keep prisoners within the escape window', () => {
+    const prisoner = makePrisoner({ captureDay: 3 });
+    const state = makeGameState({ prisoners: [prisoner], day: 4 });
+    // day 4 - captureDay 3 = 1 < 3
+    const escaped = prisonerEscapeProcess(state);
+    expect(escaped).toHaveLength(0);
+    expect(state.world.prisoners).toHaveLength(1);
+  });
+
+  it('should skip prisoners in active torture jobs', () => {
+    const room = makeRoom();
+    room.tortureJob = {
+      prisonerId: 'prisoner-1' as PrisonerId,
+      currentStage: 'interrogate',
+      ticksRemaining: 5,
+      targetTicks: 10,
+    };
+    const prisoner = makePrisoner({ captureDay: 1 });
+    const floor = makeFloor([room]);
+    const state = makeGameState({
+      floors: [floor],
+      prisoners: [prisoner],
+      day: 10,
+    });
+    const escaped = prisonerEscapeProcess(state);
+    expect(escaped).toHaveLength(0);
+    expect(state.world.prisoners).toHaveLength(1);
+  });
+});
+
 describe('tortureChamberProcess', () => {
-  it('should decrement torture job ticks', () => {
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 10,
-      targetTicks: 20,
-    };
+  describe('interrogate stage', () => {
+    it('should decrement ticks while processing', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'interrogate',
+        ticksRemaining: 10,
+        targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
+      };
 
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner();
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+      expect(room.tortureJob!.ticksRemaining).toBe(9);
     });
-    state.world.inhabitants = [worker];
 
-    tortureChamberProcess(state);
+    it('should add corruption per tick', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'interrogate',
+        ticksRemaining: 10,
+        targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
+      };
 
-    expect(room.tortureJob!.ticksRemaining).toBe(9);
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+      expect(state.world.resources.corruption.current).toBeCloseTo(
+        TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING,
+        5,
+      );
+    });
+
+    it('should advance to extract stage on completion and add interrogation buff', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'interrogate',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
+      };
+
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner({
+        stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
+      });
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      // Should advance to extract with 0 ticks (paused)
+      expect(room.tortureJob!.currentStage).toBe('extract');
+      expect(room.tortureJob!.ticksRemaining).toBe(0);
+      expect(room.tortureJob!.stageAction).toBeUndefined();
+
+      // Should have added interrogation buff
+      expect(state.world.interrogationBuffs).toHaveLength(1);
+      expect(
+        state.world.interrogationBuffs[0].attackBonusPercent,
+      ).toBeCloseTo(7.3, 5);
+    });
   });
 
-  it('should add corruption per tick while processing', () => {
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 10,
-      targetTicks: 20,
-    };
+  describe('extract stage', () => {
+    it('should pause when no stageAction is set', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'extract',
+        ticksRemaining: 0,
+        targetTicks: TORTURE_EXTRACT_BASE_TICKS,
+      };
 
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner();
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      // Should stay in extract, still paused
+      expect(room.tortureJob!.currentStage).toBe('extract');
+      expect(room.tortureJob!.ticksRemaining).toBe(0);
     });
-    state.world.inhabitants = [worker];
-    state.world.resources.corruption.current = 0;
 
-    tortureChamberProcess(state);
+    it('should process research extraction and advance to break stage', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'extract',
+        stageAction: 'research',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_EXTRACT_BASE_TICKS,
+      };
 
-    expect(state.world.resources.corruption.current).toBeCloseTo(
-      TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING,
-      5,
-    );
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner({
+        stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
+      });
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      // Research gained: (40+15+10+8)/3 = 24
+      expect(state.world.resources.research.current).toBe(24);
+      // Should advance to break
+      expect(room.tortureJob!.currentStage).toBe('break');
+      expect(room.tortureJob!.stageAction).toBeUndefined();
+      expect(room.tortureJob!.ticksRemaining).toBe(0);
+    });
+
+    it('should process rune extraction and advance to break stage', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'extract',
+        stageAction: 'rune',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_EXTRACT_BASE_TICKS,
+      };
+
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner({ invaderClass: 'warrior' });
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      // Rune should have been created
+      expect(state.world.traitRunes).toHaveLength(1);
+      expect(state.world.traitRunes[0].sourceInvaderClass).toBe('warrior');
+      // Should advance to break
+      expect(room.tortureJob!.currentStage).toBe('break');
+    });
   });
 
-  it('should complete extraction and grant research when ticks reach 0', () => {
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
+  describe('break stage', () => {
+    it('should execute prisoner and grant reputation', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'break',
+        stageAction: 'execute',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_BREAK_BASE_TICKS,
+      };
 
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner({
-      stats: { hp: 40, attack: 15, defense: 10, speed: 8 },
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      expect(state.world.reputation.terror).toBe(1);
+      expect(state.world.prisoners).toHaveLength(0);
+      expect(room.tortureJob).toBeUndefined();
     });
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
+
+    it('should sacrifice prisoner and grant random resource', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'break',
+        stageAction: 'sacrifice',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_BREAK_BASE_TICKS,
+      };
+
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
+
+      tortureChamberProcess(state);
+
+      expect(state.world.prisoners).toHaveLength(0);
+      expect(room.tortureJob).toBeUndefined();
     });
-    state.world.inhabitants = [worker];
-    state.world.resources.research.current = 0;
 
-    tortureChamberProcess(state);
+    it('should attempt conversion and clear job on completion', () => {
+      const room = makeRoom();
+      room.tortureJob = {
+        prisonerId: 'prisoner-1' as PrisonerId,
+        currentStage: 'break',
+        stageAction: 'convert',
+        ticksRemaining: 1,
+        targetTicks: TORTURE_BREAK_BASE_TICKS,
+      };
 
-    // Research gained: (40+15+10+8)/3 = 24
-    expect(state.world.resources.research.current).toBe(24);
-    expect(state.world.prisoners).toHaveLength(0);
-    expect(room.tortureJob).toBeUndefined();
-  });
+      const worker = makeInhabitant();
+      const prisoner = makePrisoner();
+      const floor = makeFloor([room], [worker]);
+      const state = makeGameState({
+        floors: [floor],
+        prisoners: [prisoner],
+      });
+      state.world.inhabitants = [worker];
 
-  it('should remove prisoner after extraction', () => {
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
+      tortureChamberProcess(state);
 
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner();
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
+      // Regardless of success, prisoner removed and job cleared
+      expect(state.world.prisoners).toHaveLength(0);
+      expect(room.tortureJob).toBeUndefined();
     });
-    state.world.inhabitants = [worker];
-
-    tortureChamberProcess(state);
-
-    expect(state.world.prisoners).toHaveLength(0);
-  });
-
-  it('should clear job after completion', () => {
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 1,
-      targetTicks: 20,
-    };
-
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner();
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
-    });
-    state.world.inhabitants = [worker];
-
-    tortureChamberProcess(state);
-
-    expect(room.tortureJob).toBeUndefined();
-  });
-
-  it('should handle conversion success and create inhabitant', () => {
-    // Use a rng that returns < conversion rate for warrior (0.3)
-    // seedrandom('test-seed') returns ~0.484 which is > 0.3, so conversion would fail
-    // Instead we test that the process runs correctly with the seeded rng
-    const room = makeRoom();
-    room.tortureJob = {
-      prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'convert',
-      ticksRemaining: 1,
-      targetTicks: 40,
-    };
-
-    // Use rogue class which has 0.5 success rate
-    const worker = makeInhabitant();
-    const prisoner = makePrisoner({
-      invaderClass: 'rogue',
-      name: 'Captured Rogue',
-    });
-    const floor = makeFloor([room], [worker]);
-    const state = makeGameState({
-      floors: [floor],
-      prisoners: [prisoner],
-    });
-    state.world.inhabitants = [worker];
-
-    const initialInhabitantCount = state.world.inhabitants.length;
-    tortureChamberProcess(state);
-
-    // Prisoner should be removed regardless
-    expect(state.world.prisoners).toHaveLength(0);
-    expect(room.tortureJob).toBeUndefined();
-
-    // With seedrandom('test-seed'), the rng result is deterministic
-    // The result depends on the seed - check that inhabitant count changed appropriately
-    const inhabitantCount = state.world.inhabitants.length;
-    expect(inhabitantCount).toBeGreaterThanOrEqual(initialInhabitantCount);
   });
 
   it('should not process rooms that are not torture chambers', () => {
     const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.tortureJob = {
       prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
-      ticksRemaining: 1,
+      currentStage: 'interrogate',
+      ticksRemaining: 5,
       targetTicks: 20,
     };
 
@@ -773,15 +742,14 @@ describe('tortureChamberProcess', () => {
 
     tortureChamberProcess(state);
 
-    // Job should not have been processed
-    expect(room.tortureJob!.ticksRemaining).toBe(1);
+    expect(room.tortureJob!.ticksRemaining).toBe(5);
   });
 
   it('should not process rooms without assigned workers', () => {
     const room = makeRoom();
     room.tortureJob = {
       prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'extract',
+      currentStage: 'interrogate',
       ticksRemaining: 10,
       targetTicks: 20,
     };
@@ -806,14 +774,14 @@ describe('tortureChamberProcess', () => {
     const room = makeRoom();
     room.tortureJob = {
       prisonerId: 'prisoner-1' as PrisonerId,
-      action: 'convert',
+      currentStage: 'break',
+      stageAction: 'convert',
       ticksRemaining: 1,
-      targetTicks: 40,
+      targetTicks: TORTURE_BREAK_BASE_TICKS,
     };
 
-    // Use rogue with high success rate
     const worker = makeInhabitant();
-    const prisoner = makePrisoner({ invaderClass: 'rogue' });
+    const prisoner = makePrisoner();
     const floor = makeFloor([room], [worker]);
     const state = makeGameState({
       floors: [floor],
@@ -825,64 +793,9 @@ describe('tortureChamberProcess', () => {
 
     // If conversion succeeded, floor inhabitants should match world inhabitants
     if (state.world.inhabitants.length > 1) {
-      expect(state.world.floors[0].inhabitants).toBe(state.world.inhabitants);
+      expect(state.world.floors[0].inhabitants).toBe(
+        state.world.inhabitants,
+      );
     }
-  });
-});
-
-describe('Constants', () => {
-  it('should have correct base ticks', () => {
-    expect(TORTURE_EXTRACTION_BASE_TICKS).toBe(4);
-    expect(TORTURE_CONVERSION_BASE_TICKS).toBe(8);
-  });
-
-  it('should have correct corruption per tick', () => {
-    expect(TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING).toBe(0.12);
-  });
-
-  it('should have conversion rates for all invader classes', () => {
-    expect(TORTURE_CONVERT_SUCCESS_RATES.warrior).toBe(0.3);
-    expect(TORTURE_CONVERT_SUCCESS_RATES.rogue).toBe(0.5);
-    expect(TORTURE_CONVERT_SUCCESS_RATES.mage).toBe(0.2);
-    expect(TORTURE_CONVERT_SUCCESS_RATES.cleric).toBe(0.1);
-    expect(TORTURE_CONVERT_SUCCESS_RATES.paladin).toBe(0.05);
-    expect(TORTURE_CONVERT_SUCCESS_RATES.ranger).toBe(0.35);
-  });
-});
-
-describe('Adjacency Effects', () => {
-  it('Soul Well should have tortureSpeedBonus', () => {
-    expect(soulWellDef.tortureAdjacencyEffects?.tortureSpeedBonus).toBe(0.15);
-  });
-
-  it('Barracks should have tortureConversionBonus', () => {
-    expect(barracksDef.tortureAdjacencyEffects?.tortureConversionBonus).toBe(
-      0.1,
-    );
-  });
-});
-
-describe('Upgrade Effects', () => {
-  it('Grand Inquisitor: speed multiplier 0.5x, conversion bonus 0.25, capacity +1', () => {
-    expect(grandInquisitorPath.effects).toContainEqual({
-      type: 'tortureSpeedMultiplier',
-      value: 0.5,
-    });
-    expect(grandInquisitorPath.effects).toContainEqual({
-      type: 'tortureConversionBonus',
-      value: 0.25,
-    });
-    expect(grandInquisitorPath.effects).toContainEqual({
-      type: 'maxInhabitantBonus',
-      value: 1,
-    });
-  });
-
-  it('Corruption Engine: production multiplier 2.0x for corruption', () => {
-    expect(corruptionEnginePath.effects).toContainEqual({
-      type: 'productionMultiplier',
-      value: 2.0,
-      resource: 'corruption',
-    });
   });
 });

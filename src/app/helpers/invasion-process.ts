@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
 import { combatAbilityInitStates } from '@helpers/combat-abilities';
 import { contentGetEntry } from '@helpers/content';
+import { interrogationBuffGetTotals } from '@helpers/torture-chamber';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { fearLevelCalculateAllForFloor } from '@helpers/fear-level';
@@ -837,8 +838,14 @@ export function invasionProcess(state: GameState): void {
         // Apply state modifier penalties (scared/hungry/starving fight worse)
         const attackMul = stateModifierGetAttackMultiplier(def);
         const defenseMul = stateModifierGetDefenseMultiplier(def);
-        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul));
-        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul));
+
+        // Apply interrogation buffs (stacking bonus from tortured prisoners)
+        const interrogationTotals = interrogationBuffGetTotals(state.world.interrogationBuffs);
+        const interrogationAttackMul = 1 + interrogationTotals.attackBonusPercent / 100;
+        const interrogationDefenseMul = 1 + interrogationTotals.defenseBonusPercent / 100;
+
+        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul));
+        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul));
 
         // Initialize ability states from content definition if not already set
         const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);
@@ -1770,6 +1777,9 @@ function invasionProcessComplete(
   if (rewards && capturedPrisoners.length > 0) {
     rewards.capturedPrisoners = capturedPrisoners;
   }
+
+  // Consume interrogation buffs (applied to defenders during this invasion)
+  state.world.interrogationBuffs = [];
 
   invasion.completed = true;
   invasion.result = {

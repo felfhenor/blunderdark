@@ -119,6 +119,8 @@ function makeSaveData(overrides?: Partial<SaveData>): SaveData {
         forgeInventory: [],
         alchemyConversions: [],
         prisoners: [],
+        traitRunes: [],
+        interrogationBuffs: [],
         invasionSchedule: {
           nextInvasionDay: undefined,
           nextInvasionVariance: 0,

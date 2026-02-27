@@ -4,14 +4,12 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { InvasionPrisonersPhaseComponent } from '@components/invasion-prisoners-phase/invasion-prisoners-phase.component';
 import { InvasionResultsPhaseComponent } from '@components/invasion-results-phase/invasion-results-phase.component';
 import { InvasionRewardsPhaseComponent } from '@components/invasion-rewards-phase/invasion-rewards-phase.component';
 import { InvasionPhaseTitleComponent } from '@components/invasion-phase-title/invasion-phase-title.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   invasionRewardApplyDefeat,
-  invasionRewardApplyPrisonerAction,
   invasionRewardApplyVictory,
 } from '@helpers/invasion-reward-apply';
 import { invasionTriggerRecordAndReschedule } from '@helpers/invasion-triggers';
@@ -19,10 +17,7 @@ import { updateGamestate } from '@helpers/state-game';
 import type {
   ActiveInvasion,
   BattlePhase,
-  CapturedPrisoner,
   InvasionOrchestratorResult,
-  PrisonerAction,
-  PrisonerHandlingResult,
 } from '@interfaces';
 
 @Component({
@@ -31,7 +26,6 @@ import type {
     ModalComponent,
     InvasionResultsPhaseComponent,
     InvasionRewardsPhaseComponent,
-    InvasionPrisonersPhaseComponent,
     InvasionPhaseTitleComponent,
   ],
   templateUrl: './panel-invasion-battle.component.html',
@@ -42,10 +36,6 @@ export class PanelInvasionBattleComponent {
   public visible = signal(false);
   public phase = signal<BattlePhase>('results');
   public result = signal<InvasionOrchestratorResult | undefined>(undefined);
-  public prisonersRemaining = signal<CapturedPrisoner[]>([]);
-  public prisonerResults = signal<Map<string, PrisonerHandlingResult>>(
-    new Map(),
-  );
   public rewardsApplied = signal(false);
 
   private currentInvasion: ActiveInvasion | undefined;
@@ -60,8 +50,6 @@ export class PanelInvasionBattleComponent {
     this.currentInvasion = invasion;
     this.phase.set('results');
     this.result.set(invasion.result);
-    this.prisonersRemaining.set([...invasion.result.capturedPrisoners]);
-    this.prisonerResults.set(new Map());
     this.rewardsApplied.set(false);
     this.visible.set(true);
   }
@@ -86,37 +74,8 @@ export class PanelInvasionBattleComponent {
     }
 
     if (current === 'rewards') {
-      if (this.prisonersRemaining().length > 0) {
-        this.phase.set('prisoners');
-      } else {
-        this.dismiss();
-      }
-      return;
-    }
-
-    if (current === 'prisoners') {
       this.dismiss();
     }
-  }
-
-  public async handlePrisoner(
-    prisoner: CapturedPrisoner,
-    action: PrisonerAction,
-  ): Promise<void> {
-    const handlingResult = await invasionRewardApplyPrisonerAction(
-      prisoner,
-      action,
-    );
-
-    this.prisonerResults.update((map) => {
-      const next = new Map(map);
-      next.set(prisoner.id, handlingResult);
-      return next;
-    });
-
-    this.prisonersRemaining.update((list) =>
-      list.filter((p) => p.id !== prisoner.id),
-    );
   }
 
   public dismiss(): void {

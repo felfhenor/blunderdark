@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { InvasionId, InvaderInstanceId, InvaderId, PrisonerId } from '@interfaces';
-import type {
-  CapturedPrisoner,
-  DetailedInvasionResult,
-} from '@interfaces/invasion';
+import type { InvasionId, InvaderInstanceId, InvaderId } from '@interfaces';
+import type { DetailedInvasionResult } from '@interfaces/invasion';
 import type { InvaderClassType, InvaderInstance } from '@interfaces/invader';
 import {
   INVASION_REWARD_ALL_SECONDARIES_PREVENTED_BONUS,
@@ -18,14 +15,6 @@ import {
   invasionRewardCalculateDefenseRewards,
   invasionRewardGetAltarRebuildCost,
   invasionRewardGetClassLoot,
-  invasionRewardGetConvertSuccessRate,
-  invasionRewardGetRansomGoldValue,
-  invasionRewardHandleConvert,
-  invasionRewardHandleExecute,
-  invasionRewardHandleExperiment,
-  invasionRewardHandlePrisoner,
-  invasionRewardHandleRansom,
-  invasionRewardHandleSacrifice,
   invasionRewardRollLoot,
   invasionRewardRollPrisonerCaptures,
 } from '@helpers/invasion-rewards';
@@ -59,20 +48,6 @@ function makeResult(overrides: Partial<DetailedInvasionResult> = {}): DetailedIn
     penetrationDepth: 0.5,
     roomsReached: 4,
     totalPathRooms: 8,
-    ...overrides,
-  };
-}
-
-function makePrisoner(
-  invaderClass: InvaderClassType = 'warrior',
-  overrides: Partial<CapturedPrisoner> = {},
-): CapturedPrisoner {
-  return {
-    id: 'prisoner-1' as PrisonerId,
-    invaderClass,
-    name: 'Captured Warrior',
-    stats: { hp: 20, attack: 8, defense: 5, speed: 3 },
-    captureDay: 42,
     ...overrides,
   };
 }
@@ -421,162 +396,6 @@ describe('invasion-rewards', () => {
         if (p.length > 0) captures++;
       }
       expect(captures).toBe(30);
-    });
-  });
-
-  describe('prisoner handling', () => {
-    describe('invasionRewardHandleExecute', () => {
-      it('should return execute result with fear and reputation', () => {
-        const result = invasionRewardHandleExecute();
-        expect(result.action).toBe('execute');
-        expect(result.success).toBe(true);
-        expect(result.fearChange).toBe(2);
-        expect(result.reputationChange).toBe(1);
-        expect(result.corruptionChange).toBe(0);
-      });
-    });
-
-    describe('invasionRewardHandleRansom', () => {
-      it('should return gold scaled by class', () => {
-        const prisoner = makePrisoner('paladin');
-        const result = invasionRewardHandleRansom(prisoner);
-        expect(result.action).toBe('ransom');
-        expect(result.resourceChanges.gold).toBe(50);
-        expect(result.reputationChange).toBe(-1);
-      });
-
-      it('should return less gold for rangers', () => {
-        const prisoner = makePrisoner('ranger');
-        const result = invasionRewardHandleRansom(prisoner);
-        expect(result.resourceChanges.gold).toBe(20);
-      });
-    });
-
-    describe('invasionRewardHandleConvert', () => {
-      it('should succeed when roll is below success rate', () => {
-        const prisoner = makePrisoner('rogue');
-        const result = invasionRewardHandleConvert(prisoner, fixedRng(0.1));
-        expect(result.action).toBe('convert');
-        expect(result.success).toBe(true);
-        expect(result.corruptionChange).toBe(5);
-      });
-
-      it('should fail when roll is above success rate', () => {
-        const prisoner = makePrisoner('paladin');
-        const result = invasionRewardHandleConvert(prisoner, fixedRng(0.9));
-        expect(result.success).toBe(false);
-      });
-
-      it('should have higher success rate for rogues than paladins', () => {
-        expect(invasionRewardGetConvertSuccessRate('rogue')).toBeGreaterThan(
-          invasionRewardGetConvertSuccessRate('paladin'),
-        );
-      });
-    });
-
-    describe('invasionRewardHandleSacrifice', () => {
-      it('should grant random boon resource', () => {
-        const result = invasionRewardHandleSacrifice(fixedRng(0));
-        expect(result.action).toBe('sacrifice');
-        expect(result.success).toBe(true);
-        expect(result.corruptionChange).toBe(5);
-        expect(result.reputationChange).toBe(2);
-        // The boon resource should be one of flux, essence, research
-        const resourceKeys = Object.keys(result.resourceChanges).filter(
-          (k) => k !== 'corruption',
-        );
-        expect(resourceKeys.length).toBeGreaterThan(0);
-      });
-
-      it('should not duplicate corruption in resourceChanges (handled by corruptionChange)', () => {
-        const result = invasionRewardHandleSacrifice(fixedRng(0.5));
-        expect(result.resourceChanges.corruption).toBeUndefined();
-        expect(result.corruptionChange).toBe(5);
-      });
-    });
-
-    describe('invasionRewardHandleExperiment', () => {
-      it('should grant research scaled by stats', () => {
-        const prisoner = makePrisoner('warrior', {
-          stats: { hp: 20, attack: 8, defense: 5, speed: 3 },
-        });
-        const result = invasionRewardHandleExperiment(prisoner);
-        expect(result.action).toBe('experiment');
-        expect(result.success).toBe(true);
-        // (20+8+5+3)/4 = 9
-        expect(result.resourceChanges.research).toBe(9);
-        expect(result.corruptionChange).toBe(3);
-      });
-
-      it('should scale with stronger invaders', () => {
-        const weakPrisoner = makePrisoner('warrior', {
-          stats: { hp: 10, attack: 4, defense: 2, speed: 2 },
-        });
-        const strongPrisoner = makePrisoner('paladin', {
-          stats: { hp: 40, attack: 16, defense: 12, speed: 4 },
-        });
-        const weakResult = invasionRewardHandleExperiment(weakPrisoner);
-        const strongResult = invasionRewardHandleExperiment(strongPrisoner);
-        expect(strongResult.resourceChanges.research!).toBeGreaterThan(
-          weakResult.resourceChanges.research!,
-        );
-      });
-    });
-
-    describe('invasionRewardHandlePrisoner', () => {
-      it('should dispatch to execute', () => {
-        const prisoner = makePrisoner();
-        const result = invasionRewardHandlePrisoner('execute', prisoner);
-        expect(result.action).toBe('execute');
-      });
-
-      it('should dispatch to ransom', () => {
-        const prisoner = makePrisoner('paladin');
-        const result = invasionRewardHandlePrisoner('ransom', prisoner);
-        expect(result.action).toBe('ransom');
-        expect(result.resourceChanges.gold).toBe(50);
-      });
-
-      it('should dispatch to convert', () => {
-        const prisoner = makePrisoner('rogue');
-        const result = invasionRewardHandlePrisoner('convert', prisoner, fixedRng(0.1));
-        expect(result.action).toBe('convert');
-        expect(result.success).toBe(true);
-      });
-
-      it('should dispatch to sacrifice', () => {
-        const prisoner = makePrisoner();
-        const result = invasionRewardHandlePrisoner('sacrifice', prisoner, fixedRng(0.5));
-        expect(result.action).toBe('sacrifice');
-      });
-
-      it('should dispatch to experiment', () => {
-        const prisoner = makePrisoner();
-        const result = invasionRewardHandlePrisoner('experiment', prisoner);
-        expect(result.action).toBe('experiment');
-      });
-    });
-  });
-
-  describe('invasionRewardGetConvertSuccessRate', () => {
-    it('should return correct rates for each class', () => {
-      expect(invasionRewardGetConvertSuccessRate('warrior')).toBe(0.30);
-      expect(invasionRewardGetConvertSuccessRate('rogue')).toBe(0.50);
-      expect(invasionRewardGetConvertSuccessRate('mage')).toBe(0.20);
-      expect(invasionRewardGetConvertSuccessRate('cleric')).toBe(0.10);
-      expect(invasionRewardGetConvertSuccessRate('paladin')).toBe(0.05);
-      expect(invasionRewardGetConvertSuccessRate('ranger')).toBe(0.35);
-    });
-  });
-
-  describe('invasionRewardGetRansomGoldValue', () => {
-    it('should return correct gold for each class', () => {
-      expect(invasionRewardGetRansomGoldValue('warrior')).toBe(30);
-      expect(invasionRewardGetRansomGoldValue('rogue')).toBe(25);
-      expect(invasionRewardGetRansomGoldValue('mage')).toBe(40);
-      expect(invasionRewardGetRansomGoldValue('cleric')).toBe(35);
-      expect(invasionRewardGetRansomGoldValue('paladin')).toBe(50);
-      expect(invasionRewardGetRansomGoldValue('ranger')).toBe(20);
     });
   });
 

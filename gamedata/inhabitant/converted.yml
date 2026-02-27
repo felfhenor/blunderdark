@@ -36,3 +36,41 @@
     normal:
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
+- id: b6dd2a98-3afb-43a7-bb8d-4f7fd2a79fe2
+  name: Broken Prisoner
+  type: creature
+  tier: 2
+  description: A fully processed prisoner who has been interrogated, extracted, and broken. Stronger and more capable than a basic convert due to the thorough breaking process.
+  cost: {}
+  stats:
+    hp: 35
+    attack: 14
+    defense: 10
+    speed: 12
+    workerEfficiency: 0.90
+  inhabitantTraitIds: []
+  restrictionTags:
+    - converted
+  fearTolerance: 0
+  fearModifier: 0
+  foodConsumptionRate: 1
+  corruptionGeneration: 0.1
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.5
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.6
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.8
+      defenseMultiplier: 0.9
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.4
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0

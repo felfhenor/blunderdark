@@ -76,6 +76,10 @@ import type {
   RoomUpgradeContent,
   RoomUpgradeId,
 } from '@interfaces/content-roomupgrade';
+import type {
+  TraitRuneContent,
+  TraitRuneId,
+} from '@interfaces/content-traitrune';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,6 +107,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   seasonbonus: ensureSeasonBonus,
   summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
+  traitrune: ensureTraitRune,
   trap: ensureTrap,
   victorypath: ensureVictoryPath,
 };
@@ -628,6 +633,22 @@ function ensureSeasonBonus(
     })),
     recruitmentCostMultiplier: bonus.recruitmentCostMultiplier ?? 1.0,
     flags: bonus.flags ?? [],
+  };
+}
+
+function ensureTraitRune(
+  rune: Partial<TraitRuneContent>,
+): Required<TraitRuneContent> {
+  return {
+    id: (rune.id ?? 'UNKNOWN') as TraitRuneId,
+    name: rune.name ?? 'UNKNOWN',
+    __type: 'traitrune',
+    description: rune.description ?? '',
+    invaderClass: rune.invaderClass ?? 'warrior',
+    effects: (rune.effects ?? []).map((e) => ({
+      type: e.type ?? '',
+      value: e.value ?? 0,
+    })),
   };
 }
 

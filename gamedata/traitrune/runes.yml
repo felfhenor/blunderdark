@@ -1,0 +1,35 @@
+- id: 8e3cd4da-484b-40b7-a612-e64adc56a620
+  name: Warrior's Rune
+  description: A rune extracted from a captured warrior, pulsing with martial energy.
+  invaderClass: warrior
+  effects: []
+
+- id: 87376726-2921-48c8-abb4-c55d8e3de48f
+  name: Rogue's Rune
+  description: A rune extracted from a captured rogue, shimmering with cunning.
+  invaderClass: rogue
+  effects: []
+
+- id: cef32029-634d-475c-beaa-8e554df3688d
+  name: Mage's Rune
+  description: A rune extracted from a captured mage, crackling with arcane power.
+  invaderClass: mage
+  effects: []
+
+- id: 1046f27e-816a-4681-8f7c-b46b44fe1440
+  name: Cleric's Rune
+  description: A rune extracted from a captured cleric, glowing with divine residue.
+  invaderClass: cleric
+  effects: []
+
+- id: 3b949c57-75ea-4dab-9682-86ec0eb31b57
+  name: Paladin's Rune
+  description: A rune extracted from a captured paladin, radiating righteous fury.
+  invaderClass: paladin
+  effects: []
+
+- id: 5b8fc209-bc4d-4a69-9316-7b60e2542077
+  name: Ranger's Rune
+  description: A rune extracted from a captured ranger, humming with primal instinct.
+  invaderClass: ranger
+  effects: []

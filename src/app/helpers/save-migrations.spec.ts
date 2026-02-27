@@ -74,6 +74,8 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
       forgeInventory: [],
       alchemyConversions: [],
       prisoners: [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

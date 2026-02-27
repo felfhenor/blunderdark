@@ -14,6 +14,8 @@ import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
 import type { ActiveInvasion, CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
 import type { MerchantState } from '@interfaces/merchant';
+import type { InterrogationBuff } from '@interfaces/torture';
+import type { TraitRune } from '@interfaces/traitrune';
 import type { VictoryProgress } from '@interfaces/victory';
 
 export type GameId = Branded<string, 'GameId'>;
@@ -32,6 +34,8 @@ export interface GameStateWorld {
   forgeInventory: ForgeInventoryEntry[];
   alchemyConversions: AlchemyConversion[];
   prisoners: CapturedPrisoner[];
+  traitRunes: TraitRune[];
+  interrogationBuffs: InterrogationBuff[];
   farplaneSouls: FarplaneSoul[];
   invasionSchedule: InvasionSchedule;
   playerThreat: number;

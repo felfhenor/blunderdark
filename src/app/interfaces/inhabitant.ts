@@ -4,6 +4,7 @@ import type { ForgeRecipeId } from '@interfaces/content-forgerecipe';
 import type { InhabitantId } from '@interfaces/content-inhabitant';
 import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId } from '@interfaces/room-shape';
+import type { TraitRuneInstanceId } from '@interfaces/traitrune';
 
 export type InhabitantTrait = {
   id: string;
@@ -63,6 +64,7 @@ export type InhabitantInstance = {
   travelTicksRemaining?: number;
   discontentedTicks?: number;
 
+  equippedRuneId?: TraitRuneInstanceId;
   equippedForgeItemRecipeId?: ForgeRecipeId;
   equippedStatBonuses?: Partial<InhabitantStats>;
 

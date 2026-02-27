@@ -35,19 +35,9 @@
             <app-invasion-rewards-phase
               [result]="res"
               [isVictory]="isVictory()"
-              [hasPrisoners]="prisonersRemaining().length > 0"
-              [prisonerCount]="prisonersRemaining().length"
               (advance)="advancePhase()"
             />
           }
-        }
-
-        @case ('prisoners') {
-          <app-invasion-prisoners-phase
-            [prisoners]="prisonersRemaining()"
-            (handlePrisoner)="handlePrisoner($event.prisoner, $event.action)"
-            (dismiss)="dismiss()"
-          />
         }
       }
     </div>

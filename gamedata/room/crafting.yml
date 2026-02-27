@@ -130,7 +130,7 @@
       description: Soul essence fuels the core's binding rituals.
 - id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
   name: Torture Chamber
-  description: A chamber of dread where captured invaders are interrogated and broken. Extract forbidden knowledge or convert prisoners into loyal servants. Its oppressive atmosphere generates corruption and strikes terror into all who witness it.
+  description: A chamber of dread where captured invaders are processed through a 3-stage pipeline — interrogated for intel, extracted for knowledge or runes, then broken into servitude or sacrificed. Prisoners must be processed before they escape.
   shapeId: Small L-Shape
   reputationAction: Place Torture Chamber
   cost:
@@ -145,10 +145,7 @@
   inhabitantRestriction: null
   fearLevel: 4
   isUnique: true
-  roomUpgradeIds:
-    - "Inquisitor's Chamber"
-    - Corruption Chamber
-    - Dread Chamber
+  roomUpgradeIds: []
   role: tortureChamber
   timeOfDayBonus:
     period: night
@@ -166,3 +163,20 @@
     - adjacentRoomId: Barracks
       bonus: 0.1
       description: Military discipline from the Barracks aids in prisoner control.
+- id: 9b49b3e3-7ff1-4073-8be8-25542182c770
+  name: Runeworking Chamber
+  description: A mystical workshop where trait runes extracted from prisoners are permanently embedded into inhabitants, granting them unique bonuses tied to the invader class of origin.
+  shapeId: Small L-Shape
+  cost:
+    gold: 100
+    crystals: 50
+    essence: 30
+  production: {}
+  requiresWorkers: true
+  maxInhabitants: 1
+  maxFeatures: 0
+  inhabitantRestriction: null
+  fearLevel: 1
+  isUnique: true
+  roomUpgradeIds: []
+  role: runeworking

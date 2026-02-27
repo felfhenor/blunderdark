@@ -11,8 +11,6 @@ import type {
   DefensePenalties,
   DefenseRewards,
   DetailedInvasionResult,
-  PrisonerAction,
-  PrisonerHandlingResult,
   PrisonerId,
 } from '@interfaces/invasion';
 import type { ReputationType } from '@interfaces/reputation';
@@ -101,25 +99,6 @@ const CLASS_LOOT: Record<InvaderClassType, ClassLoot> = {
   },
 };
 
-// --- Prisoner handling constants ---
-
-const CONVERT_SUCCESS_RATES: Record<InvaderClassType, number> = {
-  warrior: 0.3,
-  rogue: 0.5,
-  mage: 0.2,
-  cleric: 0.1,
-  paladin: 0.05,
-  ranger: 0.35,
-};
-
-const RANSOM_GOLD: Record<InvaderClassType, number> = {
-  warrior: 30,
-  rogue: 25,
-  mage: 40,
-  cleric: 35,
-  paladin: 50,
-  ranger: 20,
-};
 
 // --- Reward calculation ---
 
@@ -280,145 +259,6 @@ export function invasionRewardRollPrisonerCaptures(
   return prisoners;
 }
 
-// --- Prisoner handling ---
-
-/**
- * Execute a prisoner: +2 fear, +1 reputation, -5 future invader morale.
- */
-export function invasionRewardHandleExecute(): PrisonerHandlingResult {
-  return {
-    action: 'execute',
-    success: true,
-    resourceChanges: {},
-    reputationChange: 1,
-    corruptionChange: 0,
-    fearChange: 2,
-  };
-}
-
-/**
- * Ransom a prisoner: gold scales with class tier, -1 reputation.
- */
-export function invasionRewardHandleRansom(
-  prisoner: CapturedPrisoner,
-): PrisonerHandlingResult {
-  const gold = RANSOM_GOLD[prisoner.invaderClass];
-  return {
-    action: 'ransom',
-    success: true,
-    resourceChanges: { gold },
-    reputationChange: -1,
-    corruptionChange: 0,
-    fearChange: 0,
-  };
-}
-
-/**
- * Convert a prisoner: success rate by class, costs corruption.
- * Success = new tier 1 inhabitant; failure = escape.
- */
-export function invasionRewardHandleConvert(
-  prisoner: CapturedPrisoner,
-  rng: () => number = Math.random,
-): PrisonerHandlingResult {
-  const successRate = CONVERT_SUCCESS_RATES[prisoner.invaderClass];
-  const success = rng() < successRate;
-
-  return {
-    action: 'convert',
-    success,
-    resourceChanges: {},
-    reputationChange: 0,
-    corruptionChange: 5,
-    fearChange: 0,
-  };
-}
-
-/**
- * Sacrifice a prisoner at the Altar: grants random boon, +5 corruption, +2 reputation.
- */
-export function invasionRewardHandleSacrifice(
-  rng: () => number = Math.random,
-): PrisonerHandlingResult {
-  // Random boon: flux, essence, or research
-  const boonTypes: ResourceType[] = ['flux', 'essence', 'research'];
-  const boonIndex = Math.floor(rng() * boonTypes.length);
-  const boonResource = boonTypes[boonIndex];
-  const boonAmount = rollRange(10, 25, rng);
-
-  return {
-    action: 'sacrifice',
-    success: true,
-    resourceChanges: { [boonResource]: boonAmount },
-    reputationChange: 2,
-    corruptionChange: 5,
-    fearChange: 0,
-  };
-}
-
-/**
- * Experiment on a prisoner: grants research points, +3 corruption.
- */
-export function invasionRewardHandleExperiment(
-  prisoner: CapturedPrisoner,
-): PrisonerHandlingResult {
-  // Research scales with invader stats
-  const totalStats =
-    prisoner.stats.hp +
-    prisoner.stats.attack +
-    prisoner.stats.defense +
-    prisoner.stats.speed;
-  const researchGain = Math.round(totalStats / 4);
-
-  return {
-    action: 'experiment',
-    success: true,
-    resourceChanges: { research: researchGain },
-    reputationChange: 0,
-    corruptionChange: 3,
-    fearChange: 0,
-  };
-}
-
-/**
- * Handle a prisoner action. Dispatches to the appropriate handler.
- */
-export function invasionRewardHandlePrisoner(
-  action: PrisonerAction,
-  prisoner: CapturedPrisoner,
-  rng: () => number = Math.random,
-): PrisonerHandlingResult {
-  switch (action) {
-    case 'execute':
-      return invasionRewardHandleExecute();
-    case 'ransom':
-      return invasionRewardHandleRansom(prisoner);
-    case 'convert':
-      return invasionRewardHandleConvert(prisoner, rng);
-    case 'sacrifice':
-      return invasionRewardHandleSacrifice(rng);
-    case 'experiment':
-      return invasionRewardHandleExperiment(prisoner);
-  }
-}
-
-/**
- * Get the convert success rate for a given invader class.
- */
-export function invasionRewardGetConvertSuccessRate(
-  invaderClass: InvaderClassType,
-): number {
-  return CONVERT_SUCCESS_RATES[invaderClass];
-}
-
-/**
- * Get the ransom gold value for a given invader class.
- */
-export function invasionRewardGetRansomGoldValue(
-  invaderClass: InvaderClassType,
-): number {
-  return RANSOM_GOLD[invaderClass];
-}
 
 /**
  * Get the altar rebuild cost.

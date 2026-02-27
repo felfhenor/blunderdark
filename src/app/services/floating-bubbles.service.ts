@@ -10,8 +10,9 @@ import {
   researchCompleted$,
   spawningPoolSpawn$,
   summoningCompleted$,
-  tortureConversionComplete$,
-  tortureExtractionComplete$,
+  tortureBreakComplete$,
+  tortureExtractComplete$,
+  tortureInterrogateComplete$,
   trapWorkshopCompleted$,
 } from '@helpers';
 
@@ -51,18 +52,32 @@ export class FloatingBubblesService {
       floatingBubblesEmitQueue(e.roomId, `+1 ${e.inhabitantName}`);
     });
 
-    tortureExtractionComplete$.subscribe((e) => {
-      floatingBubblesEmitQueue(
-        e.roomId,
-        `+${e.researchGained} research`,
-      );
+    tortureInterrogateComplete$.subscribe((e) => {
+      floatingBubblesEmitQueue(e.roomId, 'Intel gathered');
     });
 
-    tortureConversionComplete$.subscribe((e) => {
-      const text = e.success
-        ? `+1 ${e.inhabitantName}`
-        : 'Conversion failed';
-      floatingBubblesEmitQueue(e.roomId, text);
+    tortureExtractComplete$.subscribe((e) => {
+      if (e.action === 'research') {
+        floatingBubblesEmitQueue(
+          e.roomId,
+          `+${e.researchGained} research`,
+        );
+      } else {
+        floatingBubblesEmitQueue(e.roomId, 'Rune extracted');
+      }
+    });
+
+    tortureBreakComplete$.subscribe((e) => {
+      if (e.action === 'convert') {
+        const text = e.success
+          ? `+1 ${e.inhabitantName}`
+          : 'Conversion failed';
+        floatingBubblesEmitQueue(e.roomId, text);
+      } else if (e.action === 'execute') {
+        floatingBubblesEmitQueue(e.roomId, 'Executed');
+      } else {
+        floatingBubblesEmitQueue(e.roomId, 'Sacrificed');
+      }
     });
 
     trapWorkshopCompleted$.subscribe((e) => {

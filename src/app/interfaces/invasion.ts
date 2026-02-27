@@ -13,7 +13,7 @@ import type { InvasionObjective } from '@interfaces/invasion-objective';
 import type { ReputationType } from '@interfaces/reputation';
 import type { ResourceType } from '@interfaces/resource';
 
-export type BattlePhase = 'results' | 'rewards' | 'prisoners';
+export type BattlePhase = 'results' | 'rewards';
 
 export type PrisonerId = Branded<string, 'PrisonerId'>;
 export type CombatantId = Branded<string, 'CombatantId'>;
@@ -143,21 +143,6 @@ export type CapturedPrisoner = {
   captureDay: number;
 };
 
-export type PrisonerAction =
-  | 'execute'
-  | 'ransom'
-  | 'convert'
-  | 'sacrifice'
-  | 'experiment';
-
-export type PrisonerHandlingResult = {
-  action: PrisonerAction;
-  success: boolean;
-  resourceChanges: Partial<Record<ResourceType, number>>;
-  reputationChange: number;
-  corruptionChange: number;
-  fearChange: number;
-};
 
 // --- Turn-based combat types ---
 

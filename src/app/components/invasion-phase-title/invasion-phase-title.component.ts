@@ -15,9 +15,6 @@ import type { BattlePhase } from '@interfaces';
           Defeat - Penalties
         }
       }
-      @case ('prisoners') {
-        Captured Prisoners
-      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -298,6 +298,8 @@ function makeGameState(overrides: {
       forgeInventory: overrides.forgeInventory ?? [],
       alchemyConversions: [],
       prisoners: [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

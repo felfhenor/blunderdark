@@ -321,6 +321,8 @@ function makeGameState(overrides: { floors?: Floor[] }): GameState {
       forgeInventory: [],
       alchemyConversions: [],
       prisoners: [],
+      traitRunes: [],
+      interrogationBuffs: [],
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,

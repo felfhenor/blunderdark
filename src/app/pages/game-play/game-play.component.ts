@@ -39,6 +39,7 @@ import { PanelSummoningCircleComponent } from '@components/panel-summoning-circl
 import { PanelTimeOfDayComponent } from '@components/panel-time-of-day/panel-time-of-day.component';
 import { PanelThroneRoomComponent } from '@components/panel-throne-room/panel-throne-room.component';
 import { PanelTortureChamberComponent } from '@components/panel-torture-chamber/panel-torture-chamber.component';
+import { PanelRuneworkingComponent } from '@components/panel-runeworking/panel-runeworking.component';
 import { PanelTrainingGroundsComponent } from '@components/panel-training-grounds/panel-training-grounds.component';
 import { PanelTrapWorkshopComponent } from '@components/panel-trap-workshop/panel-trap-workshop.component';
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
@@ -121,6 +122,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelTrapWorkshopComponent,
     PanelSummoningCircleComponent,
     PanelTortureChamberComponent,
+    PanelRuneworkingComponent,
   ],
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',
@@ -180,6 +182,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   private altarPanel = viewChild('altarPanel', { read: TemplateRef });
   private thronePanel = viewChild('thronePanel', { read: TemplateRef });
   private trapsPanel = viewChild('trapsPanel', { read: TemplateRef });
+  private runeworkingPanel = viewChild('runeworkingPanel', {
+    read: TemplateRef,
+  });
   private farplanePanel = viewChild('farplanePanel', { read: TemplateRef });
   private hasRoomOfRole(role: string): boolean {
     const roomTypeId = roomRoleFindById(role);
@@ -203,6 +208,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
   );
   public hasBreedingPits = computed(() => this.hasRoomOfRole('breedingPits'));
   public hasTrapWorkshop = computed(() => this.hasRoomOfRole('trapWorkshop'));
+  public hasRuneworking = computed(() => this.hasRoomOfRole('runeworking'));
   public hasFarplane = computed(() => this.hasRoomOfRole('farplane'));
   public isMerchantPresent = merchantIsPresent;
   public hasNoActiveResearch = computed(
@@ -217,6 +223,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     darkForge: 'forge',
     alchemyLab: 'alchemy',
     tortureChamber: 'torture',
+    runeworking: 'runeworking',
     breedingPits: 'breeding',
     trapWorkshop: 'traps',
     farplane: 'farplane',
@@ -488,6 +495,14 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         isModal: false,
         templateRef: this.torturePanel() ?? placeholder,
         condition: this.hasTortureChamber,
+      },
+      {
+        id: 'runeworking',
+        label: 'Runeworking',
+        isModal: false,
+        templateRef: this.runeworkingPanel() ?? placeholder,
+        condition: this.hasRuneworking,
+        hidden: true,
       },
       {
         id: 'breeding',

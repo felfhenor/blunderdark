@@ -9,6 +9,8 @@ import type { Branded } from '@interfaces/identifiable';
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { PrisonerId } from '@interfaces/invasion';
 import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
+import type { TortureStage, TortureStageAction } from '@interfaces/torture';
+import type { TraitRuneInstanceId } from '@interfaces/traitrune';
 
 export type PlacedRoomId = Branded<string, 'PlacedRoomId'>;
 export type TransportType = 'stair' | 'elevator' | 'portal';
@@ -55,7 +57,15 @@ export type TrapCraftingJob = {
 
 export type TortureJob = {
   prisonerId: PrisonerId;
-  action: 'extract' | 'convert';
+  currentStage: TortureStage;
+  stageAction?: TortureStageAction;
+  ticksRemaining: number;
+  targetTicks: number;
+};
+
+export type RuneworkingJob = {
+  runeId: TraitRuneInstanceId;
+  inhabitantInstanceId: InhabitantInstanceId;
   ticksRemaining: number;
   targetTicks: number;
 };
@@ -80,6 +90,7 @@ export type PlacedRoom = {
   mutationJob?: MutationJob;
   summonJobs?: SummonJob[];
   tortureJob?: TortureJob;
+  runeworkingJob?: RuneworkingJob;
   forgeJobs?: ForgeCraftingJob[];
   trapJobs?: TrapCraftingJob[];
   featureIds?: FeatureId[];
