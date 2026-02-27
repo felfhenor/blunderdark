@@ -61,6 +61,10 @@ export class SideTabRailComponent {
 
   public onDocumentClick(event: MouseEvent): void {
     if (this.activePanel() && !this.el.nativeElement.contains(event.target)) {
+      // Don't close the panel when clicking inside a SweetAlert dialog
+      const target = event.target as HTMLElement;
+      if (target.closest?.('.swal2-container')) return;
+
       this.activePanel.set(undefined);
     }
   }
