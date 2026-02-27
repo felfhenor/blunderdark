@@ -10,6 +10,7 @@ import type {
 } from '@interfaces/invader';
 import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
+import type { ReputationType } from '@interfaces/reputation';
 import type { ResourceType } from '@interfaces/resource';
 
 export type BattlePhase = 'results' | 'rewards' | 'prisoners';
@@ -121,6 +122,7 @@ export type DetailedInvasionResult = {
 
 export type DefenseRewards = {
   reputationGain: number;
+  reputationByType: Partial<Record<ReputationType, number>>;
 
   resourceGains: Partial<Record<ResourceType, number>>;
   capturedPrisoners: CapturedPrisoner[];
@@ -128,6 +130,7 @@ export type DefenseRewards = {
 
 export type DefensePenalties = {
   reputationLoss: number;
+  reputationByType: Partial<Record<ReputationType, number>>;
   resourceLosses: Partial<Record<ResourceType, number>>;
   killedInhabitantIds: InhabitantInstanceId[];
 };

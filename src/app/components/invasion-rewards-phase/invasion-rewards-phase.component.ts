@@ -1,4 +1,4 @@
-import { DecimalPipe, KeyValuePipe, PercentPipe } from '@angular/common';
+import { DecimalPipe, KeyValuePipe, PercentPipe, TitleCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +10,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-rewards-phase',
-  imports: [CurrencyNameComponent, DecimalPipe, KeyValuePipe, PercentPipe],
+  imports: [CurrencyNameComponent, DecimalPipe, KeyValuePipe, PercentPipe, TitleCasePipe],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -20,13 +20,18 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             <div class="text-xl font-bold text-success">Spoils of War</div>
           </div>
           <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
-            @if (res.rewards.reputationGain > 0) {
-              <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
-                <div class="text-xs opacity-50">Reputation</div>
-                <div class="text-lg font-bold text-info">
-                  +{{ res.rewards.reputationGain }}
+            @for (
+              entry of res.rewards.reputationByType | keyvalue;
+              track entry.key
+            ) {
+              @if (entry.value && entry.value > 0) {
+                <div class="reward-box bg-base-200 rounded-lg p-3 text-center">
+                  <div class="text-xs opacity-50">{{ entry.key | titlecase }} Reputation</div>
+                  <div class="text-lg font-bold text-info">
+                    +{{ entry.value }}
+                  </div>
                 </div>
-              </div>
+              }
             }
 
             @for (
@@ -60,13 +65,18 @@ import type { InvasionOrchestratorResult } from '@interfaces';
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
-            @if (res.penalties.reputationLoss > 0) {
-              <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
-                <div class="text-xs opacity-50">Reputation Lost</div>
-                <div class="text-lg font-bold text-error">
-                  -{{ res.penalties.reputationLoss }}
+            @for (
+              entry of res.penalties.reputationByType | keyvalue;
+              track entry.key
+            ) {
+              @if (entry.value && entry.value > 0) {
+                <div class="penalty-box bg-base-200 rounded-lg p-3 text-center">
+                  <div class="text-xs opacity-50">{{ entry.key | titlecase }} Reputation Lost</div>
+                  <div class="text-lg font-bold text-error">
+                    -{{ entry.value }}
+                  </div>
                 </div>
-              </div>
+              }
             }
             @for (
               entry of res.penalties.resourceLosses | keyvalue;

@@ -1,6 +1,7 @@
 import { contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import type { InvaderContent } from '@interfaces/content-invader';
+import type { ReputationActionContent } from '@interfaces/content-reputationaction';
 import type {
   InvaderClassType,
   InvaderInstance,
@@ -14,6 +15,7 @@ import type {
   PrisonerHandlingResult,
   PrisonerId,
 } from '@interfaces/invasion';
+import type { ReputationType } from '@interfaces/reputation';
 import type { ResourceType } from '@interfaces/resource';
 
 // --- Constants ---
@@ -155,8 +157,14 @@ export function invasionRewardCalculateDefenseRewards(
     resourceGains.gold = Math.round(resourceGains.gold * result.rewardMultiplier);
   }
 
+  // Look up the "Defeat Invader" reputation action for typed breakdown
+  const defeatAction = contentGetEntry<ReputationActionContent>('Defeat Invader');
+  const reputationByType: Partial<Record<ReputationType, number>> =
+    defeatAction?.reputationRewards ? { ...defeatAction.reputationRewards } : {};
+
   return {
     reputationGain,
+    reputationByType,
 
     resourceGains,
     capturedPrisoners: [],
@@ -207,6 +215,7 @@ export function invasionRewardCalculateDefensePenalties(
 
   return {
     reputationLoss,
+    reputationByType: reputationLoss > 0 ? { terror: reputationLoss } : {},
     resourceLosses,
     killedInhabitantIds: [],
   };
