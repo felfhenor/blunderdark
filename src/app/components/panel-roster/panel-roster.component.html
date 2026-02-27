@@ -121,11 +121,7 @@
                     )
                   "
                 >
-                  {{
-                    r.room.suffix
-                      ? r.roomDef.name + ' ' + r.room.suffix
-                      : r.roomDef.name
-                  }}
+                  {{ r.displayName }}
                   <span class="opacity-50">({{ r.floorName }})</span>
                 </button>
               }

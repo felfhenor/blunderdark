@@ -14,10 +14,10 @@ import {
   inhabitantRemove,
   assignmentCanAssignToRoom,
   contentGetEntry,
-  productionGetRoomDefinition,
   notifyError,
   notifySuccess,
   inhabitantUnassignFromRoom,
+  roomGetDisplayName,
 } from '@helpers';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -76,9 +76,7 @@ export class PanelRosterComponent {
               (r) => r.id === inst.assignedRoomId,
             );
             if (room) {
-              const roomDef = productionGetRoomDefinition(room.roomTypeId);
-              const baseName = roomDef?.name ?? 'Unknown Room';
-              roomName = room.suffix ? `${baseName} ${room.suffix}` : baseName;
+              roomName = roomGetDisplayName(room);
               floorName = floor.name;
               break;
             }
@@ -129,6 +127,7 @@ export class PanelRosterComponent {
     const rooms: Array<{
       room: PlacedRoom;
       roomDef: RoomContent;
+      displayName: string;
       floorName: string;
       canAssign: boolean;
     }> = [];
@@ -144,6 +143,7 @@ export class PanelRosterComponent {
         rooms.push({
           room,
           roomDef,
+          displayName: roomGetDisplayName(room),
           floorName: floor.name,
           canAssign: validation.allowed,
         });
