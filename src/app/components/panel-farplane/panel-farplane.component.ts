@@ -1,3 +1,4 @@
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
@@ -21,7 +22,7 @@ import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-farplane',
-  imports: [CurrencyCostComponent, StatRowComponent],
+  imports: [CurrencyCostComponent, DecimalPipe, NgClass, StatRowComponent],
   templateUrl: './panel-farplane.component.html',
   styleUrl: './panel-farplane.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +61,13 @@ export class PanelFarplaneComponent {
       return { soul, def, cost, costEntries };
     });
   });
+
+  public tierClass(tier: number): string {
+    if (tier >= 4) return 'badge-error';
+    if (tier === 3) return 'badge-warning';
+    if (tier === 2) return 'badge-info';
+    return 'badge-outline';
+  }
 
   public canAfford(cost: ResourceCost): boolean {
     return resourceCanAfford(cost);

@@ -17,13 +17,18 @@
         <div class="flex flex-col gap-2 mt-2">
           @for (entry of soulEntries(); track entry.soul.soulId) {
             <div class="p-2 bg-base-200 rounded flex flex-col gap-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold">{{ entry.soul.instanceName }}</span>
+              <div class="flex items-center gap-2">
                 @if (entry.def) {
-                  <span class="badge badge-xs badge-ghost">
-                    T{{ entry.def.tier }} {{ entry.def.type }}
+                  <span class="badge badge-xs" [ngClass]="tierClass(entry.def.tier)">
+                    T{{ entry.def.tier | number: '1.0-0' }}
                   </span>
                 }
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-semibold truncate">{{ entry.soul.instanceName }}</span>
+                  @if (entry.def) {
+                    <span class="text-xs opacity-50 truncate">{{ entry.def.name }}</span>
+                  }
+                </div>
               </div>
 
               @if (entry.def) {
