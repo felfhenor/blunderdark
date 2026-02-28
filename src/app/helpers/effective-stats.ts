@@ -9,7 +9,7 @@ import type { MutationTraitContent } from '@interfaces/content-mutationtrait';
 
 /**
  * Compute effective stats for an inhabitant:
- * base stats + training bonuses + instanceStatBonuses + mutation trait bonuses.
+ * base stats + instanceStatBonuses + mutation trait bonuses + instance trait bonuses.
  * Clamps: hp >= 1, attack >= 0, defense >= 0, speed >= 1, workerEfficiency >= 0.1
  */
 export function effectiveStatsCalculate(
@@ -23,12 +23,6 @@ export function effectiveStatsCalculate(
   let defense = base.defense;
   let speed = base.speed;
   let workerEfficiency = base.workerEfficiency;
-
-  // Training bonuses
-  if (instance.trainingBonuses) {
-    attack += instance.trainingBonuses.attack;
-    defense += instance.trainingBonuses.defense;
-  }
 
   // Instance stat bonuses (from hybrids, summoning)
   if (instance.instanceStatBonuses) {
@@ -66,7 +60,7 @@ export function effectiveStatsCalculate(
     }
   }
 
-  // Instance trait bonuses (from breeding hybrids)
+  // Instance trait bonuses (from breeding hybrids, training, etc.)
   if (instance.instanceTraitIds) {
     for (const traitId of instance.instanceTraitIds) {
       const trait = contentGetEntry<InhabitantTraitContent>(traitId);
@@ -77,6 +71,15 @@ export function effectiveStatsCalculate(
           break;
         case 'defense_bonus':
           defense *= 1 + trait.effectValue;
+          break;
+        case 'flat_attack':
+          attack += trait.effectValue;
+          break;
+        case 'flat_defense':
+          defense += trait.effectValue;
+          break;
+        case 'flat_worker_efficiency':
+          workerEfficiency *= 1 + trait.effectValue;
           break;
       }
     }

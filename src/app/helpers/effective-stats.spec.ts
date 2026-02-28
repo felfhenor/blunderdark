@@ -2,6 +2,8 @@ import type {
   InhabitantId,
   InhabitantInstance,
   InhabitantInstanceId,
+  InhabitantTraitContent,
+  InhabitantTraitId,
   MutationTraitContent,
   MutationTraitId,
 } from '@interfaces';
@@ -87,12 +89,73 @@ describe('effectiveStatsCalculate', () => {
     });
   });
 
-  it('should add training bonuses', () => {
+  it('should add flat_attack training trait bonus', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'tt-atk' as InhabitantTraitId,
+      name: 'Basic Attack Training',
+      __type: 'inhabitanttrait',
+      description: '',
+      effectType: 'flat_attack',
+      effectValue: 5,
+      targetResourceType: undefined,
+      targetRoomId: undefined,
+      fusionPassChance: 0,
+      isFromTraining: true,
+    };
+    mockContent.set('tt-atk', trait);
+
     const def = makeDef();
-    const inst = makeInstance({ trainingBonuses: { attack: 3, defense: 2 } });
+    const inst = makeInstance({ instanceTraitIds: ['tt-atk'] });
     const result = effectiveStatsCalculate(def, inst);
-    expect(result.attack).toBe(8);
-    expect(result.defense).toBe(5);
+    expect(result.attack).toBe(10); // 5 + 5
+
+    mockContent.delete('tt-atk');
+  });
+
+  it('should add flat_defense training trait bonus', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'tt-def' as InhabitantTraitId,
+      name: 'Basic Defense Training',
+      __type: 'inhabitanttrait',
+      description: '',
+      effectType: 'flat_defense',
+      effectValue: 5,
+      targetResourceType: undefined,
+      targetRoomId: undefined,
+      fusionPassChance: 0,
+      isFromTraining: true,
+    };
+    mockContent.set('tt-def', trait);
+
+    const def = makeDef();
+    const inst = makeInstance({ instanceTraitIds: ['tt-def'] });
+    const result = effectiveStatsCalculate(def, inst);
+    expect(result.defense).toBe(8); // 3 + 5
+
+    mockContent.delete('tt-def');
+  });
+
+  it('should apply flat_worker_efficiency training trait as multiplicative', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'tt-eff' as InhabitantTraitId,
+      name: 'Work Conditioning',
+      __type: 'inhabitanttrait',
+      description: '',
+      effectType: 'flat_worker_efficiency',
+      effectValue: 0.5,
+      targetResourceType: undefined,
+      targetRoomId: undefined,
+      fusionPassChance: 0,
+      isFromTraining: true,
+    };
+    mockContent.set('tt-eff', trait);
+
+    const def = makeDef();
+    const inst = makeInstance({ instanceTraitIds: ['tt-eff'] });
+    const result = effectiveStatsCalculate(def, inst);
+    expect(result.workerEfficiency).toBe(1.5); // 1.0 * (1 + 0.5)
+
+    mockContent.delete('tt-eff');
   });
 
   it('should add instanceStatBonuses', () => {
@@ -119,22 +182,36 @@ describe('effectiveStatsCalculate', () => {
   });
 
   it('should combine all bonus types', () => {
-    const trait = makeTrait({ id: 'mt-2' as MutationTraitId, modifiers: [{ stat: 'hp', bonus: 10 }] });
-    mockContent.set('mt-2', trait);
+    const mutTrait = makeTrait({ id: 'mt-2' as MutationTraitId, modifiers: [{ stat: 'hp', bonus: 10 }] });
+    mockContent.set('mt-2', mutTrait);
+
+    const atkTrait: InhabitantTraitContent = {
+      id: 'tt-atk2' as InhabitantTraitId,
+      name: 'Atk Training',
+      __type: 'inhabitanttrait',
+      description: '',
+      effectType: 'flat_attack',
+      effectValue: 2,
+      targetResourceType: undefined,
+      targetRoomId: undefined,
+      fusionPassChance: 0,
+      isFromTraining: true,
+    };
+    mockContent.set('tt-atk2', atkTrait);
 
     const def = makeDef();
     const inst = makeInstance({
-      trainingBonuses: { attack: 2, defense: 1 },
       instanceStatBonuses: { hp: 3, workerEfficiency: 0.2 },
       mutationTraitIds: ['mt-2'],
+      instanceTraitIds: ['tt-atk2'],
     });
     const result = effectiveStatsCalculate(def, inst);
     expect(result.hp).toBe(23); // 10 + 3 + 10
     expect(result.attack).toBe(7); // 5 + 2
-    expect(result.defense).toBe(4); // 3 + 1
     expect(result.workerEfficiency).toBe(1.2); // 1.0 + 0.2
 
     mockContent.delete('mt-2');
+    mockContent.delete('tt-atk2');
   });
 
   it('should clamp hp to minimum 1', () => {

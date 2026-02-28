@@ -40,20 +40,13 @@ export type StateModifier = {
   defenseMultiplier?: number;
 };
 
-export type TrainingBonuses = {
-  defense: number;
-  attack: number;
-};
-
 export type InhabitantInstance = {
   instanceId: InhabitantInstanceId;
   definitionId: InhabitantId;
   name: string;
   state: InhabitantState;
   assignedRoomId: PlacedRoomId | undefined;
-  trained?: boolean;
   trainingProgress?: number;
-  trainingBonuses?: TrainingBonuses;
   hungerTicksWithoutFood?: number;
   instanceStatBonuses?: Partial<InhabitantStats>;
   mutated?: boolean;

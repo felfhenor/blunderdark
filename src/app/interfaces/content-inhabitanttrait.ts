@@ -11,4 +11,5 @@ export type InhabitantTraitContent = IsContentItem &
     targetResourceType: string | undefined;
     targetRoomId: string | undefined;
     fusionPassChance: number;
+    isFromTraining: boolean;
   };

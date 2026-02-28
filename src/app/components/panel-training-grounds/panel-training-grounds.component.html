@@ -16,29 +16,14 @@
           </span>
         </div>
 
-        @if (expectedBonuses(); as bonuses) {
-          <div class="flex items-center gap-2">
-            <span class="text-xs opacity-50">Bonuses:</span>
-            <span class="text-xs">
-              @if (bonuses.defense > 0) {
-                <span class="badge badge-xs badge-info">
-                  <app-stat-name
-                    type="defense"
-                    [value]="bonuses.defense"
-                    prefix="+"
-                  />
-                </span>
-              }
-              @if (bonuses.attack > 0) {
-                <span class="badge badge-xs badge-warning">
-                  <app-stat-name
-                    type="attack"
-                    [value]="bonuses.attack"
-                    prefix="+"
-                  />
-                </span>
-              }
-            </span>
+        @if (expectedTraits().length > 0) {
+          <div class="flex flex-col gap-2">
+            <span class="text-xs opacity-50">Grants:</span>
+            @for (trait of expectedTraits(); track trait.id) {
+              <span class="badge badge-xs badge-info">
+                {{ trait.name }}
+              </span>
+            }
           </div>
         }
       </div>
@@ -66,24 +51,9 @@
               @if (!trainee.trained) {
                 <app-job-progress [percent]="trainee.percent" colorClass="progress-info" />
               } @else {
-                <div class="flex gap-2">
-                  @if (trainee.bonuses.defense > 0) {
-                    <span class="text-xs">
-                      <app-stat-name
-                        type="defense"
-                        [value]="trainee.bonuses.defense"
-                        prefix="+"
-                      />
-                    </span>
-                  }
-                  @if (trainee.bonuses.attack > 0) {
-                    <span class="text-xs">
-                      <app-stat-name
-                        type="attack"
-                        [value]="trainee.bonuses.attack"
-                        prefix="+"
-                      />
-                    </span>
+                <div class="flex flex-wrap gap-2">
+                  @for (trait of trainee.acquiredTraits; track trait.id) {
+                    <span class="badge badge-xs badge-info">{{ trait.name }}</span>
                   }
                 </div>
               }

@@ -31,7 +31,7 @@
       description: Connected barracks share training resources and patrol routes.
 - id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   name: Training Grounds
-  description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent defense bonuses. Proximity to barracks and forges enhances the training regimen.
+  description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent stat bonuses. Different upgrade paths grant different training specializations, and moving an inhabitant to a differently-upgraded room will retrain them.
   shapeId: T-Shape
   role: trainingGrounds
   cost:
@@ -45,8 +45,11 @@
   fearLevel: 1
   roomUpgradeIds:
     - Elite Arena
-    - Grand Arena
     - Drill Hall
+    - Conditioning Yard
+  trainingTraitNames:
+    - Basic Attack Training
+    - Basic Defense Training
   forgingAdjacencyEffects:
     forgingStatBonus: 1
   adjacencyBonuses:

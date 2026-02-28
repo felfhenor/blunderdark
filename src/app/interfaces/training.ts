@@ -1,8 +1,8 @@
-import type { Floor, PlacedRoom, TrainingBonuses } from '@interfaces';
+import type { Floor, PlacedRoom } from '@interfaces';
 
 export type TrainingRoomInfo = {
   placedRoom: PlacedRoom;
   floor: Floor;
   targetTicks: number;
-  bonuses: TrainingBonuses;
+  trainingTraitIds: string[];
 };

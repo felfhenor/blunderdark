@@ -210,9 +210,6 @@ export function summoningCreateInhabitant(
     name: generateInhabitantName(def.type),
     state: 'normal',
     assignedRoomId: undefined,
-    trained: false,
-    trainingProgress: 0,
-    trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
     instanceStatBonuses:
       Object.keys(instanceStatBonuses).length > 0 ? instanceStatBonuses : undefined,

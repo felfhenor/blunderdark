@@ -14,8 +14,8 @@ import type {
   PlacedRoomId,
   RoomId,
   TileOffset,
-  TrainingBonuses,
 } from '@interfaces';
+import type { InhabitantTraitContent } from '@interfaces/content-inhabitanttrait';
 import type { RoomContent } from '@interfaces/content-room';
 import { Subject } from 'rxjs';
 import type { TrainingRoomInfo } from '@interfaces/training';
@@ -83,21 +83,13 @@ function buildRoomTilesMap(floor: Floor): Map<string, TileOffset[]> {
 
 /**
  * Calculate the effective training ticks for a Training Grounds room,
- * accounting for upgrade effects and adjacency bonuses.
+ * accounting for adjacency bonuses.
  */
 export function trainingGetTicksForRoom(
-  placedRoom: PlacedRoom,
+  _placedRoom: PlacedRoom,
   adjacentRoomTypeIds: Set<string>,
 ): number {
   let ticks = TRAINING_BASE_TICKS;
-
-  // Apply upgrade time multiplier
-  const effects = roomUpgradeGetAppliedEffects(placedRoom);
-  for (const effect of effects) {
-    if (effect.type === 'trainingTimeMultiplier') {
-      ticks = Math.round(ticks * effect.value);
-    }
-  }
 
   // Check adjacent rooms for trainingAdjacencyEffects.timeReduction
   for (const adjTypeId of adjacentRoomTypeIds) {
@@ -111,35 +103,50 @@ export function trainingGetTicksForRoom(
 }
 
 /**
- * Calculate the training bonuses an inhabitant will receive upon completing
- * training in a specific Training Grounds room.
+ * Get the training trait IDs that a room will grant upon training completion.
+ * If the room has an upgrade with trainingTrait effects, those replace the base traits.
+ * Otherwise, uses the room definition's trainingTraitNames.
  */
-export function trainingGetBonusesForRoom(
+export function trainingGetTraitIdsForRoom(
   placedRoom: PlacedRoom,
-  adjacentRoomTypeIds: Set<string>,
-): TrainingBonuses {
-  const bonuses: TrainingBonuses = { defense: 1, attack: 0 };
-
+): string[] {
   const effects = roomUpgradeGetAppliedEffects(placedRoom);
-  for (const effect of effects) {
-    if (effect.type === 'trainingAttackBonus') {
-      bonuses.attack += effect.value;
-    }
-    if (effect.type === 'trainingDefenseBonus') {
-      bonuses.defense += effect.value;
-    }
+  const traitEffects = effects.filter((e) => e.type === 'trainingTrait');
+
+  if (traitEffects.length > 0) {
+    return traitEffects
+      .map((e) => contentGetEntry<InhabitantTraitContent>(e.resource!)?.id as string | undefined)
+      .filter((id): id is string => id !== undefined);
   }
 
-  // Check adjacent rooms for trainingAdjacencyEffects.statBonus
-  for (const adjTypeId of adjacentRoomTypeIds) {
-    const adjDef = contentGetEntry<RoomContent>(adjTypeId);
-    if (adjDef?.trainingAdjacencyEffects?.statBonus) {
-      bonuses.defense += adjDef.trainingAdjacencyEffects.statBonus;
-      bonuses.attack += adjDef.trainingAdjacencyEffects.statBonus;
-    }
-  }
+  const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
+  if (!roomDef?.trainingTraitNames?.length) return [];
 
-  return bonuses;
+  return roomDef.trainingTraitNames
+    .map((name) => contentGetEntry<InhabitantTraitContent>(name)?.id as string | undefined)
+    .filter((id): id is string => id !== undefined);
+}
+
+/**
+ * Get the current training trait IDs on an inhabitant.
+ */
+export function trainingGetCurrentTraitIds(
+  instanceTraitIds: string[] | undefined,
+): string[] {
+  if (!instanceTraitIds?.length) return [];
+  return instanceTraitIds.filter((id) => {
+    const trait = contentGetEntry<InhabitantTraitContent>(id);
+    return trait?.isFromTraining;
+  });
+}
+
+/**
+ * Check if two trait ID arrays contain the same set of IDs.
+ */
+function trainingTraitSetsEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const setB = new Set(b);
+  return a.every((id) => setB.has(id));
 }
 
 /**
@@ -169,18 +176,37 @@ export function trainingProcess(state: GameState, numTicks = 1): void {
 
       const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor, tileMap);
       const targetTicks = trainingGetTicksForRoom(room, adjacentTypes);
-      const bonuses = trainingGetBonusesForRoom(room, adjacentTypes);
+      const expectedTraitIds = trainingGetTraitIdsForRoom(room);
+
+      if (expectedTraitIds.length === 0) continue;
 
       for (const inhabitant of state.world.inhabitants) {
         if (inhabitant.assignedRoomId !== room.id) continue;
-        if (inhabitant.trained) continue;
+
+        const currentTrainingIds = trainingGetCurrentTraitIds(inhabitant.instanceTraitIds);
+
+        // Already has the correct training traits — skip
+        if (currentTrainingIds.length > 0 && trainingTraitSetsEqual(currentTrainingIds, expectedTraitIds)) {
+          continue;
+        }
+
+        // Has different training traits — remove them and reset progress (retraining)
+        if (currentTrainingIds.length > 0) {
+          const removeSet = new Set(currentTrainingIds);
+          inhabitant.instanceTraitIds = (inhabitant.instanceTraitIds ?? [])
+            .filter((id) => !removeSet.has(id));
+          inhabitant.trainingProgress = 0;
+        }
 
         const progress = (inhabitant.trainingProgress ?? 0) + numTicks;
         inhabitant.trainingProgress = progress;
 
         if (progress >= targetTicks) {
-          inhabitant.trained = true;
-          inhabitant.trainingBonuses = { ...bonuses };
+          inhabitant.instanceTraitIds = [
+            ...(inhabitant.instanceTraitIds ?? []),
+            ...expectedTraitIds,
+          ];
+          inhabitant.trainingProgress = 0;
           trainingCompletedSubject.next({
             instanceId: inhabitant.instanceId,
             name: inhabitant.name,
@@ -208,7 +234,7 @@ export function trainingGetRoomInfo(
       placedRoom: room,
       floor,
       targetTicks: trainingGetTicksForRoom(room, adjacentTypes),
-      bonuses: trainingGetBonusesForRoom(room, adjacentTypes),
+      trainingTraitIds: trainingGetTraitIdsForRoom(room),
     };
   }
   return undefined;
@@ -237,6 +263,6 @@ export const trainingSelectedRoom = computed<TrainingRoomInfo | undefined>(() =>
     placedRoom: room,
     floor,
     targetTicks: trainingGetTicksForRoom(room, adjacentTypes),
-    bonuses: trainingGetBonusesForRoom(room, adjacentTypes),
+    trainingTraitIds: trainingGetTraitIdsForRoom(room),
   };
 });

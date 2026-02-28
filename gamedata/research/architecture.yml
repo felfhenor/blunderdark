@@ -9,7 +9,7 @@
 #   │   ├── Deep Extraction (T3) → Deep Vein Mine + Bountiful Grove + Cold Storage + Rich Vein
 #   │   └── Aquatic & Soul Engineering (T3) → Expanded Lake + Necrotic Well + Purified Well + Essence Reservoir
 #   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault + Gold Treasury
-#   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Grand Arena
+#   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Conditioning Yard
 #   │   └── Combat Specialization (T3) → Elite Arena + War Room
 #   │       └── Rune Extraction (T3) → feature_flag: rune_extraction
 #   │           └── Runeworking Techniques (T4) → Runeworking Chamber
@@ -97,7 +97,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Comfortable Quarters
     - type: roomupgrade
-      targetRoomupgradeId: Grand Arena
+      targetRoomupgradeId: Conditioning Yard
   tier: 2
   requiredTicks: 150
 

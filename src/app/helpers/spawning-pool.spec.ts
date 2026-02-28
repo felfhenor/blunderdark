@@ -213,9 +213,6 @@ function makeInhabitant(
     name: 'Goblin the Bold',
     state: 'normal',
     assignedRoomId: undefined,
-    trained: false,
-    trainingProgress: 0,
-    trainingBonuses: { defense: 0, attack: 0 },
     hungerTicksWithoutFood: 0,
     ...overrides,
   };
@@ -549,11 +546,10 @@ describe('spawningPoolCreateInhabitant', () => {
     expect(inhabitant.assignedRoomId).toBeUndefined();
   });
 
-  it('should start untrained with zero training progress', () => {
+  it('should start with no training traits or progress', () => {
     const inhabitant = spawningPoolCreateInhabitant(goblinDef);
-    expect(inhabitant.trained).toBe(false);
-    expect(inhabitant.trainingProgress).toBe(0);
-    expect(inhabitant.trainingBonuses).toEqual({ defense: 0, attack: 0 });
+    expect(inhabitant.instanceTraitIds).toBeUndefined();
+    expect(inhabitant.trainingProgress).toBeUndefined();
   });
 
   it('should start with zero hunger ticks', () => {

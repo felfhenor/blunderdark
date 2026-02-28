@@ -1,33 +1,32 @@
 - id: 3d0d6ce5-3083-4ef5-824a-7199e7254b0d
   name: Elite Arena
-  description: Advanced combat techniques grant +1 attack in addition to +1 defense, but training takes 20% longer.
+  description: Advanced combat techniques grant elite attack training (+15 attack) instead of basic training.
   cost:
     gold: 100
     crystals: 50
     essence: 20
   effects:
-    - type: trainingAttackBonus
+    - type: trainingTrait
       value: 1
-    - type: trainingTimeMultiplier
-      value: 1.2
-- id: fb9d4aa3-0c93-4178-965d-70dddd13877d
-  name: Grand Arena
-  description: Expanded training facilities increase capacity from 4 to 6 and reduce training time by 30%.
-  cost:
-    gold: 80
-    crystals: 30
-  effects:
-    - type: maxInhabitantBonus
-      value: 2
-    - type: trainingTimeMultiplier
-      value: 0.7
+      resource: Elite Attack Training
 - id: 24679551-a0b0-4bc0-82af-26bb4cd4b4ca
   name: Drill Hall
-  description: Intensive defensive drills grant an extra +1 defense bonus to trained inhabitants.
+  description: Intensive defensive drills grant advanced defense training (+15 defense) instead of basic training.
   cost:
     gold: 120
     crystals: 60
     essence: 30
   effects:
-    - type: trainingDefenseBonus
+    - type: trainingTrait
       value: 1
+      resource: Advanced Defense Training
+- id: fb9d4aa3-0c93-4178-965d-70dddd13877d
+  name: Conditioning Yard
+  description: Rigorous physical conditioning grants work conditioning (+50% worker efficiency) instead of basic combat training.
+  cost:
+    gold: 80
+    crystals: 30
+  effects:
+    - type: trainingTrait
+      value: 1
+      resource: Work Conditioning

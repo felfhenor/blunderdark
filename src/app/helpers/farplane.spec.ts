@@ -399,8 +399,7 @@ describe('farplaneCaptureDefenderSouls', () => {
     const inh = makeInhabitant({
       instanceId: 'inh-dead' as InhabitantInstanceId,
       name: 'Grubnik the Brave',
-      trained: true,
-      trainingBonuses: { attack: 2, defense: 1 },
+      instanceTraitIds: ['trait-training-atk', 'trait-training-def'],
     });
     const room = makeRoom();
     const floor = makeFloor([room], [inh]);
@@ -418,11 +417,10 @@ describe('farplaneCaptureDefenderSouls', () => {
     expect(state.world.farplaneSouls[0].instanceName).toBe(
       'Grubnik the Brave',
     );
-    expect(state.world.farplaneSouls[0].trained).toBe(true);
-    expect(state.world.farplaneSouls[0].trainingBonuses).toEqual({
-      attack: 2,
-      defense: 1,
-    });
+    expect(state.world.farplaneSouls[0].instanceTraitIds).toEqual([
+      'trait-training-atk',
+      'trait-training-def',
+    ]);
   });
 
   it('should preserve all instance fields in soul snapshot', () => {
@@ -430,11 +428,10 @@ describe('farplaneCaptureDefenderSouls', () => {
       instanceId: 'inh-mut' as InhabitantInstanceId,
       definitionId: SKELETON_ID as InhabitantId,
       name: 'Bonecrusher',
-      trained: true,
-      trainingBonuses: { attack: 3, defense: 2 },
       instanceStatBonuses: { hp: 5, attack: 2 },
       mutated: true,
       mutationTraitIds: ['trait-1', 'trait-2'],
+      instanceTraitIds: ['training-trait-1'],
       isHybrid: true,
       hybridParentIds: [
         'parent-1' as InhabitantInstanceId,
@@ -457,11 +454,10 @@ describe('farplaneCaptureDefenderSouls', () => {
     const soul = state.world.farplaneSouls[0];
     expect(soul.definitionId).toBe(SKELETON_ID);
     expect(soul.instanceName).toBe('Bonecrusher');
-    expect(soul.trained).toBe(true);
-    expect(soul.trainingBonuses).toEqual({ attack: 3, defense: 2 });
     expect(soul.instanceStatBonuses).toEqual({ hp: 5, attack: 2 });
     expect(soul.mutated).toBe(true);
     expect(soul.mutationTraitIds).toEqual(['trait-1', 'trait-2']);
+    expect(soul.instanceTraitIds).toEqual(['training-trait-1']);
     expect(soul.isHybrid).toBe(true);
     expect(soul.hybridParentIds).toEqual([
       'parent-1',
@@ -597,8 +593,7 @@ describe('farplaneRecruitSoul', () => {
     const soul = makeSoul({
       definitionId: GOBLIN_ID as InhabitantId,
       instanceName: 'Restored Grubnik',
-      trained: true,
-      trainingBonuses: { attack: 2, defense: 1 },
+      instanceTraitIds: ['training-trait-1'],
       mutated: true,
       mutationTraitIds: ['trait-a'],
       isHybrid: false,
@@ -618,8 +613,7 @@ describe('farplaneRecruitSoul', () => {
     expect(created.definitionId).toBe(GOBLIN_ID);
     expect(created.state).toBe('normal');
     expect(created.assignedRoomId).toBeUndefined();
-    expect(created.trained).toBe(true);
-    expect(created.trainingBonuses).toEqual({ attack: 2, defense: 1 });
+    expect(created.instanceTraitIds).toEqual(['training-trait-1']);
     expect(created.mutated).toBe(true);
     expect(created.mutationTraitIds).toEqual(['trait-a']);
     expect(created.isSummoned).toBe(true);

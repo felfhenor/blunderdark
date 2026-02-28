@@ -72,4 +72,5 @@ export type RoomContent = IsContentItem &
       | undefined;
     reputationAction: string | undefined;
     queueSize: number | undefined;
+    trainingTraitNames: string[];
   };

@@ -363,6 +363,7 @@ function ensureRoom(room: Partial<RoomContent>): Required<RoomContent> {
     tortureAdjacencyEffects: room.tortureAdjacencyEffects ?? undefined,
     reputationAction: room.reputationAction ?? undefined,
     queueSize: room.queueSize ?? undefined,
+    trainingTraitNames: room.trainingTraitNames ?? [],
   };
 }
 
@@ -427,6 +428,7 @@ function ensureInhabitantTrait(
     targetResourceType: trait.targetResourceType ?? undefined,
     targetRoomId: trait.targetRoomId ?? undefined,
     fusionPassChance: trait.fusionPassChance ?? 75,
+    isFromTraining: trait.isFromTraining ?? false,
   };
 }
 
