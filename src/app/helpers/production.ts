@@ -20,6 +20,7 @@ import {
   featureCalculateCorruptionGenerationPerTick,
   featureCalculateFlatProduction,
   featureCalculateProductionBonus,
+  featureCalculateSpeedMultiplier,
   featureGetCorruptionSealedRoomIds,
   featureGetResourceConverterEfficiency,
 } from '@helpers/features';
@@ -483,6 +484,16 @@ export function productionCalculateTotal(
           (roomProduction[resourceType] ?? 0) + amount;
       }
 
+      // Apply speed multiplier (Time Dilation Field) — only when maintenance is active
+      if (room.maintenanceActive !== false) {
+        const speedMultiplier = featureCalculateSpeedMultiplier(room);
+        if (speedMultiplier !== 1.0) {
+          for (const key of Object.keys(roomProduction)) {
+            roomProduction[key] = (roomProduction[key] ?? 0) * speedMultiplier;
+          }
+        }
+      }
+
       for (const [resourceType, amount] of Object.entries(roomProduction)) {
         if (!amount) continue;
         totalProduction[resourceType] =
@@ -644,6 +655,16 @@ export function productionCalculateSingleRoom(
   for (const [resourceType, amount] of Object.entries(secondaryProduction)) {
     if (!amount) continue;
     production[resourceType] = (production[resourceType] ?? 0) + amount;
+  }
+
+  // Apply speed multiplier (Time Dilation Field) — only when maintenance is active
+  if (room.maintenanceActive !== false) {
+    const speedMultiplier = featureCalculateSpeedMultiplier(room);
+    if (speedMultiplier !== 1.0) {
+      for (const key of Object.keys(production)) {
+        production[key] = (production[key] ?? 0) * speedMultiplier;
+      }
+    }
   }
 
   return production;
@@ -1223,6 +1244,15 @@ export function productionCalculateDetailedBreakdown(
       const secondaryProduction = roomUpgradeGetSecondaryProduction(room);
       const secondaryForType = secondaryProduction[resourceType] ?? 0;
       finalAmount += secondaryForType;
+
+      // Apply speed multiplier (Time Dilation Field) — only when maintenance is active
+      if (room.maintenanceActive !== false) {
+        const speedMultiplier = featureCalculateSpeedMultiplier(room);
+        if (speedMultiplier !== 1.0) {
+          modifierDetails.push({ name: 'Time Dilation', multiplier: speedMultiplier });
+          finalAmount *= speedMultiplier;
+        }
+      }
 
       if (finalAmount === 0 && effectiveBase === 0 && flatForType === 0 && secondaryForType === 0) continue;
 

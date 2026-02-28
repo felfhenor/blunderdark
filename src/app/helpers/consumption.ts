@@ -67,9 +67,10 @@ export function consumptionCalculateBreakdowns(
     }
   }
 
-  // 3. Feature maintenance costs
+  // 3. Feature maintenance costs (only when maintenance is active)
   for (const floor of floors) {
     for (const room of floor.rooms) {
+      if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {
         if (!feature.maintenanceCost) continue;
@@ -139,9 +140,10 @@ export function consumptionCalculateDetailedBreakdown(
     });
   }
 
-  // 3. Feature maintenance costs
+  // 3. Feature maintenance costs (only when maintenance is active)
   for (const floor of floors) {
     for (const room of floor.rooms) {
+      if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {
         if (!feature.maintenanceCost) continue;
@@ -187,9 +189,10 @@ export function consumptionCalculateNonFoodTotals(
     }
   }
 
-  // Feature maintenance
+  // Feature maintenance (only when maintenance is active)
   for (const floor of floors) {
     for (const room of floor.rooms) {
+      if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {
         if (!feature.maintenanceCost) continue;

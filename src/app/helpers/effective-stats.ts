@@ -30,7 +30,7 @@ export function effectiveStatsCalculate(
     defense += instance.trainingBonuses.defense;
   }
 
-  // Instance stat bonuses (from hybrids, summoning, phylactery)
+  // Instance stat bonuses (from hybrids, summoning)
   if (instance.instanceStatBonuses) {
     hp += instance.instanceStatBonuses.hp ?? 0;
     attack += instance.instanceStatBonuses.attack ?? 0;

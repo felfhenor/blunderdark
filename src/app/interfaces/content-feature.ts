@@ -18,9 +18,7 @@ export type FeatureBonusType =
   | 'corruption_seal'
 
   | 'resource_converter'
-  | 'speed_multiplier'
-  | 'daily_summon'
-  | 'undead_respawn';
+  | 'speed_multiplier';
 
 export type FeatureBonus = {
   type: FeatureBonusType;

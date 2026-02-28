@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
-import { rngChoice, rngSucceedsChance } from '@helpers/rng';
+import { contentGetEntry } from '@helpers/content';
 import {
   featureGetAllForRoom,
   featureGetForSlot,
@@ -29,31 +28,16 @@ import {
   featureApplyResourceConversion,
   featureCalculateSpeedMultiplier,
   featureMaintenanceProcess,
-  featureVoidGateProcess,
-  featurePhylacteryQueueRespawn,
-  featurePhylacteryProcess,
-  FEATURE_PHYLACTERY_MAX_CHARGES,
-  FEATURE_PHYLACTERY_RESPAWN_TICKS,
 } from '@helpers/features';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
-import type { InhabitantContent, InhabitantId } from '@interfaces/content-inhabitant';
 import type { Floor, FloorId } from '@interfaces/floor';
-import type { InhabitantInstance, InhabitantInstanceId } from '@interfaces/inhabitant';
 import type { PlacedRoom, PlacedRoomId } from '@interfaces/room-shape';
 import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { ResourceMap } from '@interfaces/resource';
-import type { PhylacteryRespawnEntry } from '@helpers/features';
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn(),
-  contentGetEntriesByType: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngChoice: vi.fn(),
-  rngSucceedsChance: vi.fn(),
-  rngUuid: vi.fn(() => 'test-uuid'),
 }));
 
 const COFFINS_ID = 'coffins-test-id' as FeatureId;
@@ -70,8 +54,6 @@ const RESOURCE_CONVERTER_ID = 'resource-converter-test-id' as FeatureId;
 const ELDER_RUNES_ID = 'elder-runes-test-id' as FeatureId;
 const DRAGON_HOARD_ID = 'dragon-hoard-test-id' as FeatureId;
 const TIME_DILATION_ID = 'time-dilation-test-id' as FeatureId;
-const VOID_GATE_ID = 'void-gate-test-id' as FeatureId;
-const PHYLACTERY_ID = 'phylactery-test-id' as FeatureId;
 
 const coffinsContent: FeatureContent = {
   id: COFFINS_ID,
@@ -237,44 +219,6 @@ const timeDilationContent: FeatureContent = {
   ],
 };
 
-const voidGateContent: FeatureContent = {
-  id: VOID_GATE_ID,
-  name: 'Void Gate',
-  __type: 'feature',
-  description: 'Test void gate',
-  category: 'prestige',
-  cost: { gold: 400 },
-  bonuses: [
-    { type: 'daily_summon', value: 1, description: 'Daily summon' },
-  ],
-};
-
-const phylacteryContent: FeatureContent = {
-  id: PHYLACTERY_ID,
-  name: 'Phylactery',
-  __type: 'feature',
-  description: 'Test phylactery',
-  category: 'prestige',
-  cost: { gold: 450 },
-  bonuses: [
-    { type: 'undead_respawn', value: 0.75, description: 'Undead respawn at 75% stats' },
-  ],
-};
-
-const mockInhabitantContent: InhabitantContent = {
-  id: 'mock-inh-def' as InhabitantId,
-  name: 'Test Creature',
-  __type: 'inhabitant',
-  description: 'A test creature',
-  type: 'creature',
-  tier: 1,
-  cost: { gold: 50 },
-  stats: { hp: 10, attack: 4, defense: 3, speed: 2, workerEfficiency: 1.0 },
-  traits: [],
-  restrictionTags: [],
-  rulerBonuses: {},
-  rulerFearLevel: 0,
-};
 
 function makeFloor(overrides: Partial<Floor> = {}): Floor {
   return {
@@ -292,17 +236,6 @@ function makeFloor(overrides: Partial<Floor> = {}): Floor {
   } as Floor;
 }
 
-function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): InhabitantInstance {
-  return {
-    instanceId: 'inh-1' as InhabitantInstanceId,
-    definitionId: 'test-def',
-    name: 'Test Creature',
-    state: 'normal',
-    assignedRoomId: 'room-1' as PlacedRoomId,
-    ...overrides,
-  } as InhabitantInstance;
-}
-
 function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
   return {
     id: 'room-1' as PlacedRoomId,
@@ -316,9 +249,6 @@ function makeRoom(overrides: Partial<PlacedRoom> = {}): PlacedRoom {
 
 beforeEach(() => {
   vi.mocked(contentGetEntry).mockReset();
-  vi.mocked(contentGetEntriesByType).mockReset();
-  vi.mocked(rngChoice).mockReset();
-  vi.mocked(rngSucceedsChance).mockReset();
 });
 
 describe('featureGetSlotCount', () => {
@@ -1169,236 +1099,3 @@ describe('featureMaintenanceProcess', () => {
   });
 });
 
-// --- Void Gate ---
-
-describe('featureVoidGateProcess', () => {
-  it('does nothing when no rooms have daily_summon bonus', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(elderRunesContent);
-    const room = makeRoom({ featureIds: [ELDER_RUNES_ID] });
-    const floor = makeFloor({ rooms: [room] });
-    const inhabitants: InhabitantInstance[] = [];
-    const results = featureVoidGateProcess([floor], 1, inhabitants);
-    expect(results).toHaveLength(0);
-    expect(inhabitants).toHaveLength(0);
-  });
-
-  it('summons a friendly creature on new day', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(voidGateContent);
-    vi.mocked(contentGetEntriesByType).mockReturnValue([mockInhabitantContent]);
-    vi.mocked(rngChoice).mockReturnValue(mockInhabitantContent);
-    vi.mocked(rngSucceedsChance).mockReturnValue(true); // friendly
-
-    const room = makeRoom({ featureIds: [VOID_GATE_ID] });
-    const floor = makeFloor({ rooms: [room] });
-    const inhabitants: InhabitantInstance[] = [];
-
-    const results = featureVoidGateProcess([floor], 1, inhabitants);
-    expect(results).toHaveLength(1);
-    expect(results[0].summoned).toBe(true);
-    expect(results[0].hostile).toBe(false);
-    expect(results[0].inhabitant).toBeDefined();
-    expect(inhabitants).toHaveLength(1);
-    expect(inhabitants[0].name).toContain('Gatecomer');
-    expect(inhabitants[0].isSummoned).toBe(true);
-  });
-
-  it('does not summon on the same day twice', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(voidGateContent);
-    vi.mocked(contentGetEntriesByType).mockReturnValue([mockInhabitantContent]);
-    vi.mocked(rngChoice).mockReturnValue(mockInhabitantContent);
-    vi.mocked(rngSucceedsChance).mockReturnValue(true);
-
-    const room = makeRoom({ featureIds: [VOID_GATE_ID], voidGateLastSummonDay: 5 });
-    const floor = makeFloor({ rooms: [room] });
-    const inhabitants: InhabitantInstance[] = [];
-
-    const results = featureVoidGateProcess([floor], 5, inhabitants);
-    expect(results).toHaveLength(0);
-    expect(inhabitants).toHaveLength(0);
-  });
-
-  it('summons on the next day', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(voidGateContent);
-    vi.mocked(contentGetEntriesByType).mockReturnValue([mockInhabitantContent]);
-    vi.mocked(rngChoice).mockReturnValue(mockInhabitantContent);
-    vi.mocked(rngSucceedsChance).mockReturnValue(true);
-
-    const room = makeRoom({ featureIds: [VOID_GATE_ID], voidGateLastSummonDay: 5 });
-    const floor = makeFloor({ rooms: [room] });
-    const inhabitants: InhabitantInstance[] = [];
-
-    const results = featureVoidGateProcess([floor], 6, inhabitants);
-    expect(results).toHaveLength(1);
-    expect(results[0].summoned).toBe(true);
-    expect(room.voidGateLastSummonDay).toBe(6);
-  });
-
-  it('reports hostile result when summon fails chance', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(voidGateContent);
-    vi.mocked(contentGetEntriesByType).mockReturnValue([mockInhabitantContent]);
-    vi.mocked(rngChoice).mockReturnValue(mockInhabitantContent);
-    vi.mocked(rngSucceedsChance).mockReturnValue(false); // hostile
-
-    const room = makeRoom({ featureIds: [VOID_GATE_ID] });
-    const floor = makeFloor({ rooms: [room] });
-    const inhabitants: InhabitantInstance[] = [];
-
-    const results = featureVoidGateProcess([floor], 1, inhabitants);
-    expect(results).toHaveLength(1);
-    expect(results[0].summoned).toBe(true);
-    expect(results[0].hostile).toBe(true);
-    expect(results[0].damageDealt).toBeDefined();
-    // No inhabitant added to roster for hostile summon
-    expect(inhabitants).toHaveLength(0);
-  });
-
-  it('hostile summon calculates damage from creature stats', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(voidGateContent);
-    vi.mocked(contentGetEntriesByType).mockReturnValue([mockInhabitantContent]);
-    vi.mocked(rngChoice).mockReturnValue(mockInhabitantContent);
-    vi.mocked(rngSucceedsChance).mockReturnValue(false);
-
-    const room = makeRoom({ featureIds: [VOID_GATE_ID] });
-    const floor = makeFloor({ rooms: [room] });
-    const inh1 = makeInhabitant({ assignedRoomId: room.id });
-    const inh2 = makeInhabitant({ instanceId: 'i2' as InhabitantInstanceId, assignedRoomId: room.id });
-    const inhabitants = [inh1, inh2];
-
-    const results = featureVoidGateProcess([floor], 1, inhabitants);
-    // mockInhabitantContent.stats.attack = 4, 2 inhabitants in room → 8 damage
-    expect(results[0].damageDealt).toBe(8);
-  });
-});
-
-// --- Phylactery ---
-
-describe('featurePhylacteryQueueRespawn', () => {
-  it('returns false when room has no undead_respawn bonus', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(elderRunesContent);
-    const room = makeRoom({ featureIds: [ELDER_RUNES_ID] });
-    const deadInh = makeInhabitant();
-    const queue: PhylacteryRespawnEntry[] = [];
-    expect(featurePhylacteryQueueRespawn(room, deadInh, queue)).toBe(false);
-    expect(queue).toHaveLength(0);
-  });
-
-  it('queues a respawn when room has phylactery with charges', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(phylacteryContent);
-    const room = makeRoom({ featureIds: [PHYLACTERY_ID] });
-    const deadInh = makeInhabitant({ name: 'Fallen Warrior' });
-    const queue: PhylacteryRespawnEntry[] = [];
-
-    expect(featurePhylacteryQueueRespawn(room, deadInh, queue)).toBe(true);
-    expect(queue).toHaveLength(1);
-    expect(queue[0].originalName).toBe('Fallen Warrior');
-    expect(queue[0].ticksRemaining).toBe(FEATURE_PHYLACTERY_RESPAWN_TICKS);
-    expect(room.phylacteryCharges).toBe(FEATURE_PHYLACTERY_MAX_CHARGES - 1);
-  });
-
-  it('returns false when charges are exhausted', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(phylacteryContent);
-    const room = makeRoom({ featureIds: [PHYLACTERY_ID], phylacteryCharges: 0 });
-    const deadInh = makeInhabitant();
-    const queue: PhylacteryRespawnEntry[] = [];
-
-    expect(featurePhylacteryQueueRespawn(room, deadInh, queue)).toBe(false);
-    expect(queue).toHaveLength(0);
-  });
-
-  it('decrements charges on each queue', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(phylacteryContent);
-    const room = makeRoom({ featureIds: [PHYLACTERY_ID], phylacteryCharges: 2 });
-    const deadInh = makeInhabitant();
-    const queue: PhylacteryRespawnEntry[] = [];
-
-    featurePhylacteryQueueRespawn(room, deadInh, queue);
-    expect(room.phylacteryCharges).toBe(1);
-
-    featurePhylacteryQueueRespawn(room, deadInh, queue);
-    expect(room.phylacteryCharges).toBe(0);
-
-    expect(featurePhylacteryQueueRespawn(room, deadInh, queue)).toBe(false);
-  });
-});
-
-describe('featurePhylacteryProcess', () => {
-  it('does nothing with empty queue', () => {
-    const queue: PhylacteryRespawnEntry[] = [];
-    const result = featurePhylacteryProcess(queue);
-    expect(result).toHaveLength(0);
-    expect(queue).toHaveLength(0);
-  });
-
-  it('ticks down respawn timer', () => {
-    const queue: PhylacteryRespawnEntry[] = [{
-      definitionId: mockInhabitantContent.id,
-      originalName: 'Fallen Warrior',
-      ticksRemaining: 10,
-      roomId: 'room-1' as PlacedRoomId,
-    }];
-    const result = featurePhylacteryProcess(queue);
-    expect(result).toHaveLength(0);
-    expect(queue).toHaveLength(1);
-    expect(queue[0].ticksRemaining).toBe(9);
-  });
-
-  it('respawns inhabitant when timer reaches 0', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(mockInhabitantContent);
-    const queue: PhylacteryRespawnEntry[] = [{
-      definitionId: mockInhabitantContent.id,
-      originalName: 'Fallen Warrior',
-      ticksRemaining: 1,
-      roomId: 'room-1' as PlacedRoomId,
-    }];
-    const result = featurePhylacteryProcess(queue);
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Fallen Warrior (Undead)');
-    expect(result[0].isSummoned).toBe(true);
-    expect(queue).toHaveLength(0);
-  });
-
-  it('respawned inhabitant has reduced stats via instanceStatBonuses', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(mockInhabitantContent);
-    const queue: PhylacteryRespawnEntry[] = [{
-      definitionId: mockInhabitantContent.id,
-      originalName: 'Test',
-      ticksRemaining: 1,
-      roomId: 'room-1' as PlacedRoomId,
-    }];
-    const result = featurePhylacteryProcess(queue);
-    expect(result).toHaveLength(1);
-    // Stats are 75% of base, so instanceStatBonuses = -25% of base
-    // hp: 10 → floor(10 * -0.25) = floor(-2.5) = -3
-    expect(result[0].instanceStatBonuses?.hp).toBe(-3);
-    // attack: 4 → floor(4 * -0.25) = floor(-1) = -1
-    expect(result[0].instanceStatBonuses?.attack).toBe(-1);
-    // workerEfficiency: 1.0 → 1.0 * -0.25 = -0.25
-    expect(result[0].instanceStatBonuses?.workerEfficiency).toBeCloseTo(-0.25);
-  });
-
-  it('processes multiple entries independently', () => {
-    vi.mocked(contentGetEntry).mockReturnValue(mockInhabitantContent);
-    const queue: PhylacteryRespawnEntry[] = [
-      {
-        definitionId: mockInhabitantContent.id,
-        originalName: 'Warrior A',
-        ticksRemaining: 1,
-        roomId: 'room-1' as PlacedRoomId,
-      },
-      {
-        definitionId: mockInhabitantContent.id,
-        originalName: 'Warrior B',
-        ticksRemaining: 5,
-        roomId: 'room-1' as PlacedRoomId,
-      },
-    ];
-    const result = featurePhylacteryProcess(queue);
-    // Only first one completes
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Warrior A (Undead)');
-    // Second one still in queue
-    expect(queue).toHaveLength(1);
-    expect(queue[0].originalName).toBe('Warrior B');
-    expect(queue[0].ticksRemaining).toBe(4);
-  });
-});

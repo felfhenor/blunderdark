@@ -114,7 +114,7 @@
       value: 0.20
       description: +20% undead worker efficiency
     - type: roomfeature
-      targetFeatureId: Phylactery
+      targetFeatureId: Soul Furnace
   tier: 3
   requiredTicks: 300
 
@@ -308,7 +308,7 @@
       value: 0.25
       description: +25% essence production from all sources
     - type: roomfeature
-      targetFeatureId: Void Gate
+      targetFeatureId: Shadow Nexus
   tier: 5
   requiredTicks: 750
 
