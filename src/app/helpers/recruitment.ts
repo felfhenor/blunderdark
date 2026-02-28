@@ -13,14 +13,12 @@ import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effec
 import { roomUpgradeGetGlobalMaxInhabitantBonus } from '@helpers/room-upgrades';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
-import { seasonBonusGetRecruitmentCostMultiplier } from '@helpers/season-bonuses';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
   InhabitantInstanceId,
   ResourceCost,
   ResourceType,
-  Season,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
@@ -149,27 +147,25 @@ export function recruitmentGetShortfall(
 }
 
 /**
- * Apply season recruitment cost multiplier and research discount to a base cost.
+ * Apply research discount to a base recruitment cost.
  * Uses Math.ceil to round up adjusted costs, minimum 1 per resource.
  */
 export function recruitmentGetAdjustedCost(
   cost: ResourceCost,
-  season: Season,
 ): ResourceCost {
-  const seasonMultiplier = seasonBonusGetRecruitmentCostMultiplier(season);
   const researchDiscount = researchUnlockGetPassiveBonusWithMastery(
     'recruitmentCostReduction',
   );
-  const combinedMultiplier = seasonMultiplier * (1 - researchDiscount);
+  const multiplier = 1 - researchDiscount;
 
-  if (combinedMultiplier === 1.0) return cost;
+  if (multiplier === 1.0) return cost;
 
   const adjusted: ResourceCost = {};
   for (const [type, amount] of Object.entries(cost)) {
     if (!amount) continue;
     adjusted[type as ResourceType] = Math.max(
       1,
-      Math.ceil(amount * combinedMultiplier),
+      Math.ceil(amount * multiplier),
     );
   }
   return adjusted;
@@ -201,10 +197,7 @@ export async function recruitmentRecruit(
     return { success: false, error: `Requires research to unlock ${def.name}` };
   }
 
-  const adjustedCost = recruitmentGetAdjustedCost(
-    def.cost,
-    state.world.season.currentSeason,
-  );
+  const adjustedCost = recruitmentGetAdjustedCost(def.cost);
 
   if (!resourceCanAfford(adjustedCost)) {
     return { success: false, error: 'Not enough resources' };

@@ -39,7 +39,6 @@ import {
   roomUpgradeGetProductionMultiplier,
   roomUpgradeGetSecondaryProduction,
 } from '@helpers/room-upgrades';
-import { seasonBonusGetResourceModifier } from '@helpers/season-bonuses';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { gamestate } from '@helpers/state-game';
 import {
@@ -58,7 +57,6 @@ import type {
   ResourceType,
   RoomId,
   RoomProduction,
-  Season,
   TileOffset,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -338,7 +336,6 @@ export function productionCalculateConditionalModifiers(
 export function productionCalculateTotal(
   floors: Floor[],
   hour?: number,
-  season?: Season,
 ): RoomProduction {
   const totalProduction: RoomProduction = {};
   const activeSynergies = synergyEvaluateAll(floors);
@@ -424,9 +421,6 @@ export function productionCalculateTotal(
           hour !== undefined
             ? dayNightGetResourceModifier(hour, resourceType)
             : 1.0;
-        const seasonMod = season
-          ? seasonBonusGetResourceModifier(season, resourceType)
-          : 1.0;
         const featureProductionBonus = featureCalculateProductionBonus(
           room,
           resourceType,
@@ -451,7 +445,6 @@ export function productionCalculateTotal(
           envModifier *
           depthModifier *
           dayNightResourceMod *
-          seasonMod *
           creatureModifier *
           researchMultiplier *
           reputationMultiplier *
@@ -512,7 +505,6 @@ export function productionCalculateSingleRoom(
   room: PlacedRoom,
   floor: Floor,
   hour?: number,
-  season?: Season,
   floors?: Floor[],
 ): RoomProduction {
   // If floors provided, check connectivity
@@ -596,9 +588,6 @@ export function productionCalculateSingleRoom(
       hour !== undefined
         ? dayNightGetResourceModifier(hour, resourceType)
         : 1.0;
-    const seasonMod = season
-      ? seasonBonusGetResourceModifier(season, resourceType)
-      : 1.0;
     const featureProductionBonus = featureCalculateProductionBonus(
       room,
       resourceType,
@@ -623,7 +612,6 @@ export function productionCalculateSingleRoom(
       envModifier *
       depthModifier *
       dayNightResourceMod *
-      seasonMod *
       creatureModifier *
       researchMultiplier *
       reputationMultiplier *
@@ -666,7 +654,6 @@ export const productionRates = computed<RoomProduction>(() => {
   return productionCalculateTotal(
     state.world.floors,
     state.clock.hour,
-    state.world.season.currentSeason,
   );
 });
 
@@ -683,7 +670,6 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
         room,
         floor,
         state.clock.hour,
-        state.world.season.currentSeason,
         state.world.floors,
       );
     }
@@ -694,7 +680,6 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
 export function productionCalculateBreakdowns(
   floors: Floor[],
   hour?: number,
-  season?: Season,
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
   const activeSynergies = synergyEvaluateAll(floors);
@@ -782,9 +767,6 @@ export function productionCalculateBreakdowns(
           hour !== undefined
             ? dayNightGetResourceModifier(hour, resourceType)
             : 1.0;
-        const seasonMod = season
-          ? seasonBonusGetResourceModifier(season, resourceType)
-          : 1.0;
         const featureProductionBonus = featureCalculateProductionBonus(
           room,
           resourceType,
@@ -802,7 +784,6 @@ export function productionCalculateBreakdowns(
           envModifier *
           depthModifier *
           dayNightResourceMod *
-          seasonMod *
           creatureModifier;
         const withBonuses =
           baseAmount *
@@ -972,7 +953,6 @@ export function productionCalculateDetailedBreakdown(
   floors: Floor[],
   resourceType: string,
   hour?: number,
-  season?: Season,
 ): RoomProductionDetail[] {
   const details: RoomProductionDetail[] = [];
   const activeSynergies = synergyEvaluateAll(floors);
@@ -1144,19 +1124,6 @@ export function productionCalculateDetailedBreakdown(
         }
       }
 
-      if (season) {
-        const seasonMod = seasonBonusGetResourceModifier(
-          season,
-          resourceType,
-        );
-        if (seasonMod !== 1.0) {
-          modifierDetails.push({
-            name: `Season (${season})`,
-            multiplier: seasonMod,
-          });
-        }
-      }
-
       if (stateModifier !== 1.0) {
         modifierDetails.push({
           name: 'Creature State',
@@ -1169,9 +1136,6 @@ export function productionCalculateDetailedBreakdown(
         hour !== undefined
           ? dayNightGetResourceModifier(hour, resourceType)
           : 1.0;
-      const seasonMod = season
-        ? seasonBonusGetResourceModifier(season, resourceType)
-        : 1.0;
       const envModifier =
         hour !== undefined
           ? productionModifierCalculate({
@@ -1195,7 +1159,6 @@ export function productionCalculateDetailedBreakdown(
         envModifier *
         depthModifier *
         dayNightResourceMod *
-        seasonMod *
         creatureModifier;
 
       const synergyBonusVal = synergyCalculateProductionBonus(
@@ -1408,7 +1371,6 @@ export const productionBreakdowns = computed(() => {
   return productionCalculateBreakdowns(
     state.world.floors,
     state.clock.hour,
-    state.world.season.currentSeason,
   );
 });
 
@@ -1416,7 +1378,6 @@ export function productionProcess(state: GameState, numTicks = 1): void {
   const production = productionCalculateTotal(
     state.world.floors,
     state.clock.hour,
-    state.world.season.currentSeason,
   );
 
   // Compute non-food consumption (legendary upkeep + feature maintenance)

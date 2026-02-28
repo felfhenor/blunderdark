@@ -19,7 +19,6 @@ export type ContentType =
   | 'room'
   | 'roomshape'
   | 'roomupgrade'
-  | 'seasonbonus'
   | 'summonrecipe'
   | 'synergy'
   | 'traitrune'

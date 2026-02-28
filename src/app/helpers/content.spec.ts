@@ -201,7 +201,6 @@ describe('Content Functions', () => {
         'research',
         'room',
         'roomshape',
-        'seasonbonus',
         'synergy',
         'trap',
       ];

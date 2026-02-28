@@ -25,7 +25,6 @@ import type {
   RoomShapeContent,
   RoomUnlock,
   RoomUpgradeUnlock,
-  Season,
   SummonRecipeContent,
   SummonRecipeId,
   UnlockEffect,
@@ -66,10 +65,6 @@ import type {
   RoomUpgradeContent,
   RoomUpgradeId,
 } from '@interfaces/content-roomupgrade';
-import type {
-  SeasonBonusContent,
-  SeasonBonusId,
-} from '@interfaces/content-seasonbonus';
 import type { SynergyContent, SynergyId } from '@interfaces/content-synergy';
 import type {
   TraitRuneContent,
@@ -104,7 +99,6 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   room: ensureRoom,
   roomshape: ensureRoomShape,
   roomupgrade: ensureRoomUpgrade,
-  seasonbonus: ensureSeasonBonus,
   summonrecipe: ensureSummonRecipe,
   synergy: ensureSynergy,
   traitrune: ensureTraitRune,
@@ -626,25 +620,6 @@ function ensureMerchantTrade(
     reward: trade.reward ?? {},
     maxStock: trade.maxStock ?? 1,
     type: trade.type ?? 'buy',
-  };
-}
-
-function ensureSeasonBonus(
-  bonus: Partial<SeasonBonusContent>,
-): Required<SeasonBonusContent> {
-  return {
-    id: bonus.id ?? ('UNKNOWN' as SeasonBonusId),
-    name: bonus.name ?? 'UNKNOWN',
-    __type: 'seasonbonus',
-    season: bonus.season ?? ('growth' as Season),
-    description: bonus.description ?? '',
-    resourceModifiers: (bonus.resourceModifiers ?? []).map((m) => ({
-      resourceType: m.resourceType ?? '',
-      multiplier: m.multiplier ?? 1.0,
-      description: m.description ?? '',
-    })),
-    recruitmentCostMultiplier: bonus.recruitmentCostMultiplier ?? 1.0,
-    flags: bonus.flags ?? [],
   };
 }
 

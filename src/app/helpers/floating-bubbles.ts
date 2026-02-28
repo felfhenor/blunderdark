@@ -89,7 +89,6 @@ export function floatingBubblesEmitProduction(
       room,
       floor,
       state.clock.hour,
-      state.world.season.currentSeason,
       floors,
     );
 
