@@ -8,6 +8,7 @@ import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 
 export type ResearchBranch =
   | 'dark'
+  | 'nether'
   | 'arcane'
   | 'engineering'
   | 'dominion'

@@ -1,5 +1,5 @@
 # Research nodes define the tech tree for dungeon advancement.
-# Four branches: dark, arcane, engineering, dominion
+# Six branches: dark, nether, arcane, engineering, dominion, architecture
 # Each node has: id, name, description, branch, cost, prerequisiteResearchIds, unlocks, tier, requiredTicks
 # Unlock effect types: room, inhabitant, ability, upgrade, passive_bonus
 
@@ -16,6 +16,22 @@
       targetRoomId: Soul Well
     - type: roomfeature
       targetFeatureId: Blood Altar
+  tier: 1
+  requiredTicks: 50
+
+# --- NETHER BRANCH: root node ---
+- id: 2aab5d56-27a5-41d8-8140-1adc19c83dbe
+  name: Nether Attunement
+  description: Open the dungeon to nether energies, allowing corruption and shadow forces to seep through the walls.
+  branch: nether
+  cost:
+    research: 10
+  prerequisiteResearchIds: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: corruptionGeneration
+      value: 0.05
+      description: +5% corruption generation
   tier: 1
   requiredTicks: 50
 

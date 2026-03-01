@@ -31,15 +31,15 @@ export const researchUnlock$ = researchUnlockSubject.asObservable();
 
 const RESEARCH_BONUS_BRANCH_MAP: Record<
   string,
-  'dark' | 'arcane' | 'engineering' | 'dominion'
+  'dark' | 'nether' | 'arcane' | 'engineering' | 'dominion'
 > = {
   essenceProduction: 'dark',
-  corruptionGeneration: 'dark',
   undeadEfficiency: 'dark',
-  corruptionResistance: 'dark',
-  fearReduction: 'dark',
   inhabitantStats: 'dark',
   farplaneSoulCapacity: 'dark',
+  corruptionGeneration: 'nether',
+  corruptionResistance: 'nether',
+  fearReduction: 'nether',
   fluxProduction: 'arcane',
   researchSpeed: 'arcane',
   allProduction: 'arcane',
@@ -56,6 +56,7 @@ const RESEARCH_BONUS_BRANCH_MAP: Record<
 
 const MASTERY_BONUS_TYPE_MAP: Record<string, string> = {
   dark: 'darkMastery',
+  nether: 'netherMastery',
   arcane: 'arcaneMastery',
   engineering: 'engineeringMastery',
   dominion: 'dominionMastery',
