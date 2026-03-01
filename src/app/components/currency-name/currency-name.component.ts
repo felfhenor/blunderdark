@@ -17,12 +17,12 @@ import type { ResourceType } from '@interfaces';
   selector: 'app-currency-name',
   imports: [IconComponent, DecimalPipe],
   host: {
-    class: 'inline-flex items-center gap-2 align-baseline',
+    class: 'inline-flex items-center gap-1 align-baseline',
   },
   template: `
     <app-icon [name]="icon()" [color]="color()" />
     @if (short()) {
-      <span>{{ amount() | number: '1.0-2' }}</span>
+      <span class="inline-block text-right tabular-nums" [style.min-width]="minWidth()">{{ amount() | number: '1.0-0' }}</span>
     } @else {
       <span>{{ label() }}</span>
     }
@@ -41,6 +41,7 @@ export class CurrencyNameComponent {
   public type = input.required<ResourceType>();
   public short = input(false);
   public amount = input(0);
+  public minWidth = input('');
 
   public icon = computed(() => RESOURCE_ICON_MAP[this.type()]);
   public color = computed(() => RESOURCE_COLOR_MAP[this.type()]);

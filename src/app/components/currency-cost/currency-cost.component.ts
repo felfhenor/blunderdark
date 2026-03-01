@@ -5,7 +5,7 @@ import type { ResourceType } from '@interfaces';
 @Component({
   selector: 'app-currency-cost',
   imports: [CurrencyNameComponent],
-  template: `<app-currency-name [type]="type()" [short]="true" [amount]="amount()" />`,
+  template: `<app-currency-name [type]="type()" [short]="true" [amount]="amount()" [minWidth]="minWidth()" />`,
   host: {
     class: 'inline-flex items-center',
   },
@@ -14,4 +14,5 @@ import type { ResourceType } from '@interfaces';
 export class CurrencyCostComponent {
   public type = input.required<ResourceType>();
   public amount = input.required<number>();
+  public minWidth = input('');
 }

@@ -10,7 +10,11 @@
       [tpDelay]="250"
       (click)="openBreakdown(res.type)"
     >
-      <app-currency-cost [type]="res.type" [amount]="getCurrent(res.type)" />
+      <app-currency-cost
+        [type]="res.type"
+        [amount]="getCurrent(res.type)"
+        [minWidth]="res.type === 'corruption' ? '6ch' : '4ch'"
+      />
       @if (res.type === 'corruption') {
         <span
           class="badge badge-xs ml-1"
@@ -24,11 +28,11 @@
         </span>
       } @else {
         <span
-          class="resource-max"
+          class="resource-max inline-block text-right tabular-nums min-w-[6ch]"
           [class.text-success]="isFull(res.type)"
           [class.opacity-50]="!isFull(res.type)"
         >
-          /{{ getMax(res.type) | number: '1.0-0' }}
+          / {{ getMax(res.type) | number: '1.0-0' }}
         </span>
       }
     </div>
@@ -74,10 +78,17 @@
               @for (effect of corruptionInfo().activeEffects; track effect.id) {
                 @if (effect.effectType !== 'visual') {
                   <li class="flex items-start gap-1.5">
-                    <span class="shrink-0 mt-0.5" [ngClass]="corruptionInfo().colorClass"><app-icon name="tablerDiamond" size="12px" /></span>
+                    <span
+                      class="shrink-0 mt-0.5"
+                      [ngClass]="corruptionInfo().colorClass"
+                    >
+                      <app-icon name="tablerDiamond" size="12px" />
+                    </span>
                     <div>
                       <span class="font-semibold">{{ effect.name }}</span>
-                      <span class="opacity-70 ml-1">{{ effect.description }}</span>
+                      <span class="opacity-70 ml-1">
+                        {{ effect.description }}
+                      </span>
                     </div>
                   </li>
                 }

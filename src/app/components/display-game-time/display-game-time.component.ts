@@ -5,7 +5,7 @@ import { gameTimeFormatted } from '@helpers';
   selector: 'app-display-game-time',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span class="text-sm">
+    <span class="text-sm inline-block tabular-nums min-w-[16ch]">
       {{ gameTimeFormatted() }}
     </span>
   `,
