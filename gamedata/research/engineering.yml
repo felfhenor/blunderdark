@@ -10,9 +10,10 @@
 #   ├── Trap Design (T2)
 #   │   └── Automated Defenses (T3) [+Streamlined Workshop]
 #   │       └── Mechanical Sentinels (T4) [+Trap Design]
-#   └── Advanced Manufacturing (T2)
-#       └── Dark Forge Mastery (T3) [+Master Forge]
-#           └── Golem Assembly (T4) [+Master Architecture, +Infernal Forge]
+#   ├── Advanced Manufacturing (T2)
+#   │   └── Dark Forge Mastery (T3) [+Master Forge]
+#   │       └── Golem Assembly (T4) [+Master Architecture, +Infernal Forge]
+#   └── Storage Design (T2) → Storage Room
 #   Fusion Core Construction (T4) [Advanced Construction]
 #   Teleporters (T5) [Master Architecture]
 #   War Machines (T5) [Siege Works + Mechanical Sentinels]
@@ -70,6 +71,21 @@
       bonusType: goldProduction
       value: 0.10
       description: +10% gold production from all sources
+  tier: 2
+  requiredTicks: 150
+
+- id: 16c3c35b-6a51-4578-94a2-9410008ef98a
+  name: Storage Design
+  description: Design reinforced storage chambers capable of stockpiling resources beyond normal capacity, providing flat increases to all resource caps.
+  branch: engineering
+  cost:
+    research: 25
+    gold: 5
+  prerequisiteResearchIds:
+    - Basic Engineering
+  unlocks:
+    - type: room
+      targetRoomId: Storage Room
   tier: 2
   requiredTicks: 150
 

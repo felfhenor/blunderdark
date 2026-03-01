@@ -11,11 +11,8 @@
 #   ├── Sanctum Design (T2) → Empowered Altar + Reinforced Vault + Gold Treasury
 #   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Conditioning Yard
 #   │   └── Combat Specialization (T3) → Elite Arena + War Room
-#   │       └── Rune Extraction (T3) → feature_flag: rune_extraction
-#   │           └── Runeworking Techniques (T4) → Runeworking Chamber
 #   ├── Scholarly Design (T2) → Expanded Archives + Expanded Nexus + Research Archive
 #   │   └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle + Flux Capacitor
-#   └── Storage Design (T2) → Storage Room
 #   Resonant Design (T4) [Deep Extraction + Sanctum Design] → Resonant Mine + Tranquil Garden
 #   Deep Water & Financial Design (T4) [Aquatic & Soul + Sanctum Design] → Deepwater Lake + Investment Vault
 #   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall
@@ -117,21 +114,6 @@
       targetRoomupgradeId: Expanded Nexus
     - type: roomupgrade
       targetRoomupgradeId: Research Archive
-  tier: 2
-  requiredTicks: 150
-
-- id: 16c3c35b-6a51-4578-94a2-9410008ef98a
-  name: Storage Design
-  description: Design reinforced storage chambers capable of stockpiling resources beyond normal capacity, providing flat increases to all resource caps.
-  branch: architecture
-  cost:
-    research: 25
-    gold: 5
-  prerequisiteResearchIds:
-    - Structural Mastery
-  unlocks:
-    - type: room
-      targetRoomId: Storage Room
   tier: 2
   requiredTicks: 150
 
@@ -373,37 +355,3 @@
   tier: 6
   requiredTicks: 1000
 
-# --- Torture/Runeworking branch ---
-
-- id: 48465784-afc0-4fa8-936e-dfe932df4bfb
-  name: Rune Extraction
-  description: Discover techniques to extract trait runes from prisoners during the extraction stage of the torture pipeline, yielding permanent rune items tied to the invader's class.
-  branch: architecture
-  cost:
-    research: 60
-    gold: 20
-    essence: 10
-  prerequisiteResearchIds:
-    - Combat Specialization
-  unlocks:
-    - type: feature_flag
-      featureFlag: rune_extraction
-      description: Rune Extraction
-  tier: 3
-  requiredTicks: 350
-
-- id: 06e35397-21ce-4edd-9bdb-82f57e36fb7e
-  name: Runeworking Techniques
-  description: Learn to construct a Runeworking Chamber where trait runes can be permanently embedded into inhabitants, granting them powerful bonuses.
-  branch: architecture
-  cost:
-    research: 80
-    gold: 30
-    crystals: 15
-  prerequisiteResearchIds:
-    - Rune Extraction
-  unlocks:
-    - type: room
-      targetRoomId: Runeworking Chamber
-  tier: 4
-  requiredTicks: 450

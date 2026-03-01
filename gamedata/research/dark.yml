@@ -5,27 +5,19 @@
 #   Dark Arts Fundamentals (T1)
 #   ├── Soul Manipulation (T2)
 #   │   └── Soul Well Mastery (T3)
-#   ├── Shadow Magic (T2) [+Blighted Grove]
-#   │   └── Corruption Control (T3) [+Corrupted Mine, +Blighted Ore]
-#   │       ├── Shadow Weaving (T4) [+Shadow Magic]
-#   │       └── Purification Rites (T4) [+Purification Chamber]
-#   │           ├── Purification Mastery (T5) [+Sanctified Basin, +Warding Pillars]
-#   │           └── Abyssal Purification (T5) [+Abyssal Filter]
-#   ├── Necromancy (T2)
-#   │   ├── Undead Mastery (T3)
-#   │   │   └── Dark Rituals (T4) [+Soul Well Mastery, +Necronomicon Wing]
-#   │   └── Farplane Studies (T3) [+Farplane]
-#   │       └── Soul Binding (T4) [+2 soul capacity]
-#   │           └── Ethereal Resonance (T6) [+2 soul capacity]
-#   └── Corrupted Biome (T2)
+#   └── Necromancy (T2)
+#       ├── Undead Mastery (T3)
+#       ├── Farplane Studies (T3)
+#       │   └── Soul Binding (T4) [+2 soul capacity]
+#       │       └── Ethereal Resonance (T5) [+2 soul capacity]
+#       └── Rune Extraction (T3) → feature_flag: rune_extraction
+#           └── Runeworking Techniques (T4) → Runeworking Chamber
+#   Dark Rituals (T4) [Undead Mastery + Soul Well Mastery, +Necronomicon Wing]
 #   Soul Forge (T4) [Soul Well Mastery + Undead Mastery, +Abyssal Conduit]
-#   Abyssal Gateway (T5) [Dark Rituals + Shadow Weaving]
 #   Necromantic Ascension (T5) [Soul Forge]
-#   Abyssal Summoning (T6) [Abyssal Gateway + Soul Forge]
-#   Serpent's Gaze (T6) [Abyssal Gateway]
-#   Dark Apotheosis (T6) [Abyssal Gateway + Soul Forge]
+#   Dark Apotheosis (T6) [Necromantic Ascension + Ethereal Resonance]
 
-# --- TIER 2: Four paths branch from Dark Arts Fundamentals ---
+# --- TIER 2: Two paths branch from Dark Arts Fundamentals ---
 
 - id: 36c41bbd-675c-4300-abf7-273cd46333ef
   name: Soul Manipulation
@@ -44,25 +36,6 @@
   tier: 2
   requiredTicks: 150
 
-- id: 1b956dec-e63e-467d-bd4d-20541f157d40
-  name: Shadow Magic
-  description: Harness the power of shadows to conceal, deceive, and corrupt mushroom groves with shadow magic for tainted but abundant harvests.
-  branch: dark
-  cost:
-    research: 25
-    essence: 5
-  prerequisiteResearchIds:
-    - Dark Arts Fundamentals
-  unlocks:
-    - type: passive_bonus
-      bonusType: corruptionGeneration
-      value: 0.10
-      description: +10% corruption generation
-    - type: roomupgrade
-      targetRoomupgradeId: Blighted Grove
-  tier: 2
-  requiredTicks: 150
-
 - id: 303c1628-2834-4abf-a1e2-617fb554d151
   name: Necromancy
   description: The art of animating the dead, turning fallen enemies into loyal servants.
@@ -77,23 +50,6 @@
       targetInhabitantId: Skeleton
     - type: roomfeature
       targetFeatureId: Coffins
-  tier: 2
-  requiredTicks: 150
-
-- id: 8d3e5a72-1f4c-49b8-b6d2-c7a0e9f31d58
-  name: Corrupted Biome
-  description: Harness shadow energy to twist stone and earth, enabling the creation of floors pulsing with malevolent corruption.
-  branch: dark
-  cost:
-    research: 25
-    essence: 5
-  prerequisiteResearchIds:
-    - Dark Arts Fundamentals
-  unlocks:
-    - type: biome
-      targetBiome: corrupted
-    - type: roomfeature
-      targetFeatureId: Bioluminescent Moss
   tier: 2
   requiredTicks: 150
 
@@ -135,28 +91,6 @@
   tier: 3
   requiredTicks: 300
 
-- id: b4b92c13-7086-471f-8855-5c01301e73ea
-  name: Corruption Control
-  description: Master the volatile forces of corruption, bending them to your will and infusing crystal mines with dark energy for vastly increased yield.
-  branch: dark
-  cost:
-    research: 50
-    essence: 15
-    corruption: 5
-  prerequisiteResearchIds:
-    - Shadow Magic
-  unlocks:
-    - type: passive_bonus
-      bonusType: corruptionResistance
-      value: 0.10
-      description: Corruption thresholds increased by 10%
-    - type: roomupgrade
-      targetRoomupgradeId: Corrupted Mine
-    - type: roomupgrade
-      targetRoomupgradeId: Blighted Ore
-  tier: 3
-  requiredTicks: 300
-
 - id: 78ba7f10-7290-4e85-ab57-41543b257ab2
   name: Farplane Studies
   description: Uncover the secrets of the boundary between life and death, enabling the construction of a Farplane to capture the souls of fallen defenders.
@@ -171,6 +105,23 @@
       targetRoomId: Farplane
   tier: 3
   requiredTicks: 300
+
+- id: 48465784-afc0-4fa8-936e-dfe932df4bfb
+  name: Rune Extraction
+  description: Discover techniques to extract trait runes from prisoners during the extraction stage of the torture pipeline, yielding permanent rune items tied to the invader's class.
+  branch: dark
+  cost:
+    research: 60
+    gold: 20
+    essence: 10
+  prerequisiteResearchIds:
+    - Necromancy
+  unlocks:
+    - type: feature_flag
+      featureFlag: rune_extraction
+      description: Rune Extraction
+  tier: 3
+  requiredTicks: 350
 
 # --- TIER 4: Advanced combinations ---
 
@@ -195,41 +146,6 @@
   tier: 4
   requiredTicks: 500
 
-- id: 7758e38b-773b-426a-863e-c154566a49fa
-  name: Shadow Weaving
-  description: Weave shadows into semi-physical constructs that serve as both shield and weapon.
-  branch: dark
-  cost:
-    research: 100
-    essence: 30
-    corruption: 15
-  prerequisiteResearchIds:
-    - Shadow Magic
-    - Corruption Control
-  unlocks:
-    - type: passive_bonus
-      bonusType: fearReduction
-      value: 1
-      description: All rooms gain +1 fear reduction
-  tier: 4
-  requiredTicks: 500
-
-- id: 72b0062a-ac4e-452a-a8e0-a1d6f54d50cb
-  name: Purification Rites
-  description: Discover the ancient rites of purification, enabling the construction of chambers that drain corruption from the dungeon.
-  branch: dark
-  cost:
-    research: 100
-    essence: 30
-    corruption: 10
-  prerequisiteResearchIds:
-    - Corruption Control
-  unlocks:
-    - type: room
-      targetRoomId: Purification Chamber
-  tier: 4
-  requiredTicks: 500
-
 - id: 9fdc4500-6479-4348-973a-159cb86bade3
   name: Soul Binding
   description: Master the art of binding departed souls to the Farplane, expanding its capacity to hold additional spirits.
@@ -249,24 +165,21 @@
   tier: 4
   requiredTicks: 500
 
-- id: 2398d825-9ddc-4a1a-b6c2-950ed0da4486
-  name: Ethereal Resonance
-  description: Attune the Farplane to deeper ethereal frequencies, further increasing its ability to shelter wayward souls.
+- id: 06e35397-21ce-4edd-9bdb-82f57e36fb7e
+  name: Runeworking Techniques
+  description: Learn to construct a Runeworking Chamber where trait runes can be permanently embedded into inhabitants, granting them powerful bonuses.
   branch: dark
   cost:
-    research: 150
-    essence: 45
+    research: 80
+    gold: 30
+    crystals: 15
   prerequisiteResearchIds:
-    - Soul Binding
+    - Rune Extraction
   unlocks:
-    - type: passive_bonus
-      bonusType: farplaneSoulCapacity
-      value: 2
-      description: +2 Farplane soul capacity
-    - type: roomupgrade
-      targetRoomupgradeId: Ethereal Amplification
-  tier: 6
-  requiredTicks: 600
+    - type: room
+      targetRoomId: Runeworking Chamber
+  tier: 4
+  requiredTicks: 450
 
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge
@@ -291,44 +204,6 @@
 
 # --- TIER 5: Pinnacle powers ---
 
-- id: de9b2001-7a9d-415c-bf42-936c813e02c5
-  name: Abyssal Gateway
-  description: Tear open a rift to the abyss, summoning forth entities of immense dark power.
-  branch: dark
-  cost:
-    research: 200
-    essence: 60
-    corruption: 30
-  prerequisiteResearchIds:
-    - Dark Rituals
-    - Shadow Weaving
-  unlocks:
-    - type: passive_bonus
-      bonusType: essenceProduction
-      value: 0.25
-      description: +25% essence production from all sources
-    - type: roomfeature
-      targetFeatureId: Shadow Nexus
-  tier: 5
-  requiredTicks: 750
-
-- id: 1771e65b-0113-4318-8eac-c10f6496d849
-  name: Abyssal Summoning
-  description: Command the deepest forces of the abyss to bind a demon lord to your service, the most feared of all infernal entities.
-  branch: dark
-  cost:
-    research: 200
-    essence: 60
-    corruption: 30
-  prerequisiteResearchIds:
-    - Abyssal Gateway
-    - Soul Forge
-  unlocks:
-    - type: inhabitant
-      targetInhabitantId: Demon Lord
-  tier: 6
-  requiredTicks: 750
-
 - id: 2a744cf1-30fe-45d1-a135-dfe3ca596bea
   name: Necromantic Ascension
   description: Achieve the pinnacle of necromantic power, enabling the binding of an ancient lich — an undead sorcerer of terrifying intellect.
@@ -345,55 +220,24 @@
   tier: 5
   requiredTicks: 750
 
-- id: d311dfe1-5fc4-4b3f-a394-670e219cb154
-  name: Serpent's Gaze
-  description: Unravel the petrification mysteries of the shadow realm, allowing the recruitment of a medusa whose gaze turns flesh to stone.
+- id: 2398d825-9ddc-4a1a-b6c2-950ed0da4486
+  name: Ethereal Resonance
+  description: Attune the Farplane to deeper ethereal frequencies, further increasing its ability to shelter wayward souls.
   branch: dark
   cost:
-    research: 200
-    essence: 60
-    corruption: 30
-  prerequisiteResearchIds:
-    - Abyssal Gateway
-  unlocks:
-    - type: inhabitant
-      targetInhabitantId: Medusa
-  tier: 6
-  requiredTicks: 750
-
-- id: d5d60545-90a0-4f52-9000-ec2e6a7c63e2
-  name: Purification Mastery
-  description: Perfect the art of purification, unlocking advanced upgrades that enhance the chamber's drain rate and suppression aura.
-  branch: dark
-  cost:
-    research: 200
+    research: 150
     essence: 45
-    corruption: 20
   prerequisiteResearchIds:
-    - Purification Rites
+    - Soul Binding
   unlocks:
+    - type: passive_bonus
+      bonusType: farplaneSoulCapacity
+      value: 2
+      description: +2 Farplane soul capacity
     - type: roomupgrade
-      targetRoomupgradeId: Sanctified Basin
-    - type: roomupgrade
-      targetRoomupgradeId: Warding Pillars
+      targetRoomupgradeId: Ethereal Amplification
   tier: 5
   requiredTicks: 600
-
-- id: c7f82a5e-cc60-4c23-bffb-935176664593
-  name: Abyssal Purification
-  description: Harness the power of the abyss to fuel purification, unlocking a dark upgrade that doubles drain rate and converts drained corruption into essence.
-  branch: dark
-  cost:
-    research: 200
-    essence: 60
-    corruption: 30
-  prerequisiteResearchIds:
-    - Purification Rites
-  unlocks:
-    - type: roomupgrade
-      targetRoomupgradeId: Abyssal Filter
-  tier: 5
-  requiredTicks: 750
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -406,8 +250,8 @@
     essence: 120
     corruption: 60
   prerequisiteResearchIds:
-    - Abyssal Gateway
-    - Soul Forge
+    - Necromantic Ascension
+    - Ethereal Resonance
   unlocks:
     - type: passive_bonus
       bonusType: darkMastery
