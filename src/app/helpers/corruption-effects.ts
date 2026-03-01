@@ -6,6 +6,7 @@ import {
   mutationTraitApply,
   mutationTraitRoll,
 } from '@helpers/mutation-traits';
+import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngChoice, rngRandom } from '@helpers/rng';
@@ -382,7 +383,7 @@ function shouldFire(
   if (effect.cooldownMinutes !== undefined && effect.cooldownMinutes > 0) {
     const lastTrigger = effects.lastTriggerTimes[effect.id];
     if (lastTrigger !== undefined) {
-      const gameMinutes = state.clock.numTicks / 5; // GAME_TIME_TICKS_PER_MINUTE = 5
+      const gameMinutes = state.clock.numTicks / GAME_TIME_TICKS_PER_MINUTE;
       const elapsed = gameMinutes - lastTrigger;
       if (elapsed < effect.cooldownMinutes) return false;
     }
@@ -395,7 +396,7 @@ function shouldFire(
 
   // Record trigger time
   if (effect.cooldownMinutes !== undefined) {
-    const gameMinutes = state.clock.numTicks / 5;
+    const gameMinutes = state.clock.numTicks / GAME_TIME_TICKS_PER_MINUTE;
     effects.lastTriggerTimes[effect.id] = gameMinutes;
   }
 

@@ -163,8 +163,8 @@
     food: 6
   recruitmentRequirements:
     - requirementType: room
-      targetName: Mushroom Farm
-      description: Requires a Mushroom Farm for the Treant to root into.
+      targetName: Mushroom Grove
+      description: Requires a Mushroom Grove for the Treant to root into.
     - requirementType: resource
       targetName: food
       value: 500
