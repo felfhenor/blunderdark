@@ -6,6 +6,8 @@ import {
   signal,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
@@ -95,6 +97,7 @@ import { startCase } from 'es-toolkit';
 @Component({
   selector: 'app-panel-room-info',
   imports: [
+    AnalyticsClickDirective,
     DecimalPipe,
     NgClass,
     SweetAlert2Module,
@@ -172,6 +175,7 @@ export class PanelRoomInfoComponent {
   });
 
   public async onRemoveTransport(): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Remove');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -190,6 +194,7 @@ export class PanelRoomInfoComponent {
   });
 
   public async onExtendElevator(direction: 'up' | 'down'): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Elevator:Extend');
     const info = this.transportInfo();
     if (!info || info.type !== 'elevator') return;
 
@@ -205,6 +210,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onShrinkElevator(floorDepth: number): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Elevator:Shrink');
     const info = this.transportInfo();
     if (!info || info.type !== 'elevator') return;
 
@@ -378,6 +384,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onApplyUpgrade(path: RoomUpgradeContent): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Upgrade');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -567,6 +574,7 @@ export class PanelRoomInfoComponent {
   public async onSetConvertedResource(
     resourceType: string | undefined,
   ): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Converter:Change');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -591,6 +599,7 @@ export class PanelRoomInfoComponent {
   // --- Actions ---
 
   public async onConnect(otherRoomId: string): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Connection:Toggle');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -603,6 +612,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onDisconnect(connectionId: string): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Connection:Toggle');
     const removed = await connectionRemove(connectionId);
     if (removed) {
       notifySuccess('Connection removed');
@@ -612,6 +622,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onAssignInhabitant(instanceId: string): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Inhabitant:Assign');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -628,6 +639,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onUnassignInhabitant(instanceId: string): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Inhabitant:Unassign');
     const removed = await inhabitantUnassignFromRoom(instanceId);
     if (removed) {
       notifySuccess('Inhabitant unassigned');
@@ -648,6 +660,7 @@ export class PanelRoomInfoComponent {
   });
 
   public async onMoveRoom(): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Move');
     const room = this.selectedRoom();
     if (!room) return;
     await roomMoveEnter(room.id);
@@ -697,6 +710,7 @@ export class PanelRoomInfoComponent {
   });
 
   public async onConfirmRemoval(): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Remove');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -715,11 +729,13 @@ export class PanelRoomInfoComponent {
   // --- Feature actions ---
 
   public onOpenFeatureSelect(slotIndex: number): void {
+    analyticsSendDesignEvent('Room:Info:Feature:Open');
     this.featureSelectSlotIndex.set(slotIndex);
     this.showFeatureSelect.set(true);
   }
 
   public async onAttachFeature(featureId: FeatureId): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Feature:Attach');
     const room = this.selectedRoom();
     if (!room) return;
 
@@ -761,6 +777,7 @@ export class PanelRoomInfoComponent {
   }
 
   public async onRemoveFeature(slotIndex: number): Promise<void> {
+    analyticsSendDesignEvent('Room:Info:Feature:Remove');
     const room = this.selectedRoom();
     if (!room) return;
 

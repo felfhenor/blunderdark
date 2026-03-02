@@ -12,6 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
 
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { roomPlacementPreviewShape } from '@helpers/room-placement';
 import { uiIsAnyModalOpen } from '@helpers/ui';
 import type { SideTabDefinition } from '@interfaces';
@@ -94,6 +95,7 @@ export class SideTabRailComponent {
   }
 
   public onTabClick(tab: SideTabDefinition): void {
+    analyticsSendDesignEvent('Tab:' + tab.id);
     if (tab.action) {
       tab.action();
       return;

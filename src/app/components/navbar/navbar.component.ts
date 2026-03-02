@@ -18,6 +18,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
+import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   uiCloseAllMenus,
@@ -32,6 +33,7 @@ import {
   optionsSet,
   uiShowOptionsMenu,
 } from '@helpers';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import type { GameSpeed, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
@@ -57,6 +59,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ButtonQuitComponent,
     ButtonSettingsComponent,
     DisplayGameTimeComponent,
+    AnalyticsClickDirective,
   ],
   providers: [],
   templateUrl: './navbar.component.html',
@@ -93,6 +96,7 @@ export class NavbarComponent {
   }
 
   public togglePause() {
+    analyticsSendDesignEvent('Nav:Pause:Toggle');
     if (this.showPauseMenu()) return;
     optionsSet('gameloopPaused', !this.isPaused());
   }

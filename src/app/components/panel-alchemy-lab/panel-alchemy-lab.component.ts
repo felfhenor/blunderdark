@@ -24,6 +24,7 @@ import { ticksToRealSeconds } from '@helpers/game-time';
 import type { AlchemyRecipeContent, AlchemyRecipeId } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
@@ -121,6 +122,7 @@ export class PanelAlchemyLabComponent {
   });
 
   public async selectRecipe(recipeId: AlchemyRecipeId, targetTicks: number): Promise<void> {
+    analyticsSendDesignEvent('Room:Alchemy:Recipe:Select');
     const room = this.labRoom();
     if (!room) return;
 
@@ -140,6 +142,7 @@ export class PanelAlchemyLabComponent {
   }
 
   public async stopConversion(): Promise<void> {
+    analyticsSendDesignEvent('Room:Alchemy:Conversion:Stop');
     const room = this.labRoom();
     if (!room) return;
 

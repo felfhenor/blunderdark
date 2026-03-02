@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import { floorAll } from '@helpers/floor';
@@ -170,6 +171,7 @@ export class PanelVictoryComponent {
   }
 
   public continuePlaying(): void {
+    analyticsSendDesignEvent('Victory:Continue');
     victoryDismissPanel();
     this.visible.set(false);
     optionsSet('gameloopPaused', false);

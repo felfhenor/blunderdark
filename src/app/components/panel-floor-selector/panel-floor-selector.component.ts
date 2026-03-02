@@ -1,4 +1,5 @@
 import { DecimalPipe } from '@angular/common';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -156,20 +157,24 @@ export class PanelFloorSelectorComponent {
   }
 
   public async selectFloor(index: number): Promise<void> {
+    analyticsSendDesignEvent('Floor:Select');
     await floorSetCurrentByIndex(index);
   }
 
   public openCreateModal(): void {
+    analyticsSendDesignEvent('Floor:Create:Open');
     this.selectedBiome.set('neutral');
     this.showCreateModal.set(true);
   }
 
   public async onConfirmCreateFloor(): Promise<void> {
+    analyticsSendDesignEvent('Floor:Create:Confirm');
     await floorCreate(this.selectedBiome());
     this.showCreateModal.set(false);
   }
 
   public openChangeBiomeModal(): void {
+    analyticsSendDesignEvent('Floor:ChangeBiome:Open');
     const floor = this.selectedFloor();
     if (!floor) return;
     this.changeBiomeTarget.set(floor.biome);
@@ -177,6 +182,7 @@ export class PanelFloorSelectorComponent {
   }
 
   public async onConfirmChangeBiome(): Promise<void> {
+    analyticsSendDesignEvent('Floor:ChangeBiome:Confirm');
     const floor = this.selectedFloor();
     if (!floor) return;
     await floorChangeBiome(floor.id, this.changeBiomeTarget());
@@ -188,6 +194,7 @@ export class PanelFloorSelectorComponent {
   }
 
   public async onConfirmRemoveFloor(): Promise<void> {
+    analyticsSendDesignEvent('Floor:Remove:Confirm');
     await floorRemove();
     this.showRemoveModal.set(false);
   }

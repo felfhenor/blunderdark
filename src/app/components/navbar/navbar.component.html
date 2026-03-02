@@ -22,6 +22,7 @@
             (hotkey)="panel.clickCb()"
             isGlobal
             appSfx="ui-click"
+            [appAnalyticsClick]="'Nav:Panel:' + panel.name"
             [sfxOffset]="$index"
             [sfxTrigger]="['click', 'hover']"
           >
@@ -60,6 +61,7 @@
             (click)="setSpeed(speed)"
             [hotkeys]="'' + (idx + 1)"
             (hotkey)="setSpeed(speed)"
+            [appAnalyticsClick]="'Nav:Speed:' + speed"
             isGlobal
           >
             {{ speed }}x
@@ -73,6 +75,7 @@
           [swal]="leaveSwal"
           [tp]="'Go Back [Q]'"
           appSfx="ui-error"
+          appAnalyticsClick="Nav:Back"
           [sfxOffset]="panelConfigs.length + 1"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'q'"
@@ -89,6 +92,7 @@
           [tp]="'Open Menu [ESC]'"
           (click)="uiCloseAllMenus()"
           appSfx="ui-click"
+          appAnalyticsClick="Nav:Menu:Open"
           [sfxOffset]="panelConfigs.length + 2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'ESCAPE'"
@@ -127,6 +131,7 @@
       class="btn btn-info"
       (click)="closePauseMenu()"
       appSfx="ui-click"
+      appAnalyticsClick="Nav:PauseMenu:Resume"
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >

@@ -31,6 +31,7 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
@@ -181,6 +182,7 @@ export class PanelSummoningCircleComponent {
     cost: Partial<Record<ResourceType, number>>,
     quantity: number,
   ): Promise<void> {
+    analyticsSendDesignEvent('Room:Summoning:Summon');
     const room = this.summoningRoom();
     if (!room) return;
 

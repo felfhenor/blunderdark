@@ -10,6 +10,7 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { FearIndicatorComponent } from '@components/fear-indicator/fear-indicator.component';
 import { IconComponent } from '@components/icon/icon.component';
 import {
@@ -864,6 +865,7 @@ export class GridComponent implements AfterViewInit {
   }
 
   public onResetCamera(): void {
+    analyticsSendDesignEvent('Grid:Camera:Reset');
     cameraReset();
   }
 

@@ -20,6 +20,7 @@ import {
   resourceDisplayGetPercent,
   resourceDisplayIsFull,
 } from '@helpers';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { corruptionProgressBarClass } from '@helpers/corruption-effects';
 import type { ResourceType } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -60,6 +61,7 @@ export class ResourceBarTopComponent {
   public resourceClick = output<ResourceType>();
 
   public openBreakdown(type: ResourceType): void {
+    analyticsSendDesignEvent('Resource:Breakdown:' + type);
     this.resourceClick.emit(type);
   }
 }

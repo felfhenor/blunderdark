@@ -1,4 +1,5 @@
 import { DecimalPipe } from '@angular/common';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -154,10 +155,13 @@ export class PanelRosterComponent {
   });
 
   public setFilter(filter: RosterFilter): void {
+    const filterLabels: Record<RosterFilter, string> = { all: 'All', assigned: 'Assigned', unassigned: 'Idle' };
+    analyticsSendDesignEvent('Roster:Filter:' + filterLabels[filter]);
     this.activeFilter.set(filter);
   }
 
   public selectInhabitant(instanceId: string): void {
+    analyticsSendDesignEvent('Roster:Select');
     const current = this.selectedInhabitantId();
     this.selectedInhabitantId.set(
       current === instanceId ? undefined : instanceId,
@@ -173,6 +177,7 @@ export class PanelRosterComponent {
     roomId: string,
     roomTypeId: string,
   ): Promise<void> {
+    analyticsSendDesignEvent('Roster:Assign');
     const entry = this.selectedEntry();
     if (!entry) return;
 
@@ -190,6 +195,7 @@ export class PanelRosterComponent {
   }
 
   public async onUnassign(instanceId: string): Promise<void> {
+    analyticsSendDesignEvent('Roster:Unassign');
     const removed = await inhabitantUnassignFromRoom(instanceId);
     if (removed) {
       notifySuccess('Inhabitant unassigned');
@@ -199,6 +205,7 @@ export class PanelRosterComponent {
   }
 
   public async onRename(instanceId: string, currentName: string): Promise<void> {
+    analyticsSendDesignEvent('Roster:Rename');
     const swal = this.renameSwal();
     if (!swal) return;
 
@@ -229,6 +236,7 @@ export class PanelRosterComponent {
   }
 
   public async onRelease(instanceId: string, instanceName: string): Promise<void> {
+    analyticsSendDesignEvent('Roster:Release');
     const swal = this.releaseSwal();
     if (!swal) return;
 

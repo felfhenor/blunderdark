@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   contentGetEntry,
   craftingQueueGetMaxSize,
@@ -300,6 +301,7 @@ export class PanelTrapWorkshopComponent {
     cost: ResourceCost,
     quantity: number,
   ): Promise<void> {
+    analyticsSendDesignEvent('Room:TrapWorkshop:Craft');
     const room = this.workshopRoom();
     if (!room) return;
 

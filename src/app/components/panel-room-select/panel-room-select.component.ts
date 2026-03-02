@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import {
   altarRoomHas,
@@ -214,6 +215,7 @@ export class PanelRoomSelectComponent {
   }
 
   public selectRoom(room: RoomContent): void {
+    analyticsSendDesignEvent('Build:Room:Select');
     if (this.isSelected(room.id)) {
       roomPlacementExitMode();
       return;
@@ -227,6 +229,7 @@ export class PanelRoomSelectComponent {
   }
 
   public toggleHallwayMode(): void {
+    analyticsSendDesignEvent(hallwayPlacementIsBuildMode() ? 'Build:Corridor:Cancel' : 'Build:Corridor');
     if (hallwayPlacementIsBuildMode()) {
       hallwayPlacementExit();
     } else {
@@ -239,6 +242,7 @@ export class PanelRoomSelectComponent {
   }
 
   public rotate(): void {
+    analyticsSendDesignEvent('Build:Room:Rotate');
     roomPlacementRotate();
   }
 
@@ -284,6 +288,7 @@ export class PanelRoomSelectComponent {
   }
 
   public toggleTransportMode(type: 'stair' | 'elevator' | 'portal'): void {
+    analyticsSendDesignEvent('Build:Transport:' + type.charAt(0).toUpperCase() + type.slice(1));
     if (transportPlacementActive() && transportPlacementType() === type) {
       transportPlacementExit();
     } else {

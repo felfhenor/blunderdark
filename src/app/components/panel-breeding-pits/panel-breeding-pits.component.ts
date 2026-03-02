@@ -34,12 +34,15 @@ import type {
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-breeding-pits',
   imports: [
+    AnalyticsClickDirective,
     DecimalPipe,
     InhabitantCardComponent,
     JobProgressComponent,
@@ -260,6 +263,7 @@ export class PanelBreedingPitsComponent {
     recipeId: BreedingRecipeId,
     targetTicks: number,
   ): Promise<void> {
+    analyticsSendDesignEvent('Room:Breeding:Start');
     const room = this.breedingRoom();
     if (!room) return;
 
@@ -289,6 +293,7 @@ export class PanelBreedingPitsComponent {
   }
 
   public async swapBreedingOrder(): Promise<void> {
+    analyticsSendDesignEvent('Room:Breeding:Primary:Swap');
     const room = this.breedingRoom();
     if (!room?.breedingInhabitantOrder || room.breedingInhabitantOrder.length < 2)
       return;
@@ -310,6 +315,7 @@ export class PanelBreedingPitsComponent {
   public async startMutation(
     targetInstanceId: InhabitantInstanceId,
   ): Promise<void> {
+    analyticsSendDesignEvent('Room:Breeding:Mutate');
     const room = this.breedingRoom();
     if (!room) return;
 

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   altarRoomFearReductionAura,
   altarRoomLevel,
@@ -133,6 +134,7 @@ export class PanelAltarComponent {
   }
 
   public async onUpgrade(): Promise<void> {
+    analyticsSendDesignEvent('Room:Altar:Upgrade');
     const upgrade = this.nextUpgrade();
     if (!upgrade) return;
 
@@ -145,6 +147,7 @@ export class PanelAltarComponent {
   }
 
   public async onRecruit(def: InhabitantContent): Promise<void> {
+    analyticsSendDesignEvent('Room:Altar:Recruit');
     const result = await recruitmentRecruit(def);
     if (result.success) {
       notifySuccess(`Recruited ${result.instance!.name} the ${def.name}!`);
@@ -194,6 +197,7 @@ export class PanelAltarComponent {
   }
 
   public async onRecruitLegendary(def: InhabitantContent): Promise<void> {
+    analyticsSendDesignEvent('Room:Altar:Recruit:Legendary');
     const state = gamestate();
     const result = legendaryInhabitantCanRecruit(
       def, state.world.inhabitants, state.world.floors, state.world.resources,

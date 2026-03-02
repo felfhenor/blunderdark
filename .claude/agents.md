@@ -472,6 +472,21 @@ Observable subjects keep prefix + `$` suffix: `notifyNotification$`, `reputation
 - **Check for running dev server**: Before starting a local server with `npm start`, check if one is already running on `localhost:9766` (the default game port/host).
 - **Window API access**: Every exported function in `src/app/helpers/` is available at runtime on the `window.api` object (e.g., `window.api.someHelperFunction()`).
 
+## Analytics Event Naming
+
+All analytics events use colon-delimited PascalCase hierarchy (max depth 5). Two methods:
+
+1. **Template directive** — `[appAnalyticsClick]="'Event:Name'"` on clickable elements. Requires `AnalyticsClickDirective` in component `imports`.
+2. **Programmatic** — `analyticsSendDesignEvent('Event:Name')` for dynamic events or swal confirms. Import from `@helpers/analytics`.
+
+**Naming hierarchy:**
+
+- **Room panels** are prefixed with `Room:{PanelName}:` — e.g. `Room:Breeding:Recipes:Browse`, `Room:Alchemy:Recipe:Select`, `Room:Torture:Process:Start`.
+- **General room-info panel** uses `Room:Info:` — e.g. `Room:Info:Upgrade`, `Room:Info:Feature:Attach`, `Room:Info:Inhabitant:Assign`.
+- **Non-room UI** uses its own top-level category — `Nav:`, `Build:`, `Floor:`, `Roster:`, `Research:`, `Grid:`, `Setup:`, `Options:`, `Tab:`, `Resource:`, `Victory:`.
+- **Verb goes last** — `Room:Breeding:Primary:Swap` not `Room:Breeding:SwapPrimary`. `Nav:Pause:Toggle` not `Nav:TogglePause`. `Setup:Biome:Select` not `Setup:SelectBiome`.
+- **Compound names split into segments** — `Grid:Camera:Reset` not `Grid:CameraReset`. `Room:Altar:Recruit:Legendary` not `Room:Altar:RecruitLegendary`.
+
 ## Misc Gotchas
 
 - `Record<string, number>` properties require bracket notation in strict mode (`bonuses['attack']`)

@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   throneRoomActiveRulerBonuses,
   inhabitantAssignToRoom,
@@ -80,6 +81,7 @@ export class PanelThroneRoomComponent {
   });
 
   public async onAssignRuler(instanceId: string): Promise<void> {
+    analyticsSendDesignEvent('Room:Throne:Ruler:Assign');
     const room = this.throneRoom();
     if (!room) return;
 
@@ -96,6 +98,7 @@ export class PanelThroneRoomComponent {
   }
 
   public async onRemoveRuler(): Promise<void> {
+    analyticsSendDesignEvent('Room:Throne:Ruler:Remove');
     const ruler = throneRoomSeatedRuler();
     if (!ruler) return;
 

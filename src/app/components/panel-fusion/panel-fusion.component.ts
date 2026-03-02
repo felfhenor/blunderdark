@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { IconComponent } from '@components/icon/icon.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
@@ -266,12 +267,14 @@ export class PanelFusionComponent {
   }
 
   public resetSlots(): void {
+    analyticsSendDesignEvent('Room:Fusion:Reset');
     this.slotA.set(undefined);
     this.slotB.set(undefined);
     this.showConfirmation.set(false);
   }
 
   public requestFuse(): void {
+    analyticsSendDesignEvent('Room:Fusion:Fuse');
     this.showConfirmation.set(true);
   }
 
@@ -280,6 +283,7 @@ export class PanelFusionComponent {
   }
 
   public async confirmFuse(): Promise<void> {
+    analyticsSendDesignEvent('Room:Fusion:Confirm');
     const a = this.slotA();
     const b = this.slotB();
     if (!a || !b) return;

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { biomeIsUnlocked, discordSetStatus, gameReset, worldSetSeed } from '@helpers';
 import { worldSetStartingBiome } from '@helpers/world';
 import { BIOME_DATA, type BiomeType } from '@interfaces/biome';
@@ -67,10 +68,12 @@ export class GameSetupWorldComponent implements OnInit {
   }
 
   public selectBiome(biome: BiomeSelection): void {
+    analyticsSendDesignEvent('Setup:Biome:Select');
     this.selectedBiome.set(biome);
   }
 
   public async createWorld() {
+    analyticsSendDesignEvent('Setup:Game:Start');
     gameReset();
     worldSetSeed(this.worldSeed());
     worldSetStartingBiome(this.selectedBiome());

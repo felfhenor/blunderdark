@@ -46,6 +46,7 @@
               [checked]="optionsGet('showResourceGainBubbles')"
               class="checkbox checkbox-secondary"
               (click)="optionsSet('showResourceGainBubbles', !optionsGet('showResourceGainBubbles'))"
+              appAnalyticsClick="Options:UI:ResourceBubbles"
             />
             <span class="label-text">Show Resource Gain Bubbles</span>
           </label>
@@ -58,6 +59,7 @@
               [checked]="optionsGet('showCraftCompletionBubbles')"
               class="checkbox checkbox-secondary"
               (click)="optionsSet('showCraftCompletionBubbles', !optionsGet('showCraftCompletionBubbles'))"
+              appAnalyticsClick="Options:UI:CraftBubbles"
             />
             <span class="label-text">Show Craft Completion Bubbles</span>
           </label>
@@ -78,6 +80,7 @@
               [checked]="optionsGet('bgmPlay')"
               class="checkbox checkbox-secondary"
               (click)="optionsSet('bgmPlay', !optionsGet('bgmPlay'))"
+              appAnalyticsClick="Options:UI:MusicToggle"
             />
             <span class="label-text">Play Background Music</span>
           </label>
@@ -98,6 +101,7 @@
                 [value]="optionsGet('bgmVolume')"
                 (change)="optionsSet('bgmVolume', bgmVolume.valueAsNumber)"
                 class="range range-secondary"
+                appAnalyticsClick="Options:UI:MusicVolume"
               />
               <span class="ml-2">
                 {{ optionsGet('bgmVolume') * 100 | number: '1.0-0' }}%
@@ -113,6 +117,7 @@
               [checked]="optionsGet('sfxPlay')"
               class="checkbox checkbox-secondary"
               (click)="optionsSet('sfxPlay', !optionsGet('sfxPlay'))"
+              appAnalyticsClick="Options:UI:SfxToggle"
             />
             <span class="label-text">Play Sound Effects</span>
           </label>
@@ -131,6 +136,7 @@
                 [value]="optionsGet('sfxVolume')"
                 (change)="optionsSet('sfxVolume', sfxVolume.valueAsNumber)"
                 class="range range-secondary"
+                appAnalyticsClick="Options:UI:SfxVolume"
               />
               <span class="ml-2">
                 {{ optionsGet('sfxVolume') * 100 | number: '1.0-0' }}%
@@ -156,6 +162,7 @@
           class="select select-bordered select-xs mx-1"
           [(ngModel)]="currentTheme"
           (ngModelChange)="optionsSet('uiTheme', $event)"
+          appAnalyticsClick="Options:UI:Theme"
         >
           @for (theme of themes; track $index) {
             <option [value]="theme.name">

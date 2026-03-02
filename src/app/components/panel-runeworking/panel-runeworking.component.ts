@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   contentGetEntry,
   findRoomByRole,
@@ -227,6 +228,7 @@ export class PanelRuneworkingComponent {
   }
 
   public async startJob(): Promise<void> {
+    analyticsSendDesignEvent('Room:Runeworking:Start');
     const room = this.runeworkingRoom();
     const runeId = this.selectedRuneId();
     const inhabitantId = this.selectedInhabitantId();

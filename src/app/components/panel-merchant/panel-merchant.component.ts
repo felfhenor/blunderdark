@@ -6,6 +6,7 @@ import {
   model,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import { gameTimeDay } from '@helpers/game-time';
@@ -82,6 +83,7 @@ export class PanelMerchantComponent {
   });
 
   public async executeTrade(tradeId: MerchantTradeId): Promise<void> {
+    analyticsSendDesignEvent('Room:Merchant:Trade');
     const result = await merchantExecuteTrade(tradeId);
     if (result.success) {
       const trade = contentGetEntry<MerchantTradeContent>(tradeId);
@@ -92,6 +94,7 @@ export class PanelMerchantComponent {
   }
 
   public open(): void {
+    analyticsSendDesignEvent('Room:Merchant:Open');
     this.visible.set(true);
   }
 

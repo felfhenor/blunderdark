@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   contentGetEntry,
   findRoomByRole,
@@ -148,6 +149,7 @@ export class PanelTortureChamberComponent {
   }
 
   public async startProcessing(prisonerId: PrisonerId): Promise<void> {
+    analyticsSendDesignEvent('Room:Torture:Process:Start');
     const room = this.tortureRoom();
     if (!room) return;
 
@@ -169,6 +171,7 @@ export class PanelTortureChamberComponent {
   }
 
   public async setExtractAction(action: TortureExtractAction): Promise<void> {
+    analyticsSendDesignEvent('Room:Torture:Extract:' + (action === 'research' ? 'Research' : 'Rune'));
     const room = this.tortureRoom();
     if (!room?.tortureJob) return;
 
@@ -187,6 +190,7 @@ export class PanelTortureChamberComponent {
   }
 
   public async setBreakAction(action: TortureBreakAction): Promise<void> {
+    analyticsSendDesignEvent('Room:Torture:Break:' + action.charAt(0).toUpperCase() + action.slice(1));
     const room = this.tortureRoom();
     if (!room?.tortureJob) return;
 

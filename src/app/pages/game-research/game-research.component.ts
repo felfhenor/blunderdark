@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -219,18 +220,21 @@ export class GameResearchComponent {
   }
 
   public selectNode(nodeId: string): void {
+    analyticsSendDesignEvent('Research:Node:Select');
     this.selectedNodeId.set(
       this.selectedNodeId() === nodeId ? undefined : nodeId,
     );
   }
 
   public async startResearch(): Promise<void> {
+    analyticsSendDesignEvent('Research:Start');
     const node = this.selectedNode();
     if (!node) return;
     await researchStart(node.id);
   }
 
   public async onConfirmCancel(): Promise<void> {
+    analyticsSendDesignEvent('Research:Cancel');
     await researchCancel();
   }
 

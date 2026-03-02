@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   contentGetEntry,
   farplaneGetRecruitCost,
@@ -82,6 +83,7 @@ export class PanelFarplaneComponent {
   }
 
   public async recruitSoul(soulId: FarplaneSoulId): Promise<void> {
+    analyticsSendDesignEvent('Room:Farplane:Recruit');
     await farplaneRecruitSoul(soulId);
   }
 }

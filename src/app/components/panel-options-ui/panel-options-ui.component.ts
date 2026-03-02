@@ -1,13 +1,15 @@
 import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { autosaveReset } from '@helpers/autosave';
 import type { AutosaveInterval } from '@interfaces';
 
 @Component({
   selector: 'app-panel-options-ui',
-  imports: [FormsModule, TitleCasePipe, DecimalPipe],
+  imports: [AnalyticsClickDirective, FormsModule, TitleCasePipe, DecimalPipe],
   templateUrl: './panel-options-ui.component.html',
   styleUrl: './panel-options-ui.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,12 +25,14 @@ export class PanelOptionsUIComponent extends OptionsBaseComponent {
   ];
 
   toggleAutosave(): void {
+    analyticsSendDesignEvent('Options:UI:Autosave');
     const enabled = !this.optionsGet('autosaveEnabled');
     this.optionsSet('autosaveEnabled', enabled);
     autosaveReset();
   }
 
   setAutosaveInterval(value: AutosaveInterval): void {
+    analyticsSendDesignEvent('Options:UI:AutosaveInterval');
     this.optionsSet('autosaveIntervalMinutes', value);
     autosaveReset();
   }
