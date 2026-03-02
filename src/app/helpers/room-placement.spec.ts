@@ -1,9 +1,16 @@
 import { gridCreateEmpty, gridSetTile } from '@helpers/grid';
 import {
+  roomPlacementCountTypeAllFloors,
+  roomPlacementEnterMode,
+  roomPlacementExitMode,
   roomPlacementFormatErrors,
   roomPlacementIsUniqueTypePlaced,
   roomPlacementPlaceOnFloor,
+  roomPlacementPreviewShape,
   roomPlacementRemoveFromFloor,
+  roomPlacementRotate,
+  roomPlacementRotation,
+  roomPlacementSelectedTypeId,
   roomPlacementValidate,
   roomPlacementValidateBounds,
   roomPlacementValidateNoOverlap,
@@ -17,7 +24,7 @@ import type {
   RoomShapeContent,
   RoomShapeId,
 } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 const square2x2: RoomShapeContent = {
   id: 'square-2x2' as RoomShapeId,
@@ -532,5 +539,197 @@ describe('roomPlacementIsUniqueTypePlaced', () => {
     expect(
       roomPlacementIsUniqueTypePlaced(floors, 'room-barracks' as RoomId),
     ).toBe(false);
+  });
+});
+
+describe('roomPlacementCountTypeAllFloors', () => {
+  it('should return 0 when no rooms exist', () => {
+    expect(
+      roomPlacementCountTypeAllFloors(
+        [makeFloor()],
+        'room-crystal-mine' as RoomId,
+      ),
+    ).toBe(0);
+  });
+
+  it('should count rooms of the same type on one floor', () => {
+    const rooms: PlacedRoom[] = [
+      {
+        id: 'room-1' as PlacedRoomId,
+        roomTypeId: 'room-crystal-mine' as RoomId,
+        shapeId: 'square-2x2' as RoomShapeId,
+        anchorX: 0,
+        anchorY: 0,
+      },
+      {
+        id: 'room-2' as PlacedRoomId,
+        roomTypeId: 'room-crystal-mine' as RoomId,
+        shapeId: 'square-2x2' as RoomShapeId,
+        anchorX: 5,
+        anchorY: 5,
+      },
+    ];
+    expect(
+      roomPlacementCountTypeAllFloors(
+        [makeFloor(rooms)],
+        'room-crystal-mine' as RoomId,
+      ),
+    ).toBe(2);
+  });
+
+  it('should count rooms across multiple floors', () => {
+    const room1: PlacedRoom = {
+      id: 'room-1' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const room2: PlacedRoom = {
+      id: 'room-2' as PlacedRoomId,
+      roomTypeId: 'room-crystal-mine' as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const room3: PlacedRoom = {
+      id: 'room-3' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
+      shapeId: 'square-2x2' as RoomShapeId,
+      anchorX: 5,
+      anchorY: 5,
+    };
+    const floors = [makeFloor([room1, room3]), makeFloor([room2])];
+    expect(
+      roomPlacementCountTypeAllFloors(floors, 'room-crystal-mine' as RoomId),
+    ).toBe(2);
+    expect(
+      roomPlacementCountTypeAllFloors(floors, 'room-throne' as RoomId),
+    ).toBe(1);
+    expect(
+      roomPlacementCountTypeAllFloors(floors, 'room-barracks' as RoomId),
+    ).toBe(0);
+  });
+});
+
+describe('roomPlacementEnterMode / roomPlacementRotate / roomPlacementExitMode', () => {
+  const tShape: RoomShapeContent = {
+    id: 't-shape' as RoomShapeId,
+    name: 'T-Shape',
+    tiles: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 1, y: 1 },
+    ],
+    width: 3,
+    height: 2,
+  };
+
+  beforeEach(() => {
+    roomPlacementExitMode();
+  });
+
+  afterEach(() => {
+    roomPlacementExitMode();
+  });
+
+  it('should set initial state on enterMode', () => {
+    roomPlacementEnterMode('room-test' as RoomId, square2x2);
+    expect(roomPlacementSelectedTypeId()).toBe('room-test');
+    expect(roomPlacementRotation()).toBe(0);
+    expect(roomPlacementPreviewShape()).toBe(square2x2);
+  });
+
+  it('should reset state on exitMode', () => {
+    roomPlacementEnterMode('room-test' as RoomId, square2x2);
+    roomPlacementExitMode();
+    expect(roomPlacementSelectedTypeId()).toBeUndefined();
+    expect(roomPlacementRotation()).toBe(0);
+    expect(roomPlacementPreviewShape()).toBeUndefined();
+  });
+
+  it('should cycle rotation 0→1→2→3→0', () => {
+    roomPlacementEnterMode('room-test' as RoomId, square2x2);
+    expect(roomPlacementRotation()).toBe(0);
+
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(1);
+
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(2);
+
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(3);
+
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(0);
+  });
+
+  it('should do nothing if no base shape is set', () => {
+    // Don't call enterMode — no base shape
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(0);
+  });
+
+  it('should update preview shape with rotated tiles on T-shape rotation', () => {
+    roomPlacementEnterMode('room-test' as RoomId, tShape);
+
+    // Initially preview is the unrotated T-shape (3x2)
+    const preview0 = roomPlacementPreviewShape();
+    expect(preview0?.width).toBe(3);
+    expect(preview0?.height).toBe(2);
+
+    // Rotate 90° — T-shape becomes 2x3
+    roomPlacementRotate();
+    const preview1 = roomPlacementPreviewShape();
+    expect(preview1?.width).toBe(2);
+    expect(preview1?.height).toBe(3);
+    expect(preview1?.tiles).toHaveLength(4);
+
+    // Rotate 180° — back to 3x2
+    roomPlacementRotate();
+    const preview2 = roomPlacementPreviewShape();
+    expect(preview2?.width).toBe(3);
+    expect(preview2?.height).toBe(2);
+
+    // Rotate 270° — 2x3 again
+    roomPlacementRotate();
+    const preview3 = roomPlacementPreviewShape();
+    expect(preview3?.width).toBe(2);
+    expect(preview3?.height).toBe(3);
+  });
+
+  it('should always rotate from the base shape, not accumulate drift', () => {
+    roomPlacementEnterMode('room-test' as RoomId, tShape);
+
+    // Rotate 4 full cycles (16 rotations)
+    for (let i = 0; i < 16; i++) {
+      roomPlacementRotate();
+    }
+    expect(roomPlacementRotation()).toBe(0);
+
+    // Preview should match original base shape
+    const preview = roomPlacementPreviewShape();
+    expect(preview?.width).toBe(tShape.width);
+    expect(preview?.height).toBe(tShape.height);
+
+    const originalSet = new Set(tShape.tiles.map((t) => `${t.x},${t.y}`));
+    const previewSet = new Set(
+      (preview?.tiles ?? []).map((t) => `${t.x},${t.y}`),
+    );
+    expect(previewSet).toEqual(originalSet);
+  });
+
+  it('should reset rotation to 0 when entering a new mode', () => {
+    roomPlacementEnterMode('room-test' as RoomId, tShape);
+    roomPlacementRotate();
+    roomPlacementRotate();
+    expect(roomPlacementRotation()).toBe(2);
+
+    // Enter mode again — rotation should reset
+    roomPlacementEnterMode('room-other' as RoomId, square2x2);
+    expect(roomPlacementRotation()).toBe(0);
+    expect(roomPlacementPreviewShape()).toBe(square2x2);
   });
 });
