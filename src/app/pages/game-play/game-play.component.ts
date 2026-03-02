@@ -350,10 +350,13 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     effect(() => {
       if (invasionIsCompleted()) {
         untracked(() => {
+          const battle = this.invasionBattle();
+          if (battle?.visible()) return; // Prevent re-triggering while modal is open
+
           const state = gamestate();
           const invasion = state.world.activeInvasion;
           if (invasion?.completed && invasion.result) {
-            this.invasionBattle()?.showResults(invasion);
+            battle?.showResults(invasion);
           }
         });
       }

@@ -202,8 +202,8 @@ export function invasionTriggerProcessSchedule(
     schedule.warningDismissed = false;
   }
 
-  // Guard: skip trigger if an active invasion already exists
-  if (state.world.activeInvasion && !state.world.activeInvasion.completed) return;
+  // Guard: skip trigger if an active invasion exists (in-progress OR completed but not yet dismissed)
+  if (state.world.activeInvasion) return;
 
   // Check special invasions
   for (let i = schedule.pendingSpecialInvasions.length - 1; i >= 0; i--) {
