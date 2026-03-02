@@ -55,6 +55,7 @@ export class ResourceBreakdownModalComponent {
       state.world.floors,
       resType,
       state.clock.hour,
+      state.world.season.currentSeason,
     );
 
     const consumption = consumptionCalculateDetailedBreakdown(

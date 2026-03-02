@@ -796,6 +796,37 @@ describe('darkForgeAutoEquip', () => {
     expect(inh3.equippedForgeItemRecipeId).toBeUndefined();
     expect(state.world.forgeInventory).toHaveLength(0);
   });
+
+  it('should sync equipment to world inhabitants when references differ', () => {
+    const forge = makeRoom();
+    const floorInh = makeInhabitant({
+      instanceId: 'inh-sync' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    // Create a separate object for world.inhabitants (simulates stale refs after save/load)
+    const worldInh = makeInhabitant({
+      instanceId: 'inh-sync' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const floor = makeFloor([forge], [floorInh]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+      ],
+    });
+    state.world.inhabitants = [worldInh];
+
+    darkForgeAutoEquip(state, floor);
+
+    // Floor inhabitant gets equipped
+    expect(floorInh.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(floorInh.equippedStatBonuses).toEqual({ attack: 3 });
+
+    // World inhabitant also gets synced
+    expect(worldInh.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(worldInh.equippedStatBonuses).toEqual({ attack: 3 });
+  });
 });
 
 describe('darkForgeProcess', () => {

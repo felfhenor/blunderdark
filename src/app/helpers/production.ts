@@ -47,6 +47,7 @@ import {
   synergyEvaluateAll,
 } from '@helpers/synergy';
 import { reputationEffectGetProductionMultiplier } from '@helpers/reputation-effects';
+import { seasonGetProductionMultiplier } from '@helpers/season';
 import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
@@ -58,6 +59,7 @@ import type {
   ResourceType,
   RoomId,
   RoomProduction,
+  Season,
   TileOffset,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -337,6 +339,7 @@ export function productionCalculateConditionalModifiers(
 export function productionCalculateTotal(
   floors: Floor[],
   hour?: number,
+  season?: Season,
 ): RoomProduction {
   const totalProduction: RoomProduction = {};
   const activeSynergies = synergyEvaluateAll(floors);
@@ -494,6 +497,16 @@ export function productionCalculateTotal(
         }
       }
 
+      // Apply season production multiplier
+      if (season) {
+        for (const key of Object.keys(roomProduction)) {
+          const seasonMul = seasonGetProductionMultiplier(season, key);
+          if (seasonMul !== 1.0) {
+            roomProduction[key] = (roomProduction[key] ?? 0) * seasonMul;
+          }
+        }
+      }
+
       for (const [resourceType, amount] of Object.entries(roomProduction)) {
         if (!amount) continue;
         totalProduction[resourceType] =
@@ -505,8 +518,12 @@ export function productionCalculateTotal(
   // Add non-room corruption sources (inhabitants, features, deep objectives)
   const nonRoomCorruption = productionCalculateNonRoomCorruption(floors, hour);
   if (nonRoomCorruption.final !== 0) {
+    let corruptionAmount = nonRoomCorruption.final;
+    if (season) {
+      corruptionAmount *= seasonGetProductionMultiplier(season, 'corruption');
+    }
     totalProduction['corruption'] =
-      (totalProduction['corruption'] ?? 0) + nonRoomCorruption.final;
+      (totalProduction['corruption'] ?? 0) + corruptionAmount;
   }
 
   return totalProduction;
@@ -517,6 +534,7 @@ export function productionCalculateSingleRoom(
   floor: Floor,
   hour?: number,
   floors?: Floor[],
+  season?: Season,
 ): RoomProduction {
   // If floors provided, check connectivity
   if (floors) {
@@ -667,6 +685,16 @@ export function productionCalculateSingleRoom(
     }
   }
 
+  // Apply season production multiplier
+  if (season) {
+    for (const key of Object.keys(production)) {
+      const seasonMul = seasonGetProductionMultiplier(season, key);
+      if (seasonMul !== 1.0) {
+        production[key] = (production[key] ?? 0) * seasonMul;
+      }
+    }
+  }
+
   return production;
 }
 
@@ -675,6 +703,7 @@ export const productionRates = computed<RoomProduction>(() => {
   return productionCalculateTotal(
     state.world.floors,
     state.clock.hour,
+    state.world.season.currentSeason,
   );
 });
 
@@ -692,6 +721,7 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
         floor,
         state.clock.hour,
         state.world.floors,
+        state.world.season.currentSeason,
       );
     }
   }
@@ -701,6 +731,7 @@ export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
 export function productionCalculateBreakdowns(
   floors: Floor[],
   hour?: number,
+  season?: Season,
 ): Record<string, ResourceProductionBreakdown> {
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
   const activeSynergies = synergyEvaluateAll(floors);
@@ -829,6 +860,7 @@ export function productionCalculateBreakdowns(
             modifierEffect: 0,
             researchBonus: 0,
             reputationBonus: 0,
+            seasonBonus: 0,
             final: 0,
           };
         }
@@ -860,6 +892,7 @@ export function productionCalculateBreakdowns(
             modifierEffect: 0,
             researchBonus: 0,
             reputationBonus: 0,
+            seasonBonus: 0,
             final: 0,
           };
         }
@@ -894,6 +927,7 @@ export function productionCalculateBreakdowns(
               modifierEffect: 0,
               researchBonus: 0,
               reputationBonus: 0,
+              seasonBonus: 0,
               final: 0,
             };
           }
@@ -928,6 +962,7 @@ export function productionCalculateBreakdowns(
             modifierEffect: 0,
             researchBonus: 0,
             reputationBonus: 0,
+            seasonBonus: 0,
             final: 0,
           };
         }
@@ -949,6 +984,7 @@ export function productionCalculateBreakdowns(
         modifierEffect: 0,
         researchBonus: 0,
         reputationBonus: 0,
+        seasonBonus: 0,
         final: 0,
       };
     }
@@ -967,6 +1003,17 @@ export function productionCalculateBreakdowns(
     breakdowns['corruption'].final += nonRoomCorruption.final;
   }
 
+  // Apply season production multiplier to all breakdowns
+  if (season) {
+    for (const [resourceType, bd] of Object.entries(breakdowns)) {
+      const seasonMul = seasonGetProductionMultiplier(season, resourceType);
+      if (seasonMul !== 1.0) {
+        bd.seasonBonus = bd.final * (seasonMul - 1);
+        bd.final *= seasonMul;
+      }
+    }
+  }
+
   return breakdowns;
 }
 
@@ -974,6 +1021,7 @@ export function productionCalculateDetailedBreakdown(
   floors: Floor[],
   resourceType: string,
   hour?: number,
+  season?: Season,
 ): RoomProductionDetail[] {
   const details: RoomProductionDetail[] = [];
   const activeSynergies = synergyEvaluateAll(floors);
@@ -1254,6 +1302,15 @@ export function productionCalculateDetailedBreakdown(
         }
       }
 
+      // Apply season production multiplier
+      if (season) {
+        const seasonMul = seasonGetProductionMultiplier(season, resourceType);
+        if (seasonMul !== 1.0) {
+          modifierDetails.push({ name: 'Season', multiplier: seasonMul });
+          finalAmount *= seasonMul;
+        }
+      }
+
       if (finalAmount === 0 && effectiveBase === 0 && flatForType === 0 && secondaryForType === 0) continue;
 
       details.push({
@@ -1321,7 +1378,14 @@ export function productionCalculateDetailedBreakdown(
         if (!room) continue;
 
         const afterModifier = data.perTick * dayNightMod;
-        const finalAmount = afterModifier * researchThroneMultiplier;
+        let finalAmount = afterModifier * researchThroneMultiplier;
+        const seasonCorruptionMul = season ? seasonGetProductionMultiplier(season, 'corruption') : 1.0;
+        finalAmount *= seasonCorruptionMul;
+
+        const entryModifierDetails = [...corruptionModifierDetails];
+        if (seasonCorruptionMul !== 1.0) {
+          entryModifierDetails.push({ name: 'Season', multiplier: seasonCorruptionMul });
+        }
 
         details.push({
           roomId: `${roomId}-corruption-gen` as PlacedRoomId,
@@ -1336,7 +1400,7 @@ export function productionCalculateDetailedBreakdown(
           researchBonus: 0,
           reputationBonus: 0,
           modifierEffect: 0,
-          modifierDetails: corruptionModifierDetails,
+          modifierDetails: entryModifierDetails,
           flatFeatureProduction: 0,
           upgradeSecondaryProduction: 0,
           upgradeMultiplier: 1,
@@ -1369,7 +1433,14 @@ export function productionCalculateDetailedBreakdown(
       if (source.base === 0) continue;
 
       const afterModifier = source.base * dayNightMod;
-      const finalAmount = afterModifier * researchThroneMultiplier;
+      let finalAmount = afterModifier * researchThroneMultiplier;
+      const seasonCorruptionMul = season ? seasonGetProductionMultiplier(season, 'corruption') : 1.0;
+      finalAmount *= seasonCorruptionMul;
+
+      const entryModifierDetails = [...corruptionModifierDetails];
+      if (seasonCorruptionMul !== 1.0) {
+        entryModifierDetails.push({ name: 'Season', multiplier: seasonCorruptionMul });
+      }
 
       details.push({
         roomId: '' as PlacedRoomId,
@@ -1384,7 +1455,7 @@ export function productionCalculateDetailedBreakdown(
         researchBonus: finalAmount - afterModifier,
         reputationBonus: 0,
         modifierEffect: afterModifier - source.base,
-        modifierDetails: corruptionModifierDetails,
+        modifierDetails: entryModifierDetails,
         flatFeatureProduction: 0,
         upgradeSecondaryProduction: 0,
         upgradeMultiplier: 1,
@@ -1401,6 +1472,7 @@ export const productionBreakdowns = computed(() => {
   return productionCalculateBreakdowns(
     state.world.floors,
     state.clock.hour,
+    state.world.season.currentSeason,
   );
 });
 
@@ -1408,6 +1480,7 @@ export function productionProcess(state: GameState, numTicks = 1): void {
   const production = productionCalculateTotal(
     state.world.floors,
     state.clock.hour,
+    state.world.season.currentSeason,
   );
 
   // Compute non-food consumption (legendary upkeep + feature maintenance)

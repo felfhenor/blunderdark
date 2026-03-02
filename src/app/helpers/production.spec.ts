@@ -42,6 +42,18 @@ vi.mock('@helpers/content', () => {
     adjacencyBonuses: [],
   });
 
+  entries.set('room-mushroom-grove', {
+    id: 'room-mushroom-grove',
+    name: 'Mushroom Grove',
+    __type: 'room',
+    description: '',
+    shapeId: 'shape-1' as RoomShapeId,
+    cost: {},
+    production: { food: 2.0 },
+    requiresWorkers: false,
+    adjacencyBonuses: [],
+  });
+
   entries.set('room-dark-forge', {
     id: 'room-dark-forge',
     name: 'Dark Forge',
@@ -1834,5 +1846,51 @@ describe('Purification Chamber negative corruption production', () => {
     productionProcess(state);
     // Soul Well: corruption +0.4
     expect(state.world.resources.corruption.current).toBeCloseTo(50.4);
+  });
+
+  it('should apply growth season multiplier to food production', () => {
+    const grove: PlacedRoom = {
+      id: 'placed-grove' as PlacedRoomId,
+      roomTypeId: 'room-mushroom-grove' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([grove]);
+    const withoutSeason = productionCalculateTotal([floor]);
+    const withSeason = productionCalculateTotal([floor], undefined, 'growth');
+    // Growth season: food * 1.5
+    expect(withoutSeason['food']).toBeCloseTo(2.0);
+    expect(withSeason['food']).toBeCloseTo(3.0);
+  });
+
+  it('should apply harvest season multiplier to all resources', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const withoutSeason = productionCalculateTotal([floor]);
+    const withSeason = productionCalculateTotal([floor], undefined, 'harvest');
+    // Harvest season: all resources * 1.2
+    expect(withSeason['gold']).toBeCloseTo((withoutSeason['gold'] ?? 0) * 1.2);
+  });
+
+  it('should not apply growth season multiplier to non-food resources', () => {
+    const throne: PlacedRoom = {
+      id: 'placed-throne' as PlacedRoomId,
+      roomTypeId: 'room-throne' as RoomId,
+      shapeId: 'shape-1' as RoomShapeId,
+      anchorX: 0,
+      anchorY: 0,
+    };
+    const floor = makeFloor([throne]);
+    const withoutSeason = productionCalculateTotal([floor]);
+    const withSeason = productionCalculateTotal([floor], undefined, 'growth');
+    // Growth season: gold should be unchanged
+    expect(withSeason['gold']).toBeCloseTo(withoutSeason['gold'] ?? 0);
   });
 });

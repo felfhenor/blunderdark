@@ -17,6 +17,7 @@ export type ResourceProductionBreakdown = {
   modifierEffect: number;
   researchBonus: number;
   reputationBonus: number;
+  seasonBonus: number;
   final: number;
 };
 

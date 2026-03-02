@@ -29,6 +29,26 @@ export function seasonIs(season: Season): boolean {
   return gamestate().world.season.currentSeason === season;
 }
 
+/**
+ * Get the season-based production multiplier for a resource type.
+ * Growth: +50% food, Harvest: +20% all, Darkness: +100% corruption, Storms: +80% flux.
+ */
+export function seasonGetProductionMultiplier(
+  season: Season,
+  resourceType: string,
+): number {
+  switch (season) {
+    case 'growth':
+      return resourceType === 'food' ? 1.5 : 1.0;
+    case 'harvest':
+      return 1.2;
+    case 'darkness':
+      return resourceType === 'corruption' ? 2.0 : 1.0;
+    case 'storms':
+      return resourceType === 'flux' ? 1.8 : 1.0;
+  }
+}
+
 export function seasonGetLabel(season: Season): string {
   const labels: Record<Season, string> = {
     growth: 'Growth',

@@ -1,7 +1,7 @@
 import type { SeasonState } from '@interfaces';
 import { DAYS_PER_SEASON, SEASON_ORDER } from '@interfaces/season';
 import { describe, expect, it } from 'vitest';
-import { seasonAdvanceDay, seasonGetLabel } from '@helpers/season';
+import { seasonAdvanceDay, seasonGetLabel, seasonGetProductionMultiplier } from '@helpers/season';
 
 describe('seasonAdvanceDay', () => {
   it('should advance day within a season', () => {
@@ -129,5 +129,36 @@ describe('SEASON_ORDER', () => {
 describe('DAYS_PER_SEASON', () => {
   it('should be 7', () => {
     expect(DAYS_PER_SEASON).toBe(7);
+  });
+});
+
+describe('seasonGetProductionMultiplier', () => {
+  it('growth should give 1.5x food and 1.0x other resources', () => {
+    expect(seasonGetProductionMultiplier('growth', 'food')).toBe(1.5);
+    expect(seasonGetProductionMultiplier('growth', 'gold')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('growth', 'corruption')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('growth', 'flux')).toBe(1.0);
+  });
+
+  it('harvest should give 1.2x all resources', () => {
+    expect(seasonGetProductionMultiplier('harvest', 'food')).toBe(1.2);
+    expect(seasonGetProductionMultiplier('harvest', 'gold')).toBe(1.2);
+    expect(seasonGetProductionMultiplier('harvest', 'corruption')).toBe(1.2);
+    expect(seasonGetProductionMultiplier('harvest', 'flux')).toBe(1.2);
+    expect(seasonGetProductionMultiplier('harvest', 'crystals')).toBe(1.2);
+  });
+
+  it('darkness should give 2.0x corruption and 1.0x other resources', () => {
+    expect(seasonGetProductionMultiplier('darkness', 'corruption')).toBe(2.0);
+    expect(seasonGetProductionMultiplier('darkness', 'food')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('darkness', 'gold')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('darkness', 'flux')).toBe(1.0);
+  });
+
+  it('storms should give 1.8x flux and 1.0x other resources', () => {
+    expect(seasonGetProductionMultiplier('storms', 'flux')).toBe(1.8);
+    expect(seasonGetProductionMultiplier('storms', 'food')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('storms', 'gold')).toBe(1.0);
+    expect(seasonGetProductionMultiplier('storms', 'corruption')).toBe(1.0);
   });
 });

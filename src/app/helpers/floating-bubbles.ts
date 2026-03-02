@@ -90,6 +90,7 @@ export function floatingBubblesEmitProduction(
       floor,
       state.clock.hour,
       floors,
+      state.world.season.currentSeason,
     );
 
     const entries: FloatingBubbleEntry[] = [];

@@ -262,6 +262,15 @@ export function darkForgeAutoEquip(
     inhabitant.equippedForgeItemRecipeId = best.entry.recipeId;
     inhabitant.equippedStatBonuses = { ...best.entry.bakedStatBonuses };
 
+    // Sync to world inhabitants if floor/world have separate object references
+    const worldInst = state.world.inhabitants.find(
+      (w) => w.instanceId === inhabitant.instanceId,
+    );
+    if (worldInst && worldInst !== inhabitant) {
+      worldInst.equippedForgeItemRecipeId = inhabitant.equippedForgeItemRecipeId;
+      worldInst.equippedStatBonuses = inhabitant.equippedStatBonuses;
+    }
+
     best.entry.count -= 1;
   }
 
