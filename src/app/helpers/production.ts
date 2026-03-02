@@ -48,7 +48,7 @@ import {
 } from '@helpers/synergy';
 import { reputationEffectGetProductionMultiplier } from '@helpers/reputation-effects';
 import { seasonGetProductionMultiplier } from '@helpers/season';
-import { throneRoomGetRulerBonusValue } from '@helpers/throne-room';
+import { throneRoomGetPositionalBonuses, throneRoomGetRulerBonusValue } from '@helpers/throne-room';
 import { stateModifierCalculatePerCreatureProduction } from '@helpers/state-modifiers';
 import type {
   Floor,
@@ -84,6 +84,8 @@ function productionGetResearchMultiplier(resourceType: string): number {
       rulerBonus = throneRoomGetRulerBonusValue(floors, 'fluxProduction');
     } else if (resourceType === 'food') {
       rulerBonus = throneRoomGetRulerBonusValue(floors, 'foodProduction');
+    } else if (resourceType === 'gold') {
+      rulerBonus = throneRoomGetPositionalBonuses(floors).goldProductionBonus;
     }
   }
 

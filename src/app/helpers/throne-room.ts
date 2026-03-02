@@ -74,7 +74,18 @@ export function throneRoomGetActiveRulerBonuses(floors: Floor[]): RulerBonuses {
   const def = throneRoomGetRulerDefinition(ruler);
   if (!def) return {};
 
-  return { ...def.rulerBonuses };
+  const positional = throneRoomGetPositionalBonuses(floors);
+  const amplifier = 1 + positional.rulerBonusMultiplier;
+
+  if (amplifier === 1) {
+    return { ...def.rulerBonuses };
+  }
+
+  const bonuses: RulerBonuses = {};
+  for (const [key, value] of Object.entries(def.rulerBonuses ?? {})) {
+    bonuses[key] = (value as number) * amplifier;
+  }
+  return bonuses;
 }
 
 /**

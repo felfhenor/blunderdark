@@ -320,6 +320,59 @@ describe('throneRoomGetActiveRulerBonuses', () => {
     const bonuses = throneRoomGetActiveRulerBonuses([floor]);
     expect(bonuses).toEqual({});
   });
+
+  it('should amplify ruler bonuses when throne is centrally placed', () => {
+    const throneShape = createRoomShape();
+    mockContent.set('shape-4x4', throneShape);
+
+    const dragonDef = createInhabitantDef({
+      id: 'def-dragon' as InhabitantId,
+      rulerBonuses: { attack: 0.1, fear: 0.05 },
+    });
+    mockContent.set('def-dragon', dragonDef);
+
+    // Throne at (8,8) is central (center=10,10, distance=0)
+    const floor = floorCreate({
+      rooms: [createPlacedRoom({ anchorX: 8, anchorY: 8 })],
+      inhabitants: [
+        createInhabitantInstance({
+          definitionId: 'def-dragon' as InhabitantId,
+          assignedRoomId: 'room-001' as PlacedRoomId,
+        }),
+      ],
+    });
+
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
+    const amplifier = 1 + THRONE_ROOM_CENTRALITY_RULER_BONUS_MULTIPLIER;
+    expect(bonuses['attack']).toBeCloseTo(0.1 * amplifier);
+    expect(bonuses['fear']).toBeCloseTo(0.05 * amplifier);
+  });
+
+  it('should not amplify ruler bonuses when throne is not central', () => {
+    const throneShape = createRoomShape();
+    mockContent.set('shape-4x4', throneShape);
+
+    const dragonDef = createInhabitantDef({
+      id: 'def-dragon' as InhabitantId,
+      rulerBonuses: { attack: 0.1, fear: 0.05 },
+    });
+    mockContent.set('def-dragon', dragonDef);
+
+    // Throne at (0,0) is NOT central (center=2,2, distance=16)
+    const floor = floorCreate({
+      rooms: [createPlacedRoom({ anchorX: 0, anchorY: 0 })],
+      inhabitants: [
+        createInhabitantInstance({
+          definitionId: 'def-dragon' as InhabitantId,
+          assignedRoomId: 'room-001' as PlacedRoomId,
+        }),
+      ],
+    });
+
+    const bonuses = throneRoomGetActiveRulerBonuses([floor]);
+    expect(bonuses['attack']).toBe(0.1);
+    expect(bonuses['fear']).toBe(0.05);
+  });
 });
 
 describe('throneRoomGetRulerBonusValue', () => {
