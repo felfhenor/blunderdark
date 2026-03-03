@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
@@ -33,7 +34,7 @@ type BiomeOption = {
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [DecimalPipe, CurrencyNameComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyNameComponent, ModalComponent],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -107,14 +108,6 @@ export class PanelFloorSelectorComponent {
     return this.floors().length >= MAX_FLOORS;
   });
 
-  public nextFloorCostLabel = computed(() => {
-    const cost = this.nextFloorCost();
-    const parts: string[] = [];
-    if (cost.crystals) parts.push(`${cost.crystals} Crystals`);
-    if (cost.gold) parts.push(`${cost.gold} Gold`);
-    return parts.join(' + ');
-  });
-
   public canRemove = computed(() => {
     return floorCanRemove();
   });
@@ -126,14 +119,6 @@ export class PanelFloorSelectorComponent {
 
   public removalRefund = computed(() => {
     return floorGetRemovalRefund();
-  });
-
-  public removalRefundLabel = computed(() => {
-    const refund = this.removalRefund();
-    const parts: string[] = [];
-    if (refund.crystals) parts.push(`${refund.crystals} Crystals`);
-    if (refund.gold) parts.push(`${refund.gold} Gold`);
-    return parts.join(' + ');
   });
 
   public getBiomeData(biome: BiomeType) {

@@ -27,20 +27,18 @@
     @if (!isMaxFloors()) {
       <div class="create-floor-section mt-2">
         <button
-          class="btn btn-sm btn-primary btn-block"
+          class="btn btn-sm btn-primary btn-block gap-1"
           [disabled]="!canCreate().canCreate"
           (click)="openCreateModal()"
         >
           + Create New Floor
+          @if (nextFloorCost().crystals) {
+            <app-currency-cost type="crystals" [amount]="nextFloorCost().crystals!" />
+          }
+          @if (nextFloorCost().gold) {
+            <app-currency-cost type="gold" [amount]="nextFloorCost().gold!" />
+          }
         </button>
-        <div class="text-xs opacity-60 mt-1 text-center">
-          Cost: {{ nextFloorCostLabel() }}
-        </div>
-        @if (!canCreate().canCreate && canCreate().reason) {
-          <div class="text-xs text-error mt-1 text-center">
-            {{ canCreate().reason }}
-          </div>
-        }
       </div>
     } @else {
       <div class="text-xs opacity-50 mt-2 text-center">
@@ -77,8 +75,17 @@
           }
         }
 
-        <div class="text-xs opacity-60 text-center">
-          Cost: {{ nextFloorCostLabel() }}
+        <div class="text-xs opacity-60 text-center inline-flex items-center justify-center gap-1 w-full">
+          Cost:
+          @if (nextFloorCost().crystals) {
+            <app-currency-cost type="crystals" [amount]="nextFloorCost().crystals!" />
+          }
+          @if (nextFloorCost().crystals && nextFloorCost().gold) {
+            +
+          }
+          @if (nextFloorCost().gold) {
+            <app-currency-cost type="gold" [amount]="nextFloorCost().gold!" />
+          }
         </div>
       </div>
 
@@ -158,8 +165,17 @@
             <strong>{{ floor.name }}</strong>
             ?
           </p>
-          <p class="text-xs opacity-60 mb-2">
-            Refund: {{ removalRefundLabel() }}
+          <p class="text-xs opacity-60 mb-2 inline-flex items-center gap-1">
+            Refund:
+            @if (removalRefund().crystals) {
+              <app-currency-cost type="crystals" [amount]="removalRefund().crystals!" />
+            }
+            @if (removalRefund().crystals && removalRefund().gold) {
+              +
+            }
+            @if (removalRefund().gold) {
+              <app-currency-cost type="gold" [amount]="removalRefund().gold!" />
+            }
           </p>
         }
         @if (!canRemove().canRemove && canRemove().reason) {
