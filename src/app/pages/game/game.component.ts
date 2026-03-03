@@ -1,5 +1,4 @@
-import type { OnInit } from '@angular/core';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '@components/navbar/navbar.component';
 import { discordUpdateStatus } from '@helpers/discord';
@@ -11,8 +10,8 @@ import { discordUpdateStatus } from '@helpers/discord';
   styleUrl: './game.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GameComponent implements OnInit {
-  ngOnInit() {
-    discordUpdateStatus();
+export class GameComponent {
+  constructor() {
+    effect(() => discordUpdateStatus());
   }
 }
