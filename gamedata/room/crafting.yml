@@ -1,7 +1,7 @@
 - id: ae673803-b514-4da9-a0d4-df448aa412a4
   name: Dark Forge
   description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
-  shapeId: Square 2x2
+  shapeId: Small Staircase
   role: darkForge
   queueSize: 5
   cost:
@@ -53,7 +53,7 @@
 - id: f7a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c
   name: Breeding Pits
   description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
-  shapeId: Square 3x3
+  shapeId: H-Shape
   cost:
     gold: 120
     crystals: 60
@@ -131,7 +131,7 @@
 - id: 97dd4e28-045a-4765-8a3c-ece77dd4b7f2
   name: Torture Chamber
   description: A chamber of dread where captured invaders are processed through a 3-stage pipeline — interrogated for intel, extracted for knowledge or runes, then broken into servitude or sacrificed. Prisoners must be processed before they escape.
-  shapeId: Small L-Shape
+  shapeId: Notch
   reputationAction: Place Torture Chamber
   cost:
     gold: 120
@@ -166,7 +166,7 @@
 - id: 9b49b3e3-7ff1-4073-8be8-25542182c770
   name: Runeworking Chamber
   description: A mystical workshop where trait runes extracted from prisoners are permanently embedded into inhabitants, granting them unique bonuses tied to the invader class of origin.
-  shapeId: Small L-Shape
+  shapeId: L-Reverse
   cost:
     gold: 100
     crystals: 50

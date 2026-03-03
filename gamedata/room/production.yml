@@ -41,7 +41,7 @@
 - id: 7fb314ad-a447-469f-82df-4b8c68f9deff
   name: Mushroom Grove
   description: A grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
-  shapeId: T-Shape
+  shapeId: Staircase
   reputationAction: Build Mushroom Grove
   cost:
     gold: 40
@@ -193,7 +193,7 @@
 - id: a7ef7e24-f250-45e7-986d-ad06b3610b52
   name: Ley Line Nexus
   description: A mystical convergence point where underground ley lines intersect, channeling raw magical flux. Scholars and mages stationed here harness the arcane currents to generate flux, the volatile magical resource essential for advanced research and enchantments.
-  shapeId: T-Shape
+  shapeId: Plus
   reputationAction: Activate Ley Line Nexus
   maxFeatures: 1
   biomeBonuses:

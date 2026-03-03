@@ -32,7 +32,7 @@
 - id: 46b5aa14-f6c5-48db-a9dd-d1d070dfde56
   name: Training Grounds
   description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent stat bonuses. Different upgrade paths grant different training specializations, and moving an inhabitant to a differently-upgraded room will retrain them.
-  shapeId: T-Shape
+  shapeId: Wide
   role: trainingGrounds
   cost:
     gold: 80
@@ -65,7 +65,7 @@
 - id: 6d638daa-6e43-4569-a931-eb4710009da9
   name: Trap Workshop
   description: A crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
-  shapeId: Square 2x2
+  shapeId: Z-Shape
   role: trapWorkshop
   queueSize: 25
   cost:

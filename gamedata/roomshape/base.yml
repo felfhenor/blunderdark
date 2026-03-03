@@ -163,3 +163,94 @@
     - { x: 4, y: 2 }
     - { x: 2, y: 3 }
     - { x: 2, y: 4 }
+
+- id: 418ea9ec-0d85-48c7-b9cc-b3f0368622b9
+  name: L-Reverse
+  width: 3
+  height: 3
+  tiles:
+    - { x: 2, y: 0 }
+    - { x: 2, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+
+- id: 308559f1-a38f-4dcd-9729-f332804b5db1
+  name: Staircase
+  width: 3
+  height: 3
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 1, y: 2 }
+    - { x: 2, y: 2 }
+
+- id: 2d146574-0997-4198-81d6-69e72358a8b9
+  name: Small Staircase
+  width: 2
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 1, y: 1 }
+
+- id: 0b532dcf-a7df-4a60-994c-988a12c5f7f9
+  name: Plus
+  width: 3
+  height: 3
+  tiles:
+    - { x: 1, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 1, y: 2 }
+
+- id: ee47ae7c-148d-486a-8547-46d1648333b6
+  name: Z-Shape
+  width: 3
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+
+- id: a5eaf8af-231f-49b1-b3d5-d2640a48220f
+  name: Wide
+  width: 4
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 3, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 3, y: 1 }
+
+- id: b7a95be4-9d47-4959-ad57-22cca871433a
+  name: Notch
+  width: 3
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+
+- id: c09cdd8d-a1d6-467e-98cd-eef97ce22033
+  name: H-Shape
+  width: 3
+  height: 3
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 2, y: 0 }
+    - { x: 0, y: 1 }
+    - { x: 1, y: 1 }
+    - { x: 2, y: 1 }
+    - { x: 0, y: 2 }
+    - { x: 2, y: 2 }
