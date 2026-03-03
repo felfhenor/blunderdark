@@ -54,42 +54,59 @@ export const altarRoomHas = computed<boolean>(() => {
 
 /**
  * Auto-place all rooms with autoPlace: true on a floor during world generation.
- * Places each room at the center of the grid, falling back to adjacent offsets
- * if the center is already occupied.
+ * The altar room is always placed first at the center of the grid, and subsequent
+ * rooms are placed adjacent to the altar.
  */
 export function altarRoomAutoPlace(floor: Floor): Floor {
   const roomDefs = contentGetEntriesByType<RoomContent>('room');
   const autoPlaceRooms = roomDefs.filter((r) => r.autoPlace);
 
+  // Place altar room first so it's always centered
+  const altarRoom = autoPlaceRooms.find((r) => r.role === 'altar');
+  const otherRooms = autoPlaceRooms.filter((r) => r.role !== 'altar');
+  const sortedRooms = altarRoom ? [altarRoom, ...otherRooms] : otherRooms;
+
   let floorCurrent = floor;
   const placedRoomIds: string[] = [];
+  let altarPlacement:
+    | { anchorX: number; anchorY: number; shape: RoomShapeContent }
+    | undefined;
 
-  for (const roomDef of autoPlaceRooms) {
+  for (const roomDef of sortedRooms) {
     const shape = contentGetEntry<RoomShapeContent>(roomDef.shapeId);
     if (!shape) continue;
 
-    const centerX = Math.floor((GRID_SIZE - shape.width) / 2);
-    const centerY = Math.floor((GRID_SIZE - shape.height) / 2);
+    let candidates: { x: number; y: number }[];
 
-    // Try center first, then adjacent offsets
-    const offsets = [
-      { x: 0, y: 0 },
-      { x: shape.width, y: 0 },
-      { x: -shape.width, y: 0 },
-      { x: 0, y: shape.height },
-      { x: 0, y: -shape.height },
-    ];
+    if (altarPlacement) {
+      // Place adjacent to the altar room
+      const ap = altarPlacement;
+      candidates = [
+        { x: ap.anchorX + ap.shape.width, y: ap.anchorY },
+        { x: ap.anchorX - shape.width, y: ap.anchorY },
+        { x: ap.anchorX, y: ap.anchorY + ap.shape.height },
+        { x: ap.anchorX, y: ap.anchorY - shape.height },
+      ];
+    } else {
+      // Center on grid, with fallback offsets
+      const centerX = Math.floor((GRID_SIZE - shape.width) / 2);
+      const centerY = Math.floor((GRID_SIZE - shape.height) / 2);
+      candidates = [
+        { x: centerX, y: centerY },
+        { x: centerX + shape.width, y: centerY },
+        { x: centerX - shape.width, y: centerY },
+        { x: centerX, y: centerY + shape.height },
+        { x: centerX, y: centerY - shape.height },
+      ];
+    }
 
-    for (const offset of offsets) {
-      const anchorX = centerX + offset.x;
-      const anchorY = centerY + offset.y;
-
+    for (const pos of candidates) {
       const placedRoom: PlacedRoom = {
         id: rngUuid<PlacedRoomId>(),
         roomTypeId: roomDef.id as RoomId,
         shapeId: roomDef.shapeId,
-        anchorX,
-        anchorY,
+        anchorX: pos.x,
+        anchorY: pos.y,
         suffix: generateRoomSuffix(floorCurrent, roomDef.id as RoomId),
       };
 
@@ -101,6 +118,9 @@ export function altarRoomAutoPlace(floor: Floor): Floor {
       if (updated) {
         floorCurrent = updated;
         placedRoomIds.push(placedRoom.id);
+        if (roomDef.role === 'altar') {
+          altarPlacement = { anchorX: pos.x, anchorY: pos.y, shape };
+        }
         break;
       }
     }
