@@ -84,4 +84,5 @@ export * from './traitrune';
 export * from './traits';
 export * from './trap';
 export * from './trap-workshop';
+export * from './tutorial';
 export * from './victory';

@@ -30,6 +30,8 @@ export function optionsDefault(): GameOptions {
 
     showResourceGainBubbles: false,
     showCraftCompletionBubbles: true,
+
+    tutorialCompleted: false,
   };
 }
 

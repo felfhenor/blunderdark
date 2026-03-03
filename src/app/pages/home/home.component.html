@@ -40,6 +40,16 @@
           >
             Resume Game
           </button>
+          <button
+            class="btn btn-secondary btn-block"
+            (click)="replayTutorial()"
+            appAnalyticsClick="Meta:Play:Tutorial"
+            appSfx="ui-click"
+            [sfxOffset]="2"
+            [sfxTrigger]="['click']"
+          >
+            How to Play
+          </button>
         }
 
         <app-button-settings></app-button-settings>

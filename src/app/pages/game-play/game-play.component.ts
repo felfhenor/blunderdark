@@ -45,6 +45,7 @@ import { PanelTrapWorkshopComponent } from '@components/panel-trap-workshop/pane
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
+import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import {
@@ -57,6 +58,9 @@ import {
   hallwayPlacementBuildStep,
   optionsGet,
   roomPlacementSelectedTypeId,
+  tutorialAutoStart,
+  tutorialCurrentStep,
+  tutorialIsActive,
   uiIsAnyModalOpen,
   uiIsInputFocused,
 } from '@helpers';
@@ -117,6 +121,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelRoomSelectComponent,
     PanelRosterComponent,
     SideTabRailComponent,
+    TutorialOverlayComponent,
     PanelTimeOfDayComponent,
     PanelTrainingGroundsComponent,
     PanelTrapWorkshopComponent,
@@ -373,9 +378,41 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       }
     });
 
+    // Tutorial orchestration: open/close panels and modals as tutorial steps change
+    effect(() => {
+      const step = tutorialCurrentStep();
+      if (!tutorialIsActive() || !step) return;
+
+      untracked(() => {
+        if (step.panelToOpen) {
+          this.activePanel.set(step.panelToOpen);
+        } else if (step.modalToOpen) {
+          this.activePanel.set(undefined);
+          this.showMerchant.set(step.modalToOpen === 'merchant');
+          this.showResearch.set(step.modalToOpen === 'research');
+          this.showFusion.set(step.modalToOpen === 'fusion');
+          this.showVictoryMenu.set(step.modalToOpen === 'victory');
+        } else {
+          this.activePanel.set(undefined);
+          this.showMerchant.set(false);
+          this.showResearch.set(false);
+          this.showFusion.set(false);
+          this.showVictoryMenu.set(false);
+        }
+      });
+    });
+
     // Pause CSS animations when game is paused to reduce idle CPU
     effect(() => {
       document.body.classList.toggle('game-paused', gameloopIsPaused());
+    });
+
+    // Auto-start tutorial after first render (once DOM is ready)
+    let tutorialChecked = false;
+    afterRenderEffect(() => {
+      if (tutorialChecked) return;
+      tutorialChecked = true;
+      untracked(() => tutorialAutoStart());
     });
 
     // Pause CSS animations when tab is not visible
@@ -606,6 +643,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       autosaveStop();
       autosaveRemoveBeforeUnload();
     });
+
   }
 
   public navigateFloorUp(event?: Event): void {

@@ -11,7 +11,8 @@ export type GameOption =
   | 'gameloopPaused'
   | 'autosaveEnabled'
   | 'showResourceGainBubbles'
-  | 'showCraftCompletionBubbles';
+  | 'showCraftCompletionBubbles'
+  | 'tutorialCompleted';
 
 export type NotificationCategory = 'Error' | 'Success' | 'Warning' | 'Invasion' | 'Corruption' | 'Breeding' | 'Summoning' | 'Forging' | 'Alchemy' | 'Torture' | 'Merchant' | 'Legendary' | 'Traps' | 'Farplane';
 

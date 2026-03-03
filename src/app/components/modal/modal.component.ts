@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { tutorialIsActive } from '@helpers/tutorial';
 import { uiModalOpenCount } from '@helpers/ui';
 
 @Component({
@@ -53,6 +54,7 @@ export class ModalComponent {
   }
 
   public onEscapeKey(event: Event): void {
+    if (tutorialIsActive()) return;
     if (!this.visible() || !this.allowEscToClose()) return;
     event.preventDefault();
     event.stopImmediatePropagation();

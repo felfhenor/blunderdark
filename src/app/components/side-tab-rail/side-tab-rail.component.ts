@@ -14,6 +14,7 @@ import { IconComponent } from '@components/icon/icon.component';
 
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { roomPlacementPreviewShape } from '@helpers/room-placement';
+import { tutorialIsActive } from '@helpers/tutorial';
 import { uiIsAnyModalOpen } from '@helpers/ui';
 import type { SideTabDefinition } from '@interfaces';
 
@@ -61,6 +62,7 @@ export class SideTabRailComponent {
   }
 
   public onDocumentClick(event: MouseEvent): void {
+    if (tutorialIsActive()) return;
     if (this.activePanel() && !this.el.nativeElement.contains(event.target)) {
       // Don't close the panel when clicking inside a SweetAlert dialog
       const target = event.target as HTMLElement;
@@ -79,6 +81,8 @@ export class SideTabRailComponent {
     ) {
       return;
     }
+
+    if (tutorialIsActive()) return;
 
     // Skip panel hotkeys during room placement so R can rotate
     if (roomPlacementPreviewShape()) return;

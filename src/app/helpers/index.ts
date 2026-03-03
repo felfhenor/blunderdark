@@ -115,6 +115,8 @@ export * from './transport-placement';
 export * from './transport-removal';
 export * from './trap-workshop';
 export * from './traps';
+export * from './tutorial';
+export * from './tutorial-steps';
 export * from './ui';
 export * from './version';
 export * from './vertical-transport';

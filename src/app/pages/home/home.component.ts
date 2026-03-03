@@ -8,7 +8,7 @@ import { ConnectButtonsComponent } from '@components/connect-buttons/connect-but
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetStatus, gameReset, setupIs } from '@helpers';
+import { discordSetStatus, gameReset, optionsSet, setupIs } from '@helpers';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -60,6 +60,11 @@ export class HomeComponent implements OnInit {
   }
 
   resumeGame() {
+    this.router.navigate(['/game']);
+  }
+
+  replayTutorial() {
+    optionsSet('tutorialCompleted', false);
     this.router.navigate(['/game']);
   }
 }
