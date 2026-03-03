@@ -6,6 +6,7 @@ import type {
   VictoryPathContent,
   VictoryPathId,
   VictoryPathProgress,
+  VictoryResetProgress,
 } from '@interfaces';
 
 const TEST_PATH_A_ID = 'path-a-id' as VictoryPathId;
@@ -13,6 +14,11 @@ const TEST_PATH_B_ID = 'path-b-id' as VictoryPathId;
 
 const mockProcessDayTracking = vi.fn();
 const mockEvaluatePath = vi.fn();
+const mockGamestateReset = vi.fn();
+let mockVictoryResetProgress: VictoryResetProgress = {
+  completedPathIds: [],
+  totalVictories: 0,
+};
 
 vi.mock('@helpers/content', () => ({
   contentGetEntriesByType: vi.fn(() => []),
@@ -21,6 +27,19 @@ vi.mock('@helpers/content', () => ({
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(() => ({})),
   updateGamestate: vi.fn(),
+  gamestateReset: (...args: unknown[]) => mockGamestateReset(...args),
+}));
+
+vi.mock('@helpers/state-options', () => ({
+  optionsGet: vi.fn((key: string) => {
+    if (key === 'victoryResetProgress') return mockVictoryResetProgress;
+    return undefined;
+  }),
+  optionsSet: vi.fn((key: string, value: unknown) => {
+    if (key === 'victoryResetProgress') {
+      mockVictoryResetProgress = value as VictoryResetProgress;
+    }
+  }),
 }));
 
 vi.mock('@helpers/victory-conditions', () => ({
@@ -39,6 +58,7 @@ const {
   victoryGetProgress,
   victoryRecordDefenseWin,
   victoryReset,
+  victoryResetGame,
   victoryAchievedPathId,
   victoryProgressMap,
   victoryIsAchieved,
@@ -64,6 +84,7 @@ function makePathContent(
         target: 10,
       },
     ],
+    victoryReward: [],
   };
 }
 
@@ -149,6 +170,7 @@ function makeState(overrides: {
 beforeEach(() => {
   vi.clearAllMocks();
   victoryReset();
+  mockVictoryResetProgress = { completedPathIds: [], totalVictories: 0 };
 });
 
 describe('victoryProcess', () => {
@@ -484,6 +506,7 @@ describe('victoryCalculatePathCompletionPercent', () => {
         checkType: 'count' as const,
         target: 100,
       })),
+      victoryReward: [],
     };
   }
 
@@ -499,6 +522,7 @@ describe('victoryCalculatePathCompletionPercent', () => {
       description: 'desc',
       __type: 'victorypath',
       conditions: [],
+      victoryReward: [],
     };
     const progress: VictoryPathProgress = {
       pathId: TEST_PATH_A_ID,
@@ -558,6 +582,7 @@ describe('victoryCalculatePathCompletionPercent', () => {
         { id: 'flag_cond', description: 'Flag', checkType: 'flag', target: 1 },
         { id: 'count_cond', description: 'Count', checkType: 'count', target: 10 },
       ],
+      victoryReward: [],
     };
     const progress: VictoryPathProgress = {
       pathId: TEST_PATH_A_ID,
@@ -609,5 +634,70 @@ describe('victoryCalculatePathCompletionPercent', () => {
     const percentB = victoryCalculatePathCompletionPercent(pathB, progressB);
     expect(percentA).toBe(percentB);
     expect(percentA).toBe(50);
+  });
+});
+
+describe('victoryResetGame', () => {
+  it('records achieved path in options and increments totalVictories', () => {
+    // Set up an achieved victory
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+
+    expect(victoryAchievedPathId()).toBe(TEST_PATH_A_ID);
+
+    victoryResetGame();
+
+    expect(mockVictoryResetProgress.completedPathIds).toContain(
+      TEST_PATH_A_ID,
+    );
+    expect(mockVictoryResetProgress.totalVictories).toBe(1);
+    expect(mockVictoryResetProgress.lastVictoryPathId).toBe(TEST_PATH_A_ID);
+  });
+
+  it('does not add duplicate path IDs to completedPathIds', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_A_ID],
+      totalVictories: 1,
+    };
+
+    // Achieve the same path again
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+    victoryResetGame();
+
+    expect(mockVictoryResetProgress.completedPathIds).toEqual([
+      TEST_PATH_A_ID,
+    ]);
+    expect(mockVictoryResetProgress.totalVictories).toBe(2);
+  });
+
+  it('calls victoryReset and gamestateReset', () => {
+    const pathA = makePathContent(TEST_PATH_A_ID, 'PathA');
+    vi.mocked(contentGetEntriesByType).mockReturnValue([pathA]);
+    mockEvaluatePath.mockReturnValue(makeProgress(TEST_PATH_A_ID, true));
+
+    const state = makeState({ numTicks: 60 });
+    victoryProcess(state);
+    victoryResetGame();
+
+    expect(victoryAchievedPathId()).toBeUndefined();
+    expect(victoryProgressMap().size).toBe(0);
+    expect(mockGamestateReset).toHaveBeenCalled();
+  });
+
+  it('is a no-op when no victory is achieved', () => {
+    victoryResetGame();
+
+    expect(mockVictoryResetProgress.completedPathIds).toEqual([]);
+    expect(mockVictoryResetProgress.totalVictories).toBe(0);
+    expect(mockGamestateReset).not.toHaveBeenCalled();
   });
 });

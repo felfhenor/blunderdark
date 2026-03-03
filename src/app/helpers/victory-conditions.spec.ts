@@ -14,8 +14,9 @@ import type {
   VictoryConditionProgress,
   VictoryPathContent,
   VictoryPathId,
+  VictoryResetProgress,
 } from '@interfaces';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const TEST_DEMON_LORD_ID = 'demon-lord-id' as InhabitantId;
 const TEST_DRAGON_ID = 'dragon-id' as InhabitantId;
@@ -25,6 +26,16 @@ const TEST_DRAGONS_HOARD_ID = 'dragons-hoard-id' as RoomId;
 const TEST_BREEDING_PITS_ID = 'breeding-pits-id' as RoomId;
 const TEST_RESEARCH_A = 'research-a';
 const TEST_RESEARCH_B = 'research-b';
+
+const TEST_PATH_TERROR_ID = '4275f73f-d490-46c6-9e27-d116ed91f383' as VictoryPathId;
+const TEST_PATH_SCIENTIST_ID = '545c819a-d55f-4445-96a7-e5ab4dd1e723' as VictoryPathId;
+
+let mockVictoryResetProgress: VictoryResetProgress = {
+  completedPathIds: [],
+  totalVictories: 0,
+};
+
+let mockVictoryPaths: VictoryPathContent[] = [];
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn((idOrName: string) => {
@@ -65,7 +76,17 @@ vi.mock('@helpers/content', () => ({
         { id: TEST_RESEARCH_B },
       ];
     }
+    if (type === 'victorypath') {
+      return mockVictoryPaths;
+    }
     return [];
+  }),
+}));
+
+vi.mock('@helpers/state-options', () => ({
+  optionsGet: vi.fn((key: string) => {
+    if (key === 'victoryResetProgress') return mockVictoryResetProgress;
+    return undefined;
   }),
 }));
 
@@ -91,7 +112,13 @@ const {
   victoryConditionCheckTotalRoomCount,
   victoryConditionProcessDayTracking,
   victoryConditionEvaluatePath,
+  victoryConditionCheckSinglePathCompleted,
 } = await import('@helpers/victory-conditions');
+
+beforeEach(() => {
+  mockVictoryResetProgress = { completedPathIds: [], totalVictories: 0 };
+  mockVictoryPaths = [];
+});
 
 function makeInhabitant(
   definitionId: InhabitantId,
@@ -841,6 +868,7 @@ describe('victoryConditionEvaluatePath', () => {
         { id: 'terror_depth', description: '', checkType: 'count', target: 10 },
         { id: 'terror_demon_lord', description: '', checkType: 'flag', target: 1 },
       ],
+      victoryReward: [],
     };
     const result = victoryConditionEvaluatePath(path, state);
     expect(result.complete).toBe(true);
@@ -858,6 +886,7 @@ describe('victoryConditionEvaluatePath', () => {
         { id: 'terror_corruption', description: '', checkType: 'resource_threshold', target: 500 },
         { id: 'terror_defenses', description: '', checkType: 'count', target: 10 },
       ],
+      victoryReward: [],
     };
     const result = victoryConditionEvaluatePath(path, state);
     expect(result.complete).toBe(false);
@@ -931,6 +960,7 @@ describe('All conditions track partial progress via victoryConditionEvaluateSing
       __type: 'victorypath',
       description: '',
       conditions: [{ id: conditionId, description: '', checkType: 'count', target }],
+      victoryReward: [],
     };
     return victoryConditionEvaluatePath(path, richState).conditions[0];
   }
@@ -1057,6 +1087,49 @@ describe('All conditions track partial progress via victoryConditionEvaluateSing
   it('empire_rooms: tracks total room count across floors', () => {
     const result = evalSingle('empire_rooms', 100);
     expect(result.currentValue).toBe(4);
+    expect(result.met).toBe(false);
+  });
+});
+
+// === Master of All ===
+
+describe('victoryConditionCheckSinglePathCompleted', () => {
+  it('returns met: false when path not in completed list', () => {
+    mockVictoryResetProgress = { completedPathIds: [], totalVictories: 0 };
+    const result = victoryConditionCheckSinglePathCompleted('master_path_terror');
+    expect(result.conditionId).toBe('master_path_terror');
+    expect(result.met).toBe(false);
+    expect(result.currentValue).toBe(0);
+  });
+
+  it('returns met: true when path is in completed list', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_TERROR_ID],
+      totalVictories: 1,
+    };
+    const result = victoryConditionCheckSinglePathCompleted('master_path_terror');
+    expect(result.met).toBe(true);
+    expect(result.currentValue).toBe(1);
+  });
+
+  it('checks each path independently', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_TERROR_ID, TEST_PATH_SCIENTIST_ID],
+      totalVictories: 2,
+    };
+    expect(victoryConditionCheckSinglePathCompleted('master_path_terror').met).toBe(true);
+    expect(victoryConditionCheckSinglePathCompleted('master_path_hoard').met).toBe(false);
+    expect(victoryConditionCheckSinglePathCompleted('master_path_scientist').met).toBe(true);
+    expect(victoryConditionCheckSinglePathCompleted('master_path_harmony').met).toBe(false);
+    expect(victoryConditionCheckSinglePathCompleted('master_path_empire').met).toBe(false);
+  });
+
+  it('returns met: false for unknown condition id', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_TERROR_ID],
+      totalVictories: 1,
+    };
+    const result = victoryConditionCheckSinglePathCompleted('master_path_unknown');
     expect(result.met).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
 import type { Signal } from '@angular/core';
+import type { VictoryPathId } from '@interfaces/content-victorypath';
 
 export type GameOption =
   | 'showDebug'
@@ -24,6 +25,12 @@ export interface OptionsTabLink {
   showIf: Signal<boolean>;
 }
 
+export type VictoryResetProgress = {
+  completedPathIds: VictoryPathId[];
+  totalVictories: number;
+  lastVictoryPathId?: VictoryPathId;
+};
+
 export type GameSpeed = 1 | 2 | 4;
 
 export type AutosaveInterval = 1 | 3 | 5 | 10;
@@ -37,4 +44,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugSaveInterval: number;
   optionsTab: OptionsTab;
   autosaveIntervalMinutes: AutosaveInterval;
+  victoryResetProgress: VictoryResetProgress;
 };

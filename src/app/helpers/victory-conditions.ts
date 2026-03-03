@@ -1,5 +1,6 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { roomUpgradeGetApplied } from '@helpers/room-upgrades';
+import { optionsGet } from '@helpers/state-options';
 import type {
   GameState,
   InhabitantContent,
@@ -8,7 +9,9 @@ import type {
   RoomContent,
   VictoryConditionProgress,
   VictoryPathContent,
+  VictoryPathId,
   VictoryPathProgress,
+  VictoryResetProgress,
 } from '@interfaces';
 
 
@@ -300,6 +303,34 @@ export function victoryConditionCheckTotalRoomCount(
   };
 }
 
+// --- Master of All ---
+
+const MASTER_CONDITION_TO_PATH: Record<string, VictoryPathId> = {
+  master_path_terror: '4275f73f-d490-46c6-9e27-d116ed91f383' as VictoryPathId,
+  master_path_hoard: '8a6c42bb-690f-4c60-a781-b91fbf3c4864' as VictoryPathId,
+  master_path_scientist: '545c819a-d55f-4445-96a7-e5ab4dd1e723' as VictoryPathId,
+  master_path_harmony: '1c9dd17c-04df-478b-ad3a-ec1bd3dcc8d9' as VictoryPathId,
+  master_path_empire: 'a1351de2-f672-4820-9a7c-504eaaa83716' as VictoryPathId,
+};
+
+export function victoryConditionCheckSinglePathCompleted(
+  conditionId: string,
+): VictoryConditionProgress {
+  const progress: VictoryResetProgress = optionsGet('victoryResetProgress') ?? {
+    completedPathIds: [],
+    totalVictories: 0,
+  };
+  const targetPathId = MASTER_CONDITION_TO_PATH[conditionId];
+  const completed = targetPathId
+    ? progress.completedPathIds.includes(targetPathId)
+    : false;
+  return {
+    conditionId,
+    currentValue: completed ? 1 : 0,
+    met: completed,
+  };
+}
+
 // --- Day tracking processes ---
 
 export function victoryConditionProcessDayTracking(state: GameState): void {
@@ -418,6 +449,14 @@ function victoryConditionEvaluateSingle(
       return victoryConditionCheckUniqueInhabitants(state, target);
     case 'empire_rooms':
       return victoryConditionCheckTotalRoomCount(state, target);
+
+    // Master of All
+    case 'master_path_terror':
+    case 'master_path_hoard':
+    case 'master_path_scientist':
+    case 'master_path_harmony':
+    case 'master_path_empire':
+      return victoryConditionCheckSinglePathCompleted(conditionId);
 
     default:
       return { conditionId, currentValue: 0, met: false };

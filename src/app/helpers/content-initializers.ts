@@ -655,5 +655,6 @@ function ensureVictoryPath(
       checkType: c.checkType ?? 'flag',
       target: c.target ?? 0,
     })),
+    victoryReward: path.victoryReward ?? [],
   };
 }

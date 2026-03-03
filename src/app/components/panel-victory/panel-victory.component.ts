@@ -6,6 +6,7 @@ import {
   inject,
   model,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
@@ -13,21 +14,25 @@ import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntry } from '@helpers/content';
 import { floorAll } from '@helpers/floor';
+import { RESOURCE_LABEL_MAP } from '@helpers/resource-icons';
 import { gamestate, gamestateSave } from '@helpers/state-game';
 import { optionsSet } from '@helpers/state-options';
 import {
   victoryAchievedPathId,
   victoryDismissPanel,
   victoryGetProgress,
+  victoryResetGame,
   victoryShowPanel,
 } from '@helpers/victory';
 import type {
   VictoryPathContent,
 } from '@interfaces';
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-victory',
-  imports: [DecimalPipe, ModalComponent],
+  imports: [DecimalPipe, ModalComponent, SweetAlert2Module],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal
@@ -94,6 +99,11 @@ import type {
               <span>{{ stats().researchCompleted }}</span>
             </div>
           </div>
+
+          @if (rewardDescription(); as reward) {
+            <div class="divider my-2">Victory Reward</div>
+            <p class="text-sm text-center text-accent font-semibold">{{ reward }}</p>
+          }
         }
       </div>
 
@@ -101,11 +111,25 @@ import type {
         <button class="btn btn-primary" (click)="continuePlaying()">
           Continue Playing
         </button>
+        <button class="btn btn-success" [swal]="claimResetSwal">
+          Claim Victory & Reset
+        </button>
         <button class="btn btn-ghost" (click)="returnToMenu()">
           Return to Menu
         </button>
       </div>
     </app-modal>
+
+    <swal
+      #claimResetSwal
+      title="Claim Victory & Start New Run?"
+      [text]="claimResetText()"
+      icon="question"
+      confirmButtonText="Claim & Reset"
+      cancelButtonText="Not Yet"
+      [showCancelButton]="true"
+      (confirm)="claimVictoryAndReset()"
+    ></swal>
   `,
 })
 export class PanelVictoryComponent {
@@ -113,10 +137,30 @@ export class PanelVictoryComponent {
 
   public visible = model<boolean>(false);
 
+  public claimResetSwal = viewChild<SwalComponent>('claimResetSwal');
+
   public achievedPath = computed(() => {
     const pathId = victoryAchievedPathId();
     if (!pathId) return undefined;
     return contentGetEntry<VictoryPathContent>(pathId);
+  });
+
+  public rewardDescription = computed(() => {
+    const path = this.achievedPath();
+    if (!path?.victoryReward?.length) return undefined;
+    return path.victoryReward
+      .map((reward) => {
+        const label = RESOURCE_LABEL_MAP[reward.resource] ?? reward.resource;
+        return `+${reward.amount} ${label} cap`;
+      })
+      .join(', ');
+  });
+
+  public claimResetText = computed(() => {
+    const path = this.achievedPath();
+    if (!path) return '';
+    const reward = this.rewardDescription() ?? '';
+    return `Path: ${path.name}\nReward: ${reward}\n\nYour current game will be completely reset. Victory progress and cap boosts are permanent.`;
   });
 
   public conditionDetails = computed(() => {
@@ -175,6 +219,13 @@ export class PanelVictoryComponent {
     victoryDismissPanel();
     this.visible.set(false);
     optionsSet('gameloopPaused', false);
+  }
+
+  public claimVictoryAndReset(): void {
+    analyticsSendDesignEvent('Victory:ClaimReset');
+    victoryResetGame();
+    this.visible.set(false);
+    this.router.navigate(['/setup']);
   }
 
   public returnToMenu(): void {

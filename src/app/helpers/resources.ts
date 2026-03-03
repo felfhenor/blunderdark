@@ -1,9 +1,11 @@
 import { computed, type Signal } from '@angular/core';
+import { contentGetEntry } from '@helpers/content';
 import { defaultResources } from '@helpers/defaults';
 import { featureCalculateStorageFlatBonus } from '@helpers/features';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { optionsGet } from '@helpers/state-options';
 import type {
   Floor,
   GameState,
@@ -11,6 +13,8 @@ import type {
   ResourceMap,
   ResourceState,
   ResourceType,
+  VictoryPathContent,
+  VictoryResetProgress,
 } from '@interfaces';
 
 export function resourceGet(type: ResourceType): Signal<ResourceState> {
@@ -198,6 +202,33 @@ export function storageRoomFlatBonus(
 }
 
 /**
+ * Calculate the permanent cap boost from completed victory paths.
+ * Reads from GameOptions (localStorage) so it persists across resets.
+ * Returns 0 for corruption.
+ */
+export function victoryCapBoost(resourceType: ResourceType): number {
+  if (resourceType === 'corruption') return 0;
+
+  const progress: VictoryResetProgress = optionsGet('victoryResetProgress') ?? {
+    completedPathIds: [],
+    totalVictories: 0,
+  };
+  if (progress.completedPathIds.length === 0) return 0;
+
+  let boost = 0;
+  for (const pathId of progress.completedPathIds) {
+    const path = contentGetEntry<VictoryPathContent>(pathId);
+    if (!path?.victoryReward) continue;
+    for (const reward of path.victoryReward) {
+      if (reward.resource === resourceType) {
+        boost += reward.amount;
+      }
+    }
+  }
+  return boost;
+}
+
+/**
  * Compute the effective max for a resource type, including storage bonuses.
  * Corruption is excluded from storage bonuses (already MAX_SAFE_INTEGER).
  */
@@ -209,7 +240,7 @@ export function resourceEffectiveMax(
   if (resourceType === 'corruption') return baseMax;
   const flatBonus = storageRoomFlatBonus(floors, resourceType);
   const featureBonus = featureCalculateStorageFlatBonus(floors, resourceType);
-  return Math.floor(baseMax + flatBonus + featureBonus);
+  return Math.floor(baseMax + flatBonus + featureBonus + victoryCapBoost(resourceType));
 }
 
 /**

@@ -43,6 +43,7 @@
     "./schemas/roomupgrade.schema.json": "gamedata/roomupgrade/*.yml",
     "./schemas/summonrecipe.schema.json": "gamedata/summonrecipe/*.yml",
     "./schemas/synergy.schema.json": "gamedata/synergy/*.yml",
+    "./schemas/traitrune.schema.json": "gamedata/traitrune/*.yml",
     "./schemas/trap.schema.json": "gamedata/trap/*.yml",
     "./schemas/victorypath.schema.json": "gamedata/victorypath/*.yml"
   }

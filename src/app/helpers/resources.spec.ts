@@ -6,16 +6,28 @@ import type {
   ResourceMap,
   RoomId,
   RoomUpgradeEffect,
+  VictoryPathContent,
+  VictoryPathId,
+  VictoryResetProgress,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
 let mockStorageFlatBonus = 0;
+let mockVictoryResetProgress: VictoryResetProgress = {
+  completedPathIds: [],
+  totalVictories: 0,
+};
+let mockContentEntries: Map<string, VictoryPathContent> = new Map();
 
 const STORAGE_ROOM_TYPE_ID = 'test-storage-room-type' as RoomId;
 const OTHER_ROOM_TYPE_ID = 'test-other-room-type' as RoomId;
 
 let mockAppliedEffects: Map<string, RoomUpgradeEffect[]> = new Map();
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: vi.fn((id: string) => mockContentEntries.get(id)),
+}));
 
 vi.mock('@helpers/features', () => ({
   featureCalculateStorageFlatBonus: vi.fn(() => mockStorageFlatBonus),
@@ -48,6 +60,13 @@ vi.mock('@helpers/state-game', () => {
   };
 });
 
+vi.mock('@helpers/state-options', () => ({
+  optionsGet: vi.fn((key: string) => {
+    if (key === 'victoryResetProgress') return mockVictoryResetProgress;
+    return undefined;
+  }),
+}));
+
 // Must import after mock setup
 const {
   resourceAdd,
@@ -60,6 +79,7 @@ const {
   resourceEffectiveMax,
   resourceStorageProcess,
   storageRoomFlatBonus,
+  victoryCapBoost,
   STORAGE_ROOM_BASE_BONUS,
   STORAGE_ROOM_SPECIALIZED_BONUS,
 } = await import('@helpers/resources');
@@ -507,5 +527,106 @@ describe('resourceStorageProcess', () => {
     resourceStorageProcess(state);
     expect(state.world.resources.gold.max).toBe(1100);
     expect(state.world.resources.gold.current).toBe(500);
+  });
+});
+
+describe('victoryCapBoost', () => {
+  const TEST_PATH_A_ID = 'vpath-a' as VictoryPathId;
+  const TEST_PATH_B_ID = 'vpath-b' as VictoryPathId;
+  const TEST_PATH_ALL_ID = 'vpath-all' as VictoryPathId;
+
+  beforeEach(() => {
+    mockVictoryResetProgress = { completedPathIds: [], totalVictories: 0 };
+    mockContentEntries = new Map();
+  });
+
+  it('returns 0 for corruption', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_A_ID],
+      totalVictories: 1,
+    };
+    mockContentEntries.set(TEST_PATH_A_ID, {
+      id: TEST_PATH_A_ID,
+      name: 'Terror Lord',
+      __type: 'victorypath',
+      description: '',
+      conditions: [],
+      victoryReward: [{ resource: 'essence', amount: 200 }],
+    });
+    expect(victoryCapBoost('corruption')).toBe(0);
+  });
+
+  it('returns 0 when no paths are completed', () => {
+    expect(victoryCapBoost('gold')).toBe(0);
+  });
+
+  it('returns correct boost for a single completed path', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_A_ID],
+      totalVictories: 1,
+    };
+    mockContentEntries.set(TEST_PATH_A_ID, {
+      id: TEST_PATH_A_ID,
+      name: 'Terror Lord',
+      __type: 'victorypath',
+      description: '',
+      conditions: [],
+      victoryReward: [{ resource: 'essence', amount: 200 }],
+    });
+    expect(victoryCapBoost('essence')).toBe(200);
+    expect(victoryCapBoost('gold')).toBe(0);
+  });
+
+  it('stacks boosts from multiple completed paths', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_A_ID, TEST_PATH_B_ID],
+      totalVictories: 2,
+    };
+    mockContentEntries.set(TEST_PATH_A_ID, {
+      id: TEST_PATH_A_ID,
+      name: 'Terror Lord',
+      __type: 'victorypath',
+      description: '',
+      conditions: [],
+      victoryReward: [{ resource: 'essence', amount: 200 }],
+    });
+    mockContentEntries.set(TEST_PATH_B_ID, {
+      id: TEST_PATH_B_ID,
+      name: 'Hoardmaster',
+      __type: 'victorypath',
+      description: '',
+      conditions: [],
+      victoryReward: [{ resource: 'essence', amount: 100 }],
+    });
+    expect(victoryCapBoost('essence')).toBe(300);
+  });
+
+  it('applies per-resource boosts from a path with multiple rewards', () => {
+    mockVictoryResetProgress = {
+      completedPathIds: [TEST_PATH_ALL_ID],
+      totalVictories: 1,
+    };
+    mockContentEntries.set(TEST_PATH_ALL_ID, {
+      id: TEST_PATH_ALL_ID,
+      name: 'Master of All',
+      __type: 'victorypath',
+      description: '',
+      conditions: [],
+      victoryReward: [
+        { resource: 'gold', amount: 500 },
+        { resource: 'food', amount: 500 },
+        { resource: 'crystals', amount: 500 },
+        { resource: 'essence', amount: 500 },
+        { resource: 'research', amount: 500 },
+        { resource: 'flux', amount: 500 },
+      ],
+    });
+    expect(victoryCapBoost('gold')).toBe(500);
+    expect(victoryCapBoost('essence')).toBe(500);
+    expect(victoryCapBoost('crystals')).toBe(500);
+    expect(victoryCapBoost('food')).toBe(500);
+    expect(victoryCapBoost('research')).toBe(500);
+    expect(victoryCapBoost('flux')).toBe(500);
+    expect(victoryCapBoost('corruption')).toBe(0);
   });
 });

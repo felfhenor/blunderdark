@@ -32,6 +32,8 @@ export function optionsDefault(): GameOptions {
     showCraftCompletionBubbles: true,
 
     tutorialCompleted: false,
+
+    victoryResetProgress: { completedPathIds: [], totalVictories: 0 },
   };
 }
 

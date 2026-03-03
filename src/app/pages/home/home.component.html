@@ -17,6 +17,14 @@
         Blunderdark!
       </p>
 
+      @if (victoryCount() > 0) {
+        <div class="flex justify-center">
+          <span class="badge badge-success gap-2">
+            {{ completedPathCount() }} Victory Path(s) Completed
+          </span>
+        </div>
+      }
+
       <div class="flex-3 card-actions flex flex-col gap-2 w-1/2 max-w-[300px]">
         <button
           class="btn btn-primary btn-block"

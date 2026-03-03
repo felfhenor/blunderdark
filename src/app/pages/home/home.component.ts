@@ -8,8 +8,9 @@ import { ConnectButtonsComponent } from '@components/connect-buttons/connect-but
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetStatus, gameReset, optionsSet, setupIs } from '@helpers';
+import { discordSetStatus, gameReset, optionsGet, optionsSet, setupIs } from '@helpers';
 import { MetaService } from '@services/meta.service';
+import type { VictoryResetProgress } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -37,6 +38,20 @@ export class HomeComponent implements OnInit {
   public resetGameSwal = viewChild<SwalComponent>('newGameSwal');
 
   public hasStartedGame = computed(() => setupIs());
+
+  public victoryCount = computed(() => {
+    const progress: VictoryResetProgress = optionsGet(
+      'victoryResetProgress',
+    ) ?? { completedPathIds: [], totalVictories: 0 };
+    return progress.totalVictories;
+  });
+
+  public completedPathCount = computed(() => {
+    const progress: VictoryResetProgress = optionsGet(
+      'victoryResetProgress',
+    ) ?? { completedPathIds: [], totalVictories: 0 };
+    return progress.completedPathIds.length;
+  });
 
   ngOnInit() {
     discordSetStatus({

@@ -1,5 +1,7 @@
 import { computed, signal, type Signal } from '@angular/core';
 import { contentGetEntriesByType } from '@helpers/content';
+import { gamestateReset } from '@helpers/state-game';
+import { optionsGet, optionsSet } from '@helpers/state-options';
 import {
   victoryConditionEvaluatePath,
   victoryConditionProcessDayTracking,
@@ -9,6 +11,7 @@ import type {
   VictoryPathContent,
   VictoryPathId,
   VictoryPathProgress,
+  VictoryResetProgress,
 } from '@interfaces';
 
 const VICTORY_CHECK_INTERVAL = 60;
@@ -140,4 +143,34 @@ export function victoryReset(): void {
   _victoryAchievedPathId.set(undefined);
   _victoryProgressMap.set(new Map());
   _victoryShowPanel.set(false);
+}
+
+/**
+ * Claim victory reward and reset the game for a new run.
+ * Records the achieved path in cross-run progress, then resets game state.
+ * Does NOT navigate — caller handles navigation.
+ */
+export function victoryResetGame(): void {
+  const achievedPathId = _victoryAchievedPathId();
+  if (!achievedPathId) return;
+
+  const defaultProgress: VictoryResetProgress = {
+    completedPathIds: [],
+    totalVictories: 0,
+  };
+  const current: VictoryResetProgress =
+    optionsGet('victoryResetProgress') ?? defaultProgress;
+
+  const updated: VictoryResetProgress = {
+    completedPathIds: current.completedPathIds.includes(achievedPathId)
+      ? [...current.completedPathIds]
+      : [...current.completedPathIds, achievedPathId],
+    totalVictories: current.totalVictories + 1,
+    lastVictoryPathId: achievedPathId,
+  };
+
+  optionsSet('victoryResetProgress', updated);
+
+  victoryReset();
+  gamestateReset();
 }
