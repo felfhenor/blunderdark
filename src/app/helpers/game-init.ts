@@ -1,5 +1,6 @@
 import { setupFinish } from '@helpers/setup';
 import { gamestateReset } from '@helpers/state-game';
+import { optionsSet } from '@helpers/state-options';
 import { worldSet } from '@helpers/world';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
@@ -18,4 +19,5 @@ export async function gameStart(): Promise<void> {
 
 export function gameReset(): void {
   gamestateReset();
+  optionsSet('gameloopPaused', false);
 }

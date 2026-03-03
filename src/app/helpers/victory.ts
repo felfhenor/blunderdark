@@ -173,4 +173,5 @@ export function victoryResetGame(): void {
 
   victoryReset();
   gamestateReset();
+  optionsSet('gameloopPaused', false);
 }
