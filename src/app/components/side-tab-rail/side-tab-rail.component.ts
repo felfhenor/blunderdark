@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
+import { TippyDirective } from '@ngneat/helipopper';
 
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { roomPlacementPreviewShape } from '@helpers/room-placement';
@@ -20,7 +21,7 @@ import type { SideTabDefinition } from '@interfaces';
 
 @Component({
   selector: 'app-side-tab-rail',
-  imports: [NgTemplateOutlet, IconComponent],
+  imports: [NgTemplateOutlet, IconComponent, TippyDirective],
   templateUrl: './side-tab-rail.component.html',
   styleUrl: './side-tab-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

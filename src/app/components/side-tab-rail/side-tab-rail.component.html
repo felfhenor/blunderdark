@@ -4,7 +4,7 @@
 >
   @for (tab of visibleTabs(); track tab.id) {
     <button
-      class="tab-btn flex items-center bg-base-200 rounded-lg whitespace-nowrap py-2 px-2 text-xs transition-colors cursor-pointer"
+      class="tab-btn flex items-center justify-center bg-base-200 rounded-lg py-2 px-2 text-xs transition-colors cursor-pointer"
       [class.bg-primary]="
         activePanel() === tab.id && !tab.isModal && !tab.action
       "
@@ -17,6 +17,8 @@
       [style.opacity]="
         activePanel() === tab.id && !tab.isModal && !tab.action ? 1 : 0.7
       "
+      [tp]="tab.label + (tab.hotkey ? ' [' + tab.hotkey.toUpperCase() + ']' : '')"
+      tpPlacement="right"
       (click)="onTabClick(tab)"
     >
       @if (tab.icon) {
@@ -27,12 +29,6 @@
           [class.icon-glow]="tab.iconGlow?.()"
         />
       }
-      <span class="tab-label ml-2">
-        {{ tab.label }}
-        @if (tab.hotkey) {
-          <span class="opacity-50">[{{ tab.hotkey.toUpperCase() }}]</span>
-        }
-      </span>
     </button>
   }
 </div>
