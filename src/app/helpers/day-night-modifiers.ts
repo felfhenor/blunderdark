@@ -2,7 +2,7 @@ import { contentGetEntry } from '@helpers/content';
 import { formatMultiplierAsPercentage } from '@helpers/format';
 import { findModifierMultiplier } from '@helpers/modifier-utils';
 import type { InhabitantInstance, PlacedRoomId } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { InhabitantContent, InhabitantCreatureType } from '@interfaces/content-inhabitant';
 import type { DayNightPhase, DayNightResourceModifier, DayNightCreatureModifier } from '@interfaces/day-night';
 
 // --- Constants ---
@@ -106,7 +106,7 @@ export function dayNightGetActiveResourceModifiers(hour: number): DayNightResour
  * Get the creature-type production multiplier for a given hour and creature type.
  * Returns 1.0 if no modifier applies.
  */
-export function dayNightGetCreatureModifier(hour: number, creatureType: string): number {
+export function dayNightGetCreatureModifier(hour: number, creatureType: InhabitantCreatureType): number {
   const phase = dayNightGetPhase(hour);
   return findModifierMultiplier(
     CREATURE_MODIFIERS,
@@ -161,7 +161,7 @@ export function dayNightCalculateCreatureProductionModifier(
  */
 export function dayNightCalculateCreatureProductionModifierPure(
   hour: number,
-  creatureTypes: string[],
+  creatureTypes: InhabitantCreatureType[],
 ): number {
   if (creatureTypes.length === 0) return 1.0;
 

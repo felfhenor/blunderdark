@@ -5,6 +5,7 @@ import type {
   FeatureContent,
   FeatureId,
 } from '@interfaces/content-feature';
+import type { InhabitantCreatureType } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import type { Floor } from '@interfaces/floor';
 import type { ResourceMap, ResourceType } from '@interfaces/resource';
@@ -108,7 +109,7 @@ export function featureCalculateFearReduction(
  */
 export function featureCalculateCapacityBonus(
   placedRoom: PlacedRoom,
-  inhabitantType?: string,
+  inhabitantType?: InhabitantCreatureType,
 ): number {
   const bonuses = featureGetBonuses(placedRoom, 'capacity_bonus');
   let bonus = 0;

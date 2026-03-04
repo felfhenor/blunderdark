@@ -17,7 +17,10 @@ import type {
   PlacedRoomId,
   RoomId,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type {
+  InhabitantContent,
+  InhabitantRestrictionTag,
+} from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 
 /**
@@ -147,7 +150,7 @@ export function inhabitantGetAssignmentLabel(
  */
 export function inhabitantMeetsRestriction(
   inhabitantDef: InhabitantContent,
-  restriction: string | undefined,
+  restriction: InhabitantRestrictionTag | undefined,
 ): boolean {
   if (restriction === undefined) return true;
   return inhabitantDef.restrictionTags.includes(restriction);

@@ -178,7 +178,7 @@ describe('ensureContent', () => {
         name: 'Test Creature',
         __type: 'inhabitant' as const,
       });
-      expect(result.type).toBe('');
+      expect(result.type).toBe('creature');
       expect(result.tier).toBe(1);
       expect(result.cost).toEqual({});
       expect(result.stats).toEqual({

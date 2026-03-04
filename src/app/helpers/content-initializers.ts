@@ -475,7 +475,7 @@ function ensureInhabitant(
     id: inhabitant.id ?? ('UNKNOWN' as InhabitantId),
     name: inhabitant.name ?? 'UNKNOWN',
     __type: 'inhabitant',
-    type: inhabitant.type ?? '',
+    type: inhabitant.type ?? 'creature',
     tier: inhabitant.tier ?? 1,
     description: inhabitant.description ?? '',
     cost: inhabitant.cost ?? {},

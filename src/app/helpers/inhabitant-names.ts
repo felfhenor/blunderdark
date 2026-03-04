@@ -1,10 +1,11 @@
 import { species } from 'fantastical';
 import { rngChoice } from '@helpers/rng';
+import type { InhabitantCreatureType } from '@interfaces/content-inhabitant';
 
 const genders = ['male', 'female'] as const;
 const randomGender = () => rngChoice([...genders]);
 
-const typeToGenerators: Record<string, Array<() => string>> = {
+const typeToGenerators: Record<InhabitantCreatureType, Array<() => string>> = {
   creature: [species.goblin, species.orc],
   undead: [() => species.darkelf(randomGender())],
   ooze: [species.ogre],
@@ -16,7 +17,7 @@ const typeToGenerators: Record<string, Array<() => string>> = {
 
 const fallbackGenerators: Array<() => string> = [species.human];
 
-export function generateInhabitantName(type: string): string {
+export function generateInhabitantName(type: InhabitantCreatureType): string {
   const generators = typeToGenerators[type] ?? fallbackGenerators;
   const generator = rngChoice(generators);
   return generator();

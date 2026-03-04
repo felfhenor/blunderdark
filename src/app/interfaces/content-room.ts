@@ -1,3 +1,4 @@
+import type { InhabitantRestrictionTag } from '@interfaces/content-inhabitant';
 import type { RoomUpgradeId } from '@interfaces/content-roomupgrade';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
@@ -19,7 +20,7 @@ export type RoomContent = IsContentItem &
     removable: boolean;
     maxInhabitants: number;
     maxFeatures: number;
-    inhabitantRestriction: string | undefined;
+    inhabitantRestriction: InhabitantRestrictionTag | undefined;
     fearLevel: number | 'variable';
     fearReductionAura: number;
     autoPlace: boolean;

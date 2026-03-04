@@ -14,16 +14,33 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type InhabitantId = Branded<string, 'InhabitantId'>;
 
+export type InhabitantCreatureType =
+  | 'creature'
+  | 'undead'
+  | 'demon'
+  | 'dragon'
+  | 'aberration'
+  | 'fungal'
+  | 'ooze';
+
+export type InhabitantRestrictionTag =
+  | 'unique'
+  | 'hybrid'
+  | 'summoned'
+  | 'converted'
+  | 'harmony_attract'
+  | 'harmony_attract_legendary';
+
 export type InhabitantContent = IsContentItem &
   HasDescription & {
     id: InhabitantId;
-    type: string;
+    type: InhabitantCreatureType;
     tier: number;
     cost: Partial<Record<ResourceType, number>>;
     stats: InhabitantStats;
     inhabitantTraitIds: InhabitantTraitId[];
     traits: InhabitantTrait[];
-    restrictionTags: string[];
+    restrictionTags: InhabitantRestrictionTag[];
     rulerBonuses: RulerBonuses;
     rulerFearLevel: number;
     fearTolerance: number | undefined;

@@ -20,7 +20,10 @@ import type {
   ResourceCost,
   ResourceType,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type {
+  InhabitantContent,
+  InhabitantRestrictionTag,
+} from '@interfaces/content-inhabitant';
 
 export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
 
@@ -72,7 +75,7 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
  * 'harmony_attract' requires level >= 1, 'harmony_attract_legendary' requires level >= 2.
  * Returns 0 if the creature has no harmony attraction restriction.
  */
-function getRequiredAttractionLevel(restrictionTags: string[]): number {
+function getRequiredAttractionLevel(restrictionTags: InhabitantRestrictionTag[]): number {
   let maxRequired = 0;
   for (const tag of restrictionTags) {
     if (tag === 'harmony_attract_legendary') return 2;
@@ -87,10 +90,10 @@ function getRequiredAttractionLevel(restrictionTags: string[]): number {
  * and the current attraction level meets the requirement.
  */
 function areRestrictionTagsSatisfied(
-  restrictionTags: string[],
+  restrictionTags: InhabitantRestrictionTag[],
   attractionLevel: number,
 ): boolean {
-  const harmonyTags = new Set(['harmony_attract', 'harmony_attract_legendary']);
+  const harmonyTags = new Set<InhabitantRestrictionTag>(['harmony_attract', 'harmony_attract_legendary']);
   // All restriction tags must be harmony attraction tags
   if (!restrictionTags.every((tag) => harmonyTags.has(tag))) return false;
   const requiredLevel = getRequiredAttractionLevel(restrictionTags);
