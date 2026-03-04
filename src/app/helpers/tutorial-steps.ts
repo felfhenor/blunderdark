@@ -74,7 +74,7 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: 'app-grid',
     title: 'Invasions',
     description:
-      'Heroes will periodically invade your dungeon! Traps, defenders, and room layouts all matter. Prepare well and reap the rewards of victory. Good luck, Overlord!',
+      'Heroes will periodically invade your dungeon starting on Day 5! Traps, defenders, and room layouts all matter. Prepare well and reap the rewards of victory. Good luck, Overlord!',
     tooltipPosition: 'bottom',
   },
 ];

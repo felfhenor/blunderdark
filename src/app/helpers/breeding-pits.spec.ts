@@ -326,7 +326,7 @@ function makeGameState(overrides: { floors?: Floor[] }): GameState {
       invasionSchedule: {
         nextInvasionDay: undefined,
         nextInvasionVariance: 0,
-        gracePeriodEnd: 10,
+        gracePeriodEnd: 5,
         invasionHistory: [],
         pendingSpecialInvasions: [],
         warningActive: false,

@@ -325,7 +325,7 @@ describe('invasion-triggers', () => {
 
   describe('invasionTriggerProcessSchedule', () => {
     it('should do nothing during grace period', () => {
-      const state = makeGameState({ day: 5 });
+      const state = makeGameState({ day: 3 });
       const rng = seedrandom('grace');
       invasionTriggerProcessSchedule(state, rng);
       expect(state.world.invasionSchedule.nextInvasionDay).toBeUndefined();
@@ -508,7 +508,7 @@ describe('invasion-triggers', () => {
 
   describe('constants', () => {
     it('should have correct default values', () => {
-      expect(INVASION_TRIGGER_DEFAULT_GRACE_PERIOD).toBe(10);
+      expect(INVASION_TRIGGER_DEFAULT_GRACE_PERIOD).toBe(5);
       expect(INVASION_TRIGGER_MIN_INTERVAL).toBe(5);
       expect(INVASION_TRIGGER_MAX_VARIANCE).toBe(2);
       expect(INVASION_TRIGGER_MIN_DAYS_BETWEEN).toBe(3);
@@ -597,7 +597,7 @@ describe('invasion-triggers', () => {
       const schedule = defaultInvasionSchedule();
       expect(schedule.nextInvasionDay).toBeUndefined();
       expect(schedule.nextInvasionVariance).toBe(0);
-      expect(schedule.gracePeriodEnd).toBe(10);
+      expect(schedule.gracePeriodEnd).toBe(5);
       expect(schedule.invasionHistory).toEqual([]);
       expect(schedule.pendingSpecialInvasions).toEqual([]);
       expect(schedule.warningActive).toBe(false);

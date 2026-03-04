@@ -152,9 +152,9 @@ describe('defaultFloor', () => {
 });
 
 describe('defaultInvasionSchedule', () => {
-  it('should have grace period ending on day 10', () => {
+  it('should have grace period ending on day 5', () => {
     const schedule = defaultInvasionSchedule();
-    expect(schedule.gracePeriodEnd).toBe(10);
+    expect(schedule.gracePeriodEnd).toBe(5);
   });
 
   it('should have no scheduled invasion or history', () => {
