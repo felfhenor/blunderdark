@@ -11,6 +11,7 @@ import {
   defaultResearchState,
   defaultResources,
   defaultSeasonState,
+  defaultUnlockedCurrencies,
   defaultVictoryProgress,
 } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
@@ -101,6 +102,7 @@ export async function worldgenGenerateWorld(): Promise<
     corruptionEffects: defaultCorruptionEffectState(),
     victoryProgress: defaultVictoryProgress(),
     merchant: defaultMerchantState(),
+    unlockedCurrencies: defaultUnlockedCurrencies(),
     didFinish: true,
   };
 }

@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import {
+  ALL_CURRENCIES,
   defaultCorruptionEffectState,
   defaultGameState,
   defaultUnlockedContent,
@@ -91,6 +92,16 @@ export function migrateGameState() {
     newState.world.corruptionEffects as CorruptionEffectState & Record<string, unknown>,
   );
   reconcileResearchUnlocks(newState);
+
+  // Existing saves (ticks > 0) get all currencies unlocked
+  if (
+    state.clock.numTicks > 0 &&
+    (!state.world.unlockedCurrencies ||
+      state.world.unlockedCurrencies.length === 0)
+  ) {
+    newState.world.unlockedCurrencies = [...ALL_CURRENCIES];
+  }
+
   gamestateSet(newState);
   gamestateTickStart();
   gamestateTickEnd();

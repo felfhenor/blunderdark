@@ -1016,6 +1016,7 @@ export function productionCalculateBreakdowns(
     }
   }
 
+
   return breakdowns;
 }
 
@@ -1498,8 +1499,14 @@ export function productionProcess(state: GameState, numTicks = 1): void {
     ...Object.keys(consumption),
   ]);
 
+  const unlocked = state.world.unlockedCurrencies;
+
   for (const type of allTypes) {
     const resourceType = type as ResourceType;
+
+    // Skip locked currencies — no generation or accumulation
+    if (unlocked && !unlocked.includes(resourceType)) continue;
+
     const gain = production[resourceType] ?? 0;
     const cost = consumption[resourceType] ?? 0;
     const net = gain - cost;

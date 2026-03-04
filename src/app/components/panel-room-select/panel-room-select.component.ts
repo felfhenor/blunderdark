@@ -7,6 +7,7 @@ import {
   biomeRestrictionCanBuild,
   biomeRestrictionGetRoomInfo,
   contentGetEntriesByType,
+  currencyIsUnlocked,
   floorAll,
   floorCurrent,
   gamestate,
@@ -22,6 +23,7 @@ import {
   researchUnlockIsFeatureUnlocked,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
+  RESOURCE_LABEL_MAP,
   resourceCanAfford,
   roomPlacementCountTypeAllFloors,
   roomPlacementEnterMode,
@@ -139,6 +141,19 @@ export class PanelRoomSelectComponent {
     return undefined;
   }
 
+  public isCurrencyLocked(room: RoomContent): boolean {
+    return Object.keys(room.cost).some(
+      (type) => !currencyIsUnlocked(type as ResourceType),
+    );
+  }
+
+  public getCurrencyLockedTooltip(room: RoomContent): string {
+    const locked = Object.keys(room.cost)
+      .filter((type) => !currencyIsUnlocked(type as ResourceType))
+      .map((type) => RESOURCE_LABEL_MAP[type as ResourceType]);
+    return `Requires ${locked.join(', ')}`;
+  }
+
   public isAtGlobalLimit(room: RoomContent): boolean {
     if (room.isUnique) return false;
     const floors = gamestate().world.floors;
@@ -197,6 +212,9 @@ export class PanelRoomSelectComponent {
   }
 
   public getRoomTooltip(room: RoomContent): string {
+    if (this.isCurrencyLocked(room)) {
+      return this.getCurrencyLockedTooltip(room);
+    }
     if (this.isBiomeRestricted(room)) {
       return this.getBiomeRestrictionTooltip(room);
     }

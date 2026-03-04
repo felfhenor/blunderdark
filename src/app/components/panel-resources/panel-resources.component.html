@@ -25,7 +25,7 @@
   }
 }
 <div class="bg-base-200 p-2 rounded-lg flex flex-col gap-2">
-  @for (res of resources; track res.type) {
+  @for (res of resources(); track res.type) {
     <div
       class="relative px-2 py-1 rounded cursor-default"
       [ngClass]="getWarningClass(res.type)"

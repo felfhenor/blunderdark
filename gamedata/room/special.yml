@@ -3,8 +3,7 @@
   description: The dark heart of your dungeon. This ancient altar is the source of your power, enabling room construction and creature recruitment. Its calming aura reduces fear in adjacent rooms.
   shapeId: Square 3x3
   cost: {}
-  production:
-    essence: 0.2
+  production: {}
   requiresWorkers: false
   adjacencyBonuses: []
   isUnique: true

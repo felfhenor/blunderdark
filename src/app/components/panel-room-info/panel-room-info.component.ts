@@ -20,6 +20,7 @@ import { SynergyTooltipComponent } from '@components/synergy-tooltip/synergy-too
 import { UpgradeEffectBadgeComponent } from '@components/upgrade-effect-badge/upgrade-effect-badge.component';
 import {
   connectivityDisconnectedRoomIds,
+  currencyUnlock,
   inhabitantAssignToRoom,
   inhabitantAll,
   efficiencyCalculateRoom,
@@ -84,12 +85,12 @@ import {
 import type {
   InhabitantInstance,
   PlacedRoomId,
+  ResourceType,
   RoomUpgradeEffect,
   RoomUpgradeContent,
 } from '@interfaces';
 import type { FeatureContent, FeatureId } from '@interfaces/content-feature';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { ResourceType } from '@interfaces/resource';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
@@ -776,6 +777,17 @@ export class PanelRoomInfoComponent {
 
     this.showFeatureSelect.set(false);
     notifySuccess(`Attached ${feature.name}`);
+
+    // Unlock currencies produced by this feature
+    for (const bonus of feature.bonuses) {
+      if (
+        (bonus.type === 'flat_production' ||
+          bonus.type === 'corruption_generation') &&
+        bonus.targetType
+      ) {
+        await currencyUnlock(bonus.targetType as ResourceType);
+      }
+    }
   }
 
   public async onRemoveFeature(slotIndex: number): Promise<void> {

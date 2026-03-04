@@ -185,6 +185,7 @@
           [class.room-biome-restricted]="isBiomeRestricted(room)"
           [disabled]="
             isHallwayMode() ||
+            isCurrencyLocked(room) ||
             isUniqueAndPlaced(room) ||
             isBiomeRestricted(room) ||
             isAtGlobalLimit(room) ||

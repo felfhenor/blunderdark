@@ -12,6 +12,7 @@ import type {
   ReputationState,
   ResearchState,
   ResourceMap,
+  ResourceType,
   SeasonState,
   UnlockedContent,
   VictoryProgress,
@@ -55,8 +56,25 @@ export function defaultGameState(): GameState {
       corruptionEffects: defaultCorruptionEffectState(),
       victoryProgress: defaultVictoryProgress(),
       merchant: defaultMerchantState(),
+      unlockedCurrencies: defaultUnlockedCurrencies(),
     },
   };
+}
+
+export const STARTING_CURRENCIES: ResourceType[] = ['gold', 'food', 'crystals'];
+
+export const ALL_CURRENCIES: ResourceType[] = [
+  'gold',
+  'food',
+  'crystals',
+  'flux',
+  'research',
+  'essence',
+  'corruption',
+];
+
+export function defaultUnlockedCurrencies(): ResourceType[] {
+  return [...STARTING_CURRENCIES];
 }
 
 export function defaultSeasonState(): SeasonState {

@@ -9,6 +9,7 @@ import {
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { IconComponent } from '@components/icon/icon.component';
 import {
+  currencyIsUnlocked,
   gamestate,
   hungerCalculateTotalConsumption,
   hungerGetWarningLevel,
@@ -49,7 +50,9 @@ const CRITICAL_THRESHOLD = 0.1;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelResourcesComponent {
-  public readonly resources = RESOURCE_DISPLAY;
+  public readonly resources = computed(() =>
+    RESOURCE_DISPLAY.filter((r) => currencyIsUnlocked(r.type)),
+  );
   public rates = productionRates;
 
   public readonly getCurrent = resourceDisplayGetCurrent;

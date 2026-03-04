@@ -16,6 +16,7 @@ import type { ActiveInvasion, CapturedPrisoner, InvasionSchedule } from '@interf
 import type { MerchantState } from '@interfaces/merchant';
 import type { InterrogationBuff } from '@interfaces/torture';
 import type { TraitRune } from '@interfaces/traitrune';
+import type { ResourceType } from '@interfaces/resource';
 import type { VictoryProgress } from '@interfaces/victory';
 
 export type GameId = Branded<string, 'GameId'>;
@@ -43,6 +44,7 @@ export interface GameStateWorld {
   corruptionEffects: CorruptionEffectState;
   victoryProgress: VictoryProgress;
   merchant: MerchantState;
+  unlockedCurrencies: ResourceType[];
 }
 
 export interface GameStateClock {

@@ -45,6 +45,7 @@ import { PanelTrapWorkshopComponent } from '@components/panel-trap-workshop/pane
 import { PanelVictoryComponent } from '@components/panel-victory/panel-victory.component';
 import { ResourceBarTopComponent } from '@components/resource-bar-top/resource-bar-top.component';
 import { SideTabRailComponent } from '@components/side-tab-rail/side-tab-rail.component';
+import { CurrencyUnlockPopupComponent } from '@components/currency-unlock-popup/currency-unlock-popup.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -120,6 +121,7 @@ import { GameResearchComponent } from '@pages/game-research/game-research.compon
     PanelRoomInfoComponent,
     PanelRoomSelectComponent,
     PanelRosterComponent,
+    CurrencyUnlockPopupComponent,
     SideTabRailComponent,
     TutorialOverlayComponent,
     PanelTimeOfDayComponent,

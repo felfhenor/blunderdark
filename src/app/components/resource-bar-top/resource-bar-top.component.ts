@@ -9,6 +9,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.c
 import { IconComponent } from '@components/icon/icon.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import {
+  currencyIsUnlocked,
   RESOURCE_DISPLAY,
   resourceDisplayFormatBreakdownRate,
   resourceDisplayGetBreakdown,
@@ -43,7 +44,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceBarTopComponent {
-  public readonly resources = RESOURCE_DISPLAY;
+  public readonly resources = computed(() =>
+    RESOURCE_DISPLAY.filter((r) => currencyIsUnlocked(r.type)),
+  );
 
   public readonly getCurrent = resourceDisplayGetCurrent;
   public readonly getMax = resourceDisplayGetMax;

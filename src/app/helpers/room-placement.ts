@@ -2,6 +2,7 @@ import { computed, signal } from '@angular/core';
 import { altarRoomFind } from '@helpers/altar-room';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
+import { currencyIsUnlocked, currencyUnlock } from '@helpers/currency-unlock';
 import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
 import { floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
@@ -20,6 +21,7 @@ import type {
   GridState,
   PlacedRoom,
   PlacedRoomId,
+  ResourceType,
   RoomId,
   RoomShapeContent,
   RoomShapeId,
@@ -362,6 +364,15 @@ export async function roomPlacementExecute(
     roomPlacementRotation(),
   );
   if (!placed) return { success: false, error: 'Failed to place room' };
+
+  // Unlock currencies produced by this room
+  if (roomDef.production) {
+    for (const [resourceType, amount] of Object.entries(roomDef.production)) {
+      if (amount && amount !== 0 && !currencyIsUnlocked(resourceType as ResourceType)) {
+        await currencyUnlock(resourceType as ResourceType);
+      }
+    }
+  }
 
   // Award reputation for placing specific room types
   if (roomDef.reputationAction) {
