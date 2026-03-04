@@ -3,7 +3,9 @@ import type { ElementRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   effect,
+  inject,
   input,
   model,
   output,
@@ -34,6 +36,9 @@ export class ModalComponent {
 
   public modal = viewChild<ElementRef<HTMLDialogElement>>('modal');
 
+  private destroyRef = inject(DestroyRef);
+  private trackedOpen = false;
+
   constructor() {
     effect(() => {
       const visible = this.visible();
@@ -42,8 +47,16 @@ export class ModalComponent {
         return;
       }
 
+      this.trackedOpen = true;
       uiModalOpenCount.update((c) => c + 1);
       this.modal()?.nativeElement.show();
+    });
+
+    this.destroyRef.onDestroy(() => {
+      if (this.trackedOpen) {
+        uiModalOpenCount.update((c) => Math.max(0, c - 1));
+        this.trackedOpen = false;
+      }
     });
   }
 
@@ -66,6 +79,7 @@ export class ModalComponent {
     this.modal()?.nativeElement.close();
     this.visible.set(false);
     if (wasVisible) {
+      this.trackedOpen = false;
       uiModalOpenCount.update((c) => Math.max(0, c - 1));
       this.modalClose.emit();
     }
