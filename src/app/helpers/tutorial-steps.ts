@@ -26,6 +26,14 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     tooltipPosition: 'bottom',
   },
   {
+    id: 'starter-rooms',
+    targetSelector: 'app-grid',
+    title: 'Starter Rooms',
+    description:
+      'A Crystal Mine and Mushroom Grove have been placed for you. They produce crystals and food - but only when workers are assigned! Open the Roster panel and assign your Slimes to these rooms to start earning resources.',
+    tooltipPosition: 'bottom',
+  },
+  {
     id: 'side-tabs',
     targetSelector: 'app-side-tab-rail',
     title: 'Side Tabs',

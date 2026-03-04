@@ -7,6 +7,7 @@
   production:
     crystals: 1
   requiresWorkers: true
+  autoPlace: true
   maxInhabitants: 2
   maxFeatures: 1
   fearLevel: 1
@@ -48,6 +49,7 @@
   production:
     food: 1.6
   requiresWorkers: true
+  autoPlace: true
   maxInhabitants: 3
   maxFeatures: 1
   fearLevel: 1
