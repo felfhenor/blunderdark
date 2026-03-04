@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 
 export type TabDefinition = {
   id: string;
@@ -9,14 +10,17 @@ export type TabDefinition = {
 
 @Component({
   selector: 'app-tab-bar',
+  imports: [SFXDirective],
   template: `
     <div role="tablist" class="tabs"
       [class.tabs-bordered]="variant() === 'bordered'"
       [class.tabs-boxed]="variant() === 'boxed'"
       [class.tabs-xs]="size() === 'xs'">
-      @for (tab of tabs(); track tab.id) {
+      @for (tab of tabs(); track tab.id; let i = $index) {
         @if (!tab.hidden) {
           <button role="tab" class="tab"
+            appSfx="ui-click"
+            [sfxOffset]="i"
             [class.tab-active]="activeTab() === tab.id"
             (click)="activeTab.set(tab.id)">
             {{ tab.label }}@if (tab.count !== undefined) { ({{ tab.count }})}

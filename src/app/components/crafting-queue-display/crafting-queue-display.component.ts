@@ -6,6 +6,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 
 export type QueueDisplayJob = {
@@ -23,7 +24,7 @@ export type CancelGroupEvent = {
 
 @Component({
   selector: 'app-crafting-queue-display',
-  imports: [DecimalPipe, JobProgressComponent],
+  imports: [DecimalPipe, JobProgressComponent, SFXDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="divider my-2 text-xs opacity-60">
@@ -51,6 +52,7 @@ export type CancelGroupEvent = {
               }
               <button
                 class="btn btn-xs btn-ghost btn-circle"
+                appSfx="ui-error"
                 (click)="cancelGroup.emit(group)"
               >
                 x

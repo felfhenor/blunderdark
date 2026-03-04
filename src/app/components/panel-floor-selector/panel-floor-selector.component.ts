@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -34,7 +35,7 @@ type BiomeOption = {
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyNameComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyNameComponent, ModalComponent, SFXDirective],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

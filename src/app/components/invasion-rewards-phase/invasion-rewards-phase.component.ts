@@ -5,12 +5,13 @@ import {
   input,
   output,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import type { InvasionOrchestratorResult } from '@interfaces';
 
 @Component({
   selector: 'app-invasion-rewards-phase',
-  imports: [CurrencyNameComponent, DecimalPipe, KeyValuePipe, PercentPipe, TitleCasePipe],
+  imports: [CurrencyNameComponent, DecimalPipe, KeyValuePipe, PercentPipe, SFXDirective, TitleCasePipe],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -106,7 +107,7 @@ import type { InvasionOrchestratorResult } from '@interfaces';
       }
     </div>
     <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
-      <button class="btn btn-sm btn-primary" (click)="advance.emit()">
+      <button class="btn btn-sm btn-primary" appSfx="ui-click" (click)="advance.emit()">
         Dismiss
       </button>
     </div>

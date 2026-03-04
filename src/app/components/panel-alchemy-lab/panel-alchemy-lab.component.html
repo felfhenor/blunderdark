@@ -29,7 +29,7 @@
           } @else {
             <span class="text-xs text-error">Waiting for resources...</span>
           }
-          <button class="btn btn-xs btn-ghost mt-1" (click)="stopConversion()">
+          <button class="btn btn-xs btn-ghost mt-1" appSfx="ui-error" (click)="stopConversion()">
             Stop
           </button>
         </div>
@@ -85,6 +85,7 @@
               </span>
               <button
                 class="btn btn-xs btn-primary mt-1"
+                appSfx="ui-click"
                 [disabled]="!entry.canAfford"
                 (click)="selectRecipe(entry.recipe.id, entry.ticks)"
               >

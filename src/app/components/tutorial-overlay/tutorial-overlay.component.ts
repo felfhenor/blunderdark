@@ -5,6 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
   tutorialBack,
   tutorialCurrentStep,
@@ -24,6 +25,7 @@ const VIEWPORT_MARGIN = 12;
 
 @Component({
   selector: 'app-tutorial-overlay',
+  imports: [SFXDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '(document:keydown)': 'onKeydown($event)',
@@ -88,19 +90,20 @@ const VIEWPORT_MARGIN = 12;
             <span class="text-xs opacity-60">
               Step {{ stepIndex() + 1 }} of {{ totalSteps }}
             </span>
-            <button class="btn btn-ghost btn-xs" (click)="skip()">
+            <button class="btn btn-ghost btn-xs" appSfx="ui-error" (click)="skip()">
               Skip
             </button>
           </div>
           <div class="flex items-center gap-2">
             <button
               class="btn btn-ghost btn-sm"
+              appSfx="ui-click"
               [class.invisible]="stepIndex() === 0"
               (click)="back()"
             >
               Back
             </button>
-            <button class="btn btn-primary btn-sm" (click)="next()">
+            <button class="btn btn-primary btn-sm" appSfx="ui-click" (click)="next()">
               {{ isLastStep() ? 'Finish' : 'Next' }}
             </button>
           </div>

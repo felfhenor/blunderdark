@@ -35,6 +35,7 @@
               <div class="card-actions mt-1">
                 <button
                   class="btn btn-xs btn-success"
+                  appSfx="ui-click"
                   [disabled]="isBusy()"
                   (click)="saveToSlot(slotId)"
                 >
@@ -56,6 +57,7 @@
               @if (isManualSlot(slotId)) {
                 <button
                   class="btn btn-xs btn-warning"
+                  appSfx="ui-click"
                   [disabled]="isBusy()"
                   (click)="saveToSlot(slotId)"
                 >
@@ -64,6 +66,7 @@
               }
               <button
                 class="btn btn-xs btn-info"
+                appSfx="ui-click"
                 [disabled]="isBusy()"
                 (click)="loadFromSlot(slotId)"
               >
@@ -72,6 +75,7 @@
               @if (isManualSlot(slotId)) {
                 <button
                   class="btn btn-xs btn-error"
+                  appSfx="ui-error"
                   [disabled]="isBusy()"
                   (click)="deleteSlot(slotId)"
                 >

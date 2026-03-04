@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
@@ -29,7 +30,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent, SFXDirective],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

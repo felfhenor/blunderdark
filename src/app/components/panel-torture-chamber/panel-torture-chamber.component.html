@@ -59,6 +59,7 @@
               <div class="flex gap-2">
                 <button
                   class="btn btn-xs btn-primary flex-1"
+                  appSfx="ui-click"
                   (click)="setExtractAction('research')"
                 >
                   Extract Research ({{ getExtractTime() | number: '1.0-0' }}s)
@@ -66,6 +67,7 @@
                 @if (runeExtractionUnlocked()) {
                   <button
                     class="btn btn-xs btn-accent flex-1"
+                    appSfx="ui-click"
                     (click)="setExtractAction('rune')"
                   >
                     Extract Rune ({{ getExtractTime() | number: '1.0-0' }}s)
@@ -82,18 +84,21 @@
               <div class="flex gap-2">
                 <button
                   class="btn btn-xs btn-info flex-1"
+                  appSfx="ui-click"
                   (click)="setBreakAction('convert')"
                 >
                   Convert ({{ getBreakTime() | number: '1.0-0' }}s)
                 </button>
                 <button
                   class="btn btn-xs btn-error flex-1"
+                  appSfx="ui-error"
                   (click)="setBreakAction('execute')"
                 >
                   Execute ({{ getBreakTime() | number: '1.0-0' }}s)
                 </button>
                 <button
                   class="btn btn-xs btn-warning flex-1"
+                  appSfx="ui-click"
                   (click)="setBreakAction('sacrifice')"
                 >
                   Sacrifice ({{ getBreakTime() | number: '1.0-0' }}s)
@@ -152,6 +157,7 @@
               @if (canStartJob()) {
                 <button
                   class="btn btn-xs btn-primary w-full mt-1"
+                  appSfx="ui-click"
                   (click)="startProcessing(prisoner.id)"
                 >
                   Start Processing ({{ getInterrogateTime() | number: '1.0-0' }}s)

@@ -20,11 +20,12 @@ import { gamestate } from '@helpers/state-game';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { startCase } from 'es-toolkit';
+import { SFXDirective } from '@directives/sfx.directive';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-throne-room',
-  imports: [DecimalPipe, InhabitantCardComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, SFXDirective],
   templateUrl: './panel-throne-room.component.html',
   styleUrl: './panel-throne-room.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

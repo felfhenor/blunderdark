@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
@@ -31,7 +32,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, StatRowComponent],
+  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, SFXDirective, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

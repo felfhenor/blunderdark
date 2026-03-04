@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import {
@@ -47,7 +48,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-room-select',
-  imports: [CurrencyCostComponent, TippyDirective],
+  imports: [CurrencyCostComponent, SFXDirective, TippyDirective],
   templateUrl: './panel-room-select.component.html',
   styleUrl: './panel-room-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

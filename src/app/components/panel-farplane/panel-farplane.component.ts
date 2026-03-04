@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
@@ -24,7 +25,7 @@ import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-farplane',
-  imports: [CurrencyCostComponent, InhabitantCardComponent],
+  imports: [CurrencyCostComponent, InhabitantCardComponent, SFXDirective],
   templateUrl: './panel-farplane.component.html',
   styleUrl: './panel-farplane.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

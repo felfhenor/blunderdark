@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
@@ -36,7 +37,7 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, CurrencyCostListComponent, InhabitantCardComponent, CraftingQueueDisplayComponent],
+  imports: [DecimalPipe, CraftingQueueDisplayComponent, CurrencyCostListComponent, InhabitantCardComponent, SFXDirective],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

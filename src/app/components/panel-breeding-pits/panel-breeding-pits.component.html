@@ -10,6 +10,7 @@
 
       <button
         class="btn btn-xs btn-outline btn-secondary mt-2"
+        appSfx="ui-click"
         appAnalyticsClick="Room:Breeding:Recipes:Browse"
         (click)="showRecipeBrowser.set(true)"
       >
@@ -70,6 +71,7 @@
           @if (assignedInhabitants().length === 2 && !breedingRoom()?.breedingJob && !breedingRoom()?.mutationJob) {
             <button
               class="btn btn-xs btn-outline btn-ghost"
+              appSfx="ui-click"
               (click)="swapBreedingOrder()"
             >
               Swap Primary
@@ -99,6 +101,7 @@
               </span>
               <button
                 class="btn btn-xs btn-primary mt-1"
+                appSfx="ui-click"
                 (click)="
                   startBreeding(
                     entry.parentA.instanceId,
@@ -124,6 +127,7 @@
               <span class="text-xs">{{ inh.name }}</span>
               <button
                 class="btn btn-xs btn-secondary"
+                appSfx="ui-click"
                 (click)="startMutation(inh.instanceId)"
               >
                 Mutate
@@ -194,7 +198,7 @@
     </div>
   </div>
   <div actions>
-    <button class="btn btn-sm" (click)="showRecipeBrowser.set(false)">
+    <button class="btn btn-sm" appSfx="ui-error" (click)="showRecipeBrowser.set(false)">
       Close
     </button>
   </div>

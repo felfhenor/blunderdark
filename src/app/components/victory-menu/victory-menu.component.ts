@@ -31,6 +31,7 @@ import type {
   VictoryReward,
 } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SFXDirective } from '@directives/sfx.directive';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 type PathCardCondition = VictoryCondition & {
@@ -63,7 +64,7 @@ function formatRewardList(rewards: VictoryReward[]): string {
 
 @Component({
   selector: 'app-victory-menu',
-  imports: [DecimalPipe, IconComponent, ModalComponent, SweetAlert2Module, VictoryConditionRowComponent],
+  imports: [DecimalPipe, IconComponent, ModalComponent, SFXDirective, SweetAlert2Module, VictoryConditionRowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal
@@ -76,10 +77,12 @@ function formatRewardList(rewards: VictoryReward[]): string {
 
       <div body>
         <div role="tablist" class="tabs tabs-bordered tabs-md mb-3 flex-nowrap overflow-x-auto pb-1">
-          @for (path of paths(); track path.id) {
+          @for (path of paths(); track path.id; let i = $index) {
             <button
               role="tab"
               class="tab gap-2"
+              appSfx="ui-click"
+              [sfxOffset]="i"
               [class.tab-active]="selectedPath()?.id === path.id"
               (click)="selectedPathId.set(path.id)"
             >
@@ -155,11 +158,11 @@ function formatRewardList(rewards: VictoryReward[]): string {
 
       <div actions class="flex gap-2">
         @if (hasAchievedVictory()) {
-          <button class="btn btn-sm btn-success" [swal]="claimResetSwal">
+          <button class="btn btn-sm btn-success" appSfx="ui-click" [swal]="claimResetSwal">
             Claim Victory & Reset
           </button>
         }
-        <button class="btn btn-sm btn-ghost" (click)="visible.set(false)">
+        <button class="btn btn-sm btn-ghost" appSfx="ui-error" (click)="visible.set(false)">
           Close
         </button>
       </div>

@@ -80,6 +80,7 @@ import { gridCreateEmpty } from '@helpers/grid';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
+import { SFXDirective } from '@directives/sfx.directive';
 import { TippyDirective } from '@ngneat/helipopper';
 
 const ROOM_COLORS: Record<string, string> = {};
@@ -119,7 +120,7 @@ const CAMERA_DRAG_THRESHOLD = 5;
 
 @Component({
   selector: 'app-grid',
-  imports: [DecimalPipe, NgClass, FearIndicatorComponent, IconComponent, TippyDirective],
+  imports: [DecimalPipe, NgClass, FearIndicatorComponent, IconComponent, SFXDirective, TippyDirective],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

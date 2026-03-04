@@ -76,6 +76,7 @@
                 />
                 <button
                   class="btn btn-xs btn-primary flex-1"
+                  appSfx="ui-click"
                   [disabled]="entry.queueFull || !entry.canAfford"
                   (click)="
                     startCraftingBulk(

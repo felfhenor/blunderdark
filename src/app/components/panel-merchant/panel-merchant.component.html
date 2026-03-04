@@ -9,7 +9,7 @@
       <p class="text-xs opacity-50">
         A merchant has arrived during Harvest season.
       </p>
-      <button class="btn btn-xs btn-secondary" (click)="open()">
+      <button class="btn btn-xs btn-secondary" appSfx="ui-click" (click)="open()">
         Browse Trades
       </button>
     </div>
@@ -85,6 +85,7 @@
                 </span>
                 <button
                   class="btn btn-xs btn-primary"
+                  appSfx="ui-click"
                   [disabled]="entry.stock <= 0 || !entry.affordable"
                   (click)="executeTrade(entry.trade.id)"
                 >
@@ -109,6 +110,6 @@
   </div>
 
   <div actions>
-    <button class="btn btn-sm" (click)="close()">Close</button>
+    <button class="btn btn-sm" appSfx="ui-error" (click)="close()">Close</button>
   </div>
 </app-modal>

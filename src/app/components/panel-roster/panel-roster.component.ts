@@ -1,4 +1,5 @@
 import { DecimalPipe } from '@angular/common';
+import { SFXDirective } from '@directives/sfx.directive';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   ChangeDetectionStrategy,
@@ -45,7 +46,7 @@ type RosterEntry = {
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, IconComponent, InhabitantCardComponent, SweetAlert2Module],
+  imports: [DecimalPipe, IconComponent, InhabitantCardComponent, SFXDirective, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

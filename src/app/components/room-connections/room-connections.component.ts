@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
 @Component({
   selector: 'app-room-connections',
-  imports: [ButtonCloseComponent],
+  imports: [ButtonCloseComponent, SFXDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (connectTo().length > 0) {
@@ -13,6 +14,7 @@ import type { PlacedRoomId } from '@interfaces/room-shape';
         @for (adj of connectTo(); track adj.id) {
           <button
             class="btn btn-xs btn-outline btn-success"
+            appSfx="ui-click"
             (click)="connect.emit(adj.id)"
           >
             {{ adj.name }}

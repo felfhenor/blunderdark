@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -24,7 +25,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-save-slots',
-  imports: [DatePipe, SweetAlert2Module],
+  imports: [DatePipe, SFXDirective, SweetAlert2Module],
   templateUrl: './panel-save-slots.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

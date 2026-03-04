@@ -8,6 +8,8 @@
       ) {
         <button
           class="floor-entry btn btn-sm justify-start gap-2"
+          appSfx="ui-click"
+          [sfxOffset]="i"
           [class.btn-active]="isSelected(i)"
           [style.--floor-biome-color]="getBiomeData(floor.biome).color"
           (click)="selectFloor(i)"
@@ -28,6 +30,7 @@
       <div class="create-floor-section mt-2">
         <button
           class="btn btn-sm btn-primary btn-block gap-1"
+          appSfx="ui-click"
           [disabled]="!canCreate().canCreate"
           (click)="openCreateModal()"
         >
@@ -54,6 +57,7 @@
           @for (option of biomeOptions(); track option.value) {
             <button
               class="btn btn-sm biome-btn"
+              appSfx="ui-click"
               [class.btn-active]="selectedBiome() === option.value"
               [style.--btn-color]="option.color"
               (click)="selectedBiome.set(option.value)"
@@ -90,11 +94,12 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" (click)="showCreateModal.set(false)">
+        <button class="btn btn-sm" appSfx="ui-error" (click)="showCreateModal.set(false)">
           Cancel
         </button>
         <button
           class="btn btn-sm btn-primary"
+          appSfx="ui-click"
           [disabled]="!canCreate().canCreate"
           (click)="onConfirmCreateFloor()"
         >
@@ -111,6 +116,7 @@
           @for (option of biomeOptions(); track option.value) {
             <button
               class="btn btn-sm biome-btn"
+              appSfx="ui-click"
               [class.btn-active]="changeBiomeTarget() === option.value"
               [style.--btn-color]="option.color"
               (click)="changeBiomeTarget.set(option.value)"
@@ -142,11 +148,12 @@
       </div>
 
       <div actions class="flex gap-2">
-        <button class="btn btn-sm" (click)="showChangeBiomeModal.set(false)">
+        <button class="btn btn-sm" appSfx="ui-error" (click)="showChangeBiomeModal.set(false)">
           Cancel
         </button>
         <button
           class="btn btn-sm btn-primary"
+          appSfx="ui-click"
           [disabled]="!changeBiomeValidation().canChange"
           (click)="onConfirmChangeBiome()"
         >
@@ -186,11 +193,12 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" (click)="showRemoveModal.set(false)">
+        <button class="btn btn-sm" appSfx="ui-error" (click)="showRemoveModal.set(false)">
           Cancel
         </button>
         <button
           class="btn btn-sm btn-error"
+          appSfx="ui-error"
           [disabled]="!canRemove().canRemove"
           (click)="onConfirmRemoveFloor()"
         >
@@ -212,6 +220,7 @@
           </span>
           <button
             class="btn btn-xs btn-ghost opacity-60"
+            appSfx="ui-click"
             (click)="openChangeBiomeModal()"
           >
             Change
@@ -256,6 +265,7 @@
           <div class="divider my-2"></div>
           <button
             class="btn btn-sm btn-error btn-outline btn-block"
+            appSfx="ui-error"
             [disabled]="!canRemove().canRemove"
             (click)="openRemoveModal()"
           >

@@ -35,6 +35,7 @@
         </div>
         <button
           class="btn btn-sm btn-primary mt-1"
+          appSfx="ui-click"
           [disabled]="!canAffordUpgrade()"
           [tp]="canAffordUpgrade() ? 'Apply upgrade' : 'Insufficient resources'"
           (click)="onUpgrade()"
@@ -98,6 +99,7 @@
               <!-- Recruit Button -->
               <button
                 class="btn btn-xs btn-primary w-full"
+                appSfx="ui-click"
                 [disabled]="!entry.affordable || rosterFull()"
                 [tp]="getDisabledReason(entry)"
                 (click)="onRecruit(entry.def)"
@@ -160,6 +162,7 @@
             } @else {
               <button
                 class="btn btn-xs btn-warning w-full"
+                appSfx="ui-click"
                 [disabled]="!entry.canRecruit"
                 [tp]="getLegendaryDisabledReason(entry)"
                 (click)="onRecruitLegendary(entry.def)"

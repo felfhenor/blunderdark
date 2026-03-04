@@ -243,6 +243,7 @@
                 <div class="flex gap-2 mt-3">
                   <button
                     class="btn btn-sm btn-primary flex-1"
+                    appSfx="ui-click"
                     [disabled]="!validation().valid"
                     (click)="requestFuse()"
                     [tp]="
@@ -261,7 +262,7 @@
                       </span>
                     }
                   </button>
-                  <button class="btn btn-sm btn-ghost" (click)="resetSlots()">
+                  <button class="btn btn-sm btn-ghost" appSfx="ui-error" (click)="resetSlots()">
                     Reset
                   </button>
                 </div>
@@ -273,6 +274,7 @@
                 </p>
                 <button
                   class="btn btn-xs btn-ghost mt-2"
+                  appSfx="ui-error"
                   (click)="resetSlots()"
                 >
                   Reset
@@ -359,8 +361,8 @@
     }
   </div>
   <div actions>
-    <button class="btn btn-sm btn-ghost" (click)="cancelFuse()">Cancel</button>
-    <button class="btn btn-sm btn-primary" (click)="confirmFuse()">
+    <button class="btn btn-sm btn-ghost" appSfx="ui-error" (click)="cancelFuse()">Cancel</button>
+    <button class="btn btn-sm btn-primary" appSfx="ui-click" (click)="confirmFuse()">
       Confirm Fusion
     </button>
   </div>

@@ -35,7 +35,7 @@
             {{ progressPercent() | number: '1.0-0' }}% &middot;
             {{ estimatedTimeRemaining() }}
           </span>
-          <button class="btn btn-xs btn-error btn-outline" [swal]="cancelSwal">
+          <button class="btn btn-xs btn-error btn-outline" appSfx="ui-error" [swal]="cancelSwal">
             Cancel
           </button>
         </div>
@@ -46,10 +46,12 @@
         role="tablist"
         class="tabs tabs-bordered bg-base-200 px-4 flex-shrink-0"
       >
-        @for (branch of availableBranches(); track branch) {
+        @for (branch of availableBranches(); track branch; let i = $index) {
           <button
             role="tab"
             class="tab capitalize"
+            appSfx="ui-click"
+            [sfxOffset]="i"
             [class.tab-active]="selectedBranch() === branch"
             (click)="selectBranch(branch)"
           >
@@ -77,6 +79,7 @@
                   @for (node of tierGroup.nodes; track node.id) {
                     <button
                       class="node-card bg-base-100"
+                      appSfx="ui-click"
                       [class.node-completed]="node.nodeState === 'completed'"
                       [class.node-active]="node.nodeState === 'active'"
                       [class.node-available]="node.nodeState === 'available'"
@@ -224,6 +227,7 @@
                 @if (selectedNodeState() === 'available') {
                   <button
                     class="btn btn-sm btn-primary w-full"
+                    appSfx="ui-click"
                     [disabled]="!selectedNodeCanStart().canStart"
                     (click)="startResearch()"
                     [tp]="

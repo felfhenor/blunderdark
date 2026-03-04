@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { SFXDirective } from '@directives/sfx.directive';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
@@ -106,11 +107,12 @@ import { startCase } from 'es-toolkit';
     CurrencyNameComponent,
     FearBreakdownTooltipComponent,
     InhabitantCardComponent,
-    StatNameComponent,
-    TippyDirective,
     ModalComponent,
     RoomConnectionsComponent,
+    SFXDirective,
+    StatNameComponent,
     SynergyTooltipComponent,
+    TippyDirective,
     UpgradeEffectBadgeComponent,
   ],
   templateUrl: './panel-room-info.component.html',

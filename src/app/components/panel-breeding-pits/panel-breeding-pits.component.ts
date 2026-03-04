@@ -5,6 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -47,6 +48,7 @@ import { sortBy } from 'es-toolkit/compat';
     InhabitantCardComponent,
     JobProgressComponent,
     ModalComponent,
+    SFXDirective,
     TippyDirective,
   ],
   templateUrl: './panel-breeding-pits.component.html',

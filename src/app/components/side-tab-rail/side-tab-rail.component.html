@@ -2,8 +2,10 @@
   class="side-tab-rail flex flex-col gap-2 p-1"
   [class.has-active-panel]="!!activePanel()"
 >
-  @for (tab of visibleTabs(); track tab.id) {
+  @for (tab of visibleTabs(); track tab.id; let i = $index) {
     <button
+      appSfx="ui-click"
+      [sfxOffset]="i"
       class="tab-btn flex items-center justify-center bg-base-200 rounded-lg py-2 px-2 text-xs transition-colors cursor-pointer"
       [class.bg-primary]="
         activePanel() === tab.id && !tab.isModal && !tab.action

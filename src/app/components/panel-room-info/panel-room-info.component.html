@@ -179,6 +179,7 @@
                     </div>
                     <button
                       class="btn btn-xs btn-primary"
+                      appSfx="ui-click"
                       [disabled]="entry.locked || !canAffordUpgrade(entry.path)"
                       (click)="onApplyUpgrade(entry.path)"
                     >
@@ -233,6 +234,7 @@
             } @else {
               <button
                 class="btn btn-xs btn-outline btn-accent w-full"
+                appSfx="ui-click"
                 (click)="onOpenFeatureSelect(slot.index)"
               >
                 + Add Feature
@@ -296,6 +298,7 @@
         ) {
           <button
             class="btn btn-xs btn-outline btn-accent w-full"
+            appSfx="ui-click"
             appAnalyticsClick="Room:Info:Inhabitant:Open"
             (click)="showInhabitantSelect.set(true)"
           >
@@ -336,6 +339,7 @@
           <div class="flex gap-2">
             <button
               class="btn btn-xs btn-outline btn-success flex-1"
+              appSfx="ui-click"
               [disabled]="isInvasionActive()"
               (click)="onExtendElevator('up')"
             >
@@ -343,6 +347,7 @@
             </button>
             <button
               class="btn btn-xs btn-outline btn-success flex-1"
+              appSfx="ui-click"
               [disabled]="isInvasionActive()"
               (click)="onExtendElevator('down')"
             >
@@ -353,6 +358,7 @@
             <div class="flex gap-2 mt-1">
               <button
                 class="btn btn-xs btn-outline btn-warning flex-1"
+                appSfx="ui-error"
                 [disabled]="isInvasionActive()"
                 (click)="onShrinkElevator(tInfo.connectedFloors[0])"
               >
@@ -360,6 +366,7 @@
               </button>
               <button
                 class="btn btn-xs btn-outline btn-warning flex-1"
+                appSfx="ui-error"
                 [disabled]="isInvasionActive()"
                 (click)="
                   onShrinkElevator(
@@ -393,6 +400,7 @@
       @if (canMoveRoom()) {
         <button
           class="btn btn-sm btn-outline w-full mb-2"
+          appSfx="ui-click"
           (click)="onMoveRoom()"
         >
           Move Room
@@ -402,6 +410,7 @@
       @if (transportInfo() && !isInvasionActive()) {
         <button
           class="btn btn-sm btn-error btn-outline w-full"
+          appSfx="ui-error"
           [swal]="removeSwal"
         >
           Remove Transport
@@ -420,6 +429,7 @@
       } @else if (canRemoveRoom()) {
         <button
           class="btn btn-sm btn-error btn-outline w-full"
+          appSfx="ui-error"
           [swal]="removeSwal"
         >
           Remove Room
@@ -507,6 +517,7 @@
                   </div>
                   <button
                     class="btn btn-xs btn-primary"
+                    appSfx="ui-click"
                     [disabled]="!entry.affordable"
                     (click)="onAttachFeature(entry.feature.id)"
                   >
@@ -520,7 +531,7 @@
       }
     </div>
     <div actions>
-      <button class="btn btn-sm" (click)="showFeatureSelect.set(false)">
+      <button class="btn btn-sm" appSfx="ui-error" (click)="showFeatureSelect.set(false)">
         Cancel
       </button>
     </div>
@@ -548,6 +559,7 @@
                   />
                   <button
                     class="btn btn-xs btn-primary flex-shrink-0"
+                    appSfx="ui-click"
                     (click)="
                       onAssignInhabitant(inh.instance.instanceId);
                       showInhabitantSelect.set(false)
@@ -563,7 +575,7 @@
       }
     </div>
     <div actions>
-      <button class="btn btn-sm" (click)="showInhabitantSelect.set(false)">
+      <button class="btn btn-sm" appSfx="ui-error" (click)="showInhabitantSelect.set(false)">
         Cancel
       </button>
     </div>

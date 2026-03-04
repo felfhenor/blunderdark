@@ -118,6 +118,7 @@
 
         <button
           class="btn btn-secondary btn-sm"
+          appSfx="ui-click"
           appAnalyticsClick="Options:Debug:ShowVictoryPanel"
           [disabled]="!isVictoryAchieved()"
           (click)="showVictoryPanel()"
@@ -152,6 +153,7 @@
         <div class="flex flex-row gap-2">
           <button
             class="btn btn-secondary btn-sm"
+            appSfx="ui-click"
             appAnalyticsClick="Options:Debug:ForceMerchantArrival"
             [disabled]="isMerchantPresent()"
             (click)="forceArrival()"
@@ -161,6 +163,7 @@
 
           <button
             class="btn btn-secondary btn-sm"
+            appSfx="ui-click"
             appAnalyticsClick="Options:Debug:ForceMerchantDeparture"
             [disabled]="!isMerchantPresent()"
             (click)="forceDeparture()"
@@ -170,6 +173,7 @@
 
           <button
             class="btn btn-secondary btn-sm"
+            appSfx="ui-click"
             appAnalyticsClick="Options:Debug:MerchantRestock"
             [disabled]="!isMerchantPresent()"
             (click)="restock()"

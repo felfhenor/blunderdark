@@ -5,6 +5,7 @@ import {
   computed,
   model,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -36,7 +37,7 @@ type TradeEntry = {
 
 @Component({
   selector: 'app-panel-merchant',
-  imports: [DecimalPipe, CurrencyCostComponent, ModalComponent],
+  imports: [DecimalPipe, CurrencyCostComponent, ModalComponent, SFXDirective],
   templateUrl: './panel-merchant.component.html',
   styleUrl: './panel-merchant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

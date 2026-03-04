@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { RoomConnectionsComponent } from '@components/room-connections/room-connections.component';
 import {
   connectionCreate,
@@ -37,7 +38,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
 
 @Component({
   selector: 'app-panel-hallway-info',
-  imports: [DecimalPipe, RoomConnectionsComponent],
+  imports: [DecimalPipe, RoomConnectionsComponent, SFXDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (selectedHallwayTile(); as info) {
@@ -84,6 +85,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
               }
               <button
                 class="btn btn-xs btn-outline btn-warning"
+                appSfx="ui-error"
                 [disabled]="isInvasionActive()"
                 (click)="onRemoveTrap(placedTrap.trapId)"
               >
@@ -110,6 +112,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
                   </div>
                   <button
                     class="btn btn-xs btn-outline btn-success"
+                    appSfx="ui-click"
                     [disabled]="isInvasionActive()"
                     (click)="onPlaceTrap(entry.trapTypeId)"
                   >
@@ -124,6 +127,7 @@ function formatRoomName(name: string, suffix: string | undefined): string {
 
           <button
             class="btn btn-sm btn-error btn-outline w-full"
+            appSfx="ui-error"
             [disabled]="isInvasionActive()"
             (click)="onRemoveHallway()"
           >

@@ -36,6 +36,7 @@ import type {
   InhabitantStats,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import { SFXDirective } from '@directives/sfx.directive';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -56,7 +57,7 @@ type RecipeEntry = {
 
 @Component({
   selector: 'app-panel-fusion',
-  imports: [ButtonCloseComponent, DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, IconComponent, InhabitantCardComponent, ModalComponent, StatNameComponent, TabBarComponent, TippyDirective],
+  imports: [ButtonCloseComponent, DecimalPipe, NgClass, CurrencyCostComponent, CurrencyCostListComponent, IconComponent, InhabitantCardComponent, ModalComponent, SFXDirective, StatNameComponent, TabBarComponent, TippyDirective],
   templateUrl: './panel-fusion.component.html',
   styleUrl: './panel-fusion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

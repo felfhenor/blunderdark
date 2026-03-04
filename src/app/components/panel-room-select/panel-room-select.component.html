@@ -10,6 +10,7 @@
 
     <button
       class="btn btn-sm btn-outline w-full"
+      appSfx="ui-click"
       [class.btn-active]="isHallwayMode()"
       [class.btn-primary]="isHallwayMode()"
       [disabled]="isInvasionActive()"
@@ -40,6 +41,7 @@
       @if (hallwayPath()) {
         <button
           class="btn btn-sm btn-success w-full"
+          appSfx="ui-click"
           [disabled]="!hallwayPlacementCanAfford()"
           [tp]="
             hallwayPlacementCanAfford()
@@ -58,6 +60,7 @@
       <div class="flex flex-col gap-2">
         <button
           class="btn btn-sm h-auto py-2 flex-col items-start gap-2"
+          appSfx="ui-click"
           [class.btn-active]="
             isTransportActive() && activeTransportType() === 'stair'
           "
@@ -85,6 +88,7 @@
         @if (isElevatorUnlocked()) {
           <button
             class="btn btn-sm h-auto py-2 flex-col items-start gap-2"
+            appSfx="ui-click"
             [class.btn-active]="
               isTransportActive() && activeTransportType() === 'elevator'
             "
@@ -116,6 +120,7 @@
         @if (isPortalUnlocked()) {
           <button
             class="btn btn-sm h-auto py-2 flex-col items-start gap-2"
+            appSfx="ui-click"
             [class.btn-active]="
               isTransportActive() && activeTransportType() === 'portal'
             "
@@ -152,6 +157,7 @@
     @if (selectedId()) {
       <button
         class="btn btn-sm btn-outline w-full"
+        appSfx="ui-click"
         [tp]="'Rotate placement (R key or Right-click)'"
         (click)="rotate()"
       >
@@ -173,6 +179,7 @@
       @for (room of rooms(); track room.id) {
         <button
           class="room-entry btn btn-sm h-auto py-1"
+          appSfx="ui-click"
           [class.btn-active]="isSelected(room.id)"
           [class.room-unaffordable]="!isAffordable(room)"
           [class.room-biome-restricted]="isBiomeRestricted(room)"

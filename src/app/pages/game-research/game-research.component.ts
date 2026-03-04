@@ -36,6 +36,7 @@ import type {
 } from '@interfaces';
 import { BIOME_DATA } from '@interfaces/biome';
 import { TippyDirective } from '@ngneat/helipopper';
+import { SFXDirective } from '@directives/sfx.directive';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -53,6 +54,7 @@ type NodeState = ResearchNodeState;
     ModalComponent,
     TippyDirective,
     IconComponent,
+    SFXDirective,
     SweetAlert2Module,
     ResearchStateBadgeComponent,
   ],

@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { SFXDirective } from '@directives/sfx.directive';
 import type { InvasionEndReason, InvasionOrchestratorResult } from '@interfaces';
 
 const END_REASON_LABELS: Record<InvasionEndReason, string> = {
@@ -18,7 +19,7 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
 
 @Component({
   selector: 'app-invasion-results-phase',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, SFXDirective],
   host: { class: 'flex flex-col flex-1 min-h-0' },
   template: `
     <div class="flex-1 overflow-y-auto p-4">
@@ -98,7 +99,7 @@ const END_REASON_LABELS: Record<InvasionEndReason, string> = {
       }
     </div>
     <div class="flex justify-end px-4 py-3 bg-base-200 flex-shrink-0">
-      <button class="btn btn-sm btn-primary" (click)="advance.emit()">
+      <button class="btn btn-sm btn-primary" appSfx="ui-click" (click)="advance.emit()">
         @if (isVictory()) {
           View Rewards
         } @else {

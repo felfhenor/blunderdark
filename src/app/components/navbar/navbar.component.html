@@ -55,6 +55,8 @@
         @for (speed of gameSpeeds; track speed; let idx = $index) {
           <button
             class="btn btn-xs"
+            appSfx="ui-click"
+            [sfxOffset]="idx"
             [class.btn-primary]="gameTimeSpeed() === speed"
             [class.btn-ghost]="gameTimeSpeed() !== speed"
             [tp]="speed + 'x Speed [' + (idx + 1) + ']'"

@@ -1,4 +1,5 @@
 import { DecimalPipe, NgClass, UpperCasePipe } from '@angular/common';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -40,6 +41,7 @@ const CRITICAL_THRESHOLD = 0.1;
     UpperCasePipe,
     CurrencyNameComponent,
     IconComponent,
+    SFXDirective,
     TippyDirective,
   ],
   templateUrl: './panel-resources.component.html',

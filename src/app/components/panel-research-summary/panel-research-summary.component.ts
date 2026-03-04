@@ -5,6 +5,7 @@ import {
   computed,
   output,
 } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { contentGetEntry } from '@helpers/content';
 import { formatDurationSeconds } from '@helpers/game-time';
 import {
@@ -17,13 +18,13 @@ import type { ResearchContent } from '@interfaces';
 
 @Component({
   selector: 'app-panel-research-summary',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, SFXDirective],
   template: `
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body p-4 gap-2">
         <div class="flex items-center justify-between">
           <h3 class="card-title text-sm">Research</h3>
-          <button class="btn btn-xs btn-outline" (click)="openResearch.emit()">
+          <button class="btn btn-xs btn-outline" appSfx="ui-click" (click)="openResearch.emit()">
             Open
           </button>
         </div>
