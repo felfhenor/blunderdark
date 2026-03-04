@@ -6,7 +6,7 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: 'app-grid',
     title: 'Welcome to Blunderdark!',
     description:
-      'You are a dungeon overlord! Your goal is to build rooms, recruit creatures, and defend your dungeon from invaders. Let\u2019s take a quick tour.',
+      "You are a dungeon overlord! Your goal is to build rooms, recruit creatures, and defend your dungeon from invaders. Let's take a quick tour.",
     tooltipPosition: 'bottom',
   },
   {
@@ -38,7 +38,7 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: '.panel-overlay',
     title: 'Build Panel',
     description:
-      'The Build panel lets you construct new rooms and hallways. Each room type has a unique role \u2014 from resource production to creature training.',
+      'The Build panel lets you construct new rooms and hallways. Each room type has a unique role - from resource production to creature training.',
     tooltipPosition: 'right',
     panelToOpen: 'build',
   },
@@ -68,6 +68,15 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
       'Research unlocks new rooms, upgrades, and abilities. Spend research points to progress through the tech trees and power up your dungeon.',
     tooltipPosition: 'bottom',
     modalToOpen: 'research',
+  },
+  {
+    id: 'victory',
+    targetSelector: 'app-victory-menu .modal-box',
+    title: 'Victory Paths',
+    description:
+      'There are multiple ways to win! Each victory path has unique conditions - hoard gold, terrorize heroes, master research, and more. Track your progress here and claim victory when all conditions are met.',
+    tooltipPosition: 'bottom',
+    modalToOpen: 'victory',
   },
   {
     id: 'invasions',
