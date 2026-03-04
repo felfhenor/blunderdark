@@ -18,7 +18,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       class="flex items-center gap-2 py-1"
       [class.opacity-50]="!met()"
       [tp]="tooltip()"
-      [tpDelay]="250"
       tpClassName="game-tooltip"
     >
       <span class="text-base flex-shrink-0" [class.text-success]="met()">

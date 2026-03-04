@@ -31,7 +31,6 @@ import { TippyDirective } from '@ngneat/helipopper';
         [class.bg-neutral]="isInappetent()"
         [class.text-neutral-content]="isInappetent()"
         [tp]="hungerTip"
-        [tpDelay]="250"
       >
         {{ hungerLabel() }}
       </span>

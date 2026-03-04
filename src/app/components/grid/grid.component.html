@@ -85,7 +85,6 @@
                 class="feature-indicator text-xs font-bold"
                 [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)"
                 [tp]="fInfo.names.join(', ')"
-                [tpDelay]="250"
               >
                 <app-icon name="tablerDiamond" size="12px" />
                 {{ fInfo.occupied | number: '1.0-2' }}/{{

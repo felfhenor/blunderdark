@@ -30,7 +30,6 @@ import { TippyDirective } from '@ngneat/helipopper';
       [name]="icon()"
       [color]="color()"
       [tp]="description()"
-      [tpDelay]="250"
       tpClassName="game-tooltip"
     />
     @if (value() !== undefined) {

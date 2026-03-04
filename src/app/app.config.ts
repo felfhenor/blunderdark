@@ -86,6 +86,7 @@ export const appConfig: ApplicationConfig = {
       variations: {
         tooltip: {
           ...tooltipVariation,
+          delay: 0,
         },
         popper: popperVariation,
         contextMenu: {

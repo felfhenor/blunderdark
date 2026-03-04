@@ -7,7 +7,6 @@
       [class.text-success]="res.type !== 'corruption' && isFull(res.type)"
       [tp]="resourceTip"
       tpPlacement="bottom"
-      [tpDelay]="250"
       (click)="openBreakdown(res.type)"
     >
       <app-currency-cost

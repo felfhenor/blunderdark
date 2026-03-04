@@ -28,7 +28,6 @@ import { TippyDirective } from '@ngneat/helipopper';
         [class.bg-error]="fearLevel() >= 4"
         [class.text-error-content]="fearLevel() >= 4"
         [tp]="fearTip"
-        [tpDelay]="250"
       >
         {{ fearLabel() }}
       </span>

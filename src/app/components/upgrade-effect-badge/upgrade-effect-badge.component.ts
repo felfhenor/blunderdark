@@ -18,7 +18,6 @@ import { startCase } from 'es-toolkit';
     <span
       class="badge badge-xs badge-success badge-outline"
       [tp]="tooltipText()"
-      [tpDelay]="250"
     >
       @switch (effect().type) {
         @case ('productionBonus') {
