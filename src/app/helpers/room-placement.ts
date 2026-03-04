@@ -170,11 +170,14 @@ const placementBaseShape = signal<RoomShapeContent | undefined>(undefined);
 export function roomPlacementEnterMode(
   roomTypeId: RoomId,
   shape: RoomShapeContent,
+  initialRotation: Rotation = 0,
 ): void {
   roomPlacementSelectedTypeId.set(roomTypeId);
   placementBaseShape.set(shape);
-  roomPlacementRotation.set(0);
-  roomPlacementPreviewShape.set(shape);
+  roomPlacementRotation.set(initialRotation);
+  roomPlacementPreviewShape.set(
+    initialRotation ? roomShapeGetRotated(shape, initialRotation) : shape,
+  );
   roomPlacementPreviewPosition.set(undefined);
 }
 

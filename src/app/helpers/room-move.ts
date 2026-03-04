@@ -9,7 +9,7 @@ import {
   roomPlacementRotation,
   roomPlacementValidate,
 } from '@helpers/room-placement';
-import { roomShapeResolve } from '@helpers/room-shapes';
+import { roomShapeGet, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Connection, Floor, PlacedRoom, PlacedRoomId } from '@interfaces';
 
@@ -63,8 +63,11 @@ export async function roomMoveEnter(roomId: PlacedRoomId): Promise<void> {
     };
   });
 
-  // Enter placement preview mode with the room's shape and rotation
-  roomPlacementEnterMode(room.roomTypeId, shape);
+  // Enter placement preview mode with the unrotated base shape and current rotation
+  const baseShape = roomShapeGet(room.shapeId);
+  if (!baseShape) return;
+
+  roomPlacementEnterMode(room.roomTypeId, baseShape, room.rotation ?? 0);
 }
 
 export async function roomMoveExecute(
