@@ -14,6 +14,7 @@ import {
   recruitmentCurrentInhabitantCount,
   RESOURCE_LABEL_MAP,
   gamestate,
+  altarRoomGetLockedUpgrade,
   altarRoomGetNextUpgrade,
   legendaryInhabitantCanRecruit,
   legendaryInhabitantGetResearchUnlocked,
@@ -26,6 +27,7 @@ import {
   notifySuccess,
   recruitmentRecruit,
   recruitmentUnlockedTier,
+  researchUnlockGetRequiredResearchName,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   resourcePayCost,
@@ -78,6 +80,16 @@ export class PanelAltarComponent {
 
   public nextUpgrade = computed<RoomUpgradeContent | undefined>(() => {
     return altarRoomGetNextUpgrade(gamestate().world.floors);
+  });
+
+  public lockedUpgrade = computed<RoomUpgradeContent | undefined>(() => {
+    return altarRoomGetLockedUpgrade(gamestate().world.floors);
+  });
+
+  public lockedUpgradeResearchName = computed<string | undefined>(() => {
+    const locked = this.lockedUpgrade();
+    if (!locked) return undefined;
+    return researchUnlockGetRequiredResearchName('roomupgrade', locked.id);
   });
 
   public canAffordUpgrade = computed(() => {

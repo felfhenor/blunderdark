@@ -9,6 +9,10 @@ import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { generateRoomSuffix } from '@helpers/suffix';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
+import {
+  researchUnlockIsResearchGated,
+  researchUnlockIsUnlocked,
+} from '@helpers/research-unlocks';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
 import {
@@ -184,10 +188,9 @@ export const altarRoomLevel = computed<number>(() => {
 });
 
 /**
- * Get the next available upgrade for the Altar Room.
- * Returns undefined if fully upgraded or no Altar exists.
+ * Get the raw next upgrade for the Altar Room (ignoring research).
  */
-export function altarRoomGetNextUpgrade(
+function altarRoomGetNextUpgradeRaw(
   floors: Floor[],
 ): RoomUpgradeContent | undefined {
   const altar = altarRoomFind(floors);
@@ -212,6 +215,42 @@ export function altarRoomGetNextUpgrade(
 }
 
 /**
+ * Get the next available upgrade for the Altar Room.
+ * Returns undefined if fully upgraded, no Altar exists, or the upgrade is locked behind research.
+ */
+export function altarRoomGetNextUpgrade(
+  floors: Floor[],
+): RoomUpgradeContent | undefined {
+  const upgrade = altarRoomGetNextUpgradeRaw(floors);
+  if (!upgrade) return undefined;
+
+  const isGated = researchUnlockIsResearchGated('roomupgrade', upgrade.id);
+  if (isGated && !researchUnlockIsUnlocked('roomupgrade', upgrade.id)) {
+    return undefined;
+  }
+
+  return upgrade;
+}
+
+/**
+ * Check if the next altar upgrade exists but is locked behind research.
+ * Returns the locked upgrade for UI display, or undefined if not locked.
+ */
+export function altarRoomGetLockedUpgrade(
+  floors: Floor[],
+): RoomUpgradeContent | undefined {
+  const upgrade = altarRoomGetNextUpgradeRaw(floors);
+  if (!upgrade) return undefined;
+
+  const isGated = researchUnlockIsResearchGated('roomupgrade', upgrade.id);
+  if (isGated && !researchUnlockIsUnlocked('roomupgrade', upgrade.id)) {
+    return upgrade;
+  }
+
+  return undefined;
+}
+
+/**
  * Apply the next upgrade to the Altar Room.
  */
 export async function altarRoomApplyUpgrade(
@@ -227,6 +266,12 @@ export async function altarRoomApplyUpgrade(
   const paths = roomUpgradeGetPaths(altarId);
   const path = paths.find((p) => p.id === upgradePathId);
   if (!path) return { success: false, error: 'Invalid upgrade path' };
+
+  // Validate research unlock
+  const isGated = researchUnlockIsResearchGated('roomupgrade', path.id);
+  if (isGated && !researchUnlockIsUnlocked('roomupgrade', path.id)) {
+    return { success: false, error: 'Requires research to unlock' };
+  }
 
   // Validate level ordering
   const currentLevel = altarRoomGetLevel(state.world.floors);
