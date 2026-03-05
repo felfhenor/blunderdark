@@ -242,6 +242,15 @@
     - { x: 0, y: 1 }
     - { x: 1, y: 1 }
 
+- id: effb66c3-31d8-4a84-8d8c-14e3bbbc0c8b
+  name: Tiny L-Shape
+  width: 2
+  height: 2
+  tiles:
+    - { x: 0, y: 0 }
+    - { x: 1, y: 0 }
+    - { x: 0, y: 1 }
+
 - id: c09cdd8d-a1d6-467e-98cd-eef97ce22033
   name: H-Shape
   width: 3

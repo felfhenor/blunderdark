@@ -28,15 +28,17 @@
       resource: flux
 - id: 60431433-92ba-43c7-ad45-fb6b5aecb271
   name: Corrupted Mine
-  description: Infuse the mine with dark energy. Crystal output doubles, but the corruption taints everything nearby.
+  description: Infuse the mine with dark energy. Crystal output doubles and the tainted veins seep trace essence, but the corruption taints everything nearby.
   requiresDarkUpgrade: true
   cost:
-    crystals: 100
-    essence: 30
+    crystals: 150
   effects:
     - type: productionMultiplier
       value: 2.0
       resource: crystals
+    - type: secondaryProduction
+      value: 0.05
+      resource: essence
     - type: secondaryProduction
       value: 0.1
       resource: corruption

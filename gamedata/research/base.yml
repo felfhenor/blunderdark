@@ -13,7 +13,7 @@
   prerequisiteResearchIds: []
   unlocks:
     - type: room
-      targetRoomId: Soul Well
+      targetRoomId: Spirit Shrine
     - type: roomfeature
       targetFeatureId: Blood Altar
   tier: 1

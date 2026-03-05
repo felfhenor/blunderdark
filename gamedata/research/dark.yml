@@ -2,8 +2,8 @@
 # Root node (Dark Arts Fundamentals) is in base.yml
 #
 # Tree structure (max 4 per tier):
-#   Dark Arts Fundamentals (T1)
-#   ├── Soul Manipulation (T2)
+#   Dark Arts Fundamentals (T1) → Spirit Shrine
+#   ├── Soul Manipulation (T2) → Soul Well
 #   │   └── Soul Well Mastery (T3)
 #   └── Necromancy (T2)
 #       ├── Undead Mastery (T3)
@@ -21,7 +21,7 @@
 
 - id: 36c41bbd-675c-4300-abf7-273cd46333ef
   name: Soul Manipulation
-  description: Learn to harvest and channel soul energy, the fundamental currency of dark power.
+  description: Learn to harvest and channel soul energy, unlocking the construction of a full Soul Well to draw essence from the spiritual plane.
   branch: dark
   cost:
     research: 25
@@ -29,6 +29,8 @@
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
   unlocks:
+    - type: room
+      targetRoomId: Soul Well
     - type: passive_bonus
       bonusType: essenceProduction
       value: 0.10

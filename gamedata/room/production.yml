@@ -118,6 +118,32 @@
     - adjacentRoomId: Shadow Library
       bonus: 0.2
       description: Adjacent libraries share knowledge and cross-reference tomes.
+- id: 7c2918aa-22ed-420e-87f4-11963e00aba2
+  name: Spirit Shrine
+  description: A small altar of carved bone and flickering candles that attracts lingering spirits. The shrine draws trace amounts of essence from the boundary between life and death, providing a modest but steady supply of spiritual energy.
+  shapeId: Tiny L-Shape
+  cost:
+    gold: 60
+  production:
+    essence: 0.1
+  requiresWorkers: false
+  maxInhabitants: 0
+  maxFeatures: 1
+  fearLevel: 2
+  roomUpgradeIds: []
+  timeOfDayBonus:
+    period: night
+    bonus: 0.2
+  adjacencyBonuses:
+    - adjacentRoomId: Soul Well
+      bonus: 0.3
+      description: The Soul Well's spiritual energy greatly amplifies the shrine's connection to the spirit realm.
+    - adjacentRoomId: Shadow Library
+      bonus: 0.15
+      description: Forbidden knowledge from the library strengthens the shrine's spiritual draw.
+    - adjacentRoomId: Spirit Shrine
+      bonus: 0.1
+      description: Multiple shrines create a resonance that attracts more spirits.
 - id: 8508ed7f-61d0-40b1-aacd-116b7be96d5a
   name: Soul Well
   description: A deep well reaching into the spiritual plane, drawing raw essence from departed souls. Its eerie glow and unsettling whispers create a high-fear environment, but the essence it produces is invaluable for dark rituals.
