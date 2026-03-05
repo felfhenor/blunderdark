@@ -50,7 +50,7 @@
   cost:
     gold: 150
     essence: 50
-  timeMultiplier: 2.5
+  timeMultiplier: 3.0
   statBonuses:
     defense: 6
     hp: 10

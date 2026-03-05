@@ -256,7 +256,7 @@ export class PanelTrapWorkshopComponent {
 
     const entries = allTraps.map((trap) => {
       const adjustedCost = trapWorkshopGetCraftingCost(room, trap.craftCost);
-      const ticks = trapWorkshopGetCraftingTicks(room, workerCount);
+      const ticks = trapWorkshopGetCraftingTicks(room, workerCount, trap.timeMultiplier);
       const rawQty = qtys[trap.id] ?? 1;
       const quantity = queueFull ? 1 : Math.min(Math.max(1, rawQty), slotsRemaining);
       const totalCost: Partial<Record<ResourceType, number>> = {};

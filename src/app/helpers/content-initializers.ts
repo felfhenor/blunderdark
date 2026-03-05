@@ -581,6 +581,7 @@ function ensureTrap(trap: Partial<TrapContent>): Required<TrapContent> {
     duration: trap.duration ?? 0,
     charges: trap.charges ?? 1,
     craftCost: trap.craftCost ?? {},
+    timeMultiplier: trap.timeMultiplier ?? 1,
     triggerChance: trap.triggerChance ?? 0.5,
     canBeDisarmed: trap.canBeDisarmed ?? true,
     sprite: trap.sprite ?? 'UNKNOWN',

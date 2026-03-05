@@ -8,6 +8,7 @@
   triggerChance: 0.8
   canBeDisarmed: true
   sprite: trap-pit
+  timeMultiplier: 1.0
   craftCost:
     gold: 30
     crystals: 10
@@ -22,6 +23,7 @@
   triggerChance: 0.7
   canBeDisarmed: true
   sprite: trap-arrow
+  timeMultiplier: 1.3
   craftCost:
     gold: 40
     crystals: 15
@@ -36,6 +38,7 @@
   triggerChance: 0.9
   canBeDisarmed: false
   sprite: trap-rune
+  timeMultiplier: 2.5
   craftCost:
     gold: 50
     essence: 20
@@ -50,6 +53,7 @@
   triggerChance: 0.75
   canBeDisarmed: true
   sprite: trap-magic
+  timeMultiplier: 1.8
   craftCost:
     gold: 35
     flux: 15
@@ -64,6 +68,7 @@
   triggerChance: 0.85
   canBeDisarmed: true
   sprite: trap-fear
+  timeMultiplier: 1.5
   craftCost:
     gold: 25
     essence: 10

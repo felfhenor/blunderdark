@@ -15,6 +15,7 @@ export type TrapContent = IsContentItem &
     duration: number;
     charges: number;
     craftCost: ResourceCost;
+    timeMultiplier: number;
     triggerChance: number;
     canBeDisarmed: boolean;
   };

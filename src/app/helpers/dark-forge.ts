@@ -23,8 +23,8 @@ import { Subject } from 'rxjs';
 
 // --- Constants ---
 
-/** Base crafting time: 4 game-minutes = 20 ticks */
-export const DARK_FORGE_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 4;
+/** Base crafting time: 20 game-minutes = 20 ticks */
+export const DARK_FORGE_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 20;
 
 const darkForgeCompletedSubject = new Subject<DarkForgeCompletedEvent>();
 export const darkForgeCompleted$ = darkForgeCompletedSubject.asObservable();

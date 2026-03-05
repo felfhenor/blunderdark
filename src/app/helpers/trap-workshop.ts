@@ -17,8 +17,8 @@ import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type { ResourceCost } from '@interfaces/resource';
 import type { TrapWorkshopInfo } from '@interfaces/trap-workshop';
 
-/** Base crafting time: 3 game-minutes = 15 ticks */
-export const TRAP_WORKSHOP_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 3;
+/** Base crafting time: 20 game-minutes = 20 ticks */
+export const TRAP_WORKSHOP_BASE_CRAFTING_TICKS = GAME_TIME_TICKS_PER_MINUTE * 20;
 
 type TrapWorkshopCompletedEvent = {
   trapName: string;
@@ -58,8 +58,9 @@ export function trapWorkshopGetCraftingCost(
 export function trapWorkshopGetCraftingTicks(
   placedRoom: PlacedRoom,
   assignedWorkerCount: number,
+  recipeTimeMultiplier = 1,
 ): number {
-  let ticks = TRAP_WORKSHOP_BASE_CRAFTING_TICKS;
+  let ticks = Math.round(TRAP_WORKSHOP_BASE_CRAFTING_TICKS * recipeTimeMultiplier);
 
   const effects = roomUpgradeGetAppliedEffects(placedRoom);
   for (const effect of effects) {
