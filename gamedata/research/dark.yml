@@ -132,9 +132,9 @@
   description: Perform elaborate ceremonies combining necromancy and soul magic, unlocking forbidden library wings dedicated to the darkest tomes.
   branch: dark
   cost:
-    research: 100
-    essence: 50
-    corruption: 25
+    research: 500
+    essence: 150
+    corruption: 75
   prerequisiteResearchIds:
     - Undead Mastery
     - Soul Well Mastery
@@ -153,8 +153,8 @@
   description: Master the art of binding departed souls to the Farplane, expanding its capacity to hold additional spirits.
   branch: dark
   cost:
-    research: 100
-    essence: 50
+    research: 400
+    essence: 125
   prerequisiteResearchIds:
     - Farplane Studies
   unlocks:
@@ -172,9 +172,9 @@
   description: Learn to construct a Runeworking Chamber where trait runes can be permanently embedded into inhabitants, granting them powerful bonuses.
   branch: dark
   cost:
-    research: 80
-    gold: 50
-    crystals: 25
+    research: 400
+    gold: 125
+    crystals: 60
   prerequisiteResearchIds:
     - Rune Extraction
   unlocks:
@@ -188,9 +188,9 @@
   description: Forge captured souls into powerful artifacts, imbue minions with stolen life force, and channel abyssal energies through the soul well.
   branch: dark
   cost:
-    research: 100
-    essence: 50
-    corruption: 25
+    research: 500
+    essence: 150
+    corruption: 75
   prerequisiteResearchIds:
     - Soul Well Mastery
     - Undead Mastery
@@ -211,9 +211,9 @@
   description: Achieve the pinnacle of necromantic power, enabling the binding of an ancient lich -- an undead sorcerer of terrifying intellect.
   branch: dark
   cost:
-    research: 200
-    essence: 100
-    corruption: 50
+    research: 1500
+    essence: 450
+    corruption: 225
   prerequisiteResearchIds:
     - Soul Forge
   unlocks:
@@ -227,8 +227,8 @@
   description: Attune the Farplane to deeper ethereal frequencies, further increasing its ability to shelter wayward souls.
   branch: dark
   cost:
-    research: 150
-    essence: 75
+    research: 800
+    essence: 250
   prerequisiteResearchIds:
     - Soul Binding
   unlocks:
@@ -248,9 +248,9 @@
   description: Transcend mortal limitations through total mastery of dark forces, becoming an avatar of darkness itself.
   branch: dark
   cost:
-    research: 400
-    essence: 200
-    corruption: 100
+    research: 2500
+    essence: 700
+    corruption: 350
   prerequisiteResearchIds:
     - Necromantic Ascension
     - Ethereal Resonance

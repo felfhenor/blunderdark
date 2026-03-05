@@ -163,9 +163,9 @@
   description: Coordinate large groups of diverse creatures as a unified force, maximizing inhabitant capacity and designing advanced incubation chambers.
   branch: dominion
   cost:
-    research: 100
-    food: 50
-    gold: 25
+    research: 500
+    food: 150
+    gold: 75
   prerequisiteResearchIds:
     - Nature Attunement
     - Creature Quarters
@@ -184,9 +184,9 @@
   description: Instill a collective mindset among dungeon creatures, boosting their cooperation and work output.
   branch: dominion
   cost:
-    research: 100
-    food: 50
-    gold: 25
+    research: 450
+    food: 125
+    gold: 60
   prerequisiteResearchIds:
     - Spirit Binding
     - Transmutation
@@ -203,9 +203,9 @@
   description: Develop advanced training regimens that produce elite creatures at reduced costs, incorporating controlled mutation techniques for enhanced breeding.
   branch: dominion
   cost:
-    research: 100
-    food: 50
-    gold: 25
+    research: 450
+    food: 125
+    gold: 60
   prerequisiteResearchIds:
     - Creature Quarters
     - Transmutation
@@ -226,9 +226,9 @@
   description: Establish a centralized command structure for barracks operations, unlocking garrison expansions that increase the dungeon's overall inhabitant capacity.
   branch: dominion
   cost:
-    research: 100
-    food: 50
-    gold: 25
+    research: 400
+    food: 100
+    gold: 50
   prerequisiteResearchIds:
     - Spirit Binding
     - Creature Quarters
@@ -245,9 +245,9 @@
   description: Achieve unparalleled mastery over creature hierarchies, vastly expanding the dungeon's ability to house minions.
   branch: dominion
   cost:
-    research: 200
-    food: 100
-    gold: 50
+    research: 1000
+    food: 300
+    gold: 150
   prerequisiteResearchIds:
     - Horde Tactics
     - Pack Mentality
@@ -264,9 +264,9 @@
   description: Unlock the secrets of inter-species cooperation, dramatically boosting the productivity of all dungeon workers.
   branch: dominion
   cost:
-    research: 200
-    food: 100
-    gold: 50
+    research: 1000
+    food: 300
+    gold: 150
   prerequisiteResearchIds:
     - Elite Training
     - Horde Tactics
@@ -283,9 +283,9 @@
   description: Drive creatures to serve with ruthless efficiency, slashing the cost to recruit new minions.
   branch: dominion
   cost:
-    research: 200
-    food: 100
-    gold: 50
+    research: 800
+    food: 250
+    gold: 125
   prerequisiteResearchIds:
     - Pack Mentality
     - Elite Training
@@ -302,9 +302,9 @@
   description: Extend your sovereign authority across the entire dungeon, dramatically increasing the number of creatures that can serve under your command.
   branch: dominion
   cost:
-    research: 200
-    food: 100
-    gold: 50
+    research: 1000
+    food: 300
+    gold: 150
   prerequisiteResearchIds:
     - Garrison Command
     - Horde Tactics
@@ -323,9 +323,9 @@
   description: Transcend the limits of creature command, becoming an absolute sovereign whose will amplifies all dominion bonuses.
   branch: dominion
   cost:
-    research: 400
-    food: 200
-    gold: 100
+    research: 2000
+    food: 600
+    gold: 300
   prerequisiteResearchIds:
     - Supreme Command
     - Creature Synergy

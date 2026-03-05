@@ -121,9 +121,9 @@
   description: Weave shadows into semi-physical constructs that serve as both shield and weapon.
   branch: nether
   cost:
-    research: 100
-    essence: 50
-    corruption: 25
+    research: 450
+    essence: 125
+    corruption: 60
   prerequisiteResearchIds:
     - Shadow Magic
     - Corruption Control
@@ -140,9 +140,9 @@
   description: Discover the ancient rites of purification, enabling the construction of chambers that drain corruption from the dungeon.
   branch: nether
   cost:
-    research: 100
-    essence: 50
-    corruption: 20
+    research: 400
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Corruption Control
   unlocks:
@@ -156,9 +156,9 @@
   description: Establish a permanent conduit to the nether realm, channeling its power directly into the dungeon.
   branch: nether
   cost:
-    research: 100
-    corruption: 50
-    essence: 25
+    research: 450
+    corruption: 125
+    essence: 60
   prerequisiteResearchIds:
     - Void Affinity
     - Corruption Control
@@ -177,9 +177,9 @@
   description: Tear open a rift to the abyss, summoning forth entities of immense dark power.
   branch: nether
   cost:
-    research: 200
-    essence: 100
-    corruption: 50
+    research: 1200
+    essence: 350
+    corruption: 175
   prerequisiteResearchIds:
     - Shadow Weaving
     - Nether Conduit
@@ -200,9 +200,9 @@
   description: Perfect the art of purification, unlocking advanced upgrades that enhance the chamber's drain rate and suppression aura.
   branch: nether
   cost:
-    research: 200
-    essence: 75
-    corruption: 35
+    research: 1000
+    essence: 250
+    corruption: 100
   prerequisiteResearchIds:
     - Purification Rites
   unlocks:
@@ -218,9 +218,9 @@
   description: Harness the power of the abyss to fuel purification, unlocking a dark upgrade that doubles drain rate and converts drained corruption into essence.
   branch: nether
   cost:
-    research: 200
-    essence: 100
-    corruption: 50
+    research: 1000
+    essence: 300
+    corruption: 150
   prerequisiteResearchIds:
     - Purification Rites
   unlocks:
@@ -234,9 +234,9 @@
   description: Unravel the petrification mysteries of the shadow realm, allowing the recruitment of a medusa whose gaze turns flesh to stone.
   branch: nether
   cost:
-    research: 200
-    essence: 100
-    corruption: 50
+    research: 1500
+    essence: 450
+    corruption: 225
   prerequisiteResearchIds:
     - Shadow Weaving
     - Purification Rites
@@ -253,9 +253,9 @@
   description: Command the deepest forces of the abyss to bind a demon lord to your service, the most feared of all infernal entities.
   branch: nether
   cost:
-    research: 200
-    essence: 100
-    corruption: 50
+    research: 2000
+    essence: 600
+    corruption: 300
   prerequisiteResearchIds:
     - Abyssal Gateway
   unlocks:
@@ -269,9 +269,9 @@
   description: Achieve total mastery over nether forces, amplifying all corruption and shadow bonuses to their ultimate potential.
   branch: nether
   cost:
-    research: 400
-    corruption: 200
-    essence: 100
+    research: 2500
+    corruption: 700
+    essence: 350
   prerequisiteResearchIds:
     - Abyssal Gateway
     - Serpent's Gaze

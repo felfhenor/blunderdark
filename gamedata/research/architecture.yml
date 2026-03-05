@@ -206,9 +206,9 @@
   description: Tap into crystal resonance frequencies for flux extraction and design calming garden layouts that soothe inhabitants.
   branch: architecture
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 450
+    gold: 125
+    crystals: 60
   prerequisiteResearchIds:
     - Deep Extraction
     - Sanctum Design
@@ -225,9 +225,9 @@
   description: Engineer deeper lake basins for improved aquaculture and design investment-oriented vault systems for maximum gold accumulation.
   branch: architecture
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 450
+    gold: 125
+    crystals: 60
   prerequisiteResearchIds:
     - Aquatic & Soul Engineering
     - Sanctum Design
@@ -244,9 +244,9 @@
   description: Build specialized drill halls for defensive training and redesign torture chambers for maximum corruption output.
   branch: architecture
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 400
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Combat Specialization
     - Scholarly Design
@@ -261,9 +261,9 @@
   description: Amplify ley line conduits and engineer enhanced binding circles for extended summoning duration and boosted stats.
   branch: architecture
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 500
+    gold: 150
+    crystals: 75
   prerequisiteResearchIds:
     - Workshop Mastery
     - Quarters & Arena Design
@@ -282,9 +282,9 @@
   description: Infuse underground lakes with dark energies and design legendary treasure chambers that attract gold through sheer reputation.
   branch: architecture
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1000
+    gold: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Deep Water & Financial Design
     - Resonant Design
@@ -301,9 +301,9 @@
   description: Reconstruct the altar with transcendent architecture and expand the library with forbidden knowledge sections.
   branch: architecture
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1000
+    gold: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Deep Water & Financial Design
     - Resonant Design
@@ -320,9 +320,9 @@
   description: Construct fear-inducing torture chambers, corrupt spawning pools for dark variants, and expand alchemy laboratories with additional workstations.
   branch: architecture
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1000
+    gold: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Advanced Combat Design
     - Arcane Facility Mastery
@@ -341,9 +341,9 @@
   description: Achieve transcendent understanding of dungeon architecture, amplifying the effectiveness of all room upgrades.
   branch: architecture
   cost:
-    research: 400
-    gold: 200
-    crystals: 100
+    research: 2000
+    gold: 600
+    crystals: 300
   prerequisiteResearchIds:
     - Abyssal Waters
     - Altar Ascension

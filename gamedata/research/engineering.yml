@@ -176,9 +176,9 @@
   description: Develop the arcane engineering principles needed to construct a Fusion Core, enabling creature fusion.
   branch: engineering
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 500
+    gold: 150
+    crystals: 75
   prerequisiteResearchIds:
     - Advanced Construction
   unlocks:
@@ -192,9 +192,9 @@
   description: Build massive defensive installations and siege equipment to repel even the largest invasion forces.
   branch: engineering
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 450
+    gold: 125
+    crystals: 60
   prerequisiteResearchIds:
     - Master Architecture
     - Trap Design
@@ -211,9 +211,9 @@
   description: Construct autonomous mechanical guardians that patrol hallways and defend key positions.
   branch: engineering
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 400
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Automated Defenses
     - Trap Design
@@ -230,9 +230,9 @@
   description: Assemble powerful golems from forged materials and unlock infernal forge schematics for smelting higher-tier materials.
   branch: engineering
   cost:
-    research: 100
-    gold: 50
-    crystals: 25
+    research: 500
+    gold: 150
+    crystals: 75
   prerequisiteResearchIds:
     - Dark Forge Mastery
     - Master Architecture
@@ -255,9 +255,9 @@
   description: Master the art of inscribing magical runes into forged equipment, enabling the creation of masterwork items that grant enchantments to their wielders.
   branch: engineering
   cost:
-    research: 175
-    gold: 85
-    crystals: 40
+    research: 900
+    gold: 275
+    crystals: 125
   prerequisiteResearchIds:
     - Golem Assembly
   unlocks:
@@ -271,9 +271,9 @@
   description: Master the spatial folding techniques required to create portal gateways that instantly transport inhabitants across vast distances.
   branch: engineering
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1200
+    gold: 350
+    crystals: 175
   prerequisiteResearchIds:
     - Master Architecture
   unlocks:
@@ -288,9 +288,9 @@
   description: Engineer devastating war machines that combine siege weaponry with automated defense systems.
   branch: engineering
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1000
+    gold: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Siege Works
     - Mechanical Sentinels
@@ -307,9 +307,9 @@
   description: Achieve peak manufacturing efficiency, producing golems and siege equipment at unprecedented scale.
   branch: engineering
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1000
+    gold: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Golem Assembly
     - Siege Works
@@ -328,9 +328,9 @@
   description: Establish dominance over the primal forces of nature, enabling the recruitment of ancient treants and other legendary natural creatures.
   branch: engineering
   cost:
-    research: 200
-    gold: 100
-    crystals: 50
+    research: 1500
+    gold: 450
+    crystals: 225
   prerequisiteResearchIds:
     - War Machines
     - Industrial Mastery
@@ -347,9 +347,9 @@
   description: Attain the ultimate mastery of engineering, creating wonders that blur the line between construction and creation.
   branch: engineering
   cost:
-    research: 400
-    gold: 200
-    crystals: 100
+    research: 2000
+    gold: 600
+    crystals: 300
   prerequisiteResearchIds:
     - War Machines
     - Industrial Mastery

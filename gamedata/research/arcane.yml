@@ -168,9 +168,9 @@
   description: Explore the boundaries between planes and push the ley line nexus beyond safe limits, bending space and amplifying flux output.
   branch: arcane
   cost:
-    research: 100
-    flux: 50
-    crystals: 25
+    research: 500
+    flux: 125
+    crystals: 60
   prerequisiteResearchIds:
     - Arcane Amplification
     - Enchantment
@@ -191,9 +191,9 @@
   description: Achieve total control over ley line networks, redirecting their flow to power entire dungeon floors.
   branch: arcane
   cost:
-    research: 100
-    flux: 50
-    crystals: 25
+    research: 450
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Elemental Binding
     - Ley Line Tapping
@@ -210,9 +210,9 @@
   description: Weave interconnected spell matrices that allow wards and enchantments to reinforce each other.
   branch: arcane
   cost:
-    research: 100
-    flux: 50
-    crystals: 25
+    research: 450
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Warding
     - Arcane Amplification
@@ -233,9 +233,9 @@
   description: Merge dimensional magic with ley line power to create zones of intensified magical energy.
   branch: arcane
   cost:
-    research: 200
-    flux: 100
-    crystals: 50
+    research: 1000
+    flux: 300
+    crystals: 150
   prerequisiteResearchIds:
     - Dimensional Studies
     - Ley Line Mastery
@@ -252,9 +252,9 @@
   description: Establish a permanent connection to other planes, allowing the summoning of arcane constructs and exotic materials.
   branch: arcane
   cost:
-    research: 200
-    flux: 100
-    crystals: 50
+    research: 1200
+    flux: 350
+    crystals: 175
   prerequisiteResearchIds:
     - Spellweave Lattice
     - Dimensional Studies
@@ -271,9 +271,9 @@
   description: Master the art of binding creatures from other planes of existence, enabling the recruitment of an ancient dragon of immense power.
   branch: arcane
   cost:
-    research: 200
-    flux: 100
-    crystals: 50
+    research: 1800
+    flux: 500
+    crystals: 250
   prerequisiteResearchIds:
     - Arcane Convergence
     - Planar Nexus
@@ -288,9 +288,9 @@
   description: Pierce the veil between dimensions to summon a beholder -- an alien entity of vast intellect and devastating eye rays.
   branch: arcane
   cost:
-    research: 200
-    flux: 100
-    crystals: 50
+    research: 1800
+    flux: 500
+    crystals: 250
   prerequisiteResearchIds:
     - Planar Nexus
   unlocks:
@@ -306,9 +306,9 @@
   description: Achieve the pinnacle of arcane knowledge, unifying all schools of magic into a single transcendent discipline.
   branch: arcane
   cost:
-    research: 400
-    flux: 200
-    crystals: 100
+    research: 2500
+    flux: 700
+    crystals: 350
   prerequisiteResearchIds:
     - Arcane Convergence
     - Planar Nexus
