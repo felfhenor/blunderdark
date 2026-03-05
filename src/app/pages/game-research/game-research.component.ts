@@ -12,6 +12,7 @@ import { CurrencyCostListComponent } from '@components/currency-cost-list/curren
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { signalLocalStorage } from '@helpers/signal';
 import { formatDurationSeconds } from '@helpers/game-time';
 import {
   RESEARCH_BASE_PROGRESS_PER_TICK,
@@ -65,7 +66,10 @@ type NodeState = ResearchNodeState;
 export class GameResearchComponent {
   public visible = model<boolean>(false);
 
-  public selectedBranch = signal<ResearchBranch>('dark');
+  public selectedBranch = signalLocalStorage<ResearchBranch>(
+    'researchSelectedBranch',
+    'arcane',
+  );
   public selectedNodeId = signal<string | undefined>(undefined);
 
   public allNodes = computed(() => {

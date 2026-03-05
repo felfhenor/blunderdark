@@ -498,6 +498,14 @@ export class PanelRoomInfoComponent {
     return slots;
   });
 
+  public showFeatureSlots = computed(() => {
+    const slots = this.featureSlots();
+    return (
+      slots.length > 0 &&
+      (this.availableFeatures().length > 0 || slots.some((s) => s.feature))
+    );
+  });
+
   public showInhabitantSelect = signal(false);
 
   public showFeatureSelect = signal(false);

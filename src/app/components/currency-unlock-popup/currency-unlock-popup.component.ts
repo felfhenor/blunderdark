@@ -8,18 +8,14 @@ import {
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { currencyUnlockQueue } from '@helpers/currency-unlock';
-import { RESOURCE_DISPLAY, RESOURCE_LABEL_MAP } from '@helpers';
+import {
+  ICON_ALL,
+  RESOURCE_DISPLAY,
+  RESOURCE_ICON_MAP,
+  RESOURCE_COLOR_MAP,
+  RESOURCE_LABEL_MAP,
+} from '@helpers';
 import type { ResourceType } from '@interfaces';
-
-const CURRENCY_EMOJI: Record<ResourceType, string> = {
-  gold: '&#x1F4B0;',
-  food: '&#x1F356;',
-  crystals: '&#x1F48E;',
-  flux: '&#x1F300;',
-  research: '&#x1F9EA;',
-  essence: '&#x2728;',
-  corruption: '&#x1F525;',
-};
 
 @Component({
   selector: 'app-currency-unlock-popup',
@@ -72,12 +68,13 @@ export class CurrencyUnlockPopupComponent {
     const label = RESOURCE_LABEL_MAP[type];
     const description =
       RESOURCE_DISPLAY.find((r) => r.type === type)?.description ?? '';
-    const emoji = CURRENCY_EMOJI[type];
+    const iconSvg = ICON_ALL[RESOURCE_ICON_MAP[type]];
+    const color = RESOURCE_COLOR_MAP[type];
 
     swal.swalOptions = {
       title: `${label} Unlocked!`,
       html: `<div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
-        <div style="font-size:3rem;">${emoji}</div>
+        <div style="width:3rem;height:3rem;color:${color};">${iconSvg}</div>
         <p style="opacity:0.8;font-size:0.875rem;">${description}</p>
         <p style="opacity:0.6;font-size:0.75rem;">This resource now appears in your resource bar and will be produced by your dungeon.</p>
       </div>`,
