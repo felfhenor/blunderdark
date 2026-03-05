@@ -9,7 +9,7 @@ import type { ResearchNodeState } from '@interfaces';
         <span class="badge badge-success badge-sm">Completed</span>
       }
       @case ('active') {
-        <span class="badge badge-info badge-sm">In Progress</span>
+        <span class="badge badge-info badge-sm whitespace-nowrap">In Progress</span>
       }
       @case ('available') {
         <span class="badge badge-warning badge-sm">Available</span>
