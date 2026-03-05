@@ -4,34 +4,34 @@
 
 - id: b290409e-f95c-4a83-afc5-2cb3a1f80e96
   name: Iron Muscles
-  description: "Mutation grants +2 Attack."
+  description: "Mutation grants +5 Attack."
   modifiers:
     - stat: attack
-      bonus: 2
+      bonus: 5
   rarity: common
 
 - id: fe2e8eba-4b67-4e14-b6bb-196cc08baf7f
   name: Hardened Hide
-  description: "Mutation grants +2 Defense."
+  description: "Mutation grants +5 Defense."
   modifiers:
     - stat: defense
-      bonus: 2
+      bonus: 5
   rarity: common
 
 - id: 007c1887-7cc0-424d-9364-a76e9d5fe21d
   name: Vital Surge
-  description: "Mutation grants +5 HP."
+  description: "Mutation grants +12 HP."
   modifiers:
     - stat: hp
-      bonus: 5
+      bonus: 12
   rarity: common
 
 - id: b25dd41a-dfea-4b23-9d92-0250c0a48a94
   name: Quick Twitch
-  description: "Mutation grants +2 Speed."
+  description: "Mutation grants +4 Speed."
   modifiers:
     - stat: speed
-      bonus: 2
+      bonus: 4
   rarity: common
 
 - id: ded1fd11-27fb-4d78-a0f0-69988d641d3a
@@ -46,28 +46,28 @@
 
 - id: 3b3845f7-a1c7-4426-89af-98db3ce46a45
   name: Withered Limbs
-  description: "Mutation causes -2 Attack."
+  description: "Mutation causes -4 Attack."
   modifiers:
     - stat: attack
-      bonus: -2
+      bonus: -4
   rarity: common
   isNegative: true
 
 - id: f8a8c22b-affa-4fc6-8f3a-27399c455016
   name: Brittle Bones
-  description: "Mutation causes -2 Defense."
+  description: "Mutation causes -4 Defense."
   modifiers:
     - stat: defense
-      bonus: -2
+      bonus: -4
   rarity: common
   isNegative: true
 
 - id: 6369445f-9f1e-4f52-b424-14a32956d633
   name: Wasting Sickness
-  description: "Mutation causes -3 HP."
+  description: "Mutation causes -8 HP."
   modifiers:
     - stat: hp
-      bonus: -3
+      bonus: -8
   rarity: common
   isNegative: true
 
@@ -75,34 +75,34 @@
 
 - id: 894be392-5205-458a-82d9-89a7f46a57f2
   name: Savage Claws
-  description: "Mutation grants +4 Attack."
+  description: "Mutation grants +10 Attack."
   modifiers:
     - stat: attack
-      bonus: 4
+      bonus: 10
   rarity: uncommon
 
 - id: 297a9562-0cc5-4d0b-98fd-5f7764bf3135
   name: Stone Scales
-  description: "Mutation grants +4 Defense."
+  description: "Mutation grants +10 Defense."
   modifiers:
     - stat: defense
-      bonus: 4
+      bonus: 10
   rarity: uncommon
 
 - id: f1f8a6a4-6405-438f-8173-bf652520e55c
   name: Regenerative Tissue
-  description: "Mutation grants +10 HP."
+  description: "Mutation grants +25 HP."
   modifiers:
     - stat: hp
-      bonus: 10
+      bonus: 25
   rarity: uncommon
 
 - id: 9cdec5c2-e863-4801-a246-2fa22425f0c6
   name: Lightning Reflexes
-  description: "Mutation grants +3 Speed."
+  description: "Mutation grants +7 Speed."
   modifiers:
     - stat: speed
-      bonus: 3
+      bonus: 7
   rarity: uncommon
 
 - id: 5b60aa7a-01c8-4869-accf-7c3037c97ac7
@@ -117,19 +117,19 @@
 
 - id: 332c3de8-d968-40b6-8c71-e6f7c85c8d87
   name: Numbed Nerves
-  description: "Mutation causes -3 Attack."
+  description: "Mutation causes -7 Attack."
   modifiers:
     - stat: attack
-      bonus: -3
+      bonus: -7
   rarity: uncommon
   isNegative: true
 
 - id: 3df5b38b-c525-46ea-acb7-0a2069a63e2e
   name: Soft Shell
-  description: "Mutation causes -3 Defense."
+  description: "Mutation causes -7 Defense."
   modifiers:
     - stat: defense
-      bonus: -3
+      bonus: -7
   rarity: uncommon
   isNegative: true
 
@@ -137,34 +137,34 @@
 
 - id: 0c6f46d4-7e7e-42d8-b9e8-683f81041416
   name: Berserker Blood
-  description: "Mutation grants +7 Attack."
+  description: "Mutation grants +16 Attack."
   modifiers:
     - stat: attack
-      bonus: 7
+      bonus: 16
   rarity: rare
 
 - id: 2cfcad4b-cb42-4de3-92fb-4354246bc86d
   name: Adamantine Carapace
-  description: "Mutation grants +6 Defense."
+  description: "Mutation grants +14 Defense."
   modifiers:
     - stat: defense
-      bonus: 6
+      bonus: 14
   rarity: rare
 
 - id: e51f27ab-4540-487f-8d5e-2c99e53e1bcc
   name: Undying Vitality
-  description: "Mutation grants +15 HP."
+  description: "Mutation grants +40 HP."
   modifiers:
     - stat: hp
-      bonus: 15
+      bonus: 40
   rarity: rare
 
 - id: e2260469-7c26-42e3-8f8f-6a5eb4f73250
   name: Phase Runner
-  description: "Mutation grants +5 Speed."
+  description: "Mutation grants +10 Speed."
   modifiers:
     - stat: speed
-      bonus: 5
+      bonus: 10
   rarity: rare
 
 - id: b0534748-617c-45a2-8acb-30898fb1d063
@@ -179,34 +179,34 @@
 
 - id: a9b9b545-94bc-4c69-a185-f7981e5be46b
   name: Abyssal Fury
-  description: "Mutation grants +10 Attack."
+  description: "Mutation grants +24 Attack."
   modifiers:
     - stat: attack
-      bonus: 10
+      bonus: 24
   rarity: epic
 
 - id: 4e7b6d93-747c-476f-8386-d73b55c83144
   name: Impenetrable Shell
-  description: "Mutation grants +8 Defense."
+  description: "Mutation grants +20 Defense."
   modifiers:
     - stat: defense
-      bonus: 8
+      bonus: 20
   rarity: epic
 
 - id: 12de84ce-49ad-4699-9134-4bf99ed8183e
   name: Titan's Constitution
-  description: "Mutation grants +20 HP."
+  description: "Mutation grants +55 HP."
   modifiers:
     - stat: hp
-      bonus: 20
+      bonus: 55
   rarity: epic
 
 - id: 582be62e-b4d4-4e6d-a1f3-06dd4915d382
   name: Temporal Shift
-  description: "Mutation grants +7 Speed."
+  description: "Mutation grants +14 Speed."
   modifiers:
     - stat: speed
-      bonus: 7
+      bonus: 14
   rarity: epic
 
 - id: de5748dd-a98d-42e7-9b37-00597d1c91e9

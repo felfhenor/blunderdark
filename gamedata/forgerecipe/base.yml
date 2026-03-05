@@ -6,7 +6,7 @@
     crystals: 20
   timeMultiplier: 1.0
   statBonuses:
-    attack: 3
+    attack: 8
   tier: basic
 
 - id: a1f01001-0001-4001-8001-000000000002
@@ -17,7 +17,7 @@
     crystals: 15
   timeMultiplier: 1.2
   statBonuses:
-    defense: 3
+    defense: 8
   tier: basic
 
 - id: a1f01001-0001-4001-8001-000000000003
@@ -28,8 +28,8 @@
     crystals: 25
   timeMultiplier: 1.5
   statBonuses:
-    defense: 2
-    hp: 5
+    defense: 5
+    hp: 15
   tier: basic
 
 - id: a1f01001-0001-4001-8001-000000000006
@@ -40,8 +40,8 @@
     essence: 40
   timeMultiplier: 2.0
   statBonuses:
-    attack: 6
-    speed: 2
+    attack: 16
+    speed: 5
   tier: advanced
 
 - id: a1f01001-0001-4001-8001-000000000007
@@ -52,6 +52,6 @@
     essence: 50
   timeMultiplier: 3.0
   statBonuses:
-    defense: 6
-    hp: 10
+    defense: 16
+    hp: 30
   tier: advanced
