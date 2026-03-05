@@ -79,13 +79,13 @@
       targetResourceType: research
 - id: 10f78dcf-af4b-4ba4-80cb-b7d5ed54931b
   name: Throne Scholar
-  description: When assigned to the Throne Room, provides a dungeon-wide +10%
-    Research bonus.
+  description: When assigned to the Throne Room, provides a dungeon-wide +10% Research bonus.
   effects:
     - effectType: production_multiplier
       effectValue: 0.1
       targetResourceType: research
       targetRoomId: Throne Room
+      isDungeonWide: true
 - id: cd1286ea-ea19-4371-8967-3a2cd8440f70
   name: Soul Siphon
   description: When assigned to the Soul Well, doubles Soul Essence generation.

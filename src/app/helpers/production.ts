@@ -247,6 +247,38 @@ export function productionCalculateInhabitantBonus(
     }
   }
 
+  // Dungeon-wide production bonuses (isDungeonWide traits from all inhabitants)
+  const allInhabitants = gamestate()?.world?.inhabitants ?? [];
+  for (const other of allInhabitants) {
+    // Skip inhabitants already counted as local workers
+    if (assignedInhabitants.some((a) => a.instanceId === other.instanceId)) continue;
+
+    const otherDef = contentGetEntry<InhabitantContent>(other.definitionId);
+    if (!otherDef) continue;
+
+    for (const trait of otherDef.traits) {
+      for (const effect of trait.effects) {
+        if (effect.effectType !== 'production_multiplier' || !effect.isDungeonWide) continue;
+        // If the effect requires a specific room, the creature must be assigned there
+        if (effect.targetRoomId) {
+          const assignedRoom = gamestate()?.world?.floors
+            .flatMap((f) => f.rooms)
+            .find((r) => r.id === other.assignedRoomId);
+          if (!assignedRoom || assignedRoom.roomTypeId !== effect.targetRoomId) continue;
+        }
+        // Check if this room produces the target resource
+        if (
+          !effect.targetResourceType ||
+          effect.targetResourceType === 'all' ||
+          (roomProduction[effect.targetResourceType] !== undefined &&
+            roomProduction[effect.targetResourceType]! > 0)
+        ) {
+          totalBonus += effect.effectValue;
+        }
+      }
+    }
+  }
+
   return { bonus: totalBonus, hasWorkers: true };
 }
 
