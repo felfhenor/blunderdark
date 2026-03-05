@@ -66,6 +66,8 @@ type NodeState = ResearchNodeState;
 export class GameResearchComponent {
   public visible = model<boolean>(false);
 
+  public searchQuery = signal('');
+
   public selectedBranch = signalLocalStorage<ResearchBranch>(
     'researchSelectedBranch',
     'arcane',
@@ -83,6 +85,44 @@ export class GameResearchComponent {
       branches.add(node.branch);
     }
     return [...branches];
+  });
+
+  private upgradeToRoomName = computed(() => {
+    const rooms = contentGetEntriesByType<RoomContent>('room');
+    const map = new Map<string, string>();
+    for (const room of rooms) {
+      for (const upgradeId of room.roomUpgradeIds) {
+        map.set(upgradeId, room.name);
+      }
+    }
+    return map;
+  });
+
+  public matchingNodeIds = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return undefined;
+    const nodes = this.allNodes();
+    const upgradeRoomNames = this.upgradeToRoomName();
+    const ids = new Set<string>();
+    for (const node of nodes) {
+      if (this.nodeMatchesSearch(node, query, upgradeRoomNames)) {
+        ids.add(node.id);
+      }
+    }
+    return ids;
+  });
+
+  public branchMatchCounts = computed(() => {
+    const matching = this.matchingNodeIds();
+    if (!matching) return new Map<ResearchBranch, number>();
+    const nodes = this.allNodes();
+    const counts = new Map<ResearchBranch, number>();
+    for (const node of nodes) {
+      if (matching.has(node.id)) {
+        counts.set(node.branch, (counts.get(node.branch) ?? 0) + 1);
+      }
+    }
+    return counts;
   });
 
   public branchNodes = computed(() => {
@@ -313,6 +353,40 @@ export class GameResearchComponent {
         };
       }
     }
+  }
+
+  public getBranchMatchCount(branch: ResearchBranch): number {
+    return this.branchMatchCounts().get(branch) ?? 0;
+  }
+
+  public isNodeHighlighted(nodeId: string): boolean {
+    const matching = this.matchingNodeIds();
+    if (!matching) return false;
+    return matching.has(nodeId);
+  }
+
+  public isNodeDimmed(nodeId: string): boolean {
+    const matching = this.matchingNodeIds();
+    if (!matching) return false;
+    return !matching.has(nodeId);
+  }
+
+  private nodeMatchesSearch(
+    node: ResearchContent,
+    query: string,
+    upgradeRoomNames: Map<string, string>,
+  ): boolean {
+    if (node.name.toLowerCase().includes(query)) return true;
+    if (node.description.toLowerCase().includes(query)) return true;
+    for (const unlock of node.unlocks) {
+      const formatted = this.formatUnlock(unlock);
+      if (formatted.name.toLowerCase().includes(query)) return true;
+      if (unlock.type === 'roomupgrade') {
+        const roomName = upgradeRoomNames.get(unlock.targetRoomupgradeId);
+        if (roomName && roomName.toLowerCase().includes(query)) return true;
+      }
+    }
+    return false;
   }
 
   public getNodeProgressPercent(nodeId: string): number {

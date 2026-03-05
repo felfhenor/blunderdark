@@ -10,6 +10,13 @@
         <h1 class="text-lg font-bold">Research</h1>
 
         <div class="flex items-center gap-4">
+          <input
+            type="text"
+            class="input input-xs input-bordered w-48"
+            placeholder="Search research..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+          />
           <span class="text-sm opacity-70">
             Speed: {{ speedModifier() * 100 | number: '1.0-0' }}%
           </span>
@@ -49,13 +56,16 @@
         @for (branch of availableBranches(); track branch; let i = $index) {
           <button
             role="tab"
-            class="tab capitalize"
+            class="tab capitalize gap-2"
             appSfx="ui-click"
             [sfxOffset]="i"
             [class.tab-active]="selectedBranch() === branch"
             (click)="selectBranch(branch)"
           >
             {{ branch }}
+            @if (getBranchMatchCount(branch); as count) {
+              <span class="badge badge-xs badge-primary">{{ count }}</span>
+            }
           </button>
         }
       </div>
@@ -85,6 +95,8 @@
                       [class.node-available]="node.nodeState === 'available'"
                       [class.node-locked]="node.nodeState === 'locked'"
                       [class.node-selected]="selectedNodeId() === node.id"
+                      [class.node-search-match]="isNodeHighlighted(node.id)"
+                      [class.node-search-dimmed]="isNodeDimmed(node.id)"
                       (click)="selectNode(node.id)"
                     >
                       <div class="node-name text-xs font-semibold">

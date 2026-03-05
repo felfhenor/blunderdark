@@ -50,6 +50,18 @@
   border-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
 }
 
+.node-search-match {
+  ring-color: var(--color-primary);
+  @apply ring-2 ring-offset-1;
+  &.node-locked {
+    @apply opacity-70;
+  }
+}
+
+.node-search-dimmed {
+  @apply opacity-20;
+}
+
 .node-icon {
   @apply absolute top-1 right-1 text-xs leading-none;
 }
