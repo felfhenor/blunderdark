@@ -206,7 +206,7 @@ function makeResources(
     flux: { current: 0, max: 200 },
     research: { current: 0, max: 300 },
     essence: { current: 0, max: 200 },
-    corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
+    corruption: { current: 0, max: 999999 },
     ...overrides,
   } as ResourceMap;
 }
@@ -414,7 +414,7 @@ describe('legendaryInhabitantCanRecruit', () => {
       const floors = [makeFloor([{ roomTypeId: 'room-altar' }])];
       const resources = makeResources({
         gold: { current: 1000, max: 1000 },
-        corruption: { current: 1000, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 1000, max: 999999 },
       });
 
       const result = legendaryInhabitantCanRecruit(def, [], floors, resources);
@@ -435,7 +435,7 @@ describe('legendaryInhabitantCanRecruit', () => {
       ];
       const resources = makeResources({
         gold: { current: 1000, max: 1000 },
-        corruption: { current: 1000, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 1000, max: 999999 },
       });
 
       const result = legendaryInhabitantCanRecruit(def, [], floors, resources);
@@ -448,7 +448,7 @@ describe('legendaryInhabitantCanRecruit', () => {
       const floors = [makeFloor([])];
       const resources = makeResources({
         gold: { current: 1000, max: 1000 },
-        corruption: { current: 1000, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 1000, max: 999999 },
       });
 
       const result = legendaryInhabitantCanRecruit(def, [], floors, resources);

@@ -230,7 +230,7 @@ export function victoryCapBoost(resourceType: ResourceType): number {
 
 /**
  * Compute the effective max for a resource type, including storage bonuses.
- * Corruption is excluded from storage bonuses (already MAX_SAFE_INTEGER).
+ * Corruption is excluded from storage bonuses (has a fixed cap).
  */
 export function resourceEffectiveMax(
   baseMax: number,

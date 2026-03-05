@@ -39,7 +39,7 @@ function makeGameState(overrides?: Partial<GameState>): GameState {
         flux: { current: 30, max: 200 },
         research: { current: 0, max: 300 },
         essence: { current: 0, max: 200 },
-        corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 0, max: 999999 },
       },
       inhabitants: [],
       hallways: [],

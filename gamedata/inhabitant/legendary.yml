@@ -92,7 +92,7 @@
   fearModifier: 2
   fearPropagationDistance: 2
   foodConsumptionRate: 2
-  corruptionGeneration: 3
+  corruptionGeneration: 0.6
   upkeepCost:
     gold: 5
     essence: 3

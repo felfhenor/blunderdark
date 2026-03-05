@@ -141,7 +141,7 @@
     crystals: 40
     essence: 20
   production:
-    corruption: 0.4
+    corruption: 0.15
   requiresWorkers: true
   maxInhabitants: 1
   maxFeatures: 1

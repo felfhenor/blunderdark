@@ -34,7 +34,7 @@
     - type: mutationOddsBonus
       value: 0.25
     - type: secondaryProduction
-      value: 0.3
+      value: 0.1
       resource: corruption
     - type: fearIncrease
       value: 2

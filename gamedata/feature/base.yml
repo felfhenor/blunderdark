@@ -56,8 +56,8 @@
     essence: 25
   bonuses:
     - type: corruption_generation
-      value: 2
-      description: '+2 Corruption per minute'
+      value: 0.4
+      description: '+0.4 Corruption per minute'
 
 - id: b7c88ecf-25ad-45d4-a185-b27cc4507517
   name: Geothermal Vents

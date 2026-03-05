@@ -43,7 +43,7 @@
     - type: summonStatBonus
       value: 2
     - type: secondaryProduction
-      value: 0.5
+      value: 0.2
       resource: corruption
     - type: fearIncrease
       value: 2

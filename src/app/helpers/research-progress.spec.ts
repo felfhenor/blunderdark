@@ -212,7 +212,7 @@ function makeGameState(overrides: Partial<GameStateWorld> = {}): GameState {
         flux: { current: 50, max: 200 },
         research: { current: 50, max: 300 },
         essence: { current: 50, max: 200 },
-        corruption: { current: 0, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 0, max: 999999 },
       },
       inhabitants: [],
       hallways: [],

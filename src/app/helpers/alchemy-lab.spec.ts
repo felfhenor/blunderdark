@@ -222,7 +222,7 @@ function makeGameState(overrides?: {
         flux: { current: 10, max: 200 },
         research: { current: 0, max: 300 },
         essence: { current: 5, max: 200 },
-        corruption: { current: 50, max: Number.MAX_SAFE_INTEGER },
+        corruption: { current: 50, max: 999999 },
         ...(overrides?.resources ?? {}),
       },
       inhabitants: [makeInhabitant()],

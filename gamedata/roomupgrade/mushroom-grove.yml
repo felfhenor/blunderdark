@@ -35,7 +35,7 @@
       value: 2.0
       resource: food
     - type: secondaryProduction
-      value: 0.2
+      value: 0.08
       resource: corruption
     - type: fearIncrease
       value: 1

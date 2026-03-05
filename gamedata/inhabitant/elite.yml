@@ -142,7 +142,7 @@
   restrictionTags:
     - unique
   rulerBonuses:
-    corruptionGeneration: 0.25
+    corruptionGeneration: 0.05
     fear: 0.10
     invaderMorale: -0.10
   rulerFearLevel: 5
@@ -150,7 +150,7 @@
   fearModifier: 2
   fearPropagationDistance: 2
   foodConsumptionRate: 3
-  corruptionGeneration: 10
+  corruptionGeneration: 2
   upkeepCost:
     gold: 8
     corruption: 5

@@ -50,7 +50,7 @@ describe('defaultResources', () => {
     expect(resources.flux.max).toBe(200);
     expect(resources.research.max).toBe(300);
     expect(resources.essence.max).toBe(200);
-    expect(resources.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
+    expect(resources.corruption.max).toBe(999999);
   });
 
   it('should return a new object each call', () => {

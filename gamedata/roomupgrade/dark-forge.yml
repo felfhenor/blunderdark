@@ -44,7 +44,7 @@
     - type: forgingStatBonus
       value: 3
     - type: secondaryProduction
-      value: 0.3
+      value: 0.1
       resource: corruption
     - type: fearIncrease
       value: 1

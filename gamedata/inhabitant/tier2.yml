@@ -107,7 +107,7 @@
   fearTolerance: 2
   fearModifier: 0
   foodConsumptionRate: 1
-  corruptionGeneration: 3
+  corruptionGeneration: 0.6
   stateModifiers:
     scared:
       productionMultiplier: 0.4
@@ -194,7 +194,7 @@
   fearTolerance: 99
   fearModifier: 2
   foodConsumptionRate: 0
-  corruptionGeneration: 2
+  corruptionGeneration: 0.4
   stateModifiers:
     scared:
       productionMultiplier: 1.0

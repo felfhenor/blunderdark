@@ -309,7 +309,7 @@ describe('resourceMigrate', () => {
     expect(migrated.crystals.current).toBe(300);
     expect(migrated.crystals.max).toBe(500);
     expect(migrated.corruption.current).toBe(42);
-    expect(migrated.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
+    expect(migrated.corruption.max).toBe(999999);
   });
 
   it('should initialize missing resource types to defaults', () => {
@@ -446,7 +446,7 @@ describe('resourceEffectiveMax', () => {
 
   it('always returns base max for corruption regardless of bonus', () => {
     mockStorageFlatBonus = 500;
-    expect(resourceEffectiveMax(Number.MAX_SAFE_INTEGER, 'corruption', [])).toBe(Number.MAX_SAFE_INTEGER);
+    expect(resourceEffectiveMax(999999, 'corruption', [])).toBe(999999);
   });
 
   it('floors the result to integer', () => {
@@ -497,7 +497,7 @@ describe('resourceStorageProcess', () => {
     mockStorageFlatBonus = 300;
     const state = { world: { resources: mockResources, floors: [] } } as GameState;
     resourceStorageProcess(state);
-    expect(state.world.resources.corruption.max).toBe(Number.MAX_SAFE_INTEGER);
+    expect(state.world.resources.corruption.max).toBe(999999);
   });
 
   it('clamps current to new max when max decreases', () => {

@@ -10,9 +10,9 @@ export type DeepObjectiveCorruptionTier = {
 
 export const DEEP_OBJECTIVE_CORRUPTION_TIERS: readonly DeepObjectiveCorruptionTier[] = [
   { minDepth: 1, maxDepth: 3, corruptionPerMinute: 0 },
-  { minDepth: 4, maxDepth: 6, corruptionPerMinute: 0.1 },
-  { minDepth: 7, maxDepth: 9, corruptionPerMinute: 0.2 },
-  { minDepth: 10, maxDepth: 10, corruptionPerMinute: 0.5 },
+  { minDepth: 4, maxDepth: 6, corruptionPerMinute: 0.03 },
+  { minDepth: 7, maxDepth: 9, corruptionPerMinute: 0.06 },
+  { minDepth: 10, maxDepth: 10, corruptionPerMinute: 0.15 },
 ];
 
 /**

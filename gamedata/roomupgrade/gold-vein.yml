@@ -33,7 +33,7 @@
       value: 2.0
       resource: gold
     - type: secondaryProduction
-      value: 0.05
+      value: 0.02
       resource: corruption
     - type: fearIncrease
       value: 1

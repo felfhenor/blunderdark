@@ -259,20 +259,20 @@ describe('floorModifierGetObjectiveCorruptionRate', () => {
     expect(floorModifierGetObjectiveCorruptionRate(3)).toBe(0);
   });
 
-  it('should return 0.1 for depths 4-6', () => {
-    expect(floorModifierGetObjectiveCorruptionRate(4)).toBeCloseTo(0.1);
-    expect(floorModifierGetObjectiveCorruptionRate(5)).toBeCloseTo(0.1);
-    expect(floorModifierGetObjectiveCorruptionRate(6)).toBeCloseTo(0.1);
+  it('should return 0.03 for depths 4-6', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(4)).toBeCloseTo(0.03);
+    expect(floorModifierGetObjectiveCorruptionRate(5)).toBeCloseTo(0.03);
+    expect(floorModifierGetObjectiveCorruptionRate(6)).toBeCloseTo(0.03);
   });
 
-  it('should return 0.2 for depths 7-9', () => {
-    expect(floorModifierGetObjectiveCorruptionRate(7)).toBeCloseTo(0.2);
-    expect(floorModifierGetObjectiveCorruptionRate(8)).toBeCloseTo(0.2);
-    expect(floorModifierGetObjectiveCorruptionRate(9)).toBeCloseTo(0.2);
+  it('should return 0.06 for depths 7-9', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(7)).toBeCloseTo(0.06);
+    expect(floorModifierGetObjectiveCorruptionRate(8)).toBeCloseTo(0.06);
+    expect(floorModifierGetObjectiveCorruptionRate(9)).toBeCloseTo(0.06);
   });
 
-  it('should return 0.5 for depth 10', () => {
-    expect(floorModifierGetObjectiveCorruptionRate(10)).toBeCloseTo(0.5);
+  it('should return 0.15 for depth 10', () => {
+    expect(floorModifierGetObjectiveCorruptionRate(10)).toBeCloseTo(0.15);
   });
 
   it('should return 0 for depth 0 (out of range)', () => {
