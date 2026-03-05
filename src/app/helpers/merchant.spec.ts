@@ -42,8 +42,8 @@ function makeTrade(
     name: `Trade ${id}`,
     __type: 'merchanttrade',
     description: `Test trade ${id}`,
-    cost: { gold: 100 },
-    reward: { crystals: 50 },
+    cost: [{ type: 'resource', resourceType: 'gold', amount: 100 }],
+    reward: [{ type: 'resource', resourceType: 'crystals', amount: 50 }],
     maxStock,
     type,
   };

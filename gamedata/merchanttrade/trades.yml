@@ -3,9 +3,13 @@
   name: Crystal Exchange
   description: Trade gold for a cache of raw crystals from the merchant's mines.
   cost:
-    gold: 100
+    - type: resource
+      resourceType: gold
+      amount: 120
   reward:
-    crystals: 60
+    - type: resource
+      resourceType: crystals
+      amount: 50
   maxStock: 3
   type: buy
 
@@ -13,9 +17,13 @@
   name: Ration Supply
   description: Purchase preserved provisions to feed your dungeon's inhabitants.
   cost:
-    gold: 80
+    - type: resource
+      resourceType: gold
+      amount: 100
   reward:
-    food: 100
+    - type: resource
+      resourceType: food
+      amount: 80
   maxStock: 3
   type: buy
 
@@ -23,10 +31,16 @@
   name: Flux Canister
   description: A sealed container of volatile magical flux, carefully stabilized for transport.
   cost:
-    gold: 150
-    crystals: 25
+    - type: resource
+      resourceType: gold
+      amount: 175
+    - type: resource
+      resourceType: crystals
+      amount: 30
   reward:
-    flux: 30
+    - type: resource
+      resourceType: flux
+      amount: 25
   maxStock: 2
   type: buy
 
@@ -34,11 +48,121 @@
   name: Essence Vial
   description: Distilled essence captured from ancient ley lines, concentrated into a portable form.
   cost:
-    gold: 200
-    crystals: 50
+    - type: resource
+      resourceType: gold
+      amount: 250
+    - type: resource
+      resourceType: crystals
+      amount: 60
   reward:
-    essence: 25
+    - type: resource
+      resourceType: essence
+      amount: 20
   maxStock: 2
+  type: buy
+
+# Buy trades - item trades (traps)
+- id: 18f6cf2c-c5e3-4c7d-9422-ca22dacab7f2
+  name: Merchant's Pit Traps
+  description: A crate of pre-assembled pit traps, ready to deploy in your dungeon corridors.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 60
+    - type: resource
+      resourceType: crystals
+      amount: 15
+  reward:
+    - type: trap
+      trapId: Pit Trap
+      count: 2
+  maxStock: 2
+  type: buy
+
+- id: 7694a242-35d0-467b-990b-6ea5b29b0fed
+  name: Merchant's Arrow Traps
+  description: Merchant-grade arrow mechanisms with hair-trigger sensitivity.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 80
+    - type: resource
+      resourceType: crystals
+      amount: 20
+  reward:
+    - type: trap
+      trapId: Arrow Trap
+      count: 2
+  maxStock: 2
+  type: buy
+
+- id: 9aa1b6d9-1bf2-41fa-b8a9-aa4e519c4892
+  name: Merchant's Rune Trap
+  description: A single powerful rune trap inscribed by the merchant's personal enchanter.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 120
+    - type: resource
+      resourceType: essence
+      amount: 30
+  reward:
+    - type: trap
+      trapId: Rune Trap
+      count: 1
+  maxStock: 1
+  type: buy
+
+# Buy trades - item trades (forge equipment)
+- id: 8c24c5ab-920e-4325-8e75-420ef46adcb4
+  name: Merchant's Iron Sword
+  description: A pre-forged iron blade from the merchant's personal armory.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 80
+    - type: resource
+      resourceType: crystals
+      amount: 30
+  reward:
+    - type: forgeItem
+      forgeRecipeId: Iron Sword
+      count: 1
+  maxStock: 1
+  type: buy
+
+- id: fdc04159-4c98-4ef9-91dd-7505bba92e2b
+  name: Merchant's Dark Shield
+  description: A sturdy dark shield bearing the merchant guild's sigil.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 90
+    - type: resource
+      resourceType: crystals
+      amount: 25
+  reward:
+    - type: forgeItem
+      forgeRecipeId: Dark Shield
+      count: 1
+  maxStock: 1
+  type: buy
+
+- id: e7c31b80-7b77-496a-ba35-42986bc92596
+  name: Merchant's Shadow Armor
+  description: Lightweight armor woven with shadow threads, offering magical protection.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 100
+    - type: resource
+      resourceType: crystals
+      amount: 40
+  reward:
+    - type: forgeItem
+      forgeRecipeId: Shadow Armor
+      count: 1
+  maxStock: 1
   type: buy
 
 # Sell trades - player sells resources for gold
@@ -46,9 +170,13 @@
   name: Crystal Buyback
   description: The merchant offers a fair price for surplus crystals from your mines.
   cost:
-    crystals: 50
+    - type: resource
+      resourceType: crystals
+      amount: 60
   reward:
-    gold: 75
+    - type: resource
+      resourceType: gold
+      amount: 70
   maxStock: 3
   type: sell
 
@@ -56,9 +184,13 @@
   name: Surplus Provisions
   description: Sell excess food stores to the merchant's caravan at harvest-season prices.
   cost:
-    food: 80
+    - type: resource
+      resourceType: food
+      amount: 100
   reward:
-    gold: 60
+    - type: resource
+      resourceType: gold
+      amount: 60
   maxStock: 3
   type: sell
 
@@ -66,9 +198,13 @@
   name: Flux Liquidation
   description: Convert surplus flux into gold through the merchant's arcane contacts.
   cost:
-    flux: 20
+    - type: resource
+      resourceType: flux
+      amount: 25
   reward:
-    gold: 120
+    - type: resource
+      resourceType: gold
+      amount: 100
   maxStock: 2
   type: sell
 
@@ -77,10 +213,16 @@
   name: Dark Pact
   description: A forbidden exchange channeling corruption into pure essence through an ancient ritual.
   cost:
-    corruption: 30
-    gold: 50
+    - type: resource
+      resourceType: corruption
+      amount: 40
+    - type: resource
+      resourceType: gold
+      amount: 100
   reward:
-    essence: 40
+    - type: resource
+      resourceType: essence
+      amount: 30
   maxStock: 1
   type: special
 
@@ -88,12 +230,22 @@
   name: Alchemical Bounty
   description: A rare merchant special offering a mix of resources at a bulk discount.
   cost:
-    gold: 300
+    - type: resource
+      resourceType: gold
+      amount: 400
   reward:
-    crystals: 40
-    food: 40
-    flux: 15
-    essence: 10
+    - type: resource
+      resourceType: crystals
+      amount: 35
+    - type: resource
+      resourceType: food
+      amount: 35
+    - type: resource
+      resourceType: flux
+      amount: 10
+    - type: resource
+      resourceType: essence
+      amount: 8
   maxStock: 1
   type: special
 
@@ -101,10 +253,52 @@
   name: Harvest Blessing
   description: The merchant shares a seasonal bounty, exchanging food for a diverse resource package.
   cost:
-    food: 150
+    - type: resource
+      resourceType: food
+      amount: 200
   reward:
-    gold: 50
-    crystals: 30
-    flux: 10
+    - type: resource
+      resourceType: gold
+      amount: 40
+    - type: resource
+      resourceType: crystals
+      amount: 25
+    - type: resource
+      resourceType: flux
+      amount: 8
+  maxStock: 1
+  type: special
+
+- id: 09389a66-5ea0-4b77-b3b2-2f1de2d90505
+  name: Corruption Purge
+  description: A cleansing ritual that burns away corruption, leaving behind a small offering of provisions.
+  cost:
+    - type: resource
+      resourceType: corruption
+      amount: 50
+    - type: resource
+      resourceType: gold
+      amount: 75
+  reward:
+    - type: resource
+      resourceType: food
+      amount: 25
+  maxStock: 2
+  type: special
+
+- id: b7357133-e52f-40a2-a724-36cbe9e71c0e
+  name: Arcane Manuscripts
+  description: Ancient texts containing forgotten knowledge, translated by the merchant's scholars.
+  cost:
+    - type: resource
+      resourceType: gold
+      amount: 200
+    - type: resource
+      resourceType: essence
+      amount: 30
+  reward:
+    - type: resource
+      resourceType: research
+      amount: 80
   maxStock: 1
   type: special

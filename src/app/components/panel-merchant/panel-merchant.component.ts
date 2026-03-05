@@ -20,19 +20,26 @@ import {
 } from '@helpers/merchant';
 import { notifyError, notifySuccess } from '@helpers/notify';
 import type {
+  ForgeRecipeContent,
   MerchantTradeContent,
   MerchantTradeId,
-  ResourceCost,
   ResourceType,
+  TradeEntry,
+  TrapContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-type TradeEntry = {
+type CostDisplayEntry =
+  | { kind: 'resource'; type: ResourceType; amount: number }
+  | { kind: 'trap'; name: string; count: number }
+  | { kind: 'forgeItem'; name: string; count: number };
+
+type MerchantTradeEntry = {
   trade: MerchantTradeContent;
   stock: number;
   affordable: boolean;
-  costEntries: { type: ResourceType; amount: number }[];
-  rewardEntries: { type: ResourceType; amount: number }[];
+  costEntries: CostDisplayEntry[];
+  rewardEntries: CostDisplayEntry[];
 };
 
 @Component({
@@ -49,7 +56,7 @@ export class PanelMerchantComponent {
   public daysRemaining = merchantDaysRemaining;
   public departureDay = computed(() => gameTimeDay() + this.daysRemaining());
 
-  public tradeEntries = computed((): TradeEntry[] => {
+  public tradeEntries = computed((): MerchantTradeEntry[] => {
     const inventory = merchantInventory();
     const entries = inventory.map((offer) => {
       const trade = contentGetEntry<MerchantTradeContent>(offer.tradeId);
@@ -60,8 +67,8 @@ export class PanelMerchantComponent {
             name: 'Unknown Trade',
             __type: 'merchanttrade' as const,
             description: '',
-            cost: {},
-            reward: {},
+            cost: [],
+            reward: [],
             maxStock: 0,
             type: 'buy' as const,
           },
@@ -76,8 +83,8 @@ export class PanelMerchantComponent {
         trade,
         stock: offer.stock,
         affordable: merchantCanAffordTrade(trade),
-        costEntries: this.formatCost(trade.cost),
-        rewardEntries: this.formatCost(trade.reward),
+        costEntries: this.toDisplayEntries(trade.cost),
+        rewardEntries: this.toDisplayEntries(trade.reward),
       };
     });
     return sortBy(entries, [(e) => e.trade.name]);
@@ -103,9 +110,20 @@ export class PanelMerchantComponent {
     this.visible.set(false);
   }
 
-  private formatCost(cost: ResourceCost): { type: ResourceType; amount: number }[] {
-    return Object.entries(cost)
-      .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => ({ type: type as ResourceType, amount: amount! }));
+  private toDisplayEntries(entries: TradeEntry[]): CostDisplayEntry[] {
+    return entries.map((entry): CostDisplayEntry => {
+      switch (entry.type) {
+        case 'resource':
+          return { kind: 'resource', type: entry.resourceType, amount: entry.amount };
+        case 'trap': {
+          const trap = contentGetEntry<TrapContent>(entry.trapId);
+          return { kind: 'trap', name: trap?.name ?? 'Unknown Trap', count: entry.count };
+        }
+        case 'forgeItem': {
+          const recipe = contentGetEntry<ForgeRecipeContent>(entry.forgeRecipeId);
+          return { kind: 'forgeItem', name: recipe?.name ?? 'Unknown Item', count: entry.count };
+        }
+      }
+    });
   }
 }

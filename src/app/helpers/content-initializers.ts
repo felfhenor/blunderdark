@@ -618,8 +618,8 @@ function ensureMerchantTrade(
     name: trade.name ?? 'UNKNOWN',
     __type: 'merchanttrade',
     description: trade.description ?? '',
-    cost: trade.cost ?? {},
-    reward: trade.reward ?? {},
+    cost: trade.cost ?? [],
+    reward: trade.reward ?? [],
     maxStock: trade.maxStock ?? 1,
     type: trade.type ?? 'buy',
   };

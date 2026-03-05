@@ -51,29 +51,45 @@
                 <div class="flex flex-wrap items-center gap-4 mt-1.5">
                   <div class="flex items-center gap-2">
                     <span class="text-xs opacity-50">Cost:</span>
-                    @for (cost of entry.costEntries; track cost.type) {
-                      <span
-                        class="badge badge-xs"
-                        [class.badge-error]="!entry.affordable"
-                        [class.badge-outline]="entry.affordable"
-                      >
-                        <app-currency-cost
-                          [type]="cost.type"
-                          [amount]="cost.amount"
-                        />
-                      </span>
+                    @for (cost of entry.costEntries; track $index) {
+                      @if (cost.kind === 'resource') {
+                        <span
+                          class="badge badge-xs"
+                          [class.badge-error]="!entry.affordable"
+                          [class.badge-outline]="entry.affordable"
+                        >
+                          <app-currency-cost
+                            [type]="cost.type"
+                            [amount]="cost.amount"
+                          />
+                        </span>
+                      } @else {
+                        <span
+                          class="badge badge-xs"
+                          [class.badge-error]="!entry.affordable"
+                          [class.badge-outline]="entry.affordable"
+                        >
+                          {{ cost.name }} x{{ cost.count }}
+                        </span>
+                      }
                     }
                   </div>
 
                   <div class="flex items-center gap-2">
                     <span class="text-xs opacity-50">Gain:</span>
-                    @for (reward of entry.rewardEntries; track reward.type) {
-                      <span class="badge badge-xs badge-success badge-outline">
-                        <app-currency-cost
-                          [type]="reward.type"
-                          [amount]="reward.amount"
-                        />
-                      </span>
+                    @for (reward of entry.rewardEntries; track $index) {
+                      @if (reward.kind === 'resource') {
+                        <span class="badge badge-xs badge-success badge-outline">
+                          <app-currency-cost
+                            [type]="reward.type"
+                            [amount]="reward.amount"
+                          />
+                        </span>
+                      } @else {
+                        <span class="badge badge-xs badge-success badge-outline">
+                          {{ reward.name }} x{{ reward.count }}
+                        </span>
+                      }
                     }
                   </div>
                 </div>

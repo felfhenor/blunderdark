@@ -1,15 +1,21 @@
 import { computed } from '@angular/core';
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
+import { darkForgeAddToInventory, darkForgeRemoveFromInventory } from '@helpers/dark-forge';
 import { reputationAwardForAction } from '@helpers/reputation';
-import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { resourceCanAfford } from '@helpers/resources';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { optionsGet } from '@helpers/state-options';
+import { trapAddToInventory, trapGetInventoryCount, trapRemoveFromInventory } from '@helpers/traps';
 import type {
+  ForgeRecipeContent,
   GameState,
   MerchantState,
   MerchantTradeContent,
   MerchantTradeId,
+  ResourceCost,
+  ResourceType,
+  TradeEntry,
   TradeOffer,
 } from '@interfaces';
 import { Subject } from 'rxjs';
@@ -34,6 +40,16 @@ const merchantEventSubject = new Subject<MerchantEvent>();
 export const merchantEvent$ = merchantEventSubject.asObservable();
 
 // --- Pure helpers ---
+
+function aggregateResourceEntries(entries: TradeEntry[]): ResourceCost {
+  const result: ResourceCost = {};
+  for (const entry of entries) {
+    if (entry.type === 'resource') {
+      result[entry.resourceType] = (result[entry.resourceType] ?? 0) + entry.amount;
+    }
+  }
+  return result;
+}
 
 export function merchantGenerateInventory(
   allTrades: MerchantTradeContent[],
@@ -132,7 +148,36 @@ export const merchantInventory = computed(
 // --- Trade execution ---
 
 export function merchantCanAffordTrade(trade: MerchantTradeContent): boolean {
-  return resourceCanAfford(trade.cost);
+  const state = gamestate();
+
+  for (const entry of trade.cost) {
+    switch (entry.type) {
+      case 'resource':
+        break;
+      case 'trap': {
+        if (trapGetInventoryCount(state.world.trapInventory, entry.trapId) < entry.count) {
+          return false;
+        }
+        break;
+      }
+      case 'forgeItem': {
+        const forgeEntry = state.world.forgeInventory.find(
+          (e) => e.recipeId === entry.forgeRecipeId,
+        );
+        if (!forgeEntry || forgeEntry.count < entry.count) {
+          return false;
+        }
+        break;
+      }
+    }
+  }
+
+  const resourceCosts = aggregateResourceEntries(trade.cost);
+  if (Object.keys(resourceCosts).length > 0 && !resourceCanAfford(resourceCosts)) {
+    return false;
+  }
+
+  return true;
 }
 
 export function merchantIsTradeInStock(tradeId: MerchantTradeId): boolean {
@@ -160,20 +205,64 @@ export async function merchantExecuteTrade(
     return { success: false, error: 'Insufficient resources' };
   }
 
-  const paid = await resourcePayCost(trade.cost);
-  if (!paid) return { success: false, error: 'Payment failed' };
-
-  // Grant rewards
   await updateGamestate((state) => {
     const updatedResources = { ...state.world.resources };
-    for (const [type, amount] of Object.entries(trade.reward)) {
-      if (!amount || amount <= 0) continue;
-      const resource = updatedResources[type as keyof typeof updatedResources];
+    let updatedTrapInventory = [...state.world.trapInventory];
+    let updatedForgeInventory = [...state.world.forgeInventory];
+
+    // Pay costs
+    const resourceCosts = aggregateResourceEntries(trade.cost);
+    for (const [type, amount] of Object.entries(resourceCosts)) {
+      const resourceType = type as ResourceType;
+      updatedResources[resourceType] = {
+        ...updatedResources[resourceType],
+        current: updatedResources[resourceType].current - amount,
+      };
+    }
+
+    for (const entry of trade.cost) {
+      if (entry.type === 'trap') {
+        const result = trapRemoveFromInventory(updatedTrapInventory, entry.trapId, entry.count);
+        if (result) updatedTrapInventory = result;
+      } else if (entry.type === 'forgeItem') {
+        const recipe = contentGetEntry<ForgeRecipeContent>(entry.forgeRecipeId);
+        if (recipe) {
+          updatedForgeInventory = darkForgeRemoveFromInventory(
+            updatedForgeInventory,
+            entry.forgeRecipeId,
+            recipe.statBonuses,
+            entry.count,
+          );
+        }
+      }
+    }
+
+    // Grant rewards
+    const resourceRewards = aggregateResourceEntries(trade.reward);
+    for (const [type, amount] of Object.entries(resourceRewards)) {
+      const resourceType = type as ResourceType;
+      const resource = updatedResources[resourceType];
       if (resource) {
-        updatedResources[type as keyof typeof updatedResources] = {
+        updatedResources[resourceType] = {
           ...resource,
           current: Math.min(resource.current + amount, resource.max),
         };
+      }
+    }
+
+    for (const entry of trade.reward) {
+      if (entry.type === 'trap') {
+        updatedTrapInventory = trapAddToInventory(updatedTrapInventory, entry.trapId, entry.count);
+      } else if (entry.type === 'forgeItem') {
+        const recipe = contentGetEntry<ForgeRecipeContent>(entry.forgeRecipeId);
+        if (recipe) {
+          updatedForgeInventory = darkForgeAddToInventory(
+            updatedForgeInventory,
+            entry.forgeRecipeId,
+            recipe.statBonuses,
+            entry.count,
+          );
+        }
       }
     }
 
@@ -188,6 +277,8 @@ export async function merchantExecuteTrade(
       world: {
         ...state.world,
         resources: updatedResources,
+        trapInventory: updatedTrapInventory,
+        forgeInventory: updatedForgeInventory,
         merchant: {
           ...state.world.merchant,
           inventory: updatedInventory,
