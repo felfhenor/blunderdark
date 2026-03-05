@@ -22,7 +22,7 @@ import type { ResourceType } from '@interfaces';
   template: `
     <app-icon [name]="icon()" [color]="color()" />
     @if (short()) {
-      <span class="inline-block text-right tabular-nums" [style.min-width]="minWidth()">{{ amount() | number: '1.0-0' }}</span>
+      <span class="inline-block text-right tabular-nums" [style.min-width]="minWidth()">{{ amount() | number: numberFormat() }}</span>
     } @else {
       <span>{{ label() }}</span>
     }
@@ -42,6 +42,7 @@ export class CurrencyNameComponent {
   public short = input(false);
   public amount = input(0);
   public minWidth = input('');
+  public numberFormat = input('1.0-0');
 
   public icon = computed(() => RESOURCE_ICON_MAP[this.type()]);
   public color = computed(() => RESOURCE_COLOR_MAP[this.type()]);
