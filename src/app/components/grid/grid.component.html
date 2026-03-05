@@ -10,6 +10,9 @@
   <div
     class="grid-container"
     [class.camera-animating]="cameraIsAnimating()"
+    [class.fear-overlay-active]="fearOverlayEnabled()"
+    [class.fear-overlay-dimmed]="fearOverlayDimmed()"
+    [class.game-paused]="isPaused()"
     [class.hallway-mode]="isHallwayMode()"
     [class.transport-mode]="isTransportMode()"
     [ngClass]="corruptionGridClasses()"
@@ -75,11 +78,15 @@
                 </span>
               }
             </span>
-            <app-fear-indicator
-              class="fear-grid-badge"
-              [style.--room-center-offset]="getRoomLabelOffset(tile.roomId)"
-              [roomId]="tile.roomId!"
-            />
+            @if (!fearOverlayEnabled()) {
+              <app-fear-indicator
+                class="fear-grid-badge"
+                [style.--room-center-offset]="
+                  getRoomLabelOffset(tile.roomId)
+                "
+                [roomId]="tile.roomId!"
+              />
+            }
             @if (getFeatureInfo(tile.roomId); as fInfo) {
               <span
                 class="feature-indicator text-xs font-bold"
@@ -92,9 +99,21 @@
                 }}
               </span>
             }
+            @if (fearOverlayEnabled()) {
+              @if (getFearNumeric(colIdx, rowIdx); as fearNum) {
+                <span
+                  class="fear-numeric"
+                  [style.--room-center-offset]="
+                    getRoomLabelOffset(tile.roomId)
+                  "
+                >
+                  {{ fearNum }}
+                </span>
+              }
+            }
             @if (isInvasionCurrent(tile.roomId)) {
               <span class="invasion-attack-icon">
-                <app-icon name="gameWarPick" size="14px" />
+                <app-icon name="gameSwordClash" size="28px" />
               </span>
             }
           }
@@ -126,6 +145,20 @@
               <div class="doorway doorway-left"></div>
             }
           }
+          @if (getFearArrows(colIdx, rowIdx); as fearDirs) {
+            @if (fearDirs.has('top')) {
+              <div class="fear-arrow fear-arrow-top"></div>
+            }
+            @if (fearDirs.has('right')) {
+              <div class="fear-arrow fear-arrow-right"></div>
+            }
+            @if (fearDirs.has('bottom')) {
+              <div class="fear-arrow fear-arrow-bottom"></div>
+            }
+            @if (fearDirs.has('left')) {
+              <div class="fear-arrow fear-arrow-left"></div>
+            }
+          }
           @if (hasTrap(colIdx, rowIdx)) {
             <span class="trap-indicator">
               <app-icon name="gameMantrap" size="28px" />
@@ -133,7 +166,7 @@
           }
           @if (isInvasionHallwayTile(colIdx, rowIdx)) {
             <span class="invasion-hallway-icon">
-              <app-icon name="gameWarPick" size="28px" />
+              <app-icon name="gameSwordClash" size="28px" />
             </span>
           }
           @if (getTransportInfo(colIdx, rowIdx); as tInfo) {

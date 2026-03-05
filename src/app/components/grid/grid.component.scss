@@ -334,8 +334,10 @@
 
 .invasion-attack-icon {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 16px;
   color: oklch(0.8 0.2 50);
   filter: drop-shadow(0 0 4px oklch(0.7 0.25 40 / 0.8));
@@ -463,9 +465,35 @@
   justify-content: center;
   font-size: 20px;
   color: oklch(0.8 0.2 25);
-  text-shadow: 0 0 4px oklch(0.6 0.25 25 / 0.8);
+  text-shadow: 0 0 4px oklch(0.6 0.25 300 / 0.9);
   pointer-events: none;
   z-index: 3;
+}
+
+// --- Fear overlay ---
+.grid-container.fear-overlay-active {
+  // Gray out all room tiles when overlay is on
+  .grid-tile.room-tile { background-color: oklch(0.35 0.02 260) !important; }
+  // Color tiles by fear level
+  .grid-tile.fear-level-0 { background-color: oklch(0.4 0.04 220) !important; } // calm blue-gray
+  .grid-tile.fear-level-1 { background-color: oklch(0.45 0.12 145) !important; } // green
+  .grid-tile.fear-level-2 { background-color: oklch(0.5 0.14 80) !important; }  // yellow
+  .grid-tile.fear-level-3 { background-color: oklch(0.45 0.16 40) !important; } // orange
+  .grid-tile.fear-level-4 { background-color: oklch(0.4 0.18 25) !important; }  // red
+  // Blue outline for rooms with fear reduction
+  .grid-tile.fear-reduction { outline: 2px solid oklch(0.6 0.2 220 / 0.7); outline-offset: -2px; }
+}
+@keyframes fear-arrow-flow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.9; } }
+.fear-arrow { position: absolute; z-index: 2; pointer-events: none; animation: fear-arrow-flow 1.5s ease-in-out infinite; filter: drop-shadow(0 0 1px rgba(0,0,0,0.9)) drop-shadow(0 0 2px rgba(0,0,0,0.7)); }
+.game-paused .fear-arrow { animation: none; opacity: 0.9; }
+.fear-arrow-top { top: -6px; left: 50%; transform: translateX(-50%); border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 11px solid oklch(0.6 0.25 300 / 0.9); }
+.fear-arrow-right { right: -6px; top: 50%; transform: translateY(-50%); border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 11px solid oklch(0.6 0.25 300 / 0.9); }
+.fear-arrow-bottom { bottom: -6px; left: 50%; transform: translateX(-50%); border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 11px solid oklch(0.6 0.25 300 / 0.9); }
+.fear-arrow-left { left: -6px; top: 50%; transform: translateY(-50%); border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-right: 11px solid oklch(0.6 0.25 300 / 0.9); }
+.fear-numeric { position: absolute; top: 50%; left: calc(50% + var(--room-center-offset, 0px)); transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.9); pointer-events: none; z-index: 4; }
+.grid-container.fear-overlay-dimmed {
+  .grid-tile.fear-level-0, .grid-tile.fear-level-1, .grid-tile.fear-level-2, .grid-tile.fear-level-3, .grid-tile.fear-level-4 { background-color: oklch(0.35 0.02 260) !important; }
+  .fear-arrow, .fear-numeric { opacity: 0.25; }
 }
 
 .camera-reset-btn {

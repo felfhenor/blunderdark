@@ -22,6 +22,7 @@ import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   uiCloseAllMenus,
+  fearOverlayEnabled,
   GAME_TIME_SPEEDS,
   gameTimeSpeed,
   optionsGet,
@@ -76,6 +77,7 @@ export class NavbarComponent {
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
 
   public isPaused = computed(() => optionsGet('gameloopPaused'));
+  public fearOverlayEnabled = fearOverlayEnabled;
   public gameTimeSpeed = gameTimeSpeed;
   public gameSpeeds = GAME_TIME_SPEEDS;
   public readonly panelConfigs: Array<{
@@ -93,6 +95,10 @@ export class NavbarComponent {
 
     uiCloseAllMenus();
     uiShowOptionsMenu.set(!uiShowOptionsMenu());
+  }
+
+  public toggleFearOverlay() {
+    optionsSet('showFearOverlay', !optionsGet('showFearOverlay'));
   }
 
   public togglePause() {

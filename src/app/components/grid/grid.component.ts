@@ -58,6 +58,14 @@ import {
 } from '@helpers';
 import { corruptionActiveGridClasses } from '@helpers/corruption-effects';
 import {
+  fearOverlayAnchorMap,
+  fearOverlayDimmed,
+  fearOverlayEnabled,
+  fearOverlayPropagationArrows,
+  fearOverlayTileMap,
+} from '@helpers/fear-overlay';
+import { gameloopIsPaused } from '@helpers/gameloop';
+import {
   invasionCurrentHallwayTile,
   invasionCurrentRoomId,
   invasionEntryRoomId,
@@ -147,6 +155,9 @@ export class GridComponent implements AfterViewInit {
   public invasionEntryRoomId = invasionEntryRoomId;
   public invasionCurrentRoomId = invasionCurrentRoomId;
   public invasionPathRoomIds = invasionPathRoomIds;
+  public fearOverlayEnabled = fearOverlayEnabled;
+  public fearOverlayDimmed = fearOverlayDimmed;
+  public isPaused = gameloopIsPaused;
 
   public isInvasionEntry(roomId: string | undefined): boolean {
     if (!roomId) return false;
@@ -589,7 +600,17 @@ export class GridComponent implements AfterViewInit {
   }
 
   public getRoomBorderClasses(x: number, y: number): string {
-    return this.roomBorderMap().get(`${x},${y}`)?.classes ?? '';
+    const border = this.roomBorderMap().get(`${x},${y}`)?.classes ?? '';
+    if (!this.fearOverlayEnabled()) return border;
+    const data = fearOverlayTileMap().get(`${x},${y}`);
+    if (!data) return border;
+    const parts: string[] = [];
+    if (border) parts.push(border);
+    parts.push(`fear-level-${Math.min(data.fearLevel, 4)}`);
+    if (data.hasReduction) {
+      parts.push('fear-reduction');
+    }
+    return parts.join(' ');
   }
 
   private selectedRoomId = computed(() => {
@@ -863,6 +884,14 @@ export class GridComponent implements AfterViewInit {
         break;
       }
     }
+  }
+
+  public getFearArrows(x: number, y: number): Set<string> | undefined {
+    return fearOverlayPropagationArrows().get(`${x},${y}`);
+  }
+
+  public getFearNumeric(x: number, y: number): number | undefined {
+    return fearOverlayAnchorMap().get(`${x},${y}`);
   }
 
   public onResetCamera(): void {

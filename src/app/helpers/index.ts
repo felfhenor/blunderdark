@@ -28,6 +28,7 @@ export * from './effective-stats';
 export * from './efficiency';
 export * from './farplane';
 export * from './fear-level';
+export * from './fear-overlay';
 export * from './fear-state';
 export * from './features';
 export * from './floating-bubbles';

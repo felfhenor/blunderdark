@@ -48,6 +48,7 @@ import {
   tablerSparkles,
   tablerStar,
   tablerX,
+  tablerEye,
 } from '@ng-icons/tabler-icons';
 
 export const ICON_ALL = {
@@ -91,6 +92,7 @@ export const ICON_ALL = {
   tablerCircle,
   tablerDiamond,
   tablerExclamationCircle,
+  tablerEye,
   tablerHome,
   tablerPencil,
   tablerPlus,

@@ -33,6 +33,18 @@
 
       <li class="action-button" appRequireSetup>
         <button
+          class="btn btn-xs btn-primary"
+          [class.btn-outline]="!fearOverlayEnabled()"
+          tp="Toggle Fear Overlay"
+          (click)="toggleFearOverlay()"
+          appSfx="ui-click"
+        >
+          <app-icon name="tablerEye" size="2em" [color]="fearOverlayEnabled() ? '#000' : ''"></app-icon>
+        </button>
+      </li>
+
+      <li class="action-button" appRequireSetup>
+        <button
           class="btn btn-xs btn-info"
           [tp]="isPaused() ? 'Resume Game [SPACE]' : 'Pause Game [SPACE]'"
           (click)="togglePause()"
@@ -121,7 +133,11 @@
   (confirm)="goToHome()"
 ></swal>
 
-<app-modal [visible]="showPauseMenu()" [widthClass]="'max-w-[300px]'" (modalClose)="closePauseMenu()">
+<app-modal
+  [visible]="showPauseMenu()"
+  [widthClass]="'max-w-[300px]'"
+  (modalClose)="closePauseMenu()"
+>
   <span title>Game Paused</span>
 
   <div body class="flex flex-col gap-2">
