@@ -281,7 +281,7 @@
       targetRoomId: Treasure Vault
 - id: 6e84c750-889b-45bf-b83c-94f81f126f47
   name: Versatile
-  description: Versatile nature grants +8% Worker Efficiency.
+  description: This creature can work competently in any room, with a minimum Worker Efficiency of 0.9.
   effects:
-    - effectType: worker_efficiency_multiplier
-      effectValue: 0.08
+    - effectType: efficiency_floor
+      effectValue: 0.9

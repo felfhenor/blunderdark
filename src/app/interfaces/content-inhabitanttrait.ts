@@ -24,7 +24,8 @@ export type TraitEffectType =
   | 'undead_master'
   | 'fear_immunity'
   | 'hunger_immunity'
-  | 'room_versatility';
+  | 'room_versatility'
+  | 'efficiency_floor';
 
 export type TraitEffect = {
   effectType: TraitEffectType;

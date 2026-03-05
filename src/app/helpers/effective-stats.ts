@@ -285,6 +285,37 @@ export function effectiveStatsCalculate(
     defense += lichBonus.defenseBonus;
   }
 
+  // Efficiency floor (from efficiency_floor traits — guarantees a minimum workerEfficiency)
+  let efficiencyFloor = 0;
+  for (const trait of definition.traits ?? []) {
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'efficiency_floor') {
+        efficiencyFloor = Math.max(efficiencyFloor, effect.effectValue);
+      }
+    }
+  }
+  for (const traitId of instance.instanceTraitIds ?? []) {
+    const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+    if (!trait) continue;
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'efficiency_floor') {
+        efficiencyFloor = Math.max(efficiencyFloor, effect.effectValue);
+      }
+    }
+  }
+  for (const traitId of instance.equippedTraitIds ?? []) {
+    const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+    if (!trait) continue;
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'efficiency_floor') {
+        efficiencyFloor = Math.max(efficiencyFloor, effect.effectValue);
+      }
+    }
+  }
+  if (efficiencyFloor > 0) {
+    workerEfficiency = Math.max(workerEfficiency, efficiencyFloor);
+  }
+
   // Clamp
   return {
     hp: Math.max(1, Math.round(hp)),

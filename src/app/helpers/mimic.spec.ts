@@ -59,7 +59,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-mimic-versatile',
         name: 'Versatile',
         description: '',
-        effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.8 }],
+        effects: [{ effectType: 'efficiency_floor', effectValue: 0.9 }],
       },
     ],
   });
@@ -144,18 +144,20 @@ function makeInstance(
   };
 }
 
-// --- Versatile: 80% efficiency ---
+// --- Versatile: efficiency floor of 0.9 ---
 
-describe('Versatile trait: 80% efficiency', () => {
-  it('should have 0.8 workerEfficiency representing 80% efficiency across all rooms', () => {
+describe('Versatile trait: efficiency floor', () => {
+  it('should have 0.8 base workerEfficiency', () => {
     const def = getMimicDef();
     expect(def.stats.workerEfficiency).toBe(0.8);
   });
 
-  it('should apply same efficiency bonus in Crystal Mine as in Treasure Vault', () => {
+  it('should have efficiency_floor trait with value 0.9', () => {
     const def = getMimicDef();
-    const bonus = def.stats.workerEfficiency - 1.0;
-    expect(bonus).toBeCloseTo(-0.2);
+    const versatile = def.traits.find((t: { name: string }) => t.name === 'Versatile');
+    expect(versatile).toBeDefined();
+    expect(versatile!.effects[0].effectType).toBe('efficiency_floor');
+    expect(versatile!.effects[0].effectValue).toBe(0.9);
   });
 });
 
