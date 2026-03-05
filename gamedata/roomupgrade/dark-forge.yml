@@ -30,3 +30,21 @@
   effects:
     - type: craftingQueueSize
       value: 5
+- id: 9730a490-6786-4a74-848d-e6b8d05c460c
+  name: Hellfire Crucible
+  description: Fuel the forge with demonic fire. Forging speed is halved and items gain +3 bonus stats, but the infernal flames radiate corruption.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 180
+    essence: 60
+    flux: 40
+  effects:
+    - type: forgingSpeedMultiplier
+      value: 0.5
+    - type: forgingStatBonus
+      value: 3
+    - type: secondaryProduction
+      value: 0.3
+      resource: corruption
+    - type: fearIncrease
+      value: 1

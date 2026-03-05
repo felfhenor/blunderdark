@@ -17,6 +17,7 @@
     - Master Forge
     - Infernal Forge
     - Forge Expansion
+    - Hellfire Crucible
   biomeBonuses:
     volcanic: 0.5
   adjacencyBonuses:
@@ -67,6 +68,7 @@
   roomUpgradeIds:
     - Incubation Chamber
     - Mutagenic Pits
+    - Flesh Vats
   role: breedingPits
   adjacencyBonuses:
     - adjacentRoomId: Spawning Pool
@@ -96,6 +98,7 @@
     - Greater Circle
     - Dual Circle
     - Binding Circle
+    - Abyssal Gate
   role: summoningCircle
   queueSize: 3
   adjacencyBonuses:

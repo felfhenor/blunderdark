@@ -29,3 +29,21 @@
   effects:
     - type: summonStatBonus
       value: 1
+- id: 4bebe89f-6423-4d3d-9f67-734b330ac888
+  name: Abyssal Gate
+  description: Widen the planar rift into a permanent abyssal gateway. Summon times are halved and summoned creatures gain +2 stats, but the unstable portal leaks corruption into the dungeon.
+  requiresDarkUpgrade: true
+  cost:
+    gold: 250
+    essence: 100
+    flux: 60
+  effects:
+    - type: summonTimeMultiplier
+      value: 0.5
+    - type: summonStatBonus
+      value: 2
+    - type: secondaryProduction
+      value: 0.5
+      resource: corruption
+    - type: fearIncrease
+      value: 2
