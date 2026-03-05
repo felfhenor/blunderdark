@@ -5,7 +5,7 @@
     - effectType: attack_flat
       effectValue: 10
   isFromTraining: true
-  fusionPassChance: 0
+  fusionPassChance: 75
 
 - id: 1e731481-46aa-4542-89d5-1818bd8e9128
   name: Basic Defense Training
@@ -14,7 +14,7 @@
     - effectType: defense_flat
       effectValue: 10
   isFromTraining: true
-  fusionPassChance: 0
+  fusionPassChance: 75
 
 - id: 3bb59960-871c-442e-aae6-faf4df3fc62c
   name: Elite Attack Training
@@ -23,7 +23,7 @@
     - effectType: attack_flat
       effectValue: 25
   isFromTraining: true
-  fusionPassChance: 0
+  fusionPassChance: 50
 
 - id: fdeb3e98-d0da-4ae2-a3dd-3a5857f88d68
   name: Advanced Defense Training
@@ -32,7 +32,7 @@
     - effectType: defense_flat
       effectValue: 25
   isFromTraining: true
-  fusionPassChance: 0
+  fusionPassChance: 50
 
 - id: 4d1ac68c-af58-4dc5-b230-436006f7c45a
   name: Work Conditioning
@@ -41,4 +41,4 @@
     - effectType: worker_efficiency_multiplier
       effectValue: 0.5
   isFromTraining: true
-  fusionPassChance: 0
+  fusionPassChance: 50

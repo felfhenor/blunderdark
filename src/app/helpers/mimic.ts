@@ -90,7 +90,7 @@ export function mimicTriggerLivingTrap(
       triggered: false,
       disarmed: false,
       damage: 0,
-      effectType: '',
+      effectType: 'none',
       duration: 0,
       trapDestroyed: false,
       trapName: '',

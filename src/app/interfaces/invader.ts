@@ -1,5 +1,6 @@
 import type { AbilityState, StatusEffect } from '@interfaces/combat';
 import type { CombatStats } from '@interfaces/combat-stats';
+import type { CombatAbilityEffectType } from '@interfaces/content-combatability';
 import type { InvaderId } from '@interfaces/content-invader';
 import type { Branded } from '@interfaces/identifiable';
 import type { CombatantId } from '@interfaces/invasion';
@@ -27,7 +28,7 @@ export type InvaderInstance = {
 };
 
 export type AbilityResultEffect = {
-  effectType: string;
+  effectType: CombatAbilityEffectType;
   value: number;
   duration: number;
   targetIds: CombatantId[];

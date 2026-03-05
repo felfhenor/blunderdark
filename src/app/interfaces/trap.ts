@@ -3,6 +3,7 @@ import type { HallwayId } from '@interfaces/hallway';
 import type { Branded } from '@interfaces/identifiable';
 
 export type TrapEffectType =
+  | 'none'
   | 'physical'
   | 'magic'
   | 'debuff'
@@ -29,7 +30,7 @@ export type TrapTriggerResult = {
   triggered: boolean;
   disarmed: boolean;
   damage: number;
-  effectType: string;
+  effectType: TrapEffectType;
   duration: number;
   trapDestroyed: boolean;
   trapName: string;

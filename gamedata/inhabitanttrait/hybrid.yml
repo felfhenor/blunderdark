@@ -2,327 +2,338 @@
   name: Disciplined
   description: Increases production by 15% in any assigned room.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.15
-      targetResourceType: crystals
 
 - id: 197aaf41-3b08-4638-abe7-ca15dc2c461e
   name: Taskmaster
-  description: Boosts training speed of nearby creatures.
+  description: Organized leadership improves worker efficiency by 10%.
   effects:
-    - effectType: flat_worker_efficiency
+    - effectType: worker_efficiency_multiplier
       effectValue: 0.1
 
 - id: e6df7464-8b01-48f9-b9a8-d4cf6c1f72a5
   name: Tireless Miner
   description: Increases crystal production by 25% when assigned to Crystal Mine.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.25
       targetResourceType: crystals
 
 - id: 29c3a242-49eb-4420-bae0-5a03b99172ba
   name: Undead Resilience
-  description: Takes reduced damage from physical attacks.
+  description: Undead hardiness grants +10% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.1
 
 - id: 009eefe7-ad22-41f5-a72e-07cc93cffb75
   name: Burning Traps
-  description: Traps deal additional fire damage.
+  description: Fire-enhanced attacks grant +30% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.3
 
 - id: af4c4222-609b-4189-9313-49a8fcfe48ee
   name: Blazing Speed
-  description: Moves faster than any pure-blooded creature.
+  description: Exceptional speed grants +15% Defense through evasion.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.15
 
 - id: def6dae6-84ee-4a23-bfa5-854a2b4763af
   name: Burning Bones
-  description: Deals fire damage on contact with attackers.
+  description: Fire damage on contact grants +25% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.25
 
 - id: e13f771d-041e-485c-bada-27fc43a99640
   name: Terrifying Visage
-  description: Increases fear in assigned room.
+  description: Increases fear in assigned room and grants +10% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.1
+    - effectType: fear_flat
+      effectValue: 0.15
 
 - id: 2e7c4dfc-e42f-4be9-b9e9-571688e748f1
   name: Arsonist
-  description: Deals bonus fire damage in combat.
+  description: Fire-fueled aggression grants +35% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.35
 
 - id: 731a596c-f7ad-4356-97fa-1e01cfd6c6ad
   name: Chaotic Nature
-  description: Generates corruption passively.
+  description: Chaotic energy grants +5% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.05
 
 - id: 6b09d1ed-a562-4fcd-9e9e-09c7ff601588
   name: Undead Commander
-  description: Boosts attack of nearby undead inhabitants.
+  description: Commanding presence grants +20% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.2
 
 - id: 266fa9dd-3c9f-4916-a0e4-c461e849504f
   name: Spectral Armor
-  description: Reduces incoming damage significantly.
+  description: Spectral energy reduces incoming damage, granting +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: 15a8eaf9-5bff-4147-97ec-0421d7e4ca0f
   name: Dread Presence
-  description: Greatly increases fear in assigned room.
+  description: Greatly increases fear in assigned room and grants +10% Attack.
   effects:
-    - effectType: attack_bonus
-      effectValue: 0.2
+    - effectType: attack_multiplier
+      effectValue: 0.1
+    - effectType: fear_flat
+      effectValue: 0.25
 
 - id: d721314e-0cd2-4ca0-90e6-86565aa8b110
   name: Rally Cry
-  description: Boosts attack of all creatures in the same room.
+  description: Battle cry inspires aggression, granting +15% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.15
 
 - id: daee97e2-5185-4ded-ba5e-efa7f9bf4f58
   name: Tactical Cunning
-  description: Boosts defense of creatures in the same room.
+  description: Tactical awareness grants +10% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.1
 
 - id: 1ab59513-c6e1-4eb6-a88b-ec5679291d87
   name: Phase Strike
-  description: Attacks ignore a portion of enemy defense.
+  description: Phasing attacks grant +25% Attack, partially bypassing defenses.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.25
 
 - id: b0e8bd1e-de4a-4219-93cc-b77275369380
   name: Ghost Fire
-  description: Generates corruption from spectral flames.
+  description: Spectral flames grant +10% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.1
 
 - id: e8573297-088e-4dd1-a37d-5e36f7f77225
   name: Spectral Terror
-  description: Increases fear in assigned room.
+  description: Terrifying spectral presence increases fear in assigned room and grants +10% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.1
+    - effectType: fear_flat
+      effectValue: 0.15
 
 - id: 8d9f4555-a0a6-4598-b787-340c37132873
   name: Living Fortress
-  description: Massive damage reduction from all sources.
+  description: Massive bulk grants +30% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.3
 
 - id: 960f2769-19dd-4157-8f08-aaf7d5b6b988
   name: Structural Reinforcement
-  description: Boosts structural integrity of assigned room.
+  description: Reinforced form grants +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: 76fb01be-294c-4ca6-bd22-3c750fda3933
   name: Siege Breaker
-  description: Deals massive damage to structures and armored targets.
+  description: Devastating strikes grant +30% Attack against all targets.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.3
 
 - id: e4c83e64-bc49-4afd-95b2-9735a970e860
   name: Iron Skin
-  description: Reduces all incoming damage.
+  description: Toughened skin grants +15% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.15
 
 - id: 0eefb6d2-3997-497c-824c-1234e9d70a13
   name: Supreme Necromancy
-  description: Massively boosts research speed.
+  description: Massively boosts research speed by 40%.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.4
       targetResourceType: research
 
 - id: 5dce4068-8c96-45ed-bb00-d443a0775835
   name: Spectral Command
-  description: Boosts all undead attack in the dungeon.
+  description: Spectral authority grants +15% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.15
 
 - id: 3ed31727-6016-4fe6-87f7-785e96104d18
   name: Aura of Dread
-  description: Greatly increases fear in assigned room.
+  description: Greatly increases fear in assigned room and grants +10% Attack.
   effects:
-    - effectType: attack_bonus
-      effectValue: 0.2
+    - effectType: attack_multiplier
+      effectValue: 0.1
+    - effectType: fear_flat
+      effectValue: 0.25
 
 - id: 7ce9d62c-9d3d-465d-85d6-e4f36a05461f
   name: Bone Reformation
-  description: Regenerates health over time.
+  description: Regenerative bones grant +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: 506ef520-77f2-4af8-bfd6-d87e7619bab4
   name: Skeletal Mastery
-  description: Boosts defense of nearby undead.
+  description: Mastery of bone grants +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: cf4c0490-a115-421a-873e-696654c57099
   name: Ancient Scholar
-  description: Boosts research production.
+  description: Deep knowledge boosts research production by 25%.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.25
       targetResourceType: research
 
 - id: 2bdbc569-f6f2-400f-9e9d-90fc8143fbdc
   name: Perfect Ambush
-  description: Massively boosts trap effectiveness.
+  description: Ambush tactics grant +40% Defense through positioning.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.4
 
 - id: 01263db5-ce15-4c68-9fb4-5af35cb0fc71
   name: Furniture Form
-  description: Reduces detection by invaders.
+  description: Blending into surroundings grants +30% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.3
 
 - id: 65f81999-353c-48ee-bc43-a7f321e298f8
   name: Adaptive Form
-  description: Can work in any room type.
+  description: Adaptable nature grants +10% Worker Efficiency.
   effects:
-    - effectType: flat_worker_efficiency
+    - effectType: worker_efficiency_multiplier
       effectValue: 0.1
 
 - id: 86bac394-98f4-46e4-9b39-62669ec2eb10
   name: Phase Shift
-  description: Periodically becomes intangible, evading attacks.
+  description: Periodic intangibility grants +25% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.25
 
 - id: 2a0cf51f-07a0-4637-b799-2b53197d4a96
   name: Spectral Crush
-  description: Devastating melee attacks empowered by ghostly energy.
+  description: Ghostly-empowered melee grants +20% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.2
 
 - id: 18d8acf7-ac96-45a2-9e0d-d4eac701e655
   name: Towering Horror
-  description: Greatly increases fear in assigned room.
+  description: Terrifying stature increases fear in assigned room and grants +10% Attack.
   effects:
-    - effectType: attack_bonus
-      effectValue: 0.2
+    - effectType: attack_multiplier
+      effectValue: 0.1
+    - effectType: fear_flat
+      effectValue: 0.25
 
 - id: 1f1b6ac3-7de5-4595-bcbc-a3255e0dc558
   name: Undying Might
-  description: Massive attack bonus in combat.
+  description: Relentless undead strength grants +30% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.3
 
 - id: 40a673a1-882a-4d56-9374-7ad71b0c2344
   name: Dark Regeneration
-  description: Slowly regenerates from wounds.
+  description: Dark regeneration grants +10% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.1
 
 - id: 251e7682-f837-4688-a154-0ff508769fac
   name: Warlord's Presence
-  description: Enemies cower before the Death Warlord.
+  description: Enemies cower before the warlord, increasing fear and granting +10% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
+      effectValue: 0.1
+    - effectType: fear_flat
       effectValue: 0.2
 
 - id: 99d87e67-805f-4edd-908c-ab4d466dc5fc
   name: Ooze Armor
-  description: Absorbs a portion of incoming damage.
+  description: Ooze coating absorbs damage, granting +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: b1ba8c29-4714-4957-86d1-573c7306c351
   name: Bountiful Growth
-  description: Greatly increases food production.
+  description: Greatly increases food production by 30%.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.3
       targetResourceType: food
 
 - id: 8dc41657-e164-4763-bc9c-40e5b54d6271
   name: Spore Cloud
-  description: Generates corruption passively.
+  description: Toxic spores grant +5% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.05
 
 - id: 3a57e23d-672e-4eae-b87e-6476dd7c73c4
   name: Shadow Strike
-  description: Attacks from stealth deal bonus damage.
+  description: Attacks from stealth grant +25% Attack.
   effects:
-    - effectType: attack_bonus
+    - effectType: attack_multiplier
       effectValue: 0.25
 
 - id: ea0749a6-cf7c-4c37-a58d-ce1dd925c857
   name: Dark Vision
-  description: Reduces chance of being detected by invader scouts.
+  description: Enhanced vision grants +20% Defense through awareness.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: 5b0f94fb-4d63-4788-a406-36ddd6ee518d
   name: Freezing Aura
-  description: Slows nearby enemies in combat.
+  description: Cold aura slows enemies, granting +20% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.2
 
 - id: a0aa00d4-178a-444e-b136-6053f5ddee8c
   name: Ice Wall
-  description: Boosts structural integrity of assigned room.
+  description: Icy barrier grants +25% Defense.
   effects:
-    - effectType: defense_bonus
+    - effectType: defense_multiplier
       effectValue: 0.25
 
 - id: 64d84d87-a9f0-44f0-bc77-f74c73d52cef
   name: Spectral Research
-  description: Massively boosts research production.
+  description: Spectral insight boosts research production by 35%.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.35
       targetResourceType: research
 
 - id: 05a60662-a990-455a-a21e-acd681850bf1
   name: Flux Channeler
-  description: Boosts flux production.
+  description: Boosts flux production by 20%.
   effects:
-    - effectType: production_bonus
+    - effectType: production_multiplier
       effectValue: 0.2
       targetResourceType: flux

@@ -107,7 +107,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-lich-ancient-knowledge',
         name: 'Ancient Knowledge',
         description: '',
-        effects: [{ effectType: 'ancient_knowledge', effectValue: 1 }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.5, targetResourceType: 'research' }],
       },
       {
         id: 'trait-lich-throne-scholar',
@@ -247,6 +247,10 @@ vi.mock('@helpers/content', () => {
   };
 });
 
+vi.mock('@helpers/state-game', () => ({
+  gamestate: vi.fn(() => null),
+}));
+
 vi.mock('@helpers/room-shapes', () => ({
   roomShapeResolve: vi.fn((room: unknown) => {
     const r = room as { shapeId: string };
@@ -268,9 +272,7 @@ vi.mock('@helpers/room-shapes', () => ({
 
 import {
   lichCalculateUndeadMasterBonuses,
-  lichGetAncientKnowledgeRevealCount,
-  lichGetRevealedResearchNodes,
-  lichHasAncientKnowledgeTrait,
+  lichGetUndeadMasterBonusForInstance,
   lichHasUndeadMasterTrait,
 } from '@helpers/lich';
 import { productionCalculateInhabitantBonus } from '@helpers/production';
@@ -360,9 +362,10 @@ describe('Lich Scholarly trait: 40% research bonus', () => {
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // Lich: workerEfficiency 1.0
     // Scholarly: +0.4 (targetResourceType: research, library produces research)
+    // Ancient Knowledge: +0.5 (targetResourceType: research, library produces research)
     // Library Specialist: +0.2 (targetRoomId: Shadow Library, matches)
-    // Total: 1.6
-    expect(result.bonus).toBeCloseTo(1.6);
+    // Total: 2.1
+    expect(result.bonus).toBeCloseTo(2.1);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -557,74 +560,6 @@ describe('Lich Undead Master aura', () => {
   });
 });
 
-// --- Ancient Knowledge: reveals hidden research nodes ---
-
-describe('Lich Ancient Knowledge trait', () => {
-  it('should have ancient_knowledge trait', () => {
-    const def = getLichDef();
-    expect(lichHasAncientKnowledgeTrait(def)).toBe(true);
-  });
-
-  it('should return reveal count of 1 when Lich exists', () => {
-    const inhabitants = [makeInstance(TEST_LICH_DEF_ID, 'lich-1')];
-    const count = lichGetAncientKnowledgeRevealCount(inhabitants);
-    expect(count).toBe(1);
-  });
-
-  it('should return reveal count of 0 when no Lich exists', () => {
-    const inhabitants = [makeInstance(TEST_GOBLIN_DEF_ID, 'goblin-1')];
-    const count = lichGetAncientKnowledgeRevealCount(inhabitants);
-    expect(count).toBe(0);
-  });
-
-  it('should return reveal count of 0 for empty inhabitants', () => {
-    const count = lichGetAncientKnowledgeRevealCount([]);
-    expect(count).toBe(0);
-  });
-
-  it('should reveal one node per branch when Lich is present', () => {
-    const inhabitants = [makeInstance(TEST_LICH_DEF_ID, 'lich-1')];
-    const revealed = lichGetRevealedResearchNodes(inhabitants, []);
-
-    // Should reveal one per branch: dark, arcane, engineering
-    expect(revealed).toHaveLength(3);
-
-    const branches = revealed.map((n) => n.branch);
-    expect(branches).toContain('dark');
-    expect(branches).toContain('arcane');
-    expect(branches).toContain('engineering');
-  });
-
-  it('should prefer lowest-tier node in each branch', () => {
-    const inhabitants = [makeInstance(TEST_LICH_DEF_ID, 'lich-1')];
-    const revealed = lichGetRevealedResearchNodes(inhabitants, []);
-
-    const darkNode = revealed.find((n) => n.branch === 'dark');
-    expect(darkNode).toBeDefined();
-    expect(darkNode!.tier).toBe(1);
-  });
-
-  it('should exclude already completed nodes', () => {
-    const inhabitants = [makeInstance(TEST_LICH_DEF_ID, 'lich-1')];
-    const completed = ['research-dark-1', 'research-arcane-1', 'research-engineering-1'];
-    const revealed = lichGetRevealedResearchNodes(inhabitants, completed);
-
-    // dark-1 completed, so dark-2 is revealed; arcane-1 and engineering-1 completed, no more in those branches
-    const darkNode = revealed.find((n) => n.branch === 'dark');
-    expect(darkNode).toBeDefined();
-    expect(darkNode!.id).toBe('research-dark-2');
-
-    // Arcane and engineering have no remaining nodes
-    expect(revealed.find((n) => n.branch === 'arcane')).toBeUndefined();
-    expect(revealed.find((n) => n.branch === 'engineering')).toBeUndefined();
-  });
-
-  it('should return empty array when no Lich exists', () => {
-    const inhabitants = [makeInstance(TEST_GOBLIN_DEF_ID, 'goblin-1')];
-    const revealed = lichGetRevealedResearchNodes(inhabitants, []);
-    expect(revealed).toHaveLength(0);
-  });
-});
 
 // --- Throne Room: +10% dungeon-wide Research ---
 
@@ -668,10 +603,11 @@ describe('Lich Shadow Library interaction: total +60% Research', () => {
 
     const result = productionCalculateInhabitantBonus(library, inhabitants);
     // Scholarly: +0.4 (research production present)
+    // Ancient Knowledge: +0.5 (research production present)
     // Library Specialist: +0.2 (targetRoomId matches Shadow Library)
     // workerEfficiency: 1.0
-    // Total: 1.6
-    expect(result.bonus).toBeCloseTo(1.6);
+    // Total: 2.1
+    expect(result.bonus).toBeCloseTo(2.1);
     expect(result.hasWorkers).toBe(true);
   });
 
@@ -732,9 +668,9 @@ describe('Lich Soul Well interaction: double essence', () => {
     ];
 
     const result = productionCalculateInhabitantBonus(library, inhabitants);
-    // In Shadow Library: only Scholarly (+0.4) and Library Specialist (+0.2) apply
+    // In Shadow Library: Scholarly (+0.4), Ancient Knowledge (+0.5), Library Specialist (+0.2) apply
     // Soul Siphon: NOT applied (not Soul Well)
     // workerEfficiency: 1.0
-    expect(result.bonus).toBeCloseTo(1.6);
+    expect(result.bonus).toBeCloseTo(2.1);
   });
 });

@@ -67,6 +67,28 @@ export function fearLevelCalculateInhabitantModifier(
     if (!def) continue;
 
     modifier += def.fearModifier ?? 0;
+
+    // Trait-based fear modifier (fear_flat effect type)
+    for (const trait of def.traits ?? []) {
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'fear_flat') {
+          modifier += effect.effectValue;
+        }
+      }
+    }
+
+    // Instance trait fear modifier
+    if (inhabitant.instanceTraitIds) {
+      for (const traitId of inhabitant.instanceTraitIds) {
+        const traitDef = contentGetEntry<InhabitantTraitContent>(traitId);
+        if (!traitDef) continue;
+        for (const effect of traitDef.effects) {
+          if (effect.effectType === 'fear_flat') {
+            modifier += effect.effectValue;
+          }
+        }
+      }
+    }
   }
 
   return modifier;

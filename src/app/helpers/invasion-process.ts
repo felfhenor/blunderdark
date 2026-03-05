@@ -63,7 +63,7 @@ import { trapApplyTrigger, trapGetAtTile, trapGetDefinition, trapRollTrigger } f
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { gamestate } from '@helpers/state-game';
-import type { AbilityState } from '@interfaces/combat';
+import type { AbilityActivation, AbilityState } from '@interfaces/combat';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
 import type { CombatAbilityContent } from '@interfaces/content-combatability';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -1234,7 +1234,7 @@ function processHallwayTrapAtTile(
         disarmed: true,
         trapName,
         damage: 0,
-        effectType: '',
+        effectType: 'none',
         duration: 0,
         trapDestroyed: false,
         moralePenalty: 0,
@@ -1407,7 +1407,7 @@ function processCombatKill(
 function processAbilityResult(
   invasion: ActiveInvasion,
   actor: { name: string; id: string },
-  actionResult: { abilityActivation?: { abilityName: string; effects: Array<{ effectType: string; damage: number; statusApplied?: string; statusDuration: number; targetIds: string[]; targetsHit: number; targetType: string }> } | undefined },
+  actionResult: { abilityActivation?: AbilityActivation | undefined },
   roomId: string,
 ): void {
   const activation = actionResult.abilityActivation;
@@ -1669,7 +1669,7 @@ function processCombatRound(
           });
           return {
             ...c,
-            statusEffects: [...c.statusEffects, { name: 'stunned', remainingDuration: 2 }],
+            statusEffects: [...c.statusEffects, { name: 'stunned' as const, remainingDuration: 2 }],
           };
         }
         return c;

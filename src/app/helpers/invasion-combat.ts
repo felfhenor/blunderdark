@@ -10,7 +10,7 @@ import {
 import { combatResolve } from '@helpers/combat';
 import { contentGetEntry } from '@helpers/content';
 import { gridManhattanDistance } from '@helpers/grid-math';
-import type { AbilityState, StatusEffect } from '@interfaces/combat';
+import type { AbilityState, AbilityTargetType, StatusEffect } from '@interfaces/combat';
 import type {
   CombatAbilityContent,
   CombatAbilityId,
@@ -673,12 +673,12 @@ export function invasionCombatExecuteAbility(
  * Resolve targets for a single activation effect based on its targetType.
  */
 function resolveTargetsForEffect(
-  actEffect: { targetType: string },
+  actEffect: { targetType: AbilityTargetType },
   actor: Combatant,
   enemies: Combatant[],
   allies: Combatant[],
   deadAllies: Combatant[],
-  abilityClass: string,
+  abilityClass: 'heal' | 'buff' | 'debuff' | 'damage' | 'scout' | 'other',
   targetId: CombatantId | undefined,
   queue: TurnQueue,
 ): Combatant[] {

@@ -16,6 +16,7 @@ import type {
   RoomId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { TraitEffectType } from '@interfaces/content-inhabitanttrait';
 import type { RoomContent } from '@interfaces/content-room';
 
 /** Production multiplier applied when a legendary is discontented. */
@@ -247,7 +248,7 @@ export function legendaryInhabitantIsAuraActive(
  */
 export function legendaryAuraGetBonus(
   inhabitants: InhabitantInstance[],
-  effectType: string,
+  effectType: TraitEffectType,
 ): number {
   let total = 0;
 

@@ -4,6 +4,7 @@ import type {
   AbilityState,
   CombatAbilityId,
   CombatUnit,
+  StatusEffectName,
 } from '@interfaces';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
 import type { CombatAbilityContent, CombatAbilityEffect } from '@interfaces/content-combatability';
@@ -112,7 +113,7 @@ export function combatAbilityTryActivate(
     if (!effectDef) continue;
 
     let damage = 0;
-    let statusApplied: string | undefined = undefined;
+    let statusApplied: StatusEffectName | undefined = undefined;
     let statusDuration = 0;
     let targetsHit = 1;
 

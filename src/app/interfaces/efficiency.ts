@@ -1,9 +1,10 @@
 import type { InhabitantInstanceId } from '@interfaces/inhabitant';
+import type { ResourceType } from '@interfaces/resource';
 
 export type EfficiencyTrait = {
   traitName: string;
   effectValue: number;
-  targetResourceType: string | undefined;
+  targetResourceType: ResourceType | 'all' | undefined;
 };
 
 export type InhabitantContribution = {

@@ -24,6 +24,7 @@ import type {
   RoomFeatureUnlock,
   RoomShapeContent,
   RoomUnlock,
+  ResourceType,
   RoomUpgradeUnlock,
   SummonRecipeContent,
   SummonRecipeId,
@@ -50,6 +51,8 @@ import type {
 import type {
   InhabitantTraitContent,
   InhabitantTraitId,
+  TraitEffect,
+  TraitEffectType,
 } from '@interfaces/content-inhabitanttrait';
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
@@ -423,11 +426,11 @@ function ensureInhabitantTrait(
   // Backward compat: migrate old scalar effectType/effectValue to effects array
   let effects = trait.effects;
   if (!effects && trait['effectType']) {
-    const effect: { effectType: string; effectValue: number; targetResourceType?: string; targetRoomId?: string } = {
-      effectType: trait['effectType'] as string,
+    const effect: TraitEffect = {
+      effectType: trait['effectType'] as TraitEffectType,
       effectValue: (trait['effectValue'] as number) ?? 0,
     };
-    if (trait['targetResourceType']) effect.targetResourceType = trait['targetResourceType'] as string;
+    if (trait['targetResourceType']) effect.targetResourceType = trait['targetResourceType'] as ResourceType | 'all';
     if (trait['targetRoomId']) effect.targetRoomId = trait['targetRoomId'] as string;
     effects = [effect];
   }
@@ -559,7 +562,7 @@ function ensureCombatAbilityEffect(
   effect: Partial<CombatAbilityEffect>,
 ): CombatAbilityEffect {
   return {
-    effectType: effect.effectType ?? '',
+    effectType: effect.effectType ?? 'Damage',
     value: effect.value ?? 0,
     targetType: effect.targetType ?? 'single',
     duration: effect.duration ?? 0,

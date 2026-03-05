@@ -1,5 +1,6 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
+import type { StatusEffectName } from '@interfaces/combat';
 import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
 import type { CombatAbilityContent, CombatAbilityId } from '@interfaces/content-combatability';
 import type { InvaderContent } from '@interfaces/content-invader';
@@ -161,7 +162,7 @@ export function invaderTickCooldowns(
  */
 export function invaderApplyStatusEffect(
   invader: InvaderInstance,
-  statusName: string,
+  statusName: StatusEffectName,
   duration: number,
 ): InvaderInstance {
   const existing = invader.statusEffects.find((s) => s.name === statusName);

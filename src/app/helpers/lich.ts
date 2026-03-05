@@ -1,15 +1,14 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
-import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { contentGetEntry } from '@helpers/content';
 import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
+import { gamestate } from '@helpers/state-game';
 import type {
   Floor,
   InhabitantInstance,
   PlacedRoom,
-  ResearchBranch,
-  ResearchContent,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 
@@ -22,14 +21,6 @@ export function lichHasUndeadMasterTrait(def: InhabitantContent): boolean {
   );
 }
 
-/**
- * Check whether an inhabitant definition has the Ancient Knowledge trait.
- */
-export function lichHasAncientKnowledgeTrait(def: InhabitantContent): boolean {
-  return def.traits.some((t) =>
-    t.effects.some((e) => e.effectType === 'ancient_knowledge'),
-  );
-}
 
 /**
  * Find assigned Lich-type inhabitants on a floor that have the Undead Master trait.
@@ -141,68 +132,25 @@ export function lichCalculateUndeadMasterBonuses(
   return bonusMap;
 }
 
-/**
- * Count how many hidden research nodes per branch should be revealed
- * by the Ancient Knowledge trait.
- *
- * Returns 1 per branch if any inhabitant with Ancient Knowledge exists
- * in the dungeon (assigned or not), 0 otherwise.
- */
-export function lichGetAncientKnowledgeRevealCount(
-  inhabitants: InhabitantInstance[],
-): number {
-  for (const inhabitant of inhabitants) {
-    const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
-    if (!def) continue;
-
-    if (lichHasAncientKnowledgeTrait(def)) {
-      return 1;
-    }
-  }
-
-  return 0;
-}
 
 /**
- * Get research nodes that would be revealed by Ancient Knowledge.
- * Returns one unrevealed node per branch when a Lich with Ancient Knowledge
- * is present, preferring the lowest-tier unrevealed node in each branch.
+ * Get the Undead Master aura bonus for a specific inhabitant instance.
+ * Searches all floors in the current gamestate to find and compute the bonus.
+ * Returns { attackBonus: 0, defenseBonus: 0 } if the instance has no bonus.
  */
-export function lichGetRevealedResearchNodes(
-  inhabitants: InhabitantInstance[],
-  completedNodeIds: string[],
-): ResearchContent[] {
-  const revealCount = lichGetAncientKnowledgeRevealCount(inhabitants);
-  if (revealCount <= 0) return [];
+export function lichGetUndeadMasterBonusForInstance(
+  instance: InhabitantInstance,
+): { attackBonus: number; defenseBonus: number } {
+  const state = gamestate();
+  if (!state?.world?.floors) return { attackBonus: 0, defenseBonus: 0 };
 
-  const allNodes = contentGetEntriesByType<ResearchContent>('research');
-  const completedSet = new Set(completedNodeIds);
-
-  // Group unrevealed nodes by branch
-  const branchNodes = new Map<ResearchBranch, ResearchContent[]>();
-  for (const node of allNodes) {
-    if (completedSet.has(node.id)) continue;
-
-    const branch = node.branch;
-    if (!branchNodes.has(branch)) {
-      branchNodes.set(branch, []);
+  for (const floor of state.world.floors) {
+    if (!floor.inhabitants.some((i) => i.instanceId === instance.instanceId)) {
+      continue;
     }
-    branchNodes.get(branch)!.push(node);
+    const bonuses = lichCalculateUndeadMasterBonuses(floor);
+    return bonuses.get(instance.instanceId) ?? { attackBonus: 0, defenseBonus: 0 };
   }
 
-  // Pick one lowest-tier node per branch
-  const revealed: ResearchContent[] = [];
-  for (const [, nodes] of branchNodes) {
-    if (nodes.length === 0) continue;
-
-    let lowest = nodes[0];
-    for (let i = 1; i < nodes.length; i++) {
-      if (nodes[i].tier < lowest.tier) {
-        lowest = nodes[i];
-      }
-    }
-    revealed.push(lowest);
-  }
-
-  return revealed;
+  return { attackBonus: 0, defenseBonus: 0 };
 }

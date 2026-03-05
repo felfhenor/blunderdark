@@ -1,4 +1,4 @@
-import type { CombatAbilityId } from '@interfaces/content-combatability';
+import type { CombatAbilityEffectType, CombatAbilityId } from '@interfaces/content-combatability';
 
 export type CombatUnit = {
   attack: number;
@@ -17,8 +17,21 @@ export type CombatResult = {
 
 export type AbilityTargetType = 'single' | 'aoe' | 'self';
 
+export type StatusEffectName =
+  | 'stunned'
+  | 'berserk'
+  | 'shielded'
+  | 'phased'
+  | 'resurrected'
+  | 'healing'
+  | 'disarm'
+  | 'dispel'
+  | 'courage'
+  | 'scouting'
+  | 'marked';
+
 export type StatusEffect = {
-  name: string;
+  name: StatusEffectName;
   remainingDuration: number;
 };
 
@@ -31,11 +44,11 @@ export type AbilityState = {
 };
 
 export type AbilityActivationEffect = {
-  effectType: string;
+  effectType: CombatAbilityEffectType;
   targetType: AbilityTargetType;
   damage: number;
   targetsHit: number;
-  statusApplied: string | undefined;
+  statusApplied: StatusEffectName | undefined;
   statusDuration: number;
   targetIds: string[];
 };

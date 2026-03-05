@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { lichGetUndeadMasterBonusForInstance } from '@helpers/lich';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type { InhabitantStats } from '@interfaces/inhabitant';
@@ -56,6 +57,29 @@ export function effectiveStatsCalculate(
             workerEfficiency += mod.bonus;
             break;
         }
+      }
+    }
+  }
+
+  // Definition trait bonuses (from innate creature traits)
+  for (const trait of definition.traits ?? []) {
+    for (const effect of trait.effects) {
+      switch (effect.effectType) {
+        case 'attack_multiplier':
+          attack *= 1 + effect.effectValue;
+          break;
+        case 'defense_multiplier':
+          defense *= 1 + effect.effectValue;
+          break;
+        case 'attack_flat':
+          attack += effect.effectValue;
+          break;
+        case 'defense_flat':
+          defense += effect.effectValue;
+          break;
+        case 'worker_efficiency_multiplier':
+          workerEfficiency *= 1 + effect.effectValue;
+          break;
       }
     }
   }
@@ -155,6 +179,13 @@ export function effectiveStatsCalculate(
   );
   if (globalEfficiency > 0) {
     workerEfficiency *= 1 + globalEfficiency;
+  }
+
+  // Undead Master aura bonus (from nearby Lich-type inhabitants)
+  const lichBonus = lichGetUndeadMasterBonusForInstance(instance);
+  if (lichBonus.attackBonus > 0 || lichBonus.defenseBonus > 0) {
+    attack += lichBonus.attackBonus;
+    defense += lichBonus.defenseBonus;
   }
 
   // Clamp
