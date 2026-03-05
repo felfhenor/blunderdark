@@ -92,8 +92,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.2,
+        effects: [{ effectType: 'production_bonus', effectValue: 0.2 }],
       },
     ],
   });
@@ -117,8 +116,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-myconid-farmer',
         name: 'Farmer',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.15,
+        effects: [{ effectType: 'production_bonus', effectValue: 0.15 }],
       },
     ],
   });
@@ -142,8 +140,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-skeleton-guardian',
         name: 'Guardian',
         description: '',
-        effectType: 'defense_bonus',
-        effectValue: 0.3,
+        effects: [{ effectType: 'defense_bonus', effectValue: 0.3 }],
       },
     ],
   });
@@ -168,9 +165,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-wraith-scholar',
         name: 'Scholar',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.2,
-        targetResourceType: 'research',
+        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'research' }],
       },
     ],
   });

@@ -17,14 +17,18 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
  * Check whether an inhabitant definition has the Undead Master trait.
  */
 export function lichHasUndeadMasterTrait(def: InhabitantContent): boolean {
-  return def.traits.some((t) => t.effectType === 'undead_master');
+  return def.traits.some((t) =>
+    t.effects.some((e) => e.effectType === 'undead_master'),
+  );
 }
 
 /**
  * Check whether an inhabitant definition has the Ancient Knowledge trait.
  */
 export function lichHasAncientKnowledgeTrait(def: InhabitantContent): boolean {
-  return def.traits.some((t) => t.effectType === 'ancient_knowledge');
+  return def.traits.some((t) =>
+    t.effects.some((e) => e.effectType === 'ancient_knowledge'),
+  );
 }
 
 /**
@@ -90,9 +94,14 @@ export function lichCalculateUndeadMasterBonuses(
 
   for (const master of masters) {
     const masterTiles = roomTiles.get(master.room.id) ?? [];
-    const auraValue =
-      master.def.traits.find((t) => t.effectType === 'undead_master')
-        ?.effectValue ?? 0;
+    let auraValue = 0;
+    for (const trait of master.def.traits) {
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'undead_master') {
+          auraValue += effect.effectValue;
+        }
+      }
+    }
 
     if (auraValue <= 0) continue;
 

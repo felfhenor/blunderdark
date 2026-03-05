@@ -1,83 +1,104 @@
 - id: 5a660c7b-7444-4f1a-97a2-07b26ee0bb10
   name: Goblin Trapper
   description: A cunning hybrid combining goblin tenacity with kobold agility. Excels at swift ambushes and trap-setting.
+  effects: []
 
 - id: 60ab1a18-251f-4f59-bd0b-a102e94b1a37
   name: Skeletal Goblin
   description: An undead goblin reanimated with reinforced bones. Tougher than either parent, but sluggish.
+  effects: []
 
 - id: 139fd3a6-3de2-420b-a5a5-fdb182de7701
   name: Fungal Revenant
   description: A mushroom-infused skeleton sustained by symbiotic spores. Regenerates slowly and works with eerie efficiency.
+  effects: []
 
 - id: d4b578cb-b2bb-4000-bb1f-4db70251dda9
   name: Spore Stalker
   description: A kobold mutated by myconid spores, gaining fungal camouflage and enhanced work capacity.
+  effects: []
 
 - id: ea8b3834-4f6c-4e69-83ec-403c0ea02da0
   name: Acidic Runt
   description: A slime-goblin hybrid that oozes corrosive mucus. Small but surprisingly aggressive.
+  effects: []
 
 - id: 988f4221-1129-4cea-95a3-67d62443b04b
   name: Treant Guardian
   description: A massive living tree animated by dryad magic and reinforced with gargoyle stone. An immovable forest sentinel.
+  effects: []
 
 - id: 3a578c9f-4b48-4e9d-b008-18238e845476
   name: Thornweaver
   description: A vine-covered dryad hybrid with myconid spores woven into its bark. Excels at food production and regeneration.
+  effects: []
 
 - id: b48e93af-e2af-4daa-9205-a4edc6d09d4d
   name: Obsidian Sentinel
   description: A gargoyle fused with skeletal reinforcement. Harder than stone and twice as relentless.
+  effects: []
 
 - id: 53cf4825-5086-4ebf-bdec-9ebc1520f7fc
   name: Stone Imp
   description: An imp encased in stone armor. Retains its fiery temperament but gains surprising durability.
+  effects: []
 
 - id: dfc2c777-265d-4970-83da-97cf8a8b2310
   name: Hellfire Sprite
   description: A volatile fusion of imp cunning and goblin tenacity. Fast, chaotic, and wreathed in flame.
+  effects: []
 
 - id: d31da3e4-2124-463a-a5f8-d4c9d7ab5579
   name: Blighted Dryad
   description: A dryad corrupted by imp fire. Its nature magic is twisted but devastatingly powerful.
+  effects: []
 
 - id: 2fccd5ec-22e2-42ed-ae5d-1296f57fa45f
   name: War Goblin
   description: A goblin trained and bred alongside orcs, combining orcish brawn with goblin cunning. A fierce raider.
+  effects: []
 
 - id: 1300c9e0-e1a4-4abf-bcf6-415b752859ac
   name: Bone Crusher
   description: An orc fused with skeletal reinforcement. Tireless, brutal, and nearly unbreakable on the front lines.
+  effects: []
 
 - id: bb1b0b61-e8ea-4a4a-8ffc-7903723c2714
   name: Phantom Scholar
   description: A wraith fused with an arcane familiar, creating a spectral entity of unmatched intellect. Excels at research above all else.
+  effects: []
 
 - id: e3be130e-a009-41e4-bc4e-18f8232ad13f
   name: Banshee
   description: A wraith merged with a frost wraith, amplifying its spectral horror into a wailing terror that freezes the blood of invaders.
+  effects: []
 
 - id: 58db3d68-2681-4b02-8498-8835d0e9f4fe
   name: Magma Golem
   description: A Stone Elemental fused with Fire Elemental energy. Molten veins pulse through its rocky frame, making it a devastating combatant and forge worker.
+  effects: []
 
 - id: 6525820d-3bd4-4f92-a2b3-6995f23a038c
   name: Living Statue
   description: A Stone Elemental animated by gargoyle cunning. Faster and more aware than a pure elemental, yet retains its unyielding durability.
+  effects: []
 
 - id: 80bfc309-669a-4851-9558-188a869a528b
   name: Trapjaw
   description: A Mimic crossbred with Kobold ingenuity. Its jaw-like maw snaps shut with mechanical precision, combining shapeshifting ambush tactics with expert trap-craft.
+  effects: []
 
 - id: 5bd1f70f-3c65-40fc-aa29-bc809081f35c
   name: Doppelganger
   description: A Mimic merged with Slime adaptability. This amorphous shapeshifter can perfectly replicate any creature it observes, making it the ultimate infiltrator.
+  effects: []
 
 - id: 369ed3df-9a7c-4533-acd8-1bde4c5c2663
   name: Death Knight Hybrid
   description: A Lich's dark magic fused with orcish ferocity. This undead warlord commands the battlefield with brutal arcane strikes and an aura that empowers fallen warriors.
+  effects: []
 
 - id: 3728a2d9-81a2-4f1e-9b9d-c68d63238896
   name: Bone Colossus
   description: A Lich's necromantic power merged with a Stone Elemental's mineral frame. This towering construct of enchanted bone and living rock is nearly indestructible.
+  effects: []

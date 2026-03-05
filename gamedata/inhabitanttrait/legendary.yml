@@ -1,47 +1,55 @@
 - id: c558ab3d-f524-455f-b949-d1c1607b033f
   name: Trap Mastery
   description: The Beholder's eye stalks optimize trap placement dungeon-wide, increasing trap effectiveness by 15%.
-  effectType: aura_trap_bonus
-  effectValue: 0.15
+  effects:
+    - effectType: aura_trap_bonus
+      effectValue: 0.15
 
 - id: 91abb690-826e-41a3-96ba-c47ee79787d4
   name: Antimagic Gaze
   description: The Beholder's central eye negates magical scouting, preventing invaders from detecting dungeon layout.
-  effectType: aura_negate_scout
-  effectValue: 1
+  effects:
+    - effectType: aura_negate_scout
+      effectValue: 1
 
 - id: 9895b24b-3a4d-4f9f-88a5-73b2d218e89a
   name: All-Seeing
   description: The Beholder's many eyes reveal all invaders on the map, even those hidden or invisible.
-  effectType: aura_reveal_invaders
-  effectValue: 1
+  effects:
+    - effectType: aura_reveal_invaders
+      effectValue: 1
 
 - id: a3f68631-4ca0-416d-a357-e013640f83cb
   name: Petrifying Presence
   description: The Medusa's aura grants a 5% chance to petrify invaders each combat round, stunning them for one turn.
-  effectType: aura_petrify
-  effectValue: 0.05
+  effects:
+    - effectType: aura_petrify
+      effectValue: 0.05
 
 - id: ca855a60-61e7-4119-932e-7bce40fb4fe4
   name: Dread Gaze
   description: The Medusa's terrifying visage increases dungeon-wide fear by 20%.
-  effectType: aura_fear_bonus
-  effectValue: 0.20
+  effects:
+    - effectType: aura_fear_bonus
+      effectValue: 0.20
 
 - id: f31f5327-671f-4a54-933b-8482d9cfd4e3
   name: Bountiful Roots
   description: The Ancient Treant's roots enrich the dungeon soil, increasing food production dungeon-wide by 20%.
-  effectType: aura_food_bonus
-  effectValue: 0.20
+  effects:
+    - effectType: aura_food_bonus
+      effectValue: 0.20
 
 - id: ff2aaae9-484c-46e9-904a-ca010b410c61
   name: Nature's Bounty
   description: All gathering and harvesting operations across the dungeon are 15% more efficient.
-  effectType: aura_gathering_bonus
-  effectValue: 0.15
+  effects:
+    - effectType: aura_gathering_bonus
+      effectValue: 0.15
 
 - id: 15e33456-029c-4f60-a5c7-22e1120d191f
   name: Living Walls
   description: The Treant's roots reinforce room structures, passively regenerating room durability over time.
-  effectType: aura_room_regen
-  effectValue: 1
+  effects:
+    - effectType: aura_room_regen
+      effectValue: 1

@@ -47,23 +47,19 @@ vi.mock('@helpers/content', () => {
         id: 'trait-mimic-shapeshifter',
         name: 'Shapeshifter',
         description: '',
-        effectType: 'attack_bonus',
-        effectValue: 1.0,
+        effects: [{ effectType: 'attack_bonus', effectValue: 1.0 }],
       },
       {
         id: 'trait-mimic-treasure-guardian',
         name: 'Treasure Guardian',
         description: '',
-        effectType: 'defense_bonus',
-        effectValue: 2,
-        targetRoomId: 'room-treasure-vault',
+        effects: [{ effectType: 'defense_bonus', effectValue: 2, targetRoomId: 'room-treasure-vault' }],
       },
       {
         id: 'trait-mimic-versatile',
         name: 'Versatile',
         description: '',
-        effectType: 'versatility',
-        effectValue: 0.8,
+        effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.8 }],
       },
     ],
   });
@@ -88,9 +84,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.2,
-        targetResourceType: 'crystals',
+        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' }],
       },
     ],
   });
@@ -198,8 +192,7 @@ describe('mimicCalculateDefenseBonus', () => {
         id: 'trait-test',
         name: 'Sturdy',
         description: '',
-        effectType: 'defense_bonus',
-        effectValue: 1,
+        effects: [{ effectType: 'defense_bonus', effectValue: 1 }],
       },
     ];
     const bonus = mimicCalculateDefenseBonus(traits, TEST_ROOM_MINE_ID);
@@ -237,8 +230,7 @@ describe('mimicCalculateSurpriseAttackDamage', () => {
         id: 'trait-test',
         name: 'Surprise',
         description: '',
-        effectType: 'attack_bonus',
-        effectValue: 0.5,
+        effects: [{ effectType: 'attack_bonus', effectValue: 0.5 }],
       },
     ];
     const result = mimicCalculateSurpriseAttackDamage(7, traits, true);

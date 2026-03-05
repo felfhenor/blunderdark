@@ -416,17 +416,26 @@ function ensureSynergy(
 }
 
 function ensureInhabitantTrait(
-  trait: Partial<InhabitantTraitContent>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  trait: Partial<InhabitantTraitContent> & Record<string, any>,
 ): Required<InhabitantTraitContent> {
+  // Backward compat: migrate old scalar effectType/effectValue to effects array
+  let effects = trait.effects;
+  if (!effects && trait['effectType']) {
+    const effect: { effectType: string; effectValue: number; targetResourceType?: string; targetRoomId?: string } = {
+      effectType: trait['effectType'] as string,
+      effectValue: (trait['effectValue'] as number) ?? 0,
+    };
+    if (trait['targetResourceType']) effect.targetResourceType = trait['targetResourceType'] as string;
+    if (trait['targetRoomId']) effect.targetRoomId = trait['targetRoomId'] as string;
+    effects = [effect];
+  }
   return {
     id: (trait.id ?? 'UNKNOWN') as InhabitantTraitId,
     name: trait.name ?? 'UNKNOWN',
     __type: 'inhabitanttrait',
     description: trait.description ?? '',
-    effectType: trait.effectType ?? '',
-    effectValue: trait.effectValue ?? 0,
-    targetResourceType: trait.targetResourceType ?? undefined,
-    targetRoomId: trait.targetRoomId ?? undefined,
+    effects: effects ?? [],
     fusionPassChance: trait.fusionPassChance ?? 75,
     isFromTraining: trait.isFromTraining ?? false,
   };
@@ -658,4 +667,38 @@ function ensureVictoryPath(
     })),
     victoryReward: path.victoryReward ?? [],
   };
+}
+
+/**
+ * Hydrate inhabitant traits from inhabitantTraitIds after all content is loaded.
+ * Must be called after all content entries are in the map.
+ */
+export function hydrateInhabitantTraits(
+  allEntries: Map<string, IsContentItem>,
+): void {
+  for (const entry of allEntries.values()) {
+    if (entry.__type !== 'inhabitant') continue;
+    const inhabitant = entry as InhabitantContent;
+    if (
+      inhabitant.inhabitantTraitIds &&
+      inhabitant.inhabitantTraitIds.length > 0
+    ) {
+      inhabitant.traits = inhabitant.inhabitantTraitIds
+        .map((traitId) => {
+          const traitDef = allEntries.get(traitId) as
+            | InhabitantTraitContent
+            | undefined;
+          if (!traitDef) return undefined;
+          return {
+            id: traitDef.id,
+            name: traitDef.name,
+            description: traitDef.description,
+            effects: traitDef.effects ?? [],
+          };
+        })
+        .filter(
+          (t): t is NonNullable<typeof t> => t !== undefined,
+        );
+    }
+  }
 }

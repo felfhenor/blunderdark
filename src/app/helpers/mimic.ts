@@ -29,11 +29,13 @@ export function mimicCalculateDefenseBonus(
 
   let bonus = 0;
   for (const trait of traits) {
-    if (trait.effectType !== 'defense_bonus') continue;
-    if (!trait.targetRoomId) {
-      bonus += trait.effectValue;
-    } else if (roomDef.id === trait.targetRoomId) {
-      bonus += trait.effectValue;
+    for (const effect of trait.effects) {
+      if (effect.effectType !== 'defense_bonus') continue;
+      if (!effect.targetRoomId) {
+        bonus += effect.effectValue;
+      } else if (roomDef.id === effect.targetRoomId) {
+        bonus += effect.effectValue;
+      }
     }
   }
 
@@ -55,8 +57,10 @@ export function mimicCalculateSurpriseAttackDamage(
 
   let multiplier = 1.0;
   for (const trait of traits) {
-    if (trait.effectType === 'attack_bonus') {
-      multiplier += trait.effectValue;
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'attack_bonus') {
+        multiplier += effect.effectValue;
+      }
     }
   }
 
@@ -68,7 +72,9 @@ export function mimicCalculateSurpriseAttackDamage(
  * Inhabitants with the Shapeshifter trait can function as living traps.
  */
 export function mimicHasLivingTrap(def: InhabitantContent): boolean {
-  return def.traits.some((t) => t.effectType === 'attack_bonus');
+  return def.traits.some((t) =>
+    t.effects.some((e) => e.effectType === 'attack_bonus'),
+  );
 }
 
 /**

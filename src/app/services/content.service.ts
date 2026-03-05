@@ -7,6 +7,7 @@ import {
   contentSetAllById,
   contentSetAllIdsByName,
   ensureContent,
+  hydrateInhabitantTraits,
 } from '@helpers';
 import type { ContentType, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
@@ -135,5 +136,8 @@ export class ContentService {
 
     contentSetAllIdsByName(allIdsByNameAssets);
     contentSetAllById(allEntriesByIdAssets);
+
+    // Hydrate inhabitant traits from inhabitantTraitIds now that all content is loaded
+    hydrateInhabitantTraits(allEntriesByIdAssets);
   }
 }

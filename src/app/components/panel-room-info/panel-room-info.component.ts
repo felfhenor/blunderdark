@@ -835,18 +835,20 @@ export class PanelRoomInfoComponent {
     const reasons: string[] = [];
 
     for (const trait of def.traits) {
-      if (trait.effectType !== 'production_bonus') continue;
+      for (const effect of trait.effects) {
+        if (effect.effectType !== 'production_bonus') continue;
 
-      if (trait.targetRoomId && trait.targetRoomId === roomDef.id) {
-        const pct = Math.round(trait.effectValue * 100);
-        reasons.push(`Production bonus: +${pct}% (${trait.name})`);
-        continue;
-      }
+        if (effect.targetRoomId && effect.targetRoomId === roomDef.id) {
+          const pct = Math.round(effect.effectValue * 100);
+          reasons.push(`Production bonus: +${pct}% (${trait.name})`);
+          continue;
+        }
 
-      if (efficiencyDoesTraitApply(trait, roomDef.production)) {
-        const pct = Math.round(trait.effectValue * 100);
-        const resource = trait.targetResourceType ?? 'all';
-        reasons.push(`Production bonus: +${pct}% ${resource} (${trait.name})`);
+        if (efficiencyDoesTraitApply(effect, roomDef.production)) {
+          const pct = Math.round(effect.effectValue * 100);
+          const resource = effect.targetResourceType ?? 'all';
+          reasons.push(`Production bonus: +${pct}% ${resource} (${trait.name})`);
+        }
       }
     }
 

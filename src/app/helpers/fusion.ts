@@ -220,15 +220,23 @@ export function fusionMergeTraits(
     parentADef.tier >= parentBDef.tier ? parentBDef : parentADef;
 
   for (const trait of higherTierParent.traits) {
-    const key = `${trait.effectType}:${trait.targetResourceType ?? ''}:${trait.targetRoomId ?? ''}`;
-    seenKeys.add(key);
+    for (const effect of trait.effects) {
+      const key = `${effect.effectType}:${effect.targetResourceType ?? ''}:${effect.targetRoomId ?? ''}`;
+      seenKeys.add(key);
+    }
     merged.push(trait);
   }
 
   for (const trait of lowerTierParent.traits) {
-    const key = `${trait.effectType}:${trait.targetResourceType ?? ''}:${trait.targetRoomId ?? ''}`;
-    if (!seenKeys.has(key)) {
-      seenKeys.add(key);
+    const hasConflict = trait.effects.some((effect) => {
+      const key = `${effect.effectType}:${effect.targetResourceType ?? ''}:${effect.targetRoomId ?? ''}`;
+      return seenKeys.has(key);
+    });
+    if (!hasConflict) {
+      for (const effect of trait.effects) {
+        const key = `${effect.effectType}:${effect.targetResourceType ?? ''}:${effect.targetRoomId ?? ''}`;
+        seenKeys.add(key);
+      }
       merged.push(trait);
     }
   }

@@ -228,18 +228,20 @@ export function productionCalculateInhabitantBonus(
     totalBonus += def.stats.workerEfficiency;
 
     for (const trait of def.traits) {
-      if (trait.effectType === 'production_bonus') {
-        // Skip trait if it targets a specific room and this room doesn't match
-        if (trait.targetRoomId && roomDef?.id !== trait.targetRoomId) continue;
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'production_bonus') {
+          // Skip effect if it targets a specific room and this room doesn't match
+          if (effect.targetRoomId && roomDef?.id !== effect.targetRoomId) continue;
 
-        // Only apply trait if it targets this room's production or has no target
-        if (
-          !trait.targetResourceType ||
-          trait.targetResourceType === 'all' ||
-          (roomProduction[trait.targetResourceType] !== undefined &&
-            roomProduction[trait.targetResourceType]! > 0)
-        ) {
-          totalBonus += trait.effectValue;
+          // Only apply effect if it targets this room's production or has no target
+          if (
+            !effect.targetResourceType ||
+            effect.targetResourceType === 'all' ||
+            (roomProduction[effect.targetResourceType] !== undefined &&
+              roomProduction[effect.targetResourceType]! > 0)
+          ) {
+            totalBonus += effect.effectValue;
+          }
         }
       }
     }

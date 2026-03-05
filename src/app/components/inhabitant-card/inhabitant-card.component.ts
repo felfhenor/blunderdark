@@ -202,20 +202,22 @@ export class InhabitantCardComponent {
 
     // Check trait-room match
     for (const trait of def.traits) {
-      if (trait.effectType !== 'production_bonus') continue;
+      for (const effect of trait.effects) {
+        if (effect.effectType !== 'production_bonus') continue;
 
-      // Check targetRoomId match
-      if (trait.targetRoomId && trait.targetRoomId === roomDef.id) {
-        const pct = Math.round(trait.effectValue * 100);
-        reasons.push(`Production bonus: +${pct}% (${trait.name})`);
-        continue;
-      }
+        // Check targetRoomId match
+        if (effect.targetRoomId && effect.targetRoomId === roomDef.id) {
+          const pct = Math.round(effect.effectValue * 100);
+          reasons.push(`Production bonus: +${pct}% (${trait.name})`);
+          continue;
+        }
 
-      // Check targetResourceType match via production
-      if (efficiencyDoesTraitApply(trait, roomDef.production)) {
-        const pct = Math.round(trait.effectValue * 100);
-        const resource = trait.targetResourceType ?? 'all';
-        reasons.push(`Production bonus: +${pct}% ${resource} (${trait.name})`);
+        // Check targetResourceType match via production
+        if (efficiencyDoesTraitApply(effect, roomDef.production)) {
+          const pct = Math.round(effect.effectValue * 100);
+          const resource = effect.targetResourceType ?? 'all';
+          reasons.push(`Production bonus: +${pct}% ${resource} (${trait.name})`);
+        }
       }
     }
 

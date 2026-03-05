@@ -65,22 +65,24 @@ export function effectiveStatsCalculate(
     for (const traitId of instance.instanceTraitIds) {
       const trait = contentGetEntry<InhabitantTraitContent>(traitId);
       if (!trait) continue;
-      switch (trait.effectType) {
-        case 'attack_bonus':
-          attack *= 1 + trait.effectValue;
-          break;
-        case 'defense_bonus':
-          defense *= 1 + trait.effectValue;
-          break;
-        case 'flat_attack':
-          attack += trait.effectValue;
-          break;
-        case 'flat_defense':
-          defense += trait.effectValue;
-          break;
-        case 'flat_worker_efficiency':
-          workerEfficiency *= 1 + trait.effectValue;
-          break;
+      for (const effect of trait.effects) {
+        switch (effect.effectType) {
+          case 'attack_bonus':
+            attack *= 1 + effect.effectValue;
+            break;
+          case 'defense_bonus':
+            defense *= 1 + effect.effectValue;
+            break;
+          case 'flat_attack':
+            attack += effect.effectValue;
+            break;
+          case 'flat_defense':
+            defense += effect.effectValue;
+            break;
+          case 'flat_worker_efficiency':
+            workerEfficiency *= 1 + effect.effectValue;
+            break;
+        }
       }
     }
   }

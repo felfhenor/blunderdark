@@ -77,8 +77,7 @@ vi.mock('@helpers/content', () => {
       {
         id: 't1',
         name: 'Draconic Fury',
-        effectType: 'aura_attack_bonus',
-        effectValue: 0.15,
+        effects: [{ effectType: 'attack_bonus', effectValue: 0.15 }],
         description: '',
       },
     ],

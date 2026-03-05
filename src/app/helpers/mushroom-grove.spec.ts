@@ -197,8 +197,7 @@ mockContent.set('def-goblin', {
       id: 'trait-goblin-miner',
       name: 'Miner',
       description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.2,
+      effects: [{ effectType: 'production_bonus', effectValue: 0.2 }],
     },
   ],
 });

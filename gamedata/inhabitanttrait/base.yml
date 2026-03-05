@@ -1,260 +1,302 @@
 - id: 40136c39-3429-48bb-a6e2-6c1fd3bfd9cf
   name: Miner
   description: Increases crystal production by 20% when assigned to a crystal-producing room.
-  effectType: production_bonus
-  effectValue: 0.2
-  targetResourceType: crystals
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: crystals
 
 - id: 910d1644-50dd-4c59-a2e7-6656c5b522e0
   name: Trapper
   description: Skilled at laying traps that slow and damage invaders.
-  effectType: trap_bonus
-  effectValue: 0.25
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.25
 
 - id: b03356e0-d8c2-4be1-a631-750b4dfa93b5
   name: Guardian
   description: Increases room defense effectiveness against invaders.
-  effectType: defense_bonus
-  effectValue: 0.3
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.3
 
 - id: 055276be-6f7f-4460-a277-3c1b9a5f75ab
   name: Farmer
   description: Increases food production by 15% when assigned to a food-producing room.
-  effectType: production_bonus
-  effectValue: 0.15
-  targetResourceType: food
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: food
 
 - id: 65ebed0a-1c53-4c12-9a0b-29be8134bb51
   name: Adaptable
   description: Can be assigned to any room type without penalty.
-  effectType: versatility
-  effectValue: 1.0
+  effects:
+    - effectType: flat_worker_efficiency
+      effectValue: 0.1
 
 - id: f09ea869-8705-4193-b917-e48a7f1d64f7
   name: Draconic Fury
-  description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power dungeon-wide by 15%.
-  effectType: aura_attack_bonus
-  effectValue: 0.15
+  description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power by 15%.
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.15
 
 - id: 239c7292-eed6-4206-b931-776fc3cc1819
   name: Fire Breath
-  description: Devastating fire attacks deal 50% bonus fire damage to all invaders in combat.
-  effectType: fire_damage_bonus
-  effectValue: 0.5
+  description: Devastating fire attacks deal 50% bonus damage to all invaders in combat.
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.5
 
 - id: ca911967-8236-49a3-8cac-e60b5267b123
   name: Fearless
   description: Immune to all fear effects. Never enters the scared state.
-  effectType: fear_immunity
-  effectValue: 1
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.1
 
 - id: 4f8df10a-4c3a-4f26-b45c-01fcdf3ca800
   name: Scholarly
   description: Increases research production by 40% when assigned to a research-producing room.
-  effectType: production_bonus
-  effectValue: 0.4
-  targetResourceType: research
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.4
+      targetResourceType: research
 
 - id: b950768f-5733-42db-824e-a99ad84be591
   name: Undead Master
   description: Undead inhabitants in the same or adjacent rooms gain +1 Attack and +1 Defense.
-  effectType: undead_master
-  effectValue: 1
+  effects:
+    - effectType: undead_master
+      effectValue: 1
 
 - id: 3c6a8954-51a0-427b-9067-60ede3b1b6fc
   name: Ancient Knowledge
   description: Reveals one hidden research node per branch in the research tree.
-  effectType: ancient_knowledge
-  effectValue: 1
+  effects:
+    - effectType: ancient_knowledge
+      effectValue: 1
 
 - id: 10f78dcf-af4b-4ba4-80cb-b7d5ed54931b
   name: Throne Scholar
   description: When assigned to the Throne Room, provides a dungeon-wide +10% Research bonus.
-  effectType: production_bonus
-  effectValue: 0.1
-  targetResourceType: research
-  targetRoomId: Throne Room
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.1
+      targetResourceType: research
+      targetRoomId: Throne Room
 
 - id: cd1286ea-ea19-4371-8967-3a2cd8440f70
   name: Soul Siphon
   description: When assigned to the Soul Well, doubles Soul Essence generation.
-  effectType: production_bonus
-  effectValue: 1.0
-  targetResourceType: essence
-  targetRoomId: Soul Well
+  effects:
+    - effectType: production_bonus
+      effectValue: 1.0
+      targetResourceType: essence
+      targetRoomId: Soul Well
 
 - id: 02efe8bd-c9ba-4ebf-919e-f002925d4b67
   name: Library Specialist
   description: When assigned to the Shadow Library, grants +20% additional Research on top of Scholarly bonus.
-  effectType: production_bonus
-  effectValue: 0.2
-  targetResourceType: research
-  targetRoomId: Shadow Library
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: research
+      targetRoomId: Shadow Library
 
 - id: 7f0b4906-56c5-4306-8345-7876b366d025
   name: Abyssal Corruption
-  description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing corruption generation dungeon-wide by 25%.
-  effectType: aura_corruption_bonus
-  effectValue: 0.25
+  description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing fear dungeon-wide by 25%.
+  effects:
+    - effectType: aura_fear_bonus
+      effectValue: 0.25
 
 - id: a5010fb7-37ed-4698-8950-8269d80f1f02
   name: Dread Aura
   description: Radiates an overwhelming aura of dread that increases dungeon-wide fear by 10.
-  effectType: aura_fear_bonus
-  effectValue: 10
+  effects:
+    - effectType: aura_fear_bonus
+      effectValue: 10
 
 - id: 0ec6bc83-4d3c-4b73-8f9b-9e952acaabcb
   name: Crushing Presence
   description: The Demon Lord's oppressive will reduces invader morale dungeon-wide by 15%.
-  effectType: aura_morale_penalty
-  effectValue: 0.15
+  effects:
+    - effectType: aura_fear_bonus
+      effectValue: 0.15
 
 - id: ecb71c53-b413-469e-82ab-87e0f46b7ab1
   name: Nature Affinity
   description: Increases food production by 30% when assigned to a food-producing room.
-  effectType: production_bonus
-  effectValue: 0.3
-  targetResourceType: food
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.3
+      targetResourceType: food
 
 - id: 997df7af-9dce-442e-a341-720e44d34e22
   name: Purifier
-  description: Reduces corruption in the assigned room by 1 per game day.
-  effectType: corruption_reduction
-  effectValue: 1
+  description: Reduces corruption in the assigned room, improving flux generation.
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: flux
 
 - id: a4af2314-d74f-4b4e-aebc-8e5a2aa532f4
   name: Regenerative
-  description: Passively heals 5% HP per minute outside of combat.
-  effectType: regeneration
-  effectValue: 0.05
+  description: Passively heals outside of combat, improving survivability.
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.05
 
 - id: 544a6d63-8f8a-49bf-b9b7-56dfb21990d5
   name: Stone Form
   description: Takes 50% reduced damage from physical attacks and is immune to poison.
-  effectType: damage_reduction
-  effectValue: 0.5
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.5
 
 - id: 4b11cbde-ad5c-4b29-b324-6720894cd99f
   name: Sentinel
   description: Automatically detects invaders within 2 tiles and alerts the dungeon.
-  effectType: detection
-  effectValue: 2
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.2
 
 - id: fedaba9b-e8bf-4718-8637-bd26d680b9e9
   name: Architectural
   description: Room the Gargoyle is assigned to gains +1 structural integrity.
-  effectType: structural_bonus
-  effectValue: 1
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.1
 
 - id: 1337742f-ada0-4f90-a3da-81c3c064f538
   name: Mischievous
   description: 5% chance per game hour to cause a random minor event in the assigned room.
-  effectType: random_event
-  effectValue: 0.05
+  effects:
+    - effectType: flat_worker_efficiency
+      effectValue: 0.05
 
 - id: 41a302f7-699c-4557-8062-7f5d11100eb4
   name: FireStarter
   description: +25% damage with fire-based attacks. Assigned room gains fire hazard potential.
-  effectType: fire_damage_bonus
-  effectValue: 0.25
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.25
 
 - id: 8316523a-b303-4fe6-9e1c-003555a815d7
   name: Corruptor
-  description: Increases corruption in the assigned room by 1 per game day.
-  effectType: corruption_generation
-  effectValue: 1
+  description: Increases corruption in the assigned room, boosting offensive presence.
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.1
 
 - id: 6e524753-0d97-43fe-81f2-b566a52b1ea6
   name: Warrior
-  description: Increases training speed by 30% when assigned to a Barracks or Training Grounds.
-  effectType: training_bonus
-  effectValue: 0.3
+  description: Increases training speed and combat readiness.
+  effects:
+    - effectType: flat_worker_efficiency
+      effectValue: 0.3
 
 - id: 6a093167-21eb-4662-b75d-f5602e0b4376
   name: Intimidating
-  description: Adds +1 Fear to the room the Orc is assigned to.
-  effectType: fear_bonus
-  effectValue: 1
+  description: Adds offensive pressure through intimidation.
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.1
 
 - id: bf1f858e-f77f-415b-9452-b8e02049e5fc
   name: Strong
   description: Adds +2 Attack in combat encounters.
-  effectType: attack_bonus
-  effectValue: 2
+  effects:
+    - effectType: attack_bonus
+      effectValue: 2
 
 - id: 6cc9a1d7-f5a1-4dd1-a354-b98137a942c2
   name: Aggressive
   description: Orcs always act first in combat, gaining initiative priority.
-  effectType: combat_priority
-  effectValue: 1
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.1
 
 - id: 2d6acb8d-bf56-4cac-be22-e9435493a7f1
   name: Terrifying
   description: Adds +2 Fear to the room the Wraith is assigned to.
-  effectType: fear_bonus
-  effectValue: 2
+  effects:
+    - effectType: attack_bonus
+      effectValue: 0.2
 
 - id: b4c7b56b-59ec-4686-a753-c450157ce750
   name: Intangible
   description: 50% chance to evade physical attacks. Magical attacks are unaffected.
-  effectType: physical_evasion
-  effectValue: 0.5
+  effects:
+    - effectType: defense_bonus
+      effectValue: 0.5
 
 - id: 79f34764-c8d9-4c28-8ebe-ac0867bd279b
   name: Scholar
   description: Increases research production by 20% when assigned to a research-producing room.
-  effectType: production_bonus
-  effectValue: 0.2
-  targetResourceType: research
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: research
 
 - id: 06b86f11-4426-45f1-931d-e6048080d700
   name: Inappetent
   description: Does not require food. Never enters hungry or starving states.
-  effectType: food_exemption
-  effectValue: 1
+  effects:
+    - effectType: flat_worker_efficiency
+      effectValue: 0.1
 
 - id: 0a75910b-8135-41ca-98e5-91dd1088d07a
   name: Geological
   description: Increases crystal mining production by 40% when assigned to a mining room.
-  effectType: production_bonus
-  effectValue: 0.4
-  targetResourceType: crystals
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.4
+      targetResourceType: crystals
 
 - id: cece9c54-66eb-4513-8e5b-ae2d47f043a1
   name: Sturdy
   description: Grants +1 Defense from hardened stone hide.
-  effectType: defense_bonus
-  effectValue: 1
+  effects:
+    - effectType: defense_bonus
+      effectValue: 1
 
 - id: 335cd443-8edb-4897-aff5-a504e3010f70
   name: Forge Affinity
   description: Increases gold production by 20% when assigned to a forge.
-  effectType: production_bonus
-  effectValue: 0.2
-  targetResourceType: gold
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.2
+      targetResourceType: gold
 
 - id: 87aa7c6a-078b-43e5-8c3f-2efca7c74464
   name: Ley Conductor
   description: Generates 15% more flux when assigned to a Ley Line Nexus.
-  effectType: production_bonus
-  effectValue: 0.15
-  targetResourceType: flux
+  effects:
+    - effectType: production_bonus
+      effectValue: 0.15
+      targetResourceType: flux
 
 - id: 3eb825b4-f880-4655-a4e4-90a794e203d5
   name: Shapeshifter
   description: Disguises as a room object. When revealed, deals +100% damage on the first attack against an invader.
-  effectType: attack_bonus
-  effectValue: 1.0
+  effects:
+    - effectType: attack_bonus
+      effectValue: 1.0
 
 - id: 1aa5685a-9490-4e48-9f8d-c893171f0dfe
   name: Treasure Guardian
   description: Gains +2 Defense when assigned to a Treasure Vault.
-  effectType: defense_bonus
-  effectValue: 2
-  targetRoomId: Treasure Vault
+  effects:
+    - effectType: defense_bonus
+      effectValue: 2
+      targetRoomId: Treasure Vault
 
 - id: 6e84c750-889b-45bf-b83c-94f81f126f47
   name: Versatile
   description: Can work in any room at 80% efficiency, applied as a final multiplier after other bonuses.
-  effectType: versatility
-  effectValue: 0.8
+  effects:
+    - effectType: flat_worker_efficiency
+      effectValue: 0.08

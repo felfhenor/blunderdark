@@ -5,10 +5,10 @@ import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
-  InhabitantTrait,
   PlacedRoom,
   PlacedRoomId,
   RoomProduction,
+  TraitEffect,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown } from '@interfaces/efficiency';
@@ -19,28 +19,34 @@ import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown }
 export function efficiencyGetTraits(
   def: InhabitantContent,
 ): EfficiencyTrait[] {
-  return def.traits
-    .filter((t) => t.effectType === 'production_bonus')
-    .map((t) => ({
-      traitName: t.name,
-      effectValue: t.effectValue,
-      targetResourceType: t.targetResourceType,
-    }));
+  const result: EfficiencyTrait[] = [];
+  for (const trait of def.traits) {
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'production_bonus') {
+        result.push({
+          traitName: trait.name,
+          effectValue: effect.effectValue,
+          targetResourceType: effect.targetResourceType,
+        });
+      }
+    }
+  }
+  return result;
 }
 
 /**
- * Check if a trait applies to a room based on the room's production resources.
- * A trait with no targetResourceType (or 'all') applies to any producing room.
- * A trait with a specific targetResourceType only applies if the room produces that resource.
+ * Check if an effect applies to a room based on the room's production resources.
+ * An effect with no targetResourceType (or 'all') applies to any producing room.
+ * An effect with a specific targetResourceType only applies if the room produces that resource.
  */
 export function efficiencyDoesTraitApply(
-  trait: InhabitantTrait,
+  effect: Pick<TraitEffect, 'targetResourceType'>,
   roomProduction: RoomProduction,
 ): boolean {
-  if (!trait.targetResourceType || trait.targetResourceType === 'all') {
+  if (!effect.targetResourceType || effect.targetResourceType === 'all') {
     return true;
   }
-  const amount = roomProduction[trait.targetResourceType];
+  const amount = roomProduction[effect.targetResourceType];
   return amount !== undefined && amount > 0;
 }
 
@@ -60,16 +66,19 @@ export function efficiencyCalculateInhabitantContribution(
   const stats = effectiveStatsCalculate(def, instance);
   const workerEfficiencyBonus = stats.workerEfficiency;
 
-  const traitBonuses = def.traits
-    .filter((t) => t.effectType === 'production_bonus')
-    .map((t) => {
-      const applies = efficiencyDoesTraitApply(t, roomProduction);
-      return {
-        traitName: t.name,
-        bonus: t.effectValue,
-        applies,
-      };
-    });
+  const traitBonuses: { traitName: string; bonus: number; applies: boolean }[] = [];
+  for (const trait of def.traits) {
+    for (const effect of trait.effects) {
+      if (effect.effectType === 'production_bonus') {
+        const applies = efficiencyDoesTraitApply(effect, roomProduction);
+        traitBonuses.push({
+          traitName: trait.name,
+          bonus: effect.effectValue,
+          applies,
+        });
+      }
+    }
+  }
 
   const applicableTraitBonus = traitBonuses
     .filter((t) => t.applies)
@@ -149,9 +158,11 @@ export function efficiencyCalculateMatchedInhabitantBonus(
     totalBonus += stats.workerEfficiency;
 
     for (const trait of def.traits) {
-      if (trait.effectType === 'production_bonus') {
-        if (efficiencyDoesTraitApply(trait, roomProduction)) {
-          totalBonus += trait.effectValue;
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'production_bonus') {
+          if (efficiencyDoesTraitApply(effect, roomProduction)) {
+            totalBonus += effect.effectValue;
+          }
         }
       }
     }

@@ -3,13 +3,17 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type InhabitantTraitId = Branded<string, 'InhabitantTraitId'>;
 
+export type TraitEffect = {
+  effectType: string;
+  effectValue: number;
+  targetResourceType?: string;
+  targetRoomId?: string;
+};
+
 export type InhabitantTraitContent = IsContentItem &
   HasDescription & {
     id: InhabitantTraitId;
-    effectType: string;
-    effectValue: number;
-    targetResourceType: string | undefined;
-    targetRoomId: string | undefined;
+    effects: TraitEffect[];
     fusionPassChance: number;
     isFromTraining: boolean;
   };

@@ -57,9 +57,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.2,
-        targetResourceType: 'crystals',
+        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' }],
       },
     ],
   });
@@ -83,9 +81,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-myconid-farmer',
         name: 'Farmer',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.15,
-        targetResourceType: 'food',
+        effects: [{ effectType: 'production_bonus', effectValue: 0.15, targetResourceType: 'food' }],
       },
     ],
   });
@@ -109,8 +105,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-skeleton-guardian',
         name: 'Guardian',
         description: '',
-        effectType: 'defense_bonus',
-        effectValue: 0.3,
+        effects: [{ effectType: 'defense_bonus', effectValue: 0.3 }],
       },
     ],
   });
@@ -134,8 +129,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-slime-adaptable',
         name: 'Adaptable',
         description: '',
-        effectType: 'versatility',
-        effectValue: 1.0,
+        effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.1 }],
       },
     ],
   });
@@ -160,9 +154,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-all-production',
         name: 'Industrious',
         description: '',
-        effectType: 'production_bonus',
-        effectValue: 0.1,
-        targetResourceType: 'all',
+        effects: [{ effectType: 'production_bonus', effectValue: 0.1, targetResourceType: 'all' }],
       },
     ],
   });
@@ -192,11 +184,11 @@ import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
   InhabitantInstanceId,
-  InhabitantTrait,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
   RoomProduction,
+  TraitEffect,
   RoomShapeId,
 } from '@interfaces';
 import type {
@@ -244,66 +236,32 @@ describe('efficiencyDoesTraitApply', () => {
   const foodProduction: RoomProduction = { food: 0.8 };
   const emptyProduction: RoomProduction = {};
 
-  it('should return true when trait targets a resource the room produces', () => {
-    const trait: InhabitantTrait = {
-      id: 't1',
-      name: 'Miner',
-      description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.2,
-      targetResourceType: 'crystals',
-    };
-    expect(efficiencyDoesTraitApply(trait, crystalProduction)).toBe(true);
+  it('should return true when effect targets a resource the room produces', () => {
+    const effect: TraitEffect = { effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' };
+    expect(efficiencyDoesTraitApply(effect, crystalProduction)).toBe(true);
   });
 
-  it('should return false when trait targets a resource the room does NOT produce', () => {
-    const trait: InhabitantTrait = {
-      id: 't1',
-      name: 'Miner',
-      description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.2,
-      targetResourceType: 'crystals',
-    };
-    expect(efficiencyDoesTraitApply(trait, foodProduction)).toBe(false);
+  it('should return false when effect targets a resource the room does NOT produce', () => {
+    const effect: TraitEffect = { effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' };
+    expect(efficiencyDoesTraitApply(effect, foodProduction)).toBe(false);
   });
 
-  it('should return true when trait has targetResourceType "all"', () => {
-    const trait: InhabitantTrait = {
-      id: 't1',
-      name: 'Industrious',
-      description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.1,
-      targetResourceType: 'all',
-    };
-    expect(efficiencyDoesTraitApply(trait, crystalProduction)).toBe(true);
-    expect(efficiencyDoesTraitApply(trait, foodProduction)).toBe(true);
-    expect(efficiencyDoesTraitApply(trait, emptyProduction)).toBe(true);
+  it('should return true when effect has targetResourceType "all"', () => {
+    const effect: TraitEffect = { effectType: 'production_bonus', effectValue: 0.1, targetResourceType: 'all' };
+    expect(efficiencyDoesTraitApply(effect, crystalProduction)).toBe(true);
+    expect(efficiencyDoesTraitApply(effect, foodProduction)).toBe(true);
+    expect(efficiencyDoesTraitApply(effect, emptyProduction)).toBe(true);
   });
 
-  it('should return true when trait has no targetResourceType (undefined)', () => {
-    const trait: InhabitantTrait = {
-      id: 't1',
-      name: 'Generic',
-      description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.1,
-    };
-    expect(efficiencyDoesTraitApply(trait, crystalProduction)).toBe(true);
-    expect(efficiencyDoesTraitApply(trait, emptyProduction)).toBe(true);
+  it('should return true when effect has no targetResourceType (undefined)', () => {
+    const effect: TraitEffect = { effectType: 'production_bonus', effectValue: 0.1 };
+    expect(efficiencyDoesTraitApply(effect, crystalProduction)).toBe(true);
+    expect(efficiencyDoesTraitApply(effect, emptyProduction)).toBe(true);
   });
 
-  it('should return false for empty production when trait targets a specific resource', () => {
-    const trait: InhabitantTrait = {
-      id: 't1',
-      name: 'Farmer',
-      description: '',
-      effectType: 'production_bonus',
-      effectValue: 0.15,
-      targetResourceType: 'food',
-    };
-    expect(efficiencyDoesTraitApply(trait, emptyProduction)).toBe(false);
+  it('should return false for empty production when effect targets a specific resource', () => {
+    const effect: TraitEffect = { effectType: 'production_bonus', effectValue: 0.15, targetResourceType: 'food' };
+    expect(efficiencyDoesTraitApply(effect, emptyProduction)).toBe(false);
   });
 });
 

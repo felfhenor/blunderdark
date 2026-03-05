@@ -257,8 +257,10 @@ export function legendaryAuraGetBonus(
     if (!def) continue;
 
     for (const trait of def.traits) {
-      if (trait.effectType === effectType) {
-        total += trait.effectValue;
+      for (const effect of trait.effects) {
+        if (effect.effectType === effectType) {
+          total += effect.effectValue;
+        }
       }
     }
   }

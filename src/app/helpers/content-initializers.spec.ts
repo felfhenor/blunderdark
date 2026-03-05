@@ -211,8 +211,7 @@ describe('ensureContent', () => {
         name: 'Test Trait',
         __type: 'inhabitanttrait' as const,
       });
-      expect(result.effectType).toBe('');
-      expect(result.effectValue).toBe(0);
+      expect(result.effects).toEqual([]);
       expect(result.fusionPassChance).toBe(75);
       expect(result.isFromTraining).toBe(false);
     });

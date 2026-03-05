@@ -6,14 +6,13 @@ import type { Branded } from '@interfaces/identifiable';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 import type { TraitRuneInstanceId } from '@interfaces/traitrune';
 
+import type { TraitEffect } from '@interfaces/content-inhabitanttrait';
+
 export type InhabitantTrait = {
   id: string;
   name: string;
   description: string;
-  effectType: string;
-  effectValue: number;
-  targetResourceType?: string;
-  targetRoomId?: string;
+  effects: TraitEffect[];
 };
 
 export type InhabitantStats = CombatStats & {
