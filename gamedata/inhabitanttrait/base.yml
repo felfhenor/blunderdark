@@ -37,7 +37,7 @@
 
 - id: f09ea869-8705-4193-b917-e48a7f1d64f7
   name: Draconic Fury
-  description: The dragon's presence drives all dungeon defenders into a battle frenzy, increasing attack power by 15%.
+  description: This creature's presence drives all dungeon defenders into a battle frenzy, increasing attack power by 15%.
   effects:
     - effectType: attack_bonus
       effectValue: 0.15
@@ -107,7 +107,7 @@
 
 - id: 7f0b4906-56c5-4306-8345-7876b366d025
   name: Abyssal Corruption
-  description: The Demon Lord's presence saturates the dungeon with abyssal energy, increasing fear dungeon-wide by 25%.
+  description: This creature's presence saturates the dungeon with abyssal energy, increasing fear dungeon-wide by 25%.
   effects:
     - effectType: aura_fear_bonus
       effectValue: 0.25
@@ -121,7 +121,7 @@
 
 - id: 0ec6bc83-4d3c-4b73-8f9b-9e952acaabcb
   name: Crushing Presence
-  description: The Demon Lord's oppressive will reduces invader morale dungeon-wide by 15%.
+  description: This creature's oppressive will reduces invader morale dungeon-wide by 15%.
   effects:
     - effectType: aura_fear_bonus
       effectValue: 0.15
@@ -165,7 +165,7 @@
 
 - id: fedaba9b-e8bf-4718-8637-bd26d680b9e9
   name: Architectural
-  description: Room the Gargoyle is assigned to gains +1 structural integrity.
+  description: The room this creature is assigned to gains +1 structural integrity.
   effects:
     - effectType: defense_bonus
       effectValue: 0.1
@@ -214,14 +214,14 @@
 
 - id: 6cc9a1d7-f5a1-4dd1-a354-b98137a942c2
   name: Aggressive
-  description: Orcs always act first in combat, gaining initiative priority.
+  description: This creature always acts first in combat, gaining initiative priority.
   effects:
     - effectType: attack_bonus
       effectValue: 0.1
 
 - id: 2d6acb8d-bf56-4cac-be22-e9435493a7f1
   name: Terrifying
-  description: Adds +2 Fear to the room the Wraith is assigned to.
+  description: Adds +2 Fear to the room this creature is assigned to.
   effects:
     - effectType: attack_bonus
       effectValue: 0.2
