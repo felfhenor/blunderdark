@@ -65,10 +65,6 @@ export function floatingBubbleRemove(id: number): void {
   _bubbles.update((bubbles) => bubbles.filter((b) => b.id !== id));
 }
 
-export function floatingBubblesClear(): void {
-  _bubbles.set([]);
-}
-
 /**
  * Compute per-room production for a given floor and emit bubbles.
  * Called after productionProcess each tick.

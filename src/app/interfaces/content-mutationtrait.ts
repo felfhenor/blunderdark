@@ -4,7 +4,7 @@ import type { HasDescription, HasRarity } from '@interfaces/traits';
 
 export type MutationTraitId = Branded<string, 'MutationTraitId'>;
 
-export type MutationTraitModifier = {
+type MutationTraitModifier = {
   stat: keyof InhabitantStats;
   bonus: number;
 };

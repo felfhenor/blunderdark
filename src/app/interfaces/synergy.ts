@@ -2,7 +2,7 @@ import type { InhabitantCreatureType } from '@interfaces/content-inhabitant';
 import type { RoomId } from '@interfaces/content-room';
 import type { SynergyContent } from '@interfaces/content-synergy';
 
-export type SynergyConditionType =
+type SynergyConditionType =
   | 'roomType'
   | 'adjacentRoomType'
   | 'connectedRoomType'
@@ -16,7 +16,7 @@ export type SynergyCondition = {
   count?: number;
 };
 
-export type SynergyEffectType = 'productionBonus' | 'fearReduction';
+type SynergyEffectType = 'productionBonus' | 'fearReduction';
 
 export type SynergyEffect = {
   type: SynergyEffectType;

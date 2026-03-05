@@ -11,7 +11,7 @@ export type TraitRuneContent = IsContentItem &
     effects: TraitRuneEffect[];
   };
 
-export type TraitRuneEffect = {
+type TraitRuneEffect = {
   type: string;
   value: number;
 };

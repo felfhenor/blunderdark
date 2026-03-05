@@ -6,8 +6,4 @@ export interface HasSprite {
   sprite: string;
 }
 
-export type HasAnimation = HasSprite & {
-  frames: number;
-};
-
 export type AtlasedImage = 'inhabitant';

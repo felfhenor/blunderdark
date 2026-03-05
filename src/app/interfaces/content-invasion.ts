@@ -1,12 +1,4 @@
-import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { InvaderClassWeights } from '@interfaces/invasion';
+import type { Branded } from '@interfaces/identifiable';
 
 export type InvasionId = Branded<string, 'InvasionId'>;
 
-export type InvasionContent = IsContentItem & {
-  id: InvasionId;
-  balanced: InvaderClassWeights;
-  highCorruption: InvaderClassWeights;
-  highWealth: InvaderClassWeights;
-  highKnowledge: InvaderClassWeights;
-};

@@ -1,5 +1,4 @@
-import type { PlacedRoomId, TileOffset } from '@interfaces';
-import type { AdjacencyMap } from '@interfaces/adjacency';
+import type { TileOffset } from '@interfaces';
 
 /**
  * Checks if two sets of tiles share at least one edge (horizontal or vertical).
@@ -62,58 +61,4 @@ export function adjacencyGetSharedEdges(
   }
 
   return edges;
-}
-
-export function adjacencyCreateMap(): AdjacencyMap {
-  return {};
-}
-
-export function adjacencyAddRoom(
-  map: AdjacencyMap,
-  roomId: PlacedRoomId,
-  roomTiles: TileOffset[],
-  allRooms: Array<{ id: PlacedRoomId; tiles: TileOffset[] }>,
-): AdjacencyMap {
-  const result = { ...map };
-  result[roomId] = [];
-
-  for (const other of allRooms) {
-    if (other.id === roomId) continue;
-
-    if (adjacencyAreRoomsAdjacent(roomTiles, other.tiles)) {
-      result[roomId].push(other.id);
-
-      if (!result[other.id]) {
-        result[other.id] = [];
-      }
-      result[other.id] = [...result[other.id], roomId];
-    }
-  }
-
-  return result;
-}
-
-export function adjacencyRemoveRoom(
-  map: AdjacencyMap,
-  roomId: PlacedRoomId,
-): AdjacencyMap {
-  const result = { ...map };
-
-  // Remove this room from all other rooms' lists
-  for (const key of Object.keys(result) as PlacedRoomId[]) {
-    if (key === roomId) continue;
-    result[key] = result[key].filter((id) => id !== roomId);
-  }
-
-  // Remove this room's entry
-  delete result[roomId];
-
-  return result;
-}
-
-export function adjacencyGetAdjacentRooms(
-  map: AdjacencyMap,
-  roomId: PlacedRoomId,
-): PlacedRoomId[] {
-  return map[roomId] ?? [];
 }

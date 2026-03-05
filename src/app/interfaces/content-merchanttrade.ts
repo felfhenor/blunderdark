@@ -4,7 +4,7 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type MerchantTradeId = Branded<string, 'MerchantTradeId'>;
 
-export type MerchantTradeType = 'buy' | 'sell' | 'special';
+type MerchantTradeType = 'buy' | 'sell' | 'special';
 
 export type MerchantTradeContent = IsContentItem &
   HasDescription & {

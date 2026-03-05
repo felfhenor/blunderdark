@@ -39,7 +39,7 @@ export type InvasionHistoryEntry = {
   unreachableObjectiveCount?: number;
 };
 
-export type PendingSpecialInvasion = {
+type PendingSpecialInvasion = {
   type: SpecialInvasionType;
   triggerDay: number;
 };
@@ -187,7 +187,7 @@ export type TurnQueue = {
 
 // --- Battle log types ---
 
-export type BattleLogEntryType =
+type BattleLogEntryType =
   | 'room_enter'
   | 'hallway_enter'
   | 'trap_trigger'

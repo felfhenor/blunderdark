@@ -1,7 +1,7 @@
 import type { HallwayId } from '@interfaces/hallway';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
-export type TileOccupant = 'empty' | 'room' | 'hallway';
+type TileOccupant = 'empty' | 'room' | 'hallway';
 
 export type GridTile = {
   occupied: boolean;

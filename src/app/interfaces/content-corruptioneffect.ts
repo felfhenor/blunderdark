@@ -3,9 +3,9 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type CorruptionEffectId = Branded<string, 'CorruptionEffectId'>;
 
-export type CorruptionEffectTriggerType = 'threshold' | 'interval';
-export type CorruptionEffectBehavior = 'passive' | 'event';
-export type CorruptionEffectNotificationSeverity = 'info' | 'warning' | 'error';
+type CorruptionEffectTriggerType = 'threshold' | 'interval';
+type CorruptionEffectBehavior = 'passive' | 'event';
+type CorruptionEffectNotificationSeverity = 'info' | 'warning' | 'error';
 
 export type CorruptionEffectType =
   | 'unlock'
@@ -19,19 +19,19 @@ export type CorruptionEffectType =
   | 'inhabitant_debuff'
   | 'visual';
 
-export type CorruptionEffectConditions = {
+type CorruptionEffectConditions = {
   requiresResearch?: string[];
   minFloorDepth?: number;
   minInhabitants?: number;
 };
 
-export type CorruptionEffectNotification = {
+type CorruptionEffectNotification = {
   title: string;
   message: string;
   severity: CorruptionEffectNotificationSeverity;
 };
 
-export type CorruptionEffectVisual = {
+type CorruptionEffectVisual = {
   gridClass?: string;
   progressBarClass?: string;
 };

@@ -25,13 +25,6 @@ export function worldSetStartingBiome(biome: BiomeType | 'random'): void {
 }
 
 /**
- * Get the starting biome selection.
- */
-export function worldGetStartingBiome(): BiomeType | 'random' {
-  return _startingBiome();
-}
-
-/**
  * Resolve the starting biome - if 'random', pick one from the unlocked random pool.
  */
 export function worldResolveStartingBiome(): BiomeType {

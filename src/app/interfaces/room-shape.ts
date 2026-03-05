@@ -23,7 +23,7 @@ export type TileOffset = {
 
 export type Rotation = 0 | 1 | 2 | 3;
 
-export type BreedingJob = {
+type BreedingJob = {
   parentAInstanceId: InhabitantInstanceId;
   parentBInstanceId: InhabitantInstanceId;
   recipeId: BreedingRecipeId;
@@ -31,7 +31,7 @@ export type BreedingJob = {
   targetTicks: number;
 };
 
-export type MutationJob = {
+type MutationJob = {
   targetInstanceId: InhabitantInstanceId;
   ticksRemaining: number;
   targetTicks: number;
@@ -55,7 +55,7 @@ export type TrapCraftingJob = {
   targetTicks: number;
 };
 
-export type TortureJob = {
+type TortureJob = {
   prisonerId: PrisonerId;
   currentStage: TortureStage;
   stageAction?: TortureStageAction;
@@ -63,7 +63,7 @@ export type TortureJob = {
   targetTicks: number;
 };
 
-export type RuneworkingJob = {
+type RuneworkingJob = {
   runeId: TraitRuneInstanceId;
   inhabitantInstanceId: InhabitantInstanceId;
   ticksRemaining: number;

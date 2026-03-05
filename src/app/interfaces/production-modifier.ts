@@ -1,7 +1,7 @@
 import type { BiomeType } from '@interfaces/biome';
 import type { RoomId } from '@interfaces/content-room';
 
-export type ProductionModifierType =
+type ProductionModifierType =
   | 'time_of_day'
   | 'biome';
 
