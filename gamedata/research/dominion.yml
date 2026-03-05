@@ -32,7 +32,7 @@
   branch: dominion
   cost:
     research: 25
-    food: 5
+    food: 10
   prerequisiteResearchIds:
     - Creature Lore
   unlocks:
@@ -47,7 +47,7 @@
   branch: dominion
   cost:
     research: 25
-    food: 5
+    food: 10
   prerequisiteResearchIds:
     - Creature Lore
   unlocks:
@@ -62,7 +62,7 @@
   branch: dominion
   cost:
     research: 25
-    food: 5
+    food: 10
   prerequisiteResearchIds:
     - Creature Lore
   unlocks:
@@ -77,7 +77,7 @@
   branch: dominion
   cost:
     research: 25
-    food: 5
+    food: 10
   prerequisiteResearchIds:
     - Creature Lore
   unlocks:
@@ -94,7 +94,7 @@
   branch: dominion
   cost:
     research: 50
-    food: 15
+    food: 25
   prerequisiteResearchIds:
     - Stone Shaping
   unlocks:
@@ -109,7 +109,7 @@
   branch: dominion
   cost:
     research: 50
-    food: 15
+    food: 25
   prerequisiteResearchIds:
     - Dark Pacts
   unlocks:
@@ -126,7 +126,7 @@
   branch: dominion
   cost:
     research: 50
-    food: 15
+    food: 25
   prerequisiteResearchIds:
     - Elemental Crystallization
   unlocks:
@@ -141,7 +141,7 @@
   branch: dominion
   cost:
     research: 50
-    food: 15
+    food: 25
   prerequisiteResearchIds:
     - Martial Training
   unlocks:
@@ -164,8 +164,8 @@
   branch: dominion
   cost:
     research: 100
-    food: 30
-    gold: 15
+    food: 50
+    gold: 25
   prerequisiteResearchIds:
     - Nature Attunement
     - Creature Quarters
@@ -185,8 +185,8 @@
   branch: dominion
   cost:
     research: 100
-    food: 30
-    gold: 15
+    food: 50
+    gold: 25
   prerequisiteResearchIds:
     - Spirit Binding
     - Transmutation
@@ -204,8 +204,8 @@
   branch: dominion
   cost:
     research: 100
-    food: 30
-    gold: 15
+    food: 50
+    gold: 25
   prerequisiteResearchIds:
     - Creature Quarters
     - Transmutation
@@ -227,8 +227,8 @@
   branch: dominion
   cost:
     research: 100
-    food: 30
-    gold: 15
+    food: 50
+    gold: 25
   prerequisiteResearchIds:
     - Spirit Binding
     - Creature Quarters
@@ -246,8 +246,8 @@
   branch: dominion
   cost:
     research: 200
-    food: 60
-    gold: 30
+    food: 100
+    gold: 50
   prerequisiteResearchIds:
     - Horde Tactics
     - Pack Mentality
@@ -265,8 +265,8 @@
   branch: dominion
   cost:
     research: 200
-    food: 60
-    gold: 30
+    food: 100
+    gold: 50
   prerequisiteResearchIds:
     - Elite Training
     - Horde Tactics
@@ -284,8 +284,8 @@
   branch: dominion
   cost:
     research: 200
-    food: 60
-    gold: 30
+    food: 100
+    gold: 50
   prerequisiteResearchIds:
     - Pack Mentality
     - Elite Training
@@ -303,8 +303,8 @@
   branch: dominion
   cost:
     research: 200
-    food: 60
-    gold: 30
+    food: 100
+    gold: 50
   prerequisiteResearchIds:
     - Garrison Command
     - Horde Tactics
@@ -324,8 +324,8 @@
   branch: dominion
   cost:
     research: 400
-    food: 120
-    gold: 60
+    food: 200
+    gold: 100
   prerequisiteResearchIds:
     - Supreme Command
     - Creature Synergy

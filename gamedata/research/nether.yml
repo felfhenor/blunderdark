@@ -26,7 +26,7 @@
   branch: nether
   cost:
     research: 25
-    essence: 5
+    essence: 10
   prerequisiteResearchIds:
     - Nether Attunement
   unlocks:
@@ -45,7 +45,7 @@
   branch: nether
   cost:
     research: 25
-    essence: 5
+    essence: 10
   prerequisiteResearchIds:
     - Nether Attunement
   unlocks:
@@ -62,7 +62,7 @@
   branch: nether
   cost:
     research: 25
-    corruption: 5
+    corruption: 10
   prerequisiteResearchIds:
     - Nether Attunement
   unlocks:
@@ -81,8 +81,8 @@
   branch: nether
   cost:
     research: 50
-    essence: 15
-    corruption: 5
+    essence: 25
+    corruption: 15
   prerequisiteResearchIds:
     - Shadow Magic
   unlocks:
@@ -103,7 +103,7 @@
   branch: nether
   cost:
     research: 50
-    corruption: 15
+    corruption: 25
   prerequisiteResearchIds:
     - Nether Channeling
   unlocks:
@@ -122,8 +122,8 @@
   branch: nether
   cost:
     research: 100
-    essence: 30
-    corruption: 15
+    essence: 50
+    corruption: 25
   prerequisiteResearchIds:
     - Shadow Magic
     - Corruption Control
@@ -141,8 +141,8 @@
   branch: nether
   cost:
     research: 100
-    essence: 30
-    corruption: 10
+    essence: 50
+    corruption: 20
   prerequisiteResearchIds:
     - Corruption Control
   unlocks:
@@ -157,8 +157,8 @@
   branch: nether
   cost:
     research: 100
-    corruption: 30
-    essence: 15
+    corruption: 50
+    essence: 25
   prerequisiteResearchIds:
     - Void Affinity
     - Corruption Control
@@ -178,8 +178,8 @@
   branch: nether
   cost:
     research: 200
-    essence: 60
-    corruption: 30
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Shadow Weaving
     - Nether Conduit
@@ -201,8 +201,8 @@
   branch: nether
   cost:
     research: 200
-    essence: 45
-    corruption: 20
+    essence: 75
+    corruption: 35
   prerequisiteResearchIds:
     - Purification Rites
   unlocks:
@@ -219,8 +219,8 @@
   branch: nether
   cost:
     research: 200
-    essence: 60
-    corruption: 30
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Purification Rites
   unlocks:
@@ -235,8 +235,8 @@
   branch: nether
   cost:
     research: 200
-    essence: 60
-    corruption: 30
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Shadow Weaving
     - Purification Rites
@@ -254,8 +254,8 @@
   branch: nether
   cost:
     research: 200
-    essence: 60
-    corruption: 30
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Abyssal Gateway
   unlocks:
@@ -270,8 +270,8 @@
   branch: nether
   cost:
     research: 400
-    corruption: 120
-    essence: 60
+    corruption: 200
+    essence: 100
   prerequisiteResearchIds:
     - Abyssal Gateway
     - Serpent's Gaze

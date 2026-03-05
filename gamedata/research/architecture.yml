@@ -30,7 +30,7 @@
   branch: architecture
   cost:
     research: 10
-    gold: 5
+    gold: 10
   prerequisiteResearchIds: []
   unlocks:
     - type: feature_flag
@@ -47,7 +47,7 @@
   branch: architecture
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Structural Mastery
   unlocks:
@@ -68,7 +68,7 @@
   branch: architecture
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Structural Mastery
   unlocks:
@@ -87,7 +87,7 @@
   branch: architecture
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Structural Mastery
   unlocks:
@@ -104,7 +104,7 @@
   branch: architecture
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Structural Mastery
   unlocks:
@@ -125,7 +125,7 @@
   branch: architecture
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Resource Room Design
   unlocks:
@@ -146,7 +146,7 @@
   branch: architecture
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Resource Room Design
   unlocks:
@@ -167,7 +167,7 @@
   branch: architecture
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Quarters & Arena Design
   unlocks:
@@ -184,7 +184,7 @@
   branch: architecture
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Scholarly Design
   unlocks:
@@ -207,8 +207,8 @@
   branch: architecture
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Deep Extraction
     - Sanctum Design
@@ -226,8 +226,8 @@
   branch: architecture
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Aquatic & Soul Engineering
     - Sanctum Design
@@ -245,8 +245,8 @@
   branch: architecture
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Combat Specialization
     - Scholarly Design
@@ -262,8 +262,8 @@
   branch: architecture
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Workshop Mastery
     - Quarters & Arena Design
@@ -283,8 +283,8 @@
   branch: architecture
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Deep Water & Financial Design
     - Resonant Design
@@ -302,8 +302,8 @@
   branch: architecture
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Deep Water & Financial Design
     - Resonant Design
@@ -321,8 +321,8 @@
   branch: architecture
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Advanced Combat Design
     - Arcane Facility Mastery
@@ -342,8 +342,8 @@
   branch: architecture
   cost:
     research: 400
-    gold: 120
-    crystals: 60
+    gold: 200
+    crystals: 100
   prerequisiteResearchIds:
     - Abyssal Waters
     - Altar Ascension

@@ -42,7 +42,7 @@
   branch: arcane
   cost:
     research: 25
-    flux: 5
+    flux: 10
   prerequisiteResearchIds:
     - Arcane Basics
   unlocks:
@@ -59,7 +59,7 @@
   branch: arcane
   cost:
     research: 25
-    flux: 5
+    flux: 10
   prerequisiteResearchIds:
     - Arcane Basics
   unlocks:
@@ -78,7 +78,7 @@
   branch: arcane
   cost:
     research: 25
-    flux: 5
+    flux: 10
   prerequisiteResearchIds:
     - Arcane Basics
   unlocks:
@@ -95,7 +95,7 @@
   branch: arcane
   cost:
     research: 50
-    flux: 15
+    flux: 25
   prerequisiteResearchIds:
     - Flux Manipulation
   unlocks:
@@ -112,7 +112,7 @@
   branch: arcane
   cost:
     research: 50
-    flux: 15
+    flux: 25
   prerequisiteResearchIds:
     - Ley Line Tapping
   unlocks:
@@ -129,7 +129,7 @@
   branch: arcane
   cost:
     research: 50
-    flux: 15
+    flux: 25
   prerequisiteResearchIds:
     - Enchantment
   unlocks:
@@ -148,7 +148,7 @@
   branch: arcane
   cost:
     research: 50
-    flux: 15
+    flux: 25
   prerequisiteResearchIds:
     - Enchantment
   unlocks:
@@ -169,8 +169,8 @@
   branch: arcane
   cost:
     research: 100
-    flux: 30
-    crystals: 15
+    flux: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Arcane Amplification
     - Enchantment
@@ -192,8 +192,8 @@
   branch: arcane
   cost:
     research: 100
-    flux: 30
-    crystals: 15
+    flux: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Elemental Binding
     - Ley Line Tapping
@@ -211,8 +211,8 @@
   branch: arcane
   cost:
     research: 100
-    flux: 30
-    crystals: 15
+    flux: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Warding
     - Arcane Amplification
@@ -234,8 +234,8 @@
   branch: arcane
   cost:
     research: 200
-    flux: 60
-    crystals: 30
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Dimensional Studies
     - Ley Line Mastery
@@ -253,8 +253,8 @@
   branch: arcane
   cost:
     research: 200
-    flux: 60
-    crystals: 30
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Spellweave Lattice
     - Dimensional Studies
@@ -272,8 +272,8 @@
   branch: arcane
   cost:
     research: 200
-    flux: 60
-    crystals: 30
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Arcane Convergence
     - Planar Nexus
@@ -285,12 +285,12 @@
 
 - id: 0c4358c0-e787-41d3-a989-c91263f67ccf
   name: Aberrant Summoning
-  description: Pierce the veil between dimensions to summon a beholder — an alien entity of vast intellect and devastating eye rays.
+  description: Pierce the veil between dimensions to summon a beholder -- an alien entity of vast intellect and devastating eye rays.
   branch: arcane
   cost:
     research: 200
-    flux: 60
-    crystals: 30
+    flux: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Planar Nexus
   unlocks:
@@ -307,8 +307,8 @@
   branch: arcane
   cost:
     research: 400
-    flux: 120
-    crystals: 60
+    flux: 200
+    crystals: 100
   prerequisiteResearchIds:
     - Arcane Convergence
     - Planar Nexus

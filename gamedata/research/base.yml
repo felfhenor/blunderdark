@@ -41,7 +41,7 @@
   description: Introduction to the fundamental principles of arcane magic and flux manipulation.
   branch: arcane
   cost:
-    crystals: 10
+    crystals: 20
   prerequisiteResearchIds: []
   unlocks:
     - type: room

@@ -25,7 +25,7 @@
   branch: dark
   cost:
     research: 25
-    essence: 5
+    essence: 10
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
   unlocks:
@@ -44,7 +44,7 @@
   branch: dark
   cost:
     research: 25
-    essence: 5
+    essence: 10
   prerequisiteResearchIds:
     - Dark Arts Fundamentals
   unlocks:
@@ -63,7 +63,7 @@
   branch: dark
   cost:
     research: 50
-    essence: 15
+    essence: 25
   prerequisiteResearchIds:
     - Necromancy
   unlocks:
@@ -82,7 +82,7 @@
   branch: dark
   cost:
     research: 50
-    essence: 15
+    essence: 25
   prerequisiteResearchIds:
     - Soul Manipulation
   unlocks:
@@ -99,7 +99,7 @@
   branch: dark
   cost:
     research: 50
-    essence: 15
+    essence: 25
   prerequisiteResearchIds:
     - Necromancy
   unlocks:
@@ -114,8 +114,8 @@
   branch: dark
   cost:
     research: 60
-    gold: 20
-    essence: 10
+    gold: 35
+    essence: 20
   prerequisiteResearchIds:
     - Necromancy
   unlocks:
@@ -133,8 +133,8 @@
   branch: dark
   cost:
     research: 100
-    essence: 30
-    corruption: 15
+    essence: 50
+    corruption: 25
   prerequisiteResearchIds:
     - Undead Mastery
     - Soul Well Mastery
@@ -154,7 +154,7 @@
   branch: dark
   cost:
     research: 100
-    essence: 30
+    essence: 50
   prerequisiteResearchIds:
     - Farplane Studies
   unlocks:
@@ -173,8 +173,8 @@
   branch: dark
   cost:
     research: 80
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Rune Extraction
   unlocks:
@@ -189,8 +189,8 @@
   branch: dark
   cost:
     research: 100
-    essence: 30
-    corruption: 15
+    essence: 50
+    corruption: 25
   prerequisiteResearchIds:
     - Soul Well Mastery
     - Undead Mastery
@@ -208,12 +208,12 @@
 
 - id: 2a744cf1-30fe-45d1-a135-dfe3ca596bea
   name: Necromantic Ascension
-  description: Achieve the pinnacle of necromantic power, enabling the binding of an ancient lich — an undead sorcerer of terrifying intellect.
+  description: Achieve the pinnacle of necromantic power, enabling the binding of an ancient lich -- an undead sorcerer of terrifying intellect.
   branch: dark
   cost:
     research: 200
-    essence: 60
-    corruption: 30
+    essence: 100
+    corruption: 50
   prerequisiteResearchIds:
     - Soul Forge
   unlocks:
@@ -228,7 +228,7 @@
   branch: dark
   cost:
     research: 150
-    essence: 45
+    essence: 75
   prerequisiteResearchIds:
     - Soul Binding
   unlocks:
@@ -249,8 +249,8 @@
   branch: dark
   cost:
     research: 400
-    essence: 120
-    corruption: 60
+    essence: 200
+    corruption: 100
   prerequisiteResearchIds:
     - Necromantic Ascension
     - Ethereal Resonance

@@ -30,7 +30,7 @@
   branch: engineering
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Basic Engineering
   unlocks:
@@ -47,7 +47,7 @@
   branch: engineering
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Basic Engineering
   unlocks:
@@ -64,7 +64,7 @@
   branch: engineering
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Basic Engineering
   unlocks:
@@ -81,7 +81,7 @@
   branch: engineering
   cost:
     research: 25
-    gold: 5
+    gold: 10
   prerequisiteResearchIds:
     - Basic Engineering
   unlocks:
@@ -98,7 +98,7 @@
   branch: engineering
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Advanced Construction
   unlocks:
@@ -114,7 +114,7 @@
   branch: engineering
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Advanced Construction
   unlocks:
@@ -133,7 +133,7 @@
   branch: engineering
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Trap Design
   unlocks:
@@ -154,7 +154,7 @@
   branch: engineering
   cost:
     research: 50
-    gold: 15
+    gold: 25
   prerequisiteResearchIds:
     - Advanced Manufacturing
   unlocks:
@@ -177,8 +177,8 @@
   branch: engineering
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Advanced Construction
   unlocks:
@@ -193,8 +193,8 @@
   branch: engineering
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Master Architecture
     - Trap Design
@@ -212,8 +212,8 @@
   branch: engineering
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Automated Defenses
     - Trap Design
@@ -231,8 +231,8 @@
   branch: engineering
   cost:
     research: 100
-    gold: 30
-    crystals: 15
+    gold: 50
+    crystals: 25
   prerequisiteResearchIds:
     - Dark Forge Mastery
     - Master Architecture
@@ -256,8 +256,8 @@
   branch: engineering
   cost:
     research: 175
-    gold: 50
-    crystals: 25
+    gold: 85
+    crystals: 40
   prerequisiteResearchIds:
     - Golem Assembly
   unlocks:
@@ -272,8 +272,8 @@
   branch: engineering
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Master Architecture
   unlocks:
@@ -289,8 +289,8 @@
   branch: engineering
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Siege Works
     - Mechanical Sentinels
@@ -308,8 +308,8 @@
   branch: engineering
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - Golem Assembly
     - Siege Works
@@ -329,8 +329,8 @@
   branch: engineering
   cost:
     research: 200
-    gold: 60
-    crystals: 30
+    gold: 100
+    crystals: 50
   prerequisiteResearchIds:
     - War Machines
     - Industrial Mastery
@@ -348,8 +348,8 @@
   branch: engineering
   cost:
     research: 400
-    gold: 120
-    crystals: 60
+    gold: 200
+    crystals: 100
   prerequisiteResearchIds:
     - War Machines
     - Industrial Mastery
