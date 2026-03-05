@@ -53,3 +53,27 @@
   effects:
     - effectType: aura_room_regen
       effectValue: 1
+
+- id: 3ebad40b-5a90-4a67-8ec7-ac5a2c541ed8
+  name: Vigilant Oversight
+  description: The Beholder's all-seeing gaze warns all dungeon inhabitants of danger, granting +10% Defense dungeon-wide.
+  effects:
+    - effectType: defense_multiplier
+      effectValue: 0.1
+      isDungeonWide: true
+
+- id: fc8e8848-96ea-49ed-b623-e474ab5b6a1c
+  name: Gorgon's Fury
+  description: The Medusa's terrifying presence emboldens all dungeon inhabitants to fight with savage ferocity, granting +10% Attack dungeon-wide.
+  effects:
+    - effectType: attack_multiplier
+      effectValue: 0.1
+      isDungeonWide: true
+
+- id: 0de9db28-de74-464a-9c7f-c456c510fc39
+  name: Nurturing Roots
+  description: The Ancient Treant's roots nurture all workers across the dungeon, granting +10% Worker Efficiency dungeon-wide.
+  effects:
+    - effectType: worker_efficiency_multiplier
+      effectValue: 0.1
+      isDungeonWide: true

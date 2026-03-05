@@ -23,7 +23,7 @@ export function efficiencyGetTraits(
   const result: EfficiencyTrait[] = [];
   for (const trait of def.traits) {
     for (const effect of trait.effects) {
-      if (effect.effectType === 'production_multiplier') {
+      if (effect.effectType === 'production_multiplier' || effect.effectType === 'room_versatility') {
         result.push({
           traitName: trait.name,
           effectValue: effect.effectValue,
@@ -58,13 +58,14 @@ export function efficiencyDoesTraitApply(
 export function efficiencyCalculateInhabitantContribution(
   instance: InhabitantInstance,
   roomProduction: RoomProduction,
+  roommates?: InhabitantInstance[],
 ): InhabitantContribution | undefined {
   const def = contentGetEntry<InhabitantContent>(
     instance.definitionId,
   );
   if (!def) return undefined;
 
-  const stats = effectiveStatsCalculate(def, instance);
+  const stats = effectiveStatsCalculate(def, instance, roommates);
   const workerEfficiencyBonus = stats.workerEfficiency;
 
   const traitBonuses: { traitName: string; bonus: number; applies: boolean }[] = [];
@@ -76,6 +77,12 @@ export function efficiencyCalculateInhabitantContribution(
           traitName: trait.name,
           bonus: effect.effectValue,
           applies,
+        });
+      } else if (effect.effectType === 'room_versatility') {
+        traitBonuses.push({
+          traitName: trait.name,
+          bonus: effect.effectValue,
+          applies: true,
         });
       }
     }
@@ -93,6 +100,12 @@ export function efficiencyCalculateInhabitantContribution(
             traitName: eqTrait.name,
             bonus: effect.effectValue,
             applies,
+          });
+        } else if (effect.effectType === 'room_versatility') {
+          traitBonuses.push({
+            traitName: eqTrait.name,
+            bonus: effect.effectValue,
+            applies: true,
           });
         }
       }
@@ -129,7 +142,7 @@ export function efficiencyCalculateRoom(
 
   const inhabitantBonuses: InhabitantContribution[] = [];
   for (const inst of assigned) {
-    const contribution = efficiencyCalculateInhabitantContribution(inst, roomProduction);
+    const contribution = efficiencyCalculateInhabitantContribution(inst, roomProduction, assigned);
     if (contribution) {
       inhabitantBonuses.push(contribution);
     }
@@ -173,7 +186,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
     );
     if (!def) continue;
 
-    const stats = effectiveStatsCalculate(def, inst);
+    const stats = effectiveStatsCalculate(def, inst, assigned);
     totalBonus += stats.workerEfficiency;
 
     for (const trait of def.traits) {
@@ -182,6 +195,8 @@ export function efficiencyCalculateMatchedInhabitantBonus(
           if (efficiencyDoesTraitApply(effect, roomProduction)) {
             totalBonus += effect.effectValue;
           }
+        } else if (effect.effectType === 'room_versatility') {
+          totalBonus += effect.effectValue;
         }
       }
     }
@@ -196,6 +211,8 @@ export function efficiencyCalculateMatchedInhabitantBonus(
             if (efficiencyDoesTraitApply(effect, roomProduction)) {
               totalBonus += effect.effectValue;
             }
+          } else if (effect.effectType === 'room_versatility') {
+            totalBonus += effect.effectValue;
           }
         }
       }

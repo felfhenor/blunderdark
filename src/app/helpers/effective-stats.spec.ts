@@ -345,4 +345,103 @@ describe('effectiveStatsCalculate', () => {
 
     mockContent.delete('et-harvest');
   });
+
+  it('should apply aura attack_multiplier from roommate definition traits', () => {
+    const auraDef = makeDef({
+      id: 'def-aura' as InhabitantId,
+      traits: [{
+        id: 'trait-fury' as InhabitantTraitId,
+        name: 'Draconic Fury',
+        __type: 'inhabitanttrait',
+        description: '',
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.15, isAura: true }],
+        fusionPassChance: 0,
+        isFromTraining: false,
+      }],
+    });
+    mockContent.set('def-aura', auraDef);
+
+    const def = makeDef();
+    const inst = makeInstance();
+    const roommate = makeInstance({
+      instanceId: 'inst-aura' as InhabitantInstanceId,
+      definitionId: 'def-aura' as InhabitantId,
+    });
+
+    const result = effectiveStatsCalculate(def, inst, [inst, roommate]);
+    // base 5 * 1.15 = 5.75 -> 6
+    expect(result.attack).toBe(6);
+
+    mockContent.delete('def-aura');
+  });
+
+  it('should not apply non-aura traits from roommates', () => {
+    const selfDef = makeDef({
+      id: 'def-self' as InhabitantId,
+      traits: [{
+        id: 'trait-strong' as InhabitantTraitId,
+        name: 'Strong',
+        __type: 'inhabitanttrait',
+        description: '',
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.5 }],
+        fusionPassChance: 0,
+        isFromTraining: false,
+      }],
+    });
+    mockContent.set('def-self', selfDef);
+
+    const def = makeDef();
+    const inst = makeInstance();
+    const roommate = makeInstance({
+      instanceId: 'inst-self' as InhabitantInstanceId,
+      definitionId: 'def-self' as InhabitantId,
+    });
+
+    const result = effectiveStatsCalculate(def, inst, [inst, roommate]);
+    // base 5 unchanged (roommate trait is not aura)
+    expect(result.attack).toBe(5);
+
+    mockContent.delete('def-self');
+  });
+
+  it('should apply aura worker_efficiency from roommate instance traits', () => {
+    mockContent.set('trait-taskmaster', {
+      id: 'trait-taskmaster',
+      name: 'Taskmaster',
+      __type: 'inhabitanttrait',
+      effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.1, isAura: true }],
+    });
+
+    const def = makeDef();
+    const inst = makeInstance();
+    const roommate = makeInstance({
+      instanceId: 'inst-rm' as InhabitantInstanceId,
+      instanceTraitIds: ['trait-taskmaster'],
+    });
+
+    const result = effectiveStatsCalculate(def, inst, [inst, roommate]);
+    // base 1.0 * 1.1 = 1.1
+    expect(result.workerEfficiency).toBe(1.1);
+
+    mockContent.delete('trait-taskmaster');
+  });
+
+  it('should apply aura to self when creature has its own aura trait', () => {
+    const auraDef = makeDef({
+      traits: [{
+        id: 'trait-fury' as InhabitantTraitId,
+        name: 'Rally Cry',
+        __type: 'inhabitanttrait',
+        description: '',
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.15, isAura: true }],
+        fusionPassChance: 0,
+        isFromTraining: false,
+      }],
+    });
+
+    const inst = makeInstance();
+    const result = effectiveStatsCalculate(auraDef, inst);
+    // base 5 * 1.15 = 5.75 -> 6 (self trait applies even without roommates)
+    expect(result.attack).toBe(6);
+  });
 });

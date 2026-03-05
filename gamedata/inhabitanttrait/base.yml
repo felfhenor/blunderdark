@@ -30,17 +30,18 @@
 
 - id: 65ebed0a-1c53-4c12-9a0b-29be8134bb51
   name: Adaptable
-  description: Can be assigned to any room type without penalty.
+  description: This creature is equally productive in any room, granting +15% production regardless of room type.
   effects:
-    - effectType: worker_efficiency_multiplier
-      effectValue: 0.1
+    - effectType: room_versatility
+      effectValue: 0.15
 
 - id: f09ea869-8705-4193-b917-e48a7f1d64f7
   name: Draconic Fury
-  description: This creature's presence drives all dungeon defenders into a battle frenzy, increasing attack power by 15%.
+  description: This creature's presence drives all allies in the room into a battle frenzy, increasing attack power by 15%.
   effects:
     - effectType: attack_multiplier
       effectValue: 0.15
+      isAura: true
 
 - id: 239c7292-eed6-4206-b931-776fc3cc1819
   name: Fire Breath
@@ -51,10 +52,10 @@
 
 - id: ca911967-8236-49a3-8cac-e60b5267b123
   name: Fearless
-  description: This creature's unshakable resolve grants +10% Defense.
+  description: This creature is immune to fear and can never become scared.
   effects:
-    - effectType: defense_multiplier
-      effectValue: 0.1
+    - effectType: fear_immunity
+      effectValue: 1
 
 - id: 4f8df10a-4c3a-4f26-b45c-01fcdf3ca800
   name: Scholarly
@@ -112,6 +113,7 @@
   effects:
     - effectType: aura_fear_multiplier
       effectValue: 0.25
+      isDungeonWide: true
 
 - id: a5010fb7-37ed-4698-8950-8269d80f1f02
   name: Dread Aura
@@ -119,6 +121,7 @@
   effects:
     - effectType: aura_fear_multiplier
       effectValue: 0.5
+      isDungeonWide: true
 
 - id: 0ec6bc83-4d3c-4b73-8f9b-9e952acaabcb
   name: Crushing Presence
@@ -126,6 +129,7 @@
   effects:
     - effectType: aura_fear_multiplier
       effectValue: 0.15
+      isDungeonWide: true
 
 - id: ecb71c53-b413-469e-82ab-87e0f46b7ab1
   name: Nature Affinity
@@ -145,10 +149,10 @@
 
 - id: a4af2314-d74f-4b4e-aebc-8e5a2aa532f4
   name: Regenerative
-  description: Regenerative ability grants +5% Defense.
+  description: Regenerative ability grants +5 Defense.
   effects:
-    - effectType: defense_multiplier
-      effectValue: 0.05
+    - effectType: defense_flat
+      effectValue: 5
 
 - id: 544a6d63-8f8a-49bf-b9b7-56dfb21990d5
   name: Stone Form
@@ -222,12 +226,13 @@
 
 - id: 2d6acb8d-bf56-4cac-be22-e9435493a7f1
   name: Terrifying
-  description: This creature's terrifying presence increases fear in the assigned room and grants +10% Attack.
+  description: This creature's terrifying presence increases fear in the assigned room by 2 and grants +5 Attack to all allies in the room.
   effects:
-    - effectType: attack_multiplier
-      effectValue: 0.1
+    - effectType: attack_flat
+      effectValue: 5
+      isAura: true
     - effectType: fear_flat
-      effectValue: 0.2
+      effectValue: 2
 
 - id: b4c7b56b-59ec-4686-a753-c450157ce750
   name: Intangible
@@ -246,10 +251,10 @@
 
 - id: 06b86f11-4426-45f1-931d-e6048080d700
   name: Inappetent
-  description: Requires minimal sustenance, granting +10% Worker Efficiency.
+  description: This creature does not need to eat and is immune to hunger.
   effects:
-    - effectType: worker_efficiency_multiplier
-      effectValue: 0.1
+    - effectType: hunger_immunity
+      effectValue: 1
 
 - id: 0a75910b-8135-41ca-98e5-91dd1088d07a
   name: Geological

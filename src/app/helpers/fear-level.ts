@@ -68,22 +68,22 @@ export function fearLevelCalculateInhabitantModifier(
 
     modifier += def.fearModifier ?? 0;
 
-    // Trait-based fear modifier (fear_flat effect type)
+    // Trait-based fear modifier (fear_flat effect type, room-local only)
     for (const trait of def.traits ?? []) {
       for (const effect of trait.effects) {
-        if (effect.effectType === 'fear_flat') {
+        if (effect.effectType === 'fear_flat' && !effect.isDungeonWide) {
           modifier += effect.effectValue;
         }
       }
     }
 
-    // Instance trait fear modifier
+    // Instance trait fear modifier (room-local only)
     if (inhabitant.instanceTraitIds) {
       for (const traitId of inhabitant.instanceTraitIds) {
         const traitDef = contentGetEntry<InhabitantTraitContent>(traitId);
         if (!traitDef) continue;
         for (const effect of traitDef.effects) {
-          if (effect.effectType === 'fear_flat') {
+          if (effect.effectType === 'fear_flat' && !effect.isDungeonWide) {
             modifier += effect.effectValue;
           }
         }
@@ -312,10 +312,32 @@ export function fearLevelGetForRoom(
     baseFear *= 1 + equipFearBonus;
   }
 
+  // Dungeon-wide fear_flat bonuses (from traits with isDungeonWide)
+  let dungeonWideFearFlat = 0;
+  for (const inhabitant of allInhabitants) {
+    const inhDef = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
+    for (const trait of inhDef?.traits ?? []) {
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'fear_flat' && effect.isDungeonWide) {
+          dungeonWideFearFlat += effect.effectValue;
+        }
+      }
+    }
+    for (const traitId of inhabitant.instanceTraitIds ?? []) {
+      const traitDef = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!traitDef) continue;
+      for (const effect of traitDef.effects) {
+        if (effect.effectType === 'fear_flat' && effect.isDungeonWide) {
+          dungeonWideFearFlat += effect.effectValue;
+        }
+      }
+    }
+  }
+
   const inhabitantModifier = fearLevelCalculateInhabitantModifier(
     placedRoom.id,
     floor.inhabitants,
-  );
+  ) + dungeonWideFearFlat;
 
   const upgradeAdjustment = fearLevelCalculateUpgradeAdjustment(placedRoom);
 

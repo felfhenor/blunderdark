@@ -21,13 +21,18 @@ export type TraitEffectType =
   | 'aura_food_bonus'
   | 'aura_gathering_bonus'
   | 'aura_room_regen'
-  | 'undead_master';
+  | 'undead_master'
+  | 'fear_immunity'
+  | 'hunger_immunity'
+  | 'room_versatility';
 
 export type TraitEffect = {
   effectType: TraitEffectType;
   effectValue: number;
   targetResourceType?: ResourceType | 'all';
   targetRoomId?: string;
+  isAura?: boolean;
+  isDungeonWide?: boolean;
 };
 
 export type InhabitantTraitContent = IsContentItem &

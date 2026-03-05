@@ -1,21 +1,50 @@
 import { contentGetEntry } from '@helpers/content';
 import { lichGetUndeadMasterBonusForInstance } from '@helpers/lich';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
+import { gamestate } from '@helpers/state-game';
 import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type { InhabitantStats } from '@interfaces/inhabitant';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { InhabitantTraitContent } from '@interfaces/content-inhabitanttrait';
+import type { InhabitantTraitContent, TraitEffect } from '@interfaces/content-inhabitanttrait';
 import type { InhabitantInstance } from '@interfaces/inhabitant';
 import type { MutationTraitContent } from '@interfaces/content-mutationtrait';
 
+function applyStatEffect(
+  effect: TraitEffect,
+  attack: number,
+  defense: number,
+  workerEfficiency: number,
+): { attack: number; defense: number; workerEfficiency: number } {
+  switch (effect.effectType) {
+    case 'attack_multiplier':
+      attack *= 1 + effect.effectValue;
+      break;
+    case 'defense_multiplier':
+      defense *= 1 + effect.effectValue;
+      break;
+    case 'attack_flat':
+      attack += effect.effectValue;
+      break;
+    case 'defense_flat':
+      defense += effect.effectValue;
+      break;
+    case 'worker_efficiency_multiplier':
+      workerEfficiency *= 1 + effect.effectValue;
+      break;
+  }
+  return { attack, defense, workerEfficiency };
+}
+
 /**
  * Compute effective stats for an inhabitant:
- * base stats + instanceStatBonuses + mutation trait bonuses + instance trait bonuses.
+ * base stats + instanceStatBonuses + mutation trait bonuses + instance trait bonuses + roommate auras.
+ * Pass roommates (other inhabitants in the same room) to include their isAura trait effects.
  * Clamps: hp >= 1, attack >= 0, defense >= 0, speed >= 1, workerEfficiency >= 0.1
  */
 export function effectiveStatsCalculate(
   definition: InhabitantContent,
   instance: InhabitantInstance,
+  roommates?: InhabitantInstance[],
 ): InhabitantStats {
   const base = definition.stats;
 
@@ -145,6 +174,74 @@ export function effectiveStatsCalculate(
     defense += instance.equippedStatBonuses.defense ?? 0;
     speed += instance.equippedStatBonuses.speed ?? 0;
     workerEfficiency += instance.equippedStatBonuses.workerEfficiency ?? 0;
+  }
+
+  // Roommate aura bonuses (isAura traits from other inhabitants in the same room)
+  if (roommates) {
+    for (const roommate of roommates) {
+      if (roommate.instanceId === instance.instanceId) continue;
+
+      // Definition aura traits
+      const rmDef = contentGetEntry<InhabitantContent>(roommate.definitionId);
+      for (const trait of rmDef?.traits ?? []) {
+        for (const effect of trait.effects) {
+          if (!effect.isAura) continue;
+          ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+        }
+      }
+
+      // Instance aura traits
+      for (const traitId of roommate.instanceTraitIds ?? []) {
+        const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+        if (!trait) continue;
+        for (const effect of trait.effects) {
+          if (!effect.isAura) continue;
+          ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+        }
+      }
+
+      // Equipped aura traits
+      for (const traitId of roommate.equippedTraitIds ?? []) {
+        const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+        if (!trait) continue;
+        for (const effect of trait.effects) {
+          if (!effect.isAura) continue;
+          ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+        }
+      }
+    }
+  }
+
+  // Dungeon-wide stat bonuses (isDungeonWide traits from all inhabitants)
+  const allInhabitants = gamestate()?.world?.inhabitants ?? [];
+  for (const other of allInhabitants) {
+    if (other.instanceId === instance.instanceId) continue;
+
+    const otherDef = contentGetEntry<InhabitantContent>(other.definitionId);
+    for (const trait of otherDef?.traits ?? []) {
+      for (const effect of trait.effects) {
+        if (!effect.isDungeonWide) continue;
+        ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+      }
+    }
+
+    for (const traitId of other.instanceTraitIds ?? []) {
+      const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!trait) continue;
+      for (const effect of trait.effects) {
+        if (!effect.isDungeonWide) continue;
+        ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+      }
+    }
+
+    for (const traitId of other.equippedTraitIds ?? []) {
+      const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!trait) continue;
+      for (const effect of trait.effects) {
+        if (!effect.isDungeonWide) continue;
+        ({ attack, defense, workerEfficiency } = applyStatEffect(effect, attack, defense, workerEfficiency));
+      }
+    }
   }
 
   // Research passive bonuses

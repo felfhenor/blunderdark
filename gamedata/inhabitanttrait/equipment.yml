@@ -32,6 +32,7 @@
   effects:
     - effectType: aura_fear_multiplier
       effectValue: 0.1
+      isDungeonWide: true
   fusionPassChance: 0
   isFromTraining: false
 

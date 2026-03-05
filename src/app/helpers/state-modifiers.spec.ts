@@ -4,6 +4,7 @@ import type {
   InhabitantInstance,
   InhabitantInstanceId,
   InhabitantState,
+  InhabitantTraitId,
   StateModifier,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -115,6 +116,40 @@ describe('stateModifierIsInhabitantScared', () => {
     const inhabitant = makeInhabitant({ definitionId: 'skeleton' as InhabitantId });
     expect(stateModifierIsInhabitantScared(inhabitant, 4)).toBe(false);
     expect(stateModifierIsInhabitantScared(inhabitant, 5)).toBe(true);
+  });
+
+  it('should never be scared when definition has fear_immunity trait', () => {
+    registerDef('dragon', {
+      fearTolerance: 0,
+      traits: [
+        {
+          id: 'fearless-trait' as InhabitantTraitId,
+          name: 'Fearless',
+          __type: 'inhabitanttrait',
+          description: '',
+          effects: [{ effectType: 'fear_immunity', effectValue: 1 }],
+          fusionPassChance: 0,
+          isFromTraining: false,
+        },
+      ],
+    });
+    const inhabitant = makeInhabitant({ definitionId: 'dragon' as InhabitantId });
+    expect(stateModifierIsInhabitantScared(inhabitant, 100)).toBe(false);
+  });
+
+  it('should never be scared when instance has fear_immunity trait', () => {
+    registerDef('goblin', { fearTolerance: 0 });
+    mockEntries.set('fearless-instance-trait', {
+      id: 'fearless-instance-trait',
+      name: 'Fearless',
+      __type: 'inhabitanttrait',
+      effects: [{ effectType: 'fear_immunity', effectValue: 1 }],
+    });
+    const inhabitant = makeInhabitant({
+      definitionId: 'goblin' as InhabitantId,
+      instanceTraitIds: ['fearless-instance-trait' as InhabitantTraitId],
+    });
+    expect(stateModifierIsInhabitantScared(inhabitant, 100)).toBe(false);
   });
 });
 

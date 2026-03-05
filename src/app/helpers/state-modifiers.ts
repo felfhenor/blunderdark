@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { inhabitantHasTraitEffect } from '@helpers/inhabitants';
 import {
   LEGENDARY_DISCONTENTED_ATTACK_MULTIPLIER,
   LEGENDARY_DISCONTENTED_DEFENSE_MULTIPLIER,
@@ -53,6 +54,10 @@ export function stateModifierIsInhabitantScared(
   inhabitant: InhabitantInstance,
   roomFearLevel: number,
 ): boolean {
+  if (inhabitantHasTraitEffect(inhabitant, 'fear_immunity')) {
+    return false;
+  }
+
   const def = contentGetEntry<InhabitantContent>(
     inhabitant.definitionId,
   );

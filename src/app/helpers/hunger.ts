@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { inhabitantHasTraitEffect } from '@helpers/inhabitants';
 import { stateModifierGetFoodConsumptionMultiplier } from '@helpers/state-modifiers';
 import type {
   GameState,
@@ -64,6 +65,13 @@ export function hungerIsInappetent(foodConsumptionRate: number): boolean {
 }
 
 /**
+ * Check if an inhabitant has hunger immunity via traits.
+ */
+export function hungerIsImmune(inhabitant: InhabitantInstance): boolean {
+  return inhabitantHasTraitEffect(inhabitant, 'hunger_immunity');
+}
+
+/**
  * Get the food consumption rate for an inhabitant definition.
  * Returns 0 if not defined (inappetent).
  */
@@ -86,6 +94,7 @@ export function hungerCalculateTotalConsumption(
   for (const inhabitant of inhabitants) {
     const rate = hungerGetConsumptionRate(inhabitant.definitionId);
     if (rate <= 0) continue;
+    if (hungerIsImmune(inhabitant)) continue;
 
     const consumptionMultiplier =
       stateModifierGetFoodConsumptionMultiplier(inhabitant);
@@ -145,8 +154,8 @@ function hungerUpdateInhabitant(
 ): void {
   const rate = hungerGetConsumptionRate(inhabitant.definitionId);
 
-  // Inappetent: always normal
-  if (hungerIsInappetent(rate)) {
+  // Inappetent or hunger-immune: always normal
+  if (hungerIsInappetent(rate) || hungerIsImmune(inhabitant)) {
     if (inhabitant.state === 'hungry' || inhabitant.state === 'starving') {
       inhabitant.state = 'normal';
     }

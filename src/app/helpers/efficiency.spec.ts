@@ -129,7 +129,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-slime-adaptable',
         name: 'Adaptable',
         description: '',
-        effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.1 }],
+        effects: [{ effectType: 'room_versatility', effectValue: 0.15 }],
       },
     ],
   });
@@ -237,10 +237,12 @@ describe('efficiencyGetTraits', () => {
     expect(traits).toHaveLength(0);
   });
 
-  it('should return empty for versatility traits', () => {
+  it('should return room_versatility trait as production-affecting', () => {
     const def = getDef('def-slime');
     const traits = efficiencyGetTraits(def);
-    expect(traits).toHaveLength(0);
+    expect(traits).toHaveLength(1);
+    expect(traits[0].traitName).toBe('Adaptable');
+    expect(traits[0].effectValue).toBe(0.15);
   });
 
   it('should return trait with "all" targetResourceType', () => {

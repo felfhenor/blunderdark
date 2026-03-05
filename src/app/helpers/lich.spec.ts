@@ -101,7 +101,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-lich-fearless',
         name: 'Fearless',
         description: '',
-        effects: [{ effectType: 'defense_multiplier', effectValue: 1 }],
+        effects: [{ effectType: 'fear_immunity', effectValue: 1 }],
       },
       {
         id: 'trait-lich-ancient-knowledge',
@@ -272,7 +272,6 @@ vi.mock('@helpers/room-shapes', () => ({
 
 import {
   lichCalculateUndeadMasterBonuses,
-  lichGetUndeadMasterBonusForInstance,
   lichHasUndeadMasterTrait,
 } from '@helpers/lich';
 import { productionCalculateInhabitantBonus } from '@helpers/production';
@@ -409,7 +408,7 @@ describe('Lich Fearless trait: never scared', () => {
   it('should have fear_immunity trait in definition', () => {
     const def = getLichDef();
     const hasFearImmunity = def.traits.some(
-      (t) => t.effects.some((e) => e.effectType === 'defense_multiplier'),
+      (t) => t.effects.some((e) => e.effectType === 'fear_immunity'),
     );
     expect(hasFearImmunity).toBe(true);
   });

@@ -832,7 +832,7 @@ export function invasionProcess(state: GameState): void {
       const defenderCombatants = roomDefenders.map((def, idx) => {
         const defContent = contentGetEntry<InhabitantContent>(def.definitionId);
         const stats = defContent
-          ? effectiveStatsCalculate(defContent, def)
+          ? effectiveStatsCalculate(defContent, def, roomDefenders)
           : { hp: 10, attack: 5, defense: 5, speed: 5, workerEfficiency: 1 };
 
         // Apply state modifier penalties (scared/hungry/starving fight worse)

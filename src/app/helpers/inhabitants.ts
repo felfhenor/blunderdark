@@ -21,7 +21,32 @@ import type {
   InhabitantContent,
   InhabitantRestrictionTag,
 } from '@interfaces/content-inhabitant';
+import type { InhabitantTraitContent, TraitEffectType } from '@interfaces/content-inhabitanttrait';
 import type { RoomContent } from '@interfaces/content-room';
+
+/**
+ * Check if an inhabitant has any trait (definition or instance) with the given effect type.
+ */
+export function inhabitantHasTraitEffect(
+  inhabitant: InhabitantInstance,
+  effectType: TraitEffectType,
+): boolean {
+  const def = contentGetEntry<InhabitantContent>(inhabitant.definitionId);
+  if (def?.traits?.some((t) => t.effects.some((e) => e.effectType === effectType))) {
+    return true;
+  }
+
+  if (inhabitant.instanceTraitIds) {
+    for (const traitId of inhabitant.instanceTraitIds) {
+      const traitDef = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (traitDef?.effects.some((e) => e.effectType === effectType)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 /**
  * Sync world.inhabitants into each floor's inhabitants array.

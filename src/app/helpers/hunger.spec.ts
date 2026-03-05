@@ -61,6 +61,7 @@ function makeInhabitant(overrides: Partial<InhabitantInstance> = {}): Inhabitant
     state: overrides.state ?? 'normal',
     assignedRoomId: overrides.assignedRoomId ?? undefined,
     hungerTicksWithoutFood: overrides.hungerTicksWithoutFood ?? 0,
+    instanceTraitIds: overrides.instanceTraitIds ?? undefined,
   };
 }
 
@@ -488,6 +489,65 @@ describe('hungerProcess', () => {
 
       expect(skeleton.state).toBe('normal');
       expect(skeleton.hungerTicksWithoutFood).toBe(0);
+    });
+  });
+
+  describe('hunger_immunity trait', () => {
+    it('should not consume food for inhabitants with hunger_immunity definition trait', () => {
+      mockContent.set('def-immune', {
+        id: 'def-immune',
+        name: 'Immune Creature',
+        __type: 'inhabitant',
+        foodConsumptionRate: 5,
+        traits: [{ effects: [{ effectType: 'hunger_immunity', effectValue: 1 }] }],
+      });
+      const immune = makeInhabitant({ definitionId: 'def-immune' as InhabitantId });
+      const state = makeGameState({ inhabitants: [immune], foodCurrent: 100 });
+
+      hungerProcess(state);
+
+      expect(state.world.resources.food.current).toBe(100);
+      expect(immune.state).toBe('normal');
+    });
+
+    it('should not consume food for inhabitants with hunger_immunity instance trait', () => {
+      mockContent.set('trait-inappetent', {
+        id: 'trait-inappetent',
+        name: 'Inappetent',
+        __type: 'inhabitanttrait',
+        effects: [{ effectType: 'hunger_immunity', effectValue: 1 }],
+      });
+      const creature = makeInhabitant({
+        definitionId: 'def-goblin' as InhabitantId,
+        instanceTraitIds: ['trait-inappetent'],
+      });
+      const state = makeGameState({ inhabitants: [creature], foodCurrent: 100 });
+
+      hungerProcess(state);
+
+      expect(state.world.resources.food.current).toBe(100);
+      expect(creature.state).toBe('normal');
+    });
+
+    it('should reset hungry state for hunger-immune inhabitant', () => {
+      mockContent.set('def-immune', {
+        id: 'def-immune',
+        name: 'Immune Creature',
+        __type: 'inhabitant',
+        foodConsumptionRate: 5,
+        traits: [{ effects: [{ effectType: 'hunger_immunity', effectValue: 1 }] }],
+      });
+      const immune = makeInhabitant({
+        definitionId: 'def-immune' as InhabitantId,
+        state: 'hungry',
+        hungerTicksWithoutFood: 300,
+      });
+      const state = makeGameState({ inhabitants: [immune], foodCurrent: 0 });
+
+      hungerProcess(state);
+
+      expect(immune.state).toBe('normal');
+      expect(immune.hungerTicksWithoutFood).toBe(0);
     });
   });
 

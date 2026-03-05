@@ -17,6 +17,7 @@
     - Trap Mastery
     - Antimagic Gaze
     - All-Seeing
+    - Vigilant Oversight
     - Fearless
   restrictionTags:
     - unique
@@ -81,6 +82,7 @@
   inhabitantTraitIds:
     - Petrifying Presence
     - Dread Gaze
+    - Gorgon's Fury
     - Fearless
   restrictionTags:
     - unique
@@ -147,6 +149,7 @@
     - Bountiful Roots
     - Nature's Bounty
     - Living Walls
+    - Nurturing Roots
     - Fearless
   restrictionTags:
     - unique
