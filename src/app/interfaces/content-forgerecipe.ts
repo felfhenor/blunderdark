@@ -11,5 +11,6 @@ export type ForgeRecipeContent = IsContentItem &
     cost: Partial<Record<ResourceType, number>>;
     timeMultiplier: number;
     statBonuses: Partial<InhabitantStats>;
-    tier: 'basic' | 'advanced';
+    tier: 'basic' | 'advanced' | 'masterwork';
+    grantedTraitIds?: string[];
   };

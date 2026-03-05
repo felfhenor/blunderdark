@@ -240,6 +240,17 @@ export class InhabitantCardComponent {
     return reasons.length > 0 ? reasons : undefined;
   });
 
+  public equippedTraits = computed(() => {
+    const ids = this.instance().equippedTraitIds;
+    if (!ids || ids.length === 0) return [];
+    const traits: InhabitantTraitContent[] = [];
+    for (const id of ids) {
+      const trait = contentGetEntry<InhabitantTraitContent>(id);
+      if (trait) traits.push(trait);
+    }
+    return traits;
+  });
+
   public equippedItemName = computed(() => {
     const recipeId = this.instance().equippedForgeItemRecipeId;
     if (!recipeId) return undefined;

@@ -5,6 +5,7 @@ import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
+  InhabitantTraitContent,
   PlacedRoom,
   PlacedRoomId,
   RoomProduction,
@@ -76,6 +77,24 @@ export function efficiencyCalculateInhabitantContribution(
           bonus: effect.effectValue,
           applies,
         });
+      }
+    }
+  }
+
+  // Equipped trait production bonuses (from masterwork forge items)
+  if (instance.equippedTraitIds) {
+    for (const traitId of instance.equippedTraitIds) {
+      const eqTrait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!eqTrait) continue;
+      for (const effect of eqTrait.effects) {
+        if (effect.effectType === 'production_multiplier') {
+          const applies = efficiencyDoesTraitApply(effect, roomProduction);
+          traitBonuses.push({
+            traitName: eqTrait.name,
+            bonus: effect.effectValue,
+            applies,
+          });
+        }
       }
     }
   }
@@ -162,6 +181,21 @@ export function efficiencyCalculateMatchedInhabitantBonus(
         if (effect.effectType === 'production_multiplier') {
           if (efficiencyDoesTraitApply(effect, roomProduction)) {
             totalBonus += effect.effectValue;
+          }
+        }
+      }
+    }
+
+    // Equipped trait production bonuses (from masterwork forge items)
+    if (inst.equippedTraitIds) {
+      for (const traitId of inst.equippedTraitIds) {
+        const eqTrait = contentGetEntry<InhabitantTraitContent>(traitId);
+        if (!eqTrait) continue;
+        for (const effect of eqTrait.effects) {
+          if (effect.effectType === 'production_multiplier') {
+            if (efficiencyDoesTraitApply(effect, roomProduction)) {
+              totalBonus += effect.effectValue;
+            }
           }
         }
       }

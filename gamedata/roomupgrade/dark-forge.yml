@@ -48,3 +48,13 @@
       resource: corruption
     - type: fearIncrease
       value: 1
+- id: e18b89a4-1bd6-4efd-8885-9c64c1e7e0e2
+  name: Runic Anvil
+  description: Inscribe ancient runes into the forge, unlocking masterwork recipes that imbue equipment with magical traits.
+  cost:
+    gold: 250
+    essence: 80
+    flux: 60
+  effects:
+    - type: forgingTierUnlock
+      value: 2

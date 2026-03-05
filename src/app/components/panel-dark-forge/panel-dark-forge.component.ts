@@ -26,16 +26,18 @@ import type {
   ForgeRecipeContent,
   ForgeRecipeId,
   InhabitantStats,
+  InhabitantTraitContent,
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostListComponent, CraftingQueueDisplayComponent, InhabitantCardComponent, SFXDirective],
+  imports: [DecimalPipe, CurrencyCostListComponent, CraftingQueueDisplayComponent, InhabitantCardComponent, SFXDirective, TippyDirective],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -162,10 +164,21 @@ export class PanelDarkForgeComponent {
         name: recipe?.name ?? 'Unknown',
         count: entry.count,
         bakedStatBonuses: entry.bakedStatBonuses,
+        grantedTraitIds: entry.grantedTraitIds,
       };
     });
     return sortBy(entries, [(e) => e.name]);
   });
+
+  public lookupTraits(traitIds: string[] | undefined): InhabitantTraitContent[] {
+    if (!traitIds || traitIds.length === 0) return [];
+    const traits: InhabitantTraitContent[] = [];
+    for (const id of traitIds) {
+      const trait = contentGetEntry<InhabitantTraitContent>(id);
+      if (trait) traits.push(trait);
+    }
+    return traits;
+  }
 
   public formatStatBonuses(bonuses: Partial<InhabitantStats>): string {
     return Object.entries(bonuses)

@@ -42,11 +42,17 @@ export function darkForgeGetAvailableRecipes(
   const recipes = contentGetEntriesByType<ForgeRecipeContent>('forgerecipe');
 
   const effects = roomUpgradeGetAppliedEffects(room);
-  const hasInfernalForge = effects.some((e) => e.type === 'forgingTierUnlock');
+  let maxTierUnlock = 0;
+  for (const e of effects) {
+    if (e.type === 'forgingTierUnlock' && e.value > maxTierUnlock) {
+      maxTierUnlock = e.value;
+    }
+  }
 
   return recipes.filter((r) => {
     if (r.tier === 'basic') return true;
-    if (r.tier === 'advanced' && hasInfernalForge) return true;
+    if (r.tier === 'advanced' && maxTierUnlock >= 1) return true;
+    if (r.tier === 'masterwork' && maxTierUnlock >= 2) return true;
     return false;
   });
 }
@@ -199,6 +205,7 @@ export function darkForgeAddToInventory(
   recipeId: ForgeRecipeId,
   bakedStatBonuses: Partial<InhabitantStats>,
   count = 1,
+  grantedTraitIds?: string[],
 ): ForgeInventoryEntry[] {
   const updated = [...inventory];
   const existing = updated.find(
@@ -207,7 +214,11 @@ export function darkForgeAddToInventory(
   if (existing) {
     existing.count += count;
   } else {
-    updated.push({ recipeId, count, bakedStatBonuses });
+    const entry: ForgeInventoryEntry = { recipeId, count, bakedStatBonuses };
+    if (grantedTraitIds && grantedTraitIds.length > 0) {
+      entry.grantedTraitIds = grantedTraitIds;
+    }
+    updated.push(entry);
   }
   return updated;
 }
@@ -261,6 +272,9 @@ export function darkForgeAutoEquip(
     const best = sorted[bestIdx];
     inhabitant.equippedForgeItemRecipeId = best.entry.recipeId;
     inhabitant.equippedStatBonuses = { ...best.entry.bakedStatBonuses };
+    inhabitant.equippedTraitIds = best.entry.grantedTraitIds?.length
+      ? [...best.entry.grantedTraitIds]
+      : undefined;
 
     // Sync to world inhabitants if floor/world have separate object references
     const worldInst = state.world.inhabitants.find(
@@ -269,6 +283,7 @@ export function darkForgeAutoEquip(
     if (worldInst && worldInst !== inhabitant) {
       worldInst.equippedForgeItemRecipeId = inhabitant.equippedForgeItemRecipeId;
       worldInst.equippedStatBonuses = inhabitant.equippedStatBonuses;
+      worldInst.equippedTraitIds = inhabitant.equippedTraitIds;
     }
 
     best.entry.count -= 1;
@@ -379,6 +394,8 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
           state.world.forgeInventory,
           job.recipeId,
           bakedBonuses,
+          1,
+          recipe?.grantedTraitIds,
         );
 
         room.forgeJobs.shift();

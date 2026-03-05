@@ -159,6 +159,26 @@ vi.mock('@helpers/content', () => {
     ],
   });
 
+  // Equipment trait for testing
+  entries.set('eq-trait-research', {
+    id: 'eq-trait-research',
+    name: 'Shadow Study',
+    __type: 'inhabitanttrait',
+    description: '',
+    effects: [{ effectType: 'production_multiplier', effectValue: 0.2, targetResourceType: 'crystals' }],
+    fusionPassChance: 0,
+    isFromTraining: false,
+  });
+  entries.set('eq-trait-all', {
+    id: 'eq-trait-all',
+    name: 'Harvest Enchantment',
+    __type: 'inhabitanttrait',
+    description: '',
+    effects: [{ effectType: 'production_multiplier', effectValue: 0.1, targetResourceType: 'all' }],
+    fusionPassChance: 0,
+    isFromTraining: false,
+  });
+
   return {
     contentGetEntry: vi.fn((id: string) => entries.get(id)),
     contentGetEntriesByType: vi.fn(() => []),
@@ -384,6 +404,44 @@ describe('efficiencyCalculateInhabitantContribution', () => {
     );
     expect(resultFood!.traitBonuses[0].applies).toBe(true);
     expect(resultFood!.totalBonus).toBeCloseTo(1.1);
+  });
+
+  it('should apply production_multiplier from equippedTraitIds matching room resource', () => {
+    const instance: InhabitantInstance = {
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-skeleton' as InhabitantId,
+      name: 'Skeleton',
+      state: 'normal',
+      assignedRoomId: 'room-1' as PlacedRoomId,
+      equippedTraitIds: ['eq-trait-research'],
+    };
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      crystalProduction,
+    );
+    expect(result).toBeDefined();
+    // Skeleton: workerEff 0.7, no def traits, equipment trait +0.2 crystals applies
+    expect(result!.traitBonuses).toHaveLength(1);
+    expect(result!.traitBonuses[0].applies).toBe(true);
+    expect(result!.totalBonus).toBeCloseTo(0.9);
+  });
+
+  it('should apply "all" equipped trait production_multiplier to any room', () => {
+    const instance: InhabitantInstance = {
+      instanceId: 'inst-1' as InhabitantInstanceId,
+      definitionId: 'def-skeleton' as InhabitantId,
+      name: 'Skeleton',
+      state: 'normal',
+      assignedRoomId: 'room-1' as PlacedRoomId,
+      equippedTraitIds: ['eq-trait-all'],
+    };
+    const result = efficiencyCalculateInhabitantContribution(
+      instance,
+      foodProduction,
+    );
+    expect(result).toBeDefined();
+    // Skeleton: workerEff 0.7, equipment +0.1 all applies
+    expect(result!.totalBonus).toBeCloseTo(0.8);
   });
 });
 
@@ -646,6 +704,26 @@ describe('efficiencyCalculateMatchedInhabitantBonus', () => {
     );
     // workerEff 1.0 + 0.1 (all) = 1.1
     expect(result.bonus).toBeCloseTo(1.1);
+    expect(result.hasWorkers).toBe(true);
+  });
+
+  it('should include equipped trait production_multiplier in matched bonus', () => {
+    const inhabitants: InhabitantInstance[] = [
+      {
+        instanceId: 'inst-1' as InhabitantInstanceId,
+        definitionId: 'def-skeleton' as InhabitantId,
+        name: 'Skeleton',
+        state: 'normal',
+        assignedRoomId: 'placed-mine-1' as PlacedRoomId,
+        equippedTraitIds: ['eq-trait-research'],
+      },
+    ];
+    const result = efficiencyCalculateMatchedInhabitantBonus(
+      crystalMine,
+      inhabitants,
+    );
+    // Skeleton: workerEff 0.7 + equipped trait 0.2 (crystals match) = 0.9
+    expect(result.bonus).toBeCloseTo(0.9);
     expect(result.hasWorkers).toBe(true);
   });
 });

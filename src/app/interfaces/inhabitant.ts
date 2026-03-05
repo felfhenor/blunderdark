@@ -60,6 +60,7 @@ export type InhabitantInstance = {
   equippedRuneId?: TraitRuneInstanceId;
   equippedForgeItemRecipeId?: ForgeRecipeId;
   equippedStatBonuses?: Partial<InhabitantStats>;
+  equippedTraitIds?: string[];
 
   abilityStates?: AbilityState[];
   statusEffects?: StatusEffect[];

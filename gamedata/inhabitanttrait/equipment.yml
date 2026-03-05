@@ -1,0 +1,46 @@
+- id: 4dfdfe01-c664-47c6-a657-f5011b8d9762
+  name: Fury Enchantment
+  description: A magical enchantment that amplifies attack power by 15%.
+  effects:
+    - effectType: attack_multiplier
+      effectValue: 0.15
+  fusionPassChance: 0
+  isFromTraining: false
+
+- id: e5bb32ea-6b50-466c-b8d8-c0112a4e7b6b
+  name: Sentinel Enchantment
+  description: A magical enchantment that bolsters defense by 10%.
+  effects:
+    - effectType: defense_multiplier
+      effectValue: 0.1
+  fusionPassChance: 0
+  isFromTraining: false
+
+- id: a05a08dd-38e8-483d-8e92-91e621176931
+  name: Shadow Study
+  description: Dark knowledge that increases research production by 20%.
+  effects:
+    - effectType: production_multiplier
+      effectValue: 0.2
+      targetResourceType: research
+  fusionPassChance: 0
+  isFromTraining: false
+
+- id: c5772ca7-6504-453a-bdec-26ec8f17fc38
+  name: Dread Enchantment
+  description: An aura of dread that increases fear output by 10%.
+  effects:
+    - effectType: aura_fear_multiplier
+      effectValue: 0.1
+  fusionPassChance: 0
+  isFromTraining: false
+
+- id: 99e6c974-0799-4208-9916-932f077693ba
+  name: Harvest Enchantment
+  description: An attunement to resource flows that increases all production by 10%.
+  effects:
+    - effectType: production_multiplier
+      effectValue: 0.1
+      targetResourceType: all
+  fusionPassChance: 0
+  isFromTraining: false

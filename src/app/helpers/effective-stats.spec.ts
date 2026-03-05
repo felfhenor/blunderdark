@@ -282,4 +282,67 @@ describe('effectiveStatsCalculate', () => {
 
     mockContent.delete('mt-eff');
   });
+
+  it('should apply attack_multiplier from equippedTraitIds', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'et-fury' as InhabitantTraitId,
+      name: 'Fury Enchantment',
+      __type: 'inhabitanttrait',
+      description: '',
+      effects: [{ effectType: 'attack_multiplier', effectValue: 0.15 }],
+      fusionPassChance: 0,
+      isFromTraining: false,
+    };
+    mockContent.set('et-fury', trait);
+
+    const def = makeDef();
+    const inst = makeInstance({ equippedTraitIds: ['et-fury'] });
+    const result = effectiveStatsCalculate(def, inst);
+    // base attack 5 * 1.15 = 5.75 -> rounded to 6
+    expect(result.attack).toBe(6);
+
+    mockContent.delete('et-fury');
+  });
+
+  it('should apply defense_multiplier from equippedTraitIds', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'et-sentinel' as InhabitantTraitId,
+      name: 'Sentinel Enchantment',
+      __type: 'inhabitanttrait',
+      description: '',
+      effects: [{ effectType: 'defense_multiplier', effectValue: 0.1 }],
+      fusionPassChance: 0,
+      isFromTraining: false,
+    };
+    mockContent.set('et-sentinel', trait);
+
+    const def = makeDef();
+    const inst = makeInstance({ equippedTraitIds: ['et-sentinel'] });
+    const result = effectiveStatsCalculate(def, inst);
+    // base defense 3 * 1.1 = 3.3 -> rounded to 3
+    expect(result.defense).toBe(3);
+
+    mockContent.delete('et-sentinel');
+  });
+
+  it('should apply worker_efficiency_multiplier from equippedTraitIds', () => {
+    const trait: InhabitantTraitContent = {
+      id: 'et-harvest' as InhabitantTraitId,
+      name: 'Harvest Enchantment',
+      __type: 'inhabitanttrait',
+      description: '',
+      effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.1 }],
+      fusionPassChance: 0,
+      isFromTraining: false,
+    };
+    mockContent.set('et-harvest', trait);
+
+    const def = makeDef();
+    const inst = makeInstance({ equippedTraitIds: ['et-harvest'] });
+    const result = effectiveStatsCalculate(def, inst);
+    // base 1.0 * 1.1 = 1.1
+    expect(result.workerEfficiency).toBe(1.1);
+
+    mockContent.delete('et-harvest');
+  });
 });

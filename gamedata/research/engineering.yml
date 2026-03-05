@@ -17,6 +17,7 @@
 #   Fusion Core Construction (T4) [Advanced Construction]
 #   Teleporters (T5) [Master Architecture]
 #   War Machines (T5) [Siege Works + Mechanical Sentinels]
+#   Runic Forging (T5) [Golem Assembly]
 #   Industrial Mastery (T5) [Golem Assembly + Siege Works]
 #   Primal Dominion (T5) [War Machines + Industrial Mastery]
 #   Grand Artificer (T6) [War Machines + Industrial Mastery]
@@ -248,6 +249,22 @@
   requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
+
+- id: 15d8f39a-aa5a-4900-a521-9e1e244fb5b8
+  name: Runic Forging
+  description: Master the art of inscribing magical runes into forged equipment, enabling the creation of masterwork items that grant enchantments to their wielders.
+  branch: engineering
+  cost:
+    research: 175
+    gold: 50
+    crystals: 25
+  prerequisiteResearchIds:
+    - Golem Assembly
+  unlocks:
+    - type: roomupgrade
+      targetRoomupgradeId: Runic Anvil
+  tier: 5
+  requiredTicks: 2000
 
 - id: d7b42e19-3a8f-4c65-b1d0-9e6f5a2c8d73
   name: Teleporters

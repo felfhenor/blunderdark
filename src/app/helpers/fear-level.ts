@@ -20,6 +20,7 @@ import type {
   TileOffset,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { InhabitantTraitContent } from '@interfaces/content-inhabitanttrait';
 import type { RoomContent } from '@interfaces/content-room';
 import type { FearPropagationSource, FearLevelBreakdown } from '@interfaces/fear';
 
@@ -269,6 +270,24 @@ export function fearLevelGetForRoom(
   const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_multiplier');
   if (fearAuraBonus !== 0) {
     baseFear *= 1 + fearAuraBonus;
+  }
+
+  // Equipment aura fear bonus (from masterwork forge items with aura_fear_multiplier)
+  let equipFearBonus = 0;
+  for (const inhabitant of allInhabitants) {
+    if (!inhabitant.equippedTraitIds) continue;
+    for (const traitId of inhabitant.equippedTraitIds) {
+      const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!trait) continue;
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'aura_fear_multiplier') {
+          equipFearBonus += effect.effectValue;
+        }
+      }
+    }
+  }
+  if (equipFearBonus !== 0) {
+    baseFear *= 1 + equipFearBonus;
   }
 
   const inhabitantModifier = fearLevelCalculateInhabitantModifier(

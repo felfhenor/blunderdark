@@ -6,6 +6,7 @@ export type ForgeInventoryEntry = {
   recipeId: ForgeRecipeId;
   count: number;
   bakedStatBonuses: Partial<InhabitantStats>;
+  grantedTraitIds?: string[];
 };
 
 export type DarkForgeCompletedEvent = {

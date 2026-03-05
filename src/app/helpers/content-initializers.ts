@@ -157,6 +157,7 @@ function ensureForgeRecipe(
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
     statBonuses: recipe.statBonuses ?? {},
     tier: recipe.tier ?? 'basic',
+    grantedTraitIds: recipe.grantedTraitIds ?? [],
   };
 }
 

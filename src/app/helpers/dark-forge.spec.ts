@@ -30,6 +30,8 @@ const IRON_SWORD_ID = 'a1f01001-0001-4001-8001-000000000001' as ForgeRecipeId;
 const DARK_SHIELD_ID = 'a1f01001-0001-4001-8001-000000000002' as ForgeRecipeId;
 const INFERNAL_BLADE_ID =
   'a1f01001-0001-4001-8001-000000000006' as ForgeRecipeId;
+const BLADE_OF_FURY_ID = '355317aa-a5a8-4e37-a4ca-19e621e72bb6' as ForgeRecipeId;
+const FURY_TRAIT_ID = '4dfdfe01-c664-47c6-a657-f5011b8d9762';
 
 // --- Upgrade paths ---
 
@@ -54,6 +56,17 @@ const infernalForgePath: RoomUpgradeContent = {
   effects: [
     { type: 'forgingTierUnlock', value: 1 },
     { type: 'forgingStatBonus', value: 2 },
+  ],
+};
+
+const runicAnvilPath: RoomUpgradeContent = {
+  id: 'e18b89a4-1bd6-4efd-8885-9c64c1e7e0e2' as RoomUpgradeId,
+  __type: 'roomupgrade',
+  name: 'Runic Anvil',
+  description: 'Unlock masterwork recipes.',
+  cost: { gold: 250, essence: 80, flux: 60 },
+  effects: [
+    { type: 'forgingTierUnlock', value: 2 },
   ],
 };
 
@@ -123,6 +136,7 @@ const ironSwordRecipe: ForgeRecipeContent = {
   timeMultiplier: 1.0,
   statBonuses: { attack: 3 },
   tier: 'basic',
+  grantedTraitIds: [],
 };
 
 const darkShieldRecipe: ForgeRecipeContent = {
@@ -134,6 +148,7 @@ const darkShieldRecipe: ForgeRecipeContent = {
   timeMultiplier: 1.2,
   statBonuses: { defense: 3 },
   tier: 'basic',
+  grantedTraitIds: [],
 };
 
 const infernalBladeRecipe: ForgeRecipeContent = {
@@ -145,6 +160,29 @@ const infernalBladeRecipe: ForgeRecipeContent = {
   timeMultiplier: 2.0,
   statBonuses: { attack: 6, speed: 2 },
   tier: 'advanced',
+  grantedTraitIds: [],
+};
+
+const bladeOfFuryRecipe: ForgeRecipeContent = {
+  id: BLADE_OF_FURY_ID as ForgeRecipeId,
+  name: 'Blade of Fury',
+  __type: 'forgerecipe',
+  description: 'Masterwork weapon with fury enchantment.',
+  cost: { gold: 250, essence: 60, flux: 30 },
+  timeMultiplier: 4.0,
+  statBonuses: { attack: 20 },
+  tier: 'masterwork',
+  grantedTraitIds: [FURY_TRAIT_ID],
+};
+
+const furyTraitContent = {
+  id: FURY_TRAIT_ID,
+  name: 'Fury Enchantment',
+  __type: 'inhabitanttrait',
+  description: 'Amplifies attack by 15%.',
+  effects: [{ effectType: 'attack_multiplier', effectValue: 0.15 }],
+  fusionPassChance: 0,
+  isFromTraining: false,
 };
 
 // --- Room definitions ---
@@ -168,7 +206,7 @@ const forgeDef: RoomContent = {
   autoPlace: false,
   role: 'darkForge',
   queueSize: 5,
-  roomUpgradeIds: [masterForgePath.id, infernalForgePath.id],
+  roomUpgradeIds: [masterForgePath.id, infernalForgePath.id, runicAnvilPath.id],
 };
 
 const crystalMineDef: RoomContent = {
@@ -366,6 +404,9 @@ beforeEach(() => {
   mockContent.set(TRAINING_GROUNDS_ID, trainingGroundsDef);
   mockContent.set(masterForgePath.id, masterForgePath);
   mockContent.set(infernalForgePath.id, infernalForgePath);
+  mockContent.set(runicAnvilPath.id, runicAnvilPath);
+  mockContent.set(BLADE_OF_FURY_ID, bladeOfFuryRecipe);
+  mockContent.set(FURY_TRAIT_ID, furyTraitContent);
 });
 
 // --- Tests ---
@@ -998,5 +1039,126 @@ describe('Upgrade Effects', () => {
       type: 'forgingStatBonus',
       value: 2,
     });
+  });
+
+  it('Runic Anvil: unlocks masterwork tier', () => {
+    expect(runicAnvilPath.effects).toContainEqual({
+      type: 'forgingTierUnlock',
+      value: 2,
+    });
+  });
+});
+
+describe('Masterwork Tier', () => {
+  it('should not show masterwork recipes without Runic Anvil upgrade', () => {
+    vi.mocked(contentGetEntriesByType).mockReturnValue([
+      ironSwordRecipe,
+      infernalBladeRecipe,
+      bladeOfFuryRecipe,
+    ]);
+    const room = makeRoom({ appliedUpgradePathId: infernalForgePath.id });
+    const recipes = darkForgeGetAvailableRecipes(room);
+    expect(recipes.some((r) => r.tier === 'masterwork')).toBe(false);
+  });
+
+  it('should show masterwork recipes with Runic Anvil upgrade', () => {
+    vi.mocked(contentGetEntriesByType).mockReturnValue([
+      ironSwordRecipe,
+      infernalBladeRecipe,
+      bladeOfFuryRecipe,
+    ]);
+    const room = makeRoom({ appliedUpgradePathId: runicAnvilPath.id });
+    const recipes = darkForgeGetAvailableRecipes(room);
+    expect(recipes.some((r) => r.tier === 'masterwork')).toBe(true);
+    expect(recipes.some((r) => r.tier === 'basic')).toBe(true);
+  });
+
+  it('should store grantedTraitIds in inventory when completing masterwork item', () => {
+    const forge = makeRoom({
+      appliedUpgradePathId: runicAnvilPath.id,
+      forgeJobs: [{ recipeId: BLADE_OF_FURY_ID, progress: 4, targetTicks: 5 }],
+    });
+    const worker = makeInhabitant({
+      assignedRoomId: forge.id,
+      equippedForgeItemRecipeId: DARK_SHIELD_ID,
+      equippedStatBonuses: { defense: 3 },
+    });
+    const floor = makeFloor([forge], [worker]);
+    const state = makeGameState({ floors: [floor] });
+
+    darkForgeProcess(state);
+
+    expect(state.world.forgeInventory).toHaveLength(1);
+    expect(state.world.forgeInventory[0].recipeId).toBe(BLADE_OF_FURY_ID);
+    expect(state.world.forgeInventory[0].grantedTraitIds).toEqual([FURY_TRAIT_ID]);
+  });
+
+  it('should set equippedTraitIds on auto-equip of masterwork item', () => {
+    const forge = makeRoom();
+    const inh = makeInhabitant({ assignedRoomId: forge.id });
+    const floor = makeFloor([forge], [inh]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        {
+          recipeId: BLADE_OF_FURY_ID,
+          count: 1,
+          bakedStatBonuses: { attack: 20 },
+          grantedTraitIds: [FURY_TRAIT_ID],
+        },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(inh.equippedForgeItemRecipeId).toBe(BLADE_OF_FURY_ID);
+    expect(inh.equippedTraitIds).toEqual([FURY_TRAIT_ID]);
+    expect(state.world.forgeInventory).toHaveLength(0);
+  });
+
+  it('should not set equippedTraitIds for basic items without traits', () => {
+    const forge = makeRoom();
+    const inh = makeInhabitant({ assignedRoomId: forge.id });
+    const floor = makeFloor([forge], [inh]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        { recipeId: IRON_SWORD_ID, count: 1, bakedStatBonuses: { attack: 3 } },
+      ],
+    });
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(inh.equippedForgeItemRecipeId).toBe(IRON_SWORD_ID);
+    expect(inh.equippedTraitIds).toBeUndefined();
+  });
+
+  it('should sync equippedTraitIds to world inhabitants on auto-equip', () => {
+    const forge = makeRoom();
+    const floorInh = makeInhabitant({
+      instanceId: 'inh-sync' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const worldInh = makeInhabitant({
+      instanceId: 'inh-sync' as InhabitantInstanceId,
+      assignedRoomId: forge.id,
+    });
+    const floor = makeFloor([forge], [floorInh]);
+    const state = makeGameState({
+      floors: [floor],
+      forgeInventory: [
+        {
+          recipeId: BLADE_OF_FURY_ID,
+          count: 1,
+          bakedStatBonuses: { attack: 20 },
+          grantedTraitIds: [FURY_TRAIT_ID],
+        },
+      ],
+    });
+    state.world.inhabitants = [worldInh];
+
+    darkForgeAutoEquip(state, floor);
+
+    expect(worldInh.equippedTraitIds).toEqual([FURY_TRAIT_ID]);
   });
 });

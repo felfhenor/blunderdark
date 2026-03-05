@@ -87,6 +87,33 @@ export function effectiveStatsCalculate(
     }
   }
 
+  // Equipped trait bonuses (from masterwork forge items)
+  if (instance.equippedTraitIds) {
+    for (const traitId of instance.equippedTraitIds) {
+      const trait = contentGetEntry<InhabitantTraitContent>(traitId);
+      if (!trait) continue;
+      for (const effect of trait.effects) {
+        switch (effect.effectType) {
+          case 'attack_multiplier':
+            attack *= 1 + effect.effectValue;
+            break;
+          case 'defense_multiplier':
+            defense *= 1 + effect.effectValue;
+            break;
+          case 'attack_flat':
+            attack += effect.effectValue;
+            break;
+          case 'defense_flat':
+            defense += effect.effectValue;
+            break;
+          case 'worker_efficiency_multiplier':
+            workerEfficiency *= 1 + effect.effectValue;
+            break;
+        }
+      }
+    }
+  }
+
   // Forge equipment bonuses (baked at craft time)
   if (instance.equippedStatBonuses) {
     hp += instance.equippedStatBonuses.hp ?? 0;

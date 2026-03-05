@@ -55,3 +55,145 @@
     defense: 16
     hp: 30
   tier: advanced
+
+- id: b48bb8a3-7b3e-4622-98cd-bf5a4f6a27b9
+  name: Worker's Mallet
+  description: A crude but effective tool that channels focus into labor. Improves the efficiency of any worker who wields it.
+  cost:
+    gold: 35
+    crystals: 15
+  timeMultiplier: 1.0
+  statBonuses:
+    workerEfficiency: 0.4
+  tier: basic
+
+- id: 1b46879b-c978-4bac-a1f2-7fe4a643d8fb
+  name: Bone Helm
+  description: A helmet carved from dense bone, offering reliable protection on a budget.
+  cost:
+    gold: 45
+    crystals: 20
+  timeMultiplier: 1.2
+  statBonuses:
+    hp: 12
+    defense: 4
+  tier: basic
+
+- id: 99de5bf0-980b-4af5-888b-40d364a964e4
+  name: Swift Boots
+  description: Lightweight boots enchanted for speed. The wearer moves with unnatural quickness.
+  cost:
+    gold: 40
+    crystals: 20
+  timeMultiplier: 1.0
+  statBonuses:
+    speed: 6
+  tier: basic
+
+- id: 57091952-401b-4dc3-b8e8-e65ad2c3de2e
+  name: Void Dagger
+  description: A dagger forged from void-touched metal. Strikes with blinding speed and devastating precision.
+  cost:
+    gold: 100
+    essence: 35
+  timeMultiplier: 2.0
+  statBonuses:
+    attack: 12
+    speed: 8
+  tier: advanced
+
+- id: 699a681f-e0f2-453b-b483-23be6d9d5273
+  name: Crystal Mail
+  description: Armor woven with crystal fibers that harden under stress. Provides defense while enhancing work output.
+  cost:
+    gold: 130
+    essence: 30
+    crystals: 20
+  timeMultiplier: 2.5
+  statBonuses:
+    defense: 12
+    workerEfficiency: 0.3
+  tier: advanced
+
+- id: c9fae571-0c06-4ca8-ad87-27fd87c4a81f
+  name: Soulforged Gauntlets
+  description: Gauntlets tempered with captured soul energy. Grant balanced offensive and defensive prowess.
+  cost:
+    gold: 140
+    essence: 45
+  timeMultiplier: 2.5
+  statBonuses:
+    attack: 12
+    defense: 12
+  tier: advanced
+
+- id: 355317aa-a5a8-4e37-a4ca-19e621e72bb6
+  name: Blade of Fury
+  description: A weapon that burns with inner rage. Imbues the wielder with a fury enchantment that amplifies attack power.
+  cost:
+    gold: 250
+    essence: 60
+    flux: 30
+  timeMultiplier: 4.0
+  statBonuses:
+    attack: 20
+  tier: masterwork
+  grantedTraitIds:
+    - 4dfdfe01-c664-47c6-a657-f5011b8d9762
+
+- id: 3bcc87e4-6866-4a07-8963-55742110ab07
+  name: Sentinel's Bulwark
+  description: An immense shield radiating protective magic. Grants a sentinel enchantment that bolsters defense.
+  cost:
+    gold: 250
+    essence: 60
+    flux: 30
+  timeMultiplier: 4.0
+  statBonuses:
+    defense: 20
+    hp: 20
+  tier: masterwork
+  grantedTraitIds:
+    - e5bb32ea-6b50-466c-b8d8-c0112a4e7b6b
+
+- id: 0e4ff6bf-a11d-4ad8-b65e-b07f7ea40fcb
+  name: Tome of Shadows
+  description: A grimoire pulsing with dark knowledge. Enhances the wielder's research output through shadow study.
+  cost:
+    gold: 200
+    essence: 50
+    research: 40
+  timeMultiplier: 3.5
+  statBonuses:
+    workerEfficiency: 0.5
+  tier: masterwork
+  grantedTraitIds:
+    - a05a08dd-38e8-483d-8e92-91e621176931
+
+- id: 6748e933-2cf8-4494-875a-15b530b8b12b
+  name: Dread Crown
+  description: A crown that radiates an aura of dread. The wearer's presence intensifies the fear felt by nearby invaders.
+  cost:
+    gold: 220
+    essence: 55
+    flux: 35
+  timeMultiplier: 3.5
+  statBonuses:
+    hp: 10
+  tier: masterwork
+  grantedTraitIds:
+    - c5772ca7-6504-453a-bdec-26ec8f17fc38
+
+- id: 5ae8029a-8bc7-424a-bae2-d68bddc34271
+  name: Harvester's Ring
+  description: A ring that attunes the wearer to the flow of resources. Subtly enhances all production activities.
+  cost:
+    gold: 200
+    essence: 40
+    crystals: 30
+  timeMultiplier: 3.0
+  statBonuses:
+    workerEfficiency: 0.3
+  tier: masterwork
+  grantedTraitIds:
+    - 99e6c974-0799-4208-9916-932f077693ba
