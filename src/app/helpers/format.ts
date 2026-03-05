@@ -7,3 +7,13 @@ export function formatMultiplierAsPercentage(multiplier: number): string {
   const sign = percentage >= 0 ? '+' : '';
   return `${sign}${percentage}%`;
 }
+
+/**
+ * Get the daisyUI badge class for a creature tier.
+ */
+export function formatTierBadgeClass(tier: number): string {
+  if (tier >= 4) return 'badge-error';
+  if (tier === 3) return 'badge-warning';
+  if (tier === 2) return 'badge-info';
+  return 'badge-outline';
+}

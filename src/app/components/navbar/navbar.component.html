@@ -158,6 +158,15 @@
 
     <app-button-settings></app-button-settings>
 
+    <button
+      class="btn btn-secondary btn-block"
+      (click)="showHelpMenu()"
+      appSfx="ui-error"
+      [sfxTrigger]="['hover', 'click']"
+    >
+      Help
+    </button>
+
     <a
       class="btn btn-warning"
       [swal]="leaveSwal"
@@ -171,3 +180,14 @@
     <app-button-quit></app-button-quit>
   </div>
 </app-modal>
+
+<div *appTeleportTo="'menu-options'">
+  <app-modal
+    [visible]="showHelp()"
+    [allowEscToClose]="true"
+    [widthClass]="'max-w-[unset]'"
+    (modalClose)="closeHelpMenu()"
+  >
+    <app-panel-help replacement></app-panel-help>
+  </app-modal>
+</div>

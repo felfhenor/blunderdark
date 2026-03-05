@@ -11,6 +11,8 @@ export const uiShowAnySubmenu = signal<boolean>(false);
 
 export const uiShowOptionsMenu = signal<boolean>(false);
 
+export const uiShowHelpMenu = signal<boolean>(false);
+
 export const uiModalOpenCount = signal<number>(0);
 
 export const uiIsAnyModalOpen = computed(() => uiModalOpenCount() > 0);
@@ -36,4 +38,5 @@ export function uiCloseAllMenus(smart = false) {
 
   uiShowAnySubmenu.set(false);
   uiShowOptionsMenu.set(false);
+  uiShowHelpMenu.set(false);
 }

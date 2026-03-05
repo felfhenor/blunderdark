@@ -35,6 +35,7 @@ import {
 import {
   tablerArrowRight,
   tablerArrowsVertical,
+  tablerBook,
   tablerCheck,
   tablerChevronDown,
   tablerChevronUp,
@@ -86,6 +87,7 @@ export const ICON_ALL = {
   gameWarPick,
   tablerArrowRight,
   tablerArrowsVertical,
+  tablerBook,
   tablerCheck,
   tablerChevronDown,
   tablerChevronUp,

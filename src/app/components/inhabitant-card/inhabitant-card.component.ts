@@ -12,7 +12,10 @@ import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { efficiencyDoesTraitApply } from '@helpers/efficiency';
 import { fearLevelRoomMap } from '@helpers/fear-level';
-import { formatMultiplierAsPercentage } from '@helpers/format';
+import {
+  formatMultiplierAsPercentage,
+  formatTierBadgeClass,
+} from '@helpers/format';
 import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
@@ -63,13 +66,7 @@ export class InhabitantCardComponent {
   public synergyRoomId = input<PlacedRoomId | undefined>(undefined);
   public compact = input(false);
 
-  public tierClass = computed(() => {
-    const tier = this.definition().tier;
-    if (tier >= 4) return 'badge-error';
-    if (tier === 3) return 'badge-warning';
-    if (tier === 2) return 'badge-info';
-    return 'badge-outline';
-  });
+  public tierClass = computed(() => formatTierBadgeClass(this.definition().tier));
 
   public effectiveStats = computed(() =>
     effectiveStatsCalculate(this.definition(), this.instance()),

@@ -16,10 +16,12 @@ import { ButtonUpdateComponent } from '@components/button-update/button-update.c
 import { DisplayGameTimeComponent } from '@components/display-game-time/display-game-time.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { PanelHelpComponent } from '@components/panel-help/panel-help.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TeleportToDirective } from '@directives/teleport.to.directive';
 import {
   uiCloseAllMenus,
   fearOverlayEnabled,
@@ -34,6 +36,7 @@ import {
   optionsSet,
   uiShowOptionsMenu,
 } from '@helpers';
+import { uiShowHelpMenu } from '@helpers/ui';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import type { GameSpeed, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -61,6 +64,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ButtonSettingsComponent,
     DisplayGameTimeComponent,
     AnalyticsClickDirective,
+    PanelHelpComponent,
+    TeleportToDirective,
   ],
   providers: [],
   templateUrl: './navbar.component.html',
@@ -86,6 +91,8 @@ export class NavbarComponent {
     hotkey: string;
     clickCb: () => void;
   }> = [];
+
+  public showHelp = computed(() => uiShowHelpMenu());
 
   public toggleOptions() {
     if (uiShowOptionsMenu()) {
@@ -134,6 +141,14 @@ export class NavbarComponent {
       this.wasPausedBeforeOpeningMenu.set(false);
       optionsSet('gameloopPaused', true);
     }
+  }
+
+  public showHelpMenu() {
+    uiShowHelpMenu.set(true);
+  }
+
+  public closeHelpMenu() {
+    uiShowHelpMenu.set(false);
   }
 
   public uiCloseAllMenus() {

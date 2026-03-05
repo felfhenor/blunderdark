@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep .card-page-container {
+    min-height: 85vh;
+    max-height: 85vh;
+  }
+
+  ::ng-deep .card-content {
+    height: auto;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}

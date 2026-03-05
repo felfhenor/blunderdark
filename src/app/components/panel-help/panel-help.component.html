@@ -1,0 +1,195 @@
+<app-card-page [isEmbeddedInModal]="true">
+  <span header>Help</span>
+
+  <div pageactions>
+    <app-button-close (click)="closeMenu()"></app-button-close>
+  </div>
+
+  <app-tab-bar
+    [tabs]="tabDefs"
+    [activeTab]="helpTab()"
+    (activeTabChange)="changeHelpTab($event)"
+    variant="boxed"
+  />
+
+  @switch (helpTab()) {
+    @case ('Creature Compendium') {
+      <div class="flex flex-1 min-h-0 gap-4 p-2">
+        <!-- Left: creature list -->
+        <div class="flex flex-col gap-2 w-64 min-w-64 min-h-0">
+          <!-- Search and sort -->
+          <input
+            type="text"
+            class="input input-bordered input-sm w-full"
+            placeholder="Search by name or type..."
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+          />
+          <select
+            class="select select-bordered select-xs w-full"
+            [ngModel]="sortMode()"
+            (ngModelChange)="sortMode.set($event)"
+          >
+            <option value="name">Sort: Name</option>
+            <option value="tier">Sort: Tier</option>
+            <option value="type">Sort: Type</option>
+          </select>
+
+          <!-- Creature list -->
+          <div class="flex-1 overflow-y-auto flex flex-col gap-0">
+            @for (creature of unlockedCreatures(); track creature.id) {
+              <button
+                class="btn btn-ghost btn-xs justify-start gap-2 w-full text-left"
+                [class.btn-info]="selectedCreature()?.id === creature.id"
+                (click)="selectCreature(creature.id)"
+              >
+                <span class="badge badge-xs" [ngClass]="tierClass(creature.tier)">
+                  T{{ creature.tier | number: '1.0-0' }}
+                </span>
+                <span class="truncate flex-1">{{ creature.name }}</span>
+                <span class="text-xs opacity-50 capitalize">{{ creature.type }}</span>
+              </button>
+            }
+          </div>
+
+          <!-- Undiscovered count -->
+          @if (undiscoveredCount() > 0) {
+            <div class="text-xs opacity-50 text-center py-1">
+              {{ undiscoveredCount() | number: '1.0-0' }} creatures not yet encountered
+            </div>
+          } @else {
+            <div class="text-xs opacity-50 text-center py-1">
+              All creatures discovered
+            </div>
+          }
+        </div>
+
+        <!-- Right: detail panel -->
+        <div class="flex-1 overflow-y-auto min-h-0">
+          @if (selectedCreature(); as creature) {
+            <div class="flex flex-col gap-4 p-2">
+              <!-- Header -->
+              <div class="flex items-center gap-2">
+                <span class="badge" [ngClass]="selectedTierClass()">
+                  T{{ creature.tier | number: '1.0-0' }}
+                </span>
+                <span class="text-lg font-bold">{{ creature.name }}</span>
+                <span class="text-sm opacity-60 capitalize">{{ creature.type }}</span>
+                @if (isLegendary()) {
+                  <span class="badge badge-sm badge-accent">Legendary</span>
+                }
+              </div>
+
+              @if (creature.description) {
+                <div class="text-sm opacity-70 italic">{{ creature.description }}</div>
+              }
+
+              <!-- Stats -->
+              <div>
+                <div class="text-xs font-semibold opacity-60 mb-1">Stats</div>
+                <app-stat-row [stats]="creature.stats" />
+              </div>
+
+              <!-- Fear -->
+              <div>
+                <div class="text-xs font-semibold opacity-60 mb-1">Fear</div>
+                <div class="flex gap-4 text-sm">
+                  <span>Innate Fear: {{ creature.fearModifier | number: '1.0-2' }}</span>
+                  <span>
+                    Tolerance:
+                    @if (creature.fearTolerance !== undefined && creature.fearTolerance !== null) {
+                      {{ creature.fearTolerance | number: '1.0-0' }}
+                    } @else {
+                      2 (default)
+                    }
+                  </span>
+                </div>
+              </div>
+
+              <!-- Work Affinities -->
+              @if (selectedAffinities(); as affinities) {
+                <div>
+                  <div class="text-xs font-semibold opacity-60 mb-1">Work Affinities</div>
+                  <div class="flex flex-col gap-1 text-sm">
+                    @if (affinities.preferred.length > 0) {
+                      <div class="flex items-center gap-2">
+                        <span class="text-success font-semibold">Likes:</span>
+                        <span>{{ affinities.preferred.join(', ') }}</span>
+                      </div>
+                    }
+                    @if (affinities.disliked.length > 0) {
+                      <div class="flex items-center gap-2">
+                        <span class="text-error font-semibold">Dislikes:</span>
+                        <span>{{ affinities.disliked.join(', ') }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Traits -->
+              @if (creature.traits.length > 0) {
+                <div>
+                  <div class="text-xs font-semibold opacity-60 mb-1">Traits</div>
+                  <div class="flex flex-col gap-1">
+                    @for (trait of creature.traits; track trait.id) {
+                      <div class="flex items-start gap-2 text-sm">
+                        <span class="badge badge-xs badge-outline mt-0.5">{{ trait.name }}</span>
+                        <span class="opacity-70">{{ trait.description }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Cost -->
+              <div>
+                <div class="text-xs font-semibold opacity-60 mb-1">Recruitment Cost</div>
+                <app-currency-cost-list [cost]="creature.cost" />
+              </div>
+
+              <!-- Food -->
+              <div>
+                <div class="text-xs font-semibold opacity-60 mb-1">Food</div>
+                <div class="text-sm">
+                  @if (creature.foodConsumptionRate > 0) {
+                    Consumes {{ creature.foodConsumptionRate | number: '1.0-2' }} food per tick
+                  } @else {
+                    Does not eat
+                  }
+                </div>
+              </div>
+
+              <!-- Legendary extras -->
+              @if (isLegendary()) {
+                <!-- Upkeep -->
+                @if (creature.upkeepCost) {
+                  <div>
+                    <div class="text-xs font-semibold opacity-60 mb-1">Upkeep Cost</div>
+                    <app-currency-cost-list [cost]="creature.upkeepCost" />
+                  </div>
+                }
+
+                <!-- Recruitment Requirements -->
+                @if (creature.recruitmentRequirements.length > 0) {
+                  <div>
+                    <div class="text-xs font-semibold opacity-60 mb-1">Recruitment Requirements</div>
+                    <div class="flex flex-col gap-1 text-sm">
+                      @for (req of creature.recruitmentRequirements; track $index) {
+                        <div class="opacity-70">{{ req.description }}</div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          } @else {
+            <div class="flex items-center justify-center h-full opacity-50">
+              No creatures unlocked yet
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</app-card-page>
