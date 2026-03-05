@@ -203,7 +203,7 @@ export class InhabitantCardComponent {
     // Check trait-room match
     for (const trait of def.traits) {
       for (const effect of trait.effects) {
-        if (effect.effectType !== 'production_bonus') continue;
+        if (effect.effectType !== 'production_multiplier') continue;
 
         // Check targetRoomId match
         if (effect.targetRoomId && effect.targetRoomId === roomDef.id) {

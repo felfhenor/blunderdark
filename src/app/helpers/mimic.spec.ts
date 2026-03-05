@@ -47,19 +47,19 @@ vi.mock('@helpers/content', () => {
         id: 'trait-mimic-shapeshifter',
         name: 'Shapeshifter',
         description: '',
-        effects: [{ effectType: 'attack_bonus', effectValue: 1.0 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 1.0 }],
       },
       {
         id: 'trait-mimic-treasure-guardian',
         name: 'Treasure Guardian',
         description: '',
-        effects: [{ effectType: 'defense_bonus', effectValue: 2, targetRoomId: 'room-treasure-vault' }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 2, targetRoomId: 'room-treasure-vault' }],
       },
       {
         id: 'trait-mimic-versatile',
         name: 'Versatile',
         description: '',
-        effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.8 }],
+        effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.8 }],
       },
     ],
   });
@@ -84,7 +84,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.2, targetResourceType: 'crystals' }],
       },
     ],
   });
@@ -180,19 +180,19 @@ describe('mimicCalculateDefenseBonus', () => {
     expect(bonus).toBe(0);
   });
 
-  it('should return 0 for inhabitants without defense_bonus traits', () => {
+  it('should return 0 for inhabitants without defense_multiplier traits', () => {
     const def = getGoblinDef();
     const bonus = mimicCalculateDefenseBonus(def.traits, TEST_ROOM_VAULT_ID);
     expect(bonus).toBe(0);
   });
 
-  it('should apply unconditional defense_bonus when no targetRoomId', () => {
+  it('should apply unconditional defense_multiplier when no targetRoomId', () => {
     const traits: InhabitantTrait[] = [
       {
         id: 'trait-test',
         name: 'Sturdy',
         description: '',
-        effects: [{ effectType: 'defense_bonus', effectValue: 1 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 1 }],
       },
     ];
     const bonus = mimicCalculateDefenseBonus(traits, TEST_ROOM_MINE_ID);
@@ -217,7 +217,7 @@ describe('mimicCalculateSurpriseAttackDamage', () => {
     expect(result).toBe(10);
   });
 
-  it('should not modify damage for inhabitants without attack_bonus', () => {
+  it('should not modify damage for inhabitants without attack_multiplier', () => {
     const def = getGoblinDef();
     const baseDamage = 10;
     const result = mimicCalculateSurpriseAttackDamage(baseDamage, def.traits, true);
@@ -230,7 +230,7 @@ describe('mimicCalculateSurpriseAttackDamage', () => {
         id: 'trait-test',
         name: 'Surprise',
         description: '',
-        effects: [{ effectType: 'attack_bonus', effectValue: 0.5 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.5 }],
       },
     ];
     const result = mimicCalculateSurpriseAttackDamage(7, traits, true);
@@ -241,12 +241,12 @@ describe('mimicCalculateSurpriseAttackDamage', () => {
 // --- Living trap interaction ---
 
 describe('mimicHasLivingTrap', () => {
-  it('should return true for inhabitants with attack_bonus trait', () => {
+  it('should return true for inhabitants with attack_multiplier trait', () => {
     const def = getMimicDef();
     expect(mimicHasLivingTrap(def)).toBe(true);
   });
 
-  it('should return false for inhabitants without attack_bonus trait', () => {
+  it('should return false for inhabitants without attack_multiplier trait', () => {
     const def = getGoblinDef();
     expect(mimicHasLivingTrap(def)).toBe(false);
   });

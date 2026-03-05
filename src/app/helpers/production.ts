@@ -229,7 +229,7 @@ export function productionCalculateInhabitantBonus(
 
     for (const trait of def.traits) {
       for (const effect of trait.effects) {
-        if (effect.effectType === 'production_bonus') {
+        if (effect.effectType === 'production_multiplier') {
           // Skip effect if it targets a specific room and this room doesn't match
           if (effect.targetRoomId && roomDef?.id !== effect.targetRoomId) continue;
 

@@ -89,7 +89,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-lich-scholarly',
         name: 'Scholarly',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.4, targetResourceType: 'research' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.4, targetResourceType: 'research' }],
       },
       {
         id: 'trait-lich-undead-master',
@@ -101,7 +101,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-lich-fearless',
         name: 'Fearless',
         description: '',
-        effects: [{ effectType: 'defense_bonus', effectValue: 1 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 1 }],
       },
       {
         id: 'trait-lich-ancient-knowledge',
@@ -113,19 +113,19 @@ vi.mock('@helpers/content', () => {
         id: 'trait-lich-throne-scholar',
         name: 'Throne Scholar',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.1, targetResourceType: 'research', targetRoomId: 'room-throne' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.1, targetResourceType: 'research', targetRoomId: 'room-throne' }],
       },
       {
         id: 'trait-lich-soul-siphon',
         name: 'Soul Siphon',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 1.0, targetResourceType: 'essence', targetRoomId: 'room-soul-well' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 1.0, targetResourceType: 'essence', targetRoomId: 'room-soul-well' }],
       },
       {
         id: 'trait-lich-library-specialist',
         name: 'Library Specialist',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'research', targetRoomId: 'room-shadow-library' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.2, targetResourceType: 'research', targetRoomId: 'room-shadow-library' }],
       },
     ],
     fearTolerance: 99,
@@ -406,7 +406,7 @@ describe('Lich Fearless trait: never scared', () => {
   it('should have fear_immunity trait in definition', () => {
     const def = getLichDef();
     const hasFearImmunity = def.traits.some(
-      (t) => t.effects.some((e) => e.effectType === 'defense_bonus'),
+      (t) => t.effects.some((e) => e.effectType === 'defense_multiplier'),
     );
     expect(hasFearImmunity).toBe(true);
   });

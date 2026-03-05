@@ -568,7 +568,7 @@ describe('fusion', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: 'Crystal production bonus.',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'crystals' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.2, targetResourceType: 'crystals' }],
       },
     ],
     restrictionTags: [],
@@ -596,7 +596,7 @@ describe('fusion', () => {
         id: 'trait-kobold-trapper',
         name: 'Trapper',
         description: 'Trap bonus.',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.25 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.25 }],
       },
     ],
     restrictionTags: [],
@@ -624,7 +624,7 @@ describe('fusion', () => {
         id: 'trait-skeleton-guard',
         name: 'Tireless Guard',
         description: 'Defense bonus.',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.15 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.15 }],
       },
     ],
     restrictionTags: [],
@@ -652,13 +652,13 @@ describe('fusion', () => {
         id: 'trait-wraith-phase',
         name: 'Phase',
         description: 'Physical evasion.',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.2 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.2 }],
       },
       {
         id: 'trait-wraith-fear',
         name: 'Terror Aura',
         description: 'Fear bonus.',
-        effects: [{ effectType: 'attack_bonus', effectValue: 1 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 1 }],
       },
     ],
     restrictionTags: [],
@@ -686,7 +686,7 @@ describe('fusion', () => {
         id: 'trait-orc-brawl',
         name: 'Brawler',
         description: 'Attack bonus.',
-        effects: [{ effectType: 'attack_bonus', effectValue: 0.2 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.2 }],
       },
     ],
     restrictionTags: [],
@@ -714,13 +714,13 @@ describe('fusion', () => {
         id: 'trait-hobgoblin-disciplined',
         name: 'Disciplined',
         description: 'Production bonus.',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.15, targetResourceType: 'crystals' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.15, targetResourceType: 'crystals' }],
       },
       {
         id: 'trait-hobgoblin-taskmaster',
         name: 'Taskmaster',
         description: 'Training speed bonus.',
-        effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.1 }],
+        effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.1 }],
       },
     ],
     restrictionTags: ['hybrid'],
@@ -749,19 +749,19 @@ describe('fusion', () => {
         id: 'trait-death-knight-command',
         name: 'Undead Commander',
         description: 'Attack bonus.',
-        effects: [{ effectType: 'attack_bonus', effectValue: 0.2 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.2 }],
       },
       {
         id: 'trait-death-knight-spectral',
         name: 'Spectral Armor',
         description: 'Damage reduction.',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.2 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.2 }],
       },
       {
         id: 'trait-death-knight-fear',
         name: 'Dread Presence',
         description: 'Fear bonus.',
-        effects: [{ effectType: 'attack_bonus', effectValue: 2 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 2 }],
       },
     ],
     restrictionTags: ['hybrid'],
@@ -790,13 +790,13 @@ describe('fusion', () => {
         id: 'trait-war-chief-rally',
         name: 'Rally Cry',
         description: 'Attack bonus.',
-        effects: [{ effectType: 'attack_bonus', effectValue: 0.15 }],
+        effects: [{ effectType: 'attack_multiplier', effectValue: 0.15 }],
       },
       {
         id: 'trait-war-chief-cunning',
         name: 'Tactical Cunning',
         description: 'Defense bonus.',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.1 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.1 }],
       },
     ],
     restrictionTags: ['hybrid'],
@@ -1032,18 +1032,18 @@ describe('fusion', () => {
         yamlHobgoblin,
       );
 
-      // Goblin: production_bonus (crystals), Kobold: defense_bonus
-      // Hobgoblin bonus: production_bonus (crystals), flat_worker_efficiency
+      // Goblin: production_multiplier (crystals), Kobold: defense_multiplier
+      // Hobgoblin bonus: production_multiplier (crystals), worker_efficiency_multiplier
       const effectTypes = merged.flatMap((t) => t.effects.map((e) => e.effectType));
-      expect(effectTypes).toContain('production_bonus');
-      expect(effectTypes).toContain('defense_bonus');
-      expect(effectTypes).toContain('flat_worker_efficiency');
+      expect(effectTypes).toContain('production_multiplier');
+      expect(effectTypes).toContain('defense_multiplier');
+      expect(effectTypes).toContain('worker_efficiency_multiplier');
     });
 
     it('should resolve conflicting traits by favoring higher-tier parent', async () => {
       const { fusionMergeTraits } = await import('./fusion');
 
-      // Wraith (tier 2) has attack_bonus, create a tier 1 with attack_bonus
+      // Wraith (tier 2) has attack_multiplier, create a tier 1 with attack_multiplier
       const tier1WithFear: InhabitantContent = {
         ...yamlSkeleton,
         traits: [
@@ -1051,7 +1051,7 @@ describe('fusion', () => {
             id: 'trait-skel-fear',
             name: 'Weak Fear',
             description: 'Fear bonus.',
-            effects: [{ effectType: 'attack_bonus', effectValue: 0.5 }],
+            effects: [{ effectType: 'attack_multiplier', effectValue: 0.5 }],
           },
         ],
       };
@@ -1063,8 +1063,8 @@ describe('fusion', () => {
 
       const merged = fusionMergeTraits(tier1WithFear, yamlWraith, hybridDef);
 
-      // Wraith is tier 2 (higher), so its attack_bonus (Terror Aura) should be used
-      const fearTraits = merged.filter((t) => t.effects.some((e) => e.effectType === 'attack_bonus'));
+      // Wraith is tier 2 (higher), so its attack_multiplier (Terror Aura) should be used
+      const fearTraits = merged.filter((t) => t.effects.some((e) => e.effectType === 'attack_multiplier'));
       expect(fearTraits).toHaveLength(1);
       expect(fearTraits[0].effects[0].effectValue).toBe(1);
       expect(fearTraits[0].name).toBe('Terror Aura');
@@ -1072,7 +1072,7 @@ describe('fusion', () => {
 
     it('should keep non-conflicting traits from both parents', async () => {
       const { fusionMergeTraits } = await import('./fusion');
-      // Skeleton: defense_bonus, Wraith: defense_bonus (phase) + attack_bonus (terror)
+      // Skeleton: defense_multiplier, Wraith: defense_multiplier (phase) + attack_multiplier (terror)
       const hybridDef: InhabitantContent = {
         ...yamlDeathKnight,
         traits: [],
@@ -1084,8 +1084,8 @@ describe('fusion', () => {
       );
 
       const effectTypes = merged.flatMap((t) => t.effects.map((e) => e.effectType));
-      expect(effectTypes).toContain('defense_bonus');
-      expect(effectTypes).toContain('attack_bonus');
+      expect(effectTypes).toContain('defense_multiplier');
+      expect(effectTypes).toContain('attack_multiplier');
     });
 
     it('should add bonus traits from hybrid definition', async () => {
@@ -1096,7 +1096,7 @@ describe('fusion', () => {
         yamlDeathKnight,
       );
 
-      // Death Knight bonus traits: attack_bonus, damage_reduction, fear_bonus
+      // Death Knight bonus traits: attack_multiplier, damage_reduction, fear_bonus
       const bonusTraitNames = merged.map((t) => t.name);
       expect(bonusTraitNames).toContain('Undead Commander');
       expect(bonusTraitNames).toContain('Spectral Armor');
@@ -1116,13 +1116,13 @@ describe('fusion', () => {
       );
       expect(merged.length).toBeGreaterThan(0);
       // Kobold trait + hobgoblin bonus traits
-      expect(merged.some((t) => t.effects.some((e) => e.effectType === 'defense_bonus'))).toBe(true);
+      expect(merged.some((t) => t.effects.some((e) => e.effectType === 'defense_multiplier'))).toBe(true);
     });
 
     it('should include at least 5 unique bonus traits across hybrids', async () => {
       const { fusionMergeTraits } = await import('./fusion');
 
-      // Hobgoblin: Disciplined (production_bonus) + Taskmaster (training_bonus)
+      // Hobgoblin: Disciplined (production_multiplier) + Taskmaster (training_bonus)
       const hob = fusionMergeTraits(yamlGoblin, yamlKobold, yamlHobgoblin);
       const hobBonus = hob.filter(
         (t) =>
@@ -1505,7 +1505,7 @@ describe('fusion', () => {
     name: 'Goblin Trapper',
     __type: 'inhabitanttrait',
     description: 'A cunning hybrid.',
-    effectType: 'attack_bonus',
+    effectType: 'attack_multiplier',
     effectValue: 0.1,
     targetResourceType: undefined,
     targetRoomId: undefined,
@@ -1517,7 +1517,7 @@ describe('fusion', () => {
     name: 'Acidic Runt',
     __type: 'inhabitanttrait',
     description: 'An aggressive hybrid.',
-    effectType: 'defense_bonus',
+    effectType: 'defense_multiplier',
     effectValue: 0.05,
     targetResourceType: undefined,
     targetRoomId: undefined,

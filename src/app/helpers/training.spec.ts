@@ -44,7 +44,7 @@ const traitBasicAtk: InhabitantTraitContent = {
   __type: 'inhabitanttrait',
   name: 'Basic Attack Training',
   description: '+5 attack',
-  effects: [{ effectType: 'flat_attack', effectValue: 5 }],
+  effects: [{ effectType: 'attack_flat', effectValue: 5 }],
   fusionPassChance: 0,
   isFromTraining: true,
 };
@@ -54,7 +54,7 @@ const traitBasicDef: InhabitantTraitContent = {
   __type: 'inhabitanttrait',
   name: 'Basic Defense Training',
   description: '+5 defense',
-  effects: [{ effectType: 'flat_defense', effectValue: 5 }],
+  effects: [{ effectType: 'defense_flat', effectValue: 5 }],
   fusionPassChance: 0,
   isFromTraining: true,
 };
@@ -64,7 +64,7 @@ const traitEliteAtk: InhabitantTraitContent = {
   __type: 'inhabitanttrait',
   name: 'Elite Attack Training',
   description: '+15 attack',
-  effects: [{ effectType: 'flat_attack', effectValue: 15 }],
+  effects: [{ effectType: 'attack_flat', effectValue: 15 }],
   fusionPassChance: 0,
   isFromTraining: true,
 };
@@ -74,7 +74,7 @@ const traitAdvDef: InhabitantTraitContent = {
   __type: 'inhabitanttrait',
   name: 'Advanced Defense Training',
   description: '+15 defense',
-  effects: [{ effectType: 'flat_defense', effectValue: 15 }],
+  effects: [{ effectType: 'defense_flat', effectValue: 15 }],
   fusionPassChance: 0,
   isFromTraining: true,
 };
@@ -84,7 +84,7 @@ const traitWorkCond: InhabitantTraitContent = {
   __type: 'inhabitanttrait',
   name: 'Work Conditioning',
   description: '+50% worker efficiency',
-  effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.5 }],
+  effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.5 }],
   fusionPassChance: 0,
   isFromTraining: true,
 };

@@ -266,7 +266,7 @@ export function fearLevelGetForRoom(
 
   // Legendary aura fear bonus (multiplicative on base fear)
   const allInhabitants = gamestate()?.world?.inhabitants ?? [];
-  const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_bonus');
+  const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_multiplier');
   if (fearAuraBonus !== 0) {
     baseFear *= 1 + fearAuraBonus;
   }

@@ -12,7 +12,7 @@ const MIMIC_LIVING_TRAP_DAMAGE = 8;
 const MIMIC_LIVING_TRAP_SLOW_DURATION = 2;
 
 /**
- * Calculate bonus defense from defense_bonus traits that target a specific room.
+ * Calculate bonus defense from defense_multiplier traits that target a specific room.
  * Returns the total defense bonus from matching traits.
  *
  * Traits with targetRoomId only apply when the assigned room matches.
@@ -30,7 +30,7 @@ export function mimicCalculateDefenseBonus(
   let bonus = 0;
   for (const trait of traits) {
     for (const effect of trait.effects) {
-      if (effect.effectType !== 'defense_bonus') continue;
+      if (effect.effectType !== 'defense_multiplier') continue;
       if (!effect.targetRoomId) {
         bonus += effect.effectValue;
       } else if (roomDef.id === effect.targetRoomId) {
@@ -44,7 +44,7 @@ export function mimicCalculateDefenseBonus(
 
 /**
  * Calculate surprise attack damage for first-hit bonus.
- * Returns the total damage after applying attack_bonus traits on the first attack.
+ * Returns the total damage after applying attack_multiplier traits on the first attack.
  *
  * Shapeshifter trait: +100% damage (effectValue: 1.0 means 100% bonus) on first attack.
  */
@@ -58,7 +58,7 @@ export function mimicCalculateSurpriseAttackDamage(
   let multiplier = 1.0;
   for (const trait of traits) {
     for (const effect of trait.effects) {
-      if (effect.effectType === 'attack_bonus') {
+      if (effect.effectType === 'attack_multiplier') {
         multiplier += effect.effectValue;
       }
     }
@@ -68,12 +68,12 @@ export function mimicCalculateSurpriseAttackDamage(
 }
 
 /**
- * Check whether an inhabitant has the living trap capability (attack_bonus trait).
+ * Check whether an inhabitant has the living trap capability (attack_multiplier trait).
  * Inhabitants with the Shapeshifter trait can function as living traps.
  */
 export function mimicHasLivingTrap(def: InhabitantContent): boolean {
   return def.traits.some((t) =>
-    t.effects.some((e) => e.effectType === 'attack_bonus'),
+    t.effects.some((e) => e.effectType === 'attack_multiplier'),
   );
 }
 

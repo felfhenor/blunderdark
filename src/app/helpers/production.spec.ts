@@ -92,7 +92,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-goblin-miner',
         name: 'Miner',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.2 }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.2 }],
       },
     ],
   });
@@ -116,7 +116,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-myconid-farmer',
         name: 'Farmer',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.15 }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.15 }],
       },
     ],
   });
@@ -140,7 +140,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-skeleton-guardian',
         name: 'Guardian',
         description: '',
-        effects: [{ effectType: 'defense_bonus', effectValue: 0.3 }],
+        effects: [{ effectType: 'defense_multiplier', effectValue: 0.3 }],
       },
     ],
   });
@@ -165,7 +165,7 @@ vi.mock('@helpers/content', () => {
         id: 'trait-wraith-scholar',
         name: 'Scholar',
         description: '',
-        effects: [{ effectType: 'production_bonus', effectValue: 0.2, targetResourceType: 'research' }],
+        effects: [{ effectType: 'production_multiplier', effectValue: 0.2, targetResourceType: 'research' }],
       },
     ],
   });
@@ -380,7 +380,7 @@ describe('productionCalculateInhabitantBonus', () => {
     expect(result.hasWorkers).toBe(false);
   });
 
-  it('should calculate bonus for one inhabitant with production_bonus trait', () => {
+  it('should calculate bonus for one inhabitant with production_multiplier trait', () => {
     const inhabitants: InhabitantInstance[] = [
       {
         instanceId: 'inst-1' as InhabitantInstanceId,
@@ -391,7 +391,7 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Goblin: workerEfficiency 1.0, plus production_bonus 0.2 = 1.2
+    // Goblin: workerEfficiency 1.0, plus production_multiplier 0.2 = 1.2
     expect(result.bonus).toBeCloseTo(1.2);
     expect(result.hasWorkers).toBe(true);
   });
@@ -455,12 +455,12 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Skeleton: workerEfficiency 0.7, no production_bonus trait (defense_bonus ignored)
+    // Skeleton: workerEfficiency 0.7, no production_multiplier trait (defense_multiplier ignored)
     expect(result.bonus).toBeCloseTo(0.7);
     expect(result.hasWorkers).toBe(true);
   });
 
-  it('should ignore non-production_bonus traits', () => {
+  it('should ignore non-production_multiplier traits', () => {
     const inhabitants: InhabitantInstance[] = [
       {
         instanceId: 'inst-1' as InhabitantInstanceId,
@@ -471,7 +471,7 @@ describe('productionCalculateInhabitantBonus', () => {
       },
     ];
     const result = productionCalculateInhabitantBonus(placedRoom, inhabitants);
-    // Skeleton has defense_bonus trait, not production_bonus — should be ignored
+    // Skeleton has defense_multiplier trait, not production_multiplier — should be ignored
     // Only workerEfficiency contributes: 0.7
     expect(result.bonus).toBeCloseTo(0.7);
   });
@@ -516,7 +516,7 @@ describe('Wraith Scholar trait in research rooms', () => {
       shadowLibrary,
       inhabitants,
     );
-    // Wraith: workerEfficiency 1.1, plus Scholar production_bonus 0.2 = 1.3
+    // Wraith: workerEfficiency 1.1, plus Scholar production_multiplier 0.2 = 1.3
     expect(result.bonus).toBeCloseTo(1.3);
     expect(result.hasWorkers).toBe(true);
   });
@@ -568,7 +568,7 @@ describe('Wraith Scholar trait in research rooms', () => {
       inhabitants,
     );
     // Wraith: 1.1 + 0.2 = 1.3
-    // Goblin: 1.0 + 0.2 = 1.2 (Goblin's production_bonus has no targetResourceType, applies to all)
+    // Goblin: 1.0 + 0.2 = 1.2 (Goblin's production_multiplier has no targetResourceType, applies to all)
     // Total: 2.5
     expect(result.bonus).toBeCloseTo(2.5);
   });

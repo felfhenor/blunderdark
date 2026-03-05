@@ -89,13 +89,13 @@ describe('effectiveStatsCalculate', () => {
     });
   });
 
-  it('should add flat_attack training trait bonus', () => {
+  it('should add attack_flat training trait bonus', () => {
     const trait: InhabitantTraitContent = {
       id: 'tt-atk' as InhabitantTraitId,
       name: 'Basic Attack Training',
       __type: 'inhabitanttrait',
       description: '',
-      effects: [{ effectType: 'flat_attack', effectValue: 5 }],
+      effects: [{ effectType: 'attack_flat', effectValue: 5 }],
       fusionPassChance: 0,
       isFromTraining: true,
     };
@@ -109,13 +109,13 @@ describe('effectiveStatsCalculate', () => {
     mockContent.delete('tt-atk');
   });
 
-  it('should add flat_defense training trait bonus', () => {
+  it('should add defense_flat training trait bonus', () => {
     const trait: InhabitantTraitContent = {
       id: 'tt-def' as InhabitantTraitId,
       name: 'Basic Defense Training',
       __type: 'inhabitanttrait',
       description: '',
-      effects: [{ effectType: 'flat_defense', effectValue: 5 }],
+      effects: [{ effectType: 'defense_flat', effectValue: 5 }],
       fusionPassChance: 0,
       isFromTraining: true,
     };
@@ -129,13 +129,13 @@ describe('effectiveStatsCalculate', () => {
     mockContent.delete('tt-def');
   });
 
-  it('should apply flat_worker_efficiency training trait as multiplicative', () => {
+  it('should apply worker_efficiency_multiplier training trait as multiplicative', () => {
     const trait: InhabitantTraitContent = {
       id: 'tt-eff' as InhabitantTraitId,
       name: 'Work Conditioning',
       __type: 'inhabitanttrait',
       description: '',
-      effects: [{ effectType: 'flat_worker_efficiency', effectValue: 0.5 }],
+      effects: [{ effectType: 'worker_efficiency_multiplier', effectValue: 0.5 }],
       fusionPassChance: 0,
       isFromTraining: true,
     };
@@ -181,7 +181,7 @@ describe('effectiveStatsCalculate', () => {
       name: 'Atk Training',
       __type: 'inhabitanttrait',
       description: '',
-      effects: [{ effectType: 'flat_attack', effectValue: 2 }],
+      effects: [{ effectType: 'attack_flat', effectValue: 2 }],
       fusionPassChance: 0,
       isFromTraining: true,
     };

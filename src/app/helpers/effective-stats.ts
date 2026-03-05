@@ -67,19 +67,19 @@ export function effectiveStatsCalculate(
       if (!trait) continue;
       for (const effect of trait.effects) {
         switch (effect.effectType) {
-          case 'attack_bonus':
+          case 'attack_multiplier':
             attack *= 1 + effect.effectValue;
             break;
-          case 'defense_bonus':
+          case 'defense_multiplier':
             defense *= 1 + effect.effectValue;
             break;
-          case 'flat_attack':
+          case 'attack_flat':
             attack += effect.effectValue;
             break;
-          case 'flat_defense':
+          case 'defense_flat':
             defense += effect.effectValue;
             break;
-          case 'flat_worker_efficiency':
+          case 'worker_efficiency_multiplier':
             workerEfficiency *= 1 + effect.effectValue;
             break;
         }

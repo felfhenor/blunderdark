@@ -2,7 +2,7 @@
   name: Basic Attack Training
   description: Combat drills improve attack power by 10.
   effects:
-    - effectType: flat_attack
+    - effectType: attack_flat
       effectValue: 10
   isFromTraining: true
   fusionPassChance: 0
@@ -11,7 +11,7 @@
   name: Basic Defense Training
   description: Defensive exercises improve defense by 10.
   effects:
-    - effectType: flat_defense
+    - effectType: defense_flat
       effectValue: 10
   isFromTraining: true
   fusionPassChance: 0
@@ -20,7 +20,7 @@
   name: Elite Attack Training
   description: Advanced combat techniques improve attack power by 25.
   effects:
-    - effectType: flat_attack
+    - effectType: attack_flat
       effectValue: 25
   isFromTraining: true
   fusionPassChance: 0
@@ -29,7 +29,7 @@
   name: Advanced Defense Training
   description: Intensive defensive drills improve defense by 25.
   effects:
-    - effectType: flat_defense
+    - effectType: defense_flat
       effectValue: 25
   isFromTraining: true
   fusionPassChance: 0
@@ -38,7 +38,7 @@
   name: Work Conditioning
   description: Rigorous conditioning improves worker efficiency by 50%.
   effects:
-    - effectType: flat_worker_efficiency
+    - effectType: worker_efficiency_multiplier
       effectValue: 0.5
   isFromTraining: true
   fusionPassChance: 0

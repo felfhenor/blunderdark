@@ -836,7 +836,7 @@ export class PanelRoomInfoComponent {
 
     for (const trait of def.traits) {
       for (const effect of trait.effects) {
-        if (effect.effectType !== 'production_bonus') continue;
+        if (effect.effectType !== 'production_multiplier') continue;
 
         if (effect.targetRoomId && effect.targetRoomId === roomDef.id) {
           const pct = Math.round(effect.effectValue * 100);

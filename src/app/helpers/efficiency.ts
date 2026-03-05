@@ -14,7 +14,7 @@ import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown } from '@interfaces/efficiency';
 
 /**
- * Extract efficiency-related traits (production_bonus) from an inhabitant definition.
+ * Extract efficiency-related traits (production_multiplier) from an inhabitant definition.
  */
 export function efficiencyGetTraits(
   def: InhabitantContent,
@@ -22,7 +22,7 @@ export function efficiencyGetTraits(
   const result: EfficiencyTrait[] = [];
   for (const trait of def.traits) {
     for (const effect of trait.effects) {
-      if (effect.effectType === 'production_bonus') {
+      if (effect.effectType === 'production_multiplier') {
         result.push({
           traitName: trait.name,
           effectValue: effect.effectValue,
@@ -69,7 +69,7 @@ export function efficiencyCalculateInhabitantContribution(
   const traitBonuses: { traitName: string; bonus: number; applies: boolean }[] = [];
   for (const trait of def.traits) {
     for (const effect of trait.effects) {
-      if (effect.effectType === 'production_bonus') {
+      if (effect.effectType === 'production_multiplier') {
         const applies = efficiencyDoesTraitApply(effect, roomProduction);
         traitBonuses.push({
           traitName: trait.name,
@@ -159,7 +159,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 
     for (const trait of def.traits) {
       for (const effect of trait.effects) {
-        if (effect.effectType === 'production_bonus') {
+        if (effect.effectType === 'production_multiplier') {
           if (efficiencyDoesTraitApply(effect, roomProduction)) {
             totalBonus += effect.effectValue;
           }
