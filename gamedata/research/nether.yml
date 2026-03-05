@@ -190,6 +190,8 @@
       description: +25% essence production from all sources
     - type: roomfeature
       targetFeatureId: Shadow Nexus
+    - type: roomupgrade
+      targetRoomupgradeId: Abyssal Gate
   tier: 5
   requiredTicks: 2250
 

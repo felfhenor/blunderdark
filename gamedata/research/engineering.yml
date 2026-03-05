@@ -242,6 +242,8 @@
       description: +20% gold production from all sources
     - type: roomupgrade
       targetRoomupgradeId: Infernal Forge
+    - type: roomupgrade
+      targetRoomupgradeId: Hellfire Crucible
   tier: 4
   requiredTicks: 1500
 

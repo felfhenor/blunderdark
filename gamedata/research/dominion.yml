@@ -216,6 +216,8 @@
       description: -10% recruitment cost for all creatures
     - type: roomupgrade
       targetRoomupgradeId: Mutagenic Pits
+    - type: roomupgrade
+      targetRoomupgradeId: Flesh Vats
   tier: 4
   requiredTicks: 1500
 
