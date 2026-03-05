@@ -34,6 +34,7 @@ import { startCase } from 'es-toolkit';
           <app-currency-cost
             [type]="$any(effect().resource)"
             [amount]="perMinuteValue()"
+            numberFormat="1.0-2"
           />
           /min
         }
