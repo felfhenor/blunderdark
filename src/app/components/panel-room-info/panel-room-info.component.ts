@@ -74,6 +74,7 @@ import { corruptionEffectIsDarkUpgradeUnlocked } from '@helpers/corruption-effec
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { STORAGE_ROOM_BASE_BONUS } from '@helpers/resources';
+import { WORK_CATEGORY_LABELS } from '@helpers/work-affinity';
 import {
   transportRemovalGetInfo,
   transportRemovalExecute,
@@ -147,6 +148,8 @@ export class PanelRoomInfoComponent {
       roomTypeId: room.roomTypeId,
       placedRoom: room,
       maxInhabitants: effectiveMax,
+      workCategory: def.workCategory,
+      workCategoryLabel: def.workCategory ? WORK_CATEGORY_LABELS[def.workCategory] : undefined,
     };
   });
 

@@ -3,6 +3,7 @@ import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
+import { workAffinityGet } from '@helpers/work-affinity';
 import type {
   InhabitantInstance,
   InhabitantTraitContent,
@@ -10,6 +11,7 @@ import type {
   PlacedRoomId,
   RoomProduction,
   TraitEffect,
+  WorkCategory,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { EfficiencyTrait, InhabitantContribution, RoomEfficiencyBreakdown } from '@interfaces/efficiency';
@@ -59,6 +61,7 @@ export function efficiencyCalculateInhabitantContribution(
   instance: InhabitantInstance,
   roomProduction: RoomProduction,
   roommates?: InhabitantInstance[],
+  workCategory?: WorkCategory,
 ): InhabitantContribution | undefined {
   const def = contentGetEntry<InhabitantContent>(
     instance.definitionId,
@@ -67,6 +70,7 @@ export function efficiencyCalculateInhabitantContribution(
 
   const stats = effectiveStatsCalculate(def, instance, roommates);
   const workerEfficiencyBonus = stats.workerEfficiency;
+  const affinityBonus = workAffinityGet(def.type, workCategory);
 
   const traitBonuses: { traitName: string; bonus: number; applies: boolean }[] = [];
   for (const trait of def.traits) {
@@ -120,8 +124,9 @@ export function efficiencyCalculateInhabitantContribution(
     instanceId: instance.instanceId,
     name: def.name,
     workerEfficiencyBonus,
+    affinityBonus,
     traitBonuses,
-    totalBonus: workerEfficiencyBonus + applicableTraitBonus,
+    totalBonus: workerEfficiencyBonus + applicableTraitBonus + affinityBonus,
   };
 }
 
@@ -135,6 +140,7 @@ export function efficiencyCalculateRoom(
 ): RoomEfficiencyBreakdown {
   const roomDef = productionGetRoomDefinition(room.roomTypeId);
   const roomProduction = roomDef?.production ?? {};
+  const workCategory = roomDef?.workCategory;
 
   const assigned = inhabitants.filter(
     (i) => i.assignedRoomId === room.id,
@@ -142,7 +148,7 @@ export function efficiencyCalculateRoom(
 
   const inhabitantBonuses: InhabitantContribution[] = [];
   for (const inst of assigned) {
-    const contribution = efficiencyCalculateInhabitantContribution(inst, roomProduction, assigned);
+    const contribution = efficiencyCalculateInhabitantContribution(inst, roomProduction, assigned, workCategory);
     if (contribution) {
       inhabitantBonuses.push(contribution);
     }
@@ -170,6 +176,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 ): { bonus: number; hasWorkers: boolean } {
   const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
   const roomProduction = roomDef?.production ?? {};
+  const workCategory = roomDef?.workCategory;
 
   const assigned = inhabitants.filter(
     (i) => i.assignedRoomId === placedRoom.id,
@@ -188,6 +195,9 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 
     const stats = effectiveStatsCalculate(def, inst, assigned);
     totalBonus += stats.workerEfficiency;
+
+    // Work category affinity bonus/penalty
+    totalBonus += workAffinityGet(def.type, workCategory);
 
     for (const trait of def.traits) {
       for (const effect of trait.effects) {

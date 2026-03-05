@@ -53,6 +53,11 @@
           }
         </ng-template>
       }
+      @if (affinityWarning(); as warning) {
+        <span class="text-error flex-shrink-0" [tp]="warning">
+          <app-icon name="tablerExclamationCircle" size="14px" />
+        </span>
+      }
     </div>
     @if (showStats()) {
       <div class="flex items-center mt-0.5">
@@ -100,6 +105,11 @@
             }
           </ng-template>
         }
+        @if (affinityWarning(); as warning) {
+          <span class="text-error" [tp]="warning">
+            <app-icon name="tablerExclamationCircle" size="14px" />
+          </span>
+        }
         @if (showState()) {
           <span class="badge badge-xs" [ngClass]="stateClass()" [tp]="stateTipFull">
             {{ instance().state }}
@@ -122,7 +132,7 @@
     </div>
 
     @if (showType()) {
-      <div class="text-xs opacity-60 mt-0.5">{{ definition().type }}</div>
+      <div class="text-xs opacity-60 mt-0.5 capitalize">{{ definition().type }}</div>
     }
 
     <!-- Stats row -->

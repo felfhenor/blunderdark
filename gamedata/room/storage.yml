@@ -3,6 +3,7 @@
   description: A massive reinforced chamber designed to stockpile resources. Its sheer size increases the maximum capacity for all stored materials. Can be specialized via upgrades to focus on a single resource type for even greater capacity.
   shapeId: Step 5x5
   role: storage
+  workCategory: storage
   cost:
     gold: 80
     crystals: 30

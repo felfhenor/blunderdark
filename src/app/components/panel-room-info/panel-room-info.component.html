@@ -1,7 +1,12 @@
 @if (selectedRoom(); as room) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <h3 class="card-title text-sm">{{ room.name }}</h3>
+      <div class="flex items-center justify-between">
+        <h3 class="card-title text-sm">{{ room.name }}</h3>
+        @if (room.workCategory) {
+          <span class="badge badge-xs badge-outline capitalize">{{ room.workCategoryLabel }}</span>
+        }
+      </div>
       @if (room.baseRoomName) {
         <p class="text-xs italic opacity-60 -mt-1">{{ room.baseRoomName }}</p>
       }
@@ -79,6 +84,12 @@
                 {{ contrib.totalBonus >= 0 ? '+' : ''
                 }}{{ contrib.totalBonus | number: '1.0-2' }}x
               </span>
+              @if (contrib.affinityBonus !== 0) {
+                <span class="opacity-50"
+                  [class.text-success]="contrib.affinityBonus > 0"
+                  [class.text-error]="contrib.affinityBonus < 0"
+                >(affinity {{ contrib.affinityBonus >= 0 ? '+' : '' }}{{ contrib.affinityBonus | number: '1.0-2' }})</span>
+              }
               @for (tb of contrib.traitBonuses; track tb.traitName) {
                 @if (tb.applies) {
                   <span class="opacity-50">({{ tb.traitName }})</span>
@@ -283,6 +294,7 @@
                   [showTier]="false"
                   [showAssignment]="false"
                   [showHunger]="true"
+                  [synergyRoomId]="selectedRoom()?.id"
                 />
                 <app-button-close
                   class="text-error flex-shrink-0"

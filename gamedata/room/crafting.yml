@@ -3,6 +3,7 @@
   description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
   shapeId: Small Staircase
   role: darkForge
+  workCategory: crafting
   queueSize: 5
   cost:
     gold: 60
@@ -43,6 +44,7 @@
     - Advanced Laboratory
     - Expanded Laboratory
   role: alchemyLab
+  workCategory: crafting
   biomeBonuses:
     crystal: 0.2
   adjacencyBonuses:
@@ -71,6 +73,7 @@
     - Mutagenic Pits
     - Flesh Vats
   role: breedingPits
+  workCategory: crafting
   adjacencyBonuses:
     - adjacentRoomId: Spawning Pool
       bonus: 0.15
@@ -101,6 +104,7 @@
     - Binding Circle
     - Abyssal Gate
   role: summoningCircle
+  workCategory: crafting
   queueSize: 3
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
@@ -125,6 +129,7 @@
   fearLevel: 3
   isUnique: true
   role: fusionCore
+  workCategory: crafting
   adjacencyBonuses:
     - adjacentRoomId: Shadow Library
       bonus: 0.15
@@ -151,6 +156,7 @@
   isUnique: true
   roomUpgradeIds: []
   role: tortureChamber
+  workCategory: crafting
   timeOfDayBonus:
     period: night
     bonus: 0.2
@@ -184,3 +190,4 @@
   isUnique: true
   roomUpgradeIds: []
   role: runeworking
+  workCategory: crafting

@@ -15,6 +15,7 @@
   inhabitantRestriction: null
   fearLevel: 0
   role: stair
+  workCategory: transport
 - id: 02d01c66-0ba4-4b82-8ce8-e801e798e731
   name: Elevator Shaft
   description: A mechanical lift system that rapidly transports inhabitants between floors. Faster than stairs and can span multiple floors.
@@ -33,6 +34,7 @@
   inhabitantRestriction: null
   fearLevel: 0
   role: elevator
+  workCategory: transport
 - id: 2c382a21-53f8-4667-a7b9-38e900d84761
   name: Portal
   description: A magical gateway that instantly teleports inhabitants between two locations on different floors. Requires flux and essence to construct.
@@ -51,3 +53,4 @@
   inhabitantRestriction: null
   fearLevel: 0
   role: portal
+  workCategory: transport

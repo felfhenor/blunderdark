@@ -123,5 +123,6 @@ export * from './version';
 export * from './vertical-transport';
 export * from './victory';
 export * from './victory-conditions';
+export * from './work-affinity';
 export * from './world';
 export * from './worldgen';

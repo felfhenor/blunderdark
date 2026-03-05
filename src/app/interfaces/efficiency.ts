@@ -11,6 +11,7 @@ export type InhabitantContribution = {
   instanceId: InhabitantInstanceId;
   name: string;
   workerEfficiencyBonus: number;
+  affinityBonus: number;
   traitBonuses: Array<{
     traitName: string;
     bonus: number;

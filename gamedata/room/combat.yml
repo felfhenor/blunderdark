@@ -15,6 +15,7 @@
     - War Room
     - Garrison Expansion
   role: barracks
+  workCategory: combat
   trainingAdjacencyEffects:
     timeReduction: 0.2
   tortureAdjacencyEffects:
@@ -34,6 +35,7 @@
   description: A combat preparation area where inhabitants drill and spar. Assigned creatures undergo training to improve their combat skills, gaining permanent stat bonuses. Different upgrade paths grant different training specializations, and moving an inhabitant to a differently-upgraded room will retrain them.
   shapeId: Wide
   role: trainingGrounds
+  workCategory: combat
   cost:
     gold: 80
     crystals: 30
@@ -67,6 +69,7 @@
   description: A crafting room where inhabitants assemble traps from raw materials. Assign workers to queue trap crafting jobs, which complete over time. More workers means faster crafting. Proximity to forges and magical rooms enhances trap quality.
   shapeId: Z-Shape
   role: trapWorkshop
+  workCategory: combat
   queueSize: 25
   cost:
     gold: 90

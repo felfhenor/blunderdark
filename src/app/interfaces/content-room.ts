@@ -8,6 +8,16 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type RoomId = Branded<string, 'RoomId'>;
 
+export type WorkCategory =
+  | 'mining'
+  | 'nature'
+  | 'arcane'
+  | 'combat'
+  | 'crafting'
+  | 'sanctum'
+  | 'storage'
+  | 'transport';
+
 export type RoomContent = IsContentItem &
   HasDescription & {
     id: RoomId;
@@ -26,6 +36,7 @@ export type RoomContent = IsContentItem &
     autoPlace: boolean;
     roomUpgradeIds: RoomUpgradeId[];
     role: string | undefined;
+    workCategory: WorkCategory | undefined;
     timeOfDayBonus: { period: 'day' | 'night'; bonus: number } | undefined;
     biomeBonuses: Partial<Record<string, number>> | undefined;
     invasionProfile: { dimension: string; weight: number } | undefined;

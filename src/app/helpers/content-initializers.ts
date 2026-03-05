@@ -351,6 +351,7 @@ function ensureRoom(room: Partial<RoomContent>): Required<RoomContent> {
     autoPlace: room.autoPlace ?? false,
     roomUpgradeIds: room.roomUpgradeIds ?? [],
     role: room.role ?? undefined,
+    workCategory: room.workCategory ?? undefined,
     timeOfDayBonus: room.timeOfDayBonus ?? undefined,
     biomeBonuses: room.biomeBonuses ?? undefined,
     invasionProfile: room.invasionProfile ?? undefined,

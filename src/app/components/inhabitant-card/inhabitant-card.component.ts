@@ -16,6 +16,7 @@ import { formatMultiplierAsPercentage } from '@helpers/format';
 import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { gamestate } from '@helpers/state-game';
+import { workAffinityGetLabel, WORK_CATEGORY_LABELS } from '@helpers/work-affinity';
 import {
   stateModifierGet,
   stateModifierGetFearTolerance,
@@ -177,13 +178,10 @@ export class InhabitantCardComponent {
     };
   });
 
-  public synergyInfo = computed(() => {
+  private resolvedRoomDef = computed(() => {
     const roomId = this.synergyRoomId();
     if (!roomId) return undefined;
 
-    const def = this.definition();
-
-    // Resolve placed room to get its roomTypeId
     const floors = gamestate().world.floors;
     let roomTypeId: RoomId | undefined;
     for (const floor of floors) {
@@ -194,10 +192,14 @@ export class InhabitantCardComponent {
       }
     }
     if (!roomTypeId) return undefined;
+    return productionGetRoomDefinition(roomTypeId);
+  });
 
-    const roomDef = productionGetRoomDefinition(roomTypeId);
+  public synergyInfo = computed(() => {
+    const roomDef = this.resolvedRoomDef();
     if (!roomDef) return undefined;
 
+    const def = this.definition();
     const reasons: string[] = [];
 
     // Check trait-room match
@@ -237,7 +239,26 @@ export class InhabitantCardComponent {
       }
     }
 
+    // Check work category affinity
+    const affinity = workAffinityGetLabel(def.type, roomDef.workCategory);
+    if (affinity === 'preferred') {
+      const label = roomDef.workCategory ? WORK_CATEGORY_LABELS[roomDef.workCategory] : '';
+      reasons.push(`Preferred work: ${label} (+15%)`);
+    }
+
     return reasons.length > 0 ? reasons : undefined;
+  });
+
+  public affinityWarning = computed(() => {
+    const roomDef = this.resolvedRoomDef();
+    if (!roomDef) return undefined;
+
+    const def = this.definition();
+    const affinity = workAffinityGetLabel(def.type, roomDef.workCategory);
+    if (affinity !== 'disliked') return undefined;
+
+    const label = roomDef.workCategory ? WORK_CATEGORY_LABELS[roomDef.workCategory] : '';
+    return `Disliked work: ${label} (-25%)`;
   });
 
   public equippedTraits = computed(() => {
