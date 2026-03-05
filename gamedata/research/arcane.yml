@@ -34,7 +34,7 @@
     - type: room
       targetRoomId: Ley Line Nexus
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 7a2ebad7-c9ab-4718-a456-0562b7a8da6d
   name: Ley Line Tapping
@@ -51,7 +51,7 @@
       value: 0.10
       description: +10% flux production from all sources
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 85974131-d05e-4b8e-81f5-4ae3247e781a
   name: Enchantment
@@ -70,7 +70,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Arcane Library
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: f4a91c23-8e67-4d3b-a5f0-7c2b9d1e6a84
   name: Crystal Biome
@@ -85,7 +85,7 @@
     - type: biome
       targetBiome: crystal
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 # --- TIER 3: Specializations ---
 
@@ -104,7 +104,7 @@
       value: 0.15
       description: +15% flux production from all sources
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: e318e918-eb4f-4d0b-823e-360ddf1dfe80
   name: Elemental Binding
@@ -121,7 +121,7 @@
       value: 0.05
       description: +5% to all resource production
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 4500639c-fd48-4ee5-b05b-b1cb37f8d609
   name: Advanced Room Modifications
@@ -140,7 +140,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Advanced Laboratory
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 21df8436-d4be-4f55-b2eb-217dfec171a0
   name: Warding
@@ -159,7 +159,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Arcane Trapworks
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 # --- TIER 4: Advanced combinations ---
 
@@ -184,7 +184,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Overcharged Nexus
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 3bae2f3c-511a-4afd-9f52-8f4839dc847f
   name: Ley Line Mastery
@@ -203,7 +203,7 @@
       value: 0.10
       description: +10% to all resource production
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 575be533-699f-492f-81f9-3cd003a0e822
   name: Spellweave Lattice
@@ -224,7 +224,7 @@
     - type: roomfeature
       targetFeatureId: Elder Runes
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -245,7 +245,7 @@
       value: 0.25
       description: +25% flux production from all sources
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: a0d84b13-668d-4cfc-9ed9-79355f70d484
   name: Planar Nexus
@@ -264,7 +264,7 @@
       value: 0.15
       description: +15% to all resource production
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: da630228-917b-4ab1-a30c-cebb1b8634c9
   name: Planar Binding
@@ -281,7 +281,7 @@
     - type: inhabitant
       targetInhabitantId: Dragon
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 0c4358c0-e787-41d3-a989-c91263f67ccf
   name: Aberrant Summoning
@@ -297,7 +297,7 @@
     - type: inhabitant
       targetInhabitantId: Beholder
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -318,4 +318,4 @@
       value: 0.50
       description: +50% to all arcane branch bonuses
   tier: 6
-  requiredTicks: 1000
+  requiredTicks: 3000

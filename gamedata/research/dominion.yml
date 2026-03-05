@@ -39,7 +39,7 @@
     - type: inhabitant
       targetInhabitantId: Gargoyle
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: e01d43f1-b4c6-4483-800f-7bfad3aa2daf
   name: Dark Pacts
@@ -54,7 +54,7 @@
     - type: inhabitant
       targetInhabitantId: Imp
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 1e1a283e-3b94-4d52-b218-09090cedaec7
   name: Elemental Crystallization
@@ -69,7 +69,7 @@
     - type: inhabitant
       targetInhabitantId: Stone Elemental
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: f6487b40-fc5d-4909-92f3-5c049ff13d96
   name: Martial Training
@@ -84,7 +84,7 @@
     - type: inhabitant
       targetInhabitantId: Orc
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 # --- TIER 3: Creature specializations ---
 
@@ -101,7 +101,7 @@
     - type: inhabitant
       targetInhabitantId: Dryad
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: e1b0fbf9-fe73-4c64-b0a1-3cf6a118d320
   name: Spirit Binding
@@ -118,7 +118,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Greater Circle
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: de20f99f-edc6-4cab-a775-cb8a1626881e
   name: Transmutation
@@ -133,7 +133,7 @@
     - type: inhabitant
       targetInhabitantId: Mimic
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 849a01b0-b6b5-47ea-8c77-daf471b6a6d3
   name: Creature Quarters
@@ -154,7 +154,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Teeming Pool
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 # --- TIER 4: Advanced combinations ---
 
@@ -177,7 +177,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Incubation Chamber
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 79328f84-7d0f-4c45-94c6-9cf361661fd9
   name: Pack Mentality
@@ -196,7 +196,7 @@
       value: 0.10
       description: +10% worker efficiency for all inhabitants
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: f027eb3f-b483-4fa0-abd3-dfd0273725fa
   name: Elite Training
@@ -217,7 +217,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Mutagenic Pits
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 7b1bb0f6-6399-4174-81c0-fad6f7ca2ab2
   name: Garrison Command
@@ -234,7 +234,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Garrison Expansion
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -255,7 +255,7 @@
       value: 10
       description: +10 maximum inhabitants
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: cda817bf-8ae7-4d87-a419-736e7fb98e04
   name: Creature Synergy
@@ -274,7 +274,7 @@
       value: 0.15
       description: +15% worker efficiency for all inhabitants
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 67338f35-6b17-49ce-bad4-61125fd851fa
   name: Forced March
@@ -293,7 +293,7 @@
       value: 0.10
       description: -10% recruitment cost for all creatures
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 9685b3eb-a200-42d6-8298-d83c08d6c95f
   name: Vast Dominion
@@ -312,7 +312,7 @@
       value: 10
       description: +10 maximum inhabitants
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -333,4 +333,4 @@
       value: 0.50
       description: +50% to all dominion branch bonuses
   tier: 6
-  requiredTicks: 1000
+  requiredTicks: 3000

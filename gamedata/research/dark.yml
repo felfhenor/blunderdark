@@ -34,7 +34,7 @@
       value: 0.10
       description: +10% essence production from all sources
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 303c1628-2834-4abf-a1e2-617fb554d151
   name: Necromancy
@@ -51,7 +51,7 @@
     - type: roomfeature
       targetFeatureId: Coffins
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 # --- TIER 3: Specializations ---
 
@@ -72,7 +72,7 @@
     - type: roomfeature
       targetFeatureId: Soul Furnace
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 8a4edb8b-65bb-4d08-a30c-45097e1e8483
   name: Soul Well Mastery
@@ -89,7 +89,7 @@
       value: 0.15
       description: +15% essence production from all sources
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 78ba7f10-7290-4e85-ab57-41543b257ab2
   name: Farplane Studies
@@ -104,7 +104,7 @@
     - type: room
       targetRoomId: Farplane
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 48465784-afc0-4fa8-936e-dfe932df4bfb
   name: Rune Extraction
@@ -121,7 +121,7 @@
       featureFlag: rune_extraction
       description: Rune Extraction
   tier: 3
-  requiredTicks: 350
+  requiredTicks: 875
 
 # --- TIER 4: Advanced combinations ---
 
@@ -144,7 +144,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Necronomicon Wing
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 9fdc4500-6479-4348-973a-159cb86bade3
   name: Soul Binding
@@ -163,7 +163,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Spiritual Expansion
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 06e35397-21ce-4edd-9bdb-82f57e36fb7e
   name: Runeworking Techniques
@@ -179,7 +179,7 @@
     - type: room
       targetRoomId: Runeworking Chamber
   tier: 4
-  requiredTicks: 450
+  requiredTicks: 1350
 
 - id: 031cb877-8674-4213-ae08-424ca51fd8c8
   name: Soul Forge
@@ -200,7 +200,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Abyssal Conduit
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -218,7 +218,7 @@
     - type: inhabitant
       targetInhabitantId: Lich
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 2398d825-9ddc-4a1a-b6c2-950ed0da4486
   name: Ethereal Resonance
@@ -237,7 +237,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Ethereal Amplification
   tier: 5
-  requiredTicks: 600
+  requiredTicks: 1800
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -258,4 +258,4 @@
       value: 0.50
       description: +50% to all dark branch bonuses
   tier: 6
-  requiredTicks: 1000
+  requiredTicks: 3000

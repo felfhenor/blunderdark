@@ -38,7 +38,7 @@
     - type: room
       targetRoomId: Treasure Vault
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: eb8b543e-0b7d-47f8-9192-7fba92e9ea34
   name: Trap Design
@@ -55,7 +55,7 @@
     - type: room
       targetRoomId: Training Grounds
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 7c76338a-a73a-4b12-a726-beec4e93974d
   name: Advanced Manufacturing
@@ -72,7 +72,7 @@
       value: 0.10
       description: +10% gold production from all sources
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 16c3c35b-6a51-4578-94a2-9410008ef98a
   name: Storage Design
@@ -87,7 +87,7 @@
     - type: room
       targetRoomId: Storage Room
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 # --- TIER 3: Specializations ---
 
@@ -105,7 +105,7 @@
       featureFlag: elevators
       description: Elevators
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 6fc62ebf-39d2-47b0-9ba3-92c0241f6146
   name: Master Architecture
@@ -124,7 +124,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Fortified Barracks
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 687957be-a605-4d0d-811e-591a71f21300
   name: Automated Defenses
@@ -145,7 +145,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Expanded Workshop
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: e1af3b41-800b-4190-82de-7e8a2e626986
   name: Dark Forge Mastery
@@ -166,7 +166,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Forge Expansion
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 # --- TIER 4: Advanced combinations ---
 
@@ -184,7 +184,7 @@
     - type: room
       targetRoomId: Fusion Core
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 127df468-753f-47a9-ab98-ab8b212cac69
   name: Siege Works
@@ -203,7 +203,7 @@
       value: 0.15
       description: +15% defense for all inhabitants
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: c1509327-9bf8-41ad-b674-9c79137fe3b9
   name: Mechanical Sentinels
@@ -222,7 +222,7 @@
       value: 0.20
       description: +20% trap damage
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 0493134f-837b-4636-909a-ca334d605466
   name: Golem Assembly
@@ -243,7 +243,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Infernal Forge
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -262,7 +262,7 @@
       featureFlag: portals
       description: Teleporters
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 6279db88-f682-4738-973c-fdd56c9d628f
   name: War Machines
@@ -281,7 +281,7 @@
       value: 0.25
       description: +25% defense for all inhabitants
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 4caa2af0-5ecd-48f5-b012-0223c2d3bb79
   name: Industrial Mastery
@@ -302,7 +302,7 @@
     - type: roomfeature
       targetFeatureId: "Dragon's Hoard Core"
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: 2c486077-51f1-4f1b-ad6f-c55349a7932f
   name: Primal Dominion
@@ -319,7 +319,7 @@
     - type: inhabitant
       targetInhabitantId: Ancient Treant
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -340,4 +340,4 @@
       value: 0.50
       description: +50% to all engineering branch bonuses
   tier: 6
-  requiredTicks: 1000
+  requiredTicks: 3000

@@ -37,7 +37,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Blighted Grove
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: 8d3e5a72-1f4c-49b8-b6d2-c7a0e9f31d58
   name: Corrupted Biome
@@ -54,7 +54,7 @@
     - type: roomfeature
       targetFeatureId: Bioluminescent Moss
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 - id: f4a4dc7a-660f-4684-9a52-d394cec8935b
   name: Nether Channeling
@@ -71,7 +71,7 @@
       value: 0.10
       description: +10% corruption generation
   tier: 2
-  requiredTicks: 150
+  requiredTicks: 300
 
 # --- TIER 3: Specializations ---
 
@@ -95,7 +95,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Blighted Ore
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 - id: 93d2120e-d116-4581-89a7-e093fc47c4f4
   name: Void Affinity
@@ -112,7 +112,7 @@
       value: 0.15
       description: Corruption thresholds increased by 15%
   tier: 3
-  requiredTicks: 300
+  requiredTicks: 750
 
 # --- TIER 4: Advanced combinations ---
 
@@ -133,7 +133,7 @@
       value: 1
       description: All rooms gain +1 fear reduction
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: 72b0062a-ac4e-452a-a8e0-a1d6f54d50cb
   name: Purification Rites
@@ -149,7 +149,7 @@
     - type: room
       targetRoomId: Purification Chamber
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 - id: e2c237e2-27f5-4fc6-bbd6-8cf38317e016
   name: Nether Conduit
@@ -168,7 +168,7 @@
       value: 0.15
       description: +15% corruption generation
   tier: 4
-  requiredTicks: 500
+  requiredTicks: 1500
 
 # --- TIER 5: Pinnacle powers ---
 
@@ -191,7 +191,7 @@
     - type: roomfeature
       targetFeatureId: Shadow Nexus
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: d5d60545-90a0-4f52-9000-ec2e6a7c63e2
   name: Purification Mastery
@@ -209,7 +209,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Warding Pillars
   tier: 5
-  requiredTicks: 600
+  requiredTicks: 1800
 
 - id: c7f82a5e-cc60-4c23-bffb-935176664593
   name: Abyssal Purification
@@ -225,7 +225,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Abyssal Filter
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: d311dfe1-5fc4-4b3f-a394-670e219cb154
   name: Serpent's Gaze
@@ -242,7 +242,7 @@
     - type: inhabitant
       targetInhabitantId: Medusa
   tier: 5
-  requiredTicks: 750
+  requiredTicks: 2250
 
 # --- TIER 6: Ultimate mastery ---
 
@@ -260,7 +260,7 @@
     - type: inhabitant
       targetInhabitantId: Demon Lord
   tier: 6
-  requiredTicks: 750
+  requiredTicks: 2250
 
 - id: fb26748a-73da-4d2b-b1f2-88e793ba817a
   name: Nether Apotheosis
@@ -279,4 +279,4 @@
       value: 0.50
       description: +50% to all nether branch bonuses
   tier: 6
-  requiredTicks: 1000
+  requiredTicks: 3000
