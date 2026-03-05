@@ -319,6 +319,24 @@ describe('invasion-triggers', () => {
       invasionTriggerAddSpecial(schedule, 'bounty_hunter', 50);
       expect(schedule.pendingSpecialInvasions).toHaveLength(0);
     });
+
+    it('should clamp trigger day to grace period end when added during grace period', () => {
+      const schedule = makeSchedule({ gracePeriodEnd: 10 });
+      const result = invasionTriggerAddSpecial(schedule, 'crusade', 3);
+      expect(result.pendingSpecialInvasions[0]).toEqual({
+        type: 'crusade',
+        triggerDay: 10,
+      });
+    });
+
+    it('should not clamp trigger day when already past grace period', () => {
+      const schedule = makeSchedule({ gracePeriodEnd: 10 });
+      const result = invasionTriggerAddSpecial(schedule, 'crusade', 20);
+      expect(result.pendingSpecialInvasions[0]).toEqual({
+        type: 'crusade',
+        triggerDay: 21,
+      });
+    });
   });
 
   // --- invasionTriggerProcessSchedule ---

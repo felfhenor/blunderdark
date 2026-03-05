@@ -136,11 +136,12 @@ export function invasionTriggerAddSpecial(
   currentDay: number,
   delay: number = 1,
 ): InvasionSchedule {
+  const triggerDay = Math.max(currentDay + delay, schedule.gracePeriodEnd);
   return {
     ...schedule,
     pendingSpecialInvasions: [
       ...schedule.pendingSpecialInvasions,
-      { type, triggerDay: currentDay + delay },
+      { type, triggerDay },
     ],
   };
 }
