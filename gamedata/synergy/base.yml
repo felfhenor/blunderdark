@@ -1,3 +1,7 @@
+# =============================================================================
+# Existing synergies
+# =============================================================================
+
 - id: 0525d9f1-08e7-4be3-8d06-dac038e69f50
   name: Dark Industry
   description: Goblin miners near a Dark Forge extract crystals with forge-heated tools.
@@ -66,3 +70,650 @@
     - type: productionBonus
       value: 0.2
       resource: gold
+
+# =============================================================================
+# Production room synergies
+# =============================================================================
+
+- id: ac21bc3f-fc83-418b-9930-3de563be3c68
+  name: Arcane Extraction
+  description: Scholarly mining techniques and a full crew maximize crystal yield.
+  conditions:
+    - type: roomType
+      roomTypeId: Crystal Mine
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: crystals
+
+- id: caeaa2ca-9fba-4ec5-b2f0-e3a025aa39d8
+  name: Fertile Depths
+  description: Lake moisture seeps into the grove, accelerating fungal growth cycles.
+  conditions:
+    - type: roomType
+      roomTypeId: Mushroom Grove
+    - type: adjacentRoomType
+      roomTypeId: Underground Lake
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: food
+
+- id: 9fc477e9-0ea3-40e5-8629-4076287bfc07
+  name: Spore Tenders
+  description: A fully-staffed grove with dedicated tenders maximizes the mushroom harvest.
+  conditions:
+    - type: roomType
+      roomTypeId: Mushroom Grove
+    - type: minInhabitants
+      count: 3
+  effects:
+    - type: productionBonus
+      value: 0.1
+      resource: food
+
+- id: cd839841-0ee1-4c76-9fea-1e02552183e4
+  name: Forbidden Scholarship
+  description: Tireless undead scholars channel ley line energy into accelerated research.
+  conditions:
+    - type: roomType
+      roomTypeId: Shadow Library
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+    - type: inhabitantType
+      inhabitantType: undead
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: research
+
+- id: 7793d62a-8506-4494-b64f-8f077a38940c
+  name: Spectral Confluence
+  description: The Soul Well's spiritual energy greatly amplifies the shrine's spectral draw.
+  conditions:
+    - type: roomType
+      roomTypeId: Spirit Shrine
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.25
+
+- id: 0dad086f-dc00-40fb-8f5e-62771b509235
+  name: Hallowed Ground
+  description: The altar sanctifies the shrine, calming the surrounding area and boosting output.
+  conditions:
+    - type: roomType
+      roomTypeId: Spirit Shrine
+    - type: adjacentRoomType
+      roomTypeId: Altar Room
+  effects:
+    - type: productionBonus
+      value: 0.2
+    - type: fearReduction
+      value: 1
+
+- id: c74ba90c-64bb-48fd-a272-4148bebdabf6
+  name: Necrotic Wellspring
+  description: Spiritual research from the shrine and library focuses the well's essence draw.
+  conditions:
+    - type: roomType
+      roomTypeId: Soul Well
+    - type: adjacentRoomType
+      roomTypeId: Spirit Shrine
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 7542a5f8-6c21-448e-a4b9-2ff3073699c2
+  name: Abyssal Depths
+  description: Attendants maintain the well's connection to the spirit plane, amplifying its flow.
+  conditions:
+    - type: roomType
+      roomTypeId: Soul Well
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 68e87419-ab74-4f91-bdfb-f1fded9b915b
+  name: Deep Fishing
+  description: A full fishing crew works the lake in shifts, maximizing the catch.
+  conditions:
+    - type: roomType
+      roomTypeId: Underground Lake
+    - type: minInhabitants
+      count: 3
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: food
+
+- id: a2fbde2d-a46f-467c-9970-79e919d039f4
+  name: Enchanted Waters
+  description: Magical currents from the ley nexus attract rare luminescent cave fish.
+  conditions:
+    - type: roomType
+      roomTypeId: Underground Lake
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: food
+
+- id: 0fa9ae1e-c389-4f9e-b41d-ee600b71ca98
+  name: Arcane Network
+  description: Scholars direct ley line output with precision, channeling raw flux efficiently.
+  conditions:
+    - type: roomType
+      roomTypeId: Ley Line Nexus
+    - type: connectedRoomType
+      roomTypeId: Shadow Library
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: flux
+
+- id: 250950cd-4312-4711-b421-26310cef146b
+  name: Crystalline Conduit
+  description: Nearby crystals amplify and focus the ley line's raw magical energy.
+  conditions:
+    - type: roomType
+      roomTypeId: Ley Line Nexus
+    - type: adjacentRoomType
+      roomTypeId: Crystal Mine
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: flux
+
+- id: 32b9b410-622d-4efc-96f3-684395a03f7f
+  name: Merchant Prince
+  description: A vault attendant manages the forge-to-vault pipeline for maximum profit.
+  conditions:
+    - type: roomType
+      roomTypeId: Treasure Vault
+    - type: minInhabitants
+      count: 1
+    - type: adjacentRoomType
+      roomTypeId: Dark Forge
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: gold
+
+- id: d87f2fa8-5764-4820-88ca-b4570f4bd6b3
+  name: Vein Cluster
+  description: Connected veins form a rich deposit, increasing gold extraction from both.
+  conditions:
+    - type: roomType
+      roomTypeId: Gold Vein
+    - type: adjacentRoomType
+      roomTypeId: Gold Vein
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: gold
+
+- id: 11d9a6f3-88f1-461b-941a-3759e0946280
+  name: Forge Smelting
+  description: Forge heat exposes hidden ore veins, increasing gold extraction.
+  conditions:
+    - type: roomType
+      roomTypeId: Gold Vein
+    - type: adjacentRoomType
+      roomTypeId: Dark Forge
+  effects:
+    - type: productionBonus
+      value: 0.2
+      resource: gold
+
+# =============================================================================
+# Crafting room synergies
+# =============================================================================
+
+- id: 43436a0f-635d-4a47-92e2-9a20355dbfe4
+  name: War Industry
+  description: Military demand from the barracks and raw crystal supply drive forge output.
+  conditions:
+    - type: roomType
+      roomTypeId: Dark Forge
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+    - type: adjacentRoomType
+      roomTypeId: Crystal Mine
+  effects:
+    - type: productionBonus
+      value: 0.15
+      resource: gold
+
+- id: ba6d13d5-7adc-434e-b459-efce4d5ab099
+  name: Volcanic Smithing
+  description: Ley energy stabilizes forge heat, improving output and calming the surroundings.
+  conditions:
+    - type: roomType
+      roomTypeId: Dark Forge
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.1
+      resource: gold
+    - type: fearReduction
+      value: 1
+
+- id: 91bcd75e-422d-4d32-bad9-5e7b2c5d3e8b
+  name: Reagent Pipeline
+  description: Direct access to both crystal ore and mushroom substrate supercharges alchemy.
+  conditions:
+    - type: roomType
+      roomTypeId: Alchemy Lab
+    - type: adjacentRoomType
+      roomTypeId: Crystal Mine
+    - type: adjacentRoomType
+      roomTypeId: Mushroom Grove
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 364c14cb-b15b-4958-a20a-5103d9b70cf1
+  name: Arcane Distillation
+  description: Library recipes and research notes improve alchemical yield and precision.
+  conditions:
+    - type: roomType
+      roomTypeId: Alchemy Lab
+    - type: connectedRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.1
+
+- id: a735e446-63e5-4596-88b7-f95c3a0ca225
+  name: Primordial Incubation
+  description: Primordial ooze and soul energy combine to dramatically accelerate breeding.
+  conditions:
+    - type: roomType
+      roomTypeId: Breeding Pits
+    - type: adjacentRoomType
+      roomTypeId: Spawning Pool
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 7324af04-bd99-4582-8733-77f099a26413
+  name: Mutagenic Feeding
+  description: Organic mushroom feed sustains breeding specimens and accelerates growth.
+  conditions:
+    - type: roomType
+      roomTypeId: Breeding Pits
+    - type: adjacentRoomType
+      roomTypeId: Mushroom Grove
+  effects:
+    - type: productionBonus
+      value: 0.1
+
+- id: 779914a7-daa0-4c5f-afc9-3d3c9a863251
+  name: Ley Summoning
+  description: Ley line energy powers summoning rituals, reducing the strain on the summoner.
+  conditions:
+    - type: roomType
+      roomTypeId: Summoning Circle
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 78e69279-4ef5-4616-b340-86e123c58cf9
+  name: Dark Covenant
+  description: A demonic summoner channels soul energy to forge powerful planar connections.
+  conditions:
+    - type: roomType
+      roomTypeId: Summoning Circle
+    - type: connectedRoomType
+      roomTypeId: Soul Well
+    - type: inhabitantType
+      inhabitantType: demon
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 07001016-b2ca-4f23-9ad7-786078c0e68f
+  name: Energized Core
+  description: Crystal-focused ley energy stabilizes the volatile fusion process.
+  conditions:
+    - type: roomType
+      roomTypeId: Fusion Core
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+    - type: adjacentRoomType
+      roomTypeId: Crystal Mine
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 6eb8e734-5428-4958-9fb4-bd993924a8be
+  name: Essence Fusion
+  description: Soul essence binds fused creatures more reliably, improving fusion success.
+  conditions:
+    - type: roomType
+      roomTypeId: Fusion Core
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 6e65331b-3eb3-4f23-b120-38dffdf323b0
+  name: Dark Inquisition
+  description: Military discipline and a tireless undead torturer maximize prisoner processing.
+  conditions:
+    - type: roomType
+      roomTypeId: Torture Chamber
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+    - type: inhabitantType
+      inhabitantType: undead
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 604e1254-b906-4084-ac9e-4e4fc03a0825
+  name: Eldritch Methods
+  description: Forbidden library techniques powered by soul energy refine torture methods.
+  conditions:
+    - type: roomType
+      roomTypeId: Torture Chamber
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: f62b8641-d8fb-4503-ad47-6160f1b96db1
+  name: Runic Forge
+  description: Forge-crafted tools improve rune inscription precision and speed.
+  conditions:
+    - type: roomType
+      roomTypeId: Runeworking Chamber
+    - type: adjacentRoomType
+      roomTypeId: Dark Forge
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 6cdf3762-c886-4b77-99e5-e7bbedcc5353
+  name: Arcane Inscriptions
+  description: Scholarly knowledge and ley energy combine for masterful rune crafting.
+  conditions:
+    - type: roomType
+      roomTypeId: Runeworking Chamber
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+# =============================================================================
+# Combat room synergies
+# =============================================================================
+
+- id: 5f381a65-f00e-401e-a71d-facba53f7a77
+  name: Throne Garrison
+  description: A fully garrisoned barracks near the throne creates a disciplined command center.
+  conditions:
+    - type: roomType
+      roomTypeId: Barracks
+    - type: adjacentRoomType
+      roomTypeId: Throne Room
+    - type: minInhabitants
+      count: 6
+  effects:
+    - type: productionBonus
+      value: 0.15
+    - type: fearReduction
+      value: 1
+
+- id: 196e24fc-5d0b-4ae2-95d7-b2147d1ac08d
+  name: Armed Forces
+  description: Forge arms and adjacent training grounds create a well-equipped fighting force.
+  conditions:
+    - type: roomType
+      roomTypeId: Barracks
+    - type: adjacentRoomType
+      roomTypeId: Dark Forge
+    - type: adjacentRoomType
+      roomTypeId: Training Grounds
+  effects:
+    - type: productionBonus
+      value: 0.1
+
+- id: 1391145c-cfdb-4c25-ad00-b9d248718cab
+  name: Elite Drilling
+  description: A full roster trains alongside barracked soldiers for superior combat readiness.
+  conditions:
+    - type: roomType
+      roomTypeId: Training Grounds
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+    - type: minInhabitants
+      count: 4
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 407e3ca8-9969-4343-8e8d-d1d3159cb9cf
+  name: Arcane Training
+  description: Mystical combat techniques from the library enhance training effectiveness.
+  conditions:
+    - type: roomType
+      roomTypeId: Training Grounds
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.1
+
+- id: a11adb71-f66f-495a-89f0-27c3ca31c750
+  name: Ley-Powered Trapworks
+  description: Ley energy powers mechanical trap components, speeding assembly.
+  conditions:
+    - type: roomType
+      roomTypeId: Trap Workshop
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: dc1637a4-9f5c-456c-8ddb-056b3ec6be28
+  name: Battle Engineering
+  description: Soldiers inform trap design while dedicated workers assemble at full speed.
+  conditions:
+    - type: roomType
+      roomTypeId: Trap Workshop
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.1
+
+# =============================================================================
+# Special room synergies
+# =============================================================================
+
+- id: e87597a4-7cc8-480e-a744-916b3056bc3f
+  name: Sacred Nexus
+  description: Ley energy flows through the altar, calming the dungeon's dark atmosphere.
+  conditions:
+    - type: roomType
+      roomTypeId: Altar Room
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: fearReduction
+      value: 1
+
+- id: d2cda241-8d24-4221-b9e6-058e080cac95
+  name: Dark Sanctum
+  description: Spiritual and arcane energy converge at the altar, creating a zone of eerie calm.
+  conditions:
+    - type: roomType
+      roomTypeId: Altar Room
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: fearReduction
+      value: 2
+
+- id: 790c0f44-2f35-46a5-8faa-6adee2248daa
+  name: Royal Court
+  description: A garrisoned ruler flanked by loyal troops maintains order throughout the dungeon.
+  conditions:
+    - type: roomType
+      roomTypeId: Throne Room
+    - type: adjacentRoomType
+      roomTypeId: Barracks
+    - type: minInhabitants
+      count: 1
+  effects:
+    - type: fearReduction
+      value: 1
+
+- id: bda1dccc-2e5a-4a03-b72a-bb21ab273c86
+  name: Seat of Knowledge
+  description: Scholarly counsel from the library improves the ruler's dungeon management.
+  conditions:
+    - type: roomType
+      roomTypeId: Throne Room
+    - type: connectedRoomType
+      roomTypeId: Shadow Library
+    - type: minInhabitants
+      count: 1
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 5b408ba9-d06d-4d9b-95ee-ba72f40df922
+  name: Arcane Genesis
+  description: Magical ley energy accelerates the spawning pool's primordial processes.
+  conditions:
+    - type: roomType
+      roomTypeId: Spawning Pool
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: 9d9cf0b4-1003-487a-9aa5-176280e45ec1
+  name: Fungal Seeding
+  description: Organic mushroom nutrients and soul energy supercharge the spawning pool.
+  conditions:
+    - type: roomType
+      roomTypeId: Spawning Pool
+    - type: adjacentRoomType
+      roomTypeId: Mushroom Grove
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: 9be17f5f-953b-47a6-bfa1-7545031cac52
+  name: Holy Alliance
+  description: Altar power and dedicated attendants maximize the purification effect.
+  conditions:
+    - type: roomType
+      roomTypeId: Purification Chamber
+    - type: adjacentRoomType
+      roomTypeId: Altar Room
+    - type: minInhabitants
+      count: 2
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: ac4d7e83-1f29-4a5b-b8c3-6d2e9f0a4b7c
+  name: Spiritual Cleansing
+  description: Shrine energy aids corruption drainage and calms the surrounding area.
+  conditions:
+    - type: roomType
+      roomTypeId: Purification Chamber
+    - type: adjacentRoomType
+      roomTypeId: Spirit Shrine
+  effects:
+    - type: productionBonus
+      value: 0.1
+    - type: fearReduction
+      value: 1
+
+- id: b5e8f1a2-3c4d-4e6f-a7b8-9c0d1e2f3a4b
+  name: Ethereal Bridge
+  description: Soul energy from the well strengthens the rift to the farplane.
+  conditions:
+    - type: roomType
+      roomTypeId: Farplane
+    - type: adjacentRoomType
+      roomTypeId: Soul Well
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: c6f9a2b3-4d5e-4f7a-8b9c-0d1e2f3a4b5c
+  name: Mystical Anchor
+  description: Arcane knowledge and ley energy stabilize the rift between worlds.
+  conditions:
+    - type: roomType
+      roomTypeId: Farplane
+    - type: adjacentRoomType
+      roomTypeId: Ley Line Nexus
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.2
+
+- id: d7a0b3c4-5e6f-4a8b-9c0d-1e2f3a4b5c6d
+  name: Organized Stockpile
+  description: Efficient resource routing between storage and the vault reduces overhead.
+  conditions:
+    - type: roomType
+      roomTypeId: Storage Room
+    - type: adjacentRoomType
+      roomTypeId: Treasure Vault
+  effects:
+    - type: productionBonus
+      value: 0.15
+
+- id: e8b1c4d5-6f7a-4b9c-0d1e-2f3a4b5c6d7e
+  name: Arcane Preservation
+  description: Library preservation magic reduces resource spoilage and decay in storage.
+  conditions:
+    - type: roomType
+      roomTypeId: Storage Room
+    - type: adjacentRoomType
+      roomTypeId: Shadow Library
+  effects:
+    - type: productionBonus
+      value: 0.1
