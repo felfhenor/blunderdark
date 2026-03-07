@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { saveSerialize, notifySuccess, notifyError } from '@helpers';
+import { notifyError, notifySuccess, saveSerialize } from '@helpers';
 
 @Component({
   selector: 'app-button-savefile-export',
@@ -15,7 +15,7 @@ export class ButtonSavefileExportComponent {
     try {
       const saveData = saveSerialize();
 
-      const fileName = `${Date.now()}.grdh`;
+      const fileName = `${Date.now()}.blunder`;
       const dataStr =
         'data:text/json;charset=utf-8,' +
         encodeURIComponent(JSON.stringify(saveData));
