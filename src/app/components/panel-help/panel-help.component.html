@@ -43,11 +43,16 @@
                 [class.btn-info]="selectedCreature()?.id === creature.id"
                 (click)="selectCreature(creature.id)"
               >
-                <span class="badge badge-xs" [ngClass]="tierClass(creature.tier)">
+                <span
+                  class="badge badge-xs"
+                  [ngClass]="tierClass(creature.tier)"
+                >
                   T{{ creature.tier | number: '1.0-0' }}
                 </span>
                 <span class="truncate flex-1">{{ creature.name }}</span>
-                <span class="text-xs opacity-50 capitalize">{{ creature.type }}</span>
+                <span class="text-xs opacity-50 capitalize">
+                  {{ creature.type }}
+                </span>
               </button>
             }
           </div>
@@ -55,7 +60,8 @@
           <!-- Undiscovered count -->
           @if (undiscoveredCount() > 0) {
             <div class="text-xs opacity-50 text-center py-1">
-              {{ undiscoveredCount() | number: '1.0-0' }} creatures not yet encountered
+              {{ undiscoveredCount() | number: '1.0-0' }} creatures not yet
+              encountered
             </div>
           } @else {
             <div class="text-xs opacity-50 text-center py-1">
@@ -74,14 +80,18 @@
                   T{{ creature.tier | number: '1.0-0' }}
                 </span>
                 <span class="text-lg font-bold">{{ creature.name }}</span>
-                <span class="text-sm opacity-60 capitalize">{{ creature.type }}</span>
+                <span class="text-sm opacity-60 capitalize">
+                  {{ creature.type }}
+                </span>
                 @if (isLegendary()) {
                   <span class="badge badge-sm badge-accent">Legendary</span>
                 }
               </div>
 
               @if (creature.description) {
-                <div class="text-sm opacity-70 italic">{{ creature.description }}</div>
+                <div class="text-sm opacity-70 italic">
+                  {{ creature.description }}
+                </div>
               }
 
               <!-- Stats -->
@@ -94,10 +104,15 @@
               <div>
                 <div class="text-xs font-semibold opacity-60 mb-1">Fear</div>
                 <div class="flex gap-4 text-sm">
-                  <span>Innate Fear: {{ creature.fearModifier | number: '1.0-2' }}</span>
+                  <span>
+                    Innate Fear: {{ creature.fearModifier | number: '1.0-2' }}
+                  </span>
                   <span>
                     Tolerance:
-                    @if (creature.fearTolerance !== undefined && creature.fearTolerance !== null) {
+                    @if (
+                      creature.fearTolerance !== undefined &&
+                      creature.fearTolerance !== null
+                    ) {
                       {{ creature.fearTolerance | number: '1.0-0' }}
                     } @else {
                       2 (default)
@@ -109,7 +124,9 @@
               <!-- Work Affinities -->
               @if (selectedAffinities(); as affinities) {
                 <div>
-                  <div class="text-xs font-semibold opacity-60 mb-1">Work Affinities</div>
+                  <div class="text-xs font-semibold opacity-60 mb-1">
+                    Work Affinities
+                  </div>
                   <div class="flex flex-col gap-1 text-sm">
                     @if (affinities.preferred.length > 0) {
                       <div class="flex items-center gap-2">
@@ -130,11 +147,15 @@
               <!-- Traits -->
               @if (creature.traits.length > 0) {
                 <div>
-                  <div class="text-xs font-semibold opacity-60 mb-1">Traits</div>
+                  <div class="text-xs font-semibold opacity-60 mb-1">
+                    Traits
+                  </div>
                   <div class="flex flex-col gap-1">
                     @for (trait of creature.traits; track trait.id) {
                       <div class="flex items-start gap-2 text-sm">
-                        <span class="badge badge-xs badge-outline mt-0.5">{{ trait.name }}</span>
+                        <span class="badge badge-xs badge-outline mt-0.5">
+                          {{ trait.name }}
+                        </span>
                         <span class="opacity-70">{{ trait.description }}</span>
                       </div>
                     }
@@ -144,7 +165,9 @@
 
               <!-- Cost -->
               <div>
-                <div class="text-xs font-semibold opacity-60 mb-1">Recruitment Cost</div>
+                <div class="text-xs font-semibold opacity-60 mb-1">
+                  Recruitment Cost
+                </div>
                 <app-currency-cost-list [cost]="creature.cost" />
               </div>
 
@@ -153,7 +176,9 @@
                 <div class="text-xs font-semibold opacity-60 mb-1">Food</div>
                 <div class="text-sm">
                   @if (creature.foodConsumptionRate > 0) {
-                    Consumes {{ creature.foodConsumptionRate | number: '1.0-2' }} food per tick
+                    Consumes
+                    {{ creature.foodConsumptionRate | number: '1.0-2' }} food
+                    per tick
                   } @else {
                     Does not eat
                   }
@@ -165,7 +190,9 @@
                 <!-- Upkeep -->
                 @if (creature.upkeepCost) {
                   <div>
-                    <div class="text-xs font-semibold opacity-60 mb-1">Upkeep Cost</div>
+                    <div class="text-xs font-semibold opacity-60 mb-1">
+                      Upkeep Cost
+                    </div>
                     <app-currency-cost-list [cost]="creature.upkeepCost" />
                   </div>
                 }
@@ -173,9 +200,14 @@
                 <!-- Recruitment Requirements -->
                 @if (creature.recruitmentRequirements.length > 0) {
                   <div>
-                    <div class="text-xs font-semibold opacity-60 mb-1">Recruitment Requirements</div>
+                    <div class="text-xs font-semibold opacity-60 mb-1">
+                      Recruitment Requirements
+                    </div>
                     <div class="flex flex-col gap-1 text-sm">
-                      @for (req of creature.recruitmentRequirements; track $index) {
+                      @for (
+                        req of creature.recruitmentRequirements;
+                        track $index
+                      ) {
                         <div class="opacity-70">{{ req.description }}</div>
                       }
                     </div>

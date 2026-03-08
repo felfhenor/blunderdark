@@ -10,8 +10,8 @@ import { ButtonCloseComponent } from '@components/button-close/button-close.comp
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
-import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
 import type { TabDefinition } from '@components/tab-bar/tab-bar.component';
+import { TabBarComponent } from '@components/tab-bar/tab-bar.component';
 import { contentGetEntriesByType } from '@helpers/content';
 import { formatTierBadgeClass } from '@helpers/format';
 import {
@@ -20,8 +20,8 @@ import {
 } from '@helpers/research-unlocks';
 import { uiShowHelpMenu } from '@helpers/ui';
 import {
-  workAffinityGetForType,
   WORK_CATEGORY_LABELS,
+  workAffinityGetForType,
 } from '@helpers/work-affinity';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { sortBy } from 'es-toolkit/compat';
@@ -107,7 +107,7 @@ export class PanelHelpComponent {
     }).length;
   });
 
-  public selectedCreature = computed(() => {
+  public selectedCreature = computed<InhabitantContent | undefined>(() => {
     const id = this.selectedCreatureId();
     const creatures = this.unlockedCreatures();
     if (id) {
