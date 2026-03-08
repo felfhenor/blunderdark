@@ -8,6 +8,7 @@ import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import { generateRoomSuffix } from '@helpers/suffix';
+import { floorAll } from '@helpers/floor';
 import { roomPlacementPlaceOnFloor } from '@helpers/room-placement';
 import {
   researchUnlockIsResearchGated,
@@ -53,7 +54,7 @@ export function altarRoomFind(
  * Reactive signal: whether the Altar Room is placed.
  */
 export const altarRoomHas = computed<boolean>(() => {
-  return altarRoomFind(gamestate().world.floors) !== undefined;
+  return altarRoomFind(floorAll()) !== undefined;
 });
 
 /**
@@ -184,7 +185,7 @@ export function altarRoomGetLevel(floors: Floor[]): number {
  * Reactive signal for the Altar's current level.
  */
 export const altarRoomLevel = computed<number>(() => {
-  return altarRoomGetLevel(gamestate().world.floors);
+  return altarRoomGetLevel(floorAll());
 });
 
 /**
@@ -362,7 +363,7 @@ export function altarRoomIsAdjacent(floor: Floor, room: PlacedRoom): boolean {
  * Reactive computed signal for the Altar Room's fear reduction aura value.
  */
 export const altarRoomFearReductionAura = computed<number>(() => {
-  return altarRoomGetFearReductionAura(gamestate().world.floors);
+  return altarRoomGetFearReductionAura(floorAll());
 });
 
 /**
@@ -390,5 +391,5 @@ export function altarRoomGetEffectiveFearLevel(
  * The Altar's presence enables basic recruitment; upgrades may expand it later.
  */
 export const altarRoomCanRecruit = computed<boolean>(() => {
-  return altarRoomFind(gamestate().world.floors) !== undefined;
+  return altarRoomFind(floorAll()) !== undefined;
 });

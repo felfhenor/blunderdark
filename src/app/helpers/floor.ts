@@ -7,7 +7,7 @@ import { gridCreateEmpty } from '@helpers/grid';
 import { resourceApplyMap, resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { ensureFloorSuffixes } from '@helpers/suffix';
-import type { BiomeType, Floor, GameStateWorld, ResourceCost } from '@interfaces';
+import type { BiomeType, Floor, GameStateWorld, PlacedRoom, ResourceCost } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { MAX_FLOORS } from '@interfaces/floor';
 
@@ -39,10 +39,17 @@ export const floorAll = computed<Floor[]>(() => {
 });
 
 /**
+ * Get all rooms across all floors.
+ */
+export const roomAll = computed<PlacedRoom[]>(() => {
+  return floorAll().flatMap((f) => f.rooms);
+});
+
+/**
  * Get a floor by its ID.
  */
 export function floorGet(floorId: string): Floor | undefined {
-  return gamestate().world.floors.find((f) => f.id === floorId);
+  return floorAll().find((f) => f.id === floorId);
 }
 
 /**
@@ -59,7 +66,7 @@ export function floorGetBiome(floorId: string): BiomeType {
  * Returns undefined if no floor exists at that depth.
  */
 export function floorGetByDepth(depth: number): Floor | undefined {
-  return gamestate().world.floors.find((f) => f.depth === depth);
+  return floorAll().find((f) => f.depth === depth);
 }
 
 /**
@@ -74,7 +81,7 @@ export const floorCurrentIndex = computed<number>(() => {
  * Returns false if index is out of bounds.
  */
 export async function floorSetCurrentByIndex(index: number): Promise<boolean> {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   if (index < 0 || index >= floors.length) {
     return false;
   }
@@ -94,7 +101,7 @@ export async function floorSetCurrentByIndex(index: number): Promise<boolean> {
  * Returns false if floor not found.
  */
 export async function floorSetCurrentById(floorId: string): Promise<boolean> {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   const index = floors.findIndex((f) => f.id === floorId);
   if (index === -1) {
     return false;
@@ -119,7 +126,7 @@ export function floorGetCreationCost(depth: number): ResourceCost {
  * Returns an object with whether creation is possible and a reason if not.
  */
 export function floorCanCreate(): { canCreate: boolean; reason?: string } {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
 
   if (floors.length >= MAX_FLOORS) {
     return { canCreate: false, reason: 'Maximum number of floors reached' };
@@ -148,7 +155,7 @@ export async function floorCreate(
     return undefined;
   }
 
-  const nextDepth = gamestate().world.floors.length + 1;
+  const nextDepth = floorAll().length + 1;
   const cost = floorGetCreationCost(nextDepth);
 
   const paid = await resourcePayCost(cost);
@@ -240,7 +247,7 @@ export async function floorChangeBiome(
  * Only the deepest floor can be removed, it must be empty, and at least 1 floor must remain.
  */
 export function floorCanRemove(): { canRemove: boolean; reason?: string } {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
 
   if (floors.length <= 1) {
     return { canRemove: false, reason: 'Cannot remove the only floor' };
@@ -261,7 +268,7 @@ export function floorCanRemove(): { canRemove: boolean; reason?: string } {
  * Calculate the 50% refund for removing the last floor.
  */
 export function floorGetRemovalRefund(): ResourceCost {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   const lastFloor = floors[floors.length - 1];
   const cost = floorGetCreationCost(lastFloor.depth);
   return {

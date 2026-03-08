@@ -6,6 +6,7 @@ import {
   roomShapeGetAbsoluteTiles,
   roomShapeGetBounds,
 } from '@helpers/room-shapes';
+import { floorAll } from '@helpers/floor';
 import { gamestate } from '@helpers/state-game';
 import {
   GRID_SIZE,
@@ -106,7 +107,7 @@ export function throneRoomGetRulerBonusValue(
  */
 export const throneRoomSeatedRuler = computed<InhabitantInstance | undefined>(
   () => {
-    const floors = gamestate().world.floors;
+    const floors = floorAll();
     const throne = throneRoomFind(floors);
     if (!throne) return undefined;
     return throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
@@ -157,7 +158,7 @@ export function throneRoomGetFearLevel(floors: Floor[]): number | undefined {
  * Returns null if no Throne Room is placed.
  */
 export const throneRoomFearLevel = computed<number | undefined>(() => {
-  return throneRoomGetFearLevel(gamestate().world.floors);
+  return throneRoomGetFearLevel(floorAll());
 });
 
 // --- Adjacency & centrality bonuses ---
@@ -258,6 +259,6 @@ export function throneRoomGetPositionalBonuses(
  */
 export const throneRoomPositionalBonuses = computed<ThronePositionalBonuses>(
   () => {
-    return throneRoomGetPositionalBonuses(gamestate().world.floors);
+    return throneRoomGetPositionalBonuses(floorAll());
   },
 );

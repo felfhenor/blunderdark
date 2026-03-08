@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { productionGetRoomDefinition } from '@helpers/production';
+import { floorAll } from '@helpers/floor';
 import { gamestate } from '@helpers/state-game';
 import { workAffinityGet } from '@helpers/work-affinity';
 import type {
@@ -262,7 +263,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
  * Get the efficiency breakdown for a specific room by ID.
  */
 export function efficiencyGetRoom(roomId: PlacedRoomId): RoomEfficiencyBreakdown | undefined {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === roomId);
     if (room) {
@@ -276,7 +277,7 @@ export function efficiencyGetRoom(roomId: PlacedRoomId): RoomEfficiencyBreakdown
  * Average efficiency multiplier across all production rooms.
  */
 export const efficiencyAverageDungeon = computed<number>(() => {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   let totalMultiplier = 0;
   let roomCount = 0;
 
@@ -298,7 +299,7 @@ export const efficiencyAverageDungeon = computed<number>(() => {
  * Sum of all efficiency bonuses for a specific resource across all rooms.
  */
 export function efficiencyTotalBonusForResource(resourceType: string): number {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   let totalBonus = 0;
 
   for (const floor of floors) {

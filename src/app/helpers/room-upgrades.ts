@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { floorAll } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import { featureCalculateCapacityBonus } from '@helpers/features';
 import { reputationEffectIsRoomUpgradesUnlocked } from '@helpers/reputation-effects';
@@ -6,7 +7,6 @@ import {
   researchUnlockGetPassiveBonusWithMastery,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
-import { gamestate } from '@helpers/state-game';
 import type {
   PlacedRoom,
   PlacedRoomId,
@@ -226,7 +226,7 @@ export function roomUpgradeGetProductionMultiplier(
  * every placed room in the dungeon. This contributes to the global roster cap.
  */
 export function roomUpgradeGetGlobalMaxInhabitantBonus(): number {
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
 
   let bonus = 0;
   for (const floor of floors) {

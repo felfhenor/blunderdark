@@ -10,7 +10,7 @@ import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
-import { gamestate } from '@helpers/state-game';
+import { floorAll } from '@helpers/floor';
 import type {
   Connection,
   Floor,
@@ -170,7 +170,7 @@ export function synergyGetActive(roomId: PlacedRoomId): SynergyContent[] {
 }
 
 export const synergyActiveMap = computed(() => {
-  return synergyEvaluateAll(gamestate().world.floors);
+  return synergyEvaluateAll(floorAll());
 });
 
 function describeRoomName(roomTypeId: RoomId): string {

@@ -9,6 +9,7 @@ import {
   altarRoomFearReductionAura,
   altarRoomLevel,
   altarRoomApplyUpgrade,
+  floorAll,
   resourceCanAfford,
   altarRoomCanRecruit,
   recruitmentCurrentInhabitantCount,
@@ -79,11 +80,11 @@ export class PanelAltarComponent {
   public tierUnlocked = recruitmentUnlockedTier;
 
   public nextUpgrade = computed<RoomUpgradeContent | undefined>(() => {
-    return altarRoomGetNextUpgrade(gamestate().world.floors);
+    return altarRoomGetNextUpgrade(floorAll());
   });
 
   public lockedUpgrade = computed<RoomUpgradeContent | undefined>(() => {
-    return altarRoomGetLockedUpgrade(gamestate().world.floors);
+    return altarRoomGetLockedUpgrade(floorAll());
   });
 
   public lockedUpgradeResearchName = computed<string | undefined>(() => {

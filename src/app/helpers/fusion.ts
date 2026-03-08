@@ -2,6 +2,7 @@ import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
+import { floorAll } from '@helpers/floor';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -474,7 +475,7 @@ export function fusionHasRoom(): boolean {
   const fusionCoreId = roomRoleFindById('fusionCore');
   if (!fusionCoreId) return false;
 
-  for (const floor of gamestate().world.floors) {
+  for (const floor of floorAll()) {
     if (floor.rooms.some((r) => r.roomTypeId === fusionCoreId)) return true;
   }
 

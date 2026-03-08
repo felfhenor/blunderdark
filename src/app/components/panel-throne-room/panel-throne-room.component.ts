@@ -16,7 +16,7 @@ import {
   throneRoomFind,
 } from '@helpers';
 import { formatMultiplierAsPercentage } from '@helpers/format';
-import { gamestate } from '@helpers/state-game';
+import { floorAll } from '@helpers/floor';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
 import { startCase } from 'es-toolkit';
@@ -32,7 +32,7 @@ import { sortBy } from 'es-toolkit/compat';
 })
 export class PanelThroneRoomComponent {
   public throneRoom = computed(() => {
-    const result = throneRoomFind(gamestate().world.floors);
+    const result = throneRoomFind(floorAll());
     return result?.room;
   });
 
@@ -65,7 +65,7 @@ export class PanelThroneRoomComponent {
   });
 
   public eligibleCreatures = computed(() => {
-    const result = throneRoomFind(gamestate().world.floors);
+    const result = throneRoomFind(floorAll());
     if (!result) return [];
 
     const entries = result.floor.inhabitants

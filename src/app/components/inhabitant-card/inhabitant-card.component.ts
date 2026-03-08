@@ -18,7 +18,7 @@ import {
 } from '@helpers/format';
 import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
 import { productionGetRoomDefinition } from '@helpers/production';
-import { gamestate } from '@helpers/state-game';
+import { floorAll } from '@helpers/floor';
 import { workAffinityGetLabel, WORK_CATEGORY_LABELS } from '@helpers/work-affinity';
 import {
   stateModifierGet,
@@ -179,7 +179,7 @@ export class InhabitantCardComponent {
     const roomId = this.synergyRoomId();
     if (!roomId) return undefined;
 
-    const floors = gamestate().world.floors;
+    const floors = floorAll();
     let roomTypeId: RoomId | undefined;
     for (const floor of floors) {
       const placedRoom = floor.rooms.find((r) => r.id === roomId);

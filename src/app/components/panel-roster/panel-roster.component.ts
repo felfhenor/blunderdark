@@ -16,6 +16,7 @@ import {
   inhabitantRemove,
   assignmentCanAssignToRoom,
   contentGetEntry,
+  floorAll,
   notifyError,
   notifySuccess,
   inhabitantUnassignFromRoom,
@@ -125,7 +126,7 @@ export class PanelRosterComponent {
     const entry = this.selectedEntry();
     if (!entry) return [];
 
-    const floors = gamestate().world.floors;
+    const floors = floorAll();
     const rooms: Array<{
       room: PlacedRoom;
       roomDef: RoomContent;

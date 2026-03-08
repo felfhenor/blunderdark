@@ -4,7 +4,7 @@ import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
 import { currencyIsUnlocked, currencyUnlock } from '@helpers/currency-unlock';
 import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
-import { floorCurrent, floorCurrentIndex } from '@helpers/floor';
+import { floorAll, floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
@@ -318,15 +318,15 @@ export async function roomPlacementExecute(
 
   // Non-autoPlace rooms require the Altar to be present
   if (!roomDef.autoPlace) {
-    const floorAll = gamestate().world.floors;
-    if (!altarRoomFind(floorAll)) {
+    const allFloors = floorAll();
+    if (!altarRoomFind(allFloors)) {
       return { success: false, error: 'An Altar is required to build rooms' };
     }
   }
 
   if (roomDef.isUnique) {
-    const floorAll = gamestate().world.floors;
-    if (roomPlacementIsUniqueTypePlaced(floorAll, roomTypeId)) {
+    const allFloors = floorAll();
+    if (roomPlacementIsUniqueTypePlaced(allFloors, roomTypeId)) {
       return { success: false, error: 'This unique room is already built' };
     }
   }
@@ -339,8 +339,8 @@ export async function roomPlacementExecute(
 
   // Check global per-type limit
   if (!roomDef.isUnique) {
-    const allFloors = gamestate().world.floors;
-    const totalCount = roomPlacementCountTypeAllFloors(allFloors, roomTypeId);
+    const allFloorsArr = floorAll();
+    const totalCount = roomPlacementCountTypeAllFloors(allFloorsArr, roomTypeId);
     if (totalCount >= MAX_ROOMS_PER_TYPE) {
       return {
         success: false,

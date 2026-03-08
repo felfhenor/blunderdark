@@ -3,6 +3,7 @@ import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
+import { floorAll } from '@helpers/floor';
 import {
   verticalTransportCalculateTravelTicks,
   verticalTransportFloorsAreConnected,
@@ -154,7 +155,7 @@ export function inhabitantGetAssignmentLabel(
 ): string {
   if (!assignedRoomId) return 'Unassigned';
 
-  const floors = gamestate().world.floors;
+  const floors = floorAll();
   for (const floor of floors) {
     const room = floor.rooms.find((r) => r.id === assignedRoomId);
     if (room) {
