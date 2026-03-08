@@ -1,18 +1,17 @@
 import { computed } from '@angular/core';
-import { sortBy } from 'es-toolkit/compat';
 import { altarRoomCanRecruit } from '@helpers/altar-room';
 import { contentGetEntriesByType } from '@helpers/content';
-import { inhabitantAdd } from '@helpers/inhabitants';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { inhabitantAdd } from '@helpers/inhabitants';
+import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
 import {
   researchUnlockGetPassiveBonusWithMastery,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
-import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
-import { roomUpgradeGetGlobalMaxInhabitantBonus } from '@helpers/room-upgrades';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
+import { roomUpgradeGetGlobalMaxInhabitantBonus } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
@@ -24,6 +23,7 @@ import type {
   InhabitantContent,
   InhabitantRestrictionTag,
 } from '@interfaces/content-inhabitant';
+import { sortBy } from 'es-toolkit/compat';
 
 export const RECRUITMENT_DEFAULT_MAX_INHABITANTS = 50;
 
@@ -51,9 +51,14 @@ export const recruitmentUnlockedTier = computed<number>(() => {
  * Signal for the maximum number of total inhabitants allowed.
  */
 export const recruitmentMaxInhabitantCount = computed<number>(() => {
-  const researchBonus = researchUnlockGetPassiveBonusWithMastery('maxInhabitants');
+  const researchBonus =
+    researchUnlockGetPassiveBonusWithMastery('maxInhabitants');
   const roomUpgradeBonus = roomUpgradeGetGlobalMaxInhabitantBonus();
-  return RECRUITMENT_DEFAULT_MAX_INHABITANTS + Math.floor(researchBonus) + roomUpgradeBonus;
+  return (
+    RECRUITMENT_DEFAULT_MAX_INHABITANTS +
+    Math.floor(researchBonus) +
+    roomUpgradeBonus
+  );
 });
 
 /**
@@ -75,7 +80,9 @@ export const recruitmentIsRosterFull = computed<boolean>(() => {
  * 'harmony_attract' requires level >= 1, 'harmony_attract_legendary' requires level >= 2.
  * Returns 0 if the creature has no harmony attraction restriction.
  */
-function getRequiredAttractionLevel(restrictionTags: InhabitantRestrictionTag[]): number {
+function getRequiredAttractionLevel(
+  restrictionTags: InhabitantRestrictionTag[],
+): number {
   let maxRequired = 0;
   for (const tag of restrictionTags) {
     if (tag === 'harmony_attract_legendary') return 2;
@@ -93,7 +100,10 @@ function areRestrictionTagsSatisfied(
   restrictionTags: InhabitantRestrictionTag[],
   attractionLevel: number,
 ): boolean {
-  const harmonyTags = new Set<InhabitantRestrictionTag>(['harmony_attract', 'harmony_attract_legendary']);
+  const harmonyTags = new Set<InhabitantRestrictionTag>([
+    'harmony_attract',
+    'harmony_attract_legendary',
+  ]);
   // All restriction tags must be harmony attraction tags
   if (!restrictionTags.every((tag) => harmonyTags.has(tag))) return false;
   const requiredLevel = getRequiredAttractionLevel(restrictionTags);
@@ -153,9 +163,7 @@ export function recruitmentGetShortfall(
  * Apply research discount to a base recruitment cost.
  * Uses Math.ceil to round up adjusted costs, minimum 1 per resource.
  */
-export function recruitmentGetAdjustedCost(
-  cost: ResourceCost,
-): ResourceCost {
+export function recruitmentGetAdjustedCost(cost: ResourceCost): ResourceCost {
   const researchDiscount = researchUnlockGetPassiveBonusWithMastery(
     'recruitmentCostReduction',
   );
@@ -178,9 +186,7 @@ export function recruitmentGetAdjustedCost(
  * Recruit a new inhabitant by paying the cost and creating an instance.
  * Returns the result with success/error info.
  */
-export async function recruitmentRecruit(
-  def: InhabitantContent,
-): Promise<{
+export async function recruitmentRecruit(def: InhabitantContent): Promise<{
   success: boolean;
   error?: string;
   instance?: InhabitantInstance;

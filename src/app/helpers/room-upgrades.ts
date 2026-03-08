@@ -154,7 +154,10 @@ export function roomUpgradeGetEffectiveMaxInhabitants(
   if (roomDef.maxInhabitants < 0) return -1;
 
   // Rooms with unique inhabitant restrictions or breeding pits have a hard cap
-  if (roomDef.inhabitantRestriction === 'unique' || roomDef.role === 'breedingPits')
+  if (
+    roomDef.inhabitantRestriction === 'unique' ||
+    roomDef.role === 'breedingPits'
+  )
     return roomDef.maxInhabitants;
 
   const effects = roomUpgradeGetAppliedEffects(placedRoom);
@@ -222,6 +225,7 @@ export function roomUpgradeGetProductionMultiplier(
  */
 export function roomUpgradeGetGlobalMaxInhabitantBonus(): number {
   const floors = gamestate().world.floors;
+
   let bonus = 0;
   for (const floor of floors) {
     for (const room of floor.rooms) {

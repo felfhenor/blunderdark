@@ -13,7 +13,8 @@ let tickGamestate: GameState | undefined = undefined;
 const _liveGameState = signal<GameState>(defaultGameState());
 
 export function gamestate() {
-  return tickGamestate ?? _liveGameState();
+  const live = _liveGameState();
+  return tickGamestate ?? live;
 }
 
 const _savedGamestate = signalIndexedDb<GameState>(
