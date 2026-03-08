@@ -382,7 +382,7 @@ function ensureRoomUpgrade(
     description: upgrade.description ?? '',
     cost: upgrade.cost ?? {},
     effects: (upgrade.effects ?? []).map((e) => ({
-      type: e.type ?? '',
+      type: e.type ?? ('productionMultiplier' as const),
       value: e.value ?? 0,
       resource: e.resource ?? undefined,
     })),

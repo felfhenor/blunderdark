@@ -163,10 +163,10 @@ describe('ensureContent', () => {
         id: 'ru1' as RoomUpgradeId,
         name: 'Test Upgrade',
         __type: 'roomupgrade' as const,
-        effects: [{ type: 'production_multiplier' }],
+        effects: [{ type: 'productionMultiplier' }],
       });
       expect(result.effects).toHaveLength(1);
-      expect(result.effects[0].type).toBe('production_multiplier');
+      expect(result.effects[0].type).toBe('productionMultiplier');
       expect(result.effects[0].value).toBe(0);
     });
   });

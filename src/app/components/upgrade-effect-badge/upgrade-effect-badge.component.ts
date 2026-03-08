@@ -7,7 +7,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { productionPerMinute } from '@helpers';
-import type { RoomUpgradeEffect } from '@interfaces';
+import type { RoomUpgradeEffect, RoomUpgradeEffectType } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { startCase } from 'es-toolkit';
 
@@ -70,7 +70,7 @@ export class UpgradeEffectBadgeComponent {
     productionPerMinute(this.effect().value),
   );
 
-  public formatEffectType(type: string): string {
+  public formatEffectType(type: RoomUpgradeEffectType): string {
     return startCase(type);
   }
 }
