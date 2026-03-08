@@ -13,11 +13,10 @@ import {
   gridSelectedTile,
   resourceCanAfford,
   resourcePayCost,
-  trapWorkshopAddJob,
+  trapWorkshopCancelGroup,
+  trapWorkshopCraft,
   trapWorkshopGetCraftingCost,
   trapWorkshopGetCraftingTicks,
-  trapWorkshopRemoveJobGroup,
-  updateGamestate,
 } from '@helpers';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { contentGetEntriesByType } from '@helpers/content';
@@ -316,33 +315,13 @@ export class PanelTrapWorkshopComponent {
     const paid = await resourcePayCost(totalCost);
     if (!paid) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          for (let i = 0; i < quantity; i++) {
-            trapWorkshopAddJob(target, trapTypeId, targetTicks);
-          }
-          break;
-        }
-      }
-      return state;
-    });
+    await trapWorkshopCraft(room.id, trapTypeId, targetTicks, quantity);
   }
 
   public async cancelGroup(event: CancelGroupEvent): Promise<void> {
     const room = this.workshopRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          trapWorkshopRemoveJobGroup(target, event.startIndex, event.count);
-          break;
-        }
-      }
-      return state;
-    });
+    await trapWorkshopCancelGroup(room.id, event.startIndex, event.count);
   }
 }

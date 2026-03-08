@@ -17,14 +17,11 @@ import {
   notifyError,
   notifySuccess,
   productionGetRoomDefinition,
-  trapAddToInventory,
   trapCanPlace,
   trapGetAtTile,
   trapGetDefinition,
-  trapPlace,
-  trapRemove,
-  trapRemoveFromInventory,
-  updateGamestate,
+  trapPlaceAction,
+  trapRemoveAction,
 } from '@helpers';
 import { contentGetEntry } from '@helpers/content';
 import { floorCurrentIndex } from '@helpers/floor';
@@ -288,45 +285,13 @@ export class PanelHallwayInfoComponent {
     if (!info) return;
 
     const floorIndex = floorCurrentIndex();
-    await updateGamestate((state) => {
-      const floor = state.world.floors[floorIndex];
-      if (!floor) return state;
-
-      const result = trapPlace(floor, trapTypeId, info.x, info.y);
-      if (!result) return state;
-
-      state.world.floors[floorIndex] = result.floor;
-
-      const newInventory = trapRemoveFromInventory(
-        state.world.trapInventory,
-        trapTypeId,
-      );
-      if (newInventory) {
-        state.world.trapInventory = newInventory;
-      }
-
-      return state;
-    });
+    await trapPlaceAction(floorIndex, trapTypeId, info.x, info.y);
     notifySuccess('Trap placed');
   }
 
   public async onRemoveTrap(trapId: TrapInstanceId): Promise<void> {
     const floorIndex = floorCurrentIndex();
-    await updateGamestate((state) => {
-      const floor = state.world.floors[floorIndex];
-      if (!floor) return state;
-
-      const result = trapRemove(floor, trapId);
-      if (!result) return state;
-
-      state.world.floors[floorIndex] = result.floor;
-      state.world.trapInventory = trapAddToInventory(
-        state.world.trapInventory,
-        result.trap.trapTypeId,
-      );
-
-      return state;
-    });
+    await trapRemoveAction(floorIndex, trapId);
     notifySuccess('Trap removed');
   }
 

@@ -12,14 +12,13 @@ import {
   alchemyLabGetConversion,
   alchemyLabGetConversionTicks,
   alchemyLabGetEffectiveCost,
-  alchemyLabStartConversion,
-  alchemyLabStopConversion,
+  alchemyLabSelectRecipe,
+  alchemyLabStopConversionAction,
   contentGetEntry,
   floorCurrent,
   gamestate,
   gridSelectedTile,
   resourceCanAfford,
-  updateGamestate,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type { AlchemyRecipeContent, AlchemyRecipeId } from '@interfaces';
@@ -131,15 +130,7 @@ export class PanelAlchemyLabComponent {
     const { canConvert } = alchemyLabCanConvert(room.id, state.world.floors);
     if (!canConvert) return;
 
-    await updateGamestate((s) => {
-      s.world.alchemyConversions = alchemyLabStartConversion(
-        s.world.alchemyConversions,
-        room.id,
-        recipeId,
-        targetTicks,
-      );
-      return s;
-    });
+    await alchemyLabSelectRecipe(room.id, recipeId, targetTicks);
   }
 
   public async stopConversion(): Promise<void> {
@@ -147,12 +138,6 @@ export class PanelAlchemyLabComponent {
     const room = this.labRoom();
     if (!room) return;
 
-    await updateGamestate((s) => {
-      s.world.alchemyConversions = alchemyLabStopConversion(
-        s.world.alchemyConversions,
-        room.id,
-      );
-      return s;
-    });
+    await alchemyLabStopConversionAction(room.id);
   }
 }

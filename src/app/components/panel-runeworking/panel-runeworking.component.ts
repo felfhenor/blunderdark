@@ -10,7 +10,7 @@ import {
   gamestate,
   RUNEWORKING_BASE_TICKS,
   runeworkingComplete$,
-  updateGamestate,
+  runeworkingStartJob,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
@@ -234,21 +234,11 @@ export class PanelRuneworkingComponent {
     const inhabitantId = this.selectedInhabitantId();
     if (!room || !runeId || !inhabitantId) return;
 
-    await updateGamestate((state) => {
-      for (const flr of state.world.floors) {
-        const target = flr.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.runeworkingJob = {
-            runeId: runeId as TraitRuneInstanceId,
-            inhabitantInstanceId: inhabitantId as InhabitantInstanceId,
-            ticksRemaining: RUNEWORKING_BASE_TICKS,
-            targetTicks: RUNEWORKING_BASE_TICKS,
-          };
-          break;
-        }
-      }
-      return state;
-    });
+    await runeworkingStartJob(
+      room.id,
+      runeId as TraitRuneInstanceId,
+      inhabitantId as InhabitantInstanceId,
+    );
 
     this.selectedRuneId.set('');
     this.selectedInhabitantId.set('');

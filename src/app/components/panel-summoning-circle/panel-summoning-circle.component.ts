@@ -13,15 +13,14 @@ import {
   notify,
   resourceCanAfford,
   resourcePayCost,
-  summoningAddJob,
+  summoningCancelGroup,
   summoningCompleted$,
+  summoningCraft,
   summoningDismissed$,
   summoningGetAdjacentRoomTypeIds,
   summoningGetAvailableRecipes,
   summoningGetEffectiveTicks,
   summoningGetStatBonuses,
-  summoningRemoveJobGroup,
-  updateGamestate,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
@@ -195,33 +194,13 @@ export class PanelSummoningCircleComponent {
     const paid = await resourcePayCost(totalCost);
     if (!paid) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          for (let i = 0; i < quantity; i++) {
-            summoningAddJob(target, recipeId, targetTicks);
-          }
-          break;
-        }
-      }
-      return state;
-    });
+    await summoningCraft(room.id, recipeId, targetTicks, quantity);
   }
 
   public async cancelGroup(event: CancelGroupEvent): Promise<void> {
     const room = this.summoningRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          summoningRemoveJobGroup(target, event.startIndex, event.count);
-          break;
-        }
-      }
-      return state;
-    });
+    await summoningCancelGroup(room.id, event.startIndex, event.count);
   }
 }

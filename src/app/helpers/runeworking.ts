@@ -1,9 +1,12 @@
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
+import { updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
   InhabitantInstance,
+  InhabitantInstanceId,
   PlacedRoom,
+  PlacedRoomId,
   TraitRune,
   TraitRuneInstanceId,
 } from '@interfaces';
@@ -28,6 +31,28 @@ export const runeworkingComplete$ = runeworkingCompleteSubject.asObservable();
 /**
  * Check if a runeworking job can be started.
  */
+export async function runeworkingStartJob(
+  roomId: PlacedRoomId,
+  runeId: TraitRuneInstanceId,
+  inhabitantInstanceId: InhabitantInstanceId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const flr of state.world.floors) {
+      const target = flr.rooms.find((r) => r.id === roomId);
+      if (target) {
+        target.runeworkingJob = {
+          runeId,
+          inhabitantInstanceId,
+          ticksRemaining: RUNEWORKING_BASE_TICKS,
+          targetTicks: RUNEWORKING_BASE_TICKS,
+        };
+        break;
+      }
+    }
+    return state;
+  });
+}
+
 export function runeworkingCanStart(
   room: PlacedRoom,
   inhabitants: InhabitantInstance[],

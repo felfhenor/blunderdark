@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { updateGamestate } from '@helpers/state-game';
 import { featureCalculateCapacityBonus } from '@helpers/features';
 import { reputationEffectIsRoomUpgradesUnlocked } from '@helpers/reputation-effects';
 import {
@@ -8,6 +9,7 @@ import {
 import { gamestate } from '@helpers/state-game';
 import type {
   PlacedRoom,
+  PlacedRoomId,
   RoomId,
   RoomProduction,
   RoomUpgradeEffect,
@@ -238,4 +240,40 @@ export function roomUpgradeGetGlobalMaxInhabitantBonus(): number {
     }
   }
   return bonus;
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function roomUpgradeApplyAction(
+  roomId: PlacedRoomId,
+  upgradePathId: RoomUpgradeId,
+): Promise<void> {
+  await updateGamestate((s) => {
+    const newFloors = s.world.floors.map((floor) => ({
+      ...floor,
+      rooms: floor.rooms.map((r) =>
+        r.id === roomId ? roomUpgradeApply(r, upgradePathId) : r,
+      ),
+    }));
+    return {
+      ...s,
+      world: { ...s.world, floors: newFloors },
+    };
+  });
+}
+
+export async function roomSetConvertedResource(
+  roomId: PlacedRoomId,
+  resourceType: string | undefined,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        target.convertedOutputResource = resourceType || undefined;
+        break;
+      }
+    }
+    return state;
+  });
 }

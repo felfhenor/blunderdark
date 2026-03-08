@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -320,6 +321,34 @@ export function alchemyLabCalculateBreakdown(
  * 3. If input consumed: increment progress.
  * 4. If progress >= target: add output resource, reset cycle (progress=0, inputConsumed=false).
  */
+export async function alchemyLabSelectRecipe(
+  roomId: PlacedRoomId,
+  recipeId: AlchemyRecipeId,
+  targetTicks: number,
+): Promise<void> {
+  await updateGamestate((s) => {
+    s.world.alchemyConversions = alchemyLabStartConversion(
+      s.world.alchemyConversions,
+      roomId,
+      recipeId,
+      targetTicks,
+    );
+    return s;
+  });
+}
+
+export async function alchemyLabStopConversionAction(
+  roomId: PlacedRoomId,
+): Promise<void> {
+  await updateGamestate((s) => {
+    s.world.alchemyConversions = alchemyLabStopConversion(
+      s.world.alchemyConversions,
+      roomId,
+    );
+    return s;
+  });
+}
+
 export function alchemyLabProcess(state: GameState, numTicks = 1): void {
   const labTypeId = roomRoleFindById('alchemyLab');
   if (!labTypeId) return;

@@ -5,6 +5,7 @@ import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlo
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
+import { updateGamestate } from '@helpers/state-game';
 import { trapAddToInventory } from '@helpers/traps';
 import type {
   Floor,
@@ -222,4 +223,43 @@ export function trapWorkshopGetDefinitionById(
   trapTypeId: string,
 ): TrapContent | undefined {
   return contentGetEntry<TrapContent>(trapTypeId);
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function trapWorkshopCraft(
+  roomId: PlacedRoomId,
+  trapTypeId: TrapId,
+  targetTicks: number,
+  quantity: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        for (let i = 0; i < quantity; i++) {
+          trapWorkshopAddJob(target, trapTypeId, targetTicks);
+        }
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function trapWorkshopCancelGroup(
+  roomId: PlacedRoomId,
+  startIndex: number,
+  count: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        trapWorkshopRemoveJobGroup(target, startIndex, count);
+        break;
+      }
+    }
+    return state;
+  });
 }

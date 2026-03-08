@@ -16,14 +16,15 @@ import {
   breedingGetAvailableRecipes,
   breedingGetHybridTicks,
   breedingGetMutatableInhabitants,
+  breedingStartJob,
+  breedingStartMutation,
+  breedingSwapOrder,
   contentGetEntry,
   floorCurrent,
   gamestate,
   gridSelectedTile,
   mutationCompleted$,
-  updateGamestate,
   notify,
-  MUTATION_BASE_TICKS,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
@@ -269,22 +270,7 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.breedingJob = {
-            parentAInstanceId,
-            parentBInstanceId,
-            recipeId,
-            ticksRemaining: targetTicks,
-            targetTicks,
-          };
-          break;
-        }
-      }
-      return state;
-    });
+    await breedingStartJob(room.id, parentAInstanceId, parentBInstanceId, recipeId, targetTicks);
   }
 
   public resolveResultName(recipe: BreedingRecipeContent): string {
@@ -300,18 +286,7 @@ export class PanelBreedingPitsComponent {
     if (!room?.breedingInhabitantOrder || room.breedingInhabitantOrder.length < 2)
       return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target?.breedingInhabitantOrder) {
-          target.breedingInhabitantOrder = [
-            ...target.breedingInhabitantOrder,
-          ].reverse();
-          break;
-        }
-      }
-      return state;
-    });
+    await breedingSwapOrder(room.id);
   }
 
   public async startMutation(
@@ -321,19 +296,6 @@ export class PanelBreedingPitsComponent {
     const room = this.breedingRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.mutationJob = {
-            targetInstanceId,
-            ticksRemaining: MUTATION_BASE_TICKS,
-            targetTicks: MUTATION_BASE_TICKS,
-          };
-          break;
-        }
-      }
-      return state;
-    });
+    await breedingStartMutation(room.id, targetInstanceId);
   }
 }

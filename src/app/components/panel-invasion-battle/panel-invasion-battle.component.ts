@@ -12,8 +12,7 @@ import {
   invasionRewardApplyDefeat,
   invasionRewardApplyVictory,
 } from '@helpers/invasion-reward-apply';
-import { invasionTriggerRecordAndReschedule } from '@helpers/invasion-triggers';
-import { updateGamestate } from '@helpers/state-game';
+import { invasionDismiss } from '@helpers/invasion-triggers';
 import type {
   ActiveInvasion,
   BattlePhase,
@@ -81,15 +80,7 @@ export class PanelInvasionBattleComponent {
   public dismiss(): void {
     const invasion = this.currentInvasion;
     if (invasion) {
-      updateGamestate((state) => {
-        invasionTriggerRecordAndReschedule(state, {
-          day: invasion.day,
-          type: invasion.invasionType,
-          unreachableObjectiveCount: invasion.unreachableObjectiveCount ?? 0,
-        });
-        state.world.activeInvasion = undefined;
-        return state;
-      });
+      invasionDismiss(invasion);
     }
 
     this.visible.set(false);

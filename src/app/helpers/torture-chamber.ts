@@ -2,12 +2,15 @@ import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
+import { updateGamestate } from '@helpers/state-game';
 import type {
   CapturedPrisoner,
   GameState,
   InhabitantInstance,
   InhabitantInstanceId,
   PlacedRoom,
+  PlacedRoomId,
+  PrisonerId,
   ResourceType,
   TraitRune,
   TraitRuneInstanceId,
@@ -161,6 +164,65 @@ export function tortureCreateTraitRune(
     runeTypeId: runeDef.id,
     sourceInvaderClass: prisoner.invaderClass,
   };
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function tortureStartProcessing(
+  roomId: PlacedRoomId,
+  prisonerId: PrisonerId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const flr of state.world.floors) {
+      const target = flr.rooms.find((r) => r.id === roomId);
+      if (target) {
+        target.tortureJob = {
+          prisonerId,
+          currentStage: 'interrogate',
+          ticksRemaining: TORTURE_INTERROGATE_BASE_TICKS,
+          targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
+        };
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function tortureSetExtractAction(
+  roomId: PlacedRoomId,
+  action: TortureExtractAction,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const flr of state.world.floors) {
+      const target = flr.rooms.find((r) => r.id === roomId);
+      if (target?.tortureJob && target.tortureJob.currentStage === 'extract') {
+        target.tortureJob.stageAction = action;
+        target.tortureJob.ticksRemaining = TORTURE_EXTRACT_BASE_TICKS;
+        target.tortureJob.targetTicks = TORTURE_EXTRACT_BASE_TICKS;
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function tortureSetBreakAction(
+  roomId: PlacedRoomId,
+  action: TortureBreakAction,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const flr of state.world.floors) {
+      const target = flr.rooms.find((r) => r.id === roomId);
+      if (target?.tortureJob && target.tortureJob.currentStage === 'break') {
+        target.tortureJob.stageAction = action;
+        target.tortureJob.ticksRemaining = TORTURE_BREAK_BASE_TICKS;
+        target.tortureJob.targetTicks = TORTURE_BREAK_BASE_TICKS;
+        break;
+      }
+    }
+    return state;
+  });
 }
 
 /**

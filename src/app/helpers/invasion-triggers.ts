@@ -338,6 +338,22 @@ export function debugTriggerInvasion(): void {
   });
 }
 
+export function invasionDismiss(invasion: {
+  day: number;
+  invasionType: 'scheduled' | SpecialInvasionType;
+  unreachableObjectiveCount?: number;
+}): void {
+  updateGamestate((state) => {
+    invasionTriggerRecordAndReschedule(state, {
+      day: invasion.day,
+      type: invasion.invasionType,
+      unreachableObjectiveCount: invasion.unreachableObjectiveCount ?? 0,
+    });
+    state.world.activeInvasion = undefined;
+    return state;
+  });
+}
+
 // --- Computed signals ---
 
 export const invasionTriggerNextDay = computed(

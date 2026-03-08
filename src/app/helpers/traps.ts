@@ -2,7 +2,7 @@ import { contentGetEntry } from '@helpers/content';
 import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngUuid } from '@helpers/rng';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import { throneRoomRulerBonus } from '@helpers/throne-room';
 import type {
   Floor,
@@ -266,6 +266,56 @@ export function trapGetInHallway(
   hallwayId: string,
 ): TrapInstance[] {
   return (floor.traps ?? []).filter((t) => t.hallwayId === hallwayId);
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function trapPlaceAction(
+  floorIndex: number,
+  trapTypeId: TrapId,
+  x: number,
+  y: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    const floor = state.world.floors[floorIndex];
+    if (!floor) return state;
+
+    const result = trapPlace(floor, trapTypeId, x, y);
+    if (!result) return state;
+
+    state.world.floors[floorIndex] = result.floor;
+
+    const newInventory = trapRemoveFromInventory(
+      state.world.trapInventory,
+      trapTypeId,
+    );
+    if (newInventory) {
+      state.world.trapInventory = newInventory;
+    }
+
+    return state;
+  });
+}
+
+export async function trapRemoveAction(
+  floorIndex: number,
+  trapId: TrapInstanceId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    const floor = state.world.floors[floorIndex];
+    if (!floor) return state;
+
+    const result = trapRemove(floor, trapId);
+    if (!result) return state;
+
+    state.world.floors[floorIndex] = result.floor;
+    state.world.trapInventory = trapAddToInventory(
+      state.world.trapInventory,
+      result.trap.trapTypeId,
+    );
+
+    return state;
+  });
 }
 
 // --- State Mutation (for gameloop integration) ---

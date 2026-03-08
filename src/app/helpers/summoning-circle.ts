@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
@@ -19,6 +20,7 @@ import type {
   InhabitantInstanceId,
   InhabitantStats,
   PlacedRoom,
+  PlacedRoomId,
   SummonJob,
   SummonRecipeContent,
   SummonRecipeId,
@@ -242,6 +244,45 @@ export function summoningGetAdjacentRoomTypeIds(
   }
 
   return adjacentTypes;
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function summoningCraft(
+  roomId: PlacedRoomId,
+  recipeId: SummonRecipeId,
+  targetTicks: number,
+  quantity: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        for (let i = 0; i < quantity; i++) {
+          summoningAddJob(target, recipeId, targetTicks);
+        }
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function summoningCancelGroup(
+  roomId: PlacedRoomId,
+  startIndex: number,
+  count: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        summoningRemoveJobGroup(target, startIndex, count);
+        break;
+      }
+    }
+    return state;
+  });
 }
 
 // --- Tick processor ---

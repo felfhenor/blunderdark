@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -17,10 +18,12 @@ import {
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
   BreedingRecipeContent,
+  BreedingRecipeId,
   GameState,
   InhabitantInstance,
   InhabitantStats,
   PlacedRoom,
+  PlacedRoomId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
@@ -322,6 +325,70 @@ export function breedingGetAdjacentRoomTypeIds(
   }
 
   return adjacentTypes;
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function breedingStartJob(
+  roomId: PlacedRoomId,
+  parentAInstanceId: InhabitantInstanceId,
+  parentBInstanceId: InhabitantInstanceId,
+  recipeId: BreedingRecipeId,
+  targetTicks: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        target.breedingJob = {
+          parentAInstanceId,
+          parentBInstanceId,
+          recipeId,
+          ticksRemaining: targetTicks,
+          targetTicks,
+        };
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function breedingSwapOrder(
+  roomId: PlacedRoomId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target?.breedingInhabitantOrder) {
+        target.breedingInhabitantOrder = [
+          ...target.breedingInhabitantOrder,
+        ].reverse();
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function breedingStartMutation(
+  roomId: PlacedRoomId,
+  targetInstanceId: InhabitantInstanceId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        target.mutationJob = {
+          targetInstanceId,
+          ticksRemaining: MUTATION_BASE_TICKS,
+          targetTicks: MUTATION_BASE_TICKS,
+        };
+        break;
+      }
+    }
+    return state;
+  });
 }
 
 // --- Tick processor ---

@@ -7,18 +7,17 @@ import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-
 import {
   contentGetEntry,
   craftingQueueGetMaxSize,
-  darkForgeAddJob,
+  darkForgeCancelGroup,
+  darkForgeCraft,
   darkForgeGetAdjacentRoomTypeIds,
   darkForgeGetAvailableRecipes,
   darkForgeGetCraftingTicks,
   darkForgeGetStatBonuses,
-  darkForgeRemoveJobGroup,
   floorCurrent,
   gamestate,
   gridSelectedTile,
   resourceCanAfford,
   resourcePayCost,
-  updateGamestate,
 } from '@helpers';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { ticksToRealSeconds } from '@helpers/game-time';
@@ -210,33 +209,13 @@ export class PanelDarkForgeComponent {
     const paid = await resourcePayCost(totalCost);
     if (!paid) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          for (let i = 0; i < quantity; i++) {
-            darkForgeAddJob(target, recipeId, targetTicks);
-          }
-          break;
-        }
-      }
-      return state;
-    });
+    await darkForgeCraft(room.id, recipeId, targetTicks, quantity);
   }
 
   public async cancelGroup(event: CancelGroupEvent): Promise<void> {
     const room = this.forgeRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          darkForgeRemoveJobGroup(target, event.startIndex, event.count);
-          break;
-        }
-      }
-      return state;
-    });
+    await darkForgeCancelGroup(room.id, event.startIndex, event.count);
   }
 }

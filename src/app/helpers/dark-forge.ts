@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
@@ -16,6 +17,7 @@ import type {
   GameState,
   InhabitantStats,
   PlacedRoom,
+  PlacedRoomId,
 } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import type { DarkForgeCompletedEvent } from '@interfaces/forge';
@@ -352,6 +354,45 @@ export function darkForgeGetAdjacentRoomTypeIds(
   }
 
   return adjacentTypes;
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function darkForgeCraft(
+  roomId: PlacedRoomId,
+  recipeId: ForgeRecipeId,
+  targetTicks: number,
+  quantity: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        for (let i = 0; i < quantity; i++) {
+          darkForgeAddJob(target, recipeId, targetTicks);
+        }
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function darkForgeCancelGroup(
+  roomId: PlacedRoomId,
+  startIndex: number,
+  count: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        darkForgeRemoveJobGroup(target, startIndex, count);
+        break;
+      }
+    }
+    return state;
+  });
 }
 
 // --- Tick processor ---

@@ -36,7 +36,6 @@ import {
   roomGetDisplayName,
   roomUpgradeGetApplied,
   roomUpgradeCanApply,
-  roomUpgradeApply,
   roomRemovalGetInfo,
   connectionGetRoomConnections,
   getEntityName,
@@ -56,16 +55,17 @@ import {
   fearLevelGetLabel,
   featureGetSlotCount,
   featureGetForSlot,
-  featureAttachToSlot,
-  featureRemoveFromSlot,
+  featureAttachAction,
   featureIsUniquePlaced,
   featureGetResourceConverterEfficiency,
+  featureRemoveAction,
   researchUnlockIsFeatureUnlocked,
   researchUnlockIsResearchGated,
   researchUnlockIsUnlocked,
   resourceCanAfford,
   resourcePayCost,
-  updateGamestate,
+  roomSetConvertedResource,
+  roomUpgradeApplyAction,
   gamestate,
   verticalTransportGetGroupsOnFloor,
   synergyGetDefinitions,
@@ -417,18 +417,7 @@ export class PanelRoomInfoComponent {
       return;
     }
 
-    await updateGamestate((s) => {
-      const newFloors = s.world.floors.map((floor) => ({
-        ...floor,
-        rooms: floor.rooms.map((r) =>
-          r.id === room.id ? roomUpgradeApply(r, path.id) : r,
-        ),
-      }));
-      return {
-        ...s,
-        world: { ...s.world, floors: newFloors },
-      };
-    });
+    await roomUpgradeApplyAction(room.id, path.id);
 
     notifySuccess(`Applied ${path.name} upgrade`);
   }
@@ -592,16 +581,7 @@ export class PanelRoomInfoComponent {
     const room = this.selectedRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.convertedOutputResource = resourceType || undefined;
-          break;
-        }
-      }
-      return state;
-    });
+    await roomSetConvertedResource(room.id, resourceType);
 
     if (resourceType) {
       notifySuccess(`Converting output to ${resourceType}`);
@@ -775,16 +755,7 @@ export class PanelRoomInfoComponent {
     const slotIndex = this.featureSelectSlotIndex();
     const totalSlots = featureGetSlotCount(room.placedRoom);
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          featureAttachToSlot(target, slotIndex, featureId, totalSlots);
-          break;
-        }
-      }
-      return state;
-    });
+    await featureAttachAction(room.id, slotIndex, featureId, totalSlots);
 
     this.showFeatureSelect.set(false);
     notifySuccess(`Attached ${feature.name}`);
@@ -809,16 +780,7 @@ export class PanelRoomInfoComponent {
     const feature = featureGetForSlot(room.placedRoom, slotIndex);
     const featureName = feature?.name ?? 'Feature';
 
-    await updateGamestate((state) => {
-      for (const floor of state.world.floors) {
-        const target = floor.rooms.find((r) => r.id === room.id);
-        if (target) {
-          featureRemoveFromSlot(target, slotIndex);
-          break;
-        }
-      }
-      return state;
-    });
+    await featureRemoveAction(room.id, slotIndex);
 
     notifySuccess(`Removed ${featureName} (destroyed)`);
   }

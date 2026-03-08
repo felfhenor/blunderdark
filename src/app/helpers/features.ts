@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { updateGamestate } from '@helpers/state-game';
 import type {
   FeatureBonus,
   FeatureBonusType,
@@ -10,7 +11,7 @@ import type { RoomContent } from '@interfaces/content-room';
 import type { Floor } from '@interfaces/floor';
 import type { ResourceMap, ResourceType } from '@interfaces/resource';
 import type { RoomProduction } from '@interfaces/room';
-import type { PlacedRoom, SacrificeBuff } from '@interfaces/room-shape';
+import type { PlacedRoom, PlacedRoomId, SacrificeBuff } from '@interfaces/room-shape';
 
 export const FEATURE_SLOT_COUNT_DEFAULT = 2;
 
@@ -463,5 +464,41 @@ export function featureRemoveFromSlot(
 export function featureRemoveAllFromRoom(placedRoom: PlacedRoom): void {
   placedRoom.featureIds = undefined;
   placedRoom.sacrificeBuff = undefined;
+}
+
+// --- Action helpers (wrap updateGamestate for component use) ---
+
+export async function featureAttachAction(
+  roomId: PlacedRoomId,
+  slotIndex: number,
+  featureId: FeatureId,
+  totalSlots: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        featureAttachToSlot(target, slotIndex, featureId, totalSlots);
+        break;
+      }
+    }
+    return state;
+  });
+}
+
+export async function featureRemoveAction(
+  roomId: PlacedRoomId,
+  slotIndex: number,
+): Promise<void> {
+  await updateGamestate((state) => {
+    for (const floor of state.world.floors) {
+      const target = floor.rooms.find((r) => r.id === roomId);
+      if (target) {
+        featureRemoveFromSlot(target, slotIndex);
+        break;
+      }
+    }
+    return state;
+  });
 }
 

@@ -17,7 +17,9 @@ import {
   tortureBreakComplete$,
   tortureExtractComplete$,
   tortureInterrogateComplete$,
-  updateGamestate,
+  tortureSetBreakAction,
+  tortureSetExtractAction,
+  tortureStartProcessing,
 } from '@helpers';
 import { researchUnlockIsFeatureUnlocked } from '@helpers/research-unlocks';
 import { ticksToRealSeconds } from '@helpers/game-time';
@@ -154,21 +156,7 @@ export class PanelTortureChamberComponent {
     const room = this.tortureRoom();
     if (!room) return;
 
-    await updateGamestate((state) => {
-      for (const flr of state.world.floors) {
-        const target = flr.rooms.find((r) => r.id === room.id);
-        if (target) {
-          target.tortureJob = {
-            prisonerId,
-            currentStage: 'interrogate',
-            ticksRemaining: TORTURE_INTERROGATE_BASE_TICKS,
-            targetTicks: TORTURE_INTERROGATE_BASE_TICKS,
-          };
-          break;
-        }
-      }
-      return state;
-    });
+    await tortureStartProcessing(room.id, prisonerId);
   }
 
   public async setExtractAction(action: TortureExtractAction): Promise<void> {
@@ -176,18 +164,7 @@ export class PanelTortureChamberComponent {
     const room = this.tortureRoom();
     if (!room?.tortureJob) return;
 
-    await updateGamestate((state) => {
-      for (const flr of state.world.floors) {
-        const target = flr.rooms.find((r) => r.id === room.id);
-        if (target?.tortureJob && target.tortureJob.currentStage === 'extract') {
-          target.tortureJob.stageAction = action;
-          target.tortureJob.ticksRemaining = TORTURE_EXTRACT_BASE_TICKS;
-          target.tortureJob.targetTicks = TORTURE_EXTRACT_BASE_TICKS;
-          break;
-        }
-      }
-      return state;
-    });
+    await tortureSetExtractAction(room.id, action);
   }
 
   public async setBreakAction(action: TortureBreakAction): Promise<void> {
@@ -195,17 +172,6 @@ export class PanelTortureChamberComponent {
     const room = this.tortureRoom();
     if (!room?.tortureJob) return;
 
-    await updateGamestate((state) => {
-      for (const flr of state.world.floors) {
-        const target = flr.rooms.find((r) => r.id === room.id);
-        if (target?.tortureJob && target.tortureJob.currentStage === 'break') {
-          target.tortureJob.stageAction = action;
-          target.tortureJob.ticksRemaining = TORTURE_BREAK_BASE_TICKS;
-          target.tortureJob.targetTicks = TORTURE_BREAK_BASE_TICKS;
-          break;
-        }
-      }
-      return state;
-    });
+    await tortureSetBreakAction(room.id, action);
   }
 }
