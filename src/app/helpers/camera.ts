@@ -144,6 +144,20 @@ export function cameraInit(
   cameraPosition.set(cameraClampPosition(x, y, 1));
 }
 
+export function cameraFocusOnTile(tileX: number, tileY: number, zoom?: number): void {
+  const vp = cameraViewportSize();
+  const targetZoom = zoom ?? Math.max(cameraZoom(), 1);
+  const pixelX = tileX * 65 + 32;
+  const pixelY = tileY * 65 + 32;
+  const targetX = vp.width / 2 - pixelX * targetZoom;
+  const targetY = vp.height / 2 - pixelY * targetZoom;
+
+  cameraIsAnimating.set(true);
+  cameraZoom.set(targetZoom);
+  cameraPosition.set(cameraClampPosition(targetX, targetY, targetZoom));
+  setTimeout(() => cameraIsAnimating.set(false), 300);
+}
+
 export function cameraUpdateViewport(
   viewportWidth: number,
   viewportHeight: number,

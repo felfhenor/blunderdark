@@ -1,5 +1,17 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
+    <div class="relative mb-2">
+      <input type="text" class="input input-bordered input-sm w-full"
+             placeholder="Search rooms..."
+             [ngModel]="searchText()"
+             (ngModelChange)="searchText.set($event)"
+             (keydown.escape)="clearSearch()" />
+      @if (hasSearch()) {
+        <button class="btn btn-ghost btn-xs absolute right-1 top-1"
+                (click)="clearSearch()">x</button>
+      }
+    </div>
+
     <div class="floor-list flex flex-col gap-2">
       @for (
         floor of floors();
@@ -11,6 +23,7 @@
           appSfx="ui-click"
           [sfxOffset]="i"
           [class.btn-active]="isSelected(i)"
+          [class.opacity-40]="hasSearch() && getFloorMatchCount(floor.id) === 0"
           [style.--floor-biome-color]="getBiomeData(floor.biome).color"
           (click)="selectFloor(i)"
         >
@@ -22,6 +35,9 @@
           <span class="room-count text-xs opacity-50">
             {{ floor.rooms.length | number: '1.0-0' }}rm
           </span>
+          @if (hasSearch() && getFloorMatchCount(floor.id) > 0) {
+            <span class="badge badge-info badge-xs">{{ getFloorMatchCount(floor.id) }}</span>
+          }
         </button>
       }
     </div>

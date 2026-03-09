@@ -42,6 +42,7 @@ export * from './game-time';
 export * from './gameloop';
 export * from './grid';
 export * from './grid-math';
+export * from './grid-search';
 export * from './hallway-placement';
 export * from './hallway-tile-removal';
 export * from './hallways';

@@ -57,3 +57,4 @@ export function gridSelectTile(x: number, y: number): void {
 export function gridDeselectTile(): void {
   gridSelectedTile.set(undefined);
 }
+

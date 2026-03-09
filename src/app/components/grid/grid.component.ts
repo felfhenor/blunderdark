@@ -85,6 +85,7 @@ import {
   transportPortalStep,
 } from '@helpers/transport-placement';
 import { gridCreateEmpty } from '@helpers/grid';
+import { gridSearchHasQuery, gridSearchMatchingRoomIds } from '@helpers/grid-search';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
@@ -892,6 +893,18 @@ export class GridComponent implements AfterViewInit {
 
   public getFearNumeric(x: number, y: number): number | undefined {
     return fearOverlayAnchorMap().get(`${x},${y}`);
+  }
+
+  // --- Room search ---
+
+  public isSearchHighlight(roomId: string | undefined): boolean {
+    if (!roomId) return false;
+    return gridSearchMatchingRoomIds().has(roomId as PlacedRoomId);
+  }
+
+  public isSearchDimmed(roomId: string | undefined): boolean {
+    if (!roomId || !gridSearchHasQuery()) return false;
+    return !gridSearchMatchingRoomIds().has(roomId as PlacedRoomId);
   }
 
   public onResetCamera(): void {

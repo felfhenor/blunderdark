@@ -1,4 +1,5 @@
 import { DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -7,6 +8,7 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import { ModalComponent } from '@components/modal/modal.component';
 import {
   biomeIsUnlocked,
+  cameraFocusOnTile,
   floorAll,
   floorCanChangeBiome,
   floorCanCreate,
@@ -21,9 +23,15 @@ import {
   floorModifierGet,
   floorRemove,
   floorSetCurrentByIndex,
+  gridSearchClear,
+  gridSearchFloorMatchCounts,
+  gridSearchHasQuery,
+  gridSearchMatchingRoomIds,
+  gridSearchQuery,
+  gridSelectTile,
 } from '@helpers';
 import type { FloorDepthResourceModifier } from '@interfaces/floor-modifier';
-import { BIOME_DATA, type BiomeType, type Floor } from '@interfaces';
+import { BIOME_DATA, type BiomeType, type Floor, type FloorId } from '@interfaces';
 import { MAX_FLOORS } from '@interfaces/floor';
 
 type BiomeOption = {
@@ -35,7 +43,7 @@ type BiomeOption = {
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyNameComponent, ModalComponent, SFXDirective],
+  imports: [DecimalPipe, FormsModule, CurrencyCostComponent, CurrencyNameComponent, ModalComponent, SFXDirective],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +52,11 @@ export class PanelFloorSelectorComponent {
   public floors = floorAll;
   public currentIndex = floorCurrentIndex;
   public selectedFloor = floorCurrent;
+
+  // Search
+  public searchText = gridSearchQuery;
+  public hasSearch = gridSearchHasQuery;
+  public floorMatchCounts = gridSearchFloorMatchCounts;
 
   public showCreateModal = signal(false);
   public selectedBiome = signal<BiomeType>('neutral');
@@ -142,9 +155,29 @@ export class PanelFloorSelectorComponent {
     return this.currentIndex() === index;
   }
 
+  public getFloorMatchCount(floorId: FloorId): number {
+    return this.floorMatchCounts().get(floorId) ?? 0;
+  }
+
+  public clearSearch(): void {
+    gridSearchClear();
+  }
+
   public async selectFloor(index: number): Promise<void> {
     analyticsSendDesignEvent('Floor:Select');
     await floorSetCurrentByIndex(index);
+
+    if (this.hasSearch()) {
+      const floor = this.floors()[index];
+      if (floor) {
+        const matching = gridSearchMatchingRoomIds();
+        const matchRoom = floor.rooms.find((r) => matching.has(r.id));
+        if (matchRoom) {
+          gridSelectTile(matchRoom.anchorX, matchRoom.anchorY);
+          cameraFocusOnTile(matchRoom.anchorX, matchRoom.anchorY);
+        }
+      }
+    }
   }
 
   public openCreateModal(): void {
