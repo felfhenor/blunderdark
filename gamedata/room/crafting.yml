@@ -40,9 +40,9 @@
   inhabitantRestriction: null
   fearLevel: 2
   roomUpgradeIds:
-    - Distillery
-    - Advanced Laboratory
-    - Expanded Laboratory
+    - Dark Crucible
+    - Arcane Annex
+    - Transmutation Forge
   role: alchemyLab
   workCategory: crafting
   biomeBonuses:

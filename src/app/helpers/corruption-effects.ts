@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType } from '@helpers/content';
 import { corruptionCurrent } from '@helpers/corruption';
+import { currencyUnlockInPlace } from '@helpers/currency-unlock';
 import { invasionTriggerAddSpecial } from '@helpers/invasion-triggers';
 import {
   mutationTraitApply,
@@ -247,6 +248,7 @@ function handleResourceGrant(
     const res = state.world.resources[resource];
     const available = res.max - res.current;
     res.current += Math.min(amount, available);
+    currencyUnlockInPlace(state, resource);
   }
 }
 

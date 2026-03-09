@@ -4,6 +4,12 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type AlchemyRecipeId = Branded<string, 'AlchemyRecipeId'>;
 
+export type AlchemyRecipeTier =
+  | 'basic'
+  | 'dark-crucible'
+  | 'arcane-annex'
+  | 'transmutation-forge';
+
 export type AlchemyResourceEntry = {
   resource: ResourceType;
   amount: number;
@@ -15,5 +21,5 @@ export type AlchemyRecipeContent = IsContentItem &
     inputCost: AlchemyResourceEntry[];
     outputCost: AlchemyResourceEntry[];
     baseTicks: number;
-    tier: 'basic' | 'advanced';
+    tier: AlchemyRecipeTier;
   };

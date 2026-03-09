@@ -12,14 +12,14 @@
 #   ├── Quarters & Arena Design (T2) → Comfortable Quarters + Conditioning Yard
 #   │   └── Combat Specialization (T3) → Elite Arena + War Room
 #   ├── Scholarly Design (T2) → Expanded Archives + Expanded Nexus + Research Archive
-#   │   └── Workshop Mastery (T3) → Distillery + Master Trapworks + Dual Circle + Flux Capacitor
+#   │   └── Workshop Mastery (T3) → Dark Crucible + Master Trapworks + Dual Circle + Flux Capacitor
 #   Resonant Design (T4) [Deep Extraction + Sanctum Design] → Resonant Mine + Tranquil Garden
 #   Deep Water & Financial Design (T4) [Aquatic & Soul + Sanctum Design] → Deepwater Lake + Investment Vault
 #   Advanced Combat Design (T4) [Combat Spec + Scholarly Design] → Drill Hall
 #   Arcane Facility Mastery (T4) [Workshop Mastery + Quarters & Arena] → Amplified Nexus + Binding Circle
 #   Abyssal Waters (T5) [Deep Water + Resonant] → Dark Waters + Dragon's Hoard
 #   Altar Ascension (T5) [Deep Water + Resonant] → Ascendant Altar + Forbidden Archives
-#   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dark Pool + Expanded Laboratory
+#   Dark Facility Mastery (T5) [Adv Combat + Arcane Facility] → Dark Pool + Transmutation Forge
 #   Architectural Mastery (T6) → capstone passive
 
 # --- TIER 1: Root node ---
@@ -189,7 +189,7 @@
     - Scholarly Design
   unlocks:
     - type: roomupgrade
-      targetRoomupgradeId: Distillery
+      targetRoomupgradeId: Dark Crucible
     - type: roomupgrade
       targetRoomupgradeId: Master Trapworks
     - type: roomupgrade
@@ -330,7 +330,7 @@
     - type: roomupgrade
       targetRoomupgradeId: Dark Pool
     - type: roomupgrade
-      targetRoomupgradeId: Expanded Laboratory
+      targetRoomupgradeId: Transmutation Forge
   tier: 5
   requiredTicks: 2250
 

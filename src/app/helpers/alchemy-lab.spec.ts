@@ -27,34 +27,37 @@ const MUSHROOM_GROVE_ID = '7fb314ad-a447-469f-82df-4b8c68f9deff';
 const FLUX_RECIPE_ID = 'b2a01001-0001-4001-8001-000000000001';
 const ESSENCE_RECIPE_ID = 'b2a01001-0001-4001-8001-000000000002';
 const DARK_TRANSMUTE_ID = 'b2a01001-0001-4001-8001-000000000003';
+const CORRUPTION_BREWING_ID = '7dd72688-64d7-4c18-b039-f6768efc0b7c';
+const FORBIDDEN_KNOWLEDGE_ID = '74313406-186c-4280-a827-c38812c9fc49';
+const ESSENCE_RECYCLING_ID = 'b0365c29-5b01-4bd0-99c3-94c616cb93ec';
 
 // --- Upgrade paths ---
 
-const efficientDistillationPath: RoomUpgradeContent = {
-  id: 'c3b02001-0002-4001-8001-000000000001' as RoomUpgradeId,
+const darkCruciblePath: RoomUpgradeContent = {
+  id: '88ed58e2-7382-4639-b0b4-29d665661af9' as RoomUpgradeId,
   __type: 'roomupgrade',
-  name: 'Efficient Distillation',
-  description: 'Reduced costs.',
-  cost: { gold: 100, crystals: 50 },
-  effects: [{ type: 'alchemyCostMultiplier', value: 0.6 }],
+  name: 'Dark Crucible',
+  description: 'Unlocks Dark Crucible recipes.',
+  cost: { gold: 80, flux: 30 },
+  effects: [{ type: 'alchemyUnlockDarkCrucible', value: 1 }],
 };
 
-const advancedAlchemyPath: RoomUpgradeContent = {
-  id: 'c3b02001-0002-4001-8001-000000000002' as RoomUpgradeId,
+const arcaneAnnexPath: RoomUpgradeContent = {
+  id: '72c1067d-b5e7-4655-99c3-e935ee0cc45a' as RoomUpgradeId,
   __type: 'roomupgrade',
-  name: 'Advanced Alchemy',
-  description: 'Unlock advanced recipes.',
-  cost: { gold: 120, essence: 40, flux: 20 },
-  effects: [{ type: 'alchemyTierUnlock', value: 1 }],
+  name: 'Arcane Annex',
+  description: 'Unlocks Arcane Annex recipes.',
+  cost: { gold: 100, essence: 20 },
+  effects: [{ type: 'alchemyUnlockArcaneAnnex', value: 1 }],
 };
 
-const expandedCapacityPath: RoomUpgradeContent = {
-  id: 'c3b02001-0002-4001-8001-000000000003' as RoomUpgradeId,
+const transmutationForgePath: RoomUpgradeContent = {
+  id: '4b99dc18-b9ec-4a3c-9002-42943021e920' as RoomUpgradeId,
   __type: 'roomupgrade',
-  name: 'Expanded Capacity',
-  description: 'More workers.',
-  cost: { gold: 80, crystals: 40 },
-  effects: [{ type: 'maxInhabitantBonus', value: 2 }],
+  name: 'Transmutation Forge',
+  description: 'Unlocks Transmutation Forge recipes.',
+  cost: { gold: 120, crystals: 40 },
+  effects: [{ type: 'alchemyUnlockTransmutationForge', value: 1 }],
 };
 
 // --- Mock content ---
@@ -95,6 +98,12 @@ vi.mock('@helpers/room-shapes', () => ({
 
 vi.mock('@helpers/adjacency', () => ({
   adjacencyAreRoomsAdjacent: vi.fn(() => false),
+}));
+
+const mockCurrencyUnlocked = vi.fn(() => true);
+vi.mock('@helpers/currency-unlock', () => ({
+  currencyIsUnlocked: (...args: unknown[]) => mockCurrencyUnlocked(...args),
+  currencyUnlockInPlace: vi.fn(),
 }));
 
 let mockResourceMap: Record<string, { current: number; max: number }>;
@@ -148,7 +157,7 @@ function makeEssenceRecipe(): AlchemyRecipeContent {
     ],
     outputCost: [{ resource: 'essence', amount: 1 }],
     baseTicks: 25,
-    tier: 'advanced',
+    tier: 'transmutation-forge',
   };
 }
 
@@ -164,7 +173,55 @@ function makeDarkTransmuteRecipe(): AlchemyRecipeContent {
     ],
     outputCost: [{ resource: 'flux', amount: 2 }],
     baseTicks: 20,
-    tier: 'advanced',
+    tier: 'dark-crucible',
+  };
+}
+
+function makeCorruptionBrewingRecipe(): AlchemyRecipeContent {
+  return {
+    id: CORRUPTION_BREWING_ID as AlchemyRecipeId,
+    name: 'Corruption Brewing',
+    __type: 'alchemyrecipe',
+    description: 'Ferment essence and gold into corruption.',
+    inputCost: [
+      { resource: 'essence', amount: 3 },
+      { resource: 'gold', amount: 5 },
+    ],
+    outputCost: [{ resource: 'corruption', amount: 5 }],
+    baseTicks: 22,
+    tier: 'dark-crucible',
+  };
+}
+
+function makeForbiddenKnowledgeRecipe(): AlchemyRecipeContent {
+  return {
+    id: FORBIDDEN_KNOWLEDGE_ID as AlchemyRecipeId,
+    name: 'Forbidden Knowledge',
+    __type: 'alchemyrecipe',
+    description: 'Distill forbidden insights from essence and corruption.',
+    inputCost: [
+      { resource: 'essence', amount: 5 },
+      { resource: 'corruption', amount: 8 },
+    ],
+    outputCost: [{ resource: 'research', amount: 4 }],
+    baseTicks: 30,
+    tier: 'arcane-annex',
+  };
+}
+
+function makeEssenceRecyclingRecipe(): AlchemyRecipeContent {
+  return {
+    id: ESSENCE_RECYCLING_ID as AlchemyRecipeId,
+    name: 'Essence Recycling',
+    __type: 'alchemyrecipe',
+    description: 'Reclaim essence from flux and crystals.',
+    inputCost: [
+      { resource: 'flux', amount: 10 },
+      { resource: 'crystals', amount: 5 },
+    ],
+    outputCost: [{ resource: 'essence', amount: 2 }],
+    baseTicks: 28,
+    tier: 'transmutation-forge',
   };
 }
 
@@ -290,10 +347,16 @@ describe('alchemy-lab', () => {
     const fluxRecipe = makeFluxRecipe();
     const essenceRecipe = makeEssenceRecipe();
     const darkTransmuteRecipe = makeDarkTransmuteRecipe();
+    const corruptionBrewingRecipe = makeCorruptionBrewingRecipe();
+    const forbiddenKnowledgeRecipe = makeForbiddenKnowledgeRecipe();
+    const essenceRecyclingRecipe = makeEssenceRecyclingRecipe();
 
     mockContent.set(FLUX_RECIPE_ID, fluxRecipe);
     mockContent.set(ESSENCE_RECIPE_ID, essenceRecipe);
     mockContent.set(DARK_TRANSMUTE_ID, darkTransmuteRecipe);
+    mockContent.set(CORRUPTION_BREWING_ID, corruptionBrewingRecipe);
+    mockContent.set(FORBIDDEN_KNOWLEDGE_ID, forbiddenKnowledgeRecipe);
+    mockContent.set(ESSENCE_RECYCLING_ID, essenceRecyclingRecipe);
 
     const labDef: Partial<RoomContent> = {
       id: ALCHEMY_LAB_ID as RoomId,
@@ -301,15 +364,15 @@ describe('alchemy-lab', () => {
       role: 'alchemyLab',
       maxInhabitants: 1,
       roomUpgradeIds: [
-        efficientDistillationPath.id,
-        advancedAlchemyPath.id,
-        expandedCapacityPath.id,
+        darkCruciblePath.id,
+        arcaneAnnexPath.id,
+        transmutationForgePath.id,
       ],
     };
     mockContent.set(ALCHEMY_LAB_ID, labDef);
-    mockContent.set(efficientDistillationPath.id, efficientDistillationPath);
-    mockContent.set(advancedAlchemyPath.id, advancedAlchemyPath);
-    mockContent.set(expandedCapacityPath.id, expandedCapacityPath);
+    mockContent.set(darkCruciblePath.id, darkCruciblePath);
+    mockContent.set(arcaneAnnexPath.id, arcaneAnnexPath);
+    mockContent.set(transmutationForgePath.id, transmutationForgePath);
   });
 
   describe('Recipe Availability', () => {
@@ -318,6 +381,7 @@ describe('alchemy-lab', () => {
         makeFluxRecipe(),
         makeEssenceRecipe(),
         makeDarkTransmuteRecipe(),
+        makeForbiddenKnowledgeRecipe(),
       ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
 
@@ -331,10 +395,57 @@ describe('alchemy-lab', () => {
       expect(result[0].name).toBe('Flux Conversion');
     });
 
-    it('should return basic and advanced recipes with Advanced Alchemy upgrade', async () => {
+    it('should return basic + dark-crucible recipes with Dark Crucible upgrade', async () => {
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeDarkTransmuteRecipe(),
+        makeCorruptionBrewingRecipe(),
+        makeEssenceRecipe(),
+        makeForbiddenKnowledgeRecipe(),
+      ];
+      vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
+
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: darkCruciblePath.id,
+      });
+      const result = alchemyLabGetAvailableRecipes(room);
+
+      expect(result).toHaveLength(3);
+      expect(result.map((r) => r.name)).toContain('Flux Conversion');
+      expect(result.map((r) => r.name)).toContain('Dark Transmutation');
+      expect(result.map((r) => r.name)).toContain('Corruption Brewing');
+    });
+
+    it('should return basic + arcane-annex recipes with Arcane Annex upgrade', async () => {
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeDarkTransmuteRecipe(),
+        makeForbiddenKnowledgeRecipe(),
+        makeEssenceRecipe(),
+      ];
+      vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
+
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: arcaneAnnexPath.id,
+      });
+      const result = alchemyLabGetAvailableRecipes(room);
+
+      expect(result).toHaveLength(2);
+      expect(result.map((r) => r.name)).toContain('Flux Conversion');
+      expect(result.map((r) => r.name)).toContain('Forbidden Knowledge');
+    });
+
+    it('should return basic + transmutation-forge recipes with Transmutation Forge upgrade', async () => {
       const allRecipes = [
         makeFluxRecipe(),
         makeEssenceRecipe(),
+        makeEssenceRecyclingRecipe(),
         makeDarkTransmuteRecipe(),
       ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
@@ -343,11 +454,43 @@ describe('alchemy-lab', () => {
         '@helpers/alchemy-lab'
       );
       const room = makePlacedRoom({
-        appliedUpgradePathId: advancedAlchemyPath.id,
+        appliedUpgradePathId: transmutationForgePath.id,
       });
       const result = alchemyLabGetAvailableRecipes(room);
 
       expect(result).toHaveLength(3);
+      expect(result.map((r) => r.name)).toContain('Flux Conversion');
+      expect(result.map((r) => r.name)).toContain('Essence Synthesis');
+      expect(result.map((r) => r.name)).toContain('Essence Recycling');
+    });
+
+    it('should hide recipes whose input currencies are not unlocked', async () => {
+      // Corruption Brewing needs essence + gold; lock essence
+      mockCurrencyUnlocked.mockImplementation(
+        (type: string) => type !== 'essence',
+      );
+
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeDarkTransmuteRecipe(),
+        makeCorruptionBrewingRecipe(),
+      ];
+      vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
+
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: darkCruciblePath.id,
+      });
+      const result = alchemyLabGetAvailableRecipes(room);
+
+      // Flux Conversion (crystals+food) and Dark Transmutation (food+corruption) visible
+      // Corruption Brewing (essence+gold) hidden because essence is locked
+      expect(result).toHaveLength(2);
+      expect(result.map((r) => r.name)).not.toContain('Corruption Brewing');
+
+      mockCurrencyUnlocked.mockImplementation(() => true);
     });
   });
 
@@ -367,11 +510,11 @@ describe('alchemy-lab', () => {
       );
       const room = makePlacedRoom();
 
-      // 2 workers: 15 * (1 - 0.25) = 15 * 0.75 = 11.25 → 11
+      // 2 workers: 15 * (1 - 0.25) = 15 * 0.75 = 11.25 -> 11
       const ticks2 = alchemyLabGetConversionTicks(room, 2, 15, new Set());
       expect(ticks2).toBe(11);
 
-      // 3 workers: 15 * (1 - 0.50) = 15 * 0.50 = 7.5 → 8
+      // 3 workers: 15 * (1 - 0.50) = 15 * 0.50 = 7.5 -> 8
       const ticks3 = alchemyLabGetConversionTicks(room, 3, 15, new Set());
       expect(ticks3).toBe(8);
     });
@@ -382,7 +525,7 @@ describe('alchemy-lab', () => {
       );
       const room = makePlacedRoom();
 
-      // 4 workers: 15 * max(0.5, 1 - 0.75) = 15 * 0.5 = 7.5 → 8
+      // 4 workers: 15 * max(0.5, 1 - 0.75) = 15 * 0.5 = 7.5 -> 8
       const ticks4 = alchemyLabGetConversionTicks(room, 4, 15, new Set());
       expect(ticks4).toBe(8);
     });
@@ -428,29 +571,6 @@ describe('alchemy-lab', () => {
       ]);
     });
 
-    it('should apply Efficient Distillation cost reduction', async () => {
-      const { alchemyLabGetEffectiveCost } = await import(
-        '@helpers/alchemy-lab'
-      );
-      const room = makePlacedRoom({
-        appliedUpgradePathId: efficientDistillationPath.id,
-      });
-      const cost = alchemyLabGetEffectiveCost(
-        room,
-        [
-          { resource: 'crystals', amount: 5 },
-          { resource: 'food', amount: 5 },
-        ],
-        new Set(),
-      );
-
-      // 5 * 0.6 = 3
-      expect(cost).toEqual([
-        { resource: 'crystals', amount: 3 },
-        { resource: 'food', amount: 3 },
-      ]);
-    });
-
     it('should apply adjacency cost reduction', async () => {
       const groveDef: Partial<RoomContent> = {
         id: MUSHROOM_GROVE_ID as RoomId,
@@ -465,7 +585,7 @@ describe('alchemy-lab', () => {
       const room = makePlacedRoom();
       const adjacentTypes = new Set([MUSHROOM_GROVE_ID]);
 
-      // 5 * (1 - 0.15) = 5 * 0.85 = 4.25 → 4
+      // 5 * (1 - 0.15) = 5 * 0.85 = 4.25 -> 4
       const cost = alchemyLabGetEffectiveCost(
         room,
         [
@@ -484,16 +604,22 @@ describe('alchemy-lab', () => {
       const { alchemyLabGetEffectiveCost } = await import(
         '@helpers/alchemy-lab'
       );
-      const room = makePlacedRoom({
-        appliedUpgradePathId: efficientDistillationPath.id,
-      });
+      const room = makePlacedRoom();
+
+      const groveDef: Partial<RoomContent> = {
+        id: MUSHROOM_GROVE_ID as RoomId,
+        name: 'Mushroom Grove',
+        alchemyAdjacencyEffects: { alchemyCostReduction: 0.95 },
+      };
+      mockContent.set(MUSHROOM_GROVE_ID, groveDef);
+
       const cost = alchemyLabGetEffectiveCost(
         room,
         [
           { resource: 'crystals', amount: 1 },
           { resource: 'food', amount: 1 },
         ],
-        new Set(),
+        new Set([MUSHROOM_GROVE_ID]),
       );
 
       expect(cost).toEqual([
@@ -807,7 +933,7 @@ describe('alchemy-lab', () => {
       expect(state.world.resources.flux.current).toBe(11);
     });
 
-    it('should handle advanced recipe output (multiple units)', async () => {
+    it('should handle dark-crucible recipe output (multiple units)', async () => {
       const { alchemyLabProcess } = await import('@helpers/alchemy-lab');
       const conversion: AlchemyConversion = {
         roomId: 'room-1' as PlacedRoomId,
@@ -826,32 +952,57 @@ describe('alchemy-lab', () => {
   });
 
   describe('Upgrade Effects', () => {
-    it('should apply alchemyCostMultiplier from Efficient Distillation', async () => {
-      const { alchemyLabGetEffectiveCost } = await import(
+    it('should unlock dark-crucible recipes with Dark Crucible upgrade', async () => {
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeDarkTransmuteRecipe(),
+        makeCorruptionBrewingRecipe(),
+        makeEssenceRecipe(),
+        makeForbiddenKnowledgeRecipe(),
+      ];
+      vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
+
+      const { alchemyLabGetAvailableRecipes } = await import(
         '@helpers/alchemy-lab'
       );
       const room = makePlacedRoom({
-        appliedUpgradePathId: efficientDistillationPath.id,
+        appliedUpgradePathId: darkCruciblePath.id,
       });
-      const cost = alchemyLabGetEffectiveCost(
-        room,
-        [
-          { resource: 'crystals', amount: 5 },
-          { resource: 'food', amount: 5 },
-        ],
-        new Set(),
-      );
+      const result = alchemyLabGetAvailableRecipes(room);
 
-      expect(cost).toEqual([
-        { resource: 'crystals', amount: 3 },
-        { resource: 'food', amount: 3 },
-      ]);
+      expect(result).toHaveLength(3);
+      expect(result.map((r) => r.tier)).toContain('dark-crucible');
+      expect(result.map((r) => r.tier)).not.toContain('arcane-annex');
+      expect(result.map((r) => r.tier)).not.toContain('transmutation-forge');
     });
 
-    it('should unlock advanced recipes with alchemyTierUnlock', async () => {
+    it('should unlock arcane-annex recipes with Arcane Annex upgrade', async () => {
+      const allRecipes = [
+        makeFluxRecipe(),
+        makeForbiddenKnowledgeRecipe(),
+        makeDarkTransmuteRecipe(),
+        makeEssenceRecipe(),
+      ];
+      vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
+
+      const { alchemyLabGetAvailableRecipes } = await import(
+        '@helpers/alchemy-lab'
+      );
+      const room = makePlacedRoom({
+        appliedUpgradePathId: arcaneAnnexPath.id,
+      });
+      const result = alchemyLabGetAvailableRecipes(room);
+
+      expect(result).toHaveLength(2);
+      expect(result.map((r) => r.tier)).toContain('arcane-annex');
+      expect(result.map((r) => r.tier)).not.toContain('dark-crucible');
+    });
+
+    it('should unlock transmutation-forge recipes with Transmutation Forge upgrade', async () => {
       const allRecipes = [
         makeFluxRecipe(),
         makeEssenceRecipe(),
+        makeEssenceRecyclingRecipe(),
         makeDarkTransmuteRecipe(),
       ];
       vi.mocked(contentGetEntriesByType).mockReturnValue(allRecipes);
@@ -860,12 +1011,13 @@ describe('alchemy-lab', () => {
         '@helpers/alchemy-lab'
       );
       const room = makePlacedRoom({
-        appliedUpgradePathId: advancedAlchemyPath.id,
+        appliedUpgradePathId: transmutationForgePath.id,
       });
       const result = alchemyLabGetAvailableRecipes(room);
 
       expect(result).toHaveLength(3);
-      expect(result.map((r) => r.tier)).toContain('advanced');
+      expect(result.map((r) => r.tier)).toContain('transmutation-forge');
+      expect(result.map((r) => r.tier)).not.toContain('dark-crucible');
     });
   });
 });

@@ -34,6 +34,20 @@ export async function currencyUnlock(type: ResourceType): Promise<void> {
   currencyUnlockQueue.update((q) => [...q, type]);
 }
 
+/**
+ * Unlock a currency by mutating the state in-place.
+ * Use this inside tick processors that already hold a mutable GameState.
+ */
+export function currencyUnlockInPlace(
+  state: { world: { unlockedCurrencies: ResourceType[] } },
+  type: ResourceType,
+): void {
+  if (!state.world.unlockedCurrencies) return;
+  if (state.world.unlockedCurrencies.includes(type)) return;
+  state.world.unlockedCurrencies.push(type);
+  currencyUnlockQueue.update((q) => [...q, type]);
+}
+
 export async function currencyUnlockAll(): Promise<void> {
   const missing = ALL_CURRENCIES.filter((t) => !currencyIsUnlocked(t));
   if (missing.length === 0) return;

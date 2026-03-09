@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { currencyUnlockInPlace } from '@helpers/currency-unlock';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngRandom, rngUuid } from '@helpers/rng';
@@ -302,6 +303,7 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
         // Add corruption while actively processing
         state.world.resources.corruption.current +=
           TORTURE_CORRUPTION_PER_TICK_WHILE_PROCESSING * numTicks;
+        currencyUnlockInPlace(state, 'corruption');
       }
 
       // Check for stage completion
@@ -342,6 +344,7 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
           if (action === 'research') {
             const researchGained = tortureCalculateExtractionReward(prisoner);
             state.world.resources.research.current += researchGained;
+            currencyUnlockInPlace(state, 'research');
 
             tortureExtractCompleteSubject.next({
               roomId: room.id,
@@ -422,6 +425,7 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
             const boonAmount = Math.round(10 + rng() * 15);
 
             state.world.resources[boonResource].current += boonAmount;
+            currencyUnlockInPlace(state, boonResource);
 
             tortureBreakCompleteSubject.next({
               roomId: room.id,

@@ -1,4 +1,8 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import {
+  currencyIsUnlocked,
+  currencyUnlockInPlace,
+} from '@helpers/currency-unlock';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { reputationAwardInPlace } from '@helpers/reputation';
@@ -44,7 +48,7 @@ export const alchemyLabCompleted$ = alchemyLabCompletedSubject.asObservable();
 /**
  * Get available alchemy recipes for a room, filtered by tier.
  * Base rooms can only use 'basic' recipes.
- * With the Advanced Alchemy upgrade, 'advanced' recipes are also available.
+ * Thematic upgrades unlock their corresponding recipe tiers.
  */
 export function alchemyLabGetAvailableRecipes(
   room: PlacedRoom,
@@ -53,14 +57,25 @@ export function alchemyLabGetAvailableRecipes(
     contentGetEntriesByType<AlchemyRecipeContent>('alchemyrecipe');
 
   const effects = roomUpgradeGetAppliedEffects(room);
-  const hasAdvancedAlchemy = effects.some(
-    (e) => e.type === 'alchemyTierUnlock',
+  const hasDarkCrucible = effects.some(
+    (e) => e.type === 'alchemyUnlockDarkCrucible',
+  );
+  const hasArcaneAnnex = effects.some(
+    (e) => e.type === 'alchemyUnlockArcaneAnnex',
+  );
+  const hasTransmutationForge = effects.some(
+    (e) => e.type === 'alchemyUnlockTransmutationForge',
   );
 
   return recipes.filter((r) => {
-    if (r.tier === 'basic') return true;
-    if (r.tier === 'advanced' && hasAdvancedAlchemy) return true;
-    return false;
+    if (r.tier === 'basic') { /* always eligible */ }
+    else if (r.tier === 'dark-crucible' && hasDarkCrucible) { /* eligible */ }
+    else if (r.tier === 'arcane-annex' && hasArcaneAnnex) { /* eligible */ }
+    else if (r.tier === 'transmutation-forge' && hasTransmutationForge) { /* eligible */ }
+    else return false;
+
+    // Hide recipes whose input currencies are not yet unlocked
+    return r.inputCost.every((c) => currencyIsUnlocked(c.resource as ResourceType));
   });
 }
 
@@ -101,22 +116,14 @@ export function alchemyLabGetConversionTicks(
 }
 
 /**
- * Calculate effective input cost after upgrade and adjacency modifiers.
+ * Calculate effective input cost after adjacency modifiers.
  */
 export function alchemyLabGetEffectiveCost(
-  room: PlacedRoom,
+  _room: PlacedRoom,
   baseCost: AlchemyResourceEntry[],
   adjacentRoomTypeIds: Set<string>,
 ): AlchemyResourceEntry[] {
-  const effects = roomUpgradeGetAppliedEffects(room);
-
-  // Apply upgrade cost multiplier (e.g., Efficient Distillation)
   let costMultiplier = 1;
-  for (const effect of effects) {
-    if (effect.type === 'alchemyCostMultiplier') {
-      costMultiplier *= effect.value;
-    }
-  }
 
   // Apply adjacency cost reduction
   for (const adjTypeId of adjacentRoomTypeIds) {
@@ -418,6 +425,7 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
         // Add output resources (direct mutation; clamped at end of tick)
         for (const output of recipe.outputCost) {
           state.world.resources[output.resource].current += output.amount;
+          currencyUnlockInPlace(state, output.resource as ResourceType);
         }
 
         reputationAwardInPlace(state, 'complete_transmutation');

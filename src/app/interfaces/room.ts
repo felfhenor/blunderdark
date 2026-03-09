@@ -7,8 +7,9 @@ export type AdjacencyBonus = {
 };
 
 export type RoomUpgradeEffectType =
-  | 'alchemyCostMultiplier'
-  | 'alchemyTierUnlock'
+  | 'alchemyUnlockArcaneAnnex'
+  | 'alchemyUnlockDarkCrucible'
+  | 'alchemyUnlockTransmutationForge'
   | 'breedingTimeMultiplier'
   | 'craftingBonusDamage'
   | 'craftingCostMultiplier'

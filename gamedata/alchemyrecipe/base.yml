@@ -1,3 +1,5 @@
+# === Basic Recipes ===
+
 - id: b2a01001-0001-4001-8001-000000000001
   name: Flux Conversion
   description: Transmute crystals and food into magical flux.
@@ -12,19 +14,49 @@
   baseTicks: 15
   tier: basic
 
-- id: b2a01001-0001-4001-8001-000000000002
-  name: Essence Synthesis
-  description: Distill gold and crystals into pure essence.
+- id: 26a960cb-891e-4b98-b01d-97c3b9101261
+  name: Gilded Residue
+  description: Extract trace gold from crystalline structures using flux as a catalyst.
+  inputCost:
+    - resource: crystals
+      amount: 8
+    - resource: flux
+      amount: 3
+  outputCost:
+    - resource: gold
+      amount: 5
+  baseTicks: 18
+  tier: basic
+
+- id: ce9698ab-1dd2-45ba-9cec-e0f07cada306
+  name: Sporemeal Brewing
+  description: Brew a nutrient-rich meal from gold coins and corrupted spores.
   inputCost:
     - resource: gold
-      amount: 10
-    - resource: crystals
+      amount: 5
+    - resource: corruption
       amount: 5
   outputCost:
-    - resource: essence
-      amount: 1
-  baseTicks: 25
-  tier: advanced
+    - resource: food
+      amount: 8
+  baseTicks: 12
+  tier: basic
+
+- id: 67336d3f-83e9-4a04-b2b3-58cbc1d25809
+  name: Crystal Distillation
+  description: Distill raw food matter into crystalline shards using flux binding.
+  inputCost:
+    - resource: food
+      amount: 8
+    - resource: flux
+      amount: 3
+  outputCost:
+    - resource: crystals
+      amount: 5
+  baseTicks: 16
+  tier: basic
+
+# === Dark Crucible Recipes ===
 
 - id: b2a01001-0001-4001-8001-000000000003
   name: Dark Transmutation
@@ -38,4 +70,120 @@
     - resource: flux
       amount: 2
   baseTicks: 20
-  tier: advanced
+  tier: dark-crucible
+
+- id: 7dd72688-64d7-4c18-b039-f6768efc0b7c
+  name: Corruption Brewing
+  description: Ferment essence and gold into a potent brew of liquid corruption.
+  inputCost:
+    - resource: essence
+      amount: 3
+    - resource: gold
+      amount: 5
+  outputCost:
+    - resource: corruption
+      amount: 5
+  baseTicks: 22
+  tier: dark-crucible
+
+- id: b1051000-073e-42fa-aced-1c9f2ab2dd7f
+  name: Dark Harvest
+  description: Reap sustenance from corrupted flux through dark rituals.
+  inputCost:
+    - resource: corruption
+      amount: 8
+    - resource: flux
+      amount: 5
+  outputCost:
+    - resource: food
+      amount: 10
+  baseTicks: 20
+  tier: dark-crucible
+
+# === Arcane Annex Recipes ===
+
+- id: 74313406-186c-4280-a827-c38812c9fc49
+  name: Forbidden Knowledge
+  description: Distill forbidden insights from essence and corruption.
+  inputCost:
+    - resource: essence
+      amount: 5
+    - resource: corruption
+      amount: 8
+  outputCost:
+    - resource: research
+      amount: 4
+  baseTicks: 30
+  tier: arcane-annex
+
+- id: 6a0858eb-264f-442a-9901-d12b13f551e9
+  name: Philosopher's Transmutation
+  description: Transform essence and research into gleaming gold through arcane philosophy.
+  inputCost:
+    - resource: essence
+      amount: 5
+    - resource: research
+      amount: 5
+  outputCost:
+    - resource: gold
+      amount: 8
+  baseTicks: 35
+  tier: arcane-annex
+
+- id: bfe9d71f-8f04-4d14-a141-448eb0ba55b7
+  name: Arcane Condensation
+  description: Condense arcane research into solid crystalline form using flux.
+  inputCost:
+    - resource: research
+      amount: 8
+    - resource: flux
+      amount: 3
+  outputCost:
+    - resource: crystals
+      amount: 6
+  baseTicks: 25
+  tier: arcane-annex
+
+# === Transmutation Forge Recipes ===
+
+- id: b2a01001-0001-4001-8001-000000000002
+  name: Essence Synthesis
+  description: Distill gold and crystals into pure essence.
+  inputCost:
+    - resource: gold
+      amount: 10
+    - resource: crystals
+      amount: 5
+  outputCost:
+    - resource: essence
+      amount: 1
+  baseTicks: 25
+  tier: transmutation-forge
+
+- id: b0365c29-5b01-4bd0-99c3-94c616cb93ec
+  name: Essence Recycling
+  description: Reclaim trace essence from spent flux and shattered crystals.
+  inputCost:
+    - resource: flux
+      amount: 10
+    - resource: crystals
+      amount: 5
+  outputCost:
+    - resource: essence
+      amount: 2
+  baseTicks: 28
+  tier: transmutation-forge
+
+- id: 32bdfb7b-4b9f-4e66-a2e0-74fa2de32376
+  name: Concentrated Flux
+  description: Forge gold and essence into a dense, concentrated flux under extreme heat.
+  inputCost:
+    - resource: gold
+      amount: 8
+    - resource: essence
+      amount: 5
+  outputCost:
+    - resource: flux
+      amount: 4
+  baseTicks: 30
+  tier: transmutation-forge

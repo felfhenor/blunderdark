@@ -50,8 +50,16 @@
                 <span class="text-xs font-semibold">
                   {{ entry.recipe.name }}
                 </span>
-                @if (entry.recipe.tier === 'advanced') {
-                  <span class="badge badge-xs badge-accent">Advanced</span>
+                @switch (entry.recipe.tier) {
+                  @case ('dark-crucible') {
+                    <span class="badge badge-xs badge-accent">Dark Crucible</span>
+                  }
+                  @case ('arcane-annex') {
+                    <span class="badge badge-xs badge-info">Arcane Annex</span>
+                  }
+                  @case ('transmutation-forge') {
+                    <span class="badge badge-xs badge-warning">Transmutation Forge</span>
+                  }
                 }
               </div>
               <span class="text-xs opacity-60">

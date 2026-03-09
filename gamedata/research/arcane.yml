@@ -10,7 +10,7 @@
 #   │   └── Elemental Binding (T3)
 #   │       └── Ley Line Mastery (T4) [+Ley Line Tapping]
 #   ├── Enchantment (T2) [+Arcane Library]
-#   │   ├── Advanced Room Modifications (T3) [+Advanced Laboratory]
+#   │   ├── Advanced Room Modifications (T3) [+Arcane Annex]
 #   │   └── Warding (T3) [+Arcane Trapworks]
 #   │       └── Spellweave Lattice (T4) [+Arcane Amplification]
 #   └── Crystal Biome (T2)
@@ -138,7 +138,7 @@
     - type: roomfeature
       targetFeatureId: Resource Converter
     - type: roomupgrade
-      targetRoomupgradeId: Advanced Laboratory
+      targetRoomupgradeId: Arcane Annex
   tier: 3
   requiredTicks: 750
 

@@ -1,28 +1,27 @@
-- id: c3b02001-0002-4001-8001-000000000001
-  name: Distillery
-  description: Refine the conversion process to use fewer raw materials per cycle. Reduces input costs to 3 Crystals + 3 Food per Flux.
-  cost:
-    gold: 100
-    crystals: 50
-  effects:
-    - type: alchemyCostMultiplier
-      value: 0.6
-- id: c3b02001-0002-4001-8001-000000000002
-  name: Advanced Laboratory
-  description: Unlock advanced transmutation recipes for producing Essence and concentrated Flux from exotic inputs.
-  cost:
-    gold: 120
-    essence: 40
-    flux: 20
-  effects:
-    - type: alchemyTierUnlock
-      value: 1
-- id: c3b02001-0002-4001-8001-000000000003
-  name: Expanded Laboratory
-  description: Add additional workstations, increasing the lab's inhabitant capacity from 1 to 3.
+- id: 88ed58e2-7382-4639-b0b4-29d665661af9
+  name: Dark Crucible
+  description: Install a crucible attuned to dark energies, unlocking recipes that harness corruption and shadowy reagents.
   cost:
     gold: 80
+    flux: 30
+  effects:
+    - type: alchemyUnlockDarkCrucible
+      value: 1
+- id: 72c1067d-b5e7-4655-99c3-e935ee0cc45a
+  name: Arcane Annex
+  description: Expand the lab with an arcane research wing, unlocking recipes that transmute essence and knowledge.
+  cost:
+    gold: 100
+    essence: 20
+  effects:
+    - type: alchemyUnlockArcaneAnnex
+      value: 1
+- id: 4b99dc18-b9ec-4a3c-9002-42943021e920
+  name: Transmutation Forge
+  description: Construct a high-powered transmutation forge, unlocking recipes that refine and concentrate volatile materials.
+  cost:
+    gold: 120
     crystals: 40
   effects:
-    - type: maxInhabitantBonus
-      value: 2
+    - type: alchemyUnlockTransmutationForge
+      value: 1

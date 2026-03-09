@@ -361,6 +361,12 @@ export class PanelRoomInfoComponent {
         return `Reduces fear in adjacent rooms by ${effect.value}`;
       case 'storageSpecialization':
         return `Specializes this storage room to hold +${effect.value} max ${effect.resource ?? 'resource'} capacity, replacing the general +200 bonus`;
+      case 'alchemyUnlockDarkCrucible':
+        return 'Unlocks Dark Crucible alchemy recipes';
+      case 'alchemyUnlockArcaneAnnex':
+        return 'Unlocks Arcane Annex alchemy recipes';
+      case 'alchemyUnlockTransmutationForge':
+        return 'Unlocks Transmutation Forge alchemy recipes';
       default:
         return `${startCase(effect.type)}: ${effect.value}`;
     }

@@ -55,6 +55,15 @@ import { startCase } from 'es-toolkit';
           <app-currency-name [type]="$any(effect().resource)" />
           capacity
         }
+        @case ('alchemyUnlockDarkCrucible') {
+          Unlocks Dark Crucible recipes
+        }
+        @case ('alchemyUnlockArcaneAnnex') {
+          Unlocks Arcane Annex recipes
+        }
+        @case ('alchemyUnlockTransmutationForge') {
+          Unlocks Transmutation Forge recipes
+        }
         @default {
           {{ formatEffectType(effect().type) }}: {{ effect().value }}
         }
