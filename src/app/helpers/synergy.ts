@@ -10,7 +10,7 @@ import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
 } from '@helpers/room-shapes';
-import { floorAll } from '@helpers/floor';
+import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import type {
   Connection,
   Floor,
@@ -89,7 +89,7 @@ export function synergyEvaluateCondition(
 
     case 'adjacentRoomType': {
       return adjacentRoomIds.some((adjId) => {
-        const adjRoom = floor.rooms.find((r) => r.id === adjId);
+        const adjRoom = findRoomOnFloor(floor, adjId as PlacedRoomId);
         return adjRoom?.roomTypeId === condition.roomTypeId;
       });
     }

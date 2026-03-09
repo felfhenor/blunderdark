@@ -51,6 +51,7 @@ import { VictoryMenuComponent } from '@components/victory-menu/victory-menu.comp
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import {
   contentGetEntry,
+  findRoomOnFloor,
   floorAll,
   floorCurrent,
   floorCurrentIndex,
@@ -244,7 +245,7 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    const room = findRoomOnFloor(floor, gridTile.roomId);
     if (!room) return undefined;
 
     const def = contentGetEntry<RoomContent>(room.roomTypeId);
@@ -297,9 +298,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
         const currentFloor = untracked(floorCurrent);
         const gridCell = currentFloor?.grid[currentTile.y]?.[currentTile.x];
         if (gridCell?.roomId) {
-          const selectedRoom = currentFloor?.rooms.find(
-            (r) => r.id === gridCell.roomId,
-          );
+          const selectedRoom = currentFloor
+            ? findRoomOnFloor(currentFloor, gridCell.roomId)
+            : undefined;
           const selectedDef = selectedRoom
             ? contentGetEntry<RoomContent>(selectedRoom.roomTypeId)
             : undefined;

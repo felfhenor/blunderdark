@@ -6,6 +6,7 @@ import {
   invasionTriggerPendingWarning,
   invasionTriggerWarningActive,
 } from '@helpers/invasion-triggers';
+import { findRoomOnFloor } from '@helpers/floor';
 import { gamestate } from '@helpers/state-game';
 import type { PlacedRoomId } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
@@ -186,7 +187,7 @@ export class BadgeInvasionWarningComponent {
 
     const state = gamestate();
     for (const floor of state.world.floors) {
-      const room = floor.rooms.find((r) => r.id === (targetId as PlacedRoomId));
+      const room = findRoomOnFloor(floor, targetId as PlacedRoomId);
       if (room) {
         const def = contentGetEntry<RoomContent>(room.roomTypeId);
         const baseName = def?.name ?? 'Unknown Room';

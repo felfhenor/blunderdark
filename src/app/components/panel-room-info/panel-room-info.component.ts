@@ -21,11 +21,13 @@ import { UpgradeEffectBadgeComponent } from '@components/upgrade-effect-badge/up
 import {
   connectivityDisconnectedRoomIds,
   currencyUnlock,
+  getAssignedInhabitantsWithDefs,
   inhabitantAssignToRoom,
   inhabitantAll,
   efficiencyCalculateRoom,
   efficiencyDoesTraitApply,
   connectionCreate,
+  findRoomOnFloor,
   floorCurrent,
   roomRemovalExecute,
   connectionGetAdjacentUnconnected,
@@ -132,7 +134,7 @@ export class PanelRoomInfoComponent {
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    const room = findRoomOnFloor(floor, gridTile.roomId);
     if (!room) return undefined;
 
     const def = productionGetRoomDefinition(room.roomTypeId);
@@ -234,17 +236,7 @@ export class PanelRoomInfoComponent {
   public assignedInhabitants = computed(() => {
     const room = this.selectedRoom();
     if (!room) return [];
-
-    const entries = this.inhabitants()
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, name: i.name, def };
-      })
-      .filter(
-        (e): e is typeof e & { def: InhabitantContent } => e.def !== undefined,
-      );
-    return sortBy(entries, [(e) => e.def.name]);
+    return getAssignedInhabitantsWithDefs(room.id);
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);

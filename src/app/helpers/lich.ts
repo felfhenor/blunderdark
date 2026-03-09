@@ -1,5 +1,6 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import {
   roomShapeGetAbsoluteTiles,
   roomShapeResolve,
@@ -45,7 +46,7 @@ function lichFindUndeadMasters(floor: Floor): {
 
     if (!lichHasUndeadMasterTrait(def)) continue;
 
-    const room = floor.rooms.find((r) => r.id === instance.assignedRoomId);
+    const room = findRoomOnFloor(floor, instance.assignedRoomId);
     if (!room) continue;
 
     results.push({ instance, def, room });

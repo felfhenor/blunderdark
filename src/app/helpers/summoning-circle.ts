@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { findRoomOnFloor } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
@@ -256,7 +257,7 @@ export async function summoningCraft(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         for (let i = 0; i < quantity; i++) {
           summoningAddJob(target, recipeId, targetTicks);
@@ -275,7 +276,7 @@ export async function summoningCancelGroup(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         summoningRemoveJobGroup(target, startIndex, count);
         break;

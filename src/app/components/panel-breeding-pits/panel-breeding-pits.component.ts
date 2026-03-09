@@ -20,11 +20,11 @@ import {
   breedingStartMutation,
   breedingSwapOrder,
   contentGetEntry,
-  floorCurrent,
   gamestate,
-  gridSelectedTile,
   mutationCompleted$,
   notify,
+  roomDefFromRoom,
+  selectedPlacedRoom,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
@@ -71,20 +71,11 @@ export class PanelBreedingPitsComponent {
   ];
 
   private selectedBreedingData = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
-
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
-
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return undefined;
-
-    const def = contentGetEntry<RoomContent>(room.roomTypeId);
+    const result = selectedPlacedRoom();
+    if (!result) return undefined;
+    const def = contentGetEntry<RoomContent>(result.room.roomTypeId);
     if (def?.role !== 'breedingPits') return undefined;
-
-    return { room, floor };
+    return result;
   });
 
   public breedingRoom = computed(() => this.selectedBreedingData()?.room);
@@ -93,11 +84,7 @@ export class PanelBreedingPitsComponent {
     () => this.selectedBreedingData()?.floor,
   );
 
-  public roomDef = computed(() => {
-    const room = this.breedingRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
+  public roomDef = roomDefFromRoom(this.breedingRoom);
 
   public assignedInhabitants = computed(() => {
     const room = this.breedingRoom();

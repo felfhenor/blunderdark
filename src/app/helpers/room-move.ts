@@ -9,6 +9,7 @@ import {
   roomPlacementRotation,
   roomPlacementValidate,
 } from '@helpers/room-placement';
+import { findRoomOnFloor } from '@helpers/floor';
 import { roomShapeGet, roomShapeResolve } from '@helpers/room-shapes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Connection, Floor, PlacedRoom, PlacedRoomId } from '@interfaces';
@@ -27,7 +28,7 @@ export async function roomMoveEnter(roomId: PlacedRoomId): Promise<void> {
   const floor = state.world.floors[floorIndex];
   if (!floor) return;
 
-  const room = floor.rooms.find((r) => r.id === roomId);
+  const room = findRoomOnFloor(floor, roomId);
   if (!room) return;
 
   const shape = roomShapeResolve(room);

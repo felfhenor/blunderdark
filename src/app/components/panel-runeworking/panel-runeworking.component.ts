@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { AssignedWorkersListComponent } from '@components/assigned-workers-list/assigned-workers-list.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
@@ -8,6 +8,8 @@ import {
   contentGetEntry,
   findRoomByRole,
   gamestate,
+  getAssignedInhabitantsWithDefs,
+  roomDefFromRoom,
   RUNEWORKING_BASE_TICKS,
   runeworkingComplete$,
   runeworkingStartJob,
@@ -17,23 +19,21 @@ import type {
   InhabitantInstanceId,
   TraitRuneInstanceId,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import type { TraitRuneContent } from '@interfaces/content-traitrune';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-runeworking',
-  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, ModalComponent],
+  imports: [AssignedWorkersListComponent, DecimalPipe, JobProgressComponent, ModalComponent],
   template: `
     @if (runeworkingRoom(); as room) {
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4">
           <h3 class="card-title text-sm">
-            {{ roomDefName() }}
+            {{ roomDef()?.name ?? 'Runeworking Chamber' }}
           </h3>
           <div class="mt-2">
-            <div class="text-xs opacity-70">{{ roomDefDesc() }}</div>
+            <div class="text-xs opacity-70">{{ roomDef()?.description }}</div>
           </div>
 
           <!-- Active Job -->
@@ -53,21 +53,10 @@ import { sortBy } from 'es-toolkit/compat';
           }
 
           <!-- Assigned Worker -->
-          @if (assignedInhabitants().length > 0) {
-            <div class="divider my-2 text-xs opacity-60">Runeworker</div>
-            <div class="flex flex-col gap-2">
-              @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
-                <app-inhabitant-card
-                  [instance]="inh.instance"
-                  [definition]="inh.def"
-                  [compact]="true"
-                  [showAssignment]="false"
-                />
-              }
-            </div>
-          } @else {
-            <p class="text-xs opacity-50 mt-2">No runeworker assigned.</p>
-          }
+          <app-assigned-workers-list
+            [workers]="assignedInhabitants()"
+            label="Runeworker"
+          />
 
           <!-- Start Job UI -->
           @if (!jobProgress() && canStart()) {
@@ -159,31 +148,11 @@ export class PanelRuneworkingComponent {
     return findRoomByRole('runeworking')?.room;
   });
 
-  public roomDefName = computed(() => {
-    const room = this.runeworkingRoom();
-    if (!room) return 'Runeworking Chamber';
-    return contentGetEntry<RoomContent>(room.roomTypeId)?.name ?? 'Runeworking Chamber';
-  });
+  public roomDef = roomDefFromRoom(this.runeworkingRoom);
 
-  public roomDefDesc = computed(() => {
-    const room = this.runeworkingRoom();
-    if (!room) return '';
-    return contentGetEntry<RoomContent>(room.roomTypeId)?.description ?? '';
-  });
-
-  public assignedInhabitants = computed(() => {
-    const room = this.runeworkingRoom();
-    if (!room) return [];
-    const state = gamestate();
-    const mapped = state.world.inhabitants
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, def };
-      })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
-    return sortBy(mapped, [(e) => e.def.name]);
-  });
+  public assignedInhabitants = computed(() =>
+    getAssignedInhabitantsWithDefs(this.runeworkingRoom()?.id),
+  );
 
   public availableRunes = computed(() => {
     const state = gamestate();

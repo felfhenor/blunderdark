@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
+  findRoomOnFloor,
   floorCurrent,
   synergyEvaluateForRoom,
   synergyFormatEffect,
@@ -27,7 +28,7 @@ export class SynergyTooltipComponent {
     const gridTile = floor.grid[tile.y]?.[tile.x];
     if (!gridTile?.roomId) return undefined;
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
+    const room = findRoomOnFloor(floor, gridTile.roomId);
     if (!room) return undefined;
 
     const def = productionGetRoomDefinition(room.roomTypeId);

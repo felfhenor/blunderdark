@@ -1,7 +1,7 @@
 import { computed, signal } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
 import { contentGetEntriesByType } from '@helpers/content';
-import { floorCurrent } from '@helpers/floor';
+import { findRoomOnFloor, floorCurrent } from '@helpers/floor';
 import { hallwayPlacementExit } from '@helpers/hallway-placement';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
@@ -392,7 +392,7 @@ export async function transportElevatorShrinkExecute(
     const newFloors = s.world.floors.map((floor) => {
       if (floor.depth !== floorDepth) return floor;
 
-      const room = floor.rooms.find((r) => r.id === roomToRemove.room.id);
+      const room = findRoomOnFloor(floor, roomToRemove.room.id);
       if (!room) return floor;
 
       // Clear grid tile

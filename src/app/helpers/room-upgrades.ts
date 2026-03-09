@@ -1,6 +1,6 @@
 import { connectivityAllConnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
-import { floorAll } from '@helpers/floor';
+import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import { featureCalculateCapacityBonus } from '@helpers/features';
 import { reputationEffectIsRoomUpgradesUnlocked } from '@helpers/reputation-effects';
@@ -272,7 +272,7 @@ export async function roomSetConvertedResource(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         target.convertedOutputResource = resourceType || undefined;
         break;

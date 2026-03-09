@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
+import { findRoomOnFloor } from '@helpers/floor';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
@@ -134,7 +135,7 @@ export class HudInvasionComponent {
     const roomId = inv.path[inv.currentRoomIndex];
     const floorIndex = inv.roomFloorMap[roomId] ?? 0;
     const floor = state.world.floors[floorIndex];
-    const room = floor?.rooms.find((r) => r.id === roomId);
+    const room = floor ? findRoomOnFloor(floor, roomId) : undefined;
 
     return {
       current: inv.currentRoomIndex + 1,

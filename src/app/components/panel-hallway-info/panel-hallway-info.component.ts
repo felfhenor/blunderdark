@@ -24,7 +24,7 @@ import {
   trapRemoveAction,
 } from '@helpers';
 import { contentGetEntry } from '@helpers/content';
-import { floorCurrentIndex } from '@helpers/floor';
+import { findRoomOnFloor, floorCurrentIndex } from '@helpers/floor';
 import type { PlacedRoomId } from '@interfaces';
 import type { TrapContent, TrapId } from '@interfaces/content-trap';
 import type { TrapInstanceId } from '@interfaces/trap';
@@ -152,10 +152,10 @@ export class PanelHallwayInfoComponent {
     if (!hallway) return undefined;
 
     const startRoom = hallway.startRoomId
-      ? floor.rooms.find((r) => r.id === hallway.startRoomId)
+      ? findRoomOnFloor(floor, hallway.startRoomId)
       : undefined;
     const endRoom = hallway.endRoomId
-      ? floor.rooms.find((r) => r.id === hallway.endRoomId)
+      ? findRoomOnFloor(floor, hallway.endRoomId)
       : undefined;
 
     const startDef = startRoom

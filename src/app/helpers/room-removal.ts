@@ -1,5 +1,6 @@
 import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import {
   roomPlacementIsRemovable,
@@ -42,7 +43,7 @@ export function roomRemovalGetInfo(roomId: PlacedRoomId): RemovalInfo | undefine
   const floor = state.world.floors[floorIndex];
   if (!floor) return undefined;
 
-  const room = floor.rooms.find((r) => r.id === roomId);
+  const room = findRoomOnFloor(floor, roomId);
   if (!room) return undefined;
 
   const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
@@ -91,7 +92,7 @@ export async function roomRemovalExecute(
   const floor = state.world.floors[floorIndex];
   if (!floor) return { success: false, error: 'No active floor' };
 
-  const room = floor.rooms.find((r) => r.id === roomId);
+  const room = findRoomOnFloor(floor, roomId);
   if (!room) return { success: false, error: 'Room not found' };
 
   if (!roomPlacementIsRemovable(room.roomTypeId)) {

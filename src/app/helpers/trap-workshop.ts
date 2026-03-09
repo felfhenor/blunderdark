@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -197,7 +198,7 @@ export function trapWorkshopGetInfo(
   state: GameState,
 ): TrapWorkshopInfo | undefined {
   for (const floor of state.world.floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (!room || room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
 
     const assignedWorkerCount = floor.inhabitants.filter(
@@ -235,7 +236,7 @@ export async function trapWorkshopCraft(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         for (let i = 0; i < quantity; i++) {
           trapWorkshopAddJob(target, trapTypeId, targetTicks);
@@ -254,7 +255,7 @@ export async function trapWorkshopCancelGroup(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         trapWorkshopRemoveJobGroup(target, startIndex, count);
         break;

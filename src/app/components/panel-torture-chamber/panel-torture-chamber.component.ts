@@ -1,16 +1,17 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
-import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import { AssignedWorkersListComponent } from '@components/assigned-workers-list/assigned-workers-list.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
-  contentGetEntry,
   findRoomByRole,
   gamestate,
+  getAssignedInhabitantsWithDefs,
   notify,
   PRISONER_ESCAPE_DAYS,
+  roomDefFromRoom,
   TORTURE_BREAK_BASE_TICKS,
   TORTURE_EXTRACT_BASE_TICKS,
   TORTURE_INTERROGATE_BASE_TICKS,
@@ -28,13 +29,11 @@ import type {
   TortureBreakAction,
   TortureExtractAction,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-torture-chamber',
-  imports: [DecimalPipe, InhabitantCardComponent, JobProgressComponent, SFXDirective, StatRowComponent],
+  imports: [AssignedWorkersListComponent, DecimalPipe, JobProgressComponent, SFXDirective, StatRowComponent],
   templateUrl: './panel-torture-chamber.component.html',
   styleUrl: './panel-torture-chamber.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,26 +69,11 @@ export class PanelTortureChamberComponent {
     return findRoomByRole('tortureChamber')?.room;
   });
 
-  public roomDef = computed(() => {
-    const room = this.tortureRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
+  public roomDef = roomDefFromRoom(this.tortureRoom);
 
-  public assignedInhabitants = computed(() => {
-    const room = this.tortureRoom();
-    if (!room) return [];
-
-    const state = gamestate();
-    const mapped = state.world.inhabitants
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, def };
-      })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
-    return sortBy(mapped, [(e) => e.def.name]);
-  });
+  public assignedInhabitants = computed(() =>
+    getAssignedInhabitantsWithDefs(this.tortureRoom()?.id),
+  );
 
   public availablePrisoners = computed(() => {
     const room = this.tortureRoom();

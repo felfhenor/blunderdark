@@ -1,3 +1,4 @@
+import { findRoomOnFloor } from '@helpers/floor';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { updateGamestate } from '@helpers/state-game';
@@ -38,7 +39,7 @@ export async function runeworkingStartJob(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const flr of state.world.floors) {
-      const target = flr.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(flr, roomId);
       if (target) {
         target.runeworkingJob = {
           runeId,

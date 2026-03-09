@@ -10,6 +10,7 @@ import {
   inhabitantMeetsRestriction,
   notifyError,
   notifySuccess,
+  roomDefFromRoom,
   throneRoomSeatedRuler,
   throneRoomPositionalBonuses,
   inhabitantUnassignFromRoom,
@@ -18,7 +19,6 @@ import {
 import { formatMultiplierAsPercentage } from '@helpers/format';
 import { floorAll } from '@helpers/floor';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import { startCase } from 'es-toolkit';
 import { SFXDirective } from '@directives/sfx.directive';
 import { sortBy } from 'es-toolkit/compat';
@@ -36,11 +36,7 @@ export class PanelThroneRoomComponent {
     return result?.room;
   });
 
-  public roomDef = computed(() => {
-    const room = this.throneRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
+  public roomDef = roomDefFromRoom(this.throneRoom);
 
   public rulerInfo = computed(() => {
     const ruler = throneRoomSeatedRuler();

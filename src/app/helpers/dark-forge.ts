@@ -5,6 +5,7 @@ import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
+import { findRoomOnFloor } from '@helpers/floor';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomShapeGetAbsoluteTiles, roomShapeResolve } from '@helpers/room-shapes';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
@@ -366,7 +367,7 @@ export async function darkForgeCraft(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         for (let i = 0; i < quantity; i++) {
           darkForgeAddJob(target, recipeId, targetTicks);
@@ -385,7 +386,7 @@ export async function darkForgeCancelGroup(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         darkForgeRemoveJobGroup(target, startIndex, count);
         break;

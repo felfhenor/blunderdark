@@ -24,6 +24,7 @@ import {
   featureGetCorruptionSealedRoomIds,
   featureGetResourceConverterEfficiency,
 } from '@helpers/features';
+import { findRoomOnFloor } from '@helpers/floor';
 import { floorModifierGetMultiplier } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
@@ -424,7 +425,7 @@ export function productionCalculateTotal(
         floor.rooms,
       );
       const adjacentPlacedRooms = adjacentRoomIds
-        .map((id) => floor.rooms.find((r) => r.id === id))
+        .map((id) => findRoomOnFloor(floor, id as PlacedRoomId))
         .filter((r): r is PlacedRoom => r !== undefined);
       const featureAdjacentBonus =
         featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
@@ -618,7 +619,7 @@ export function productionCalculateSingleRoom(
     floor.rooms,
   );
   const adjacentPlacedRooms = adjacentRoomIds
-    .map((id) => floor.rooms.find((r) => r.id === id))
+    .map((id) => findRoomOnFloor(floor, id as PlacedRoomId))
     .filter((r): r is PlacedRoom => r !== undefined);
   const featureAdjacentBonus =
     featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
@@ -750,7 +751,7 @@ export function productionPerMinute(perTickRate: number): number {
 export function productionGetRoomRates(roomId: PlacedRoomId): RoomProduction {
   const state = gamestate();
   for (const floor of state.world.floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (room) {
       return productionCalculateSingleRoom(
         room,
@@ -816,7 +817,7 @@ export function productionCalculateBreakdowns(
         floor.rooms,
       );
       const adjacentPlacedRooms = adjacentRoomIds
-        .map((id) => floor.rooms.find((r) => r.id === id))
+        .map((id) => findRoomOnFloor(floor, id as PlacedRoomId))
         .filter((r): r is PlacedRoom => r !== undefined);
       const featureAdjacentBonus =
         featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
@@ -1116,7 +1117,7 @@ export function productionCalculateDetailedBreakdown(
         floor.rooms,
       );
       const adjacentPlacedRooms = adjacentRoomIds
-        .map((id) => floor.rooms.find((r) => r.id === id))
+        .map((id) => findRoomOnFloor(floor, id as PlacedRoomId))
         .filter((r): r is PlacedRoom => r !== undefined);
       const featureAdjacentBonus =
         featureCalculateAdjacentProductionBonus(adjacentPlacedRooms);
@@ -1411,7 +1412,7 @@ export function productionCalculateDetailedBreakdown(
       }
 
       for (const [roomId, data] of roomCorruptionWorkers) {
-        const room = floor.rooms.find((r) => r.id === roomId);
+        const room = findRoomOnFloor(floor, roomId as PlacedRoomId);
         if (!room) continue;
 
         const afterModifier = data.perTick * dayNightMod;

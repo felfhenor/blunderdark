@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -6,8 +7,10 @@ import type {
   PlacedRoom,
   PlacedRoomId,
 } from '@interfaces';
-import type { AssignmentValidation } from '@interfaces/assignment';
+import type { AssignedInhabitantEntry, AssignmentValidation } from '@interfaces/assignment';
+import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import type { RoomContent } from '@interfaces/content-room';
+import { sortBy } from 'es-toolkit/compat';
 
 /**
  * Check whether a given room (by roomId) can accept another inhabitant.
@@ -19,7 +22,7 @@ export function assignmentCanAssignToRoom(roomId: PlacedRoomId): AssignmentValid
   let placedRoom: PlacedRoom | undefined;
   let roomFloor: Floor | undefined;
   for (const floor of state.world.floors) {
-    placedRoom = floor.rooms.find((r) => r.id === roomId);
+    placedRoom = findRoomOnFloor(floor, roomId);
     if (placedRoom) {
       roomFloor = floor;
       break;
@@ -82,7 +85,7 @@ export function assignmentGetRoomInfo(
 
   let placedRoom: PlacedRoom | undefined;
   for (const floor of state.world.floors) {
-    placedRoom = floor.rooms.find((r) => r.id === roomId);
+    placedRoom = findRoomOnFloor(floor, roomId);
     if (placedRoom) break;
   }
 
@@ -99,4 +102,24 @@ export function assignmentGetRoomInfo(
   ).length;
 
   return { currentCount, maxCapacity };
+}
+
+/**
+ * Get inhabitants assigned to a room, with their content definitions, sorted by name.
+ */
+export function getAssignedInhabitantsWithDefs(
+  roomId: PlacedRoomId | undefined,
+): AssignedInhabitantEntry[] {
+  if (!roomId) return [];
+  const state = gamestate();
+  const mapped = state.world.inhabitants
+    .filter((i) => i.assignedRoomId === roomId)
+    .map((i) => {
+      const def = contentGetEntry<InhabitantContent>(i.definitionId);
+      return { instance: i, def };
+    })
+    .filter(
+      (e): e is typeof e & { def: InhabitantContent } => e.def !== undefined,
+    );
+  return sortBy(mapped, [(e) => e.def.name]);
 }

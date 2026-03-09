@@ -36,21 +36,7 @@
       }
 
       <!-- Assigned Workers -->
-      @if (assignedWorkers().length > 0) {
-        <div class="divider my-2 text-xs opacity-60">Workers</div>
-        <div class="flex flex-col gap-2">
-          @for (w of assignedWorkers(); track w.instance.instanceId) {
-            <app-inhabitant-card
-              [instance]="w.instance"
-              [definition]="w.def"
-              [compact]="true"
-              [showAssignment]="false"
-            />
-          }
-        </div>
-      } @else {
-        <p class="text-xs opacity-50 mt-2">No workers assigned.</p>
-      }
+      <app-assigned-workers-list [workers]="assignedWorkers()" />
 
       <!-- Available Recipes -->
       @if (assignedWorkers().length > 0) {

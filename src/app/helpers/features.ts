@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import type {
   FeatureBonus,
@@ -476,7 +477,7 @@ export async function featureAttachAction(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         featureAttachToSlot(target, slotIndex, featureId, totalSlots);
         break;
@@ -492,7 +493,7 @@ export async function featureRemoveAction(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         featureRemoveFromSlot(target, slotIndex);
         break;

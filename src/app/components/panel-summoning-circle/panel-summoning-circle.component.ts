@@ -1,18 +1,20 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { AssignedWorkersListComponent } from '@components/assigned-workers-list/assigned-workers-list.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
-import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
   craftingQueueGetMaxSize,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
+  getAssignedInhabitantsWithDefs,
   notify,
   resourceCanAfford,
   resourcePayCost,
+  roomDefFromRoom,
+  selectedPlacedRoomByRole,
   summoningCancelGroup,
   summoningCompleted$,
   summoningCraft,
@@ -29,14 +31,12 @@ import type {
   SummonRecipeContent,
   SummonRecipeId,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-summoning-circle',
-  imports: [DecimalPipe, CraftingQueueDisplayComponent, CurrencyCostListComponent, InhabitantCardComponent, SFXDirective],
+  imports: [AssignedWorkersListComponent, DecimalPipe, CraftingQueueDisplayComponent, CurrencyCostListComponent, SFXDirective],
   templateUrl: './panel-summoning-circle.component.html',
   styleUrl: './panel-summoning-circle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,43 +52,13 @@ export class PanelSummoningCircleComponent {
 
   private quantities = signal<Record<string, number>>({});
 
-  public summoningRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+  public summoningRoom = selectedPlacedRoomByRole('summoningCircle');
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
+  public roomDef = roomDefFromRoom(this.summoningRoom);
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return undefined;
-
-    const def = contentGetEntry<RoomContent>(room.roomTypeId);
-    if (def?.role !== 'summoningCircle') return undefined;
-
-    return room;
-  });
-
-  public roomDef = computed(() => {
-    const room = this.summoningRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
-
-  public assignedInhabitants = computed(() => {
-    const room = this.summoningRoom();
-    if (!room) return [];
-
-    const state = gamestate();
-    const mapped = state.world.inhabitants
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, def };
-      })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
-    return sortBy(mapped, [(e) => e.def.name]);
-  });
+  public assignedInhabitants = computed(() =>
+    getAssignedInhabitantsWithDefs(this.summoningRoom()?.id),
+  );
 
   public queueState = computed(() => {
     const room = this.summoningRoom();

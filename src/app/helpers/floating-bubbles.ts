@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { floorAll } from '@helpers/floor';
+import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import { productionCalculateSingleRoom } from '@helpers/production';
 import { optionsGet } from '@helpers/state-options';
 import { gamestate } from '@helpers/state-game';
@@ -130,7 +130,7 @@ export function floatingBubblesEmitQueue(
 
   const floors = floorAll();
   for (let i = 0; i < floors.length; i++) {
-    const room = floors[i].rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floors[i], roomId);
     if (!room) continue;
 
     const bounds = getRoomBounds(floors[i].grid, room.id);

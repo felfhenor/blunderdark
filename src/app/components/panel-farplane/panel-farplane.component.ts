@@ -11,6 +11,7 @@ import {
   findRoomByRole,
   gamestate,
   resourceCanAfford,
+  roomDefFromRoom,
 } from '@helpers';
 import { recruitmentIsRosterFull } from '@helpers/recruitment';
 import type {
@@ -21,7 +22,6 @@ import type {
   ResourceType,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 
 @Component({
   selector: 'app-panel-farplane',
@@ -35,11 +35,7 @@ export class PanelFarplaneComponent {
     return findRoomByRole('farplane')?.room;
   });
 
-  public roomDef = computed(() => {
-    const room = this.farplaneRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
+  public roomDef = roomDefFromRoom(this.farplaneRoom);
 
   public souls = computed(() => {
     return gamestate().world.farplaneSouls;

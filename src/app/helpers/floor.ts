@@ -1,14 +1,14 @@
-import { computed } from '@angular/core';
+import { computed, type Signal } from '@angular/core';
 import { biomeIsUnlocked } from '@helpers/biome';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { connectivityAllConnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { defaultFloor } from '@helpers/defaults';
-import { gridCreateEmpty } from '@helpers/grid';
+import { gridCreateEmpty, gridSelectedTile } from '@helpers/grid';
 import { resourceApplyMap, resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { ensureFloorSuffixes } from '@helpers/suffix';
-import type { BiomeType, Floor, GameStateWorld, PlacedRoom, ResourceCost } from '@interfaces';
+import type { BiomeType, Floor, GameStateWorld, PlacedRoom, PlacedRoomId, ResourceCost } from '@interfaces';
 import type { RoomContent } from '@interfaces/content-room';
 import { MAX_FLOORS } from '@interfaces/floor';
 
@@ -54,6 +54,65 @@ export const roomAllConnected = computed<PlacedRoom[]>(() => {
   const connectedIds = connectivityAllConnectedRoomIds();
   return roomAll().filter((r) => connectedIds.has(r.id));
 });
+
+/**
+ * Look up the placed room under the currently selected grid tile.
+ * Returns the room and its floor, or undefined if no room is selected.
+ */
+export const selectedPlacedRoom = computed<
+  { room: PlacedRoom; floor: Floor } | undefined
+>(() => {
+  const tile = gridSelectedTile();
+  const floor = floorCurrent();
+  if (!tile || !floor) return undefined;
+
+  const gridTile = floor.grid[tile.y]?.[tile.x];
+  if (!gridTile?.roomId) return undefined;
+
+  const room = findRoomOnFloor(floor, gridTile.roomId);
+  if (!room) return undefined;
+
+  return { room, floor };
+});
+
+/**
+ * Return a computed signal that resolves to the selected room only if it
+ * matches the given content role (e.g. 'alchemyLab', 'darkForge').
+ */
+export function selectedPlacedRoomByRole(
+  role: string,
+): Signal<PlacedRoom | undefined> {
+  return computed(() => {
+    const result = selectedPlacedRoom();
+    if (!result) return undefined;
+    const def = contentGetEntry<RoomContent>(result.room.roomTypeId);
+    if (def?.role !== role) return undefined;
+    return result.room;
+  });
+}
+
+/**
+ * Look up the RoomContent definition for a room signal.
+ */
+export function roomDefFromRoom(
+  roomSignal: () => PlacedRoom | undefined,
+): Signal<RoomContent | undefined> {
+  return computed(() => {
+    const room = roomSignal();
+    if (!room) return undefined;
+    return contentGetEntry<RoomContent>(room.roomTypeId);
+  });
+}
+
+/**
+ * Find a room on a specific floor by its ID.
+ */
+export function findRoomOnFloor(
+  floor: Floor,
+  roomId: PlacedRoomId,
+): PlacedRoom | undefined {
+  return floor.rooms.find((r) => r.id === roomId);
+}
 
 /**
  * Get a floor by its ID.

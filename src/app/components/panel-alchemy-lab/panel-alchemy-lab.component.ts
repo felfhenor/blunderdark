@@ -1,10 +1,10 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { AssignedWorkersListComponent } from '@components/assigned-workers-list/assigned-workers-list.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { JobProgressComponent } from '@components/job-progress/job-progress.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
-import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   alchemyLabCanConvert,
   alchemyLabGetAdjacentRoomTypeIds,
@@ -17,61 +17,31 @@ import {
   contentGetEntry,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
+  getAssignedInhabitantsWithDefs,
   resourceCanAfford,
+  roomDefFromRoom,
+  selectedPlacedRoomByRole,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type { AlchemyRecipeContent, AlchemyRecipeId } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-alchemy-lab',
-  imports: [DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, InhabitantCardComponent, JobProgressComponent, SFXDirective],
+  imports: [AssignedWorkersListComponent, DecimalPipe, CurrencyCostComponent, CurrencyCostListComponent, JobProgressComponent, SFXDirective],
   templateUrl: './panel-alchemy-lab.component.html',
   styleUrl: './panel-alchemy-lab.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelAlchemyLabComponent {
-  public labRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+  public labRoom = selectedPlacedRoomByRole('alchemyLab');
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
+  public roomDef = roomDefFromRoom(this.labRoom);
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return undefined;
-
-    const def = contentGetEntry<RoomContent>(room.roomTypeId);
-    if (def?.role !== 'alchemyLab') return undefined;
-
-    return room;
-  });
-
-  public roomDef = computed(() => {
-    const room = this.labRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
-
-  public assignedWorkers = computed(() => {
-    const room = this.labRoom();
-    if (!room) return [];
-
-    const state = gamestate();
-    const mapped = state.world.inhabitants
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, def };
-      })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
-    return sortBy(mapped, [(e) => e.def.name]);
-  });
+  public assignedWorkers = computed(() =>
+    getAssignedInhabitantsWithDefs(this.labRoom()?.id),
+  );
 
   public availableRecipes = computed(() => {
     const room = this.labRoom();

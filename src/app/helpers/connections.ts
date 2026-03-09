@@ -2,7 +2,7 @@ import {
   adjacencyAreRoomsAdjacent,
   adjacencyGetSharedEdges,
 } from '@helpers/adjacency';
-import { floorCurrent } from '@helpers/floor';
+import { findRoomOnFloor, floorCurrent } from '@helpers/floor';
 import { rngUuid } from '@helpers/rng';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import {
@@ -37,7 +37,7 @@ function getEntityTiles(
   floor: Floor,
   entityId: PlacedRoomId,
 ): TileOffset[] | undefined {
-  const room = floor.rooms.find((r) => r.id === entityId);
+  const room = findRoomOnFloor(floor, entityId);
   if (room) return getRoomTiles(room);
 
   const hallway = floor.hallways.find((h) => h.id === (entityId as string));
@@ -50,7 +50,7 @@ function getEntityTiles(
  * Get the display name for an entity (room or hallway) by ID.
  */
 export function getEntityName(floor: Floor, entityId: string): string {
-  const room = floor.rooms.find((r) => r.id === entityId);
+  const room = findRoomOnFloor(floor, entityId as PlacedRoomId);
   if (room) return roomGetDisplayName(room);
 
   const hallway = floor.hallways.find((h) => h.id === entityId);

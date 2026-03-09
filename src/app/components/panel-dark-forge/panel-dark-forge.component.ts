@@ -1,9 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { AssignedWorkersListComponent } from '@components/assigned-workers-list/assigned-workers-list.component';
 import { CurrencyCostListComponent } from '@components/currency-cost-list/currency-cost-list.component';
 import { CraftingQueueDisplayComponent, type CancelGroupEvent } from '@components/crafting-queue-display/crafting-queue-display.component';
-import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import {
   contentGetEntry,
   craftingQueueGetMaxSize,
@@ -15,11 +15,12 @@ import {
   darkForgeGetStatBonuses,
   floorCurrent,
   gamestate,
-  gridSelectedTile,
+  getAssignedInhabitantsWithDefs,
   resourceCanAfford,
   resourcePayCost,
+  roomDefFromRoom,
+  selectedPlacedRoomByRole,
 } from '@helpers';
-import { roomRoleFindById } from '@helpers/room-roles';
 import { ticksToRealSeconds } from '@helpers/game-time';
 import type {
   ForgeRecipeContent,
@@ -28,15 +29,13 @@ import type {
   InhabitantTraitContent,
   ResourceType,
 } from '@interfaces';
-import type { InhabitantContent } from '@interfaces/content-inhabitant';
-import type { RoomContent } from '@interfaces/content-room';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-dark-forge',
-  imports: [DecimalPipe, CurrencyCostListComponent, CraftingQueueDisplayComponent, InhabitantCardComponent, SFXDirective, TippyDirective],
+  imports: [AssignedWorkersListComponent, DecimalPipe, CurrencyCostListComponent, CraftingQueueDisplayComponent, SFXDirective, TippyDirective],
   templateUrl: './panel-dark-forge.component.html',
   styleUrl: './panel-dark-forge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,43 +44,13 @@ export class PanelDarkForgeComponent {
 
   private quantities = signal<Record<string, number>>({});
 
-  public forgeRoom = computed(() => {
-    const tile = gridSelectedTile();
-    const floor = floorCurrent();
-    if (!tile || !floor) return undefined;
+  public forgeRoom = selectedPlacedRoomByRole('darkForge');
 
-    const gridTile = floor.grid[tile.y]?.[tile.x];
-    if (!gridTile?.roomId) return undefined;
+  public roomDef = roomDefFromRoom(this.forgeRoom);
 
-    const room = floor.rooms.find((r) => r.id === gridTile.roomId);
-    if (!room) return undefined;
-
-    const darkForgeTypeId = roomRoleFindById('darkForge');
-    if (room.roomTypeId !== darkForgeTypeId) return undefined;
-
-    return room;
-  });
-
-  public roomDef = computed(() => {
-    const room = this.forgeRoom();
-    if (!room) return undefined;
-    return contentGetEntry<RoomContent>(room.roomTypeId);
-  });
-
-  public assignedWorkers = computed(() => {
-    const room = this.forgeRoom();
-    if (!room) return [];
-
-    const state = gamestate();
-    const mapped = state.world.inhabitants
-      .filter((i) => i.assignedRoomId === room.id)
-      .map((i) => {
-        const def = contentGetEntry<InhabitantContent>(i.definitionId);
-        return { instance: i, def };
-      })
-      .filter((e): e is typeof e & { def: InhabitantContent } => e.def !== undefined);
-    return sortBy(mapped, [(e) => e.def.name]);
-  });
+  public assignedWorkers = computed(() =>
+    getAssignedInhabitantsWithDefs(this.forgeRoom()?.id),
+  );
 
   public queueState = computed(() => {
     const room = this.forgeRoom();

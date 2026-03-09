@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { gridSelectedTile } from '@helpers/grid';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -226,7 +227,7 @@ export function trainingGetRoomInfo(
   const trainingGroundsId = roomRoleFindById('trainingGrounds');
   const state = gamestate();
   for (const floor of state.world.floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (!room || room.roomTypeId !== trainingGroundsId) continue;
 
     const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor);
@@ -255,7 +256,7 @@ export const trainingSelectedRoom = computed<TrainingRoomInfo | undefined>(() =>
   const gridCell = floor.grid[tile.y]?.[tile.x];
   if (!gridCell?.roomId) return undefined;
 
-  const room = floor.rooms.find((r) => r.id === gridCell.roomId);
+  const room = findRoomOnFloor(floor, gridCell.roomId as PlacedRoomId);
   if (!room || room.roomTypeId !== trainingGroundsId) return undefined;
 
   const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor);

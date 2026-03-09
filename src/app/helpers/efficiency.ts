@@ -2,7 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { productionGetRoomDefinition } from '@helpers/production';
-import { floorAll } from '@helpers/floor';
+import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import { gamestate } from '@helpers/state-game';
 import { workAffinityGet } from '@helpers/work-affinity';
 import type {
@@ -265,7 +265,7 @@ export function efficiencyCalculateMatchedInhabitantBonus(
 export function efficiencyGetRoom(roomId: PlacedRoomId): RoomEfficiencyBreakdown | undefined {
   const floors = floorAll();
   for (const floor of floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (room) {
       return efficiencyCalculateRoom(room, floor.inhabitants);
     }

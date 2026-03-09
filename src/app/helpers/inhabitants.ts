@@ -3,7 +3,7 @@ import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
-import { floorAll } from '@helpers/floor';
+import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import {
   verticalTransportCalculateTravelTicks,
   verticalTransportFloorsAreConnected,
@@ -157,7 +157,7 @@ export function inhabitantGetAssignmentLabel(
 
   const floors = floorAll();
   for (const floor of floors) {
-    const room = floor.rooms.find((r) => r.id === assignedRoomId);
+    const room = findRoomOnFloor(floor, assignedRoomId);
     if (room) {
       const roomDef = productionGetRoomDefinition(room.roomTypeId);
       return `${roomDef?.name ?? 'Unknown Room'} (F${floor.depth})`;
@@ -261,7 +261,7 @@ export async function inhabitantAssignToRoom(
   let placedRoom: PlacedRoom | undefined;
   let roomFloor: Floor | undefined;
   for (const floor of state.world.floors) {
-    placedRoom = floor.rooms.find((r) => r.id === roomId);
+    placedRoom = findRoomOnFloor(floor, roomId);
     if (placedRoom) {
       roomFloor = floor;
       break;
@@ -312,7 +312,7 @@ export async function inhabitantAssignToRoom(
     // Track assignment order for breeding pits
     if (roomDef.role === 'breedingPits' && placedRoom) {
       for (const floor of world.floors) {
-        const target = floor.rooms.find((r) => r.id === roomId);
+        const target = findRoomOnFloor(floor, roomId);
         if (target) {
           const order = target.breedingInhabitantOrder ?? [];
           target.breedingInhabitantOrder = [
@@ -354,7 +354,7 @@ export async function inhabitantUnassignFromRoom(
 
     // Remove from breeding pit order tracking
     for (const floor of world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target?.breedingInhabitantOrder) {
         target.breedingInhabitantOrder =
           target.breedingInhabitantOrder.filter((id) => id !== instanceId);

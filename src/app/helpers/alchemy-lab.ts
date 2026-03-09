@@ -3,6 +3,7 @@ import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { findRoomOnFloor } from '@helpers/floor';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
   roomShapeGetAbsoluteTiles,
@@ -175,7 +176,7 @@ export function alchemyLabCanConvert(
   floors: Floor[],
 ): { canConvert: boolean; reason?: string; room?: PlacedRoom } {
   for (const floor of floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (!room) continue;
 
     if (room.roomTypeId !== roomRoleFindById('alchemyLab')) {

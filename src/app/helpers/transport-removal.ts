@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { findRoomOnFloor } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceApplyMap } from '@helpers/resources';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -23,7 +24,7 @@ export function transportRemovalGetInfo(roomId: PlacedRoomId): TransportRemovalI
   let targetRoom: PlacedRoom | undefined;
   let targetGroupId: TransportGroupId | undefined;
   for (const floor of state.world.floors) {
-    const room = floor.rooms.find((r) => r.id === roomId);
+    const room = findRoomOnFloor(floor, roomId);
     if (room) {
       targetRoom = room;
       targetGroupId = room.transportGroupId;

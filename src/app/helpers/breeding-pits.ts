@@ -9,6 +9,7 @@ import {
   mutationTraitRoll,
   mutationTraitRollNegative,
 } from '@helpers/mutation-traits';
+import { findRoomOnFloor } from '@helpers/floor';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -338,7 +339,7 @@ export async function breedingStartJob(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         target.breedingJob = {
           parentAInstanceId,
@@ -359,7 +360,7 @@ export async function breedingSwapOrder(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target?.breedingInhabitantOrder) {
         target.breedingInhabitantOrder = [
           ...target.breedingInhabitantOrder,
@@ -377,7 +378,7 @@ export async function breedingStartMutation(
 ): Promise<void> {
   await updateGamestate((state) => {
     for (const floor of state.world.floors) {
-      const target = floor.rooms.find((r) => r.id === roomId);
+      const target = findRoomOnFloor(floor, roomId);
       if (target) {
         target.mutationJob = {
           targetInstanceId,

@@ -4,7 +4,7 @@ import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
 import { contentGetEntry } from '@helpers/content';
 import { currencyIsUnlocked, currencyUnlock } from '@helpers/currency-unlock';
 import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
-import { floorAll, floorCurrent, floorCurrentIndex } from '@helpers/floor';
+import { findRoomOnFloor, floorAll, floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
@@ -430,7 +430,7 @@ export function roomPlacementRemoveFromFloor(
   roomId: PlacedRoomId,
   shape: RoomShapeContent,
 ): Floor | undefined {
-  const room = floor.rooms.find((r) => r.id === roomId);
+  const room = findRoomOnFloor(floor, roomId);
   if (!room) return undefined;
 
   const tiles = roomShapeGetAbsoluteTiles(shape, room.anchorX, room.anchorY);
@@ -526,7 +526,7 @@ export async function roomPlacementRemove(
   const floor = state.world.floors[floorIndex];
   if (!floor) return false;
 
-  const room = floor.rooms.find((r) => r.id === roomId);
+  const room = findRoomOnFloor(floor, roomId);
   if (!room) return false;
 
   if (!roomPlacementIsRemovable(room.roomTypeId)) return false;
