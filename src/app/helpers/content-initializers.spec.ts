@@ -30,9 +30,8 @@ describe('ensureContent', () => {
         __type: 'alchemyrecipe' as const,
       });
       expect(result.description).toBe('');
-      expect(result.inputCost).toEqual({});
-      expect(result.outputResource).toBe('flux');
-      expect(result.outputAmount).toBe(1);
+      expect(result.inputCost).toEqual([]);
+      expect(result.outputCost).toEqual([{ resource: 'flux', amount: 1 }]);
       expect(result.baseTicks).toBe(15);
       expect(result.tier).toBe('basic');
     });
@@ -42,13 +41,11 @@ describe('ensureContent', () => {
         id: 'a1' as AlchemyRecipeId,
         name: 'Test',
         __type: 'alchemyrecipe' as const,
-        outputResource: 'essence',
-        outputAmount: 5,
+        outputCost: [{ resource: 'essence', amount: 5 }],
         baseTicks: 30,
         tier: 'advanced',
       });
-      expect(result.outputResource).toBe('essence');
-      expect(result.outputAmount).toBe(5);
+      expect(result.outputCost).toEqual([{ resource: 'essence', amount: 5 }]);
       expect(result.baseTicks).toBe(30);
       expect(result.tier).toBe('advanced');
     });

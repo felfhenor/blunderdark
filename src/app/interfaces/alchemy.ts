@@ -1,4 +1,5 @@
 import type { AlchemyRecipeId } from '@interfaces/content-alchemyrecipe';
+import type { AlchemyResourceEntry } from '@interfaces/content-alchemyrecipe';
 import type { PlacedRoomId } from '@interfaces/room-shape';
 
 export type AlchemyConversion = {
@@ -12,6 +13,5 @@ export type AlchemyConversion = {
 export type AlchemyLabCompletedEvent = {
   roomId: PlacedRoomId;
   recipeName: string;
-  outputResource: string;
-  outputAmount: number;
+  outputs: AlchemyResourceEntry[];
 };

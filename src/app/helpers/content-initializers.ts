@@ -123,9 +123,8 @@ function ensureAlchemyRecipe(
     name: recipe.name ?? 'UNKNOWN',
     __type: 'alchemyrecipe',
     description: recipe.description ?? '',
-    inputCost: recipe.inputCost ?? {},
-    outputResource: recipe.outputResource ?? 'flux',
-    outputAmount: recipe.outputAmount ?? 1,
+    inputCost: recipe.inputCost ?? [],
+    outputCost: recipe.outputCost ?? [{ resource: 'flux', amount: 1 }],
     baseTicks: recipe.baseTicks ?? 15,
     tier: recipe.tier ?? 'basic',
   };

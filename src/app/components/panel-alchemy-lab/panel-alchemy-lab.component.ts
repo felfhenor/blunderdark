@@ -23,7 +23,8 @@ import {
   selectedPlacedRoomByRole,
 } from '@helpers';
 import { ticksToRealSeconds } from '@helpers/game-time';
-import type { AlchemyRecipeContent, AlchemyRecipeId } from '@interfaces';
+import type { AlchemyRecipeContent, AlchemyRecipeId, AlchemyResourceEntry } from '@interfaces';
+import type { ResourceCost } from '@interfaces/resource';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -58,13 +59,14 @@ export class PanelAlchemyLabComponent {
     const entries = recipes.map((recipe) => {
       const ticks = alchemyLabGetConversionTicks(room, workerCount, recipe.baseTicks, adjacentTypes);
       const effectiveCost = alchemyLabGetEffectiveCost(room, recipe.inputCost, adjacentTypes);
-      const canAfford = resourceCanAfford(effectiveCost);
+      const effectiveCostMap = this.entriesToCostMap(effectiveCost);
+      const canAfford = resourceCanAfford(effectiveCostMap);
 
       return {
         recipe,
         ticks,
         timeSeconds: ticksToRealSeconds(ticks),
-        effectiveCost,
+        effectiveCostMap,
         canAfford,
       };
     });
@@ -84,12 +86,19 @@ export class PanelAlchemyLabComponent {
 
     return {
       recipeName: recipe?.name ?? 'Unknown',
-      outputResource: recipe?.outputResource ?? 'flux',
-      outputAmount: recipe?.outputAmount ?? 1,
+      outputCost: recipe?.outputCost ?? [],
       percent,
       inputConsumed: conversion.inputConsumed,
     };
   });
+
+  private entriesToCostMap(entries: AlchemyResourceEntry[]): ResourceCost {
+    const result: ResourceCost = {};
+    for (const entry of entries) {
+      result[entry.resource] = entry.amount;
+    }
+    return result;
+  }
 
   public async selectRecipe(recipeId: AlchemyRecipeId, targetTicks: number): Promise<void> {
     analyticsSendDesignEvent('Room:Alchemy:Recipe:Select');

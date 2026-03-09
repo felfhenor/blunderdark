@@ -4,12 +4,16 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type AlchemyRecipeId = Branded<string, 'AlchemyRecipeId'>;
 
+export type AlchemyResourceEntry = {
+  resource: ResourceType;
+  amount: number;
+};
+
 export type AlchemyRecipeContent = IsContentItem &
   HasDescription & {
     id: AlchemyRecipeId;
-    inputCost: Partial<Record<ResourceType, number>>;
-    outputResource: ResourceType;
-    outputAmount: number;
+    inputCost: AlchemyResourceEntry[];
+    outputCost: AlchemyResourceEntry[];
     baseTicks: number;
     tier: 'basic' | 'advanced';
   };

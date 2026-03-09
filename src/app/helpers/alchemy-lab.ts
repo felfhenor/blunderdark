@@ -16,6 +16,7 @@ import type {
   AlchemyConversion,
   AlchemyRecipeContent,
   AlchemyRecipeId,
+  AlchemyResourceEntry,
   Floor,
   GameState,
   PlacedRoom,
@@ -104,9 +105,9 @@ export function alchemyLabGetConversionTicks(
  */
 export function alchemyLabGetEffectiveCost(
   room: PlacedRoom,
-  baseCost: Partial<Record<string, number>>,
+  baseCost: AlchemyResourceEntry[],
   adjacentRoomTypeIds: Set<string>,
-): Partial<Record<string, number>> {
+): AlchemyResourceEntry[] {
   const effects = roomUpgradeGetAppliedEffects(room);
 
   // Apply upgrade cost multiplier (e.g., Efficient Distillation)
@@ -125,13 +126,12 @@ export function alchemyLabGetEffectiveCost(
     }
   }
 
-  const result: Partial<Record<string, number>> = {};
-  for (const [resource, amount] of Object.entries(baseCost)) {
-    if (amount && amount > 0) {
-      result[resource] = Math.max(1, Math.round(amount * costMultiplier));
-    }
-  }
-  return result;
+  return baseCost
+    .filter((entry) => entry.amount > 0)
+    .map((entry) => ({
+      resource: entry.resource,
+      amount: Math.max(1, Math.round(entry.amount * costMultiplier)),
+    }));
 }
 
 // --- Conversion management ---
@@ -284,20 +284,24 @@ export function alchemyLabCalculateBreakdown(
       const roomName = roomGetDisplayName(room);
 
       // Output production for the requested resource
-      if (recipe.outputResource === resourceType) {
-        const perTick = recipe.outputAmount / effectiveTicks;
-        production.push({
-          recipeName: recipe.name,
-          roomName,
-          floorDepth: floor.depth,
-          perTick,
-        });
+      for (const output of recipe.outputCost) {
+        if (output.resource === resourceType) {
+          const perTick = output.amount / effectiveTicks;
+          production.push({
+            recipeName: recipe.name,
+            roomName,
+            floorDepth: floor.depth,
+            perTick,
+          });
+        }
       }
 
       // Input consumption for the requested resource
-      const inputAmount = effectiveCost[resourceType];
-      if (inputAmount && inputAmount > 0) {
-        const perTick = inputAmount / effectiveTicks;
+      const inputEntry = effectiveCost.find(
+        (e) => e.resource === resourceType,
+      );
+      if (inputEntry && inputEntry.amount > 0) {
+        const perTick = inputEntry.amount / effectiveTicks;
         consumption.push({
           sourceName: recipe.name,
           category: 'alchemy_input',
@@ -386,13 +390,10 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
 
         // Check if we can afford
         let canAfford = true;
-        for (const [resource, amount] of Object.entries(effectiveCost)) {
-          if (!amount || amount <= 0) continue;
-          const res =
-            state.world.resources[
-              resource as keyof typeof state.world.resources
-            ];
-          if (!res || res.current < amount) {
+        for (const entry of effectiveCost) {
+          if (entry.amount <= 0) continue;
+          const res = state.world.resources[entry.resource];
+          if (!res || res.current < entry.amount) {
             canAfford = false;
             break;
           }
@@ -401,9 +402,9 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
         if (!canAfford) continue;
 
         // Deduct resources (direct mutation; clamped at end of tick)
-        for (const [resource, amount] of Object.entries(effectiveCost)) {
-          if (!amount || amount <= 0) continue;
-          state.world.resources[resource as ResourceType].current -= amount;
+        for (const entry of effectiveCost) {
+          if (entry.amount <= 0) continue;
+          state.world.resources[entry.resource].current -= entry.amount;
         }
 
         conversion.inputConsumed = true;
@@ -414,9 +415,10 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
 
       // Step 3: Complete the conversion
       if (conversion.progress >= conversion.targetTicks) {
-        // Add output resource (direct mutation; clamped at end of tick)
-        const outputType = recipe.outputResource as ResourceType;
-        state.world.resources[outputType].current += recipe.outputAmount;
+        // Add output resources (direct mutation; clamped at end of tick)
+        for (const output of recipe.outputCost) {
+          state.world.resources[output.resource].current += output.amount;
+        }
 
         reputationAwardInPlace(state, 'complete_transmutation');
 
@@ -427,8 +429,7 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
         alchemyLabCompletedSubject.next({
           roomId: room.id,
           recipeName: recipe.name,
-          outputResource: recipe.outputResource,
-          outputAmount: recipe.outputAmount,
+          outputs: recipe.outputCost,
         });
       }
     }

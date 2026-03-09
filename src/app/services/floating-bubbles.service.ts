@@ -40,10 +40,10 @@ export class FloatingBubblesService {
 
     alchemyLabCompleted$.subscribe((e) => {
       if (!optionsGet('showResourceGainBubbles')) return;
-      floatingBubblesEmitQueue(
-        e.roomId,
-        `+${e.outputAmount} ${e.outputResource}`,
-      );
+      const label = e.outputs
+        .map((o) => `+${parseFloat(o.amount.toFixed(2))} ${o.resource}`)
+        .join(', ');
+      floatingBubblesEmitQueue(e.roomId, label);
     });
 
     darkForgeCompleted$.subscribe((e) => {

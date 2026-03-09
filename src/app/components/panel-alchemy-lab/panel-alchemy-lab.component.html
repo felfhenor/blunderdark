@@ -16,10 +16,12 @@
           </div>
           <span class="text-xs opacity-50">
             Output:
-            <app-currency-cost
-              [type]="conv.outputResource"
-              [amount]="conv.outputAmount"
-            />
+            @for (output of conv.outputCost; track output.resource) {
+              <app-currency-cost
+                [type]="output.resource"
+                [amount]="output.amount"
+              />
+            }
           </span>
           @if (conv.inputConsumed) {
             <app-job-progress
@@ -57,14 +59,16 @@
               </span>
               <span class="text-xs opacity-50">
                 Input:
-                <app-currency-cost-list [cost]="entry.effectiveCost" />
+                <app-currency-cost-list [cost]="entry.effectiveCostMap" />
               </span>
               <span class="text-xs opacity-50">
                 Output:
-                <app-currency-cost
-                  [type]="entry.recipe.outputResource"
-                  [amount]="entry.recipe.outputAmount"
-                />
+                @for (output of entry.recipe.outputCost; track output.resource) {
+                  <app-currency-cost
+                    [type]="output.resource"
+                    [amount]="output.amount"
+                  />
+                }
               </span>
               <span class="text-xs opacity-50">
                 Cycle: {{ entry.timeSeconds | number: '1.0-0' }} sec

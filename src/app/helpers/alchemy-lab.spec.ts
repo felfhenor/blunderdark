@@ -126,9 +126,11 @@ function makeFluxRecipe(): AlchemyRecipeContent {
     name: 'Flux Conversion',
     __type: 'alchemyrecipe',
     description: 'Convert crystals and food to flux.',
-    inputCost: { crystals: 5, food: 5 },
-    outputResource: 'flux',
-    outputAmount: 1,
+    inputCost: [
+      { resource: 'crystals', amount: 5 },
+      { resource: 'food', amount: 5 },
+    ],
+    outputCost: [{ resource: 'flux', amount: 1 }],
     baseTicks: 15,
     tier: 'basic',
   };
@@ -140,9 +142,11 @@ function makeEssenceRecipe(): AlchemyRecipeContent {
     name: 'Essence Synthesis',
     __type: 'alchemyrecipe',
     description: 'Convert gold and crystals to essence.',
-    inputCost: { gold: 10, crystals: 5 },
-    outputResource: 'essence',
-    outputAmount: 1,
+    inputCost: [
+      { resource: 'gold', amount: 10 },
+      { resource: 'crystals', amount: 5 },
+    ],
+    outputCost: [{ resource: 'essence', amount: 1 }],
     baseTicks: 25,
     tier: 'advanced',
   };
@@ -154,9 +158,11 @@ function makeDarkTransmuteRecipe(): AlchemyRecipeContent {
     name: 'Dark Transmutation',
     __type: 'alchemyrecipe',
     description: 'Convert food and corruption to flux.',
-    inputCost: { food: 5, corruption: 10 },
-    outputResource: 'flux',
-    outputAmount: 2,
+    inputCost: [
+      { resource: 'food', amount: 5 },
+      { resource: 'corruption', amount: 10 },
+    ],
+    outputCost: [{ resource: 'flux', amount: 2 }],
     baseTicks: 20,
     tier: 'advanced',
   };
@@ -409,11 +415,17 @@ describe('alchemy-lab', () => {
       const room = makePlacedRoom();
       const cost = alchemyLabGetEffectiveCost(
         room,
-        { crystals: 5, food: 5 },
+        [
+          { resource: 'crystals', amount: 5 },
+          { resource: 'food', amount: 5 },
+        ],
         new Set(),
       );
 
-      expect(cost).toEqual({ crystals: 5, food: 5 });
+      expect(cost).toEqual([
+        { resource: 'crystals', amount: 5 },
+        { resource: 'food', amount: 5 },
+      ]);
     });
 
     it('should apply Efficient Distillation cost reduction', async () => {
@@ -425,12 +437,18 @@ describe('alchemy-lab', () => {
       });
       const cost = alchemyLabGetEffectiveCost(
         room,
-        { crystals: 5, food: 5 },
+        [
+          { resource: 'crystals', amount: 5 },
+          { resource: 'food', amount: 5 },
+        ],
         new Set(),
       );
 
       // 5 * 0.6 = 3
-      expect(cost).toEqual({ crystals: 3, food: 3 });
+      expect(cost).toEqual([
+        { resource: 'crystals', amount: 3 },
+        { resource: 'food', amount: 3 },
+      ]);
     });
 
     it('should apply adjacency cost reduction', async () => {
@@ -450,10 +468,16 @@ describe('alchemy-lab', () => {
       // 5 * (1 - 0.15) = 5 * 0.85 = 4.25 → 4
       const cost = alchemyLabGetEffectiveCost(
         room,
-        { crystals: 5, food: 5 },
+        [
+          { resource: 'crystals', amount: 5 },
+          { resource: 'food', amount: 5 },
+        ],
         adjacentTypes,
       );
-      expect(cost).toEqual({ crystals: 4, food: 4 });
+      expect(cost).toEqual([
+        { resource: 'crystals', amount: 4 },
+        { resource: 'food', amount: 4 },
+      ]);
     });
 
     it('should not reduce cost below 1', async () => {
@@ -465,11 +489,17 @@ describe('alchemy-lab', () => {
       });
       const cost = alchemyLabGetEffectiveCost(
         room,
-        { crystals: 1, food: 1 },
+        [
+          { resource: 'crystals', amount: 1 },
+          { resource: 'food', amount: 1 },
+        ],
         new Set(),
       );
 
-      expect(cost).toEqual({ crystals: 1, food: 1 });
+      expect(cost).toEqual([
+        { resource: 'crystals', amount: 1 },
+        { resource: 'food', amount: 1 },
+      ]);
     });
   });
 
@@ -805,11 +835,17 @@ describe('alchemy-lab', () => {
       });
       const cost = alchemyLabGetEffectiveCost(
         room,
-        { crystals: 5, food: 5 },
+        [
+          { resource: 'crystals', amount: 5 },
+          { resource: 'food', amount: 5 },
+        ],
         new Set(),
       );
 
-      expect(cost).toEqual({ crystals: 3, food: 3 });
+      expect(cost).toEqual([
+        { resource: 'crystals', amount: 3 },
+        { resource: 'food', amount: 3 },
+      ]);
     });
 
     it('should unlock advanced recipes with alchemyTierUnlock', async () => {

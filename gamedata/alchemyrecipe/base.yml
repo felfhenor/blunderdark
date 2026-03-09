@@ -2,10 +2,13 @@
   name: Flux Conversion
   description: Transmute crystals and food into magical flux.
   inputCost:
-    crystals: 5
-    food: 5
-  outputResource: flux
-  outputAmount: 1
+    - resource: crystals
+      amount: 5
+    - resource: food
+      amount: 5
+  outputCost:
+    - resource: flux
+      amount: 1
   baseTicks: 15
   tier: basic
 
@@ -13,10 +16,13 @@
   name: Essence Synthesis
   description: Distill gold and crystals into pure essence.
   inputCost:
-    gold: 10
-    crystals: 5
-  outputResource: essence
-  outputAmount: 1
+    - resource: gold
+      amount: 10
+    - resource: crystals
+      amount: 5
+  outputCost:
+    - resource: essence
+      amount: 1
   baseTicks: 25
   tier: advanced
 
@@ -24,9 +30,12 @@
   name: Dark Transmutation
   description: Channel corruption through food to produce concentrated flux.
   inputCost:
-    food: 5
-    corruption: 10
-  outputResource: flux
-  outputAmount: 2
+    - resource: food
+      amount: 5
+    - resource: corruption
+      amount: 10
+  outputCost:
+    - resource: flux
+      amount: 2
   baseTicks: 20
   tier: advanced
