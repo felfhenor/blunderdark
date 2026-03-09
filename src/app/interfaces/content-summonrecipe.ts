@@ -14,4 +14,5 @@ export type SummonRecipeContent = IsContentItem &
     timeMultiplier: number;
     statBonuses: Partial<InhabitantStats>;
     tier: 'rare' | 'advanced';
+    reputationActionId: string | undefined;
   };

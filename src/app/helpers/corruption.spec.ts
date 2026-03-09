@@ -34,6 +34,7 @@ vi.mock('@helpers/state-game', () => {
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn(),
+  contentGetEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/floor-modifiers', () => ({

@@ -448,7 +448,7 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
         }
 
         if (recipe) {
-          reputationAwardInPlace(state, 'Forge Equipment');
+          reputationAwardInPlace(state, 'forge_equipment');
 
           darkForgeCompletedSubject.next({
             roomId: room.id,

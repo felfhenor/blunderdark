@@ -7,7 +7,7 @@ import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlo
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { recruitmentMaxInhabitantCount } from '@helpers/recruitment';
-import { reputationAwardInPlace } from '@helpers/reputation';
+import { reputationAwardByIdInPlace, reputationAwardInPlace } from '@helpers/reputation';
 import { rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -342,7 +342,12 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
                 state.world.inhabitants = [...state.world.inhabitants, summoned];
                 inhabitantsChanged = true;
 
-                reputationAwardInPlace(state, 'Summon Wraith');
+                reputationAwardInPlace(state, 'complete_summoning');
+
+                // Award recipe-specific reputation action if defined
+                if (recipe.reputationActionId) {
+                  reputationAwardByIdInPlace(state, recipe.reputationActionId);
+                }
 
                 summoningCompletedSubject.next({
                   roomId: room.id,

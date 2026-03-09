@@ -1,5 +1,6 @@
 import { findRoomOnFloor } from '@helpers/floor';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { updateGamestate } from '@helpers/state-game';
 import type {
@@ -107,6 +108,8 @@ export function runeworkingProcess(state: GameState, numTicks = 1): void {
 
           // Remove rune from inventory
           state.world.traitRunes.splice(runeIndex, 1);
+
+          reputationAwardInPlace(state, 'embed_rune');
 
           runeworkingCompleteSubject.next({
             inhabitantName: inhabitant.name,

@@ -4,6 +4,7 @@
 # --- TERROR actions (fear-based, intimidation) ---
 - id: 3f96200b-4d49-46ad-93db-b637a27a65f2
   name: Place Torture Chamber
+  actionType: place_torture_chamber
   description: Building a torture chamber strikes fear into the hearts of all who hear of it.
   reputationRewards:
     terror: 15
@@ -11,12 +12,14 @@
 
 - id: a767bc20-42ea-47d5-8c70-a7cff16ca41d
   name: Defeat Invader
+  actionType: defeat_invader
   description: Crushing an invading force sends a clear message to would-be attackers.
   reputationRewards:
     terror: 10
 
 - id: b62a8264-7822-4528-90f7-da9b87a4b67b
   name: Summon Wraith
+  actionType: summon_wraith
   description: Summoning a wraith from the spirit realm inspires dread.
   reputationRewards:
     terror: 8
@@ -25,12 +28,14 @@
 # --- WEALTH actions (gold, treasure, trade) ---
 - id: 40ba134a-2a3f-4b40-a14a-971c1d329d7e
   name: Build Treasure Vault
+  actionType: build_treasure_vault
   description: Constructing a vault to store riches signals prosperity.
   reputationRewards:
     wealth: 15
 
 - id: c32c8844-9742-4ec8-807e-764566d7c25b
   name: Complete Trade Deal
+  actionType: complete_trade_deal
   description: Successful trade with surface merchants spreads word of your prosperity.
   reputationRewards:
     wealth: 12
@@ -38,12 +43,14 @@
 
 - id: 25181bbd-bbb6-418b-81ed-8b3f0a2c7fdb
   name: Mine Gold Vein
+  actionType: mine_gold_vein
   description: Extracting precious gold adds to your legendary hoard.
   reputationRewards:
     wealth: 8
 
 - id: 9154e80d-56e2-4171-a841-3a3a75b782a7
   name: Forge Equipment
+  actionType: forge_equipment
   description: Crafting weapons and armor demonstrates martial preparation.
   reputationRewards:
     wealth: 6
@@ -52,12 +59,14 @@
 # --- KNOWLEDGE actions (research, discovery, magic) ---
 - id: 3df93d45-e8ea-4118-9eaf-7eb9c1eeba29
   name: Complete Research
+  actionType: complete_research
   description: Completing a research project advances the understanding of dungeon magic.
   reputationRewards:
     knowledge: 15
 
 - id: aaf6b346-019c-4516-9643-4cb41275f042
   name: Build Library
+  actionType: build_library
   description: Constructing a shadow library to house ancient tomes.
   reputationRewards:
     knowledge: 12
@@ -66,6 +75,7 @@
 # --- HARMONY actions (balance, coexistence, stability) ---
 - id: 48ea4e0e-ca49-4d2b-83d1-b8110a4097ad
   name: Build Mushroom Grove
+  actionType: build_mushroom_grove
   description: Creating a peaceful fungal garden promotes natural balance.
   reputationRewards:
     harmony: 15
@@ -73,12 +83,14 @@
 
 - id: bd047df4-f621-4bf0-9afb-f7e4e99b681d
   name: Feed All Inhabitants
+  actionType: feed_all_inhabitants
   description: Ensuring no inhabitant goes hungry demonstrates benevolent leadership.
   reputationRewards:
     harmony: 10
 
 - id: 69c77f70-6e98-4e52-a5fe-07c206df048b
   name: Peaceful Season Transition
+  actionType: peaceful_season_transition
   description: Guiding the dungeon through a season change without incident.
   reputationRewards:
     harmony: 8
@@ -87,6 +99,7 @@
 # --- CHAOS actions (corruption, unpredictability, dark magic) ---
 - id: 7d107963-f5e9-4f7e-93f3-06ad8a6a171c
   name: Embrace Corruption
+  actionType: embrace_corruption
   description: Allowing corruption to spread through the dungeon empowers dark forces.
   reputationRewards:
     chaos: 15
@@ -95,6 +108,7 @@
 
 - id: fe4121aa-1794-4d85-bdfe-cc512540a9a2
   name: Summon Demon
+  actionType: summon_demon
   description: Calling forth a demon from the abyss invites unpredictable power.
   reputationRewards:
     chaos: 12
@@ -102,7 +116,165 @@
 
 - id: 47ab9fc6-f018-400a-a2e5-e559245bcfcf
   name: Activate Ley Line Nexus
+  actionType: activate_ley_line_nexus
   description: Tapping into raw magical energy creates surges of chaotic power.
   reputationRewards:
     chaos: 10
     knowledge: 5
+
+# --- TORTURE actions ---
+- id: 2d403b25-d876-48db-ae78-686048d1dec1
+  name: Extract Prisoner Knowledge
+  actionType: prisoner_extract
+  description: Extracting useful knowledge from a captive prisoner through dark methods.
+  reputationRewards:
+    knowledge: 8
+    terror: 3
+
+- id: a9af6e81-39b1-4722-b16c-59474681c2f0
+  name: Break Prisoner Will
+  actionType: prisoner_break
+  description: Breaking a prisoner's will and converting them to serve the dungeon.
+  reputationRewards:
+    terror: 12
+    harmony: -3
+
+- id: 4c470a35-374b-410b-80dd-016adf803cdf
+  name: Interrogate Prisoner
+  actionType: prisoner_interrogate
+  description: Interrogating a prisoner to extract tactical intelligence.
+  reputationRewards:
+    terror: 5
+    knowledge: 5
+
+# --- ALCHEMY actions ---
+- id: 2fb90e0a-7618-4edf-9871-3108d70d4ef8
+  name: Complete Transmutation
+  actionType: complete_transmutation
+  description: Completing a successful alchemical transmutation of resources.
+  reputationRewards:
+    knowledge: 5
+    wealth: 3
+
+# --- BREEDING actions ---
+- id: 72c1e0c4-b7eb-4af4-a699-98425fcdee83
+  name: Create Hybrid Creature
+  actionType: create_hybrid
+  description: Breeding two creatures to create an entirely new hybrid species.
+  reputationRewards:
+    chaos: 8
+    knowledge: 5
+
+- id: 3d67b220-dac8-41e3-a918-cc5fddbf0b14
+  name: Trigger Positive Mutation
+  actionType: trigger_positive_mutation
+  description: Successfully inducing a beneficial mutation in a creature.
+  reputationRewards:
+    chaos: 5
+    knowledge: 3
+
+# --- FUSION actions ---
+- id: 5dff5b7e-2a9d-4c8b-9d7b-73fd639dd46a
+  name: Complete Fusion Ritual
+  actionType: complete_fusion
+  description: Completing a powerful fusion ritual to merge two creatures into one.
+  reputationRewards:
+    chaos: 12
+    knowledge: 5
+    harmony: -3
+
+# --- RUNEWORKING actions ---
+- id: 9942f907-7e5d-4d70-93a7-a68b92c3617d
+  name: Embed Rune
+  actionType: embed_rune
+  description: Embedding a trait rune into a creature to enhance their abilities.
+  reputationRewards:
+    knowledge: 6
+    terror: 3
+
+# --- TRAP actions ---
+- id: 47b3e0d2-45b8-4748-9798-5899963b7ac0
+  name: Craft Trap
+  actionType: craft_trap
+  description: Crafting a devious trap to defend the dungeon from invaders.
+  reputationRewards:
+    terror: 5
+    chaos: 3
+
+# --- FARPLANE actions ---
+- id: e57410f9-ef4e-459c-82b8-0896862aeef5
+  name: Preserve Fallen Soul
+  actionType: preserve_fallen_soul
+  description: Capturing the soul of a fallen defender in the Farplane.
+  reputationRewards:
+    harmony: 8
+    knowledge: 3
+
+- id: 12b02a02-fe54-4621-b733-7c5defe9d777
+  name: Recruit From Farplane
+  actionType: recruit_from_farplane
+  description: Re-recruiting a fallen soul from the Farplane to serve once more.
+  reputationRewards:
+    harmony: 6
+    knowledge: 3
+
+# --- INVASION actions ---
+- id: 83da8402-c96e-45d4-a832-ce00fc3eb762
+  name: Capture Prisoner
+  actionType: capture_prisoner
+  description: Capturing an invader as a prisoner after a successful defense.
+  reputationRewards:
+    terror: 6
+    knowledge: 3
+
+- id: f94ad63e-f335-4b0d-9a4f-87ad42f2a6ab
+  name: Repel Invasion Flawlessly
+  actionType: repel_invasion_flawless
+  description: Repelling an invasion without losing a single defender.
+  reputationRewards:
+    terror: 10
+    wealth: 5
+
+- id: 77426e17-58a9-42a7-9288-22081d12bd76
+  name: Lose Invasion
+  actionType: lose_invasion
+  description: Suffering a defeat at the hands of invaders.
+  reputationRewards:
+    terror: -8
+    harmony: -5
+
+# --- SUMMONING actions ---
+- id: b74c9e8d-2564-43ab-bdcf-f90413b2f98e
+  name: Complete Summoning
+  actionType: complete_summoning
+  description: Successfully completing a summoning ritual to call forth a creature.
+  reputationRewards:
+    chaos: 6
+    terror: 3
+
+# --- CORRUPTION actions ---
+- id: ea0d88d4-be16-40d2-8b0c-bc4fe9e98046
+  name: Spend Corruption
+  actionType: spend_corruption
+  description: Spending corruption empowers dark forces and destabilizes harmony.
+  reputationRewards:
+    chaos: 3
+    harmony: -2
+
+# --- ROOM UPGRADE actions ---
+- id: c5ab9f70-c517-4a7a-a98a-ecdb6557f3dc
+  name: Upgrade Room
+  actionType: upgrade_room
+  description: Upgrading a room to enhance its capabilities.
+  reputationRewards:
+    wealth: 5
+    knowledge: 3
+
+# --- RECRUITMENT actions ---
+- id: 936f0c57-55bc-473d-b6e6-a26711357bdf
+  name: Recruit Harmony Creature
+  actionType: recruit_harmony_creature
+  description: Recruiting a creature attracted by the dungeon's harmonious reputation.
+  reputationRewards:
+    harmony: 10
+    knowledge: 3

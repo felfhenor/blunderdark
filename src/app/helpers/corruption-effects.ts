@@ -213,7 +213,7 @@ function handleMutateInhabitant(
   state: GameState,
   rng: PRNG,
 ): void {
-  reputationAwardInPlace(state, 'Embrace Corruption');
+  reputationAwardInPlace(state, 'embrace_corruption');
   const target = corruptionEffectSelectMutationTarget(
     state.world.inhabitants,
     rng,

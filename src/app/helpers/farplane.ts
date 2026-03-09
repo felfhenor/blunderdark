@@ -2,6 +2,7 @@ import { contentGetEntry } from '@helpers/content';
 import { inhabitantAdd } from '@helpers/inhabitants';
 import { notify } from '@helpers/notify';
 import { recruitmentIsRosterFull } from '@helpers/recruitment';
+import { reputationAwardForAction, reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
@@ -107,6 +108,7 @@ export function farplaneCaptureDefenderSouls(
   }
 
   if (capturedCount > 0) {
+    reputationAwardInPlace(state, 'preserve_fallen_soul');
     const soulWord = capturedCount === 1 ? 'soul was' : 'souls were';
     notify('Farplane', `${capturedCount} ${soulWord} captured in the Farplane`);
   }
@@ -188,6 +190,8 @@ export async function farplaneRecruitSoul(
   };
 
   await inhabitantAdd(instance);
+
+  await reputationAwardForAction('recruit_from_farplane');
 
   // Remove soul from farplane
   await updateGamestate((s) => {

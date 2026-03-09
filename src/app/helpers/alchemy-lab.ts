@@ -1,6 +1,7 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { findRoomOnFloor } from '@helpers/floor';
@@ -416,6 +417,8 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
         // Add output resource (direct mutation; clamped at end of tick)
         const outputType = recipe.outputResource as ResourceType;
         state.world.resources[outputType].current += recipe.outputAmount;
+
+        reputationAwardInPlace(state, 'complete_transmutation');
 
         // Reset cycle for continuous conversion
         conversion.progress = 0;

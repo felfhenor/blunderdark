@@ -1,5 +1,6 @@
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { floorAll } from '@helpers/floor';
@@ -448,6 +449,8 @@ export async function fusionExecute(
       },
     };
   });
+
+  await reputationAwardForAction('complete_fusion');
 
   return { success: true, hybridInstance };
 }

@@ -29,12 +29,18 @@ export async function invasionRewardApplyVictory(
 
   // Reputation + victory tracking + threat adjustment
   await updateGamestate((state) => {
-    reputationAwardInPlace(state, 'Defeat Invader');
+    reputationAwardInPlace(state, 'defeat_invader');
     victoryRecordDefenseWin(state);
 
     // Add captured prisoners
     if (result.capturedPrisoners.length > 0) {
       state.world.prisoners.push(...result.capturedPrisoners);
+      reputationAwardInPlace(state, 'capture_prisoner');
+    }
+
+    // Flawless victory: no defenders killed
+    if (result.killedDefenderIds.length === 0) {
+      reputationAwardInPlace(state, 'repel_invasion_flawless');
     }
 
     // Adjust player threat upward on victory
@@ -82,13 +88,8 @@ export async function invasionRewardApplyDefeat(
       );
     }
 
-    // Apply reputation loss via direct mutation (no gamedata action for defeat)
-    if (penalties.reputationLoss > 0) {
-      state.world.reputation.terror = Math.max(
-        0,
-        state.world.reputation.terror - penalties.reputationLoss,
-      );
-    }
+    // Apply reputation loss via gamedata action
+    reputationAwardInPlace(state, 'lose_invasion');
 
     // Adjust player threat downward on defeat
     const perfScore = invasionThreatCalculatePerformanceScore(result.detailedResult);

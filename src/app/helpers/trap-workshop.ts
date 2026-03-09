@@ -2,6 +2,7 @@ import { Subject } from 'rxjs';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -174,6 +175,8 @@ export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
           state.world.trapInventory,
           job.trapTypeId,
         );
+
+        reputationAwardInPlace(state, 'craft_trap');
 
         const trapDef = contentGetEntry<TrapContent>(job.trapTypeId);
         room.trapJobs.shift();

@@ -287,7 +287,7 @@ export async function merchantExecuteTrade(
     };
   });
 
-  reputationAwardForAction('Complete Trade Deal');
+  reputationAwardForAction('complete_trade_deal');
 
   return { success: true };
 }

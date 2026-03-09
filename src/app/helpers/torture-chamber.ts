@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { updateGamestate } from '@helpers/state-game';
@@ -318,6 +319,8 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
           const buff = tortureCalculateInterrogationBuff(prisoner);
           state.world.interrogationBuffs.push(buff);
 
+          reputationAwardInPlace(state, 'prisoner_interrogate');
+
           tortureInterrogateCompleteSubject.next({
             roomId: room.id,
             prisonerName: prisoner.name,
@@ -333,6 +336,8 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
         } else if (job.currentStage === 'extract' && job.stageAction) {
           // Stage 2 complete
           const action = job.stageAction as TortureExtractAction;
+
+          reputationAwardInPlace(state, 'prisoner_extract');
 
           if (action === 'research') {
             const researchGained = tortureCalculateExtractionReward(prisoner);
@@ -373,6 +378,7 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
             const success = rng() < TORTURE_BREAK_CONVERT_SUCCESS_RATE;
 
             if (success) {
+              reputationAwardInPlace(state, 'prisoner_break');
               const newInhabitant = tortureCreateBrokenInhabitant(prisoner);
               if (newInhabitant) {
                 state.world.inhabitants = [

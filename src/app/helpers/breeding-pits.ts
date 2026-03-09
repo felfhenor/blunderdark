@@ -1,6 +1,7 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
@@ -437,6 +438,8 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
             state.world.inhabitants = [...state.world.inhabitants, hybrid];
             inhabitantsChanged = true;
 
+            reputationAwardInPlace(state, 'create_hybrid');
+
             // Clear breeding order since parents are consumed
             room.breedingInhabitantOrder = undefined;
 
@@ -472,6 +475,10 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
 
             state.world.inhabitants[targetIdx] = mutated;
             inhabitantsChanged = true;
+
+            if (outcome === 'positive') {
+              reputationAwardInPlace(state, 'trigger_positive_mutation');
+            }
 
             mutationCompletedSubject.next({
               roomId: room.id,

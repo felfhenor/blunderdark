@@ -4,6 +4,7 @@ import { contentGetEntriesByType } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { inhabitantAdd } from '@helpers/inhabitants';
 import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
+import { reputationAwardForAction } from '@helpers/reputation';
 import {
   researchUnlockGetPassiveBonusWithMastery,
   researchUnlockIsResearchGated,
@@ -226,6 +227,12 @@ export async function recruitmentRecruit(def: InhabitantContent): Promise<{
   };
 
   await inhabitantAdd(instance);
+
+  // Award reputation for recruiting harmony-attracted creatures
+  const harmonyTags = new Set(['harmony_attract', 'harmony_attract_legendary']);
+  if (def.restrictionTags.some((tag) => harmonyTags.has(tag))) {
+    await reputationAwardForAction('recruit_harmony_creature');
+  }
 
   return { success: true, instance };
 }

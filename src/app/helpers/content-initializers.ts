@@ -231,6 +231,7 @@ function ensureReputationAction(
     name: action.name ?? 'UNKNOWN',
     __type: 'reputationaction',
     description: action.description ?? '',
+    actionType: action.actionType ?? 'defeat_invader',
     reputationRewards: action.reputationRewards ?? {},
   };
 }
@@ -404,6 +405,7 @@ function ensureSummonRecipe(
     timeMultiplier: recipe.timeMultiplier ?? 1.0,
     statBonuses: recipe.statBonuses ?? {},
     tier: recipe.tier ?? 'rare',
+    reputationActionId: recipe.reputationActionId ?? undefined,
   };
 }
 

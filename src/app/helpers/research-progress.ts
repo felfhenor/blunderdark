@@ -230,7 +230,7 @@ export function researchProcess(state: GameState, numTicks = 1): void {
 
     researchUnlockProcessCompletion(completedNodeId, state);
 
-    reputationAwardInPlace(state, 'Complete Research');
+    reputationAwardInPlace(state, 'complete_research');
 
     researchCompletedSubject.next({
       nodeId: completedNodeId,

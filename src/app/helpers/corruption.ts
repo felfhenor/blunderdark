@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
 import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { reputationAwardForAction } from '@helpers/reputation';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { Floor, InhabitantInstance } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
@@ -58,6 +59,8 @@ export async function corruptionSpend(amount: number): Promise<boolean> {
       },
     },
   }));
+
+  await reputationAwardForAction('spend_corruption');
 
   return true;
 }

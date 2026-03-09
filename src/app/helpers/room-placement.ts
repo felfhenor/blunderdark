@@ -6,7 +6,7 @@ import { currencyIsUnlocked, currencyUnlock } from '@helpers/currency-unlock';
 import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
 import { findRoomOnFloor, floorAll, floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
-import { reputationAwardForAction } from '@helpers/reputation';
+import { reputationAwardByIdForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import {
@@ -376,7 +376,7 @@ export async function roomPlacementExecute(
 
   // Award reputation for placing specific room types
   if (roomDef.reputationAction) {
-    reputationAwardForAction(roomDef.reputationAction);
+    reputationAwardByIdForAction(roomDef.reputationAction);
   }
 
   floatingBubblesEmitPlacement(

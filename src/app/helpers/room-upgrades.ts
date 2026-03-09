@@ -1,6 +1,7 @@
 import { connectivityAllConnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor, floorAll } from '@helpers/floor';
+import { reputationAwardInPlace } from '@helpers/reputation';
 import { updateGamestate } from '@helpers/state-game';
 import { featureCalculateCapacityBonus } from '@helpers/features';
 import { reputationEffectIsRoomUpgradesUnlocked } from '@helpers/reputation-effects';
@@ -259,6 +260,9 @@ export async function roomUpgradeApplyAction(
         r.id === roomId ? roomUpgradeApply(r, upgradePathId) : r,
       ),
     }));
+
+    reputationAwardInPlace(s, 'upgrade_room');
+
     return {
       ...s,
       world: { ...s.world, floors: newFloors },
