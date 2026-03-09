@@ -187,5 +187,19 @@ export class NotifyService {
       tapToDismiss: true,
       progressBar: true,
     });
+
+    if (event.type === 'harmony' && event.newLevel === 'high') {
+      this.toast.info(
+        'Your harmonious dungeon attracts peaceful creatures! Check the Altar.',
+        'Creatures Attracted',
+        { timeOut: 6000, extendedTimeOut: 2000, tapToDismiss: true, progressBar: true },
+      );
+    } else if (event.type === 'harmony' && event.newLevel === 'legendary') {
+      this.toast.info(
+        'Legendary harmony attracts rare creatures to your dungeon!',
+        'Rare Creatures Attracted',
+        { timeOut: 6000, extendedTimeOut: 2000, tapToDismiss: true, progressBar: true },
+      );
+    }
   }
 }

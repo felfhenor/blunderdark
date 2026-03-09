@@ -66,6 +66,14 @@
             maxInhabitants() | number: '1.0-0'
           }}
         </span>
+        @if (hasHarmonyCreatures()) {
+          <span
+            class="badge badge-sm badge-success ml-1"
+            tp="Harmony reputation has attracted peaceful creatures"
+          >
+            Harmony
+          </span>
+        }
       </div>
 
       <div>

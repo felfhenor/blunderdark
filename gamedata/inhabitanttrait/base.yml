@@ -285,3 +285,23 @@
   effects:
     - effectType: efficiency_floor
       effectValue: 0.9
+- id: c793e47c-9b89-4225-ae9a-d72ff1e0dff3
+  name: Pacifist
+  description:
+    A peaceful nature grants +30% production in any room, but combat
+    effectiveness is halved due to an aversion to violence.
+  effects:
+    - effectType: production_multiplier
+      effectValue: 0.3
+      targetResourceType: all
+    - effectType: attack_multiplier
+      effectValue: -0.5
+- id: fa994f89-09cd-4fed-a936-c1a080b8b589
+  name: Calming Aura
+  description:
+    Radiates a soothing presence that reduces fear generation in the
+    assigned room by 15%.
+  effects:
+    - effectType: aura_fear_multiplier
+      effectValue: -0.15
+      isAura: true

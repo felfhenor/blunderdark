@@ -251,6 +251,96 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
+- id: c2fab401-f320-46da-98c4-9d10d7097a5c
+  name: Grove Tender
+  type: creature
+  tier: 2
+  description: A gentle woodland guardian that nurtures growth and soothes the fearful. Grove Tenders radiate calm, reducing fear wherever they are assigned.
+  cost:
+    gold: 110
+    food: 50
+    essence: 20
+  stats:
+    hp: 45
+    attack: 6
+    defense: 16
+    speed: 12
+    workerEfficiency: 1.4
+  inhabitantTraitIds:
+    - Calming Aura
+    - Nature Affinity
+  combatAbilityIds:
+    - Aura of Courage
+  restrictionTags:
+    - harmony_attract
+  fearTolerance: 3
+  fearModifier: -0.15
+  foodConsumptionRate: 2
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
+- id: c5b7dcf2-4b88-48bd-9b4d-111f8927f3f2
+  name: Verdant Archon
+  type: creature
+  tier: 3
+  description: A majestic nature elemental that only appears in the most harmonious of dungeons. The Verdant Archon is an unmatched worker whose calming presence and peaceful nature inspire productivity in all who serve alongside it.
+  cost:
+    gold: 200
+    food: 80
+    essence: 50
+  stats:
+    hp: 70
+    attack: 10
+    defense: 25
+    speed: 10
+    workerEfficiency: 1.6
+  inhabitantTraitIds:
+    - Pacifist
+    - Calming Aura
+  combatAbilityIds:
+    - Dungeon Ward
+  restrictionTags:
+    - harmony_attract_legendary
+  fearTolerance: 4
+  fearModifier: -0.2
+  foodConsumptionRate: 2.5
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.4
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.7
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
 - id: d0276755-5f68-457a-be36-263f1bc95e83
   name: Mimic
   type: creature

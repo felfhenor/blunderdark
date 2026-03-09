@@ -34,6 +34,7 @@ import {
   resourcePayCost,
   inhabitantAdd,
 } from '@helpers';
+import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { rngUuid } from '@helpers/rng';
 import type {
@@ -78,6 +79,13 @@ export class PanelAltarComponent {
   public inhabitantCount = recruitmentCurrentInhabitantCount;
   public maxInhabitants = recruitmentMaxInhabitantCount;
   public tierUnlocked = recruitmentUnlockedTier;
+
+  public hasHarmonyCreatures = computed<boolean>(() => {
+    const reputation = gamestate()?.world?.reputation;
+    if (!reputation) return false;
+    const attractionLevel = reputationEffectGetMaxAttractionLevel(reputation);
+    return attractionLevel > 0;
+  });
 
   public nextUpgrade = computed<RoomUpgradeContent | undefined>(() => {
     return altarRoomGetNextUpgrade(floorAll());

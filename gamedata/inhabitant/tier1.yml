@@ -155,6 +155,49 @@
       productionMultiplier: 1.0
       foodConsumptionMultiplier: 1.0
 
+- id: d20ceb9a-1297-43cd-94ea-9a3422202bf4
+  name: Moss Sprite
+  type: creature
+  tier: 1
+  description: A tiny, luminous nature spirit drawn to harmonious dungeons. Excellent workers but poor fighters.
+  cost:
+    gold: 45
+    food: 20
+  stats:
+    hp: 18
+    attack: 4
+    defense: 6
+    speed: 14
+    workerEfficiency: 1.25
+  inhabitantTraitIds:
+    - Pacifist
+  combatAbilityIds:
+    - Heal
+  restrictionTags:
+    - harmony_attract
+  fearTolerance: 3
+  fearModifier: -0.1
+  foodConsumptionRate: 1.5
+  stateModifiers:
+    scared:
+      productionMultiplier: 0.3
+      foodConsumptionMultiplier: 1.5
+      attackMultiplier: 0.5
+      defenseMultiplier: 0.6
+    hungry:
+      productionMultiplier: 0.6
+      foodConsumptionMultiplier: 1.0
+      attackMultiplier: 0.7
+      defenseMultiplier: 0.8
+    starving:
+      productionMultiplier: 0.1
+      foodConsumptionMultiplier: 0.5
+      attackMultiplier: 0.3
+      defenseMultiplier: 0.4
+    normal:
+      productionMultiplier: 1.0
+      foodConsumptionMultiplier: 1.0
+
 - id: d336e6e7-2d96-41cb-af02-106b34efbc16
   name: Slime
   type: ooze
