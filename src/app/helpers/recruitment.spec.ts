@@ -60,6 +60,7 @@ vi.mock('@helpers/state-game', () => ({
 
 vi.mock('@helpers/altar-room', () => ({
   altarRoomCanRecruit: () => mockHasAltar,
+  altarRoomFind: () => undefined,
 }));
 
 vi.mock('@helpers/content', () => ({

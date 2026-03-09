@@ -1,3 +1,4 @@
+import { connectivityAllConnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { floorAll } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
@@ -223,14 +224,17 @@ export function roomUpgradeGetProductionMultiplier(
 
 /**
  * Sum all globalMaxInhabitantBonus effects from room upgrades across
- * every placed room in the dungeon. This contributes to the global roster cap.
+ * every connected placed room in the dungeon. Disconnected rooms do not
+ * contribute to the global roster cap.
  */
 export function roomUpgradeGetGlobalMaxInhabitantBonus(): number {
   const floors = floorAll();
+  const connectedIds = connectivityAllConnectedRoomIds();
 
   let bonus = 0;
   for (const floor of floors) {
     for (const room of floor.rooms) {
+      if (!connectedIds.has(room.id)) continue;
       const effects = roomUpgradeGetAppliedEffects(room);
       for (const effect of effects) {
         if (effect.type === 'globalMaxInhabitantBonus') {

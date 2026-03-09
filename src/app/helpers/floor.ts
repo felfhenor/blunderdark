@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { biomeIsUnlocked } from '@helpers/biome';
 import { biomeRestrictionCanBuild } from '@helpers/biome-restrictions';
+import { connectivityAllConnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { defaultFloor } from '@helpers/defaults';
 import { gridCreateEmpty } from '@helpers/grid';
@@ -43,6 +44,15 @@ export const floorAll = computed<Floor[]>(() => {
  */
 export const roomAll = computed<PlacedRoom[]>(() => {
   return floorAll().flatMap((f) => f.rooms);
+});
+
+/**
+ * Get all rooms across all floors that are connected to the Altar Room.
+ * Disconnected rooms are excluded so their bonuses/effects don't apply.
+ */
+export const roomAllConnected = computed<PlacedRoom[]>(() => {
+  const connectedIds = connectivityAllConnectedRoomIds();
+  return roomAll().filter((r) => connectedIds.has(r.id));
 });
 
 /**

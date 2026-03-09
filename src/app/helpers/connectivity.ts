@@ -187,6 +187,28 @@ export function connectivityIsRoomConnected(
 }
 
 /**
+ * Reactive signal: set of connected room IDs across ALL floors.
+ * Computes global connectivity from the Altar Room through all floors.
+ */
+export const connectivityAllConnectedRoomIds = computed<Set<PlacedRoomId>>(
+  () => {
+    const state = gamestate();
+    const floors = state.world.floors;
+    const altar = altarRoomFind(floors);
+    if (!altar) return new Set<PlacedRoomId>();
+
+    const globalMap = connectivityComputeGlobal(floors, altar);
+    const allConnected = new Set<PlacedRoomId>();
+    for (const ids of globalMap.values()) {
+      for (const id of ids) {
+        allConnected.add(id);
+      }
+    }
+    return allConnected;
+  },
+);
+
+/**
  * Reactive signal: count of disconnected rooms on the current floor.
  */
 export const connectivityDisconnectedCount = computed<number>(() => {
