@@ -24,6 +24,7 @@ import type { ResourceType } from '@interfaces';
     <swal
       #unlockSwal
       [showConfirmButton]="true"
+      [showCancelButton]="false"
       confirmButtonText="Got it!"
     ></swal>
   `,
@@ -79,6 +80,8 @@ export class CurrencyUnlockPopupComponent {
         <p style="opacity:0.6;font-size:0.75rem;">This resource now appears in your resource bar and will be produced by your dungeon.</p>
       </div>`,
       confirmButtonText: 'Got it!',
+      showCancelButton: false,
+      showDenyButton: false,
     };
 
     await swal.fire();
