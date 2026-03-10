@@ -26,6 +26,14 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     tooltipPosition: 'bottom',
   },
   {
+    id: 'connecting-rooms',
+    targetSelector: 'app-grid',
+    title: 'Connecting Rooms',
+    description:
+      'Rooms must be connected by hallways to function! An unconnected room cannot receive workers or produce resources. Always build hallways between your rooms or connect your rooms directly to keep everything running smoothly.',
+    tooltipPosition: 'bottom',
+  },
+  {
     id: 'starter-rooms',
     targetSelector: 'app-grid',
     title: 'Starter Rooms',
