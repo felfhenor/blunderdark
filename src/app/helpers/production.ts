@@ -7,6 +7,11 @@ import {
 import { consumptionCalculateNonFoodTotals } from '@helpers/consumption';
 import { contentGetEntry } from '@helpers/content';
 import {
+  biomeCalculateCreatureProductionModifier,
+  biomeGetCorruptionMultiplier,
+  biomeGetResourceModifier,
+} from '@helpers/biome-modifiers';
+import {
   dayNightCalculateCreatureProductionModifier,
   dayNightGetResourceModifier,
 } from '@helpers/day-night-modifiers';
@@ -119,6 +124,8 @@ type NonRoomCorruptionResult = {
   dayNightMultiplier: number;
   /** Combined research + throne multiplier (1 + bonuses) */
   researchThroneMultiplier: number;
+  /** Biome corruption multiplier (from corrupted floors) */
+  biomeCorruptionMultiplier: number;
   /** Total non-room corruption per tick after all modifiers */
   final: number;
 };
@@ -170,7 +177,7 @@ function productionCalculateNonRoomCorruption(
 
   const total = inhabitantPerTick + featurePerTick + deepObjectivePerTick;
   if (total === 0) {
-    return { inhabitantPerTick: 0, featurePerTick: 0, deepObjectivePerTick: 0, dayNightMultiplier: 1, researchThroneMultiplier: 1, final: 0 };
+    return { inhabitantPerTick: 0, featurePerTick: 0, deepObjectivePerTick: 0, dayNightMultiplier: 1, researchThroneMultiplier: 1, biomeCorruptionMultiplier: 1, final: 0 };
   }
 
   const dayNightMultiplier = hour !== undefined
@@ -180,9 +187,18 @@ function productionCalculateNonRoomCorruption(
   const throneCorruptionBonus = throneRoomGetRulerBonusValue(floors, 'corruptionGeneration');
   const researchThroneMultiplier = 1 + researchCorruptionBonus + throneCorruptionBonus;
 
-  const final = total * dayNightMultiplier * researchThroneMultiplier;
+  // Biome corruption multiplier: use the highest multiplier across all floors
+  let biomeCorruptionMultiplier = 1.0;
+  for (const floor of floors) {
+    const floorBiomeMul = biomeGetCorruptionMultiplier(floor.biome);
+    if (floorBiomeMul > biomeCorruptionMultiplier) {
+      biomeCorruptionMultiplier = floorBiomeMul;
+    }
+  }
 
-  return { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, final };
+  const final = total * dayNightMultiplier * researchThroneMultiplier * biomeCorruptionMultiplier;
+
+  return { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier, final };
 }
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
@@ -450,6 +466,11 @@ export function productionCalculateTotal(
               room.id,
             )
           : 1.0;
+      const biomeCreatureModifier = biomeCalculateCreatureProductionModifier(
+        floor.biome,
+        floor.inhabitants,
+        room.id,
+      );
 
       let roomProduction: RoomProduction = {};
       for (const [resourceType, baseAmount] of Object.entries(base)) {
@@ -462,6 +483,7 @@ export function productionCalculateTotal(
           hour !== undefined
             ? dayNightGetResourceModifier(hour, resourceType)
             : 1.0;
+        const biomeResourceMod = biomeGetResourceModifier(floor.biome, resourceType);
         const featureProductionBonus = featureCalculateProductionBonus(
           room,
           resourceType,
@@ -486,7 +508,9 @@ export function productionCalculateTotal(
           envModifier *
           depthModifier *
           dayNightResourceMod *
+          biomeResourceMod *
           creatureModifier *
+          biomeCreatureModifier *
           researchMultiplier *
           reputationMultiplier *
           legendaryAuraMultiplier;
@@ -645,6 +669,11 @@ export function productionCalculateSingleRoom(
           room.id,
         )
       : 1.0;
+  const biomeCreatureModifier = biomeCalculateCreatureProductionModifier(
+    floor.biome,
+    floor.inhabitants,
+    room.id,
+  );
 
   let production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
@@ -654,6 +683,7 @@ export function productionCalculateSingleRoom(
       hour !== undefined
         ? dayNightGetResourceModifier(hour, resourceType)
         : 1.0;
+    const biomeResourceMod = biomeGetResourceModifier(floor.biome, resourceType);
     const featureProductionBonus = featureCalculateProductionBonus(
       room,
       resourceType,
@@ -678,7 +708,9 @@ export function productionCalculateSingleRoom(
       envModifier *
       depthModifier *
       dayNightResourceMod *
+      biomeResourceMod *
       creatureModifier *
+      biomeCreatureModifier *
       researchMultiplier *
       reputationMultiplier *
       legendaryAuraMultiplier;
@@ -842,6 +874,11 @@ export function productionCalculateBreakdowns(
               room.id,
             )
           : 1.0;
+      const biomeCreatureModifier = biomeCalculateCreatureProductionModifier(
+        floor.biome,
+        floor.inhabitants,
+        room.id,
+      );
       // Track each room's final contribution per resource for upgrade multiplier
       let roomFinals: Record<string, number> = {};
 
@@ -856,6 +893,7 @@ export function productionCalculateBreakdowns(
           hour !== undefined
             ? dayNightGetResourceModifier(hour, resourceType)
             : 1.0;
+        const biomeResourceMod = biomeGetResourceModifier(floor.biome, resourceType);
         const featureProductionBonus = featureCalculateProductionBonus(
           room,
           resourceType,
@@ -873,7 +911,9 @@ export function productionCalculateBreakdowns(
           envModifier *
           depthModifier *
           dayNightResourceMod *
-          creatureModifier;
+          biomeResourceMod *
+          creatureModifier *
+          biomeCreatureModifier;
         const withBonuses =
           baseAmount *
           (1 +
@@ -1026,7 +1066,7 @@ export function productionCalculateBreakdowns(
       };
     }
 
-    const { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier } = nonRoomCorruption;
+    const { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier } = nonRoomCorruption;
     const nonInhabitantBase = featurePerTick + deepObjectivePerTick;
     const totalBase = inhabitantPerTick + nonInhabitantBase;
 
@@ -1034,7 +1074,7 @@ export function productionCalculateBreakdowns(
     breakdowns['corruption'].base += nonInhabitantBase;
     breakdowns['corruption'].inhabitantBonus += inhabitantPerTick;
     // Modifier and research effects apply to the combined total
-    const afterModifier = totalBase * dayNightMultiplier;
+    const afterModifier = totalBase * dayNightMultiplier * biomeCorruptionMultiplier;
     breakdowns['corruption'].modifierEffect += afterModifier - totalBase;
     breakdowns['corruption'].researchBonus += afterModifier * researchThroneMultiplier - afterModifier;
     breakdowns['corruption'].final += nonRoomCorruption.final;
@@ -1243,6 +1283,7 @@ export function productionCalculateDetailedBreakdown(
         hour !== undefined
           ? dayNightGetResourceModifier(hour, resourceType)
           : 1.0;
+      const biomeResourceMod = biomeGetResourceModifier(floor.biome, resourceType);
       const envModifier =
         hour !== undefined
           ? productionModifierCalculate({
@@ -1260,13 +1301,33 @@ export function productionCalculateDetailedBreakdown(
               room.id,
             )
           : 1.0;
+      const biomeCreatureModifier = biomeCalculateCreatureProductionModifier(
+        floor.biome,
+        floor.inhabitants,
+        room.id,
+      );
+
+      if (biomeResourceMod !== 1.0) {
+        modifierDetails.push({
+          name: 'Biome (Resource)',
+          multiplier: biomeResourceMod,
+        });
+      }
+      if (biomeCreatureModifier !== 1.0) {
+        modifierDetails.push({
+          name: 'Biome (Creature)',
+          multiplier: biomeCreatureModifier,
+        });
+      }
 
       const combinedModifier =
         stateModifier *
         envModifier *
         depthModifier *
         dayNightResourceMod *
-        creatureModifier;
+        biomeResourceMod *
+        creatureModifier *
+        biomeCreatureModifier;
 
       const synergyBonusVal = synergyCalculateProductionBonus(
         room.id,

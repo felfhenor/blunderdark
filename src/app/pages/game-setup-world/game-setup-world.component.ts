@@ -6,7 +6,8 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { biomeIsUnlocked, discordSetStatus, gameReset, worldSetSeed } from '@helpers';
 import { worldSetStartingBiome } from '@helpers/world';
-import { BIOME_DATA, type BiomeType } from '@interfaces/biome';
+import { biomeGetContent } from '@helpers/biome';
+import type { BiomeType } from '@interfaces/biome';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 type BiomeSelection = BiomeType | 'random';
@@ -43,12 +44,15 @@ export class GameSetupWorldComponent implements OnInit {
   public biomeOptions = computed<BiomeOption[]>(() => {
     const unlocked: BiomeOption[] = GameSetupWorldComponent.ALL_BIOME_TYPES
       .filter((type) => biomeIsUnlocked(type))
-      .map((type) => ({
-        value: type,
-        name: BIOME_DATA[type].name,
-        description: BIOME_DATA[type].description,
-        color: BIOME_DATA[type].color,
-      }));
+      .map((type) => {
+        const data = biomeGetContent(type);
+        return {
+          value: type,
+          name: data?.name ?? type,
+          description: data?.description ?? '',
+          color: data?.color ?? '#6c757d',
+        };
+      });
 
     return [
       {

@@ -10,6 +10,7 @@ export * from './combat-stats';
 export * from './connection';
 export * from './content-abilityeffect';
 export * from './content-alchemyrecipe';
+export * from './content-biome';
 export * from './content-breedingrecipe';
 export * from './content-combatability';
 export * from './content-corruptioneffect';

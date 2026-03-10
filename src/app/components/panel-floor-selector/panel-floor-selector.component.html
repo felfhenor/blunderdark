@@ -24,7 +24,7 @@
           [sfxOffset]="i"
           [class.btn-active]="isSelected(i)"
           [class.opacity-40]="hasSearch() && getFloorMatchCount(floor.id) === 0"
-          [style.--floor-biome-color]="getBiomeData(floor.biome).color"
+          [style.--floor-biome-color]="getBiomeData(floor.biome)?.color"
           (click)="selectFloor(i)"
         >
           <span class="biome-indicator"></span>
@@ -230,9 +230,9 @@
         <div class="flex items-center gap-2 mb-2">
           <span
             class="biome-badge badge badge-lg text-white"
-            [style.--badge-bg]="selectedFloorBiome().color"
+            [style.--badge-bg]="selectedFloorBiome()?.color"
           >
-            {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome().name }}
+            {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome()?.name }}
           </span>
           <button
             class="btn btn-xs btn-ghost opacity-60"
@@ -248,22 +248,34 @@
         </div>
 
         <p class="text-sm opacity-80 mb-2">
-          {{ selectedFloorBiome().description }}
+          {{ selectedFloorBiome()?.description }}
         </p>
 
-        <div class="effects-summary text-xs opacity-60">
-          <p>Effects: {{ selectedFloorBiome().effectsLabel }}</p>
-        </div>
-
-        @if (depthModifiers().length > 0) {
-          <div class="depth-modifiers mt-2">
-            <div class="divider my-2 text-xs opacity-60">Depth Modifiers</div>
+        @if (biomeEffects().length > 0 || depthModifiers().length > 0) {
+          <div class="floor-modifiers mt-2">
+            <div class="divider my-2 text-xs opacity-60">Floor Modifiers</div>
             <div class="flex flex-wrap gap-2">
+              @for (effect of biomeEffects(); track $index) {
+                <span
+                  class="badge badge-sm"
+                  [class.badge-success]="isEffectPositive(effect)"
+                  [class.badge-error]="isEffectNegative(effect)"
+                  [tp]="effect.description"
+                >
+                  {{ formatEffectValue(effect) }}
+                  @if (getEffectCurrencyType(effect); as currencyType) {
+                    <app-currency-name [type]="$any(currencyType)" />
+                  } @else {
+                    {{ getEffectLabel(effect) }}
+                  }
+                </span>
+              }
               @for (mod of depthModifiers(); track mod.resourceType) {
                 <span
                   class="badge badge-sm"
                   [class.badge-success]="mod.percentage > 0"
                   [class.badge-error]="mod.percentage < 0"
+                  [tp]="'Depth ' + (currentFloorDepth()) + ' modifier'"
                 >
                   {{ formatModifier(mod.percentage) }}
                   <app-currency-name [type]="$any(mod.resourceType)" />
@@ -271,9 +283,9 @@
               }
             </div>
           </div>
-        } @else if (selectedFloor()) {
-          <div class="depth-modifiers mt-2">
-            <p class="text-xs opacity-50">No depth modifiers (baseline)</p>
+        } @else {
+          <div class="floor-modifiers mt-2">
+            <p class="text-xs opacity-50">No modifiers (baseline)</p>
           </div>
         }
 

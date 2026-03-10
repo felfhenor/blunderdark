@@ -48,7 +48,16 @@ const mockContent = new Map<string, unknown>();
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn((id: string) => mockContent.get(id)),
+  contentGetEntriesByType: vi.fn(() => []),
 }));
+
+vi.mock('@helpers/biome-modifiers', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    biomeGetFearReduction: vi.fn((): number => 0),
+  };
+});
 
 vi.mock('@helpers/room-upgrades', () => ({
   roomUpgradeGetAppliedEffects: vi.fn((): RoomUpgradeEffect[] => []),

@@ -111,6 +111,7 @@ function setRoomFear(roomId: PlacedRoomId, effectiveFear: number): void {
     altarAuraReduction: 0,
     featureReduction: 0,
     researchReduction: 0,
+    biomeReduction: 0,
     propagatedFear: 0,
     propagationSources: [],
     effectiveFear,

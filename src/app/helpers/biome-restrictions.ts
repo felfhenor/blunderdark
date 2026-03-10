@@ -1,41 +1,19 @@
+import { biomeGetContent } from '@helpers/biome';
 import { contentGetEntry } from '@helpers/content';
 import type { BiomeType, Floor, RoomId } from '@interfaces';
-import type { BiomeRestrictionRule, BiomeRestrictionResult } from '@interfaces/biome-restriction';
+import type { BiomeRestrictionResult } from '@interfaces/biome-restriction';
+import type { BiomeRoomRestriction } from '@interfaces/content-biome';
 import type { RoomContent } from '@interfaces/content-room';
 
-
 /**
- * Map of biome type → room name → restriction rule.
- * Room names must match exactly the `name` field in gamedata/room/base.yml.
- *
- * Volcanic: Cannot build Underground Lake, Mushroom Grove
- * Flooded: Cannot build Soul Well
- * Crystal Cave: Max 5 Crystal Mines per floor
- * Corrupted: Cannot build Mushroom Grove, Underground Lake (pure/harmony rooms)
- * Fungal: No specific restrictions
- * Neutral: No restrictions
+ * Get the room restriction rule for a given biome and room name.
+ * Reads from BiomeContent.roomRestrictions defined in gamedata.
  */
-export const BIOME_RESTRICTION_MAP: Record<
-  BiomeType,
-  Record<string, BiomeRestrictionRule>
-> = {
-  volcanic: {
-    'Underground Lake': { blocked: true },
-    'Mushroom Grove': { blocked: true },
-  },
-  flooded: {
-    'Soul Well': { blocked: true },
-  },
-  crystal: {
-    'Crystal Mine': { maxPerFloor: 5 },
-  },
-  corrupted: {
-    'Mushroom Grove': { blocked: true },
-    'Underground Lake': { blocked: true },
-  },
-  fungal: {},
-  neutral: {},
-};
+function getRestriction(biome: BiomeType, roomName: string): BiomeRoomRestriction | undefined {
+  const data = biomeGetContent(biome);
+  if (!data) return undefined;
+  return data.roomRestrictions.find((r) => r.roomId === roomName);
+}
 
 /**
  * Count how many rooms of a given type are placed on a floor.
@@ -64,10 +42,7 @@ export function biomeRestrictionCanBuild(
   const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { allowed: true };
 
-  const restrictions = BIOME_RESTRICTION_MAP[biome];
-  if (!restrictions) return { allowed: true };
-
-  const rule = restrictions[roomDef.name];
+  const rule = getRestriction(biome, roomDef.name);
   if (!rule) return { allowed: true };
 
   if (rule.blocked) {
@@ -107,10 +82,7 @@ export function biomeRestrictionGetRoomInfo(
   const roomDef = contentGetEntry<RoomContent>(roomTypeId);
   if (!roomDef) return { restricted: false };
 
-  const restrictions = BIOME_RESTRICTION_MAP[biome];
-  if (!restrictions) return { restricted: false };
-
-  const rule = restrictions[roomDef.name];
+  const rule = getRestriction(biome, roomDef.name);
   if (!rule) return { restricted: false };
 
   if (rule.blocked) {

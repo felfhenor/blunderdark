@@ -12,13 +12,13 @@ export const RESOURCE_ICON_MAP: Record<ResourceType, Icon> = {
 };
 
 export const RESOURCE_COLOR_MAP: Record<ResourceType, string> = {
-  crystals: 'var(--color-info)',
-  food: 'var(--color-success)',
-  gold: 'var(--color-warning)',
-  flux: 'var(--color-secondary)',
-  research: 'var(--color-primary)',
-  essence: 'var(--color-accent)',
-  corruption: 'var(--color-error)',
+  crystals: '#06b6d4',
+  food: '#d97706',
+  gold: '#eab308',
+  flux: '#ec4899',
+  research: '#6366f1',
+  essence: '#14b8a6',
+  corruption: '#c026d3',
 };
 
 export const RESOURCE_LABEL_MAP: Record<ResourceType, string> = {

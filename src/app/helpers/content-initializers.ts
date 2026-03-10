@@ -34,6 +34,7 @@ import type {
   AbilityEffectContent,
   AbilityEffectId,
 } from '@interfaces/content-abilityeffect';
+import type { BiomeContent, BiomeId } from '@interfaces/content-biome';
 import type {
   CombatAbilityContent,
   CombatAbilityEffect,
@@ -84,6 +85,7 @@ import type {
 const initializers: Record<ContentType, (entry: any) => any> = {
   abilityeffect: ensureAbilityEffect,
   alchemyrecipe: ensureAlchemyRecipe,
+  biome: ensureBiome,
   breedingrecipe: ensureBreedingRecipe,
   combatability: ensureCombatAbility,
   corruptioneffect: ensureCorruptionEffect,
@@ -127,6 +129,33 @@ function ensureAlchemyRecipe(
     outputCost: recipe.outputCost ?? [{ resource: 'flux', amount: 1 }],
     baseTicks: recipe.baseTicks ?? 15,
     tier: recipe.tier ?? 'basic',
+  };
+}
+
+function ensureBiome(
+  biome: Partial<BiomeContent>,
+): Required<BiomeContent> {
+  return {
+    id: (biome.id ?? 'UNKNOWN') as BiomeId,
+    name: biome.name ?? 'UNKNOWN',
+    __type: 'biome',
+    biomeType: biome.biomeType ?? '',
+    description: biome.description ?? '',
+    color: biome.color ?? '#6c757d',
+    icon: biome.icon ?? '',
+    requiresResearch: biome.requiresResearch ?? false,
+    effects: (biome.effects ?? []).map((e) => ({
+      effectType: e.effectType ?? 'resource_production_multiplier',
+      effectValue: e.effectValue ?? 0,
+      description: e.description ?? '',
+      targetResourceType: e.targetResourceType ?? undefined,
+      targetCreatureType: e.targetCreatureType ?? undefined,
+    })),
+    roomRestrictions: (biome.roomRestrictions ?? []).map((r) => ({
+      roomId: r.roomId ?? '',
+      blocked: r.blocked ?? undefined,
+      maxPerFloor: r.maxPerFloor ?? undefined,
+    })),
   };
 }
 

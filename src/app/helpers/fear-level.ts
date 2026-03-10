@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { biomeGetFearReduction } from '@helpers/biome-modifiers';
 import type { AdjacencyMap } from '@interfaces/adjacency';
 import { altarRoomGetFearReductionAura, altarRoomIsAdjacent } from '@helpers/altar-room';
 import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
@@ -119,8 +120,9 @@ export function fearLevelCalculateEffective(
   propagatedFear: number = 0,
   featureReduction: number = 0,
   researchReduction: number = 0,
+  biomeReduction: number = 0,
 ): number {
-  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction - researchReduction + propagatedFear;
+  const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction - researchReduction - biomeReduction + propagatedFear;
   return Math.floor(Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw)));
 }
 
@@ -347,6 +349,7 @@ export function fearLevelGetForRoom(
 
   const featureReduction = featureCalculateFearReduction(placedRoom);
   const researchReduction = researchUnlockGetPassiveBonusWithMastery('fearReduction');
+  const biomeReduction = biomeGetFearReduction(floor.biome);
 
   const effectiveFear = fearLevelCalculateEffective(
     baseFear,
@@ -356,6 +359,7 @@ export function fearLevelGetForRoom(
     0,
     featureReduction,
     researchReduction,
+    biomeReduction,
   );
 
   return {
@@ -365,6 +369,7 @@ export function fearLevelGetForRoom(
     altarAuraReduction,
     featureReduction,
     researchReduction,
+    biomeReduction,
     propagatedFear: 0,
     propagationSources: [],
     effectiveFear,
@@ -441,6 +446,7 @@ export function fearLevelCalculateAllForFloor(
         breakdown.propagatedFear,
         breakdown.featureReduction,
         breakdown.researchReduction,
+        breakdown.biomeReduction,
       );
     }
   }

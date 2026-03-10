@@ -11,6 +11,7 @@ export type FearLevelBreakdown = {
   altarAuraReduction: number;
   featureReduction: number;
   researchReduction: number;
+  biomeReduction: number;
   propagatedFear: number;
   propagationSources: FearPropagationSource[];
   effectiveFear: number;

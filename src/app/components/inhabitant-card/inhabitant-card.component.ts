@@ -8,6 +8,8 @@ import {
 import { HungerIndicatorComponent } from '@components/hunger-indicator/hunger-indicator.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { StatRowComponent } from '@components/stat-row/stat-row.component';
+import { biomeGetContent } from '@helpers/biome';
+import { biomeGetCreatureModifier } from '@helpers/biome-modifiers';
 import { contentGetEntry } from '@helpers/content';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { efficiencyDoesTraitApply } from '@helpers/efficiency';
@@ -31,7 +33,6 @@ import type {
   InhabitantTraitContent,
   MutationTraitContent,
   PlacedRoomId,
-  RoomId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -175,22 +176,22 @@ export class InhabitantCardComponent {
     };
   });
 
-  private resolvedRoomDef = computed(() => {
+  private resolvedRoomContext = computed(() => {
     const roomId = this.synergyRoomId();
     if (!roomId) return undefined;
 
     const floors = floorAll();
-    let roomTypeId: RoomId | undefined;
     for (const floor of floors) {
       const placedRoom = findRoomOnFloor(floor, roomId);
       if (placedRoom) {
-        roomTypeId = placedRoom.roomTypeId;
-        break;
+        const roomDef = productionGetRoomDefinition(placedRoom.roomTypeId);
+        return roomDef ? { roomDef, biome: floor.biome } : undefined;
       }
     }
-    if (!roomTypeId) return undefined;
-    return productionGetRoomDefinition(roomTypeId);
+    return undefined;
   });
+
+  private resolvedRoomDef = computed(() => this.resolvedRoomContext()?.roomDef);
 
   public synergyInfo = computed(() => {
     const roomDef = this.resolvedRoomDef();
@@ -243,19 +244,41 @@ export class InhabitantCardComponent {
       reasons.push(`Preferred work: ${label} (+15%)`);
     }
 
+    // Check biome creature affinity
+    const biome = this.resolvedRoomContext()?.biome;
+    if (biome) {
+      const modifier = biomeGetCreatureModifier(biome, def.type);
+      if (modifier > 1.0) {
+        const biomeName = biomeGetContent(biome)?.name ?? biome;
+        const pct = Math.round((modifier - 1.0) * 100);
+        reasons.push(`Thrives on ${biomeName} floor (+${pct}%)`);
+      }
+    }
+
     return reasons.length > 0 ? reasons : undefined;
   });
 
   public affinityWarning = computed(() => {
-    const roomDef = this.resolvedRoomDef();
-    if (!roomDef) return undefined;
+    const ctx = this.resolvedRoomContext();
+    if (!ctx) return undefined;
 
     const def = this.definition();
-    const affinity = workAffinityGetLabel(def.type, roomDef.workCategory);
-    if (affinity !== 'disliked') return undefined;
+    const warnings: string[] = [];
 
-    const label = roomDef.workCategory ? WORK_CATEGORY_LABELS[roomDef.workCategory] : '';
-    return `Disliked work: ${label} (-25%)`;
+    const affinity = workAffinityGetLabel(def.type, ctx.roomDef.workCategory);
+    if (affinity === 'disliked') {
+      const label = ctx.roomDef.workCategory ? WORK_CATEGORY_LABELS[ctx.roomDef.workCategory] : '';
+      warnings.push(`Disliked work: ${label} (-25%)`);
+    }
+
+    const modifier = biomeGetCreatureModifier(ctx.biome, def.type);
+    if (modifier < 1.0) {
+      const biomeName = biomeGetContent(ctx.biome)?.name ?? ctx.biome;
+      const pct = Math.round((modifier - 1.0) * 100);
+      warnings.push(`Struggles on ${biomeName} floor (${pct}%)`);
+    }
+
+    return warnings.length > 0 ? warnings.join('\n') : undefined;
   });
 
   public equippedTraits = computed(() => {

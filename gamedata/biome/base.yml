@@ -1,0 +1,142 @@
+- id: 15aaba16-fa5a-4adb-81a1-3ff89e1a0d03
+  name: Neutral
+  biomeType: neutral
+  description: Standard underground caverns with no special properties.
+  color: '#6c757d'
+  icon: mountain
+  requiresResearch: false
+  effects: []
+  roomRestrictions: []
+
+- id: 72ba5510-4252-4b20-8428-a34158fef968
+  name: Volcanic
+  biomeType: volcanic
+  description: A scorching cavern with rivers of magma and obsidian formations.
+  color: '#e63946'
+  icon: volcano
+  requiresResearch: false
+  effects:
+    - effectType: defender_attack_multiplier
+      effectValue: 0.20
+      description: Defenders deal +20% attack damage from volcanic heat.
+    - effectType: creature_production_multiplier
+      effectValue: 0.20
+      targetCreatureType: demon
+      description: Demons thrive in hellfire, gaining +20% production.
+    - effectType: creature_production_multiplier
+      effectValue: -0.20
+      targetCreatureType: ooze
+      description: Ooze creatures suffer -20% production in scorching heat.
+  roomRestrictions:
+    - roomId: Underground Lake
+      blocked: true
+    - roomId: Mushroom Grove
+      blocked: true
+
+- id: e3ffd706-705e-44ac-a23b-7dd50f8872e7
+  name: Flooded
+  biomeType: flooded
+  description: Waterlogged tunnels with dripping stalactites and underground pools.
+  color: '#457b9d'
+  icon: droplet
+  requiresResearch: false
+  effects:
+    - effectType: creature_production_multiplier
+      effectValue: 0.25
+      targetCreatureType: ooze
+      description: Ooze creatures thrive in waterlogged tunnels, gaining +25% production.
+    - effectType: creature_production_multiplier
+      effectValue: -0.15
+      targetCreatureType: demon
+      description: Demons' fire is quenched in waterlogged tunnels, suffering -15% production.
+    - effectType: resource_production_multiplier
+      effectValue: 0.15
+      targetResourceType: food
+      description: Abundant water supports +15% food production on this floor.
+  roomRestrictions:
+    - roomId: Soul Well
+      blocked: true
+
+- id: 898eb980-60ec-4206-9652-bde0bf41f805
+  name: Crystal Caverns
+  biomeType: crystal
+  description: Glittering caverns lined with luminous crystal growths.
+  color: '#a8dadc'
+  icon: gem
+  requiresResearch: true
+  effects:
+    - effectType: resource_production_multiplier
+      effectValue: 0.20
+      targetResourceType: crystals
+      description: Crystalline formations boost crystal production by +20% on this floor.
+    - effectType: fear_reduction
+      effectValue: 0.5
+      description: Luminous crystal light reduces fear by 0.5 in all rooms on this floor.
+    - effectType: creature_production_multiplier
+      effectValue: 0.20
+      targetCreatureType: aberration
+      description: Aberrations feed on arcane crystal energy, gaining +20% production.
+    - effectType: creature_production_multiplier
+      effectValue: -0.15
+      targetCreatureType: undead
+      description: Luminous crystal light repels undead, causing -15% production.
+  roomRestrictions:
+    - roomId: Crystal Mine
+      maxPerFloor: 5
+
+- id: 0c0a8a5b-6503-4d91-b0a5-6bdfba887229
+  name: Corrupted
+  biomeType: corrupted
+  description: Dark passages pulsing with malevolent energy and twisted stone.
+  color: '#6a0572'
+  icon: skull
+  requiresResearch: true
+  effects:
+    - effectType: corruption_multiplier
+      effectValue: 0.30
+      description: Malevolent energy amplifies all corruption generation by +30%.
+    - effectType: resource_production_multiplier
+      effectValue: 0.25
+      targetResourceType: essence
+      description: Dark energy channels boost essence production by +25% on this floor.
+    - effectType: creature_production_multiplier
+      effectValue: 0.20
+      targetCreatureType: undead
+      description: Undead flourish in dark energy, gaining +20% production.
+    - effectType: creature_production_multiplier
+      effectValue: -0.15
+      targetCreatureType: creature
+      description: Normal creatures sicken in corrupted passages, suffering -15% production.
+  roomRestrictions:
+    - roomId: Mushroom Grove
+      blocked: true
+    - roomId: Underground Lake
+      blocked: true
+
+- id: 08a1f006-e52d-4ec8-9800-4010e5cf3642
+  name: Fungal
+  biomeType: fungal
+  description: Damp caves carpeted with bioluminescent mushrooms and spore clouds.
+  color: '#2d6a4f'
+  icon: mushroom
+  requiresResearch: false
+  effects:
+    - effectType: resource_production_multiplier
+      effectValue: 0.10
+      targetResourceType: food
+      description: Edible fungi supplement food production by +10% on this floor.
+    - effectType: invader_attack_multiplier
+      effectValue: -0.15
+      description: Toxic spore clouds reduce invader attack by 15%.
+    - effectType: invader_defense_multiplier
+      effectValue: -0.10
+      description: Disorienting spores reduce invader defense by 10%.
+    - effectType: creature_production_multiplier
+      effectValue: 0.15
+      targetCreatureType: fungal
+      description: Fungal beings are at home here, gaining +15% production.
+    - effectType: creature_production_multiplier
+      effectValue: -0.15
+      targetCreatureType: dragon
+      description: Large dragons are hindered in dense fungal growth, suffering -15% production.
+  roomRestrictions: []

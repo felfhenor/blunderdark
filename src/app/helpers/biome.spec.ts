@@ -1,16 +1,51 @@
-import { biomeIsUnlocked } from '@helpers/biome';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BiomeContent } from '@interfaces/content-biome';
 
+const mockBiomeEntries: BiomeContent[] = [];
 const mockIsBiomeUnlocked = vi.fn();
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntriesByType: vi.fn(() => mockBiomeEntries),
+}));
 
 vi.mock('@helpers/research-unlocks', () => ({
   researchUnlockIsBiomeUnlocked: (...args: unknown[]) =>
     mockIsBiomeUnlocked(...args),
 }));
 
+// Must import after mocks
+import { biomeIsUnlocked, biomeResetCache } from '@helpers/biome';
+
+function makeBiome(name: string, biomeType: string, requiresResearch: boolean): BiomeContent {
+  return {
+    id: `mock-${biomeType}`,
+    __type: 'biome',
+    name,
+    biomeType,
+    description: '',
+    color: '#000',
+    icon: '',
+    requiresResearch,
+    effects: [],
+    roomRestrictions: [],
+  } as unknown as BiomeContent;
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockIsBiomeUnlocked.mockReturnValue(false);
+
+  mockBiomeEntries.length = 0;
+  mockBiomeEntries.push(
+    makeBiome('Neutral', 'neutral', false),
+    makeBiome('Volcanic', 'volcanic', false),
+    makeBiome('Flooded', 'flooded', false),
+    makeBiome('Fungal', 'fungal', false),
+    makeBiome('Crystal Caverns', 'crystal', true),
+    makeBiome('Corrupted', 'corrupted', true),
+  );
+
+  biomeResetCache();
 });
 
 describe('biomeIsUnlocked', () => {

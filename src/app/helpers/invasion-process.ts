@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
+import { biomeGetCombatModifier } from '@helpers/biome-modifiers';
 import { combatAbilityInitStates } from '@helpers/combat-abilities';
 import { contentGetEntry } from '@helpers/content';
 import { interrogationBuffGetTotals } from '@helpers/torture-chamber';
@@ -844,8 +845,12 @@ export function invasionProcess(state: GameState): void {
         const interrogationAttackMul = 1 + interrogationTotals.attackBonusPercent / 100;
         const interrogationDefenseMul = 1 + interrogationTotals.defenseBonusPercent / 100;
 
-        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul));
-        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul));
+        // Apply biome combat bonuses (e.g. volcanic fire damage bonus)
+        const biomeDefAttackMul = biomeGetCombatModifier(currentFloor.biome, 'defender', 'attack');
+        const biomeDefDefenseMul = biomeGetCombatModifier(currentFloor.biome, 'defender', 'defense');
+
+        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul * biomeDefAttackMul));
+        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul * biomeDefDefenseMul));
 
         // Initialize ability states from content definition if not already set
         const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);
@@ -866,6 +871,8 @@ export function invasionProcess(state: GameState): void {
       );
       const focusedBonus = (invasion.unreachableObjectiveCount ?? 0) * FOCUSED_ASSAULT_ATTACK_BONUS;
       const threatStatBonus = invasionThreatGetStatBonus(invasion.profile.threatLevel);
+      const biomeInvAttackMul = biomeGetCombatModifier(currentFloor.biome, 'invader', 'attack');
+      const biomeInvDefenseMul = biomeGetCombatModifier(currentFloor.biome, 'invader', 'defense');
       const invaderCombatants = livingInvaderInstances.map((inv, idx) => {
         const invDef = invaderGetDefinitionById(inv.definitionId);
         const baseAttack = invDef?.baseStats.attack ?? 5;
@@ -873,6 +880,8 @@ export function invasionProcess(state: GameState): void {
         const baseSpeed = invDef?.baseStats.speed ?? 5;
         const baseHp = invasion.invaderHpMap[inv.id] ?? inv.currentHp;
         const baseMaxHp = inv.maxHp;
+        const scaledAttack = baseAttack + focusedBonus + Math.round(baseAttack * threatStatBonus);
+        const scaledDefense = baseDefense + Math.round(baseDefense * threatStatBonus);
         return invasionCombatCreateCombatant(
           inv.id as unknown as CombatantId,
           'invader',
@@ -880,8 +889,8 @@ export function invasionProcess(state: GameState): void {
           {
             hp: baseHp + Math.round(baseHp * threatStatBonus),
             maxHp: baseMaxHp + Math.round(baseMaxHp * threatStatBonus),
-            attack: baseAttack + focusedBonus + Math.round(baseAttack * threatStatBonus),
-            defense: baseDefense + Math.round(baseDefense * threatStatBonus),
+            attack: Math.max(0, Math.round(scaledAttack * biomeInvAttackMul)),
+            defense: Math.max(0, Math.round(scaledDefense * biomeInvDefenseMul)),
             speed: baseSpeed,
           },
           { x: idx + roomDefenders.length + 1, y: 0 },

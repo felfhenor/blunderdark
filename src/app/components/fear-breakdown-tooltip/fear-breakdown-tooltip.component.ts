@@ -39,6 +39,11 @@ import type { FearLevelBreakdown } from '@interfaces';
         Research: -{{ breakdown().researchReduction | number: '1.0-2' }}
       </div>
     }
+    @if (breakdown().biomeReduction !== 0) {
+      <div class="text-xs text-success">
+        Crystal Light: -{{ breakdown().biomeReduction | number: '1.0-2' }}
+      </div>
+    }
     @if (breakdown().propagatedFear !== 0) {
       <div class="text-xs text-error">
         Adjacent: +{{ breakdown().propagatedFear | number: '1.0-2' }}

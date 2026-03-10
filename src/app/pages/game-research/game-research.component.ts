@@ -35,7 +35,7 @@ import type {
   RoomUpgradeContent,
   UnlockEffect,
 } from '@interfaces';
-import { BIOME_DATA } from '@interfaces/biome';
+import { biomeGetContent } from '@helpers/biome';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SFXDirective } from '@directives/sfx.directive';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -337,7 +337,7 @@ export class GameResearchComponent {
       case 'feature_flag':
         return { type: 'Feature', name: unlock.description, description: '' };
       case 'biome': {
-        const biome = BIOME_DATA[unlock.targetBiome];
+        const biome = biomeGetContent(unlock.targetBiome);
         return {
           type: 'Biome',
           name: biome?.name ?? 'Unknown',

@@ -1,11 +1,15 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { analyticsSendDesignEvent } from '@helpers/analytics';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { SFXDirective } from '@directives/sfx.directive';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
   biomeIsUnlocked,
   cameraFocusOnTile,
@@ -30,9 +34,14 @@ import {
   gridSearchQuery,
   gridSelectTile,
 } from '@helpers';
-import type { FloorDepthResourceModifier } from '@interfaces/floor-modifier';
-import { BIOME_DATA, type BiomeType, type Floor, type FloorId } from '@interfaces';
+import { analyticsSendDesignEvent } from '@helpers/analytics';
+import { biomeGetContent } from '@helpers/biome';
+import { biomeGetAllEffects } from '@helpers/biome-modifiers';
+import type { BiomeType, Floor, FloorId } from '@interfaces';
+import type { BiomeEffect } from '@interfaces/content-biome';
 import { MAX_FLOORS } from '@interfaces/floor';
+import type { FloorDepthResourceModifier } from '@interfaces/floor-modifier';
+import { TippyDirective } from '@ngneat/helipopper';
 
 type BiomeOption = {
   value: BiomeType;
@@ -43,12 +52,21 @@ type BiomeOption = {
 
 @Component({
   selector: 'app-panel-floor-selector',
-  imports: [DecimalPipe, FormsModule, CurrencyCostComponent, CurrencyNameComponent, ModalComponent, SFXDirective],
+  imports: [
+    DecimalPipe,
+    FormsModule,
+    CurrencyCostComponent,
+    CurrencyNameComponent,
+    ModalComponent,
+    SFXDirective,
+    TippyDirective,
+  ],
   templateUrl: './panel-floor-selector.component.html',
   styleUrl: './panel-floor-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelFloorSelectorComponent {
+  private titleCasePipe = new TitleCasePipe();
   public floors = floorAll;
   public currentIndex = floorCurrentIndex;
   public selectedFloor = floorCurrent;
@@ -76,14 +94,17 @@ export class PanelFloorSelectorComponent {
   ];
 
   public biomeOptions = computed<BiomeOption[]>(() => {
-    return PanelFloorSelectorComponent.ALL_BIOME_TYPES
-      .filter((type) => biomeIsUnlocked(type))
-      .map((type) => ({
+    return PanelFloorSelectorComponent.ALL_BIOME_TYPES.filter((type) =>
+      biomeIsUnlocked(type),
+    ).map((type) => {
+      const data = biomeGetContent(type);
+      return {
         value: type,
-        name: BIOME_DATA[type].name,
-        description: BIOME_DATA[type].description,
-        color: BIOME_DATA[type].color,
-      }));
+        name: data?.name ?? type,
+        description: data?.description ?? '',
+        color: data?.color ?? '#6c757d',
+      };
+    });
   });
 
   public changeBiomeValidation = computed(() => {
@@ -99,8 +120,13 @@ export class PanelFloorSelectorComponent {
 
   public selectedFloorBiome = computed(() => {
     const floor = this.selectedFloor();
-    if (!floor) return BIOME_DATA.neutral;
-    return BIOME_DATA[floor.biome];
+    return biomeGetContent(floor?.biome ?? 'neutral');
+  });
+
+  public biomeEffects = computed(() => {
+    const floor = this.selectedFloor();
+    if (!floor) return [];
+    return biomeGetAllEffects(floor.biome);
   });
 
   public depthModifiers = computed<FloorDepthResourceModifier[]>(() => {
@@ -136,7 +162,7 @@ export class PanelFloorSelectorComponent {
   });
 
   public getBiomeData(biome: BiomeType) {
-    return BIOME_DATA[biome];
+    return biomeGetContent(biome);
   }
 
   public getBiomeIcon(biome: BiomeType): string {
@@ -218,6 +244,52 @@ export class PanelFloorSelectorComponent {
     this.showRemoveModal.set(false);
   }
 
+  public getEffectCurrencyType(effect: BiomeEffect): string | undefined {
+    if (effect.targetResourceType) return effect.targetResourceType;
+    if (effect.effectType === 'corruption_multiplier') return 'corruption';
+    return undefined;
+  }
+
+  public getEffectSuffix(effect: BiomeEffect): string | undefined {
+    if (effect.effectType === 'creature_production_multiplier') {
+      return effect.targetCreatureType ?? 'Creature';
+    }
+    return undefined;
+  }
+
+  public getEffectLabel(effect: BiomeEffect): string {
+    const labels: Record<string, string> = {
+      defender_attack_multiplier: 'Def. Attack',
+      defender_defense_multiplier: 'Def. Defense',
+      invader_attack_multiplier: 'Inv. Attack',
+      invader_defense_multiplier: 'Inv. Defense',
+      fear_reduction: 'Fear',
+      creature_production_multiplier:
+        this.titleCasePipe.transform(effect.targetCreatureType ?? 'Creature') +
+        ' Prod.',
+    };
+    return labels[effect.effectType] ?? effect.effectType;
+  }
+
+  public formatEffectValue(effect: BiomeEffect): string {
+    const value =
+      effect.effectType === 'fear_reduction'
+        ? -effect.effectValue
+        : effect.effectValue;
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${(value * 100).toFixed(0)}%`;
+  }
+
+  public isEffectPositive(effect: BiomeEffect): boolean {
+    if (effect.effectType === 'fear_reduction') return true;
+    return effect.effectValue > 0;
+  }
+
+  public isEffectNegative(effect: BiomeEffect): boolean {
+    if (effect.effectType === 'fear_reduction') return false;
+    return effect.effectValue < 0;
+  }
+
   public formatModifier(percentage: number): string {
     return floorModifierFormatPercentage(percentage);
   }
@@ -225,5 +297,4 @@ export class PanelFloorSelectorComponent {
   public trackByFloorId(_index: number, floor: Floor): string {
     return floor.id;
   }
-
 }

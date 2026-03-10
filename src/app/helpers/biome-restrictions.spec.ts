@@ -1,11 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BiomeType, Floor, FloorId, PlacedRoomId, RoomId, RoomShapeId } from '@interfaces';
-import {
-  BIOME_RESTRICTION_MAP,
-  biomeRestrictionCanBuild,
-  biomeRestrictionCountRoomType,
-  biomeRestrictionGetRoomInfo,
-} from '@helpers/biome-restrictions';
+import type { BiomeContent } from '@interfaces/content-biome';
 
 // Test-local room type IDs
 const CRYSTAL_MINE_ID = 'aa100001-0001-0001-0001-000000000002';
@@ -16,15 +11,41 @@ const THRONE_ROOM_ID = 'aa100001-0001-0001-0001-000000000001';
 const BARRACKS_ID = 'aa100001-0001-0001-0001-000000000007';
 
 const mockContent = new Map<string, unknown>();
+const mockBiomes = new Map<string, BiomeContent>();
 
 function registerRoom(id: string, name: string): void {
   mockContent.set(id, { id, name, __type: 'room' });
+}
+
+function makeBiome(name: string, biomeType: string, restrictions: BiomeContent['roomRestrictions']): BiomeContent {
+  return {
+    id: `mock-${biomeType}`,
+    __type: 'biome',
+    name,
+    biomeType,
+    description: '',
+    color: '#000',
+    icon: '',
+    requiresResearch: false,
+    effects: [],
+    roomRestrictions: restrictions,
+  } as unknown as BiomeContent;
 }
 
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn((id: string) => mockContent.get(id)),
   contentGetEntriesByType: vi.fn(() => []),
 }));
+
+vi.mock('@helpers/biome', () => ({
+  biomeGetContent: vi.fn((biome: string) => mockBiomes.get(biome)),
+}));
+
+import {
+  biomeRestrictionCanBuild,
+  biomeRestrictionCountRoomType,
+  biomeRestrictionGetRoomInfo,
+} from '@helpers/biome-restrictions';
 
 function makeFloor(
   biome: BiomeType = 'neutral',
@@ -52,46 +73,31 @@ function makeFloor(
 
 beforeEach(() => {
   mockContent.clear();
+  mockBiomes.clear();
+
   registerRoom(CRYSTAL_MINE_ID, 'Crystal Mine');
   registerRoom(MUSHROOM_GROVE_ID, 'Mushroom Grove');
   registerRoom(SOUL_WELL_ID, 'Soul Well');
   registerRoom(UNDERGROUND_LAKE_ID, 'Underground Lake');
   registerRoom(THRONE_ROOM_ID, 'Throne Room');
   registerRoom(BARRACKS_ID, 'Barracks');
-});
 
-// --- Restriction data ---
-
-describe('BIOME_RESTRICTION_MAP', () => {
-  it('should have restrictions defined for volcanic biome', () => {
-    const rules = BIOME_RESTRICTION_MAP['volcanic'];
-    expect(rules['Underground Lake']).toEqual({ blocked: true });
-    expect(rules['Mushroom Grove']).toEqual({ blocked: true });
-  });
-
-  it('should have restrictions defined for flooded biome', () => {
-    const rules = BIOME_RESTRICTION_MAP['flooded'];
-    expect(rules['Soul Well']).toEqual({ blocked: true });
-  });
-
-  it('should have restrictions defined for crystal biome', () => {
-    const rules = BIOME_RESTRICTION_MAP['crystal'];
-    expect(rules['Crystal Mine']).toEqual({ maxPerFloor: 5 });
-  });
-
-  it('should have restrictions defined for corrupted biome', () => {
-    const rules = BIOME_RESTRICTION_MAP['corrupted'];
-    expect(rules['Mushroom Grove']).toEqual({ blocked: true });
-    expect(rules['Underground Lake']).toEqual({ blocked: true });
-  });
-
-  it('should have no restrictions for fungal biome', () => {
-    expect(Object.keys(BIOME_RESTRICTION_MAP['fungal'])).toHaveLength(0);
-  });
-
-  it('should have no restrictions for neutral biome', () => {
-    expect(Object.keys(BIOME_RESTRICTION_MAP['neutral'])).toHaveLength(0);
-  });
+  mockBiomes.set('volcanic', makeBiome('Volcanic', 'volcanic', [
+    { roomId: 'Underground Lake', blocked: true },
+    { roomId: 'Mushroom Grove', blocked: true },
+  ]));
+  mockBiomes.set('flooded', makeBiome('Flooded', 'flooded', [
+    { roomId: 'Soul Well', blocked: true },
+  ]));
+  mockBiomes.set('crystal', makeBiome('Crystal Caverns', 'crystal', [
+    { roomId: 'Crystal Mine', maxPerFloor: 5 },
+  ]));
+  mockBiomes.set('corrupted', makeBiome('Corrupted', 'corrupted', [
+    { roomId: 'Mushroom Grove', blocked: true },
+    { roomId: 'Underground Lake', blocked: true },
+  ]));
+  mockBiomes.set('fungal', makeBiome('Fungal', 'fungal', []));
+  mockBiomes.set('neutral', makeBiome('Neutral', 'neutral', []));
 });
 
 // --- biomeRestrictionCountRoomType ---
