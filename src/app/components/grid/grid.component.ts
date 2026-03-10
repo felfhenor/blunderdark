@@ -41,6 +41,7 @@ import {
   inhabitantAll,
   notifyError,
   productionGetRoomDefinition,
+  roomMeeplesFlat,
   roomMoveActive,
   roomMoveCancel,
   roomMoveExecute,
@@ -927,6 +928,10 @@ export class GridComponent implements AfterViewInit {
       gridDeselectTile();
     }
   }
+
+  // --- Room meeples ---
+
+  public meeples = roomMeeplesFlat;
 
   // --- Floating production bubbles ---
 

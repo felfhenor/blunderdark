@@ -1,5 +1,6 @@
 import {
   gameMantrap,
+  gameMeeple,
   gameChoppedSkull,
   game3dStairs,
   gameAlarmClock,
@@ -54,6 +55,7 @@ import {
 
 export const ICON_ALL = {
   gameMantrap,
+  gameMeeple,
   gameChoppedSkull,
   game3dStairs,
   gameAlarmClock,

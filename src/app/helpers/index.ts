@@ -85,6 +85,7 @@ export * from './resource-icons';
 export * from './resources';
 export * from './rng';
 export * from './room-lookup';
+export * from './room-meeples';
 export * from './room-move';
 export * from './room-placement';
 export * from './room-removal';

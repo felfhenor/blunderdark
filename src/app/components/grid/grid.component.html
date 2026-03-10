@@ -211,6 +211,28 @@
       }
     }
 
+    @for (meeple of meeples(); track meeple.id) {
+      <div
+        class="room-meeple"
+        [class.meeple-active]="meeple.isActive"
+        [class.meeple-idle]="!meeple.isActive"
+        [style.left.px]="meeple.tileLeftPx"
+        [style.top.px]="meeple.tileTopPx"
+        [style.--ox0.px]="meeple.ox0"
+        [style.--oy0.px]="meeple.oy0"
+        [style.--ox1.px]="meeple.ox1"
+        [style.--oy1.px]="meeple.oy1"
+        [style.--ox2.px]="meeple.ox2"
+        [style.--oy2.px]="meeple.oy2"
+        [style.--ox3.px]="meeple.ox3"
+        [style.--oy3.px]="meeple.oy3"
+        [style.animation-duration.s]="meeple.wanderDuration"
+        [style.animation-delay.s]="meeple.wanderDelay"
+      >
+        <app-icon name="gameMeeple" size="14px" />
+      </div>
+    }
+
     @for (bubble of activeBubbles(); track bubble.id) {
       <div
         class="floating-bubble"

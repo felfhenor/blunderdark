@@ -534,6 +534,39 @@
   }
 }
 
+// --- Room meeples ---
+@keyframes meeple-wander {
+  0% { transform: translate(var(--ox0), var(--oy0)); }
+  25% { transform: translate(var(--ox1), var(--oy1)); }
+  50% { transform: translate(var(--ox2), var(--oy2)); }
+  75% { transform: translate(var(--ox3), var(--oy3)); }
+  100% { transform: translate(var(--ox0), var(--oy0)); }
+}
+
+.room-meeple {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  will-change: transform;
+  contain: layout style;
+  animation: meeple-wander 5s ease-in-out infinite;
+
+  &.meeple-active {
+    color: oklch(0.9 0.1 60);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 3px oklch(0.7 0.2 60 / 0.7));
+  }
+
+  &.meeple-idle {
+    color: oklch(0.75 0.04 260);
+    opacity: 0.5;
+  }
+}
+
+.game-paused .room-meeple {
+  animation-play-state: paused;
+}
+
 @keyframes bubble-float { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -30px); } }
 
 .floating-bubble {

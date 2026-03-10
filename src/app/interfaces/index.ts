@@ -63,6 +63,7 @@ export * from './reputation';
 export * from './research';
 export * from './resource';
 export * from './room';
+export * from './room-meeple';
 export * from './room-placement';
 export * from './room-removal';
 export * from './room-shape';
