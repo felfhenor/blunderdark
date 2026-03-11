@@ -50,20 +50,42 @@
       @if (showHunger()) {
         <app-hunger-indicator [inhabitantId]="instance().instanceId" />
       }
-      @if (synergyInfo(); as reasons) {
-        <span class="text-success flex-shrink-0" [tp]="synergyTip">
-          <app-icon name="tablerStar" size="14px" />
-        </span>
-        <ng-template #synergyTip>
-          @for (reason of reasons; track reason) {
-            <div class="text-xs">{{ reason }}</div>
+      @if (synergyRoomId()) {
+        <span class="w-[14px] flex-shrink-0">
+          @if (synergyInfo(); as reasons) {
+            <span class="text-success" [tp]="synergyTip">
+              <app-icon name="tablerStar" size="14px" />
+            </span>
+            <ng-template #synergyTip>
+              @for (reason of reasons; track reason) {
+                <div class="text-xs">{{ reason }}</div>
+              }
+            </ng-template>
           }
-        </ng-template>
-      }
-      @if (affinityWarning(); as warning) {
-        <span class="text-error flex-shrink-0" [tp]="warning">
-          <app-icon name="tablerExclamationCircle" size="14px" />
         </span>
+        <span class="w-[14px] flex-shrink-0">
+          @if (affinityWarning(); as warning) {
+            <span class="text-error" [tp]="warning">
+              <app-icon name="tablerExclamationCircle" size="14px" />
+            </span>
+          }
+        </span>
+      } @else {
+        @if (synergyInfo(); as reasons) {
+          <span class="text-success flex-shrink-0" [tp]="synergyTip">
+            <app-icon name="tablerStar" size="14px" />
+          </span>
+          <ng-template #synergyTip>
+            @for (reason of reasons; track reason) {
+              <div class="text-xs">{{ reason }}</div>
+            }
+          </ng-template>
+        }
+        @if (affinityWarning(); as warning) {
+          <span class="text-error flex-shrink-0" [tp]="warning">
+            <app-icon name="tablerExclamationCircle" size="14px" />
+          </span>
+        }
       }
     </div>
     @if (showStats()) {
