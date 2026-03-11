@@ -26,7 +26,7 @@ export const cameraZoom = signal(1);
 export const cameraViewportSize = signal({ width: 0, height: 0 });
 export const cameraIsAnimating = signal(false);
 
-// Effective minimum zoom: fit the entire grid in the viewport
+// Effective minimum zoom: allow zooming slightly beyond the grid-fit level
 export const cameraEffectiveMinZoom = computed(() => {
   const vp = cameraViewportSize();
   if (vp.width === 0 || vp.height === 0) return 0.5;
@@ -34,7 +34,7 @@ export const cameraEffectiveMinZoom = computed(() => {
     vp.width / CAMERA_GRID_TOTAL,
     vp.height / CAMERA_GRID_TOTAL,
   );
-  return Math.max(CAMERA_HARD_MIN_ZOOM, fitZoom);
+  return Math.max(CAMERA_HARD_MIN_ZOOM, fitZoom * 0.8);
 });
 
 // CSS transform string for the grid container
