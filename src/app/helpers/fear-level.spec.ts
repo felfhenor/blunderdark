@@ -41,6 +41,8 @@ import {
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { altarRoomIsAdjacent, altarRoomGetFearReductionAura } from '@helpers/altar-room';
 import { roomShapeGetAbsoluteTiles } from '@helpers/room-shapes';
+import { legendaryAuraGetBonus } from '@helpers/legendary-inhabitant';
+import type { TraitEffectType } from '@interfaces/content-inhabitanttrait';
 
 // --- Mocks ---
 
@@ -70,6 +72,10 @@ vi.mock('@helpers/altar-room', () => ({
 
 vi.mock('@helpers/production', () => ({
   productionGetRoomDefinition: vi.fn((id: string) => mockContent.get(id)),
+}));
+
+vi.mock('@helpers/legendary-inhabitant', () => ({
+  legendaryAuraGetBonus: vi.fn((): number => 0),
 }));
 
 vi.mock('@helpers/throne-room', () => ({
@@ -162,6 +168,7 @@ beforeEach(() => {
   vi.mocked(roomUpgradeGetAppliedEffects).mockReturnValue([]);
   vi.mocked(altarRoomIsAdjacent).mockReturnValue(false);
   vi.mocked(altarRoomGetFearReductionAura).mockReturnValue(0);
+  vi.mocked(legendaryAuraGetBonus).mockReturnValue(0);
 
   registerInhabitantDef('def-goblin', 0);
   registerInhabitantDef('def-skeleton', 1);
@@ -738,6 +745,46 @@ describe('fearLevelGetForRoom', () => {
 
     expect(result.altarAuraReduction).toBe(0);
     expect(result.effectiveFear).toBe(3);
+  });
+
+  it('should apply aura_fear_bonus as multiplicative bonus on base fear', () => {
+    // Mock legendaryAuraGetBonus to return 0.20 for aura_fear_bonus
+    vi.mocked(legendaryAuraGetBonus).mockImplementation(
+      (_inhabitants: unknown, effectType: TraitEffectType): number => {
+        if (effectType === 'aura_fear_bonus') return 0.20;
+        return 0;
+      },
+    );
+
+    const room = makePlacedRoom();
+    const roomDef = { fearLevel: 2 } as RoomContent;
+    const floor = makeFloor({ rooms: [room] });
+
+    const result = fearLevelGetForRoom(floor, room, roomDef);
+
+    // base fear 2 * (1 + 0.20) = 2.4
+    expect(result.baseFear).toBeCloseTo(2.4);
+    expect(result.effectiveFear).toBe(2); // floor(2.4) = 2
+  });
+
+  it('should stack aura_fear_bonus with aura_fear_multiplier', () => {
+    vi.mocked(legendaryAuraGetBonus).mockImplementation(
+      (_inhabitants: unknown, effectType: TraitEffectType): number => {
+        if (effectType === 'aura_fear_multiplier') return 0.10;
+        if (effectType === 'aura_fear_bonus') return 0.20;
+        return 0;
+      },
+    );
+
+    const room = makePlacedRoom();
+    const roomDef = { fearLevel: 2 } as RoomContent;
+    const floor = makeFloor({ rooms: [room] });
+
+    const result = fearLevelGetForRoom(floor, room, roomDef);
+
+    // base 2 * 1.10 (aura_fear_multiplier) * 1.20 (aura_fear_bonus) = 2.64
+    expect(result.baseFear).toBeCloseTo(2.64);
+    expect(result.effectiveFear).toBe(2); // floor(2.64) = 2
   });
 
   it('should integrate all modifiers together', () => {

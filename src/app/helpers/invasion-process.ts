@@ -1432,7 +1432,7 @@ function processAbilityResult(
     const { effectType, damage, statusApplied, statusDuration, targetIds, targetsHit, targetType } = effect;
 
     // Handle Scout effect
-    if (effectType === 'Scout Effect' || effectType === 'Scout') {
+    if (effectType === 'Scout Effect') {
       const allInhabitants = gamestate()?.world?.inhabitants ?? [];
       const negateScout = legendaryAuraGetBonus(allInhabitants, 'aura_negate_scout');
       if (negateScout > 0) {
@@ -1496,7 +1496,7 @@ function processAbilityResult(
     }
 
     // Handle heal
-    if (effectType === 'Heal Effect' || effectType === 'Heal') {
+    if (effectType === 'Heal Effect') {
       const targetName = invasion.currentRoomTurnQueue?.combatants.find((c) => targetIds.includes(c.id as string))?.name ?? 'ally';
       invasion.battleLog.push({
         turn: invasion.currentTurn,

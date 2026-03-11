@@ -12,14 +12,11 @@ export type CombatAbilityEffectType =
   | 'Evasion'
   | 'Resurrect'
   | 'Heal Effect'
-  | 'Heal'
   | 'Disarm'
   | 'Magic Damage'
   | 'Dispel Effect'
-  | 'Dispel'
   | 'Fear Immunity'
   | 'Scout Effect'
-  | 'Scout'
   | 'Mark';
 
 export type CombatAbilityEffect = {

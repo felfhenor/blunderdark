@@ -291,7 +291,13 @@ export function fearLevelGetForRoom(
 
   // Legendary aura fear bonus (multiplicative on base fear)
   const allInhabitants = gamestate()?.world?.inhabitants ?? [];
-  const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_multiplier');
+  const fearAuraMultiplier = legendaryAuraGetBonus(allInhabitants, 'aura_fear_multiplier');
+  if (fearAuraMultiplier !== 0) {
+    baseFear *= 1 + fearAuraMultiplier;
+  }
+
+  // Legendary aura fear bonus (multiplicative on base fear, e.g. Medusa's Dread Gaze)
+  const fearAuraBonus = legendaryAuraGetBonus(allInhabitants, 'aura_fear_bonus');
   if (fearAuraBonus !== 0) {
     baseFear *= 1 + fearAuraBonus;
   }

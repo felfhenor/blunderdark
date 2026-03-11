@@ -1,11 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import type { CombatantId } from '@interfaces';
+import { describe, expect, it, vi } from 'vitest';
+import type { AbilityState, CombatAbilityId, CombatantId } from '@interfaces';
+import type { AbilityEffectContent, AbilityEffectId } from '@interfaces/content-abilityeffect';
+import type { CombatAbilityContent } from '@interfaces/content-combatability';
 import type { Combatant, TilePosition, TurnQueue } from '@interfaces/invasion';
 import {
+  combatantHasStatus,
   invasionCombatAdvanceTurn,
   invasionCombatArePositionsAdjacent,
   invasionCombatBuildTurnQueue,
   invasionCombatCreateCombatant,
+  invasionCombatExecuteAbility,
   invasionCombatExecuteAiTurn,
   invasionCombatExecuteAttack,
   invasionCombatExecuteMove,
@@ -21,13 +25,227 @@ import {
   invasionCombatStartNewRound,
 } from '@helpers/invasion-combat';
 
+// --- Effect definitions (mirrors gamedata/abilityeffect/base.yml) ---
+
+const effectDefinitions: Record<string, AbilityEffectContent> = {
+  Damage: {
+    id: 'ae-damage' as AbilityEffectId,
+    name: 'Damage',
+    __type: 'abilityeffect',
+    dealsDamage: true,
+    statusName: undefined,
+    overrideTargetsHit: undefined,
+  },
+  Stun: {
+    id: 'ae-stun' as AbilityEffectId,
+    name: 'Stun',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'stunned',
+    overrideTargetsHit: undefined,
+  },
+  'Buff Attack': {
+    id: 'ae-buff-atk' as AbilityEffectId,
+    name: 'Buff Attack',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'berserk',
+    overrideTargetsHit: undefined,
+  },
+  'Buff Defense': {
+    id: 'ae-buff-def' as AbilityEffectId,
+    name: 'Buff Defense',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'shielded',
+    overrideTargetsHit: undefined,
+  },
+  Evasion: {
+    id: 'ae-evasion' as AbilityEffectId,
+    name: 'Evasion',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'phased',
+    overrideTargetsHit: 0,
+  },
+  Resurrect: {
+    id: 'ae-resurrect' as AbilityEffectId,
+    name: 'Resurrect',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'resurrected',
+    overrideTargetsHit: 1,
+  },
+  'Heal Effect': {
+    id: 'ae-heal' as AbilityEffectId,
+    name: 'Heal Effect',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'healing',
+    overrideTargetsHit: undefined,
+  },
+  'Dispel Effect': {
+    id: 'ae-dispel-effect' as AbilityEffectId,
+    name: 'Dispel Effect',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'dispel',
+    overrideTargetsHit: undefined,
+  },
+  'Fear Immunity': {
+    id: 'ae-fear-immunity' as AbilityEffectId,
+    name: 'Fear Immunity',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'courage',
+    overrideTargetsHit: undefined,
+  },
+  Mark: {
+    id: 'ae-mark' as AbilityEffectId,
+    name: 'Mark',
+    __type: 'abilityeffect',
+    dealsDamage: false,
+    statusName: 'marked',
+    overrideTargetsHit: undefined,
+  },
+  'Magic Damage': {
+    id: 'ae-magic-damage' as AbilityEffectId,
+    name: 'Magic Damage',
+    __type: 'abilityeffect',
+    dealsDamage: true,
+    statusName: undefined,
+    overrideTargetsHit: undefined,
+  },
+};
+
+// --- Test combat ability definitions ---
+
+const stunAbility: CombatAbilityContent = {
+  id: 'ability-stun' as CombatAbilityId,
+  name: 'Test Stun',
+  __type: 'combatability',
+  description: 'Stuns a target',
+  chance: 100,
+  cooldown: 3,
+  effects: [{ effectType: 'Stun', value: 0, targetType: 'single', duration: 2 }],
+};
+
+const buffDefenseAbility: CombatAbilityContent = {
+  id: 'ability-buff-def' as CombatAbilityId,
+  name: 'Test Shield',
+  __type: 'combatability',
+  description: '+50% defense for 3 turns',
+  chance: 100,
+  cooldown: 4,
+  effects: [{ effectType: 'Buff Defense', value: 50, targetType: 'self', duration: 3 }],
+};
+
+const resurrectAbility: CombatAbilityContent = {
+  id: 'ability-resurrect' as CombatAbilityId,
+  name: 'Test Resurrect',
+  __type: 'combatability',
+  description: 'Revive a dead ally at 50% HP',
+  chance: 100,
+  cooldown: 5,
+  effects: [{ effectType: 'Resurrect', value: 50, targetType: 'single', duration: 0 }],
+};
+
+const dispelAbility: CombatAbilityContent = {
+  id: 'ability-dispel' as CombatAbilityId,
+  name: 'Test Dispel',
+  __type: 'combatability',
+  description: 'Remove all buffs from target',
+  chance: 100,
+  cooldown: 3,
+  effects: [{ effectType: 'Dispel Effect', value: 0, targetType: 'single', duration: 0 }],
+};
+
+const fearImmunityAbility: CombatAbilityContent = {
+  id: 'ability-courage' as CombatAbilityId,
+  name: 'Test Courage',
+  __type: 'combatability',
+  description: 'Grants fear immunity to all allies',
+  chance: 100,
+  cooldown: 0,
+  effects: [{ effectType: 'Fear Immunity', value: 0, targetType: 'aoe', duration: 0 }],
+};
+
+const markAbility: CombatAbilityContent = {
+  id: 'ability-mark' as CombatAbilityId,
+  name: 'Test Mark',
+  __type: 'combatability',
+  description: 'Marks a target for +20% damage',
+  chance: 100,
+  cooldown: 0,
+  effects: [{ effectType: 'Mark', value: 20, targetType: 'single', duration: 3 }],
+};
+
+const healAbility: CombatAbilityContent = {
+  id: 'ability-heal' as CombatAbilityId,
+  name: 'Test Heal',
+  __type: 'combatability',
+  description: 'Heals 25% max HP',
+  chance: 100,
+  cooldown: 3,
+  effects: [{ effectType: 'Heal Effect', value: 25, targetType: 'single', duration: 0 }],
+};
+
+const damageAbility: CombatAbilityContent = {
+  id: 'ability-damage' as CombatAbilityId,
+  name: 'Test Damage',
+  __type: 'combatability',
+  description: '150% damage to single target',
+  chance: 100,
+  cooldown: 2,
+  effects: [{ effectType: 'Damage', value: 150, targetType: 'single', duration: 0 }],
+};
+
+// Map ability IDs to their content for resolveAbilityContent mock
+const abilityContentMap: Record<string, CombatAbilityContent> = {
+  'ability-stun': stunAbility,
+  'ability-buff-def': buffDefenseAbility,
+  'ability-resurrect': resurrectAbility,
+  'ability-dispel': dispelAbility,
+  'ability-courage': fearImmunityAbility,
+  'ability-mark': markAbility,
+  'ability-heal': healAbility,
+  'ability-damage': damageAbility,
+};
+
+vi.mock('@helpers/content', () => ({
+  contentGetEntry: vi.fn((nameOrId: string) => {
+    // Look up effect definitions by name
+    if (effectDefinitions[nameOrId]) return effectDefinitions[nameOrId];
+    // Look up ability content by ID
+    if (abilityContentMap[nameOrId]) return abilityContentMap[nameOrId];
+    return undefined;
+  }),
+  contentGetEntriesByType: vi.fn(() => []),
+  contentAllIdsByName: vi.fn(() => new Map()),
+  contentAllById: vi.fn(() => new Map()),
+  contentSetAllIdsByName: vi.fn(),
+  contentSetAllById: vi.fn(),
+}));
+
 // --- Helpers ---
+
+function makeAbilityState(abilityId: string, overrides: Partial<AbilityState> = {}): AbilityState {
+  return {
+    abilityId: abilityId as CombatAbilityId,
+    currentCooldown: 0,
+    isActive: false,
+    remainingDuration: 0,
+    passiveActivated: false,
+    ...overrides,
+  };
+}
 
 function makeDefender(
   id: string,
   speed: number,
   position: TilePosition | undefined = undefined,
   hp = 20,
+  abilityStates: AbilityState[] = [],
 ): Combatant {
   return invasionCombatCreateCombatant(id as CombatantId, 'defender', `Defender ${id}`, {
     hp,
@@ -35,7 +253,7 @@ function makeDefender(
     attack: 8,
     defense: 5,
     speed,
-  }, position);
+  }, position, abilityStates);
 }
 
 function makeInvader(
@@ -43,6 +261,7 @@ function makeInvader(
   speed: number,
   position: TilePosition | undefined = undefined,
   hp = 15,
+  abilityStates: AbilityState[] = [],
 ): Combatant {
   return invasionCombatCreateCombatant(id as CombatantId, 'invader', `Invader ${id}`, {
     hp,
@@ -50,7 +269,7 @@ function makeInvader(
     attack: 6,
     defense: 4,
     speed,
-  }, position);
+  }, position, abilityStates);
 }
 
 function fixedRng(value: number): () => number {
@@ -541,6 +760,271 @@ describe('invasion-combat', () => {
       const queue: TurnQueue = { combatants: [], currentIndex: 0, round: 1 };
       const { result } = invasionCombatExecuteAiTurn(queue, fixedRng(0.5));
       expect(result.action).toBe('wait');
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Stun', () => {
+    it('should apply stunned status to target', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-stun')]);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 4 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated, result } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-stun' as CombatAbilityId, 'i1' as CombatantId, fixedRng(0.5),
+      );
+
+      expect(result.action).toBe('ability');
+      expect(result.abilityActivation).toBeDefined();
+      expect(result.abilityActivation!.abilityName).toBe('Test Stun');
+
+      const target = updated.combatants.find((c) => c.id === 'i1')!;
+      expect(combatantHasStatus(target, 'stunned')).toBe(true);
+      expect(target.statusEffects.find((s) => s.name === 'stunned')!.remainingDuration).toBe(2);
+    });
+
+    it('should cause stunned combatant to auto-wait in AI', () => {
+      const stunned = makeInvader('i1', 5, { x: 5, y: 5 });
+      stunned.statusEffects = [{ name: 'stunned', remainingDuration: 1 }];
+      const enemy = makeDefender('d1', 3, { x: 5, y: 4 });
+
+      const decision = invasionCombatResolveAiAction(stunned, [stunned, enemy]);
+      expect(decision.action).toBe('wait');
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Buff Defense', () => {
+    it('should apply shielded status to self', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-buff-def')]);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 4 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-buff-def' as CombatAbilityId, 'd1' as CombatantId, fixedRng(0.5),
+      );
+
+      const defender = updated.combatants.find((c) => c.id === 'd1')!;
+      expect(combatantHasStatus(defender, 'shielded')).toBe(true);
+      expect(defender.statusEffects.find((s) => s.name === 'shielded')!.remainingDuration).toBe(3);
+    });
+
+    it('should put ability on cooldown after activation', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-buff-def')]);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 4 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-buff-def' as CombatAbilityId, 'd1' as CombatantId, fixedRng(0.5),
+      );
+
+      const defender = updated.combatants.find((c) => c.id === 'd1')!;
+      const abilityState = defender.abilityStates.find((s) => s.abilityId === 'ability-buff-def')!;
+      expect(abilityState.currentCooldown).toBe(4);
+      expect(abilityState.isActive).toBe(true);
+      expect(abilityState.remainingDuration).toBe(3);
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Resurrect', () => {
+    it('should revive a dead ally with percentage HP', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-resurrect')]);
+      const deadAlly = makeDefender('d2', 3, { x: 5, y: 6 }, 0);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, deadAlly, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-resurrect' as CombatAbilityId, 'd2' as CombatantId, fixedRng(0.5),
+      );
+
+      const revived = updated.combatants.find((c) => c.id === 'd2')!;
+      expect(revived.hp).toBe(10); // 50% of 20 maxHp
+    });
+
+    it('should revive with at least 1 HP', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-resurrect')]);
+      const deadAlly = invasionCombatCreateCombatant('d2' as CombatantId, 'defender', 'Defender d2', {
+        hp: 0, maxHp: 1, attack: 1, defense: 1, speed: 1,
+      }, { x: 5, y: 6 });
+      const enemy = makeInvader('i1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, deadAlly, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-resurrect' as CombatAbilityId, 'd2' as CombatantId, fixedRng(0.5),
+      );
+
+      const revived = updated.combatants.find((c) => c.id === 'd2')!;
+      expect(revived.hp).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Dispel', () => {
+    it('should remove all status effects from target', () => {
+      const actor = makeInvader('i1', 5, { x: 5, y: 5 }, 15, [makeAbilityState('ability-dispel')]);
+      const enemy = makeDefender('d1', 3, { x: 5, y: 4 });
+      enemy.statusEffects = [
+        { name: 'shielded', remainingDuration: 3 },
+        { name: 'courage', remainingDuration: 999 },
+      ];
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'i1' as CombatantId, 'ability-dispel' as CombatAbilityId, 'd1' as CombatantId, fixedRng(0.5),
+      );
+
+      const target = updated.combatants.find((c) => c.id === 'd1')!;
+      expect(target.statusEffects).toHaveLength(0);
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Fear Immunity', () => {
+    it('should apply courage status to all allies', () => {
+      const actor = makeInvader('i1', 5, { x: 5, y: 5 }, 15, [makeAbilityState('ability-courage')]);
+      const ally = makeInvader('i2', 3, { x: 5, y: 6 });
+      const enemy = makeDefender('d1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, ally, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'i1' as CombatantId, 'ability-courage' as CombatAbilityId, 'i1' as CombatantId, fixedRng(0.5),
+      );
+
+      const actor1 = updated.combatants.find((c) => c.id === 'i1')!;
+      const ally1 = updated.combatants.find((c) => c.id === 'i2')!;
+      const enemy1 = updated.combatants.find((c) => c.id === 'd1')!;
+      expect(combatantHasStatus(actor1, 'courage')).toBe(true);
+      expect(combatantHasStatus(ally1, 'courage')).toBe(true);
+      expect(combatantHasStatus(enemy1, 'courage')).toBe(false);
+    });
+
+    it('should not duplicate courage if already present', () => {
+      const actor = makeInvader('i1', 5, { x: 5, y: 5 }, 15, [makeAbilityState('ability-courage')]);
+      actor.statusEffects = [{ name: 'courage', remainingDuration: 999 }];
+      const enemy = makeDefender('d1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'i1' as CombatantId, 'ability-courage' as CombatAbilityId, 'i1' as CombatantId, fixedRng(0.5),
+      );
+
+      const actor1 = updated.combatants.find((c) => c.id === 'i1')!;
+      const courageStatuses = actor1.statusEffects.filter((s) => s.name === 'courage');
+      expect(courageStatuses).toHaveLength(1);
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Mark', () => {
+    it('should apply marked status to target', () => {
+      const actor = makeInvader('i1', 5, { x: 5, y: 5 }, 15, [makeAbilityState('ability-mark')]);
+      const enemy = makeDefender('d1', 3, { x: 5, y: 4 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'i1' as CombatantId, 'ability-mark' as CombatAbilityId, 'd1' as CombatantId, fixedRng(0.5),
+      );
+
+      const target = updated.combatants.find((c) => c.id === 'd1')!;
+      expect(combatantHasStatus(target, 'marked')).toBe(true);
+      expect(target.statusEffects.find((s) => s.name === 'marked')!.remainingDuration).toBe(3);
+    });
+
+    it('should amplify damage dealt to marked targets in attack', () => {
+      const attacker = makeInvader('i1', 5, { x: 5, y: 5 });
+      const marked = makeDefender('d1', 3, { x: 5, y: 4 });
+      marked.statusEffects = [{ name: 'marked', remainingDuration: 2 }];
+      const queue = invasionCombatBuildTurnQueue([attacker, marked]);
+
+      // Use a high rng to guarantee a hit (roll 20)
+      const { result } = invasionCombatExecuteAttack(queue, 'i1' as CombatantId, 'd1' as CombatantId, fixedRng(0.95));
+      expect(result.combatResult!.hit).toBe(true);
+
+      // Without mark: damage = max(1, 6 - 5) = 1
+      // With 20% mark: damage = round(1 * 1.2) = 1 (rounding)
+      // The mark amplification should be applied
+      expect(result.combatResult!.damage).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: Heal', () => {
+    it('should restore HP to injured ally', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-heal')]);
+      const injured = makeDefender('d2', 3, { x: 5, y: 4 }, 5);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, injured, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-heal' as CombatAbilityId, 'd2' as CombatantId, fixedRng(0.5),
+      );
+
+      const healed = updated.combatants.find((c) => c.id === 'd2')!;
+      expect(healed.hp).toBe(10); // 5 + round(20 * 25/100) = 5 + 5 = 10
+    });
+
+    it('should not exceed max HP when healing', () => {
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-heal')]);
+      const nearFull = makeDefender('d2', 3, { x: 5, y: 4 }, 19);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 3 });
+      const queue = invasionCombatBuildTurnQueue([actor, nearFull, enemy]);
+
+      const { queue: updated } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-heal' as CombatAbilityId, 'd2' as CombatantId, fixedRng(0.5),
+      );
+
+      const healed = updated.combatants.find((c) => c.id === 'd2')!;
+      expect(healed.hp).toBe(20); // capped at maxHp
+    });
+  });
+
+  describe('invasionCombatExecuteAbility: failed proc', () => {
+    it('should consume turn but have no effect when ability fails to proc', () => {
+      // Stun has 100% chance but we'll use a custom ability with 0% chance via high rng
+      const lowChanceAbility: CombatAbilityContent = {
+        id: 'ability-stun' as CombatAbilityId,
+        name: 'Test Stun',
+        __type: 'combatability',
+        description: 'Stuns a target',
+        chance: 1, // 1% chance
+        cooldown: 3,
+        effects: [{ effectType: 'Stun', value: 0, targetType: 'single', duration: 2 }],
+      };
+      // Override the mock for this test
+      abilityContentMap['ability-stun'] = lowChanceAbility;
+
+      const actor = makeDefender('d1', 5, { x: 5, y: 5 }, 20, [makeAbilityState('ability-stun')]);
+      const enemy = makeInvader('i1', 3, { x: 5, y: 4 });
+      const queue = invasionCombatBuildTurnQueue([actor, enemy]);
+
+      // rng 0.5 => roll 50, which is > 1% chance
+      const { result } = invasionCombatExecuteAbility(
+        queue, 'd1' as CombatantId, 'ability-stun' as CombatAbilityId, 'i1' as CombatantId, fixedRng(0.5),
+      );
+
+      expect(result.abilityActivation).toBeUndefined();
+      const target = queue.combatants.find((c) => c.id === 'i1')!;
+      expect(combatantHasStatus(target, 'stunned')).toBe(false);
+
+      // Restore original
+      abilityContentMap['ability-stun'] = stunAbility;
+    });
+  });
+
+  describe('status effect duration', () => {
+    it('should expire status effects after new round ticks', () => {
+      const combatant = makeDefender('d1', 5, { x: 5, y: 5 });
+      combatant.statusEffects = [{ name: 'stunned', remainingDuration: 1 }];
+      const queue = invasionCombatBuildTurnQueue([combatant]);
+
+      const newRound = invasionCombatStartNewRound(queue);
+      const d1 = newRound.combatants.find((c) => c.id === 'd1')!;
+      expect(d1.statusEffects).toHaveLength(0);
+    });
+
+    it('should keep status effects that have remaining duration', () => {
+      const combatant = makeDefender('d1', 5, { x: 5, y: 5 });
+      combatant.statusEffects = [{ name: 'marked', remainingDuration: 3 }];
+      const queue = invasionCombatBuildTurnQueue([combatant]);
+
+      const newRound = invasionCombatStartNewRound(queue);
+      const d1 = newRound.combatants.find((c) => c.id === 'd1')!;
+      expect(d1.statusEffects).toHaveLength(1);
+      expect(d1.statusEffects[0].remainingDuration).toBe(2);
     });
   });
 

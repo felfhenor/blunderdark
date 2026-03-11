@@ -95,7 +95,7 @@ const damageEffect = makeEffect({
 
 const healEffect = makeEffect({
   id: 'ae-heal' as AbilityEffectId,
-  name: 'Heal',
+  name: 'Heal Effect',
   statusName: 'healing',
 });
 
@@ -113,7 +113,7 @@ const magicDamageEffect = makeEffect({
 
 const dispelEffect = makeEffect({
   id: 'ae-dispel' as AbilityEffectId,
-  name: 'Dispel',
+  name: 'Dispel Effect',
   statusName: 'dispel',
 });
 
@@ -131,7 +131,7 @@ const fearImmunityEffect = makeEffect({
 
 const scoutEffect = makeEffect({
   id: 'ae-scout' as AbilityEffectId,
-  name: 'Scout',
+  name: 'Scout Effect',
   statusName: 'scouting',
 });
 
@@ -175,14 +175,14 @@ const dispelAbility = makeAbility({
   id: DISPEL_ID,
   name: 'Dispel',
   cooldown: 3,
-  effects: [{ effectType: 'Dispel', value: 0, targetType: 'single', duration: 0 }],
+  effects: [{ effectType: 'Dispel Effect', value: 0, targetType: 'single', duration: 0 }],
 });
 
 const healAbility = makeAbility({
   id: HEAL_ID,
   name: 'Heal',
   cooldown: 3,
-  effects: [{ effectType: 'Heal', value: 20, targetType: 'single', duration: 0 }],
+  effects: [{ effectType: 'Heal Effect', value: 20, targetType: 'single', duration: 0 }],
 });
 
 const turnUndeadAbility = makeAbility({
@@ -210,7 +210,7 @@ const scoutAbility = makeAbility({
   id: SCOUT_ID,
   name: 'Scout',
   cooldown: 0,
-  effects: [{ effectType: 'Scout', value: 2, targetType: 'self', duration: 0 }],
+  effects: [{ effectType: 'Scout Effect', value: 2, targetType: 'self', duration: 0 }],
 });
 
 const markTargetAbility = makeAbility({
@@ -317,13 +317,13 @@ beforeEach(() => {
 
   // Register effect definitions (by name for effectType lookup)
   mockContent.set('Damage', damageEffect);
-  mockContent.set('Heal', healEffect);
+  mockContent.set('Heal Effect', healEffect);
   mockContent.set('Disarm', disarmEffect);
   mockContent.set('Magic Damage', magicDamageEffect);
-  mockContent.set('Dispel', dispelEffect);
+  mockContent.set('Dispel Effect', dispelEffect);
   mockContent.set('Buff Defense', buffDefenseEffect);
   mockContent.set('Fear Immunity', fearImmunityEffect);
-  mockContent.set('Scout', scoutEffect);
+  mockContent.set('Scout Effect', scoutEffect);
   mockContent.set('Mark', markEffect);
 
   // Register ability definitions (by ID only — name keys would collide with effects)
@@ -547,7 +547,7 @@ describe('invaderResolveAbility', () => {
     });
     const result = invaderResolveAbility(invader, scoutAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effects[0].effectType).toBe('Scout');
+    expect(result!.effects[0].effectType).toBe('Scout Effect');
     expect(result!.effects[0].value).toBe(2);
     expect(result!.effects[0].targetIds).toEqual([invader.id]);
   });
@@ -576,7 +576,7 @@ describe('invaderResolveAbility', () => {
     });
     const result = invaderResolveAbility(invader, dispelAbility, ['target-1' as CombatantId]);
     expect(result).toBeDefined();
-    expect(result!.effects[0].effectType).toBe('Dispel');
+    expect(result!.effects[0].effectType).toBe('Dispel Effect');
     expect(result!.effects[0].value).toBe(0);
     expect(result!.effects[0].targetIds).toEqual(['target-1' as CombatantId]);
   });
@@ -629,7 +629,7 @@ describe('Cleric heal', () => {
     expect(result).toBeDefined();
     // maxHp = 20, value = 20% → 20 * 0.2 = 4
     expect(result!.effects[0].value).toBe(4);
-    expect(result!.effects[0].effectType).toBe('Heal');
+    expect(result!.effects[0].effectType).toBe('Heal Effect');
   });
 
   it('invaderApplyHealing caps at maxHp', () => {

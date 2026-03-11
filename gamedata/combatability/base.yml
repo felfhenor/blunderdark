@@ -119,7 +119,7 @@
   chance: 100
   cooldown: 3
   effects:
-    - effectType: Dispel
+    - effectType: Dispel Effect
       value: 0
       targetType: single
       duration: 0
@@ -131,7 +131,7 @@
   chance: 100
   cooldown: 3
   effects:
-    - effectType: Heal
+    - effectType: Heal Effect
       value: 20
       targetType: single
       duration: 0
@@ -177,7 +177,7 @@
   chance: 100
   cooldown: 0
   effects:
-    - effectType: Scout
+    - effectType: Scout Effect
       value: 2
       targetType: self
       duration: 0
@@ -234,7 +234,7 @@
   chance: 100
   cooldown: 4
   effects:
-    - effectType: Heal
+    - effectType: Heal Effect
       value: 25
       targetType: single
       duration: 0
