@@ -24,7 +24,11 @@ import type { ResearchContent } from '@interfaces';
       <div class="card-body p-4 gap-2">
         <div class="flex items-center justify-between">
           <h3 class="card-title text-sm">Research</h3>
-          <button class="btn btn-xs btn-outline" appSfx="ui-click" (click)="openResearch.emit()">
+          <button
+            class="btn btn-xs btn-outline"
+            appSfx="ui-click"
+            (click)="openResearch.emit()"
+          >
             Open
           </button>
         </div>

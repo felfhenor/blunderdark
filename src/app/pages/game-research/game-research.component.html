@@ -25,10 +25,10 @@
       </div>
 
       <!-- Active Research Summary Bar -->
-      @if (activeResearchNode(); as active) {
-        <div
-          class="active-summary flex items-center gap-4 px-4 py-2 bg-base-300 flex-shrink-0"
-        >
+      <div
+        class="active-summary flex items-center gap-4 px-4 py-2 bg-base-300 flex-shrink-0"
+      >
+        @if (activeResearchNode(); as active) {
           <span class="text-sm font-semibold">Researching:</span>
           <span class="text-sm">{{ active.name }}</span>
           <div class="flex-1">
@@ -42,11 +42,19 @@
             {{ progressPercent() | number: '1.0-0' }}% &middot;
             {{ estimatedTimeRemaining() }}
           </span>
-          <button class="btn btn-xs btn-error btn-outline" appSfx="ui-error" [swal]="cancelSwal">
+          <button
+            class="btn btn-xs btn-error btn-outline"
+            appSfx="ui-error"
+            [swal]="cancelSwal"
+          >
             Cancel
           </button>
-        </div>
-      }
+        } @else {
+          <span class="text-sm opacity-50 w-full text-center">
+            No active research
+          </span>
+        }
+      </div>
 
       <!-- Branch Tabs -->
       <div
