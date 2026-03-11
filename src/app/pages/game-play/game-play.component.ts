@@ -65,6 +65,7 @@ import {
   tutorialIsActive,
   uiIsAnyModalOpen,
   uiIsInputFocused,
+  rosterNavigateToInhabitant,
 } from '@helpers';
 import {
   roomShapeGetAbsoluteTiles,
@@ -416,6 +417,15 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       if (tutorialChecked) return;
       tutorialChecked = true;
       untracked(() => tutorialAutoStart());
+    });
+
+    // Open roster panel when navigating to a specific inhabitant
+    effect(() => {
+      const targetId = rosterNavigateToInhabitant();
+      if (!targetId) return;
+      untracked(() => {
+        this.activePanel.set('roster');
+      });
     });
 
     // Pause CSS animations when tab is not visible

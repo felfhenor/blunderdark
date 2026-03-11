@@ -5,7 +5,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
@@ -21,6 +23,7 @@ import {
   notifySuccess,
   inhabitantUnassignFromRoom,
   roomGetDisplayName,
+  rosterNavigateToInhabitant,
 } from '@helpers';
 import { inhabitantIsTraveling } from '@helpers/inhabitants';
 import { formatRealDuration } from '@helpers/game-time';
@@ -60,6 +63,18 @@ export class PanelRosterComponent {
 
   public activeFilter = signal<RosterFilter>('all');
   public selectedInhabitantId = signal<string | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      const targetId = rosterNavigateToInhabitant();
+      if (!targetId) return;
+      untracked(() => {
+        this.selectedInhabitantId.set(targetId);
+        this.activeFilter.set('all');
+        rosterNavigateToInhabitant.set(undefined);
+      });
+    });
+  }
 
   private allEntries = computed<RosterEntry[]>(() => {
     const state = gamestate();

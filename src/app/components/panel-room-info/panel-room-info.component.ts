@@ -73,6 +73,7 @@ import {
   gamestate,
   verticalTransportGetGroupsOnFloor,
   synergyGetDefinitions,
+  rosterNavigateToInhabitant,
 } from '@helpers';
 import { corruptionEffectIsDarkUpgradeUnlocked } from '@helpers/corruption-effects';
 import { formatRealDuration } from '@helpers/game-time';
@@ -652,6 +653,11 @@ export class PanelRoomInfoComponent {
         notifySuccess('Inhabitant assigned');
       }
     }
+  }
+
+  public onViewInRoster(instanceId: string): void {
+    analyticsSendDesignEvent('Room:Info:Inhabitant:ViewInRoster');
+    rosterNavigateToInhabitant.set(instanceId);
   }
 
   public async onUnassignInhabitant(instanceId: string): Promise<void> {

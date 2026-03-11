@@ -304,7 +304,7 @@
                 [class.opacity-50]="isInhabitantTraveling(inh.instance)"
               >
                 <app-inhabitant-card
-                  class="min-w-0"
+                  class="min-w-0 cursor-pointer hover:brightness-125 transition-all"
                   [instance]="inh.instance"
                   [definition]="inh.def"
                   [compact]="true"
@@ -312,6 +312,9 @@
                   [showAssignment]="false"
                   [showHunger]="true"
                   [synergyRoomId]="selectedRoom()?.id"
+                  appSfx="ui-click"
+                  appAnalyticsClick="Room:Info:Inhabitant:ViewInRoster"
+                  (click)="onViewInRoster(inh.instance.instanceId)"
                 />
                 <app-button-close
                   class="text-error flex-shrink-0"
