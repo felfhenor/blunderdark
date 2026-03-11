@@ -1,0 +1,262 @@
+- id: db013467-ce33-4581-9bb7-7f37f15569f5
+  name: Slay Monster
+  description: Kill a powerful creature defending the dungeon.
+  isPrimary: false
+  objectiveType: SlayMonster
+  eligibility: inhabitant_tier
+  eligibilityMinTier: 2
+  targeting: inhabitant
+  targetMinTier: 2
+  penalties:
+    - resource: crystals
+      mode: flat
+      value: 25
+    - resource: essence
+      mode: percent
+      value: 0.1
+
+- id: 6f567f2e-6c18-42dc-b208-d9316111be51
+  name: Steal Treasure
+  description: Loot gold from the dungeon treasury.
+  isPrimary: false
+  objectiveType: StealTreasure
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: gold
+      mode: percent
+      value: 0.15
+    - resource: crystals
+      mode: flat
+      value: 15
+
+- id: c22e5efe-8383-411c-97a0-d404a7308d78
+  name: Defile Library
+  description: Destroy forbidden knowledge stored in the shadow library.
+  isPrimary: false
+  objectiveType: DefileLibrary
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: research
+      mode: percent
+      value: 0.2
+    - resource: essence
+      mode: flat
+      value: 15
+
+- id: 7fa0a947-09cc-45ed-8aa9-d9a0d47ce00e
+  name: Seal Portal
+  description: Seal a dark energy nexus to weaken the dungeon.
+  isPrimary: false
+  objectiveType: SealPortal
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: flux
+      mode: percent
+      value: 0.2
+    - resource: essence
+      mode: flat
+      value: 15
+
+- id: a107cb7c-945f-431f-ad33-f258705b5a21
+  name: Plunder Vault
+  description: Break into the treasure vault and carry away riches.
+  isPrimary: false
+  objectiveType: PlunderVault
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: gold
+      mode: percent
+      value: 0.25
+    - resource: crystals
+      mode: flat
+      value: 15
+
+- id: c8c2a592-4531-48e8-aeeb-c5d9473dfd85
+  name: Rescue Prisoner
+  description: Free a captive creature from the dungeon.
+  isPrimary: false
+  objectiveType: RescuePrisoner
+  eligibility: inhabitant_tier
+  eligibilityMinTier: 1
+  targeting: inhabitant
+  targetMinTier: 1
+  penalties:
+    - resource: crystals
+      mode: flat
+      value: 15
+    - resource: essence
+      mode: flat
+      value: 10
+
+- id: 3e40d2a7-7737-44d6-ae29-4aba5a018a07
+  name: Scout Dungeon
+  description: Map the dungeon layout for future invasions.
+  isPrimary: false
+  objectiveType: ScoutDungeon
+  eligibility: always
+  targeting: none
+  penalties:
+    - resource: crystals
+      mode: flat
+      value: 10
+
+- id: c6b53c99-c746-465b-a6b6-9ac0d51dfb4d
+  name: Sabotage Forge
+  description: Wreck the dark forge to halt weapon crafting.
+  isPrimary: false
+  objectiveType: SabotageForge
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: crystals
+      mode: percent
+      value: 0.15
+    - resource: gold
+      mode: flat
+      value: 25
+
+- id: 1f60de3a-9b27-498b-b167-3bae2052b511
+  name: Disrupt Breeding
+  description: Shut down the breeding pits to stop monster production.
+  isPrimary: false
+  objectiveType: DisruptBreeding
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: essence
+      mode: percent
+      value: 0.2
+    - resource: food
+      mode: percent
+      value: 0.1
+
+- id: 9da710be-f6b0-4ac5-bfac-9aa7db0f09c6
+  name: Banish Summons
+  description: Disrupt the summoning circle to sever planar connections.
+  isPrimary: false
+  objectiveType: BanishSummons
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: flux
+      mode: percent
+      value: 0.25
+    - resource: essence
+      mode: flat
+      value: 15
+
+- id: d2c102dd-31b4-4d3d-8198-04ecb1a42b93
+  name: Purify Shrine
+  description: Cleanse the corrupted soul well of dark energy.
+  isPrimary: false
+  objectiveType: PurifyShrine
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: corruption
+      mode: percent
+      value: 0.25
+    - resource: essence
+      mode: percent
+      value: 0.15
+
+- id: 5b6cccde-1829-44e9-8c2c-18add71d8982
+  name: Poison Supply
+  description: Contaminate food stores to starve the dungeon.
+  isPrimary: false
+  objectiveType: PoisonSupply
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: food
+      mode: percent
+      value: 0.3
+    - resource: essence
+      mode: flat
+      value: 10
+
+- id: 104b66fa-1b81-4f92-bdec-87a02c00808c
+  name: Steal Blueprints
+  description: Steal research notes and arcane blueprints from the library.
+  isPrimary: false
+  objectiveType: StealBlueprints
+  eligibility: room
+  targeting: room
+  penalties:
+    - resource: research
+      mode: percent
+      value: 0.25
+    - resource: crystals
+      mode: flat
+      value: 15
+
+- id: ce090c24-3ff0-4b6c-9238-81380f6e23e6
+  name: Assassinate Commander
+  description: Hunt down and kill a high-tier commander defending the dungeon.
+  isPrimary: false
+  objectiveType: AssassinateCommander
+  eligibility: inhabitant_tier
+  eligibilityMinTier: 4
+  targeting: inhabitant
+  targetMinTier: 4
+  penalties:
+    - resource: essence
+      mode: percent
+      value: 0.15
+    - resource: gold
+      mode: flat
+      value: 25
+
+- id: 93f839e9-d821-4372-927b-1cf90bb69853
+  name: Survive the Gauntlet
+  description: Survive deep within the dungeon long enough to weaken its defenses.
+  isPrimary: false
+  objectiveType: SurviveNTurns
+  eligibility: room_count
+  eligibilityMinCount: 10
+  targeting: none
+  penalties:
+    - resource: crystals
+      mode: flat
+      value: 25
+    - resource: gold
+      mode: percent
+      value: 0.1
+
+- id: 230d6ee8-45bf-41b3-a6ad-9cc28b7af5c1
+  name: Reach the Depths
+  description: Penetrate deep into the dungeon to expose its inner sanctum.
+  isPrimary: false
+  objectiveType: ReachDepth
+  eligibility: floor_count
+  eligibilityMinCount: 5
+  targeting: dynamic_path
+  targetPathPercent: 0.75
+  penalties:
+    - resource: gold
+      mode: percent
+      value: 0.15
+    - resource: crystals
+      mode: flat
+      value: 20
+
+- id: ec5eca7e-6a82-4b51-8681-957d8f2b182e
+  name: Plant Beacon
+  description: Plant a tracking beacon deep in the dungeon to guide future invasions.
+  isPrimary: false
+  objectiveType: PlantBeacon
+  eligibility: floor_count
+  eligibilityMinCount: 5
+  targeting: dynamic_path
+  targetPathPercent: 0.6
+  penalties:
+    - resource: crystals
+      mode: flat
+      value: 15
+    - resource: gold
+      mode: flat
+      value: 10

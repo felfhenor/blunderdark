@@ -25,8 +25,32 @@ vi.mock('@helpers/rng', () => ({
 
 const mockContent = new Map<string, unknown>();
 
+const mockObjectiveDefs = [
+  { objectiveType: 'SlayMonster', penalties: [{ resource: 'crystals', mode: 'flat', value: 25 }, { resource: 'essence', mode: 'percent', value: 0.1 }], __type: 'invasionobjective' },
+  { objectiveType: 'StealTreasure', penalties: [{ resource: 'gold', mode: 'percent', value: 0.15 }, { resource: 'crystals', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'DefileLibrary', penalties: [{ resource: 'research', mode: 'percent', value: 0.2 }, { resource: 'essence', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'SealPortal', penalties: [{ resource: 'flux', mode: 'percent', value: 0.2 }, { resource: 'essence', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'PlunderVault', penalties: [{ resource: 'gold', mode: 'percent', value: 0.25 }, { resource: 'crystals', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'RescuePrisoner', penalties: [{ resource: 'crystals', mode: 'flat', value: 15 }, { resource: 'essence', mode: 'flat', value: 10 }], __type: 'invasionobjective' },
+  { objectiveType: 'ScoutDungeon', penalties: [{ resource: 'crystals', mode: 'flat', value: 10 }], __type: 'invasionobjective' },
+  { objectiveType: 'SabotageForge', penalties: [{ resource: 'crystals', mode: 'percent', value: 0.15 }, { resource: 'gold', mode: 'flat', value: 25 }], __type: 'invasionobjective' },
+  { objectiveType: 'DisruptBreeding', penalties: [{ resource: 'essence', mode: 'percent', value: 0.2 }, { resource: 'food', mode: 'percent', value: 0.1 }], __type: 'invasionobjective' },
+  { objectiveType: 'BanishSummons', penalties: [{ resource: 'flux', mode: 'percent', value: 0.25 }, { resource: 'essence', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'PurifyShrine', penalties: [{ resource: 'corruption', mode: 'percent', value: 0.25 }, { resource: 'essence', mode: 'percent', value: 0.15 }], __type: 'invasionobjective' },
+  { objectiveType: 'PoisonSupply', penalties: [{ resource: 'food', mode: 'percent', value: 0.3 }, { resource: 'essence', mode: 'flat', value: 10 }], __type: 'invasionobjective' },
+  { objectiveType: 'StealBlueprints', penalties: [{ resource: 'research', mode: 'percent', value: 0.25 }, { resource: 'crystals', mode: 'flat', value: 15 }], __type: 'invasionobjective' },
+  { objectiveType: 'AssassinateCommander', penalties: [{ resource: 'essence', mode: 'percent', value: 0.15 }, { resource: 'gold', mode: 'flat', value: 25 }], __type: 'invasionobjective' },
+  { objectiveType: 'SurviveNTurns', penalties: [{ resource: 'crystals', mode: 'flat', value: 25 }, { resource: 'gold', mode: 'percent', value: 0.1 }], __type: 'invasionobjective' },
+  { objectiveType: 'ReachDepth', penalties: [{ resource: 'gold', mode: 'percent', value: 0.15 }, { resource: 'crystals', mode: 'flat', value: 20 }], __type: 'invasionobjective' },
+  { objectiveType: 'PlantBeacon', penalties: [{ resource: 'crystals', mode: 'flat', value: 15 }, { resource: 'gold', mode: 'flat', value: 10 }], __type: 'invasionobjective' },
+];
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
+  contentGetEntriesByType: (type: string) => {
+    if (type === 'invasionobjective') return mockObjectiveDefs;
+    return [];
+  },
 }));
 
 // --- Helpers ---
@@ -268,12 +292,13 @@ describe('invasion-rewards', () => {
         completedObjectiveTypes: ['StealTreasure', 'DefileLibrary'],
       });
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
-      // crystals: floor(1000 * 0.25 * 1.0) + 5 (DefileLibrary) = 255 (StealTreasure has no crystals... wait it does: 5)
-      // StealTreasure: gold 15, crystals 5. DefileLibrary: research 10, essence 5
-      expect(penalties.resourceLosses.crystals).toBe(250 + 5);
-      expect(penalties.resourceLosses.gold).toBe(400 + 15);
-      expect(penalties.resourceLosses.essence).toBe(200 + 5);
-      expect(penalties.resourceLosses.research).toBe(10);
+      // StealTreasure: gold 15% of 1000 = 150, crystals flat 15
+      // DefileLibrary: research 20% of 1000 = 200, essence flat 15
+      // Base depth losses at 1.0: gold 400, food 300, crystals 250, essence 200, flux 150
+      expect(penalties.resourceLosses.crystals).toBe(250 + 15);
+      expect(penalties.resourceLosses.gold).toBe(400 + 150);
+      expect(penalties.resourceLosses.essence).toBe(200 + 15);
+      expect(penalties.resourceLosses.research).toBe(200);
     });
 
     it('should have no depth losses but still have objective losses when depth is 0', () => {
@@ -284,9 +309,10 @@ describe('invasion-rewards', () => {
         completedObjectiveTypes: ['SlayMonster'],
       });
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
-      // SlayMonster: crystals 10, essence 5
-      expect(penalties.resourceLosses.crystals).toBe(10);
-      expect(penalties.resourceLosses.essence).toBe(5);
+      // SlayMonster: crystals flat 25, essence 10% of 1000 = 100
+      // No depth losses (depth = 0)
+      expect(penalties.resourceLosses.crystals).toBe(25);
+      expect(penalties.resourceLosses.essence).toBe(100);
       expect(penalties.resourceLosses.gold).toBeUndefined();
     });
 

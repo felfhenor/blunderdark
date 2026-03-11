@@ -58,6 +58,10 @@ import type {
 import type { InvaderContent, InvaderId } from '@interfaces/content-invader';
 import type { InvasionId } from '@interfaces/content-invasion';
 import type {
+  InvasionObjectiveContent,
+  InvasionObjectiveContentId,
+} from '@interfaces/content-invasionobjective';
+import type {
   MerchantTradeContent,
   MerchantTradeId,
 } from '@interfaces/content-merchanttrade';
@@ -97,6 +101,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   mutationtrait: ensureMutationTrait,
   invader: ensureInvader,
   invasion: ensureInvasion,
+  invasionobjective: ensureInvasionObjective,
   merchanttrade: ensureMerchantTrade,
   reputationaction: ensureReputationAction,
   reputationeffect: ensureReputationEffect,
@@ -652,6 +657,30 @@ function ensureInvasion(
     highCorruption: config.highCorruption ?? { ...defaultWeights },
     highWealth: config.highWealth ?? { ...defaultWeights },
     highKnowledge: config.highKnowledge ?? { ...defaultWeights },
+  };
+}
+
+function ensureInvasionObjective(
+  obj: Partial<InvasionObjectiveContent>,
+): Required<InvasionObjectiveContent> {
+  return {
+    id: obj.id ?? ('UNKNOWN' as InvasionObjectiveContentId),
+    name: obj.name ?? 'UNKNOWN',
+    __type: 'invasionobjective',
+    description: obj.description ?? '',
+    isPrimary: obj.isPrimary ?? false,
+    objectiveType: obj.objectiveType ?? '',
+    eligibility: obj.eligibility ?? 'always',
+    eligibilityMinTier: obj.eligibilityMinTier ?? undefined,
+    eligibilityMinCount: obj.eligibilityMinCount ?? undefined,
+    targeting: obj.targeting ?? 'none',
+    targetMinTier: obj.targetMinTier ?? undefined,
+    targetPathPercent: obj.targetPathPercent ?? undefined,
+    penalties: (obj.penalties ?? []).map((p) => ({
+      resource: p.resource ?? 'gold',
+      mode: p.mode ?? 'flat',
+      value: p.value ?? 0,
+    })),
   };
 }
 

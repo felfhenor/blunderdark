@@ -12,6 +12,7 @@ export type ContentType =
   | 'inhabitanttrait'
   | 'invader'
   | 'invasion'
+  | 'invasionobjective'
   | 'merchanttrade'
   | 'mutationtrait'
   | 'reputationaction'

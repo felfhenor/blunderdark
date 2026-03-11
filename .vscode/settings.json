@@ -23,6 +23,7 @@
   "yaml.schemas": {
     "./schemas/abilityeffect.schema.json": "gamedata/abilityeffect/*.yml",
     "./schemas/alchemyrecipe.schema.json": "gamedata/alchemyrecipe/*.yml",
+    "./schemas/biome.schema.json": "gamedata/biome/*.yml",
     "./schemas/breedingrecipe.schema.json": "gamedata/breedingrecipe/*.yml",
     "./schemas/combatability.schema.json": "gamedata/combatability/*.yml",
     "./schemas/corruptioneffect.schema.json": "gamedata/corruptioneffect/*.yml",
@@ -33,6 +34,7 @@
     "./schemas/inhabitanttrait.schema.json": "gamedata/inhabitanttrait/*.yml",
     "./schemas/invader.schema.json": "gamedata/invader/*.yml",
     "./schemas/invasion.schema.json": "gamedata/invasion/*.yml",
+    "./schemas/invasionobjective.schema.json": "gamedata/invasionobjective/*.yml",
     "./schemas/merchanttrade.schema.json": "gamedata/merchanttrade/*.yml",
     "./schemas/mutationtrait.schema.json": "gamedata/mutationtrait/*.yml",
     "./schemas/reputationaction.schema.json": "gamedata/reputationaction/*.yml",

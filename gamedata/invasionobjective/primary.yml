@@ -1,0 +1,7 @@
+- id: 685756d4-de19-4754-bc5b-85fede51dd20
+  name: Destroy Altar
+  description: Destroy the dungeon altar to cripple the dark lord's power.
+  isPrimary: true
+  objectiveType: DestroyAltar
+  eligibility: always
+  targeting: room

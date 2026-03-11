@@ -46,10 +46,32 @@ const mockRoomDefs = [
   { id: MUSHROOM_GROVE_TYPE_ID, __type: 'room', objectiveTypes: ['PoisonSupply'] },
 ];
 
+const mockObjectiveDefs = [
+  { id: 'obj-primary', name: 'Destroy Altar', description: "Destroy the dungeon altar to cripple the dark lord's power.", isPrimary: true, objectiveType: 'DestroyAltar', eligibility: 'always', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-slay', name: 'Slay Monster', description: 'Kill a powerful creature defending the dungeon.', isPrimary: false, objectiveType: 'SlayMonster', eligibility: 'inhabitant_tier', eligibilityMinTier: 2, targeting: 'inhabitant', targetMinTier: 2, __type: 'invasionobjective' },
+  { id: 'obj-steal', name: 'Steal Treasure', description: 'Loot gold from the dungeon treasury.', isPrimary: false, objectiveType: 'StealTreasure', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-defile', name: 'Defile Library', description: 'Destroy forbidden knowledge stored in the shadow library.', isPrimary: false, objectiveType: 'DefileLibrary', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-seal', name: 'Seal Portal', description: 'Seal a dark energy nexus to weaken the dungeon.', isPrimary: false, objectiveType: 'SealPortal', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-plunder', name: 'Plunder Vault', description: 'Break into the treasure vault and carry away riches.', isPrimary: false, objectiveType: 'PlunderVault', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-rescue', name: 'Rescue Prisoner', description: 'Free a captive creature from the dungeon.', isPrimary: false, objectiveType: 'RescuePrisoner', eligibility: 'inhabitant_tier', eligibilityMinTier: 1, targeting: 'inhabitant', targetMinTier: 1, __type: 'invasionobjective' },
+  { id: 'obj-scout', name: 'Scout Dungeon', description: 'Map the dungeon layout for future invasions.', isPrimary: false, objectiveType: 'ScoutDungeon', eligibility: 'always', targeting: 'none', __type: 'invasionobjective' },
+  { id: 'obj-sabotage', name: 'Sabotage Forge', description: 'Wreck the dark forge to halt weapon crafting.', isPrimary: false, objectiveType: 'SabotageForge', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-disrupt', name: 'Disrupt Breeding', description: 'Shut down the breeding pits to stop monster production.', isPrimary: false, objectiveType: 'DisruptBreeding', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-banish', name: 'Banish Summons', description: 'Disrupt the summoning circle to sever planar connections.', isPrimary: false, objectiveType: 'BanishSummons', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-purify', name: 'Purify Shrine', description: 'Cleanse the corrupted soul well of dark energy.', isPrimary: false, objectiveType: 'PurifyShrine', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-poison', name: 'Poison Supply', description: 'Contaminate food stores to starve the dungeon.', isPrimary: false, objectiveType: 'PoisonSupply', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-blueprints', name: 'Steal Blueprints', description: 'Steal research notes and arcane blueprints from the library.', isPrimary: false, objectiveType: 'StealBlueprints', eligibility: 'room', targeting: 'room', __type: 'invasionobjective' },
+  { id: 'obj-assassinate', name: 'Assassinate Commander', description: 'Hunt down and kill a high-tier commander defending the dungeon.', isPrimary: false, objectiveType: 'AssassinateCommander', eligibility: 'inhabitant_tier', eligibilityMinTier: 4, targeting: 'inhabitant', targetMinTier: 4, __type: 'invasionobjective' },
+  { id: 'obj-survive', name: 'Survive the Gauntlet', description: 'Survive deep within the dungeon long enough to weaken its defenses.', isPrimary: false, objectiveType: 'SurviveNTurns', eligibility: 'room_count', eligibilityMinCount: 10, targeting: 'none', __type: 'invasionobjective' },
+  { id: 'obj-depth', name: 'Reach the Depths', description: 'Penetrate deep into the dungeon to expose its inner sanctum.', isPrimary: false, objectiveType: 'ReachDepth', eligibility: 'floor_count', eligibilityMinCount: 5, targeting: 'dynamic_path', targetPathPercent: 0.75, __type: 'invasionobjective' },
+  { id: 'obj-beacon', name: 'Plant Beacon', description: 'Plant a tracking beacon deep in the dungeon to guide future invasions.', isPrimary: false, objectiveType: 'PlantBeacon', eligibility: 'floor_count', eligibilityMinCount: 5, targeting: 'dynamic_path', targetPathPercent: 0.6, __type: 'invasionobjective' },
+];
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn((id: string) => mockContent.get(id)),
   contentGetEntriesByType: vi.fn((type: string) => {
     if (type === 'room') return mockRoomDefs;
+    if (type === 'invasionobjective') return mockObjectiveDefs;
     return [];
   }),
 }));

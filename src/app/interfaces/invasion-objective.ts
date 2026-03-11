@@ -2,25 +2,7 @@ import type { Branded } from '@interfaces/identifiable';
 
 export type InvasionObjectiveId = Branded<string, 'InvasionObjectiveId'>;
 
-export type ObjectiveType =
-  | 'DestroyAltar'
-  | 'SlayMonster'
-  | 'RescuePrisoner'
-  | 'StealTreasure'
-  | 'SealPortal'
-  | 'DefileLibrary'
-  | 'PlunderVault'
-  | 'ScoutDungeon'
-  | 'SabotageForge'
-  | 'DisruptBreeding'
-  | 'BanishSummons'
-  | 'PurifyShrine'
-  | 'PoisonSupply'
-  | 'AssassinateCommander'
-  | 'SurviveNTurns'
-  | 'ReachDepth'
-  | 'PlantBeacon'
-  | 'StealBlueprints';
+export type ObjectiveType = string;
 
 export type InvasionObjective = {
   id: InvasionObjectiveId;
