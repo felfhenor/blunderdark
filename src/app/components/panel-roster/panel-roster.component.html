@@ -33,6 +33,18 @@
         >
           Idle ({{ unassignedCount() | number: '1.0-0' }})
         </button>
+        @if (travelingCount() > 0) {
+          <button
+            class="btn btn-xs"
+            appSfx="ui-click"
+            [sfxOffset]="3"
+            [class.btn-info]="activeFilter() === 'traveling'"
+            [class.btn-ghost]="activeFilter() !== 'traveling'"
+            (click)="setFilter('traveling')"
+          >
+            Traveling ({{ travelingCount() | number: '1.0-0' }})
+          </button>
+        }
       </div>
 
       <!-- Roster list -->

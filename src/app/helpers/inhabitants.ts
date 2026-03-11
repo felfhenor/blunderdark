@@ -148,10 +148,11 @@ export function inhabitantDeserialize(
 
 /**
  * Get a display label for an inhabitant's room assignment.
- * Returns "RoomName (F{depth})" or "Unassigned".
+ * Returns "RoomName (F{depth})", "Traveling to RoomName (F{depth})", or "Unassigned".
  */
 export function inhabitantGetAssignmentLabel(
   assignedRoomId: PlacedRoomId | undefined,
+  travelTicksRemaining?: number,
 ): string {
   if (!assignedRoomId) return 'Unassigned';
 
@@ -160,11 +161,25 @@ export function inhabitantGetAssignmentLabel(
     const room = findRoomOnFloor(floor, assignedRoomId);
     if (room) {
       const roomDef = productionGetRoomDefinition(room.roomTypeId);
-      return `${roomDef?.name ?? 'Unknown Room'} (F${floor.depth})`;
+      const roomLabel = `${roomDef?.name ?? 'Unknown Room'} (F${floor.depth})`;
+      if (travelTicksRemaining !== undefined && travelTicksRemaining > 0) {
+        return `Traveling to ${roomLabel}`;
+      }
+      return roomLabel;
     }
   }
 
   return 'Unassigned';
+}
+
+/**
+ * Check if an inhabitant is currently traveling between floors.
+ */
+export function inhabitantIsTraveling(instance: InhabitantInstance): boolean {
+  return (
+    instance.travelTicksRemaining !== undefined &&
+    instance.travelTicksRemaining > 0
+  );
 }
 
 // --- Inhabitant restriction validation ---

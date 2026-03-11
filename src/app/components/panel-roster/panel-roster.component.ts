@@ -22,6 +22,8 @@ import {
   inhabitantUnassignFromRoom,
   roomGetDisplayName,
 } from '@helpers';
+import { inhabitantIsTraveling } from '@helpers/inhabitants';
+import { formatRealDuration } from '@helpers/game-time';
 import { gamestate } from '@helpers/state-game';
 import type {
   InhabitantInstance,
@@ -36,7 +38,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
-type RosterFilter = 'all' | 'assigned' | 'unassigned';
+type RosterFilter = 'all' | 'assigned' | 'unassigned' | 'traveling';
 
 type RosterEntry = {
   instance: InhabitantInstance;
@@ -106,6 +108,11 @@ export class PanelRosterComponent {
         .length,
   );
 
+  public travelingCount = computed(
+    () =>
+      this.allEntries().filter((e) => inhabitantIsTraveling(e.instance)).length,
+  );
+
   public filteredEntries = computed(() => {
     const filter = this.activeFilter();
     const entries = this.allEntries();
@@ -113,6 +120,8 @@ export class PanelRosterComponent {
       return entries.filter((e) => e.instance.assignedRoomId !== undefined);
     if (filter === 'unassigned')
       return entries.filter((e) => e.instance.assignedRoomId === undefined);
+    if (filter === 'traveling')
+      return entries.filter((e) => inhabitantIsTraveling(e.instance));
     return entries;
   });
 
@@ -157,7 +166,7 @@ export class PanelRosterComponent {
   });
 
   public setFilter(filter: RosterFilter): void {
-    const filterLabels: Record<RosterFilter, string> = { all: 'All', assigned: 'Assigned', unassigned: 'Idle' };
+    const filterLabels: Record<RosterFilter, string> = { all: 'All', assigned: 'Assigned', unassigned: 'Idle', traveling: 'Traveling' };
     analyticsSendDesignEvent('Roster:Filter:' + filterLabels[filter]);
     this.activeFilter.set(filter);
   }
@@ -192,7 +201,17 @@ export class PanelRosterComponent {
     if (!result.success && result.error) {
       notifyError(result.error);
     } else if (result.success) {
-      notifySuccess('Inhabitant assigned');
+      // Check if the inhabitant is now traveling
+      const updated = gamestate().world.inhabitants.find(
+        (i) => i.instanceId === instanceId,
+      );
+      if (updated && inhabitantIsTraveling(updated)) {
+        notifySuccess(
+          `Inhabitant assigned - traveling (${formatRealDuration(updated.travelTicksRemaining!)})`,
+        );
+      } else {
+        notifySuccess('Inhabitant assigned');
+      }
     }
   }
 

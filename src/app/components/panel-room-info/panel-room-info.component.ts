@@ -12,6 +12,7 @@ import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RoomConnectionsComponent } from '@components/room-connections/room-connections.component';
@@ -24,6 +25,7 @@ import {
   getAssignedInhabitantsWithDefs,
   inhabitantAssignToRoom,
   inhabitantAll,
+  inhabitantIsTraveling,
   efficiencyCalculateRoom,
   efficiencyDoesTraitApply,
   connectionCreate,
@@ -73,6 +75,7 @@ import {
   synergyGetDefinitions,
 } from '@helpers';
 import { corruptionEffectIsDarkUpgradeUnlocked } from '@helpers/corruption-effects';
+import { formatRealDuration } from '@helpers/game-time';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import { STORAGE_ROOM_BASE_BONUS } from '@helpers/resources';
@@ -110,6 +113,7 @@ import { startCase } from 'es-toolkit';
     CurrencyCostComponent,
     CurrencyNameComponent,
     FearBreakdownTooltipComponent,
+    IconComponent,
     InhabitantCardComponent,
     ModalComponent,
     RoomConnectionsComponent,
@@ -240,6 +244,17 @@ export class PanelRoomInfoComponent {
   });
 
   public inhabitantCount = computed(() => this.assignedInhabitants().length);
+
+  public travelingInhabitantCount = computed(
+    () =>
+      this.assignedInhabitants().filter((inh) =>
+        inhabitantIsTraveling(inh.instance),
+      ).length,
+  );
+
+  public isInhabitantTraveling(instance: InhabitantInstance): boolean {
+    return inhabitantIsTraveling(instance);
+  }
 
   public roomProduction = computed(() => {
     const room = this.selectedRoom();
@@ -626,7 +641,16 @@ export class PanelRoomInfoComponent {
     if (!result.success && result.error) {
       notifyError(result.error);
     } else if (result.success) {
-      notifySuccess('Inhabitant assigned');
+      const updated = gamestate().world.inhabitants.find(
+        (i) => i.instanceId === instanceId,
+      );
+      if (updated && inhabitantIsTraveling(updated)) {
+        notifySuccess(
+          `Inhabitant assigned - traveling (${formatRealDuration(updated.travelTicksRemaining!)})`,
+        );
+      } else {
+        notifySuccess('Inhabitant assigned');
+      }
     }
   }
 

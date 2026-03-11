@@ -4,7 +4,9 @@
       <div class="flex items-center justify-between">
         <h3 class="card-title text-sm">{{ room.name }}</h3>
         @if (room.workCategory) {
-          <span class="badge badge-xs badge-outline capitalize">{{ room.workCategoryLabel }}</span>
+          <span class="badge badge-xs badge-outline capitalize">
+            {{ room.workCategoryLabel }}
+          </span>
         }
       </div>
       @if (room.baseRoomName) {
@@ -24,7 +26,11 @@
         <div class="flex flex-wrap gap-2 mt-1">
           @for (prod of roomProduction(); track prod.type) {
             <span class="badge badge-sm badge-outline">
-              <app-currency-cost [type]="prod.type" [amount]="prod.perMinute" numberFormat="1.0-1" />
+              <app-currency-cost
+                [type]="prod.type"
+                [amount]="prod.perMinute"
+                numberFormat="1.0-1"
+              />
               /min
             </span>
           }
@@ -85,10 +91,14 @@
                 }}{{ contrib.totalBonus | number: '1.0-2' }}x
               </span>
               @if (contrib.affinityBonus !== 0) {
-                <span class="opacity-50"
+                <span
+                  class="opacity-50"
                   [class.text-success]="contrib.affinityBonus > 0"
                   [class.text-error]="contrib.affinityBonus < 0"
-                >(affinity {{ contrib.affinityBonus >= 0 ? '+' : '' }}{{ contrib.affinityBonus | number: '1.0-2' }})</span>
+                >
+                  (affinity {{ contrib.affinityBonus >= 0 ? '+' : ''
+                  }}{{ contrib.affinityBonus | number: '1.0-2' }})
+                </span>
               }
               @for (tb of contrib.traitBonuses; track tb.traitName) {
                 @if (tb.applies) {
@@ -127,7 +137,7 @@
                 <span class="badge badge-xs badge-success">Applied</span>
               </div>
               <p class="text-xs opacity-70">{{ upgrade.description }}</p>
-              @for (effect of upgrade.effects; track effect.type) {
+              @for (effect of upgrade.effects; track $index) {
                 <app-upgrade-effect-badge
                   [effect]="effect"
                   [tooltipText]="formatEffectTooltip(effect)"
@@ -158,7 +168,7 @@
                         {{ entry.path.description }}
                       </p>
                       <div class="flex flex-wrap gap-2 mt-1">
-                        @for (effect of entry.path.effects; track effect.type) {
+                        @for (effect of entry.path.effects; track $index) {
                           <app-upgrade-effect-badge
                             [effect]="effect"
                             [tooltipText]="formatEffectTooltip(effect)"
@@ -230,10 +240,7 @@
           @for (slot of featureSlots(); track slot.index) {
             @if (slot.feature) {
               <div class="flex items-center justify-between gap-2">
-                <span
-                  class="text-xs truncate"
-                  [tp]="slot.feature.description"
-                >
+                <span class="text-xs truncate" [tp]="slot.feature.description">
                   {{ slot.feature.name }}
                 </span>
                 <app-button-close
@@ -282,10 +289,20 @@
       @if (room.maxInhabitants !== 0 && !isThrone()) {
         <div class="divider my-2 text-xs opacity-60">Inhabitants</div>
 
+        @if (travelingInhabitantCount() > 0) {
+          <div class="text-xs text-info flex items-center gap-2 mb-2">
+            <app-icon name="tablerArrowsVertical" size="12px" class="animate-pulse" />
+            {{ travelingInhabitantCount() | number: '1.0-0' }} traveling - not yet producing
+          </div>
+        }
+
         @if (assignedInhabitants().length > 0) {
           <div class="flex flex-col gap-2">
             @for (inh of assignedInhabitants(); track inh.instance.instanceId) {
-              <div class="flex items-center justify-between gap-2">
+              <div
+                class="flex items-center justify-between gap-2"
+                [class.opacity-50]="isInhabitantTraveling(inh.instance)"
+              >
                 <app-inhabitant-card
                   class="min-w-0"
                   [instance]="inh.instance"
@@ -543,7 +560,11 @@
       }
     </div>
     <div actions>
-      <button class="btn btn-sm" appSfx="ui-error" (click)="showFeatureSelect.set(false)">
+      <button
+        class="btn btn-sm"
+        appSfx="ui-error"
+        (click)="showFeatureSelect.set(false)"
+      >
         Cancel
       </button>
     </div>
@@ -587,7 +608,11 @@
       }
     </div>
     <div actions>
-      <button class="btn btn-sm" appSfx="ui-error" (click)="showInhabitantSelect.set(false)">
+      <button
+        class="btn btn-sm"
+        appSfx="ui-error"
+        (click)="showInhabitantSelect.set(false)"
+      >
         Cancel
       </button>
     </div>

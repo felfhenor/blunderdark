@@ -18,7 +18,11 @@ import {
   formatMultiplierAsPercentage,
   formatTierBadgeClass,
 } from '@helpers/format';
-import { inhabitantGetAssignmentLabel } from '@helpers/inhabitants';
+import {
+  inhabitantGetAssignmentLabel,
+  inhabitantIsTraveling,
+} from '@helpers/inhabitants';
+import { formatRealDuration } from '@helpers/game-time';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { findRoomOnFloor, floorAll } from '@helpers/floor';
 import { workAffinityGetLabel, WORK_CATEGORY_LABELS } from '@helpers/work-affinity';
@@ -96,8 +100,19 @@ export class InhabitantCardComponent {
   });
 
   public assignmentLabel = computed(() =>
-    inhabitantGetAssignmentLabel(this.instance().assignedRoomId),
+    inhabitantGetAssignmentLabel(
+      this.instance().assignedRoomId,
+      this.instance().travelTicksRemaining,
+    ),
   );
+
+  public isTraveling = computed(() => inhabitantIsTraveling(this.instance()));
+
+  public travelTooltip = computed(() => {
+    const ticks = this.instance().travelTicksRemaining;
+    if (ticks === undefined || ticks <= 0) return '';
+    return `${formatRealDuration(ticks)} remaining`;
+  });
 
   public stateClass = computed(() => {
     const state = this.instance().state;

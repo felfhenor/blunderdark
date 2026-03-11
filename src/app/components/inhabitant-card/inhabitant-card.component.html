@@ -20,7 +20,14 @@
         }
       </div>
       @if (showAssignment() && instance().assignedRoomId) {
-        <span class="badge badge-xs badge-outline opacity-60 flex-shrink-0">Assigned</span>
+        @if (isTraveling()) {
+          <span class="badge badge-xs badge-info flex-shrink-0 animate-pulse" [tp]="travelTooltip()">
+            <app-icon name="tablerArrowsVertical" size="10px" />
+            Traveling
+          </span>
+        } @else {
+          <span class="badge badge-xs badge-outline opacity-60 flex-shrink-0">Assigned</span>
+        }
       }
       @if (showState()) {
         <span class="badge badge-xs flex-shrink-0" [ngClass]="stateClass()" [tp]="stateTipCompact">
@@ -183,7 +190,14 @@
         class="text-xs mt-0.5"
         [class.opacity-50]="!instance().assignedRoomId"
       >
-        {{ assignmentLabel() }}
+        @if (isTraveling()) {
+          <span class="inline-flex items-center gap-2">
+            <app-icon name="tablerArrowsVertical" size="12px" class="text-info animate-pulse" />
+            {{ assignmentLabel() }} - {{ travelTooltip() }}
+          </span>
+        } @else {
+          {{ assignmentLabel() }}
+        }
       </div>
     }
   </div>
