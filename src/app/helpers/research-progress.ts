@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { reputationAwardInPlace } from '@helpers/reputation';
+import { corruptionEffectGetActiveModifier } from '@helpers/corruption-effects';
 import { reputationEffectGetProductionMultiplier } from '@helpers/reputation-effects';
 import {
   researchUnlockGetPassiveBonusWithMastery,
@@ -211,7 +212,17 @@ export function researchProcess(state: GameState, numTicks = 1): void {
   if (!node) return;
 
   const speedModifier = researchCalculateSpeedModifier(state.world.floors);
-  const progressPerTick = RESEARCH_BASE_PROGRESS_PER_TICK * speedModifier;
+
+  // Apply corruption research modifier (e.g. Corruption Mastery +15% dark research)
+  const corruptionResearchMul = corruptionEffectGetActiveModifier(
+    'research_modifier',
+    (e) => {
+      const branch = (e.effectParams as Record<string, unknown>)?.['branch'];
+      return !branch || branch === node.branch;
+    },
+  );
+
+  const progressPerTick = RESEARCH_BASE_PROGRESS_PER_TICK * speedModifier * corruptionResearchMul;
 
   research.activeResearchProgress += progressPerTick * numTicks;
 

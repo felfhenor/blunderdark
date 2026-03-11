@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { sortBy } from 'es-toolkit/compat';
 import { biomeGetCombatModifier } from '@helpers/biome-modifiers';
+import { corruptionEffectGetActiveModifier } from '@helpers/corruption-effects';
 import { combatAbilityInitStates } from '@helpers/combat-abilities';
 import { contentGetEntry } from '@helpers/content';
 import { interrogationBuffGetTotals } from '@helpers/torture-chamber';
@@ -849,8 +850,11 @@ export function invasionProcess(state: GameState): void {
         const biomeDefAttackMul = biomeGetCombatModifier(currentFloor.biome, 'defender', 'attack');
         const biomeDefDefenseMul = biomeGetCombatModifier(currentFloor.biome, 'defender', 'defense');
 
-        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul * biomeDefAttackMul));
-        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul * biomeDefDefenseMul));
+        // Apply corruption combat modifier (e.g. Corrupted Vigor +10% all stats)
+        const corruptionCombatMul = corruptionEffectGetActiveModifier('combat_modifier');
+
+        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul * biomeDefAttackMul * corruptionCombatMul));
+        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul * biomeDefDefenseMul * corruptionCombatMul));
 
         // Initialize ability states from content definition if not already set
         const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);

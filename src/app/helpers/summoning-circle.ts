@@ -2,13 +2,15 @@ import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
 import { findRoomOnFloor } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { corruptionEffectGetRecruitmentTraitChance } from '@helpers/corruption-effects';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
 import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { mutationTraitRoll } from '@helpers/mutation-traits';
 import { recruitmentMaxInhabitantCount } from '@helpers/recruitment';
 import { reputationAwardByIdInPlace, reputationAwardInPlace } from '@helpers/reputation';
-import { rngUuid } from '@helpers/rng';
+import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
   roomShapeGetAbsoluteTiles,
@@ -207,7 +209,7 @@ export function summoningCreateInhabitant(
     }
   }
 
-  return {
+  const instance: InhabitantInstance = {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
     name: generateInhabitantName(def.type),
@@ -218,6 +220,17 @@ export function summoningCreateInhabitant(
       Object.keys(instanceStatBonuses).length > 0 ? instanceStatBonuses : undefined,
     isSummoned: true,
   };
+
+  // Apply corruption recruitment modifier (e.g. Dark Magnetism +10% rare trait chance)
+  const traitChance = corruptionEffectGetRecruitmentTraitChance();
+  if (traitChance > 0 && Math.random() < traitChance) {
+    const trait = mutationTraitRoll(false, [], rngRandom());
+    if (trait) {
+      instance.mutationTraitIds = [trait.id];
+    }
+  }
+
+  return instance;
 }
 
 /**

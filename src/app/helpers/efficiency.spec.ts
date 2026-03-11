@@ -191,6 +191,10 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/corruption-effects', () => ({
+  corruptionEffectGetInhabitantDebuffMultiplier: vi.fn(() => 1),
+}));
+
 import { contentGetEntry } from '@helpers/content';
 import {
   efficiencyCalculateInhabitantContribution,

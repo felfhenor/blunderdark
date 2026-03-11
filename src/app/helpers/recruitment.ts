@@ -1,8 +1,10 @@
 import { computed } from '@angular/core';
 import { altarRoomCanRecruit } from '@helpers/altar-room';
 import { contentGetEntriesByType } from '@helpers/content';
+import { corruptionEffectGetRecruitmentTraitChance } from '@helpers/corruption-effects';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { inhabitantAdd } from '@helpers/inhabitants';
+import { mutationTraitRoll } from '@helpers/mutation-traits';
 import { reputationEffectGetMaxAttractionLevel } from '@helpers/reputation-effects';
 import { reputationAwardForAction } from '@helpers/reputation';
 import {
@@ -11,7 +13,7 @@ import {
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
-import { rngUuid } from '@helpers/rng';
+import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomUpgradeGetGlobalMaxInhabitantBonus } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -225,6 +227,15 @@ export async function recruitmentRecruit(def: InhabitantContent): Promise<{
     state: 'normal',
     assignedRoomId: undefined,
   };
+
+  // Apply corruption recruitment modifier (e.g. Dark Magnetism +10% rare trait chance)
+  const traitChance = corruptionEffectGetRecruitmentTraitChance();
+  if (traitChance > 0 && Math.random() < traitChance) {
+    const trait = mutationTraitRoll(false, [], rngRandom());
+    if (trait) {
+      instance.mutationTraitIds = [trait.id];
+    }
+  }
 
   await inhabitantAdd(instance);
 

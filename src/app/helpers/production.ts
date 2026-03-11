@@ -19,6 +19,7 @@ import {
   corruptionGenerationCalculateInhabitantRate,
   corruptionCalculateDeepObjectiveRate,
 } from '@helpers/corruption';
+import { corruptionEffectGetActiveModifier } from '@helpers/corruption-effects';
 import {
   featureApplyResourceConversion,
   featureCalculateAdjacentProductionBonus,
@@ -496,6 +497,10 @@ export function productionCalculateTotal(
         const researchMultiplier = productionGetResearchMultiplier(resourceType);
         const reputationMultiplier = productionGetReputationMultiplier(resourceType);
         const legendaryAuraMultiplier = productionGetLegendaryAuraMultiplier(resourceType, allInhabitants);
+        const corruptionProductionMul = corruptionEffectGetActiveModifier(
+          'production_modifier',
+          (e) => (e.effectParams as Record<string, unknown>)?.['resource'] === resourceType,
+        );
         const final =
           baseAmount *
           (1 +
@@ -513,7 +518,8 @@ export function productionCalculateTotal(
           biomeCreatureModifier *
           researchMultiplier *
           reputationMultiplier *
-          legendaryAuraMultiplier;
+          legendaryAuraMultiplier *
+          corruptionProductionMul;
         roomProduction[resourceType] =
           (roomProduction[resourceType] ?? 0) + final;
       }

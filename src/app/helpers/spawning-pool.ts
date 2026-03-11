@@ -1,8 +1,10 @@
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
+import { corruptionEffectGetRecruitmentTraitChance } from '@helpers/corruption-effects';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
+import { mutationTraitRoll } from '@helpers/mutation-traits';
 import { recruitmentMaxInhabitantCount } from '@helpers/recruitment';
-import { rngChoice, rngUuid } from '@helpers/rng';
+import { rngChoice, rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { roomUpgradeGetAppliedEffects } from '@helpers/room-upgrades';
 import type {
@@ -114,7 +116,7 @@ export function spawningPoolCountUnassigned(
 export function spawningPoolCreateInhabitant(
   def: InhabitantContent,
 ): InhabitantInstance {
-  return {
+  const instance: InhabitantInstance = {
     instanceId: rngUuid<InhabitantInstanceId>(),
     definitionId: def.id,
     name: generateInhabitantName(def.type),
@@ -122,6 +124,17 @@ export function spawningPoolCreateInhabitant(
     assignedRoomId: undefined,
     hungerTicksWithoutFood: 0,
   };
+
+  // Apply corruption recruitment modifier (e.g. Dark Magnetism +10% rare trait chance)
+  const traitChance = corruptionEffectGetRecruitmentTraitChance();
+  if (traitChance > 0 && Math.random() < traitChance) {
+    const trait = mutationTraitRoll(false, [], rngRandom());
+    if (trait) {
+      instance.mutationTraitIds = [trait.id];
+    }
+  }
+
+  return instance;
 }
 
 // --- Tick processor ---

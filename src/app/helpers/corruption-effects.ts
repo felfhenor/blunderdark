@@ -131,6 +131,36 @@ export function corruptionEffectGetActiveModifier(
   return multiplier;
 }
 
+// --- Get active inhabitant debuff efficiency multiplier ---
+
+export function corruptionEffectGetInhabitantDebuffMultiplier(): number {
+  const active = corruptionActivePassiveEffects();
+  let multiplier = 1;
+  for (const effect of active) {
+    if (effect.effectType !== 'inhabitant_debuff') continue;
+    const m = (effect.effectParams as Record<string, number> | undefined)?.['efficiencyMultiplier'];
+    if (m !== undefined) {
+      multiplier *= m;
+    }
+  }
+  return multiplier;
+}
+
+// --- Get active recruitment modifier rare trait chance bonus ---
+
+export function corruptionEffectGetRecruitmentTraitChance(): number {
+  const active = corruptionActivePassiveEffects();
+  let totalChance = 0;
+  for (const effect of active) {
+    if (effect.effectType !== 'recruitment_modifier') continue;
+    const chance = (effect.effectParams as Record<string, number> | undefined)?.['rareTraitChance'];
+    if (chance !== undefined) {
+      totalChance += chance;
+    }
+  }
+  return totalChance;
+}
+
 // --- Check if dark upgrades are unlocked ---
 
 export function corruptionEffectIsDarkUpgradeUnlocked(

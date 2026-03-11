@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { corruptionEffectGetInhabitantDebuffMultiplier } from '@helpers/corruption-effects';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { findRoomOnFloor, floorAll } from '@helpers/floor';
@@ -253,6 +254,9 @@ export function efficiencyCalculateMatchedInhabitantBonus(
       }
     }
   }
+
+  // Apply corruption inhabitant debuff (e.g. Corruption Sickness -15% efficiency)
+  totalBonus *= corruptionEffectGetInhabitantDebuffMultiplier();
 
   return { bonus: totalBonus, hasWorkers: true };
 }
