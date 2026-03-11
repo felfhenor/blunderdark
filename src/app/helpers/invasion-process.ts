@@ -1287,33 +1287,69 @@ function processHallwayTrapAtTile(
       message: `${targetDef?.name ?? 'Invader'} disarmed ${triggerResult.trapName}!`,
     });
   } else if (triggerResult.triggered) {
-    const newHp = Math.max(0, (invasion.invaderHpMap[targetInvader.id] ?? 0) - triggerResult.damage);
-    invasion.invaderHpMap[targetInvader.id] = newHp;
-
     const isFearGlyph = triggerResult.effectType === 'fear';
     moraleApplyTrapTrigger(isFearGlyph, invasion.currentTurn, invasion.invasionState.invaders);
 
-    if (newHp <= 0) {
-      invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
-      invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
-      if (targetInvader.isLeader) {
-        moraleApplyLeaderDeath(targetInvader, invasion.currentTurn);
-      } else {
-        moraleApplyAllyDeath(targetInvader, invasion.currentTurn, invasion.invasionState.invaders);
+    if (triggerResult.effectType === 'magic') {
+      // Magic traps deal damage to ALL living invaders (AoE)
+      const killed: string[] = [];
+      for (const inv of livingInvaders) {
+        const newHp = Math.max(0, (invasion.invaderHpMap[inv.id] ?? 0) - triggerResult.damage);
+        invasion.invaderHpMap[inv.id] = newHp;
+        if (newHp <= 0) {
+          const invDef = invaderGetDefinitionById(inv.definitionId);
+          invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, inv.id);
+          invasion.killedInvaderClasses.push(invDef?.invaderClass ?? 'warrior');
+          if (inv.isLeader) {
+            moraleApplyLeaderDeath(inv, invasion.currentTurn);
+          } else {
+            moraleApplyAllyDeath(inv, invasion.currentTurn, invasion.invasionState.invaders);
+          }
+          killed.push(invDef?.name ?? 'Invader');
+        }
       }
-      invasion.battleLog.push({
-        turn: invasion.currentTurn,
-        type: 'combat_kill',
-        roomId: destRoomId,
-        message: `${triggerResult.trapName} killed ${targetDef?.name ?? 'Invader'}! (${triggerResult.damage} damage)`,
-      });
+
+      if (killed.length > 0) {
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'combat_kill',
+          roomId: destRoomId,
+          message: `${triggerResult.trapName} blasts all invaders for ${triggerResult.damage} damage, killing ${killed.join(', ')}!`,
+        });
+      } else {
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'trap_trigger',
+          roomId: destRoomId,
+          message: `${triggerResult.trapName} blasts all invaders for ${triggerResult.damage} damage each!`,
+        });
+      }
     } else {
-      invasion.battleLog.push({
-        turn: invasion.currentTurn,
-        type: 'trap_trigger',
-        roomId: destRoomId,
-        message: `${triggerResult.trapName} hit ${targetDef?.name ?? 'Invader'} for ${triggerResult.damage} damage.`,
-      });
+      const newHp = Math.max(0, (invasion.invaderHpMap[targetInvader.id] ?? 0) - triggerResult.damage);
+      invasion.invaderHpMap[targetInvader.id] = newHp;
+
+      if (newHp <= 0) {
+        invasion.invasionState = invasionWinLossMarkKilled(invasion.invasionState, targetInvader.id);
+        invasion.killedInvaderClasses.push(targetDef?.invaderClass ?? 'warrior');
+        if (targetInvader.isLeader) {
+          moraleApplyLeaderDeath(targetInvader, invasion.currentTurn);
+        } else {
+          moraleApplyAllyDeath(targetInvader, invasion.currentTurn, invasion.invasionState.invaders);
+        }
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'combat_kill',
+          roomId: destRoomId,
+          message: `${triggerResult.trapName} killed ${targetDef?.name ?? 'Invader'}! (${triggerResult.damage} damage)`,
+        });
+      } else {
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'trap_trigger',
+          roomId: destRoomId,
+          message: `${triggerResult.trapName} hit ${targetDef?.name ?? 'Invader'} for ${triggerResult.damage} damage.`,
+        });
+      }
     }
   } else {
     invasion.battleLog.push({
