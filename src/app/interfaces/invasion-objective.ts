@@ -10,7 +10,17 @@ export type ObjectiveType =
   | 'SealPortal'
   | 'DefileLibrary'
   | 'PlunderVault'
-  | 'ScoutDungeon';
+  | 'ScoutDungeon'
+  | 'SabotageForge'
+  | 'DisruptBreeding'
+  | 'BanishSummons'
+  | 'PurifyShrine'
+  | 'PoisonSupply'
+  | 'AssassinateCommander'
+  | 'SurviveNTurns'
+  | 'ReachDepth'
+  | 'PlantBeacon'
+  | 'StealBlueprints';
 
 export type InvasionObjective = {
   id: InvasionObjectiveId;

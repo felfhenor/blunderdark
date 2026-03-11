@@ -99,6 +99,31 @@ export async function invasionRewardApplyDefeat(
       Math.max(THREAT_MIN, state.world.playerThreat + adjustment),
     );
 
+    // Apply PoisonSupply food production debuff (max 1 active, replaces existing)
+    const completedTypes = result.detailedResult.completedObjectiveTypes ?? [];
+    if (completedTypes.includes('PoisonSupply')) {
+      state.world.invasionDebuff = {
+        type: 'food_production_penalty',
+        multiplier: 0.5,
+        expiresOnDay: state.clock.day + 10,
+      };
+    }
+
+    // Apply PlantBeacon schedule acceleration (next scheduled invasion 30% sooner)
+    if (completedTypes.includes('PlantBeacon')) {
+      const schedule = state.world.invasionSchedule;
+      if (schedule.nextInvasionDay !== undefined) {
+        const daysUntil = schedule.nextInvasionDay - state.clock.day;
+        if (daysUntil > 1) {
+          const reduction = Math.floor(daysUntil * 0.3);
+          schedule.nextInvasionDay = Math.max(
+            state.clock.day + 1,
+            schedule.nextInvasionDay - reduction,
+          );
+        }
+      }
+    }
+
     return state;
   });
 }

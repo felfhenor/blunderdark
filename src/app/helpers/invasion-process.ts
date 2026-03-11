@@ -26,7 +26,13 @@ import {
 import { invasionEventTryTrigger } from '@helpers/invasion-events';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
 import { invasionThreatGetPartySizeBonus, invasionThreatGetStatBonus } from '@helpers/invasion-threat';
-import { invasionObjectiveAssign, invasionObjectiveUpdateProgress } from '@helpers/invasion-objectives';
+import {
+  invasionObjectiveAssign,
+  invasionObjectiveUpdateProgress,
+  invasionObjectiveSetDynamicTargets,
+  invasionObjectiveCalculateSurviveNTurnsProgress,
+  INVASION_OBJECTIVE_SURVIVE_N_TURNS_TARGET,
+} from '@helpers/invasion-objectives';
 import {
   invasionRewardCalculateDefensePenalties,
   invasionRewardCalculateDefenseRewards,
@@ -128,7 +134,7 @@ export const SPECIAL_INVASION_CONFIGS: Record<SpecialInvasionType, SpecialInvasi
     penaltyResourceMultiplier: 2.0,
     penaltyReputationMultiplier: 0.5,
     forceWeights: { rogue: 50, ranger: 25, warrior: 10, mage: 5, cleric: 5, paladin: 5 },
-    pairedObjectives: ['StealTreasure', 'PlunderVault'],
+    pairedObjectives: ['StealTreasure', 'PlunderVault', 'PoisonSupply'],
   },
   bounty_hunter: {
     label: 'Bounty Hunters',
@@ -140,7 +146,7 @@ export const SPECIAL_INVASION_CONFIGS: Record<SpecialInvasionType, SpecialInvasi
     penaltyResourceMultiplier: 1.0,
     penaltyReputationMultiplier: 1.5,
     forceWeights: { warrior: 35, ranger: 30, rogue: 20, paladin: 10, mage: 5, cleric: 0 },
-    pairedObjectives: ['SlayMonster'],
+    pairedObjectives: ['SlayMonster', 'AssassinateCommander'],
   },
   shadow_rift: {
     label: 'Shadow Rift',
@@ -152,7 +158,7 @@ export const SPECIAL_INVASION_CONFIGS: Record<SpecialInvasionType, SpecialInvasi
     penaltyResourceMultiplier: 0,
     penaltyReputationMultiplier: 0.5,
     forceWeights: { mage: 40, rogue: 30, ranger: 15, warrior: 10, cleric: 5, paladin: 0 },
-    pairedObjectives: ['SealPortal', 'DefileLibrary'],
+    pairedObjectives: ['SealPortal', 'DefileLibrary', 'BanishSummons'],
   },
   crusade: {
     label: 'Holy Crusade',
@@ -164,7 +170,7 @@ export const SPECIAL_INVASION_CONFIGS: Record<SpecialInvasionType, SpecialInvasi
     penaltyResourceMultiplier: 1.0,
     penaltyReputationMultiplier: 1.5,
     forceWeights: { paladin: 40, cleric: 25, warrior: 20, mage: 5, rogue: 5, ranger: 5 },
-    pairedObjectives: ['SealPortal', 'DefileLibrary'],
+    pairedObjectives: ['SealPortal', 'DefileLibrary', 'PurifyShrine'],
   },
 };
 
@@ -709,7 +715,10 @@ export function invasionStart(
   );
   const { path, roomFloorMap } = pathResult;
 
-  // 4a. Apply fear immunity for special invasions (shadow_rift ignores fear)
+  // 4a. Set dynamic targetIds for path-dependent objectives (ReachDepth, PlantBeacon)
+  const finalObjectives = invasionObjectiveSetDynamicTargets(objectives, path);
+
+  // 4b. Apply fear immunity for special invasions (shadow_rift ignores fear)
   const roomFearLevels = specialConfig?.ignoreFear
     ? Object.fromEntries(Object.keys(pathResult.roomFearLevels).map((k) => [k, 0]))
     : pathResult.roomFearLevels;
@@ -722,8 +731,8 @@ export function invasionStart(
 
   const entryRoomId = path[0];
 
-  // 4b. Count unreachable secondary objectives (anti-turtling)
-  const unreachableObjectiveCount = invasionCountUnreachableObjectives(objectives, path);
+  // 4c. Count unreachable secondary objectives (anti-turtling)
+  const unreachableObjectiveCount = invasionCountUnreachableObjectives(finalObjectives, path);
 
   // 5. Count all defenders across floors in the path
   const pathRoomSet = new Set(path);
@@ -734,7 +743,7 @@ export function invasionStart(
   // 6. Create invasion state
   const invasionState = invasionWinLossCreateState(
     invaders,
-    objectives,
+    finalObjectives,
     defenderIds.length,
   );
 
@@ -854,6 +863,7 @@ export function invasionProcess(state: GameState): void {
   if (invasion.hallwayTraversal) {
     invasion.currentTurn++;
     invasion.invasionState = { ...invasion.invasionState, currentTurn: invasion.currentTurn };
+    invasionProcessSurviveNTurnsCheck(invasion);
     processHallwayTraversalTick(state, invasion, rng);
     return;
   }
@@ -861,6 +871,9 @@ export function invasionProcess(state: GameState): void {
   invasion.currentRoomTicksElapsed++;
   invasion.currentTurn++;
   invasion.invasionState = { ...invasion.invasionState, currentTurn: invasion.currentTurn };
+
+  // Auto-progress SurviveNTurns objectives
+  invasionProcessSurviveNTurnsCheck(invasion);
 
   const roomId = invasion.path[invasion.currentRoomIndex];
   const floorIndex = invasion.roomFloorMap[roomId] ?? 0;
@@ -1555,6 +1568,9 @@ function processCombatKill(
     invasion.killedDefenderIds.push(defId);
     invasion.invasionState = invasionWinLossRecordDefenderLoss(invasion.invasionState);
 
+    // Check AssassinateCommander objectives targeting this defender
+    invasionProcessAssassinateCommanderCheck(invasion, defId, roomId);
+
     invasion.battleLog.push({
       turn: invasion.currentTurn,
       type: 'defender_killed',
@@ -1871,6 +1887,74 @@ function syncCombatStateBack(invasion: ActiveInvasion, state?: GameState): void 
   }
 }
 
+function invasionProcessSurviveNTurnsCheck(invasion: ActiveInvasion): void {
+  for (const obj of invasion.invasionState.objectives) {
+    if (obj.type !== 'SurviveNTurns' || obj.isPrimary || obj.isCompleted) continue;
+
+    const progress = invasionObjectiveCalculateSurviveNTurnsProgress(
+      invasion.currentTurn,
+      INVASION_OBJECTIVE_SURVIVE_N_TURNS_TARGET,
+    );
+    const updated = invasionObjectiveUpdateProgress(obj, progress);
+
+    if (updated.isCompleted && !obj.isCompleted) {
+      // Apply altar debuff for completed objective
+      const debuffResult = invasionWinLossApplyObjectiveDebuff(
+        { ...invasion.invasionState, objectives: invasion.invasionState.objectives.map((o) => o.id === obj.id ? updated : o) },
+        invasion.altarMaxHpMultiplier,
+      );
+      invasion.invasionState = debuffResult.state;
+      invasion.altarMaxHpMultiplier = debuffResult.newMultiplier;
+
+      invasion.battleLog.push({
+        turn: invasion.currentTurn,
+        type: 'random_event',
+        message: `Objective completed: ${obj.name}! The invaders have endured the gauntlet. The altar weakens... (${invasion.invasionState.altarMaxHp} max HP)`,
+      });
+    } else {
+      invasion.invasionState = {
+        ...invasion.invasionState,
+        objectives: invasion.invasionState.objectives.map((o) =>
+          o.id === obj.id ? updated : o,
+        ),
+      };
+    }
+  }
+}
+
+function invasionProcessAssassinateCommanderCheck(
+  invasion: ActiveInvasion,
+  killedDefenderId: string,
+  roomId: string,
+): void {
+  for (const obj of invasion.invasionState.objectives) {
+    if (obj.type !== 'AssassinateCommander' || obj.isPrimary || obj.isCompleted) continue;
+    if (obj.targetId !== killedDefenderId) continue;
+
+    const updated = invasionObjectiveUpdateProgress(obj, 100);
+    invasion.invasionState = {
+      ...invasion.invasionState,
+      objectives: invasion.invasionState.objectives.map((o) =>
+        o.id === obj.id ? updated : o,
+      ),
+    };
+
+    const debuffResult = invasionWinLossApplyObjectiveDebuff(
+      invasion.invasionState,
+      invasion.altarMaxHpMultiplier,
+    );
+    invasion.invasionState = debuffResult.state;
+    invasion.altarMaxHpMultiplier = debuffResult.newMultiplier;
+
+    invasion.battleLog.push({
+      turn: invasion.currentTurn,
+      type: 'random_event',
+      roomId,
+      message: `Objective completed: ${obj.name}! The commander has fallen. The altar weakens... (${invasion.invasionState.altarMaxHp} max HP)`,
+    });
+  }
+}
+
 function invasionProcessComplete(
   state: GameState,
   invasion: ActiveInvasion,
@@ -1994,6 +2078,7 @@ function createEmptyCompletedInvasion(
       defendersLost: 0,
       objectivesCompleted: 0,
       objectivesTotal: 0,
+      completedObjectiveTypes: [],
       rewardMultiplier: 0.5,
       penetrationDepth: 0,
       roomsReached: 0,

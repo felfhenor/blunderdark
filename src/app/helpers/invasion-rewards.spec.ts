@@ -44,10 +44,12 @@ function makeResult(overrides: Partial<DetailedInvasionResult> = {}): DetailedIn
     defendersLost: 1,
     objectivesCompleted: 0,
     objectivesTotal: 2,
+    completedObjectiveTypes: [],
     rewardMultiplier: 1.5,
     penetrationDepth: 0.5,
     roomsReached: 4,
     totalPathRooms: 8,
+    altarMaxHpMultiplier: 1.0,
     ...overrides,
   };
 }
@@ -258,18 +260,31 @@ describe('invasion-rewards', () => {
       expect(penalties.reputationLoss).toBe(5);
     });
 
-    it('should stack secondary objective crystal/essence bonuses on top of depth losses', () => {
-      const result = makeResult({ outcome: 'defeat', penetrationDepth: 1.0, objectivesCompleted: 2 });
+    it('should stack per-type objective penalties on top of depth losses', () => {
+      const result = makeResult({
+        outcome: 'defeat',
+        penetrationDepth: 1.0,
+        objectivesCompleted: 2,
+        completedObjectiveTypes: ['StealTreasure', 'DefileLibrary'],
+      });
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
-      // crystals: floor(1000 * 0.25 * 1.0) + 2 * 10 = 250 + 20 = 270
-      expect(penalties.resourceLosses.crystals).toBe(270);
-      // essence: floor(1000 * 0.2 * 1.0) + 2 * 5 = 200 + 10 = 210
-      expect(penalties.resourceLosses.essence).toBe(210);
+      // crystals: floor(1000 * 0.25 * 1.0) + 5 (DefileLibrary) = 255 (StealTreasure has no crystals... wait it does: 5)
+      // StealTreasure: gold 15, crystals 5. DefileLibrary: research 10, essence 5
+      expect(penalties.resourceLosses.crystals).toBe(250 + 5);
+      expect(penalties.resourceLosses.gold).toBe(400 + 15);
+      expect(penalties.resourceLosses.essence).toBe(200 + 5);
+      expect(penalties.resourceLosses.research).toBe(10);
     });
 
     it('should have no depth losses but still have objective losses when depth is 0', () => {
-      const result = makeResult({ outcome: 'defeat', penetrationDepth: 0, objectivesCompleted: 1 });
+      const result = makeResult({
+        outcome: 'defeat',
+        penetrationDepth: 0,
+        objectivesCompleted: 1,
+        completedObjectiveTypes: ['SlayMonster'],
+      });
       const penalties = invasionRewardCalculateDefensePenalties(result, fullResources);
+      // SlayMonster: crystals 10, essence 5
       expect(penalties.resourceLosses.crystals).toBe(10);
       expect(penalties.resourceLosses.essence).toBe(5);
       expect(penalties.resourceLosses.gold).toBeUndefined();

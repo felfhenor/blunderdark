@@ -3,6 +3,8 @@
   description: A blazing forge where inhabitants smelt ores and craft equipment. Assign workers to queue crafting jobs that produce weapons, armor, and upgrades. Proximity to mines, training grounds, and trap workshops enhances forging.
   shapeId: Small Staircase
   role: darkForge
+  objectiveTypes:
+    - SabotageForge
   workCategory: crafting
   queueSize: 5
   cost:
@@ -58,6 +60,8 @@
   name: Breeding Pits
   description: A dark, humid chamber where creatures are combined to produce hybrid offspring or subjected to mutagenic experiments. Assign inhabitants to breed a hybrid, or mutate a single creature for random stat changes.
   shapeId: H-Shape
+  objectiveTypes:
+    - DisruptBreeding
   cost:
     gold: 120
     crystals: 60
@@ -88,6 +92,8 @@
   name: Summoning Circle
   description: A ritual chamber inscribed with arcane glyphs for summoning creatures from other planes. Assign an inhabitant as a summoner to begin rituals that bring permanent rare creatures or temporary magical helpers to your dungeon.
   shapeId: Hollow Circle
+  objectiveTypes:
+    - BanishSummons
   cost:
     gold: 150
     essence: 80

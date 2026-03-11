@@ -11,6 +11,7 @@ import {
 const realMigrationV1 = saveMigrations.get(1);
 const realMigrationV2 = saveMigrations.get(2);
 const realMigrationV3 = saveMigrations.get(3);
+const realMigrationV4 = saveMigrations.get(4);
 
 // --- Mocks ---
 
@@ -504,6 +505,7 @@ describe('v2→v3 migration (crafting queue overhaul)', () => {
     if (realMigrationV1) saveMigrations.set(1, realMigrationV1);
     if (realMigrationV2) saveMigrations.set(2, realMigrationV2);
     if (realMigrationV3) saveMigrations.set(3, realMigrationV3);
+    if (realMigrationV4) saveMigrations.set(4, realMigrationV4);
   });
 
   it('should migrate forgeCraftingQueues to per-room forgeJobs', () => {

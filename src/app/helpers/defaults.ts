@@ -57,6 +57,7 @@ export function defaultGameState(): GameState {
       victoryProgress: defaultVictoryProgress(),
       merchant: defaultMerchantState(),
       unlockedCurrencies: defaultUnlockedCurrencies(),
+      invasionDebuff: undefined,
     },
   };
 }

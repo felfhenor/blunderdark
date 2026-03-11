@@ -1588,6 +1588,15 @@ export function productionProcess(state: GameState, numTicks = 1): void {
     state.world.season.currentSeason,
   );
 
+  // Apply invasion debuff to food production
+  const debuff = state.world.invasionDebuff;
+  if (debuff && debuff.type === 'food_production_penalty' && debuff.expiresOnDay > state.clock.day) {
+    const foodProd = production['food'];
+    if (foodProd && foodProd > 0) {
+      production['food'] = foodProd * debuff.multiplier;
+    }
+  }
+
   // Compute non-food consumption (legendary upkeep + feature maintenance)
   // and subtract from production to get a single net delta per resource.
   const consumption = consumptionCalculateNonFoodTotals(

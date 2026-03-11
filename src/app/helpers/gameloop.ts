@@ -107,6 +107,11 @@ export async function gameloop(totalTicks: number): Promise<void> {
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);
 
+    // Clean up expired invasion debuffs
+    if (state.world.invasionDebuff && state.world.invasionDebuff.expiresOnDay <= state.clock.day) {
+      state.world.invasionDebuff = undefined;
+    }
+
     for (const floor of state.world.floors) {
       featureSacrificeProcess(floor.rooms, numTicks);
     }

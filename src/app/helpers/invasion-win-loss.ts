@@ -8,7 +8,7 @@ import type {
   InvasionEndReason,
   InvasionState,
 } from '@interfaces/invasion';
-import type { InvasionObjective } from '@interfaces/invasion-objective';
+import type { InvasionObjective, ObjectiveType } from '@interfaces/invasion-objective';
 
 // --- Constants ---
 
@@ -250,7 +250,8 @@ export function invasionWinLossResolveDetailedResult(
 ): DetailedInvasionResult {
   const objectiveResult = invasionObjectiveResolveOutcome(state.objectives);
   const secondaries = state.objectives.filter((o) => !o.isPrimary);
-  const completedSecondaries = secondaries.filter((o) => o.isCompleted).length;
+  const completedSecondaries = secondaries.filter((o) => o.isCompleted);
+  const completedObjectiveTypes: ObjectiveType[] = completedSecondaries.map((o) => o.type);
 
   return {
     invasionId: state.invasionId,
@@ -262,8 +263,9 @@ export function invasionWinLossResolveDetailedResult(
     invadersKilled: state.invadersKilled,
     defenderCount: state.defenderCount,
     defendersLost: state.defendersLost,
-    objectivesCompleted: completedSecondaries,
+    objectivesCompleted: completedObjectiveTypes.length,
     objectivesTotal: secondaries.length,
+    completedObjectiveTypes,
     rewardMultiplier: objectiveResult.rewardMultiplier,
     penetrationDepth,
     roomsReached,

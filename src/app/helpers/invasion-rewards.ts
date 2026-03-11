@@ -13,6 +13,7 @@ import type {
   DetailedInvasionResult,
   PrisonerId,
 } from '@interfaces/invasion';
+import type { ObjectiveType } from '@interfaces/invasion-objective';
 import type { ReputationType } from '@interfaces/reputation';
 import type { ResourceType } from '@interfaces/resource';
 
@@ -100,6 +101,28 @@ const CLASS_LOOT: Record<InvaderClassType, ClassLoot> = {
 };
 
 
+// --- Per-objective penalty map ---
+
+export const OBJECTIVE_PENALTY_MAP: Partial<Record<ObjectiveType, Partial<Record<ResourceType, number>>>> = {
+  SabotageForge: { crystals: 15, gold: 10 },
+  DisruptBreeding: { essence: 15, food: 5 },
+  BanishSummons: { flux: 15, essence: 5 },
+  PurifyShrine: { corruption: 10, essence: 10 },
+  PoisonSupply: { food: 20 },
+  StealBlueprints: { research: 15, crystals: 5 },
+  AssassinateCommander: { essence: 10, gold: 10 },
+  SurviveNTurns: { crystals: 10, gold: 10 },
+  ReachDepth: { gold: 15, crystals: 5 },
+  PlantBeacon: { crystals: 5 },
+  StealTreasure: { gold: 15, crystals: 5 },
+  DefileLibrary: { research: 10, essence: 5 },
+  SealPortal: { flux: 10, essence: 5 },
+  PlunderVault: { gold: 20 },
+  SlayMonster: { crystals: 10, essence: 5 },
+  RescuePrisoner: { crystals: 5, essence: 5 },
+  ScoutDungeon: { crystals: 5 },
+};
+
 // --- Reward calculation ---
 
 /**
@@ -184,12 +207,16 @@ export function invasionRewardCalculateDefensePenalties(
     }
   }
 
-  // Secondary objective bonuses stack on top
-  if (result.objectivesCompleted > 0) {
-    resourceLosses.crystals =
-      (resourceLosses.crystals ?? 0) + result.objectivesCompleted * 10;
-    resourceLosses.essence =
-      (resourceLosses.essence ?? 0) + result.objectivesCompleted * 5;
+  // Per-objective type penalties stack on top
+  if (result.completedObjectiveTypes) {
+    for (const objType of result.completedObjectiveTypes) {
+      const penalty = OBJECTIVE_PENALTY_MAP[objType];
+      if (penalty) {
+        for (const [resource, amount] of Object.entries(penalty) as [ResourceType, number][]) {
+          resourceLosses[resource] = (resourceLosses[resource] ?? 0) + amount;
+        }
+      }
+    }
   }
 
   return {

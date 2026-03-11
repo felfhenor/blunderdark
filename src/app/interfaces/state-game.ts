@@ -12,7 +12,7 @@ import type { TrapInventoryEntry } from '@interfaces/trap';
 import type { ForgeInventoryEntry } from '@interfaces/forge';
 import type { AlchemyConversion } from '@interfaces/alchemy';
 import type { CorruptionEffectState } from '@interfaces/corruption-effect';
-import type { ActiveInvasion, CapturedPrisoner, InvasionSchedule } from '@interfaces/invasion';
+import type { ActiveInvasion, CapturedPrisoner, InvasionDebuff, InvasionSchedule } from '@interfaces/invasion';
 import type { MerchantState } from '@interfaces/merchant';
 import type { InterrogationBuff } from '@interfaces/torture';
 import type { TraitRune } from '@interfaces/traitrune';
@@ -45,6 +45,7 @@ export interface GameStateWorld {
   victoryProgress: VictoryProgress;
   merchant: MerchantState;
   unlockedCurrencies: ResourceType[];
+  invasionDebuff: InvasionDebuff | undefined;
 }
 
 export interface GameStateClock {

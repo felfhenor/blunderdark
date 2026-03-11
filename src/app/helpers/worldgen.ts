@@ -103,6 +103,7 @@ export async function worldgenGenerateWorld(): Promise<
     victoryProgress: defaultVictoryProgress(),
     merchant: defaultMerchantState(),
     unlockedCurrencies: defaultUnlockedCurrencies(),
+    invasionDebuff: undefined,
     didFinish: true,
   };
 }

@@ -45,6 +45,8 @@
   description: A grove of bioluminescent fungi that feeds your dungeon inhabitants. Thrives near water and darkness. Requires workers for full output.
   shapeId: Staircase
   workCategory: nature
+  objectiveTypes:
+    - PoisonSupply
   reputationAction: Build Mushroom Grove
   cost:
     gold: 40
@@ -107,6 +109,7 @@
     weight: 15
   objectiveTypes:
     - DefileLibrary
+    - StealBlueprints
   breedingAdjacencyEffects:
     researchBonus: 5
   summoningAdjacencyEffects:
@@ -177,6 +180,7 @@
     weight: 15
   objectiveTypes:
     - SealPortal
+    - PurifyShrine
   breedingAdjacencyEffects:
     mutationOddsBonus: 0.1
   summoningAdjacencyEffects:
@@ -198,6 +202,8 @@
   description: A vast subterranean lake fed by hidden aquifers. Its dark waters teem with blind cave fish and luminescent algae. Fishers stationed here harvest a steady supply of food, while the lake's moisture benefits nearby rooms.
   shapeId: T-Shape
   workCategory: nature
+  objectiveTypes:
+    - PoisonSupply
   cost:
     gold: 60
     crystals: 20

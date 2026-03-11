@@ -3,7 +3,7 @@ import type { SaveData, SaveMigrationResult } from '@interfaces';
 
 // --- Constants ---
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 // --- Types ---
 
@@ -111,6 +111,14 @@ saveMigrations.set(3, (data) => {
     if (!entry.bakedStatBonuses) {
       entry.bakedStatBonuses = {};
     }
+  }
+  return data;
+});
+
+saveMigrations.set(4, (data) => {
+  const world = data.gameState.world as unknown as Record<string, unknown>;
+  if (world['invasionDebuff'] === undefined) {
+    world['invasionDebuff'] = undefined;
   }
   return data;
 });

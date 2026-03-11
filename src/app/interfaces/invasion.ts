@@ -9,7 +9,7 @@ import type {
   InvaderStats,
 } from '@interfaces/invader';
 import type { PlacedRoomId, TileOffset } from '@interfaces/room-shape';
-import type { InvasionObjective } from '@interfaces/invasion-objective';
+import type { InvasionObjective, ObjectiveType } from '@interfaces/invasion-objective';
 import type { ReputationType } from '@interfaces/reputation';
 import type { ResourceType } from '@interfaces/resource';
 
@@ -111,6 +111,7 @@ export type DetailedInvasionResult = {
   defendersLost: number;
   objectivesCompleted: number;
   objectivesTotal: number;
+  completedObjectiveTypes: ObjectiveType[];
   rewardMultiplier: number;
   penetrationDepth: number;
   roomsReached: number;
@@ -303,4 +304,14 @@ export type ActiveInvasion = {
   // Completion
   completed: boolean;
   result?: InvasionOrchestratorResult;
+};
+
+// --- Invasion debuff (post-invasion effects) ---
+
+export type InvasionDebuffType = 'food_production_penalty';
+
+export type InvasionDebuff = {
+  type: InvasionDebuffType;
+  multiplier: number;
+  expiresOnDay: number;
 };
