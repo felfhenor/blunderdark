@@ -122,6 +122,18 @@ vi.mock('@helpers/inhabitant-names', () => ({
   generateInhabitantName: () => 'Test Fantasy Name',
 }));
 
+vi.mock('@helpers/reputation', () => ({
+  reputationAwardForAction: vi.fn(),
+}));
+
+vi.mock('@helpers/floor', () => ({
+  floorAll: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/room-roles', () => ({
+  roomRoleFindById: vi.fn(() => undefined),
+}));
+
 // --- Test Data Helpers ---
 
 function makeRecipe(

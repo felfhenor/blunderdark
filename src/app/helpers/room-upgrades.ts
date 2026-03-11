@@ -7,6 +7,7 @@ import { featureCalculateCapacityBonus } from '@helpers/features';
 import { reputationEffectIsRoomUpgradesUnlocked } from '@helpers/reputation-effects';
 import {
   researchUnlockGetPassiveBonusWithMastery,
+  researchUnlockGetRequiredResearchName,
   researchUnlockIsUnlocked,
 } from '@helpers/research-unlocks';
 import type {
@@ -136,7 +137,8 @@ export function roomUpgradeGetVisible(
     const locked = researchLocked || darkLocked || reputationLocked;
     let lockReason: string | undefined;
     if (researchLocked) {
-      lockReason = 'Requires research';
+      const researchName = researchUnlockGetRequiredResearchName('roomupgrade', path.id);
+      lockReason = researchName ? `Requires research: ${researchName}` : 'Requires research';
     } else if (darkLocked) {
       lockReason = 'Requires 50 Corruption';
     } else if (reputationLocked) {

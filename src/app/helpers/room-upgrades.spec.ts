@@ -25,6 +25,7 @@ vi.mock('@helpers/reputation-effects', () => ({
 vi.mock('@helpers/research-unlocks', () => ({
   researchUnlockIsUnlocked: (_type: string, id: string) =>
     mockResearchUnlocked.has(id),
+  researchUnlockGetRequiredResearchName: () => 'Test Research',
   researchUnlockGetPassiveBonusWithMastery: () => 0,
 }));
 
@@ -370,7 +371,7 @@ describe('roomUpgradeGetVisible', () => {
     const room = createPlacedRoom();
     const visible = roomUpgradeGetVisible(room);
     expect(visible.every((v) => v.locked)).toBe(true);
-    expect(visible.every((v) => v.lockReason === 'Requires research')).toBe(
+    expect(visible.every((v) => v.lockReason === 'Requires research: Test Research')).toBe(
       true,
     );
   });
