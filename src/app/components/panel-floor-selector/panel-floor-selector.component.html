@@ -1,14 +1,21 @@
 <div class="card bg-base-100 shadow-xl">
   <div class="card-body p-4">
     <div class="relative mb-2">
-      <input type="text" class="input input-bordered input-sm w-full"
-             placeholder="Search rooms..."
-             [ngModel]="searchText()"
-             (ngModelChange)="searchText.set($event)"
-             (keydown.escape)="clearSearch()" />
+      <input
+        type="text"
+        class="input input-bordered input-sm w-full"
+        placeholder="Search rooms..."
+        [ngModel]="searchText()"
+        (ngModelChange)="searchText.set($event)"
+        (keydown.escape)="clearSearch()"
+      />
       @if (hasSearch()) {
-        <button class="btn btn-ghost btn-xs absolute right-1 top-1"
-                (click)="clearSearch()">x</button>
+        <button
+          class="btn btn-ghost btn-xs absolute right-1 top-1"
+          (click)="clearSearch()"
+        >
+          x
+        </button>
       }
     </div>
 
@@ -28,7 +35,15 @@
           (click)="selectFloor(i)"
         >
           <span class="biome-indicator"></span>
-          <span class="biome-icon">{{ getBiomeIcon(floor.biome) }}</span>
+          <span class="biome-icon">
+            @if (getBiomeData(floor.biome); as biome) {
+              <app-icon
+                [name]="$any(biome.icon)"
+                size="2em"
+                [color]="biome.color"
+              />
+            }
+          </span>
           <span class="floor-name flex-1 text-left truncate">
             {{ floor.name }}
           </span>
@@ -36,7 +51,9 @@
             {{ floor.rooms.length | number: '1.0-0' }}rm
           </span>
           @if (hasSearch() && getFloorMatchCount(floor.id) > 0) {
-            <span class="badge badge-info badge-xs">{{ getFloorMatchCount(floor.id) }}</span>
+            <span class="badge badge-info badge-xs">
+              {{ getFloorMatchCount(floor.id) }}
+            </span>
           }
         </button>
       }
@@ -66,13 +83,17 @@
         <div class="flex flex-row flex-wrap justify-center gap-2 mb-3">
           @for (option of biomeOptions(); track option.value) {
             <button
-              class="btn btn-sm biome-btn"
+              class="btn btn-sm btn-untextured biome-btn"
               appSfx="ui-click"
               [class.btn-active]="selectedBiome() === option.value"
-              [style.--btn-color]="option.color"
+              [style.background]="
+                getBiomeBtnBg(option.color, selectedBiome() === option.value)
+              "
+              [style.border-color]="option.color"
+              [style.color]="'white'"
               (click)="selectedBiome.set(option.value)"
             >
-              <span class="biome-dot w-3 h-3 rounded-full mr-1"></span>
+              <app-icon [name]="$any(option.icon)" size="1.1em" />
               {{ option.name }}
             </button>
           }
@@ -89,7 +110,9 @@
           }
         }
 
-        <div class="text-xs opacity-60 text-center inline-flex items-center justify-center gap-2 flex-wrap w-full">
+        <div
+          class="text-xs opacity-60 text-center inline-flex items-center justify-center gap-2 flex-wrap w-full"
+        >
           Cost:
           @for (entry of nextFloorCostEntries(); track entry[0]) {
             <app-currency-cost [type]="$any(entry[0])" [amount]="entry[1]" />
@@ -98,7 +121,11 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" appSfx="ui-error" (click)="showCreateModal.set(false)">
+        <button
+          class="btn btn-sm"
+          appSfx="ui-error"
+          (click)="showCreateModal.set(false)"
+        >
           Cancel
         </button>
         <button
@@ -119,13 +146,20 @@
         <div class="flex flex-row flex-wrap justify-center gap-2 mb-3">
           @for (option of biomeOptions(); track option.value) {
             <button
-              class="btn btn-sm biome-btn"
+              class="btn btn-sm btn-untextured biome-btn"
               appSfx="ui-click"
               [class.btn-active]="changeBiomeTarget() === option.value"
-              [style.--btn-color]="option.color"
+              [style.background]="
+                getBiomeBtnBg(
+                  option.color,
+                  changeBiomeTarget() === option.value
+                )
+              "
+              [style.border-color]="option.color"
+              [style.color]="'white'"
               (click)="changeBiomeTarget.set(option.value)"
             >
-              <span class="biome-dot w-3 h-3 rounded-full mr-1"></span>
+              <app-icon [name]="$any(option.icon)" size="1.1em" />
               {{ option.name }}
             </button>
           }
@@ -152,7 +186,11 @@
       </div>
 
       <div actions class="flex gap-2">
-        <button class="btn btn-sm" appSfx="ui-error" (click)="showChangeBiomeModal.set(false)">
+        <button
+          class="btn btn-sm"
+          appSfx="ui-error"
+          (click)="showChangeBiomeModal.set(false)"
+        >
           Cancel
         </button>
         <button
@@ -176,7 +214,9 @@
             <strong>{{ floor.name }}</strong>
             ?
           </p>
-          <p class="text-xs opacity-60 mb-2 inline-flex items-center gap-2 flex-wrap">
+          <p
+            class="text-xs opacity-60 mb-2 inline-flex items-center gap-2 flex-wrap"
+          >
             Refund:
             @for (entry of removalRefundEntries(); track entry[0]) {
               <app-currency-cost [type]="$any(entry[0])" [amount]="entry[1]" />
@@ -191,7 +231,11 @@
       </div>
 
       <div actions>
-        <button class="btn btn-sm" appSfx="ui-error" (click)="showRemoveModal.set(false)">
+        <button
+          class="btn btn-sm"
+          appSfx="ui-error"
+          (click)="showRemoveModal.set(false)"
+        >
           Cancel
         </button>
         <button
@@ -212,9 +256,14 @@
         <div class="flex items-center gap-2 mb-2">
           <span
             class="biome-badge badge badge-lg text-white"
-            [style.--badge-bg]="selectedFloorBiome()?.color"
+            [style.background]="selectedFloorBiome()?.color"
           >
-            {{ getBiomeIcon(floor.biome) }} {{ selectedFloorBiome()?.name }}
+            @if (selectedFloorBiome()?.icon; as icon) {
+              <span class="biome-icon">
+                <app-icon [name]="$any(icon)" size="1.1em" />
+              </span>
+            }
+            {{ selectedFloorBiome()?.name }}
           </span>
           <button
             class="btn btn-xs btn-ghost opacity-60"
@@ -257,7 +306,7 @@
                   class="badge badge-sm"
                   [class.badge-success]="mod.percentage > 0"
                   [class.badge-error]="mod.percentage < 0"
-                  [tp]="'Depth ' + (currentFloorDepth()) + ' modifier'"
+                  [tp]="'Depth ' + currentFloorDepth() + ' modifier'"
                 >
                   {{ formatModifier(mod.percentage) }}
                   <app-currency-name [type]="$any(mod.resourceType)" />

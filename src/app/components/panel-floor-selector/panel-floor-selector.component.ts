@@ -8,6 +8,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
@@ -48,6 +49,7 @@ type BiomeOption = {
   name: string;
   description: string;
   color: string;
+  icon: string;
 };
 
 @Component({
@@ -57,6 +59,7 @@ type BiomeOption = {
     FormsModule,
     CurrencyCostComponent,
     CurrencyNameComponent,
+    IconComponent,
     ModalComponent,
     SFXDirective,
     TippyDirective,
@@ -103,6 +106,7 @@ export class PanelFloorSelectorComponent {
         name: data?.name ?? type,
         description: data?.description ?? '',
         color: data?.color ?? '#6c757d',
+        icon: data?.icon ?? '',
       };
     });
   });
@@ -171,18 +175,6 @@ export class PanelFloorSelectorComponent {
 
   public getBiomeData(biome: BiomeType) {
     return biomeGetContent(biome);
-  }
-
-  public getBiomeIcon(biome: BiomeType): string {
-    const icons: Record<BiomeType, string> = {
-      volcanic: '🌋',
-      flooded: '💧',
-      crystal: '💎',
-      corrupted: '☠️',
-      fungal: '🍄',
-      neutral: '⛰️',
-    };
-    return icons[biome];
   }
 
   public isSelected(index: number): boolean {
@@ -300,6 +292,11 @@ export class PanelFloorSelectorComponent {
 
   public formatModifier(percentage: number): string {
     return floorModifierFormatPercentage(percentage);
+  }
+
+  public getBiomeBtnBg(color: string, active: boolean): string {
+    const pct = active ? 85 : 65;
+    return `color-mix(in srgb, ${color} ${pct}%, transparent)`;
   }
 
   public trackByFloorId(_index: number, floor: Floor): string {

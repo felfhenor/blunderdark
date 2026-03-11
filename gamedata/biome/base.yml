@@ -3,7 +3,7 @@
   biomeType: neutral
   description: Standard underground caverns with no special properties.
   color: '#6c757d'
-  icon: mountain
+  icon: gameMountainCave
   requiresResearch: false
   effects: []
   roomRestrictions: []
@@ -13,7 +13,7 @@
   biomeType: volcanic
   description: A scorching cavern with rivers of magma and obsidian formations.
   color: '#e63946'
-  icon: volcano
+  icon: gameSmokingVolcano
   requiresResearch: false
   effects:
     - effectType: defender_attack_multiplier
@@ -38,7 +38,7 @@
   biomeType: flooded
   description: Waterlogged tunnels with dripping stalactites and underground pools.
   color: '#457b9d'
-  icon: droplet
+  icon: gameWaterSplash
   requiresResearch: false
   effects:
     - effectType: creature_production_multiplier
@@ -62,7 +62,7 @@
   biomeType: crystal
   description: Glittering caverns lined with luminous crystal growths.
   color: '#a8dadc'
-  icon: gem
+  icon: gameCrystalGrowth
   requiresResearch: true
   effects:
     - effectType: resource_production_multiplier
@@ -89,7 +89,7 @@
   biomeType: corrupted
   description: Dark passages pulsing with malevolent energy and twisted stone.
   color: '#6a0572'
-  icon: skull
+  icon: gameSkullBolt
   requiresResearch: true
   effects:
     - effectType: corruption_multiplier
@@ -118,7 +118,7 @@
   biomeType: fungal
   description: Damp caves carpeted with bioluminescent mushrooms and spore clouds.
   color: '#2d6a4f'
-  icon: mushroom
+  icon: gameSuperMushroom
   requiresResearch: false
   effects:
     - effectType: resource_production_multiplier
