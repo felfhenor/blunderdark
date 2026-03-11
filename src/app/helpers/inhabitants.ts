@@ -1,5 +1,6 @@
 import { computed, type Signal } from '@angular/core';
 import { contentGetEntry, contentAllIdsByName } from '@helpers/content';
+import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { productionGetRoomDefinition } from '@helpers/production';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
@@ -281,6 +282,11 @@ export async function inhabitantAssignToRoom(
       roomFloor = floor;
       break;
     }
+  }
+
+  // Check room is connected to the Altar
+  if (roomFloor && !connectivityIsRoomConnected(roomId, roomFloor, state.world.floors)) {
+    return { success: false, error: 'Room is not connected' };
   }
 
   const check = inhabitantCanAssignToRoom(

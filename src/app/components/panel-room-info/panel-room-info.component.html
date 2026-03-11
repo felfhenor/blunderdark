@@ -286,7 +286,7 @@
         </div>
       }
 
-      @if (room.maxInhabitants !== 0 && !isThrone()) {
+      @if (room.maxInhabitants !== 0 && !isThrone() && !isDisconnected()) {
         <div class="divider my-2 text-xs opacity-60">Inhabitants</div>
 
         @if (travelingInhabitantCount() > 0) {

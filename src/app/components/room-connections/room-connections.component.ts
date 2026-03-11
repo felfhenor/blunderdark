@@ -8,23 +8,9 @@ import type { PlacedRoomId } from '@interfaces/room-shape';
   imports: [ButtonCloseComponent, SFXDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (connectTo().length > 0) {
-      <div class="divider my-2 text-xs opacity-60">Connect to</div>
-      <div class="flex flex-col gap-2">
-        @for (adj of connectTo(); track adj.id) {
-          <button
-            class="btn btn-xs btn-outline btn-success"
-            appSfx="ui-click"
-            (click)="connect.emit(adj.id)"
-          >
-            {{ adj.name }}
-          </button>
-        }
-      </div>
-    }
+    <div class="divider my-2 text-xs opacity-60">Connections</div>
 
     @if (connections().length > 0) {
-      <div class="divider my-2 text-xs opacity-60">Connected</div>
       <div class="flex flex-col gap-2">
         @for (conn of connections(); track conn.connectionId) {
           <div class="flex items-center justify-between gap-2">
@@ -38,8 +24,22 @@ import type { PlacedRoomId } from '@interfaces/room-shape';
       </div>
     }
 
+    @if (connectTo().length > 0) {
+      <div class="flex flex-col gap-2 mt-2">
+        @for (adj of connectTo(); track adj.id) {
+          <button
+            class="btn btn-xs btn-outline btn-success"
+            appSfx="ui-click"
+            (click)="connect.emit(adj.id)"
+          >
+            {{ adj.name }}
+          </button>
+        }
+      </div>
+    }
+
     @if (connectTo().length === 0 && connections().length === 0) {
-      <p class="text-xs opacity-50 mt-1">No adjacent rooms to connect.</p>
+      <p class="text-xs opacity-50">No adjacent rooms to connect.</p>
     }
   `,
 })

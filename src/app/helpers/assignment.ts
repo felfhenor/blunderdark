@@ -1,4 +1,5 @@
 import { contentGetEntry } from '@helpers/content';
+import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { findRoomOnFloor } from '@helpers/floor';
 import { roomUpgradeGetEffectiveMaxInhabitants } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
@@ -36,6 +37,11 @@ export function assignmentCanAssignToRoom(roomId: PlacedRoomId): AssignmentValid
   const roomDef = contentGetEntry<RoomContent>(placedRoom.roomTypeId);
   if (!roomDef) {
     return { allowed: false, reason: 'Unknown room type', currentCount: 0, maxCapacity: 0 };
+  }
+
+  // Check room is connected to the Altar (reachable via hallways/transports)
+  if (!connectivityIsRoomConnected(roomId, roomFloor, state.world.floors)) {
+    return { allowed: false, reason: 'Room is not connected', currentCount: 0, maxCapacity: 0 };
   }
 
   const maxCapacity = roomUpgradeGetEffectiveMaxInhabitants(placedRoom, roomDef);
