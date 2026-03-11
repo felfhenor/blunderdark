@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { contentGetEntry } from '@helpers/content';
+import { invasionGetSpecialConfig } from '@helpers/invasion-process';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
 import { invaderGetDefinitionById } from '@helpers/invaders';
 import {
@@ -36,7 +37,7 @@ type ObjectiveInfo = {
       [tp]="tooltipTpl"
       tpPlacement="bottom"
     >
-      Invasion incoming! ({{ remainingTime() }})
+      {{ warningLabel() }} incoming! ({{ remainingTime() }})
     </span>
 
     <ng-template #tooltipTpl>
@@ -92,6 +93,13 @@ type ObjectiveInfo = {
 })
 export class BadgeInvasionWarningComponent {
   public readonly invasionTriggerWarningActive = invasionTriggerWarningActive;
+
+  public warningLabel = computed(() => {
+    const warning = invasionTriggerPendingWarning();
+    if (!warning) return 'Invasion';
+    const cfg = invasionGetSpecialConfig(warning.invasionType);
+    return cfg?.label ?? 'Invasion';
+  });
 
   public arrivalDay = computed(() => {
     return gamestate().world.invasionSchedule.nextInvasionDay ?? 0;

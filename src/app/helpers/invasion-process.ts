@@ -80,6 +80,7 @@ import type {
   InhabitantInstanceId,
   InvasionObjective,
   InvasionOrchestratorResult,
+  InvaderClassWeights,
   InvasionThemeType,
   ObjectiveType,
   PendingInvasionWarning,
@@ -100,6 +101,83 @@ const MAX_ROUNDS_PER_ROOM = 15;
 
 export const FOCUSED_ASSAULT_ATTACK_BONUS = 2; // +2 attack per unreachable objective
 export const INVASION_ESCALATION_EXTRA_INVADERS = 1; // extra invaders per unreachable objective (from last invasion)
+
+// --- Special invasion type configs ---
+
+type SpecialInvasionConfig = {
+  label: string;
+  partySizeMultiplier: number;
+  statBonusPercent: number;
+  tickSpeedMultiplier: number; // <1 = faster room clearing
+  ignoreFear: boolean;
+  rewardMultiplier: number;
+  penaltyResourceMultiplier: number;
+  penaltyReputationMultiplier: number;
+  forceWeights?: Partial<Record<string, number>>;
+  pairedObjectives?: ObjectiveType[];
+};
+
+export const SPECIAL_INVASION_CONFIGS: Record<SpecialInvasionType, SpecialInvasionConfig> = {
+  raid: {
+    label: 'Raiding Party',
+    partySizeMultiplier: 0.6,
+    statBonusPercent: 0,
+    tickSpeedMultiplier: 0.6,
+    ignoreFear: false,
+    rewardMultiplier: 1.0,
+    penaltyResourceMultiplier: 2.0,
+    penaltyReputationMultiplier: 0.5,
+    forceWeights: { rogue: 50, ranger: 25, warrior: 10, mage: 5, cleric: 5, paladin: 5 },
+    pairedObjectives: ['StealTreasure', 'PlunderVault'],
+  },
+  bounty_hunter: {
+    label: 'Bounty Hunters',
+    partySizeMultiplier: 0.4,
+    statBonusPercent: 0.5,
+    tickSpeedMultiplier: 1.0,
+    ignoreFear: false,
+    rewardMultiplier: 1.5,
+    penaltyResourceMultiplier: 1.0,
+    penaltyReputationMultiplier: 1.5,
+    forceWeights: { warrior: 35, ranger: 30, rogue: 20, paladin: 10, mage: 5, cleric: 0 },
+    pairedObjectives: ['SlayMonster'],
+  },
+  shadow_rift: {
+    label: 'Shadow Rift',
+    partySizeMultiplier: 1.0,
+    statBonusPercent: 0.1,
+    tickSpeedMultiplier: 0.8,
+    ignoreFear: true,
+    rewardMultiplier: 0.7,
+    penaltyResourceMultiplier: 0,
+    penaltyReputationMultiplier: 0.5,
+    forceWeights: { mage: 40, rogue: 30, ranger: 15, warrior: 10, cleric: 5, paladin: 0 },
+    pairedObjectives: ['SealPortal', 'DefileLibrary'],
+  },
+  crusade: {
+    label: 'Holy Crusade',
+    partySizeMultiplier: 1.3,
+    statBonusPercent: 0,
+    tickSpeedMultiplier: 1.0,
+    ignoreFear: false,
+    rewardMultiplier: 1.25,
+    penaltyResourceMultiplier: 1.0,
+    penaltyReputationMultiplier: 1.5,
+    forceWeights: { paladin: 40, cleric: 25, warrior: 20, mage: 5, rogue: 5, ranger: 5 },
+    pairedObjectives: ['SealPortal', 'DefileLibrary'],
+  },
+};
+
+/**
+ * Get the special invasion config for a given invasion type.
+ * Returns undefined for 'scheduled' invasions.
+ */
+export function invasionGetSpecialConfig(
+  invasionType: 'scheduled' | SpecialInvasionType,
+): SpecialInvasionConfig | undefined {
+  if (invasionType === 'scheduled') return undefined;
+  return SPECIAL_INVASION_CONFIGS[invasionType];
+}
 
 // --- Computed signals ---
 
@@ -556,6 +634,9 @@ export function invasionStart(
   const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS
     + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
+  // 0b. Get special invasion config (if applicable)
+  const specialConfig = invasionGetSpecialConfig(invasionType);
+
   // 1. Generate invader party (use pre-computed from warning if available)
   let invaders: InvaderInstance[];
   let partyTheme: InvasionThemeType | undefined;
@@ -565,7 +646,13 @@ export function invasionStart(
     invaders = warning.invaders;
     partyTheme = warning.themedInvasionType;
   } else {
-    const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize);
+    const overrides = specialConfig ? {
+      weightOverrides: specialConfig.forceWeights as Partial<InvaderClassWeights> | undefined,
+      partySizeMultiplier: specialConfig.partySizeMultiplier,
+      skipThemeRoll: true,
+      pairedObjectives: specialConfig.pairedObjectives,
+    } : undefined;
+    const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize, overrides);
     invaders = partyResult.invaders;
     partyTheme = partyResult.themedInvasionType;
     pairedObjectives = partyResult.pairedObjectives;
@@ -612,7 +699,7 @@ export function invasionStart(
   const themedInvasionType = partyTheme;
 
   // 4. Build multi-floor invasion path
-  const { path, roomFloorMap, roomFearLevels } = buildMultiFloorPath(
+  const pathResult = buildMultiFloorPath(
     state,
     entryRoom,
     entryFloorIndex,
@@ -620,6 +707,12 @@ export function invasionStart(
     objectives,
     rng,
   );
+  const { path, roomFloorMap } = pathResult;
+
+  // 4a. Apply fear immunity for special invasions (shadow_rift ignores fear)
+  const roomFearLevels = specialConfig?.ignoreFear
+    ? Object.fromEntries(Object.keys(pathResult.roomFearLevels).map((k) => [k, 0]))
+    : pathResult.roomFearLevels;
 
   if (path.length === 0) {
     console.warn('[INV] EMPTY: no path');
@@ -666,11 +759,12 @@ export function invasionStart(
     invaderHpMap[inv.id] = inv.currentHp;
   }
 
-  // 9. Calculate ticks for first room
+  // 9. Calculate ticks for first room (apply speed multiplier for special invasions)
   const firstRoomDefenders = state.world.inhabitants.filter(
     (i) => i.assignedRoomId === entryRoomId,
   );
-  const firstRoomTicks = calculateRoomTicks(firstRoomDefenders.length);
+  const tickSpeedMul = specialConfig?.tickSpeedMultiplier ?? 1.0;
+  const firstRoomTicks = Math.max(1, Math.round(calculateRoomTicks(firstRoomDefenders.length) * tickSpeedMul));
 
   // 10. Store active invasion
   const battleLog: ActiveInvasion['battleLog'] = [];
@@ -696,6 +790,21 @@ export function invasionStart(
       turn: 0,
       type: 'room_enter',
       message: themeLabels[themedInvasionType],
+    });
+  }
+
+  // Log special invasion type
+  if (specialConfig) {
+    const specialLabels: Record<SpecialInvasionType, string> = {
+      raid: 'A raiding party sneaks into the dungeon!',
+      bounty_hunter: 'Bounty hunters have come for your strongest!',
+      shadow_rift: 'Shadow creatures pour through a rift!',
+      crusade: 'A holy crusade assaults the dungeon!',
+    };
+    battleLog.push({
+      turn: 0,
+      type: 'room_enter',
+      message: specialLabels[invasionType as SpecialInvasionType],
     });
   }
 
@@ -875,6 +984,8 @@ export function invasionProcess(state: GameState): void {
       );
       const focusedBonus = (invasion.unreachableObjectiveCount ?? 0) * FOCUSED_ASSAULT_ATTACK_BONUS;
       const threatStatBonus = invasionThreatGetStatBonus(invasion.profile.threatLevel);
+      const specialStatBonus = invasionGetSpecialConfig(invasion.invasionType)?.statBonusPercent ?? 0;
+      const totalStatBonus = threatStatBonus + specialStatBonus;
       const biomeInvAttackMul = biomeGetCombatModifier(currentFloor.biome, 'invader', 'attack');
       const biomeInvDefenseMul = biomeGetCombatModifier(currentFloor.biome, 'invader', 'defense');
       const invaderCombatants = livingInvaderInstances.map((inv, idx) => {
@@ -884,15 +995,15 @@ export function invasionProcess(state: GameState): void {
         const baseSpeed = invDef?.baseStats.speed ?? 5;
         const baseHp = invasion.invaderHpMap[inv.id] ?? inv.currentHp;
         const baseMaxHp = inv.maxHp;
-        const scaledAttack = baseAttack + focusedBonus + Math.round(baseAttack * threatStatBonus);
-        const scaledDefense = baseDefense + Math.round(baseDefense * threatStatBonus);
+        const scaledAttack = baseAttack + focusedBonus + Math.round(baseAttack * totalStatBonus);
+        const scaledDefense = baseDefense + Math.round(baseDefense * totalStatBonus);
         return invasionCombatCreateCombatant(
           inv.id as unknown as CombatantId,
           'invader',
           invDef?.name ?? 'Invader',
           {
-            hp: baseHp + Math.round(baseHp * threatStatBonus),
-            maxHp: baseMaxHp + Math.round(baseMaxHp * threatStatBonus),
+            hp: baseHp + Math.round(baseHp * totalStatBonus),
+            maxHp: baseMaxHp + Math.round(baseMaxHp * totalStatBonus),
             attack: Math.max(0, Math.round(scaledAttack * biomeInvAttackMul)),
             defense: Math.max(0, Math.round(scaledDefense * biomeInvDefenseMul)),
             speed: baseSpeed,
@@ -1390,7 +1501,8 @@ function advanceToRoom(
     (i) => i.assignedRoomId === nextRoomId && !invasion.killedDefenderIds.includes(i.instanceId),
   );
   invasion.currentRoomTicksElapsed = 0;
-  invasion.currentRoomTicksTotal = calculateRoomTicks(nextRoomDefenders.length);
+  const tickMul = invasionGetSpecialConfig(invasion.invasionType)?.tickSpeedMultiplier ?? 1.0;
+  invasion.currentRoomTicksTotal = Math.max(1, Math.round(calculateRoomTicks(nextRoomDefenders.length) * tickMul));
   invasion.currentRoomTurnQueue = undefined;
 }
 
@@ -1792,9 +1904,10 @@ function invasionProcessComplete(
       : 'The dungeon has fallen to the invaders...',
   });
 
-  // Calculate rewards/penalties
+  // Calculate rewards/penalties (with special invasion modifiers)
   let rewards: InvasionOrchestratorResult['rewards'];
   let penalties: InvasionOrchestratorResult['penalties'];
+  const specialCfg = invasionGetSpecialConfig(invasion.invasionType);
 
   if (detailedResult.outcome === 'victory') {
     rewards = invasionRewardCalculateDefenseRewards(
@@ -1802,6 +1915,13 @@ function invasionProcessComplete(
       invasion.killedInvaderClasses,
       rng,
     );
+    // Apply special reward multiplier
+    if (specialCfg && specialCfg.rewardMultiplier !== 1.0) {
+      rewards.reputationGain = Math.round(rewards.reputationGain * specialCfg.rewardMultiplier);
+      for (const key of Object.keys(rewards.resourceGains) as ResourceType[]) {
+        rewards.resourceGains[key] = Math.round((rewards.resourceGains[key] ?? 0) * specialCfg.rewardMultiplier);
+      }
+    }
   } else {
     const currentResources: Partial<Record<ResourceType, number>> = {};
     for (const [key, val] of Object.entries(state.world.resources) as [ResourceType, { current: number; max: number }][]) {
@@ -1812,6 +1932,19 @@ function invasionProcessComplete(
       currentResources,
     );
     penalties.killedInhabitantIds = [...invasion.killedDefenderIds];
+    // Apply special penalty multipliers
+    if (specialCfg) {
+      if (specialCfg.penaltyResourceMultiplier !== 1.0) {
+        for (const key of Object.keys(penalties.resourceLosses) as ResourceType[]) {
+          penalties.resourceLosses[key] = Math.round(
+            (penalties.resourceLosses[key] ?? 0) * specialCfg.penaltyResourceMultiplier,
+          );
+        }
+      }
+      if (specialCfg.penaltyReputationMultiplier !== 1.0) {
+        penalties.reputationLoss = Math.round(penalties.reputationLoss * specialCfg.penaltyReputationMultiplier);
+      }
+    }
   }
 
   // Roll prisoner captures (only if at least one invader was killed in combat)

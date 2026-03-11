@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { gameEventTimeToMinutes } from '@helpers/game-events';
-import { INVASION_ESCALATION_EXTRA_INVADERS, invasionFindEntryRoom, invasionStart } from '@helpers/invasion-process';
+import { INVASION_ESCALATION_EXTRA_INVADERS, invasionFindEntryRoom, invasionGetSpecialConfig, invasionStart } from '@helpers/invasion-process';
 import { invasionCompositionCalculateDungeonProfile, invasionCompositionGenerateParty } from '@helpers/invasion-composition';
 import { invasionThreatGetIntervalReduction, invasionThreatGetPartySizeBonus } from '@helpers/invasion-threat';
 import { invasionObjectiveAssign } from '@helpers/invasion-objectives';
@@ -11,6 +11,7 @@ import { rngNumberRange, rngRandom, rngSeeded } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
+  InvaderClassWeights,
   InvasionHistoryEntry,
   InvasionSchedule,
   PlacedRoomId,
@@ -295,7 +296,14 @@ export function invasionTriggerGenerateWarning(
   const bonusSize = lastUnreachable * INVASION_ESCALATION_EXTRA_INVADERS
     + invasionThreatGetPartySizeBonus(profile.threatLevel);
 
-  const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize);
+  const specialConfig = invasionGetSpecialConfig(invasionType);
+  const overrides = specialConfig ? {
+    weightOverrides: specialConfig.forceWeights as Partial<InvaderClassWeights> | undefined,
+    partySizeMultiplier: specialConfig.partySizeMultiplier,
+    skipThemeRoll: true,
+    pairedObjectives: specialConfig.pairedObjectives,
+  } : undefined;
+  const partyResult = invasionCompositionGenerateParty(profile, seed, bonusSize, overrides);
   const objectives = invasionObjectiveAssign(state, seed, partyResult.pairedObjectives);
   const entryRng = rngSeeded(`${seed}-entry`);
   const entryResult = invasionFindEntryRoom(state, entryRng);

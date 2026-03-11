@@ -34,6 +34,7 @@ const mockInvasionStart = vi.fn();
 vi.mock('@helpers/invasion-process', () => ({
   invasionStart: (...args: unknown[]) => mockInvasionStart(...args),
   invasionFindEntryRoom: vi.fn(() => ({ room: { id: 'entry-room-id' }, floorIndex: 0 })),
+  invasionGetSpecialConfig: vi.fn(() => undefined),
   INVASION_ESCALATION_EXTRA_INVADERS: 1,
 }));
 

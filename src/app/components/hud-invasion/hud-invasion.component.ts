@@ -3,7 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { IconComponent } from '@components/icon/icon.component';
 import { findRoomOnFloor } from '@helpers/floor';
 import { invaderGetDefinitionById } from '@helpers/invaders';
-import { invasionIsActive } from '@helpers/invasion-process';
+import { invasionGetSpecialConfig, invasionIsActive } from '@helpers/invasion-process';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { gamestate } from '@helpers/state-game';
 
@@ -35,7 +35,7 @@ type ObjectiveStatus = {
       >
         <!-- Path progress -->
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs font-semibold text-warning">Invasion</span>
+          <span class="text-xs font-semibold text-warning">{{ invasionLabel() }}</span>
           <span class="text-xs opacity-70">
             @if (pathProgress().floorLabel) {
               {{ pathProgress().floorLabel }} —
@@ -126,6 +126,13 @@ type ObjectiveStatus = {
 })
 export class HudInvasionComponent {
   public readonly invasionIsActive = invasionIsActive;
+
+  public invasionLabel = computed(() => {
+    const inv = gamestate().world.activeInvasion;
+    if (!inv) return 'Invasion';
+    const cfg = invasionGetSpecialConfig(inv.invasionType);
+    return cfg?.label ?? 'Invasion';
+  });
 
   public pathProgress = computed(() => {
     const state = gamestate();

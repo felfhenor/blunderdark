@@ -439,26 +439,42 @@ export type InvasionPartyResult = {
   pairedObjectives?: ObjectiveType[];
 };
 
+export type PartyOverrides = {
+  weightOverrides?: Partial<InvaderClassWeights>;
+  partySizeMultiplier?: number;
+  skipThemeRoll?: boolean;
+  pairedObjectives?: ObjectiveType[];
+};
+
 /**
  * Generate a full invasion party from dungeon profile.
  * Returns InvaderInstance[] and optional theme info.
  * Rolls for themed invasion (12.5% chance) which overrides class weights.
+ * Optional overrides allow special invasion types to force composition.
  */
 export function invasionCompositionGenerateParty(
   profile: DungeonProfile,
   seed: string,
   bonusSize: number = 0,
+  overrides?: PartyOverrides,
 ): InvasionPartyResult {
   const invaderDefs = invaderGetAllDefinitions();
   const config = invasionCompositionGetWeightConfig();
   if (!config || invaderDefs.length === 0) return { invaders: [] };
 
-  const themeRng = seedrandom(`${seed}-theme`);
-  const theme = invasionCompositionRollTheme(themeRng);
+  // Special invasions skip theme rolls and use their own weights
+  const theme = overrides?.skipThemeRoll
+    ? undefined
+    : invasionCompositionRollTheme(seedrandom(`${seed}-theme`));
 
-  // Get weights — themed invasions override weights entirely
+  // Get weights — overrides > theme > profile-based
   let weights: InvaderClassWeights;
-  if (theme) {
+  if (overrides?.weightOverrides) {
+    weights = {
+      warrior: 0, rogue: 0, mage: 0, cleric: 0, paladin: 0, ranger: 0,
+      ...overrides.weightOverrides,
+    };
+  } else if (theme) {
     weights = {
       warrior: 0, rogue: 0, mage: 0, cleric: 0, paladin: 0, ranger: 0,
       ...theme.weightOverrides,
@@ -468,9 +484,16 @@ export function invasionCompositionGenerateParty(
     weights = invasionCompositionGetWeights(profile, config, weightRng);
   }
 
+  // Apply party size multiplier from overrides
+  const sizeMultiplier = overrides?.partySizeMultiplier ?? 1.0;
+  const adjustedBonusSize = Math.round(bonusSize * sizeMultiplier);
+  const adjustedProfile = sizeMultiplier !== 1.0
+    ? { ...profile, size: Math.max(1, Math.round(profile.size * sizeMultiplier)) }
+    : profile;
+
   const selected = invasionCompositionSelectParty(
-    profile, invaderDefs, weights, seed, bonusSize,
-    theme?.skipWarriorGuarantee,
+    adjustedProfile, invaderDefs, weights, seed, adjustedBonusSize,
+    overrides?.weightOverrides ? true : theme?.skipWarriorGuarantee,
   );
 
   const party = selected.map((def) => invaderCreateInstance(def));
@@ -499,6 +522,6 @@ export function invasionCompositionGenerateParty(
   return {
     invaders: party,
     themedInvasionType: theme?.type,
-    pairedObjectives: theme?.pairedObjectives,
+    pairedObjectives: overrides?.pairedObjectives ?? theme?.pairedObjectives,
   };
 }
