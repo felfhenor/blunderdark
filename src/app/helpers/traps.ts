@@ -4,6 +4,7 @@ import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlo
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { throneRoomRulerBonus } from '@helpers/throne-room';
+import { trapWorkshopGetBonusDamage } from '@helpers/trap-workshop';
 import type {
   Floor,
   GameState,
@@ -199,7 +200,8 @@ export function trapRollTrigger(
   const throneTrapBonus = throneRoomRulerBonus('trapEffectiveness');
   const trapAuraInhabitants = gamestate()?.world?.inhabitants ?? [];
   const legendaryTrapBonus = legendaryAuraGetBonus(trapAuraInhabitants, 'aura_trap_bonus');
-  const finalDamage = Math.round(def.damage * (1 + researchTrapBonus + throneTrapBonus + legendaryTrapBonus));
+  const craftingBonusDamage = gamestate() ? trapWorkshopGetBonusDamage(gamestate()!) : 0;
+  const finalDamage = Math.round((def.damage + craftingBonusDamage) * (1 + researchTrapBonus + throneTrapBonus + legendaryTrapBonus));
 
   return {
     triggered: true,

@@ -275,6 +275,7 @@ import {
   trapWorkshopAddJob,
   TRAP_WORKSHOP_BASE_CRAFTING_TICKS,
   trapWorkshopCanQueue,
+  trapWorkshopGetBonusDamage,
   trapWorkshopGetCraftingCost,
   trapWorkshopGetCraftingTicks,
   trapWorkshopGetQueue,
@@ -661,5 +662,53 @@ describe('Upgrade Effects', () => {
       type: 'craftingBonusDamage',
       value: 5,
     });
+  });
+});
+
+describe('trapWorkshopGetBonusDamage', () => {
+  it('should return 0 when no workshops have craftingBonusDamage upgrade', () => {
+    const workshop = makeRoom();
+    const floor = makeFloor([workshop]);
+    const state = makeGameState({ floors: [floor] });
+    expect(trapWorkshopGetBonusDamage(state)).toBe(0);
+  });
+
+  it('should return bonus damage from Enchanted Traps upgrade', () => {
+    const workshop = makeRoom({
+      appliedUpgradePathId: 'upgrade-enchanted-traps' as RoomUpgradeId,
+    });
+    const floor = makeFloor([workshop]);
+    const state = makeGameState({ floors: [floor] });
+    expect(trapWorkshopGetBonusDamage(state)).toBe(5);
+  });
+
+  it('should sum bonus damage across multiple workshops on different floors', () => {
+    const ws1 = makeRoom({
+      id: 'ws-1' as PlacedRoomId,
+      appliedUpgradePathId: 'upgrade-enchanted-traps' as RoomUpgradeId,
+    });
+    const ws2 = makeRoom({
+      id: 'ws-2' as PlacedRoomId,
+      appliedUpgradePathId: 'upgrade-enchanted-traps' as RoomUpgradeId,
+    });
+    const floor1 = makeFloor([ws1]);
+    const floor2 = makeFloor([ws2]);
+    floor2.id = 'floor-2' as FloorId;
+    const state = makeGameState({ floors: [floor1, floor2] });
+    expect(trapWorkshopGetBonusDamage(state)).toBe(10);
+  });
+
+  it('should ignore workshops with non-damage upgrades', () => {
+    const ws1 = makeRoom({
+      id: 'ws-1' as PlacedRoomId,
+      appliedUpgradePathId: 'upgrade-master-trapper' as RoomUpgradeId,
+    });
+    const ws2 = makeRoom({
+      id: 'ws-2' as PlacedRoomId,
+      appliedUpgradePathId: 'upgrade-enchanted-traps' as RoomUpgradeId,
+    });
+    const floor = makeFloor([ws1, ws2]);
+    const state = makeGameState({ floors: [floor] });
+    expect(trapWorkshopGetBonusDamage(state)).toBe(5);
   });
 });

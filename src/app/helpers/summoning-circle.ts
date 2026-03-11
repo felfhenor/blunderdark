@@ -82,6 +82,14 @@ export function summoningGetEffectiveTicks(
 ): number {
   let ticks = Math.round(SUMMONING_BASE_TICKS * recipeTimeMultiplier);
 
+  // Apply upgrade time multiplier
+  const effects = roomUpgradeGetAppliedEffects(room);
+  for (const effect of effects) {
+    if (effect.type === 'summonTimeMultiplier') {
+      ticks = Math.round(ticks * effect.value);
+    }
+  }
+
   // Check adjacent rooms for summoningAdjacencyEffects.summonTimeReduction
   for (const adjTypeId of adjacentRoomTypeIds) {
     const adjDef = contentGetEntry<RoomContent>(adjTypeId);

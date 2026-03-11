@@ -31,6 +31,31 @@ const trapWorkshopCompletedSubject = new Subject<TrapWorkshopCompletedEvent>();
 export const trapWorkshopCompleted$ =
   trapWorkshopCompletedSubject.asObservable();
 
+// --- Bonus damage helper ---
+
+/**
+ * Get total craftingBonusDamage from all Trap Workshops across all floors.
+ * Returns the sum of all active craftingBonusDamage upgrade effects.
+ */
+export function trapWorkshopGetBonusDamage(state: GameState): number {
+  const workshopTypeId = roomRoleFindById('trapWorkshop');
+  if (!workshopTypeId) return 0;
+
+  let bonus = 0;
+  for (const floor of state.world.floors) {
+    for (const room of floor.rooms) {
+      if (room.roomTypeId !== workshopTypeId) continue;
+      const effects = roomUpgradeGetAppliedEffects(room);
+      for (const effect of effects) {
+        if (effect.type === 'craftingBonusDamage') {
+          bonus += effect.value;
+        }
+      }
+    }
+  }
+  return bonus;
+}
+
 // --- Crafting cost/time helpers ---
 
 export function trapWorkshopGetCraftingCost(

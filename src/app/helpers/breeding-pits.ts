@@ -467,11 +467,32 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
             const odds = breedingGetMutationOdds(room, adjacentTypes);
             const rng = rngRandom();
             const outcome = breedingRollMutationOutcome(odds, rng);
-            const mutated = breedingApplyMutation(
+            let mutated = breedingApplyMutation(
               state.world.inhabitants[targetIdx],
               outcome,
               rng,
             );
+
+            // Apply mutation stat bonus from room upgrade
+            const effects = roomUpgradeGetAppliedEffects(room);
+            let mutationBonus = 0;
+            for (const effect of effects) {
+              if (effect.type === 'mutationStatBonus') {
+                mutationBonus += effect.value;
+              }
+            }
+            if (mutationBonus > 0) {
+              const def = contentGetEntry<InhabitantContent>(mutated.definitionId);
+              if (def) {
+                const existing = mutated.instanceStatBonuses ?? {};
+                const statKeys: Array<keyof InhabitantStats> = ['hp', 'attack', 'defense', 'speed'];
+                const bonuses: Partial<InhabitantStats> = { ...existing };
+                for (const key of statKeys) {
+                  bonuses[key] = (existing[key] ?? 0) + Math.round(def.stats[key] * mutationBonus);
+                }
+                mutated = { ...mutated, instanceStatBonuses: bonuses };
+              }
+            }
 
             state.world.inhabitants[targetIdx] = mutated;
             inhabitantsChanged = true;

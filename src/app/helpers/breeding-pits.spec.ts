@@ -881,6 +881,37 @@ describe('breedingPitsProcess', () => {
     expect(room.mutationJob).toBeUndefined();
   });
 
+  it('should apply mutationStatBonus as percentage of base stats on mutation completion', () => {
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-mutation-amplifier' as RoomUpgradeId,
+    });
+    room.mutationJob = {
+      targetInstanceId: 'g1' as InhabitantInstanceId,
+      ticksRemaining: 1,
+      targetTicks: 15,
+    };
+
+    const goblin = makeInhabitant({
+      instanceId: 'g1' as InhabitantInstanceId,
+      definitionId: GOBLIN_ID as InhabitantId,
+      mutated: false,
+    });
+    const floor = makeFloor([room], [goblin]);
+    const state = makeGameState({ floors: [floor] });
+    state.world.inhabitants = [goblin];
+
+    breedingPitsProcess(state);
+
+    const mutated = state.world.inhabitants[0];
+    expect(mutated.mutated).toBe(true);
+    // mutationStatBonus = 0.25, goblin base: hp=30, attack=10, defense=8, speed=12
+    // bonuses: hp=round(30*0.25)=8, attack=round(10*0.25)=3, defense=round(8*0.25)=2, speed=round(12*0.25)=3
+    expect(mutated.instanceStatBonuses?.hp).toBe(8);
+    expect(mutated.instanceStatBonuses?.attack).toBe(3);
+    expect(mutated.instanceStatBonuses?.defense).toBe(2);
+    expect(mutated.instanceStatBonuses?.speed).toBe(3);
+  });
+
   it('should not process rooms that are not breeding pits', () => {
     const room = makeRoom({ roomTypeId: 'other-room-type' as RoomId });
     room.breedingJob = {

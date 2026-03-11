@@ -64,6 +64,17 @@ const bindingMasteryPath: RoomUpgradeContent = {
   ],
 };
 
+const swiftRitualPath: RoomUpgradeContent = {
+  id: 'upgrade-swift-ritual' as RoomUpgradeId,
+  __type: 'roomupgrade',
+  name: 'Swift Ritual',
+  description: 'Halve summoning time.',
+  cost: { gold: 160, essence: 50 },
+  effects: [
+    { type: 'summonTimeMultiplier', value: 0.5 },
+  ],
+};
+
 // --- Mock content ---
 
 const mockContent = new Map<string, unknown>();
@@ -92,7 +103,7 @@ vi.mock('@helpers/room-upgrades', async () => {
   return {
     roomUpgradeGetAppliedEffects: (room: PlacedRoom) => {
       if (!room.appliedUpgradePathId) return [];
-      const paths = [greaterSummoningPath, dualCirclePath, bindingMasteryPath];
+      const paths = [greaterSummoningPath, dualCirclePath, bindingMasteryPath, swiftRitualPath];
       const path = paths.find((p) => p.id === room.appliedUpgradePathId);
       return path?.effects ?? [];
     },
@@ -482,6 +493,23 @@ describe('Summon Tick Calculation', () => {
     const ticks = summoningGetEffectiveTicks(room, new Set([LIBRARY_ID]), 0.5);
     const afterRecipe = Math.round(SUMMONING_BASE_TICKS * 0.5);
     expect(ticks).toBe(Math.round(afterRecipe * 0.75));
+  });
+
+  it('should apply summonTimeMultiplier upgrade', () => {
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-swift-ritual' as RoomUpgradeId,
+    });
+    const ticks = summoningGetEffectiveTicks(room, new Set(), 1.0);
+    expect(ticks).toBe(Math.round(SUMMONING_BASE_TICKS * 0.5));
+  });
+
+  it('should combine summonTimeMultiplier with adjacency reduction', () => {
+    const room = makeRoom({
+      appliedUpgradePathId: 'upgrade-swift-ritual' as RoomUpgradeId,
+    });
+    const ticks = summoningGetEffectiveTicks(room, new Set([LIBRARY_ID]), 1.0);
+    const afterUpgrade = Math.round(SUMMONING_BASE_TICKS * 0.5);
+    expect(ticks).toBe(Math.round(afterUpgrade * 0.75));
   });
 
   it('should never go below 1 tick', () => {
