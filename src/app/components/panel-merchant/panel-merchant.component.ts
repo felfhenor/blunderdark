@@ -16,7 +16,6 @@ import {
   merchantDaysRemaining,
   merchantExecuteTrade,
   merchantInventory,
-  merchantIsPresent,
 } from '@helpers/merchant';
 import { notifyError, notifySuccess } from '@helpers/notify';
 import type {
@@ -52,7 +51,6 @@ type MerchantTradeEntry = {
 export class PanelMerchantComponent {
   public visible = model<boolean>(false);
 
-  public isPresent = merchantIsPresent;
   public daysRemaining = merchantDaysRemaining;
   public departureDay = computed(() => gameTimeDay() + this.daysRemaining());
 
@@ -99,11 +97,6 @@ export class PanelMerchantComponent {
     } else {
       notifyError(result.error ?? 'Trade failed');
     }
-  }
-
-  public open(): void {
-    analyticsSendDesignEvent('Room:Merchant:Open');
-    this.visible.set(true);
   }
 
   public close(): void {
