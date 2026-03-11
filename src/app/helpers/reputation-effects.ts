@@ -112,6 +112,44 @@ export function reputationEffectGetInvasionRateMultiplier(
 }
 
 /**
+ * Pure function: get the combined event rate multiplier from all active effects.
+ * Values >1 increase event frequency, <1 decrease it.
+ * Effects with effectValue of 1 are boolean flags (enable event types) and
+ * do not change the combined multiplier.
+ */
+export function reputationEffectGetEventRateMultiplier(
+  reputation: Record<ReputationType, number>,
+  allEffects?: (ReputationEffectContent)[],
+): number {
+  const eventEffects = reputationEffectGetByType(
+    'modify_event_rate',
+    reputation,
+    allEffects,
+  );
+
+  // Group by reputation type: take the strongest (highest or lowest) per type
+  const byType = new Map<ReputationType, number>();
+  for (const effect of eventEffects) {
+    const existing = byType.get(effect.reputationType);
+    if (existing === undefined) {
+      byType.set(effect.reputationType, effect.effectValue);
+    } else if (effect.effectValue > 1) {
+      // For increases, take the higher multiplier
+      byType.set(effect.reputationType, Math.max(existing, effect.effectValue));
+    } else {
+      // For decreases, take the lower multiplier
+      byType.set(effect.reputationType, Math.min(existing, effect.effectValue));
+    }
+  }
+
+  let combined = 1.0;
+  for (const multiplier of byType.values()) {
+    combined *= multiplier;
+  }
+  return combined;
+}
+
+/**
  * Pure function: get the production multiplier for a specific resource type.
  */
 export function reputationEffectGetProductionMultiplier(

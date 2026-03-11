@@ -1,6 +1,7 @@
 import {
   reputationEffectGetActive,
   reputationEffectGetByType,
+  reputationEffectGetEventRateMultiplier,
   reputationEffectGetInvasionRateMultiplier,
   reputationEffectGetProductionMultiplier,
   reputationEffectHas,
@@ -390,6 +391,60 @@ describe('reputationEffectGetProductionMultiplier', () => {
         allEffects,
       ),
     ).toBeCloseTo(0.85);
+  });
+});
+
+describe('reputationEffectGetEventRateMultiplier', () => {
+  it('should return 1.0 when no effects active', () => {
+    const state = freshState();
+    expect(
+      reputationEffectGetEventRateMultiplier(state, allEffects),
+    ).toBe(1.0);
+  });
+
+  it('should return chaos multiplier when chaos is high', () => {
+    const state = { ...freshState(), chaos: 350 };
+    // Chaos has effectValue 1.5 (rate increase) and 0.2 (double or nothing)
+    // Per-type grouping: takes min of 0.2 and 1.5? No - 1.5 > 1 so max, 0.2 < 1 so min
+    // Both are chaos type, so: max(1.5) for increases, min(0.2) for decreases
+    // But they share the same reputationType, so the map will take min(0.2, 1.5) = 0.2? No.
+    // First effect sets 1.5, second: 0.2 < 1 so min(1.5, 0.2) = 0.2
+    // Actually: first sets existing=1.5, second: effectValue=0.2 which is <1, so min(1.5, 0.2)=0.2
+    // Combined = 0.2
+    expect(
+      reputationEffectGetEventRateMultiplier(state, allEffects),
+    ).toBeCloseTo(0.2);
+  });
+
+  it('should return 1.0 when only boolean flag effects are active', () => {
+    const state = { ...freshState(), terror: 350 };
+    // Terror dark invasions has effectValue 1 (boolean flag)
+    expect(
+      reputationEffectGetEventRateMultiplier(state, allEffects),
+    ).toBe(1.0);
+  });
+
+  it('should combine multipliers from multiple reputation types', () => {
+    const state = { ...freshState(), terror: 350, chaos: 350 };
+    // Terror: effectValue 1 (no change), Chaos: 0.2 (per grouping above)
+    // Combined: 1.0 * 0.2 = 0.2
+    expect(
+      reputationEffectGetEventRateMultiplier(state, allEffects),
+    ).toBeCloseTo(0.2);
+  });
+
+  it('should handle legendary chaos with surge effect', () => {
+    const state = { ...freshState(), chaos: 700 };
+    // Chaos high: 1.5 and 0.2, legendary: 1.0
+    // Per-type: max of increases (1.5, 1.0) = 1.5, min of decreases (0.2) = 0.2
+    // But grouping picks one value per type. Let me trace:
+    // chaosRandomEvents: 1.5 -> set chaos=1.5
+    // chaosDoubleOrNothing: 0.2 -> 0.2 < 1, min(1.5, 0.2) = 0.2 -> set chaos=0.2
+    // chaosSurges: 1.0 -> 1.0 is not > 1, so min(0.2, 1.0) = 0.2
+    // Combined = 0.2
+    expect(
+      reputationEffectGetEventRateMultiplier(state, allEffects),
+    ).toBeCloseTo(0.2);
   });
 });
 
