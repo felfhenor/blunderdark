@@ -11,6 +11,7 @@ import { combatResolve } from '@helpers/combat';
 import { contentGetEntry } from '@helpers/content';
 import { gridManhattanDistance } from '@helpers/grid-math';
 import type { AbilityState, AbilityTargetType, StatusEffect } from '@interfaces/combat';
+import type { AbilityEffectContent } from '@interfaces/content-abilityeffect';
 import type {
   CombatAbilityContent,
   CombatAbilityId,
@@ -219,6 +220,7 @@ export function invasionCombatGetValidAttackTargets(
       c.hp > 0 &&
       c.side !== actor.side &&
       c.position !== undefined &&
+      !combatantHasStatus(c, 'phased') &&
       invasionCombatArePositionsAdjacent(actor.position!, c.position),
   );
 }
@@ -371,19 +373,49 @@ export function invasionCombatExecuteAttack(
     .map((s) => resolveAbilityContent(s.abilityId))
     .filter((a): a is CombatAbilityContent => a !== undefined);
 
+  // Phased defenders cannot be attacked at all
+  if (combatantHasStatus(defender, 'phased')) {
+    return {
+      queue,
+      result: {
+        action: 'attack',
+        actorId,
+        targetId,
+        targetPosition: defender.position ? { ...defender.position } : undefined,
+        combatResult: { hit: false, roll: 0, damage: 0, defenderHp: defender.hp, defenderDead: false },
+        abilityActivation: undefined,
+      },
+    };
+  }
+
   // Check defender evasion (passive)
   const evaded = combatAbilityCheckEvasion(defenderAbilities, defender.abilityStates, rng);
   if (evaded) {
-    // Mark evasion as activated for first-activation cost
+    // Apply phased status and mark evasion as activated for first-activation cost
+    const evasionAbility = defenderAbilities.find((a) => {
+      const effects = getEffectDefinitions(a);
+      return effects.some((e) => e.overrideTargetsHit === 0);
+    });
+    const evasionEffect = evasionAbility?.effects.find((e) => {
+      const def = contentGetEntry<AbilityEffectContent>(e.effectType);
+      return def?.statusName === 'phased';
+    });
+    const phasedDuration = evasionEffect?.duration ?? 1;
+
     const updatedCombatants = queue.combatants.map((c) => {
       if (c.id !== defender.id) return c;
-      const evasionAbility = defenderAbilities.find((a) => {
-        const effects = getEffectDefinitions(a);
-        return effects.some((e) => e.overrideTargetsHit === 0);
-      });
       if (!evasionAbility) return c;
       const wasActivated = c.abilityStates.find((s) => s.abilityId === evasionAbility.id)?.passiveActivated ?? false;
-      if (wasActivated) return c;
+
+      // Apply phased status effect
+      const existingPhased = c.statusEffects.find((s) => s.name === 'phased');
+      const newStatusEffects = existingPhased
+        ? c.statusEffects.map((s) => s.name === 'phased' ? { ...s, remainingDuration: phasedDuration } : s)
+        : [...c.statusEffects, { name: 'phased' as const, remainingDuration: phasedDuration }];
+
+      if (wasActivated) {
+        return { ...c, statusEffects: newStatusEffects };
+      }
       // First activation: mark as activated and consume next turn
       return {
         ...c,
@@ -391,6 +423,7 @@ export function invasionCombatExecuteAttack(
           s.abilityId === evasionAbility.id ? { ...s, passiveActivated: true } : s,
         ),
         hasActed: true,
+        statusEffects: newStatusEffects,
       };
     });
     return {
@@ -514,7 +547,7 @@ export function invasionCombatExecuteAbility(
     return { queue, result: invasionCombatExecuteWait(actorId) };
   }
 
-  const enemies = queue.combatants.filter((c) => c.hp > 0 && c.side !== actor.side);
+  const enemies = queue.combatants.filter((c) => c.hp > 0 && c.side !== actor.side && !combatantHasStatus(c, 'phased'));
   const allies = queue.combatants.filter((c) => c.hp > 0 && c.side === actor.side);
   const deadAllies = queue.combatants.filter((c) => c.hp <= 0 && c.side === actor.side);
   const abilityClass = classifyAbility(ability);
@@ -721,8 +754,13 @@ export function invasionCombatResolveAiAction(
     return { action: 'wait', targetId: undefined, targetPosition: undefined, abilityId: undefined };
   }
 
+  // Phased combatants skip their turn (intangible)
+  if (combatantHasStatus(actor, 'phased')) {
+    return { action: 'wait', targetId: undefined, targetPosition: undefined, abilityId: undefined };
+  }
+
   const readyAbilities = invasionCombatGetReadyAbilities(actor);
-  const enemies = allCombatants.filter((c) => c.hp > 0 && c.side !== actor.side);
+  const enemies = allCombatants.filter((c) => c.hp > 0 && c.side !== actor.side && !combatantHasStatus(c, 'phased'));
   const allies = allCombatants.filter((c) => c.hp > 0 && c.side === actor.side);
   const deadAllies = allCombatants.filter((c) => c.hp <= 0 && c.side === actor.side);
 

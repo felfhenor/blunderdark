@@ -1708,7 +1708,7 @@ function processCombatRound(
     if (petrifyChance > 0) {
       const updatedCombatants = invasion.currentRoomTurnQueue.combatants.map((c) => {
         if (c.side !== 'invader' || c.hp <= 0) return c;
-        if (combatantHasStatus(c, 'stunned')) return c;
+        if (combatantHasStatus(c, 'stunned') || combatantHasStatus(c, 'phased')) return c;
         if (rng() < petrifyChance) {
           invasion.battleLog.push({
             turn: invasion.currentTurn,

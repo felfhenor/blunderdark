@@ -790,6 +790,57 @@ describe('invasion-combat', () => {
       const decision = invasionCombatResolveAiAction(stunned, [stunned, enemy]);
       expect(decision.action).toBe('wait');
     });
+
+    it('should cause phased combatant to auto-wait in AI', () => {
+      const phased = makeInvader('i1', 5, { x: 5, y: 5 });
+      phased.statusEffects = [{ name: 'phased', remainingDuration: 1 }];
+      const enemy = makeDefender('d1', 3, { x: 5, y: 4 });
+
+      const decision = invasionCombatResolveAiAction(phased, [phased, enemy]);
+      expect(decision.action).toBe('wait');
+    });
+
+    it('should exclude phased enemies from valid attack targets', () => {
+      const attacker = makeDefender('d1', 5, { x: 5, y: 5 });
+      const phased = makeInvader('i1', 3, { x: 5, y: 4 });
+      phased.statusEffects = [{ name: 'phased', remainingDuration: 1 }];
+
+      const targets = invasionCombatGetValidAttackTargets(attacker, [attacker, phased]);
+      expect(targets).toHaveLength(0);
+    });
+
+    it('should not exclude non-phased enemies from valid attack targets', () => {
+      const attacker = makeDefender('d1', 5, { x: 5, y: 5 });
+      const normal = makeInvader('i1', 3, { x: 5, y: 4 });
+
+      const targets = invasionCombatGetValidAttackTargets(attacker, [attacker, normal]);
+      expect(targets).toHaveLength(1);
+    });
+
+    it('should auto-miss when attacking a phased target directly', () => {
+      const attacker = makeDefender('d1', 5, { x: 5, y: 5 });
+      const phased = makeInvader('i1', 3, { x: 5, y: 4 });
+      phased.statusEffects = [{ name: 'phased', remainingDuration: 1 }];
+      const queue = invasionCombatBuildTurnQueue([attacker, phased]);
+
+      const { result } = invasionCombatExecuteAttack(
+        queue, 'd1' as CombatantId, 'i1' as CombatantId, fixedRng(0.5),
+      );
+
+      expect(result.combatResult?.hit).toBe(false);
+      expect(result.combatResult?.damage).toBe(0);
+    });
+
+    it('AI should skip phased enemies when choosing targets', () => {
+      const attacker = makeInvader('i1', 5, { x: 5, y: 5 });
+      const phased = makeDefender('d1', 3, { x: 5, y: 4 });
+      phased.statusEffects = [{ name: 'phased', remainingDuration: 1 }];
+      const normal = makeDefender('d2', 3, { x: 5, y: 6 });
+
+      const decision = invasionCombatResolveAiAction(attacker, [attacker, phased, normal]);
+      expect(decision.action).toBe('attack');
+      expect(decision.targetId).toBe('d2');
+    });
   });
 
   describe('invasionCombatExecuteAbility: Buff Defense', () => {
