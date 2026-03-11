@@ -167,19 +167,44 @@ describe('floorGetByDepth', () => {
 });
 
 describe('floorGetCreationCost', () => {
-  it('should return cost scaling with depth 1', () => {
+  it('should return base cost for neutral biome at depth 1', () => {
     const cost = floorGetCreationCost(1);
     expect(cost).toEqual({ crystals: 50, gold: 30 });
   });
 
-  it('should return cost scaling with depth 5', () => {
+  it('should return base cost for neutral biome at depth 5', () => {
     const cost = floorGetCreationCost(5);
     expect(cost).toEqual({ crystals: 250, gold: 150 });
   });
 
-  it('should return cost scaling with depth 10', () => {
+  it('should return base cost for neutral biome at depth 10', () => {
     const cost = floorGetCreationCost(10);
     expect(cost).toEqual({ crystals: 500, gold: 300 });
+  });
+
+  it('should add essence cost for volcanic biome', () => {
+    const cost = floorGetCreationCost(2, 'volcanic');
+    expect(cost).toEqual({ crystals: 100, gold: 60, essence: 20 });
+  });
+
+  it('should add flux cost for flooded biome', () => {
+    const cost = floorGetCreationCost(3, 'flooded');
+    expect(cost).toEqual({ crystals: 150, gold: 90, flux: 30 });
+  });
+
+  it('should add research cost for crystal biome', () => {
+    const cost = floorGetCreationCost(2, 'crystal');
+    expect(cost).toEqual({ crystals: 100, gold: 60, research: 30 });
+  });
+
+  it('should add corruption and essence costs for corrupted biome', () => {
+    const cost = floorGetCreationCost(2, 'corrupted');
+    expect(cost).toEqual({ crystals: 100, gold: 60, corruption: 16, essence: 10 });
+  });
+
+  it('should add research cost for fungal biome', () => {
+    const cost = floorGetCreationCost(1, 'fungal');
+    expect(cost).toEqual({ crystals: 50, gold: 30, research: 10 });
   });
 });
 
@@ -213,10 +238,16 @@ describe('floorCanCreate', () => {
     expect(result.reason).toBe('Insufficient resources');
   });
 
-  it('should check cost for next depth based on current floor count', () => {
+  it('should check cost for next depth based on current floor count (neutral)', () => {
     floorCanCreate();
     // 3 floors exist, so next depth is 4: 50*4=200 crystals, 30*4=120 gold
     expect(mockCanAfford).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
+  });
+
+  it('should check biome-specific cost when biome is specified', () => {
+    floorCanCreate('volcanic');
+    // 3 floors exist, next depth 4: crystals 200, gold 120, essence 40
+    expect(mockCanAfford).toHaveBeenCalledWith({ crystals: 200, gold: 120, essence: 40 });
   });
 });
 
@@ -260,11 +291,17 @@ describe('floorCreate', () => {
     expect(mockUpdateGamestate).not.toHaveBeenCalled();
   });
 
-  it('should deduct resources before adding floor', async () => {
+  it('should deduct resources before adding floor (neutral)', async () => {
     await floorCreate();
-    // resourcePayCost should be called with cost for depth 4
+    // resourcePayCost should be called with cost for depth 4, neutral
     expect(mockPayCost).toHaveBeenCalledWith({ crystals: 200, gold: 120 });
     expect(mockUpdateGamestate).toHaveBeenCalled();
+  });
+
+  it('should deduct biome-specific resources', async () => {
+    await floorCreate('volcanic');
+    // depth 4, volcanic: crystals 200, gold 120, essence 40
+    expect(mockPayCost).toHaveBeenCalledWith({ crystals: 200, gold: 120, essence: 40 });
   });
 
   it('should call updateGamestate to add the new floor', async () => {
@@ -482,10 +519,10 @@ describe('floorCanRemove', () => {
 });
 
 describe('floorGetRemovalRefund', () => {
-  it('should return 50% of creation cost for last floor', () => {
-    // Last floor is depth 3: cost is 150 crystals, 90 gold → refund 75, 45
+  it('should return 50% of creation cost for last floor including biome costs', () => {
+    // Last floor is depth 3, biome crystal: cost is 150 crystals, 90 gold, 45 research → refund 75, 45, 22
     const refund = floorGetRemovalRefund();
-    expect(refund).toEqual({ crystals: 75, gold: 45 });
+    expect(refund).toEqual({ crystals: 75, gold: 45, research: 22 });
   });
 
   it('should floor odd values down', () => {
@@ -498,12 +535,12 @@ describe('floorGetRemovalRefund', () => {
       },
     });
 
-    // Depth 1: cost is 50 crystals, 30 gold → refund 25, 15
+    // Depth 1, neutral: cost is 50 crystals, 30 gold → refund 25, 15
     const refund = floorGetRemovalRefund();
     expect(refund).toEqual({ crystals: 25, gold: 15 });
   });
 
-  it('should return correct refund for depth 5', () => {
+  it('should return correct refund for depth 5 neutral', () => {
     mockGamestate.mockReturnValue({
       world: {
         floors: Array.from({ length: 5 }, (_, i) =>
@@ -513,19 +550,35 @@ describe('floorGetRemovalRefund', () => {
       },
     });
 
-    // Depth 5: cost is 250 crystals, 150 gold → refund 125, 75
+    // Depth 5, neutral: cost is 250 crystals, 150 gold → refund 125, 75
     const refund = floorGetRemovalRefund();
     expect(refund).toEqual({ crystals: 125, gold: 75 });
+  });
+
+  it('should include biome-specific costs in refund for volcanic', () => {
+    mockGamestate.mockReturnValue({
+      world: {
+        floors: [
+          makeFloor({ id: 'floor-1' as FloorId, depth: 1 }),
+          makeFloor({ id: 'floor-2' as FloorId, depth: 2, biome: 'volcanic' }),
+        ],
+        currentFloorIndex: 0,
+      },
+    });
+
+    // Depth 2, volcanic: cost is 100 crystals, 60 gold, 20 essence → refund 50, 30, 10
+    const refund = floorGetRemovalRefund();
+    expect(refund).toEqual({ crystals: 50, gold: 30, essence: 10 });
   });
 });
 
 describe('floorRemove', () => {
-  it('should remove last floor and refund resources', async () => {
+  it('should remove last floor and refund resources including biome costs', async () => {
     const result = await floorRemove();
     expect(result).toBe(true);
 
-    // Refund for depth 3: 75 crystals, 45 gold (batched)
-    expect(mockResourceApplyMap).toHaveBeenCalledWith({ crystals: 75, gold: 45 });
+    // Refund for depth 3, crystal biome: 75 crystals, 45 gold, 22 research (batched)
+    expect(mockResourceApplyMap).toHaveBeenCalledWith({ crystals: 75, gold: 45, research: 22 });
     expect(mockUpdateGamestate).toHaveBeenCalledTimes(1);
   });
 

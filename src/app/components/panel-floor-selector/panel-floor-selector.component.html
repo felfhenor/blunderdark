@@ -47,16 +47,10 @@
         <button
           class="btn btn-sm btn-primary btn-block gap-1"
           appSfx="ui-click"
-          [disabled]="!canCreate().canCreate"
+          [disabled]="isMaxFloors()"
           (click)="openCreateModal()"
         >
           + Create New Floor
-          @if (nextFloorCost().crystals) {
-            <app-currency-cost type="crystals" [amount]="nextFloorCost().crystals!" />
-          }
-          @if (nextFloorCost().gold) {
-            <app-currency-cost type="gold" [amount]="nextFloorCost().gold!" />
-          }
         </button>
       </div>
     } @else {
@@ -95,16 +89,10 @@
           }
         }
 
-        <div class="text-xs opacity-60 text-center inline-flex items-center justify-center gap-1 w-full">
+        <div class="text-xs opacity-60 text-center inline-flex items-center justify-center gap-2 flex-wrap w-full">
           Cost:
-          @if (nextFloorCost().crystals) {
-            <app-currency-cost type="crystals" [amount]="nextFloorCost().crystals!" />
-          }
-          @if (nextFloorCost().crystals && nextFloorCost().gold) {
-            +
-          }
-          @if (nextFloorCost().gold) {
-            <app-currency-cost type="gold" [amount]="nextFloorCost().gold!" />
+          @for (entry of nextFloorCostEntries(); track entry[0]) {
+            <app-currency-cost [type]="$any(entry[0])" [amount]="entry[1]" />
           }
         </div>
       </div>
@@ -188,16 +176,10 @@
             <strong>{{ floor.name }}</strong>
             ?
           </p>
-          <p class="text-xs opacity-60 mb-2 inline-flex items-center gap-1">
+          <p class="text-xs opacity-60 mb-2 inline-flex items-center gap-2 flex-wrap">
             Refund:
-            @if (removalRefund().crystals) {
-              <app-currency-cost type="crystals" [amount]="removalRefund().crystals!" />
-            }
-            @if (removalRefund().crystals && removalRefund().gold) {
-              +
-            }
-            @if (removalRefund().gold) {
-              <app-currency-cost type="gold" [amount]="removalRefund().gold!" />
+            @for (entry of removalRefundEntries(); track entry[0]) {
+              <app-currency-cost [type]="$any(entry[0])" [amount]="entry[1]" />
             }
           </p>
         }

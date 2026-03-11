@@ -137,11 +137,15 @@ export class PanelFloorSelectorComponent {
 
   public nextFloorCost = computed(() => {
     const nextDepth = this.floors().length + 1;
-    return floorGetCreationCost(nextDepth);
+    return floorGetCreationCost(nextDepth, this.selectedBiome());
+  });
+
+  public nextFloorCostEntries = computed(() => {
+    return Object.entries(this.nextFloorCost()).filter(([, v]) => v && v > 0) as [string, number][];
   });
 
   public canCreate = computed(() => {
-    return floorCanCreate();
+    return floorCanCreate(this.selectedBiome());
   });
 
   public isMaxFloors = computed(() => {
@@ -159,6 +163,10 @@ export class PanelFloorSelectorComponent {
 
   public removalRefund = computed(() => {
     return floorGetRemovalRefund();
+  });
+
+  public removalRefundEntries = computed(() => {
+    return Object.entries(this.removalRefund()).filter(([, v]) => v && v > 0) as [string, number][];
   });
 
   public getBiomeData(biome: BiomeType) {

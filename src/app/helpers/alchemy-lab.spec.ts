@@ -71,6 +71,30 @@ vi.mock('@helpers/content', () => ({
   contentAllIdsByName: vi.fn(() => new Map()),
 }));
 
+vi.mock('@helpers/state-game', () => ({
+  updateGamestate: vi.fn(),
+  gamestate: vi.fn(),
+}));
+
+vi.mock('@helpers/reputation', () => ({
+  reputationAwardInPlace: vi.fn(),
+}));
+
+vi.mock('@helpers/research-unlocks', () => ({
+  researchUnlockGetPassiveBonusWithMastery: vi.fn(() => 0),
+}));
+
+vi.mock('@helpers/game-time', () => ({
+  GAME_TIME_TICKS_PER_MINUTE: 5,
+}));
+
+vi.mock('@helpers/floor', () => ({
+  findRoomOnFloor: vi.fn(
+    (floor: { rooms: { id: string }[] }, roomId: string) =>
+      floor.rooms.find((r: { id: string }) => r.id === roomId),
+  ),
+}));
+
 vi.mock('@helpers/room-roles', () => ({
   roomRoleFindById: vi.fn((role: string) => {
     if (role === 'alchemyLab') return ALCHEMY_LAB_ID;
@@ -98,6 +122,17 @@ vi.mock('@helpers/room-shapes', () => ({
 
 vi.mock('@helpers/adjacency', () => ({
   adjacencyAreRoomsAdjacent: vi.fn(() => false),
+}));
+
+vi.mock('@helpers/room-upgrades', () => ({
+  roomUpgradeGetAppliedEffects: vi.fn((room: { appliedUpgradePathId?: string }) => {
+    if (!room.appliedUpgradePathId) return [];
+    const upgrade = mockContent.get(room.appliedUpgradePathId) as
+      | { effects?: { type: string; value: number }[] }
+      | undefined;
+    return upgrade?.effects ?? [];
+  }),
+  roomGetDisplayName: vi.fn(() => 'Alchemy Lab'),
 }));
 
 const mockCurrencyUnlocked = vi.fn(() => true);

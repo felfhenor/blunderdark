@@ -15,6 +15,14 @@ import { MAX_FLOORS } from '@interfaces/floor';
 const CRYSTALS_PER_DEPTH = 50;
 const GOLD_PER_DEPTH = 30;
 
+const BIOME_EXTRA_COSTS: Partial<Record<BiomeType, Partial<Record<string, number>>>> = {
+  volcanic: { essence: 10 },
+  flooded: { flux: 10 },
+  crystal: { research: 15 },
+  corrupted: { corruption: 8, essence: 5 },
+  fungal: { research: 10 },
+};
+
 /**
  * Get the current floor based on floorCurrentIndex.
  */
@@ -180,21 +188,33 @@ export async function floorSetCurrentById(floorId: string): Promise<boolean> {
 }
 
 /**
- * Calculate the resource cost to create a floor at the given depth.
- * Costs scale linearly: 50 crystals + 30 gold per depth level.
+ * Calculate the resource cost to create a floor at the given depth and biome.
+ * Base costs scale linearly: 50 crystals + 30 gold per depth level.
+ * Non-neutral biomes add extra currency costs that also scale with depth.
  */
-export function floorGetCreationCost(depth: number): ResourceCost {
-  return {
+export function floorGetCreationCost(depth: number, biome: BiomeType = 'neutral'): ResourceCost {
+  const cost: ResourceCost = {
     crystals: CRYSTALS_PER_DEPTH * depth,
     gold: GOLD_PER_DEPTH * depth,
   };
+
+  const extras = BIOME_EXTRA_COSTS[biome];
+  if (extras) {
+    for (const [resource, perDepth] of Object.entries(extras)) {
+      if (perDepth) {
+        cost[resource as keyof ResourceCost] = perDepth * depth;
+      }
+    }
+  }
+
+  return cost;
 }
 
 /**
- * Check whether a new floor can be created.
+ * Check whether a new floor can be created with the given biome.
  * Returns an object with whether creation is possible and a reason if not.
  */
-export function floorCanCreate(): { canCreate: boolean; reason?: string } {
+export function floorCanCreate(biome: BiomeType = 'neutral'): { canCreate: boolean; reason?: string } {
   const floors = floorAll();
 
   if (floors.length >= MAX_FLOORS) {
@@ -202,7 +222,7 @@ export function floorCanCreate(): { canCreate: boolean; reason?: string } {
   }
 
   const nextDepth = floors.length + 1;
-  const cost = floorGetCreationCost(nextDepth);
+  const cost = floorGetCreationCost(nextDepth, biome);
 
   if (!resourceCanAfford(cost)) {
     return { canCreate: false, reason: 'Insufficient resources' };
@@ -219,13 +239,13 @@ export function floorCanCreate(): { canCreate: boolean; reason?: string } {
 export async function floorCreate(
   biome: BiomeType = 'neutral',
 ): Promise<Floor | undefined> {
-  const { canCreate } = floorCanCreate();
+  const { canCreate } = floorCanCreate(biome);
   if (!canCreate) {
     return undefined;
   }
 
   const nextDepth = floorAll().length + 1;
-  const cost = floorGetCreationCost(nextDepth);
+  const cost = floorGetCreationCost(nextDepth, biome);
 
   const paid = await resourcePayCost(cost);
   if (!paid) {
@@ -335,15 +355,19 @@ export function floorCanRemove(): { canRemove: boolean; reason?: string } {
 
 /**
  * Calculate the 50% refund for removing the last floor.
+ * Accounts for biome-specific costs.
  */
 export function floorGetRemovalRefund(): ResourceCost {
   const floors = floorAll();
   const lastFloor = floors[floors.length - 1];
-  const cost = floorGetCreationCost(lastFloor.depth);
-  return {
-    crystals: Math.floor((cost.crystals ?? 0) / 2),
-    gold: Math.floor((cost.gold ?? 0) / 2),
-  };
+  const cost = floorGetCreationCost(lastFloor.depth, lastFloor.biome);
+  const refund: ResourceCost = {};
+  for (const [key, value] of Object.entries(cost)) {
+    if (value) {
+      refund[key as keyof ResourceCost] = Math.floor(value / 2);
+    }
+  }
+  return refund;
 }
 
 /**
