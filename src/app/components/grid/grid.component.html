@@ -181,8 +181,10 @@
                     <app-icon name="tablerChevronUp" size="14px" />
                   }
                 </span>
-                <span class="stair-label text-xs font-bold">
-                  F{{ tInfo.connectsToFloors.join(',') }}
+                <span class="transport-floors stair-label">
+                  @for (f of tInfo.connectsToFloors; track f) {
+                    <span class="transport-floor-num">{{ f }}</span>
+                  }
                 </span>
               </div>
             }
@@ -191,8 +193,10 @@
                 <span class="elevator-icon">
                   <app-icon name="tablerArrowsVertical" size="14px" />
                 </span>
-                <span class="elevator-label text-xs font-bold">
-                  F{{ tInfo.connectsToFloors.join(',') }}
+                <span class="transport-floors elevator-label">
+                  @for (f of tInfo.connectsToFloors; track f) {
+                    <span class="transport-floor-num">{{ f }}</span>
+                  }
                 </span>
               </div>
             }
@@ -201,8 +205,10 @@
                 <span class="portal-icon">
                   <app-icon name="tablerSparkles" size="14px" />
                 </span>
-                <span class="portal-label text-xs font-bold">
-                  F{{ tInfo.connectsToFloors.join(',') }}
+                <span class="transport-floors portal-label">
+                  @for (f of tInfo.connectsToFloors; track f) {
+                    <span class="transport-floor-num">{{ f }}</span>
+                  }
                 </span>
               </div>
             }
