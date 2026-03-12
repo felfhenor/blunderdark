@@ -18,11 +18,10 @@
 #   Pack Mentality (T4) [Spirit Binding + Transmutation]
 #   Elite Training (T4) [Creature Quarters + Transmutation, +Mutagenic Pits]
 #   Garrison Command (T4) [Spirit Binding + Creature Quarters, +Garrison Expansion]
-#   Supreme Command (T5) [Horde Tactics + Pack Mentality]
 #   Creature Synergy (T5) [Elite Training + Horde Tactics]
 #   Forced March (T5) [Pack Mentality + Elite Training]
 #   Vast Dominion (T5) [Garrison Command + Horde Tactics]
-#   Sovereign's Will (T6) [Supreme Command + Creature Synergy]
+#   Sovereign's Will (T6) [Vast Dominion + Creature Synergy]
 
 # --- TIER 2: Four paths branch from Creature Lore ---
 
@@ -240,25 +239,6 @@
 
 # --- TIER 5: Pinnacle powers ---
 
-- id: f6087134-bc85-4d00-955f-d50b71e50ed8
-  name: Supreme Command
-  description: Achieve unparalleled mastery over creature hierarchies, vastly expanding the dungeon's ability to house minions.
-  branch: dominion
-  cost:
-    research: 1000
-    food: 300
-    gold: 150
-  prerequisiteResearchIds:
-    - Horde Tactics
-    - Pack Mentality
-  unlocks:
-    - type: passive_bonus
-      bonusType: maxInhabitants
-      value: 10
-      description: +10 maximum inhabitants
-  tier: 5
-  requiredTicks: 2250
-
 - id: cda817bf-8ae7-4d87-a419-736e7fb98e04
   name: Creature Synergy
   description: Unlock the secrets of inter-species cooperation, dramatically boosting the productivity of all dungeon workers.
@@ -327,7 +307,7 @@
     food: 600
     gold: 300
   prerequisiteResearchIds:
-    - Supreme Command
+    - Vast Dominion
     - Creature Synergy
   unlocks:
     - type: passive_bonus

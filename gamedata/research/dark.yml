@@ -15,6 +15,7 @@
 #   Dark Rituals (T4) [Undead Mastery + Soul Well Mastery, +Necronomicon Wing]
 #   Soul Forge (T4) [Soul Well Mastery + Undead Mastery, +Abyssal Conduit]
 #   Necromantic Ascension (T5) [Soul Forge]
+#   Supreme Command (T5) [Dark Rituals + Soul Forge]
 #   Dark Apotheosis (T6) [Necromantic Ascension + Ethereal Resonance]
 
 # --- TIER 2: Two paths branch from Dark Arts Fundamentals ---
@@ -240,6 +241,25 @@
       targetRoomupgradeId: Ethereal Amplification
   tier: 5
   requiredTicks: 1800
+
+- id: f6087134-bc85-4d00-955f-d50b71e50ed8
+  name: Supreme Command
+  description: Achieve unparalleled mastery over creature hierarchies, vastly expanding the dungeon's ability to house minions.
+  branch: dark
+  cost:
+    research: 1000
+    essence: 300
+    corruption: 150
+  prerequisiteResearchIds:
+    - Dark Rituals
+    - Soul Forge
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 10
+      description: +10 maximum inhabitants
+  tier: 5
+  requiredTicks: 2250
 
 # --- TIER 6: Ultimate mastery ---
 
