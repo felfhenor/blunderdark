@@ -66,14 +66,6 @@
   @apply absolute top-1 right-1 text-xs leading-none;
 }
 
-.node-progress-mini {
-  @apply w-full mt-1;
-
-  .progress {
-    height: 4px;
-  }
-}
-
 // --- Tier Layout ---
 
 .tier-group {

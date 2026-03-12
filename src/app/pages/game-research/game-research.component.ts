@@ -388,15 +388,4 @@ export class GameResearchComponent {
     }
     return false;
   }
-
-  public getNodeProgressPercent(nodeId: string): number {
-    const state = this.researchState();
-    if (state.activeResearch !== nodeId) return 0;
-    const node = contentGetEntry<ResearchContent>(nodeId);
-    if (!node) return 0;
-    return Math.min(
-      100,
-      (state.activeResearchProgress / node.requiredTicks) * 100,
-    );
-  }
 }

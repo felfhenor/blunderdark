@@ -117,15 +117,6 @@
                         </div>
                       }
 
-                      @if (node.nodeState === 'active') {
-                        <div class="node-progress-mini">
-                          <progress
-                            class="progress progress-info w-full"
-                            [value]="getNodeProgressPercent(node.id)"
-                            max="100"
-                          ></progress>
-                        </div>
-                      }
                     </button>
                   }
                 </div>
