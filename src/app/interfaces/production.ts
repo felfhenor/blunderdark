@@ -13,6 +13,7 @@ export type ActiveAdjacencyBonus = {
 export type ResourceProductionBreakdown = {
   base: number;
   inhabitantBonus: number;
+  purifierReduction: number;
   adjacencyBonus: number;
   modifierEffect: number;
   researchBonus: number;

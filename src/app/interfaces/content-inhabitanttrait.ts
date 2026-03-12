@@ -6,6 +6,7 @@ export type InhabitantTraitId = Branded<string, 'InhabitantTraitId'>;
 
 export type TraitEffectType =
   | 'production_multiplier'
+  | 'corruption_reduction'
   | 'defense_multiplier'
   | 'attack_multiplier'
   | 'worker_efficiency_multiplier'

@@ -142,6 +142,14 @@
                   </span>
                 </div>
               }
+              @if (bd.purifierReduction !== 0) {
+                <div class="flex justify-between">
+                  <span class="opacity-70">Purifier:</span>
+                  <span class="text-success">
+                    {{ formatBreakdownRate(bd.purifierReduction) }}/min
+                  </span>
+                </div>
+              }
               @if (bd.adjacencyBonus !== 0) {
                 <div class="flex justify-between">
                   <span class="opacity-70">Adjacency:</span>

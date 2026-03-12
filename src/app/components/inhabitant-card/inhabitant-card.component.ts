@@ -223,6 +223,12 @@ export class InhabitantCardComponent {
     // Check trait-room match
     for (const trait of def.traits) {
       for (const effect of trait.effects) {
+        if (effect.effectType === 'corruption_reduction') {
+          const pct = Math.round(effect.effectValue * 100);
+          reasons.push(`Corruption reduction: -${pct}% (${trait.name})`);
+          continue;
+        }
+
         if (effect.effectType !== 'production_multiplier') continue;
 
         // Check targetRoomId match

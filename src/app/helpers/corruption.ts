@@ -70,6 +70,63 @@ export function corruptionCanAfford(amount: number): boolean {
 }
 
 /**
+ * Calculate per-tick corruption reduction from inhabitants with
+ * the corruption_reduction trait. Groups inhabitants by room,
+ * then for each room sums the reduction percentage from purifier
+ * traits and applies it to that room's inhabitant corruption.
+ */
+export function corruptionCalculatePurifierReduction(
+  inhabitants: InhabitantInstance[],
+  lookupDef?: (id: string) => InhabitantContent | undefined,
+): number {
+  const lookup =
+    lookupDef ?? ((id: string) => contentGetEntry<InhabitantContent>(id));
+
+  // Group inhabitants by assigned room
+  const roomGroups = new Map<
+    string,
+    { corruptionPerMinute: number; reductionPercent: number }
+  >();
+
+  for (const inst of inhabitants) {
+    if (!inst.assignedRoomId) continue;
+    const def = lookup(inst.definitionId);
+    if (!def) continue;
+
+    const entry = roomGroups.get(inst.assignedRoomId) ?? {
+      corruptionPerMinute: 0,
+      reductionPercent: 0,
+    };
+
+    const rate = def.corruptionGeneration ?? 0;
+    if (rate > 0) {
+      entry.corruptionPerMinute += rate;
+    }
+
+    for (const trait of def.traits) {
+      for (const effect of trait.effects) {
+        if (effect.effectType === 'corruption_reduction') {
+          entry.reductionPercent += effect.effectValue;
+        }
+      }
+    }
+
+    roomGroups.set(inst.assignedRoomId, entry);
+  }
+
+  let totalReduction = 0;
+  for (const [, data] of roomGroups) {
+    if (data.reductionPercent > 0 && data.corruptionPerMinute > 0) {
+      const clamped = Math.min(data.reductionPercent, 1.0);
+      totalReduction +=
+        (data.corruptionPerMinute * clamped) / GAME_TIME_TICKS_PER_MINUTE;
+    }
+  }
+
+  return totalReduction;
+}
+
+/**
  * Calculate per-tick corruption generation from stationed inhabitants.
  * corruptionGeneration on InhabitantContent is in per-game-minute units.
  * Only stationed (assigned to a room) inhabitants generate corruption.

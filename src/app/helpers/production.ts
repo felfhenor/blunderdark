@@ -18,6 +18,7 @@ import {
 import {
   corruptionGenerationCalculateInhabitantRate,
   corruptionCalculateDeepObjectiveRate,
+  corruptionCalculatePurifierReduction,
 } from '@helpers/corruption';
 import { corruptionEffectGetActiveModifier } from '@helpers/corruption-effects';
 import {
@@ -117,6 +118,8 @@ function productionGetReputationMultiplier(resourceType: string): number {
 type NonRoomCorruptionResult = {
   /** Per-tick corruption from stationed inhabitants */
   inhabitantPerTick: number;
+  /** Per-tick corruption reduction from purifier traits */
+  purifierReduction: number;
   /** Per-tick corruption from features */
   featurePerTick: number;
   /** Per-tick corruption from deep objective rooms */
@@ -161,6 +164,7 @@ function productionCalculateNonRoomCorruption(
 ): NonRoomCorruptionResult {
   const allInhabitants = collectUniqueInhabitants(floors);
   const inhabitantPerTick = corruptionGenerationCalculateInhabitantRate(allInhabitants);
+  const purifierReduction = corruptionCalculatePurifierReduction(allInhabitants);
 
   const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
   let featurePerTick = 0;
@@ -176,9 +180,10 @@ function productionCalculateNonRoomCorruption(
 
   const deepObjectivePerTick = corruptionCalculateDeepObjectiveRate(floors);
 
-  const total = inhabitantPerTick + featurePerTick + deepObjectivePerTick;
-  if (total === 0) {
-    return { inhabitantPerTick: 0, featurePerTick: 0, deepObjectivePerTick: 0, dayNightMultiplier: 1, researchThroneMultiplier: 1, biomeCorruptionMultiplier: 1, final: 0 };
+  const netInhabitantPerTick = Math.max(0, inhabitantPerTick - purifierReduction);
+  const total = netInhabitantPerTick + featurePerTick + deepObjectivePerTick;
+  if (total === 0 && purifierReduction === 0) {
+    return { inhabitantPerTick: 0, purifierReduction: 0, featurePerTick: 0, deepObjectivePerTick: 0, dayNightMultiplier: 1, researchThroneMultiplier: 1, biomeCorruptionMultiplier: 1, final: 0 };
   }
 
   const dayNightMultiplier = hour !== undefined
@@ -199,7 +204,7 @@ function productionCalculateNonRoomCorruption(
 
   const final = total * dayNightMultiplier * researchThroneMultiplier * biomeCorruptionMultiplier;
 
-  return { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier, final };
+  return { inhabitantPerTick, purifierReduction, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier, final };
 }
 
 export function productionGetBase(roomTypeId: RoomId): RoomProduction {
@@ -939,6 +944,7 @@ export function productionCalculateBreakdowns(
           breakdowns[resourceType] = {
             base: 0,
             inhabitantBonus: 0,
+            purifierReduction: 0,
             adjacencyBonus: 0,
             modifierEffect: 0,
             researchBonus: 0,
@@ -971,6 +977,7 @@ export function productionCalculateBreakdowns(
           breakdowns[resourceType] = {
             base: 0,
             inhabitantBonus: 0,
+            purifierReduction: 0,
             adjacencyBonus: 0,
             modifierEffect: 0,
             researchBonus: 0,
@@ -1006,6 +1013,7 @@ export function productionCalculateBreakdowns(
             breakdowns[targetResource] = {
               base: 0,
               inhabitantBonus: 0,
+              purifierReduction: 0,
               adjacencyBonus: 0,
               modifierEffect: 0,
               researchBonus: 0,
@@ -1041,6 +1049,7 @@ export function productionCalculateBreakdowns(
           breakdowns[resourceType] = {
             base: 0,
             inhabitantBonus: 0,
+            purifierReduction: 0,
             adjacencyBonus: 0,
             modifierEffect: 0,
             researchBonus: 0,
@@ -1058,11 +1067,12 @@ export function productionCalculateBreakdowns(
 
   // Add non-room corruption sources to breakdown
   const nonRoomCorruption = productionCalculateNonRoomCorruption(floors, hour);
-  if (nonRoomCorruption.final !== 0) {
+  if (nonRoomCorruption.final !== 0 || nonRoomCorruption.purifierReduction !== 0) {
     if (!breakdowns['corruption']) {
       breakdowns['corruption'] = {
         base: 0,
         inhabitantBonus: 0,
+        purifierReduction: 0,
         adjacencyBonus: 0,
         modifierEffect: 0,
         researchBonus: 0,
@@ -1072,13 +1082,15 @@ export function productionCalculateBreakdowns(
       };
     }
 
-    const { inhabitantPerTick, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier } = nonRoomCorruption;
+    const { inhabitantPerTick, purifierReduction, featurePerTick, deepObjectivePerTick, dayNightMultiplier, researchThroneMultiplier, biomeCorruptionMultiplier } = nonRoomCorruption;
+    const netInhabitantPerTick = Math.max(0, inhabitantPerTick - purifierReduction);
     const nonInhabitantBase = featurePerTick + deepObjectivePerTick;
-    const totalBase = inhabitantPerTick + nonInhabitantBase;
+    const totalBase = netInhabitantPerTick + nonInhabitantBase;
 
     // Inhabitant corruption shows as worker bonus; features/objectives show as base
     breakdowns['corruption'].base += nonInhabitantBase;
     breakdowns['corruption'].inhabitantBonus += inhabitantPerTick;
+    breakdowns['corruption'].purifierReduction -= purifierReduction;
     // Modifier and research effects apply to the combined total
     const afterModifier = totalBase * dayNightMultiplier * biomeCorruptionMultiplier;
     breakdowns['corruption'].modifierEffect += afterModifier - totalBase;
@@ -1463,31 +1475,51 @@ export function productionCalculateDetailedBreakdown(
 
     // Per-room inhabitant corruption generation (shows in Workers tab)
     for (const floor of floors) {
-      const roomCorruptionWorkers = new Map<string, { count: number; perTick: number }>();
+      const roomCorruptionWorkers = new Map<string, { count: number; perTick: number; purifierReduction: number }>();
 
       for (const inst of floor.inhabitants) {
         if (!inst.assignedRoomId) continue;
         const def = productionGetInhabitantDefinition(inst.definitionId);
         if (!def) continue;
-        const rate = def.corruptionGeneration ?? 0;
-        if (rate <= 0) continue;
 
-        const existing = roomCorruptionWorkers.get(inst.assignedRoomId) ?? { count: 0, perTick: 0 };
-        existing.count += 1;
-        existing.perTick += rate / GAME_TIME_TICKS_PER_MINUTE;
+        const existing = roomCorruptionWorkers.get(inst.assignedRoomId) ?? { count: 0, perTick: 0, purifierReduction: 0 };
+
+        const rate = def.corruptionGeneration ?? 0;
+        if (rate > 0) {
+          existing.count += 1;
+          existing.perTick += rate / GAME_TIME_TICKS_PER_MINUTE;
+        }
+
+        for (const trait of def.traits) {
+          for (const effect of trait.effects) {
+            if (effect.effectType === 'corruption_reduction') {
+              existing.purifierReduction += effect.effectValue;
+            }
+          }
+        }
+
         roomCorruptionWorkers.set(inst.assignedRoomId, existing);
       }
 
       for (const [roomId, data] of roomCorruptionWorkers) {
+        if (data.perTick === 0 && data.purifierReduction === 0) continue;
+
         const room = findRoomOnFloor(floor, roomId as PlacedRoomId);
         if (!room) continue;
 
-        const afterModifier = data.perTick * dayNightMod;
+        const clampedReduction = Math.min(data.purifierReduction, 1.0);
+        const reductionPerTick = data.perTick * clampedReduction;
+        const netPerTick = Math.max(0, data.perTick - reductionPerTick);
+
+        const afterModifier = netPerTick * dayNightMod;
         let finalAmount = afterModifier * researchThroneMultiplier;
         const seasonCorruptionMul = season ? seasonGetProductionMultiplier(season, 'corruption') : 1.0;
         finalAmount *= seasonCorruptionMul;
 
         const entryModifierDetails = [...corruptionModifierDetails];
+        if (data.purifierReduction > 0) {
+          entryModifierDetails.push({ name: 'Purifier', multiplier: 1 - clampedReduction });
+        }
         if (seasonCorruptionMul !== 1.0) {
           entryModifierDetails.push({ name: 'Season', multiplier: seasonCorruptionMul });
         }
