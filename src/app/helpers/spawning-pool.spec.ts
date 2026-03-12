@@ -446,6 +446,19 @@ describe('spawningPoolPickSpawnDefinition', () => {
     const def = spawningPoolPickSpawnDefinition(room);
     expect(def).toBeUndefined();
   });
+
+  it('should not include converted creatures in pool', () => {
+    const convertedDef: InhabitantContent = {
+      ...goblinDef,
+      id: 'aa200001-0001-0001-0001-000000000099' as InhabitantId,
+      name: 'Converted Prisoner',
+      restrictionTags: ['converted'],
+    };
+    mockContent.set('__allInhabitants', [convertedDef, skeletonDef]);
+    const room = makeRoom();
+    const def = spawningPoolPickSpawnDefinition(room);
+    expect(def).toBeUndefined();
+  });
 });
 
 describe('spawningPoolGetWorkerCount', () => {

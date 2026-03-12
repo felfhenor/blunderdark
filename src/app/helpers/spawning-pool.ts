@@ -81,7 +81,10 @@ export function spawningPoolPickSpawnDefinition(
   const allInhabitants =
     contentGetEntriesByType<InhabitantContent>('inhabitant');
   const tier1NonUndead = allInhabitants.filter(
-    (i) => i.tier === 1 && i.type !== 'undead',
+    (i) =>
+      i.tier === 1 &&
+      i.type !== 'undead' &&
+      !i.restrictionTags.includes('converted'),
   );
   if (tier1NonUndead.length === 0) return undefined;
   return rngChoice(tier1NonUndead);
