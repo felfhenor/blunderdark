@@ -7,6 +7,7 @@ import { floatingBubblesEmitPlacement } from '@helpers/floating-bubbles';
 import { findRoomOnFloor, floorAll, floorCurrent, floorCurrentIndex } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { reputationAwardByIdForAction } from '@helpers/reputation';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
 import { rngUuid } from '@helpers/rng';
 import {
@@ -36,8 +37,16 @@ import type {
   ValidationResult,
 } from '@interfaces/room-placement';
 
-/** Maximum number of a single room type that can be built across the entire dungeon. */
-export const MAX_ROOMS_PER_TYPE = 20;
+/** Base maximum number of a single room type that can be built across the entire dungeon. */
+export const MAX_ROOMS_PER_TYPE_BASE = 10;
+
+/** Get the current max rooms per type, including research bonuses. */
+export function roomPlacementMaxPerType(): number {
+  return (
+    MAX_ROOMS_PER_TYPE_BASE +
+    researchUnlockGetPassiveBonusWithMastery('maxRoomsPerType')
+  );
+}
 
 /**
  * Count how many rooms of a given type exist across all floors in the dungeon.
@@ -341,10 +350,11 @@ export async function roomPlacementExecute(
   if (!roomDef.isUnique) {
     const allFloorsArr = floorAll();
     const totalCount = roomPlacementCountTypeAllFloors(allFloorsArr, roomTypeId);
-    if (totalCount >= MAX_ROOMS_PER_TYPE) {
+    const maxPerType = roomPlacementMaxPerType();
+    if (totalCount >= maxPerType) {
       return {
         success: false,
-        error: `${roomDef.name} is limited to ${MAX_ROOMS_PER_TYPE} across the dungeon (${totalCount}/${MAX_ROOMS_PER_TYPE})`,
+        error: `${roomDef.name} is limited to ${maxPerType} across the dungeon (${totalCount}/${maxPerType})`,
       };
     }
   }

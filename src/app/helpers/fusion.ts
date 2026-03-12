@@ -2,6 +2,7 @@ import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { generateInhabitantName } from '@helpers/inhabitant-names';
 import { reputationAwardForAction } from '@helpers/reputation';
 import { resourceCanAfford, resourcePayCost } from '@helpers/resources';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { floorAll } from '@helpers/floor';
 import { roomRoleFindById } from '@helpers/room-roles';
@@ -284,11 +285,17 @@ export function fusionRollMutationTraits(
   for (const id of parentA.mutationTraitIds ?? []) traitIds.add(id);
   for (const id of parentB.mutationTraitIds ?? []) traitIds.add(id);
 
+  const inheritanceBonus = researchUnlockGetPassiveBonusWithMastery('traitInheritanceBonus') > 0;
+
   const passed: string[] = [];
   for (const id of traitIds) {
     const trait = contentGetEntry<MutationTraitContent>(id);
     if (!trait) continue;
-    const chance = trait.fusionPassChance ?? 0;
+    let chance = trait.fusionPassChance ?? 0;
+    if (inheritanceBonus) {
+      chance += trait.isNegative ? -0.15 : 0.15;
+      chance = Math.max(0, Math.min(1, chance));
+    }
     if (chance > 0 && rngSucceedsChance(chance)) {
       passed.push(id);
     }

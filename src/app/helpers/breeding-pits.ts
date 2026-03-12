@@ -28,6 +28,7 @@ import type {
   PlacedRoomId,
 } from '@interfaces';
 import type { InhabitantContent } from '@interfaces/content-inhabitant';
+import type { MutationTraitContent } from '@interfaces/content-mutationtrait';
 import type { RoomContent } from '@interfaces/content-room';
 import type {
   BreedingCompletedEvent,
@@ -224,6 +225,7 @@ export function breedingCreateHybrid(
   parentA: InhabitantInstance,
   parentB: InhabitantInstance,
   recipe: BreedingRecipeContent,
+  rng?: () => number,
 ): InhabitantInstance {
   const parentADef = contentGetEntry<InhabitantContent>(
     parentA.definitionId,
@@ -263,7 +265,60 @@ export function breedingCreateHybrid(
       recipe.resultInhabitantTraitId,
       ...(recipe.inhabitantTraitIds ?? []),
     ],
+    mutationTraitIds: breedingInheritMutationTrait(parentA, parentB, rng ?? Math.random),
   };
+}
+
+/**
+ * Selective Lineage: attempt to inherit a mutation trait from a parent.
+ * Only active when traitInheritanceBonus is researched.
+ * 40% chance to inherit one mutation; positive traits weighted 4:1 over negative.
+ */
+function breedingInheritMutationTrait(
+  parentA: InhabitantInstance,
+  parentB: InhabitantInstance,
+  rng: () => number,
+): string[] | undefined {
+  const bonus = researchUnlockGetPassiveBonusWithMastery('traitInheritanceBonus');
+  if (bonus <= 0) return undefined;
+
+  const INHERIT_CHANCE = 0.4;
+  if (rng() >= INHERIT_CHANCE) return undefined;
+
+  // Collect all parent mutations
+  const allMutations = [
+    ...(parentA.mutationTraitIds ?? []),
+    ...(parentB.mutationTraitIds ?? []),
+  ];
+  if (allMutations.length === 0) return undefined;
+
+  // Separate positive and negative
+  const positive: string[] = [];
+  const negative: string[] = [];
+  for (const id of allMutations) {
+    const trait = contentGetEntry<MutationTraitContent>(id);
+    if (!trait) continue;
+    if (trait.isNegative) {
+      negative.push(id);
+    } else {
+      positive.push(id);
+    }
+  }
+
+  // Weight selection: positive 4:1 over negative
+  const positiveWeight = positive.length * 4;
+  const negativeWeight = negative.length;
+  const totalWeight = positiveWeight + negativeWeight;
+  if (totalWeight === 0) return undefined;
+
+  const roll = rng() * totalWeight;
+  if (roll < positiveWeight && positive.length > 0) {
+    return [positive[Math.floor(rng() * positive.length)]];
+  } else if (negative.length > 0) {
+    return [negative[Math.floor(rng() * negative.length)]];
+  }
+
+  return undefined;
 }
 
 /**

@@ -16,7 +16,7 @@ import {
   gamestateSet,
 } from '@helpers/state-game';
 import { optionsDefault, options, optionsSetAll } from '@helpers/state-options';
-import type { CorruptionEffectState, ResearchContent } from '@interfaces';
+import type { CorruptionEffectState, ResearchContent, ResearchId } from '@interfaces';
 import type { CorruptionEffectContent } from '@interfaces/content-corruptioneffect';
 import { merge } from 'es-toolkit/compat';
 
@@ -91,6 +91,16 @@ export function migrateGameState() {
   newState.world.corruptionEffects = migrateCorruptionEffects(
     newState.world.corruptionEffects as CorruptionEffectState & Record<string, unknown>,
   );
+  // Existing saves need "Expanded Blueprints" auto-completed since the room cap
+  // was lowered from 20 to 10 base (research brings it back to 20, then 30).
+  // Also auto-complete the prerequisite "Sovereign's Foundation".
+  if (state.clock.numTicks > 0) {
+    const sovereignId = 'd5ae52a8-f5b9-427a-a2ee-fcec721036ff' as ResearchId;
+    const blueprintsId = '0ec73ec9-5a93-4a09-88b5-79e74adf2c82' as ResearchId;
+    const completed = newState.world.research.completedNodes;
+    if (!completed.includes(sovereignId)) completed.push(sovereignId);
+    if (!completed.includes(blueprintsId)) completed.push(blueprintsId);
+  }
   reconcileResearchUnlocks(newState);
 
   // Existing saves (ticks > 0) get all currencies unlocked

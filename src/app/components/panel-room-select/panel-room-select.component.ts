@@ -33,7 +33,7 @@ import {
   roomPlacementSelectedTypeId,
   roomShapeGet,
   roomShapeGetRotated,
-  MAX_ROOMS_PER_TYPE,
+  roomPlacementMaxPerType,
 } from '@helpers';
 import { reputationEffectIsRoomUnlocked } from '@helpers/reputation-effects';
 import {
@@ -157,7 +157,7 @@ export class PanelRoomSelectComponent {
     if (room.isUnique) return false;
     const floors = floorAll();
     const count = roomPlacementCountTypeAllFloors(floors, room.id as RoomId);
-    return count >= MAX_ROOMS_PER_TYPE;
+    return count >= roomPlacementMaxPerType();
   }
 
   public getGlobalLimitLabel(room: RoomContent): string | undefined {
@@ -167,7 +167,7 @@ export class PanelRoomSelectComponent {
     const floors = floorAll();
     const count = roomPlacementCountTypeAllFloors(floors, room.id as RoomId);
     if (count === 0) return undefined;
-    return `${count}/${MAX_ROOMS_PER_TYPE}`;
+    return `${count}/${roomPlacementMaxPerType()}`;
   }
 
   public getRoomShapeForPreview(

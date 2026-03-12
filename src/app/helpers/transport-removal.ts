@@ -2,12 +2,11 @@ import { contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
 import { resourceApplyMap } from '@helpers/resources';
+import { roomRemovalRefundRate } from '@helpers/room-removal';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { PlacedRoom, PlacedRoomId } from '@interfaces';
 import type { TransportGroupId } from '@interfaces/room-shape';
 import type { RoomContent } from '@interfaces/content-room';
-
-const REFUND_RATE = 0.5;
 
 export type TransportRemovalInfo = {
   canRemove: boolean;
@@ -63,7 +62,7 @@ export function transportRemovalGetInfo(roomId: PlacedRoomId): TransportRemovalI
   if (roomDef) {
     for (const [type, amount] of Object.entries(roomDef.cost)) {
       if (amount && amount > 0) {
-        refund[type] = Math.floor(amount * REFUND_RATE);
+        refund[type] = Math.floor(amount * roomRemovalRefundRate());
       }
     }
   }

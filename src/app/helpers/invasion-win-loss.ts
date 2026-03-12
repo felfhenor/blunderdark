@@ -1,5 +1,6 @@
 import { invasionObjectiveResolveOutcome } from '@helpers/invasion-objectives';
 import { moraleIsRetreating } from '@helpers/morale';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngUuid } from '@helpers/rng';
 import type { InvasionId } from '@interfaces/content-invasion';
 import type { InvaderInstance } from '@interfaces/invader';
@@ -12,7 +13,13 @@ import type { InvasionObjective, ObjectiveType } from '@interfaces/invasion-obje
 
 // --- Constants ---
 
-export const INVASION_WIN_LOSS_ALTAR_MAX_HP = 100;
+export const INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE = 100;
+
+/** Get the current altar max HP including research bonuses. */
+export function invasionWinLossAltarMaxHp(): number {
+  const bonus = researchUnlockGetPassiveBonusWithMastery('altarMaxHpBonus');
+  return Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE * (1 + bonus));
+}
 export const INVASION_WIN_LOSS_MAX_TURNS = 60;
 export const INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY = 2;
 export const INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE = 0.15;
@@ -32,8 +39,8 @@ export function invasionWinLossCreateState(
     invasionId: rngUuid<InvasionId>(),
     currentTurn: 0,
     maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
-    altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
-    altarMaxHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
+    altarHp: invasionWinLossAltarMaxHp(),
+    altarMaxHp: invasionWinLossAltarMaxHp(),
     invaders: [...invaders],
     objectives: [...objectives],
     defenderCount,
@@ -208,7 +215,7 @@ export function invasionWinLossApplyObjectiveDebuff(
     currentMultiplier - INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE,
   );
 
-  const newMaxHp = Math.max(1, Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP * newMultiplier));
+  const newMaxHp = Math.max(1, Math.round(invasionWinLossAltarMaxHp() * newMultiplier));
   const newHp = Math.min(state.altarHp, newMaxHp);
 
   return {

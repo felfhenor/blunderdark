@@ -54,6 +54,19 @@ export function effectiveStatsCalculate(
   let speed = base.speed;
   let workerEfficiency = base.workerEfficiency;
 
+  // Veteran training bonuses (flat +1 per stat per in-game day, cap +10)
+  if (instance.veteranTicks && instance.veteranTicks > 0) {
+    const TICKS_PER_DAY = 1440; // 60 min/hr * 24 hr/day
+    const VETERAN_CAP = 10;
+    const veteranBonus = Math.min(VETERAN_CAP, Math.floor(instance.veteranTicks / TICKS_PER_DAY));
+    if (veteranBonus > 0) {
+      hp += veteranBonus;
+      attack += veteranBonus;
+      defense += veteranBonus;
+      speed += veteranBonus;
+    }
+  }
+
   // Instance stat bonuses (from hybrids, summoning)
   if (instance.instanceStatBonuses) {
     hp += instance.instanceStatBonuses.hp ?? 0;

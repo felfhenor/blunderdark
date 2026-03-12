@@ -34,7 +34,9 @@ export const FEAR_LEVEL_HIGH = 3;
 export const FEAR_LEVEL_VERY_HIGH = 4;
 
 export const FEAR_LEVEL_MIN = 0;
-export const FEAR_LEVEL_MAX = 4;
+export const FEAR_LEVEL_MAX_BASE = 4;
+export const FEAR_LEVEL_TERRIFYING = 5;
+export const FEAR_LEVEL_ABYSSAL = 6;
 
 export const FEAR_LEVEL_PROPAGATION_DEFAULT_DISTANCE = 1;
 
@@ -44,12 +46,19 @@ export const FEAR_LEVEL_LABELS: Record<number, string> = {
   [FEAR_LEVEL_MEDIUM]: 'Medium',
   [FEAR_LEVEL_HIGH]: 'High',
   [FEAR_LEVEL_VERY_HIGH]: 'Very High',
+  [FEAR_LEVEL_TERRIFYING]: 'Terrifying',
+  [FEAR_LEVEL_ABYSSAL]: 'Abyssal',
 };
+
+/** Get the current fear level cap including research bonuses. */
+export function fearLevelMax(): number {
+  return FEAR_LEVEL_MAX_BASE + researchUnlockGetPassiveBonusWithMastery('fearLevelCapBonus');
+}
 
 // --- Pure functions ---
 
 export function fearLevelGetLabel(level: number): string {
-  if (level > FEAR_LEVEL_MAX) return 'Terror';
+  if (level > fearLevelMax()) return 'Terror';
   return FEAR_LEVEL_LABELS[level] ?? 'Terror';
 }
 
@@ -123,7 +132,7 @@ export function fearLevelCalculateEffective(
   biomeReduction: number = 0,
 ): number {
   const raw = baseFear + inhabitantModifier + upgradeAdjustment - altarAuraReduction - featureReduction - researchReduction - biomeReduction + propagatedFear;
-  return Math.floor(Math.max(FEAR_LEVEL_MIN, Math.min(FEAR_LEVEL_MAX, raw)));
+  return Math.floor(Math.max(FEAR_LEVEL_MIN, Math.min(fearLevelMax(), raw)));
 }
 
 /**

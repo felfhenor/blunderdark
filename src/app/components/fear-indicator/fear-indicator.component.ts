@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { FEAR_LEVEL_MAX, fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
+import { fearLevelMax, fearLevelBreakdownMap, fearLevelGetLabel } from '@helpers';
 import type { PlacedRoomId } from '@interfaces';
 import type { FearLevelBreakdown } from '@interfaces/fear';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -101,7 +101,9 @@ export class FearIndicatorComponent {
 
   public fearEffect = computed(() => {
     const level = this.fearLevel();
-    if (level > FEAR_LEVEL_MAX) return 'Terror: maximum fear reached';
+    if (level > fearLevelMax()) return 'Terror: maximum fear reached';
+    if (level >= 6) return 'Abyssal fear: invaders take damage over time';
+    if (level >= 5) return 'Terrifying: invaders may flee in panic';
     if (level >= 4) return 'Very High fear: most inhabitants scared';
     if (level >= 3) return 'High fear: scared inhabitants produce -50%';
     if (level >= 2) return 'Medium fear: some inhabitants may be scared';

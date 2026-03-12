@@ -9,7 +9,7 @@ import type {
 import type { TransportGroupId } from '@interfaces/room-shape';
 import { describe, expect, it } from 'vitest';
 import {
-  VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR,
+  VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR_BASE,
   VERTICAL_TRANSPORT_PORTAL_TICKS,
   VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR,
   verticalTransportBuildGraph,
@@ -59,7 +59,7 @@ describe('vertical transport constants', () => {
   });
 
   it('elevator should cost half a minute per floor (rounded)', () => {
-    expect(VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR).toBe(
+    expect(VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR_BASE).toBe(
       Math.round(VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR * 0.5),
     );
   });
@@ -125,7 +125,7 @@ describe('verticalTransportBuildGraph', () => {
     const graph = verticalTransportBuildGraph(floors);
 
     const from1 = graph.get(1)!;
-    expect(from1[0].travelTicks).toBe(2 * VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR);
+    expect(from1[0].travelTicks).toBe(2 * VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR_BASE);
   });
 
   it('should create portal edges with 0 ticks', () => {

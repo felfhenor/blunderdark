@@ -1,0 +1,364 @@
+# --- SOVEREIGNTY BRANCH ---
+# Meta research that modifies core game rules and constraints.
+# No T6 mastery capstone -- intentionally no branch-wide multiplier.
+
+# T1: Root node
+- id: d5ae52a8-f5b9-427a-a2ee-fcec721036ff
+  name: Sovereign's Foundation
+  description: Establish the foundations of absolute rule over your domain, unlocking deeper control of your dungeon's systems.
+  branch: sovereignty
+  cost:
+    research: 100
+  prerequisiteResearchIds: []
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 2
+      description: +2 max inhabitants
+  tier: 1
+  requiredTicks: 120
+
+# --- TIER 2 (4 nodes) ---
+
+- id: 0ec73ec9-5a93-4a09-88b5-79e74adf2c82
+  name: Expanded Blueprints
+  description: Improved architectural planning allows construction of more rooms of the same type across your dungeon.
+  branch: sovereignty
+  cost:
+    research: 50
+    gold: 25
+  prerequisiteResearchIds:
+    - Sovereign's Foundation
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxRoomsPerType
+      value: 10
+      description: +10 max rooms per type
+  tier: 2
+  requiredTicks: 200
+
+- id: d31711c3-bf23-46fe-84d8-0cb51f13b263
+  name: Overcrowding Tolerance I
+  description: Expanded living quarters and improved logistics allow your dungeon to support more inhabitants.
+  branch: sovereignty
+  cost:
+    research: 40
+  prerequisiteResearchIds:
+    - Sovereign's Foundation
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 5
+      description: +5 max inhabitants
+  tier: 2
+  requiredTicks: 150
+
+- id: ddada12f-636e-4052-a345-2bceae83208e
+  name: Prisoner Retention
+  description: Improved capture techniques ensure more defeated invaders are taken alive for interrogation.
+  branch: sovereignty
+  cost:
+    research: 50
+    gold: 20
+  prerequisiteResearchIds:
+    - Sovereign's Foundation
+  unlocks:
+    - type: passive_bonus
+      bonusType: prisonerCaptureBonus
+      value: 0.20
+      description: +20% prisoner capture chance
+  tier: 2
+  requiredTicks: 180
+
+- id: 1f48c8eb-323d-4091-9958-ece63ab94a60
+  name: Ancient Tomes
+  description: Recovered scrolls and forbidden texts accelerate the pace of all future research endeavors.
+  branch: sovereignty
+  cost:
+    research: 60
+    crystals: 20
+  prerequisiteResearchIds:
+    - Sovereign's Foundation
+  unlocks:
+    - type: passive_bonus
+      bonusType: researchSpeed
+      value: 0.15
+      description: +15% research speed
+  tier: 2
+  requiredTicks: 200
+
+# --- TIER 3 (4 nodes) ---
+
+- id: 568d1321-c0e8-4196-8305-90b3f43a4873
+  name: Overcrowding Tolerance II
+  description: Further refinements to housing and supply chains support an even larger population.
+  branch: sovereignty
+  cost:
+    research: 100
+  prerequisiteResearchIds:
+    - Overcrowding Tolerance I
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 5
+      description: +5 max inhabitants
+  tier: 3
+  requiredTicks: 250
+
+- id: be2756cb-801e-4c78-bb89-8851a227073c
+  name: Subterranean Shortcuts
+  description: Optimized elevator shafts and pulley systems halve vertical travel time between floors.
+  branch: sovereignty
+  cost:
+    research: 120
+    crystals: 40
+  prerequisiteResearchIds:
+    - Ancient Tomes
+  unlocks:
+    - type: passive_bonus
+      bonusType: elevatorSpeedBonus
+      value: 0.5
+      description: Halve elevator travel time
+  tier: 3
+  requiredTicks: 250
+
+- id: 02d22be3-ddbe-4914-8455-8ab2046b95a7
+  name: Merchant Reputation
+  description: Your dungeon's growing infamy attracts more traders, each bringing additional wares.
+  branch: sovereignty
+  cost:
+    research: 120
+    gold: 50
+  prerequisiteResearchIds:
+    - Ancient Tomes
+  unlocks:
+    - type: passive_bonus
+      bonusType: merchantBonusTrades
+      value: 2
+      description: +2 merchant trades per visit
+  tier: 3
+  requiredTicks: 250
+
+- id: f18197c7-0f6f-468f-9b91-68816c7c4f0c
+  name: Reinforced Chains
+  description: Stronger restraints and warded cells double the time before prisoners can attempt escape.
+  branch: sovereignty
+  cost:
+    research: 100
+    gold: 40
+  prerequisiteResearchIds:
+    - Prisoner Retention
+  unlocks:
+    - type: passive_bonus
+      bonusType: prisonerEscapeTimeBonus
+      value: 2
+      description: Double prisoner escape time
+  tier: 3
+  requiredTicks: 280
+
+# --- TIER 4 (4 nodes) ---
+
+- id: e5f5c45a-627a-4735-b763-d48f87ccbc1f
+  name: Master Blueprints
+  description: Masterful dungeon planning pushes the limits of room construction even further.
+  branch: sovereignty
+  cost:
+    research: 500
+    gold: 150
+  prerequisiteResearchIds:
+    - Expanded Blueprints
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxRoomsPerType
+      value: 10
+      description: +10 max rooms per type
+  tier: 4
+  requiredTicks: 350
+
+- id: a0d30680-4fa7-48d5-ae76-d2bf54b3b190
+  name: Overcrowding Tolerance III
+  description: Advanced population management techniques support a significantly larger workforce.
+  branch: sovereignty
+  cost:
+    research: 450
+  prerequisiteResearchIds:
+    - Overcrowding Tolerance II
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 10
+      description: +10 max inhabitants
+  tier: 4
+  requiredTicks: 300
+
+- id: a6bcecf1-a02d-48f8-b51e-3dde74ee2f5c
+  name: Rallying Cry
+  description: Inhabitants fight with renewed vigor when defending the room they call home.
+  branch: sovereignty
+  cost:
+    research: 500
+    gold: 125
+  prerequisiteResearchIds:
+    - Merchant Reputation
+  unlocks:
+    - type: passive_bonus
+      bonusType: homeRoomDefenseBonus
+      value: 0.10
+      description: +10% stats for inhabitants defending their assigned room
+  tier: 4
+  requiredTicks: 350
+
+- id: 6e8e8eb1-c88f-45ea-b5be-2da08ac0e68f
+  name: Resource Recycling
+  description: Salvage techniques recover more materials when demolishing rooms, reducing the cost of dungeon reorganization.
+  branch: sovereignty
+  cost:
+    research: 450
+    gold: 100
+    crystals: 50
+  prerequisiteResearchIds:
+    - Subterranean Shortcuts
+  unlocks:
+    - type: passive_bonus
+      bonusType: demolishRefundBonus
+      value: 0.25
+      description: +25% demolish refund (50% to 75%)
+  tier: 4
+  requiredTicks: 300
+
+# --- TIER 5 (4 nodes) ---
+
+- id: 91066263-ecab-45c9-a73e-93aeba48cbc7
+  name: Overcrowding Tolerance IV
+  description: Your dungeon can now sustain a vast population through masterful logistics and expanded infrastructure.
+  branch: sovereignty
+  cost:
+    research: 1000
+  prerequisiteResearchIds:
+    - Overcrowding Tolerance III
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 10
+      description: +10 max inhabitants
+  tier: 5
+  requiredTicks: 450
+
+- id: 545c1972-74e5-4d0e-8dbf-777081614497
+  name: Fortified Altar
+  description: Reinforced wards and structural fortifications make your altar far more resilient to invader assault.
+  branch: sovereignty
+  cost:
+    research: 1200
+    essence: 100
+  prerequisiteResearchIds:
+    - Reinforced Chains
+  unlocks:
+    - type: passive_bonus
+      bonusType: altarMaxHpBonus
+      value: 0.25
+      description: +25% altar max HP
+  tier: 5
+  requiredTicks: 400
+
+- id: d48bb43c-ebbc-48eb-a2df-7f8fe49e02ae
+  name: Intimidation Aura
+  description: Your dungeon radiates such dread that invading parties begin their assault already shaken.
+  branch: sovereignty
+  cost:
+    research: 1200
+    essence: 75
+  prerequisiteResearchIds:
+    - Reinforced Chains
+  unlocks:
+    - type: passive_bonus
+      bonusType: invaderStartingMoralePenalty
+      value: 10
+      description: -10 starting morale for invaders
+  tier: 5
+  requiredTicks: 420
+
+- id: e7071c25-4e9f-4ca2-97bb-17adc75e065e
+  name: Fearful Presence
+  description: Your dungeon's terror reaches supernatural levels, causing invaders to flee in panic when overwhelmed by dread.
+  branch: sovereignty
+  cost:
+    research: 1500
+    essence: 125
+  prerequisiteResearchIds:
+    - Reinforced Chains
+  unlocks:
+    - type: passive_bonus
+      bonusType: fearLevelCapBonus
+      value: 1
+      description: Raise fear level cap to 5 - Terrifying (20% flee chance per round)
+  tier: 5
+  requiredTicks: 450
+
+# --- TIER 6 (4 nodes, no mastery) ---
+
+- id: 00425aa8-26a9-42cf-be42-62b65f33da40
+  name: Overcrowding Tolerance V
+  description: Your domain can house a truly immense population, rivaling the great cities of the surface world.
+  branch: sovereignty
+  cost:
+    research: 2000
+  prerequisiteResearchIds:
+    - Overcrowding Tolerance IV
+  unlocks:
+    - type: passive_bonus
+      bonusType: maxInhabitants
+      value: 20
+      description: +20 max inhabitants
+  tier: 6
+  requiredTicks: 550
+
+- id: 7db0d71b-51a4-4c89-8161-1550dba405cf
+  name: Veteran Training
+  description: Inhabitants who remain in their assigned roles grow stronger over time, gaining combat experience through dedication.
+  branch: sovereignty
+  cost:
+    research: 2000
+    crystals: 200
+  prerequisiteResearchIds:
+    - Resource Recycling
+  unlocks:
+    - type: feature_flag
+      featureFlag: veteran_training
+      description: Assigned inhabitants gain +1 to all stats per day (max +10)
+  tier: 6
+  requiredTicks: 550
+
+- id: 78257936-aeb3-45a5-93a5-cdce720a12a8
+  name: Selective Lineage
+  description: Mastery of bloodline manipulation ensures bred creatures inherit their parents' greatest strengths while filtering out weaknesses.
+  branch: sovereignty
+  cost:
+    research: 2500
+    essence: 200
+  prerequisiteResearchIds:
+    - Fearful Presence
+  unlocks:
+    - type: passive_bonus
+      bonusType: traitInheritanceBonus
+      value: 1
+      description: Bred inhabitants can inherit positive parent mutations; fusion favors positive traits
+  tier: 6
+  requiredTicks: 600
+
+- id: 6d4106fc-edf2-447c-9e7e-38be7c5af096
+  name: Abyssal Dread
+  description: The deepest terror seeps into the very stones, withering invaders who dare linger in your domain.
+  branch: sovereignty
+  cost:
+    research: 2500
+    essence: 250
+  prerequisiteResearchIds:
+    - Fearful Presence
+  unlocks:
+    - type: passive_bonus
+      bonusType: fearLevelCapBonus
+      value: 1
+      description: Raise fear level cap to 6 - Abyssal (5 damage per round)
+  tier: 6
+  requiredTicks: 550

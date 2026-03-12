@@ -1,11 +1,18 @@
 import { sortBy } from 'es-toolkit/compat';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import type { Floor, PlacedRoom } from '@interfaces';
 import type { TransportGroupId, TransportType } from '@interfaces/room-shape';
 
 export const VERTICAL_TRANSPORT_STAIR_TICKS_PER_FLOOR = GAME_TIME_TICKS_PER_MINUTE;
-export const VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR = Math.round(GAME_TIME_TICKS_PER_MINUTE * 0.5);
+export const VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR_BASE = Math.round(GAME_TIME_TICKS_PER_MINUTE * 0.5);
 export const VERTICAL_TRANSPORT_PORTAL_TICKS = 0;
+
+/** Get the current elevator ticks per floor, including research bonuses. */
+export function verticalTransportElevatorTicksPerFloor(): number {
+  const bonus = researchUnlockGetPassiveBonusWithMastery('elevatorSpeedBonus');
+  return Math.round(VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR_BASE * (1 - bonus));
+}
 
 type TransportEdge = {
   toDepth: number;
@@ -82,7 +89,7 @@ export function verticalTransportBuildGraph(
         for (let i = 0; i < sortedFloors.length; i++) {
           for (let j = i + 1; j < sortedFloors.length; j++) {
             const floorsTraversed = sortedFloors[j] - sortedFloors[i];
-            const ticks = floorsTraversed * VERTICAL_TRANSPORT_ELEVATOR_TICKS_PER_FLOOR;
+            const ticks = floorsTraversed * verticalTransportElevatorTicksPerFloor();
             addEdge(sortedFloors[i], sortedFloors[j], ticks);
             addEdge(sortedFloors[j], sortedFloors[i], ticks);
           }

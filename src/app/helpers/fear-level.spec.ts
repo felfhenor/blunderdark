@@ -20,7 +20,7 @@ import {
   FEAR_LEVEL_HIGH,
   FEAR_LEVEL_LABELS,
   FEAR_LEVEL_LOW,
-  FEAR_LEVEL_MAX,
+  FEAR_LEVEL_MAX_BASE,
   FEAR_LEVEL_MEDIUM,
   FEAR_LEVEL_MIN,
   FEAR_LEVEL_NONE,
@@ -190,7 +190,7 @@ describe('Constants', () => {
 
   it('should have correct min/max', () => {
     expect(FEAR_LEVEL_MIN).toBe(0);
-    expect(FEAR_LEVEL_MAX).toBe(4);
+    expect(FEAR_LEVEL_MAX_BASE).toBe(4);
   });
 
   it('should have correct default propagation distance', () => {

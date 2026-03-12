@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { invaderGetDefinitionById } from '@helpers/invaders';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import type { InvaderClassType, InvaderInstance } from '@interfaces/invader';
 import type { MoraleEventType, MoraleEvent } from '@interfaces/morale';
 
@@ -144,7 +145,9 @@ export function moraleApplyLeaderModifier(
  * Initialize morale for a new invasion. Resets to 100 and clears event log.
  */
 export function moraleInit(): void {
-  moraleCurrent.set(MORALE_INITIAL);
+  const intimidationPenalty = researchUnlockGetPassiveBonusWithMastery('invaderStartingMoralePenalty');
+  const startingMorale = Math.max(MORALE_MIN, MORALE_INITIAL - intimidationPenalty);
+  moraleCurrent.set(startingMorale);
   moraleEventLog.set([]);
   moraleIsRetreating.set(false);
 }

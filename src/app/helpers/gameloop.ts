@@ -31,6 +31,7 @@ import {
 import { legendaryInhabitantUpkeepProcess } from '@helpers/legendary-inhabitant';
 import { merchantProcess } from '@helpers/merchant';
 import { seasonProcess } from '@helpers/season';
+import { veteranTrainingProcess } from '@helpers/veteran-training';
 import { victoryProcess } from '@helpers/victory';
 import { autosaveCheckPreInvasion } from '@helpers/autosave';
 import { debug } from '@helpers/logging';
@@ -103,6 +104,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     tortureChamberProcess(state, numTicks);
     runeworkingProcess(state, numTicks);
     verticalTransportTravelProcess(state);
+    veteranTrainingProcess(state, numTicks);
     invasionThreatDecayProcess(state);
     invasionTriggerProcessSchedule(state);
     invasionProcess(state);

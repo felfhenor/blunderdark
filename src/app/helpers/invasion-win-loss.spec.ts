@@ -5,7 +5,7 @@ import type { InvaderInstance } from '@interfaces/invader';
 import type { InvasionObjective } from '@interfaces/invasion-objective';
 import {
   INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE,
-  INVASION_WIN_LOSS_ALTAR_MAX_HP,
+  INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE,
   INVASION_WIN_LOSS_ALTAR_MIN_MAX_HP_RATIO,
   INVASION_WIN_LOSS_MAX_TURNS,
   INVASION_WIN_LOSS_SECONDARY_OBJECTIVES_FOR_VICTORY,
@@ -104,8 +104,8 @@ function makeInvasionState(overrides: Partial<InvasionState> = {}): InvasionStat
     invasionId: 'inv-1' as InvasionId,
     currentTurn: 0,
     maxTurns: INVASION_WIN_LOSS_MAX_TURNS,
-    altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
-    altarMaxHp: INVASION_WIN_LOSS_ALTAR_MAX_HP,
+    altarHp: INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE,
+    altarMaxHp: INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE,
     invaders: [makeInvader('inv-a'), makeInvader('inv-b')],
     objectives: [
       makePrimaryObjective(),
@@ -125,7 +125,7 @@ function makeInvasionState(overrides: Partial<InvasionState> = {}): InvasionStat
 describe('invasion-win-loss', () => {
   describe('constants', () => {
     it('should have altar max HP of 100', () => {
-      expect(INVASION_WIN_LOSS_ALTAR_MAX_HP).toBe(100);
+      expect(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE).toBe(100);
     });
 
     it('should have max invasion turns of 60', () => {
@@ -147,8 +147,8 @@ describe('invasion-win-loss', () => {
       expect(state.invasionId).toBe('test-uuid');
       expect(state.currentTurn).toBe(0);
       expect(state.maxTurns).toBe(INVASION_WIN_LOSS_MAX_TURNS);
-      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
-      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
+      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE);
+      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE);
       expect(state.invaders).toHaveLength(2);
       expect(state.objectives).toHaveLength(2);
       expect(state.defenderCount).toBe(3);
@@ -367,7 +367,7 @@ describe('invasion-win-loss', () => {
     it('should not mutate original state', () => {
       const state = makeInvasionState();
       invasionWinLossDamageAltar(state, 50);
-      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
+      expect(state.altarHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE);
     });
 
     it('should not modify non-DestroyAltar objectives', () => {
@@ -683,7 +683,7 @@ describe('invasion-win-loss', () => {
       const { state: newState, newMultiplier } = invasionWinLossApplyObjectiveDebuff(state, 1.0);
 
       expect(newMultiplier).toBe(1.0 - INVASION_WIN_LOSS_ALTAR_DEBUFF_PER_OBJECTIVE);
-      expect(newState.altarMaxHp).toBe(Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP * newMultiplier));
+      expect(newState.altarMaxHp).toBe(Math.round(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE * newMultiplier));
     });
 
     it('should stack debuffs', () => {
@@ -718,7 +718,7 @@ describe('invasion-win-loss', () => {
     it('should not mutate original state', () => {
       const state = makeInvasionState();
       invasionWinLossApplyObjectiveDebuff(state, 1.0);
-      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP);
+      expect(state.altarMaxHp).toBe(INVASION_WIN_LOSS_ALTAR_MAX_HP_BASE);
     });
   });
 });

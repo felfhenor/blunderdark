@@ -31,6 +31,7 @@ import {
   stateModifierGetFearTolerance,
 } from '@helpers/state-modifiers';
 import { synergyGetDefinitions } from '@helpers/synergy';
+import { veteranTrainingGetLevel } from '@helpers/veteran-training';
 import type {
   ForgeRecipeContent,
   InhabitantInstance,
@@ -98,6 +99,10 @@ export class InhabitantCardComponent {
     }
     return traits;
   });
+
+  public veteranLevel = computed(() =>
+    veteranTrainingGetLevel(this.instance().veteranTicks),
+  );
 
   public assignmentLabel = computed(() =>
     inhabitantGetAssignmentLabel(

@@ -1,5 +1,6 @@
 import { contentGetEntry } from '@helpers/content';
 import { invasionObjectiveGetPenalties } from '@helpers/invasion-objectives';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngUuid } from '@helpers/rng';
 import type { InvaderContent } from '@interfaces/content-invader';
 import type { ReputationActionContent } from '@interfaces/content-reputationaction';
@@ -254,7 +255,8 @@ export function invasionRewardRollPrisonerCaptures(
   const prisoners: CapturedPrisoner[] = [];
 
   for (const invader of retreatingInvaders) {
-    if (rng() < INVASION_REWARD_PRISONER_CAPTURE_CHANCE) {
+    const captureChance = INVASION_REWARD_PRISONER_CAPTURE_CHANCE + researchUnlockGetPassiveBonusWithMastery('prisonerCaptureBonus');
+    if (rng() < captureChance) {
       const def = contentGetEntry<InvaderContent>(
         invader.definitionId,
       );

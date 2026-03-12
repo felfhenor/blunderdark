@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { contentGetEntry, contentGetEntriesByType } from '@helpers/content';
 import { darkForgeAddToInventory, darkForgeRemoveFromInventory } from '@helpers/dark-forge';
 import { reputationAwardForAction } from '@helpers/reputation';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { resourceCanAfford } from '@helpers/resources';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -79,9 +80,10 @@ export function merchantGenerateInventory(
     selected.push(shuffledSpecial[i]);
   }
 
+  const bonusTrades = researchUnlockGetPassiveBonusWithMastery('merchantBonusTrades');
   const totalTarget = rng
-    ? rngNumberRange(MERCHANT_MIN_TRADES, MERCHANT_MAX_TRADES + 1, rng)
-    : MERCHANT_MIN_TRADES;
+    ? rngNumberRange(MERCHANT_MIN_TRADES + bonusTrades, MERCHANT_MAX_TRADES + bonusTrades + 1, rng)
+    : MERCHANT_MIN_TRADES + bonusTrades;
 
   const remaining = allTrades.filter(
     (t) => !selected.some((s) => s.id === t.id),

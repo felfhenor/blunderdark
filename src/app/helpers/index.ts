@@ -125,6 +125,7 @@ export * from './tutorial-steps';
 export * from './ui';
 export * from './version';
 export * from './vertical-transport';
+export * from './veteran-training';
 export * from './victory';
 export * from './victory-conditions';
 export * from './work-affinity';

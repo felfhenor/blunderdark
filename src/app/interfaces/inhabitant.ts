@@ -62,6 +62,8 @@ export type InhabitantInstance = {
   equippedStatBonuses?: Partial<InhabitantStats>;
   equippedTraitIds?: string[];
 
+  veteranTicks?: number;
+
   abilityStates?: AbilityState[];
   statusEffects?: StatusEffect[];
 };

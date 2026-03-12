@@ -2,6 +2,7 @@ import { contentGetEntry } from '@helpers/content';
 import { currencyUnlockInPlace } from '@helpers/currency-unlock';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import { rngRandom, rngUuid } from '@helpers/rng';
 import { roomRoleFindById } from '@helpers/room-roles';
 import { updateGamestate } from '@helpers/state-game';
@@ -248,7 +249,8 @@ export function prisonerEscapeProcess(state: GameState): string[] {
   const escaped: string[] = [];
   state.world.prisoners = state.world.prisoners.filter((prisoner) => {
     if (processingPrisonerIds.has(prisoner.id)) return true;
-    if (currentDay - prisoner.captureDay >= PRISONER_ESCAPE_DAYS) {
+    const escapeTimeMultiplier = researchUnlockGetPassiveBonusWithMastery('prisonerEscapeTimeBonus') || 1;
+    if (currentDay - prisoner.captureDay >= PRISONER_ESCAPE_DAYS * escapeTimeMultiplier) {
       escaped.push(prisoner.name);
       return false;
     }

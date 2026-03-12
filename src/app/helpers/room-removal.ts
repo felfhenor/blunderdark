@@ -2,6 +2,7 @@ import { connectionRemoveRoomFromFloor } from '@helpers/connections';
 import { contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { invasionIsActive } from '@helpers/invasion-process';
+import { researchUnlockGetPassiveBonusWithMastery } from '@helpers/research-unlocks';
 import {
   roomPlacementIsRemovable,
   roomPlacementRemoveFromFloor,
@@ -18,16 +19,21 @@ import type {
 import type { RoomContent } from '@interfaces/content-room';
 import type { RemovalRefund, RemovalInfo } from '@interfaces/room-removal';
 
-const REFUND_RATE = 0.5;
+const REFUND_RATE_BASE = 0.5;
+
+/** Get the current refund rate including research bonuses. */
+export function roomRemovalRefundRate(): number {
+  return REFUND_RATE_BASE + researchUnlockGetPassiveBonusWithMastery('demolishRefundBonus');
+}
 
 /**
- * Calculate the refund for removing a room (50% of original cost, rounded down).
+ * Calculate the refund for removing a room (base 50% of original cost, rounded down; improved by research).
  */
 export function roomRemovalCalculateRefund(cost: ResourceCost): RemovalRefund {
   const refund: RemovalRefund = {};
   for (const [type, amount] of Object.entries(cost)) {
     if (amount && amount > 0) {
-      refund[type] = Math.floor(amount * REFUND_RATE);
+      refund[type] = Math.floor(amount * roomRemovalRefundRate());
     }
   }
   return refund;

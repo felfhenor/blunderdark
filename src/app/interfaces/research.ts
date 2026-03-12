@@ -12,7 +12,8 @@ export type ResearchBranch =
   | 'arcane'
   | 'engineering'
   | 'dominion'
-  | 'architecture';
+  | 'architecture'
+  | 'sovereignty';
 
 export type ResearchNodeState = 'completed' | 'active' | 'available' | 'locked';
 

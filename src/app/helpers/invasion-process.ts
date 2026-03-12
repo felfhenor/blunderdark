@@ -7,7 +7,7 @@ import { contentGetEntry } from '@helpers/content';
 import { interrogationBuffGetTotals } from '@helpers/torture-chamber';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
 import { effectiveStatsCalculate } from '@helpers/effective-stats';
-import { fearLevelCalculateAllForFloor } from '@helpers/fear-level';
+import { fearLevelCalculateAllForFloor, FEAR_LEVEL_TERRIFYING, FEAR_LEVEL_ABYSSAL } from '@helpers/fear-level';
 import {
   stateModifierGetAttackMultiplier,
   stateModifierGetDefenseMultiplier,
@@ -975,8 +975,13 @@ export function invasionProcess(state: GameState): void {
         // Apply corruption combat modifier (e.g. Corrupted Vigor +10% all stats)
         const corruptionCombatMul = corruptionEffectGetActiveModifier('combat_modifier');
 
-        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul * biomeDefAttackMul * corruptionCombatMul));
-        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul * biomeDefDefenseMul * corruptionCombatMul));
+        // Apply Rallying Cry: bonus when defending assigned room
+        const homeRoomBonus = def.assignedRoomId === roomId
+          ? 1 + researchUnlockGetPassiveBonusWithMastery('homeRoomDefenseBonus')
+          : 1;
+
+        const modifiedAttack = Math.max(0, Math.round(stats.attack * attackMul * interrogationAttackMul * biomeDefAttackMul * corruptionCombatMul * homeRoomBonus));
+        const modifiedDefense = Math.max(0, Math.round(stats.defense * defenseMul * interrogationDefenseMul * biomeDefDefenseMul * corruptionCombatMul * homeRoomBonus));
 
         // Initialize ability states from content definition if not already set
         const defAbilityStates = def.abilityStates ?? initAbilityStatesFromContent(defContent);
@@ -1855,6 +1860,60 @@ function processCombatRound(
         ...invasion.currentRoomTurnQueue,
         combatants: updatedCombatants,
       };
+    }
+
+    // Fear level 5+: Terrifying - chance for invaders to flee the room
+    const roomFearForEffects = invasion.roomFearLevels[roomId] ?? 0;
+    if (roomFearForEffects >= FEAR_LEVEL_TERRIFYING) {
+      const fleeChance = 0.2;
+      if (rng() < fleeChance) {
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'retreat',
+          roomId,
+          message: 'The overwhelming terror causes invaders to flee this room!',
+        });
+        syncCombatStateBack(invasion, state);
+        invasion.currentRoomTurnQueue = undefined;
+        invasion.currentRoomIndex++;
+        return;
+      }
+    }
+
+    // Fear level 6: Abyssal - DOT to all invaders
+    if (roomFearForEffects >= FEAR_LEVEL_ABYSSAL) {
+      const fearDot = 5;
+      const updatedForDot = invasion.currentRoomTurnQueue.combatants.map((c) => {
+        if (c.side !== 'invader' || c.hp <= 0) return c;
+        const newHp = Math.max(0, c.hp - fearDot);
+        invasion.battleLog.push({
+          turn: invasion.currentTurn,
+          type: 'combat_attack',
+          roomId,
+          message: `${c.name} takes ${fearDot} damage from abyssal dread!`,
+        });
+        if (newHp <= 0) {
+          invasion.battleLog.push({
+            turn: invasion.currentTurn,
+            type: 'combat_kill',
+            roomId,
+            message: `${c.name} succumbs to fear!`,
+          });
+          invasion.invasionState.invadersKilled++;
+        }
+        return { ...c, hp: newHp };
+      });
+      invasion.currentRoomTurnQueue = {
+        ...invasion.currentRoomTurnQueue,
+        combatants: updatedForDot,
+      };
+
+      // Check if all invaders dead from DOT
+      const invadersAliveAfterDot = updatedForDot.filter((c) => c.side === 'invader' && c.hp > 0);
+      if (invadersAliveAfterDot.length === 0) {
+        syncCombatStateBack(invasion, state);
+        break;
+      }
     }
 
     break; // Only one round per tick
