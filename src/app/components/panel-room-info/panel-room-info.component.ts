@@ -14,6 +14,10 @@ import { CurrencyNameComponent } from '@components/currency-name/currency-name.c
 import { FearBreakdownTooltipComponent } from '@components/fear-breakdown-tooltip/fear-breakdown-tooltip.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import {
+  InhabitantListComponent,
+  type InhabitantListEntry,
+} from '@components/inhabitant-list/inhabitant-list.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RoomConnectionsComponent } from '@components/room-connections/room-connections.component';
 import { StatNameComponent } from '@components/stat-name/stat-name.component';
@@ -116,6 +120,7 @@ import { startCase } from 'es-toolkit';
     FearBreakdownTooltipComponent,
     IconComponent,
     InhabitantCardComponent,
+    InhabitantListComponent,
     ModalComponent,
     RoomConnectionsComponent,
     SFXDirective,
@@ -436,7 +441,7 @@ export class PanelRoomInfoComponent {
     notifySuccess(`Applied ${path.name} upgrade`);
   }
 
-  public eligibleUnassigned = computed(() => {
+  public eligibleUnassigned = computed<InhabitantListEntry[]>(() => {
     const room = this.selectedRoom();
     if (!room || room.maxInhabitants === 0) return [];
 
@@ -453,7 +458,7 @@ export class PanelRoomInfoComponent {
       })
       .map((i) => {
         const def = contentGetEntry<InhabitantContent>(i.definitionId)!;
-        return { instance: i, name: i.name, def };
+        return { instance: i, def };
       });
     return sortBy(entries, [(e) => e.def.name]);
   });
@@ -627,6 +632,11 @@ export class PanelRoomInfoComponent {
     } else {
       notifyError('Failed to remove connection');
     }
+  }
+
+  public onAssignInhabitantFromList(entry: InhabitantListEntry): void {
+    this.onAssignInhabitant(entry.instance.instanceId);
+    this.showInhabitantSelect.set(false);
   }
 
   public async onAssignInhabitant(instanceId: string): Promise<void> {

@@ -2,35 +2,6 @@
   @apply block;
 }
 
-.roster-list {
-  max-height: 480px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.roster-entry {
-  padding: 4px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: background-color 0.1s ease;
-
-  &:hover {
-    background-color: var(--color-base-200);
-  }
-
-  &.selected {
-    border-color: var(--color-primary);
-    background-color: color-mix(
-      in oklch,
-      var(--color-primary) 15%,
-      transparent
-    );
-  }
-}
-
 .reassign-list {
   display: flex;
   flex-direction: column;

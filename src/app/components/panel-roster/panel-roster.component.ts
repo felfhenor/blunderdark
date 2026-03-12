@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { SFXDirective } from '@directives/sfx.directive';
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
@@ -12,6 +11,11 @@ import {
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { InhabitantCardComponent } from '@components/inhabitant-card/inhabitant-card.component';
+import {
+  InhabitantListComponent,
+  type InhabitantListEntry,
+  type InhabitantListFilter,
+} from '@components/inhabitant-list/inhabitant-list.component';
 import {
   inhabitantAssignToRoom,
   inhabitantRename,
@@ -29,7 +33,6 @@ import { inhabitantIsTraveling } from '@helpers/inhabitants';
 import { formatRealDuration } from '@helpers/game-time';
 import { gamestate } from '@helpers/state-game';
 import type {
-  InhabitantInstance,
   PlacedRoom,
   PlacedRoomId,
   RoomId,
@@ -41,18 +44,14 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
-type RosterFilter = 'all' | 'assigned' | 'unassigned' | 'traveling';
-
-type RosterEntry = {
-  instance: InhabitantInstance;
-  def: InhabitantContent;
+type RosterEntry = InhabitantListEntry & {
   roomName: string | undefined;
   floorName: string | undefined;
 };
 
 @Component({
   selector: 'app-panel-roster',
-  imports: [DecimalPipe, IconComponent, InhabitantCardComponent, SFXDirective, SweetAlert2Module],
+  imports: [IconComponent, InhabitantCardComponent, InhabitantListComponent, SFXDirective, SweetAlert2Module],
   templateUrl: './panel-roster.component.html',
   styleUrl: './panel-roster.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,7 +60,7 @@ export class PanelRosterComponent {
   private renameSwal = viewChild<SwalComponent>('renameSwal');
   private releaseSwal = viewChild<SwalComponent>('releaseSwal');
 
-  public activeFilter = signal<RosterFilter>('all');
+  public activeFilter = signal<InhabitantListFilter>('all');
   public selectedInhabitantId = signal<string | undefined>(undefined);
 
   constructor() {
@@ -76,74 +75,45 @@ export class PanelRosterComponent {
     });
   }
 
-  private allEntries = computed<RosterEntry[]>(() => {
+  public allEntries = computed<InhabitantListEntry[]>(() => {
     const state = gamestate();
     const inhabitants = state.world.inhabitants;
-    const floors = state.world.floors;
 
     const entries = inhabitants
       .map((inst) => {
-        const def = contentGetEntry<InhabitantContent>(
-          inst.definitionId,
-        );
+        const def = contentGetEntry<InhabitantContent>(inst.definitionId);
         if (!def) return undefined;
-
-        let roomName: string | undefined = undefined;
-        let floorName: string | undefined = undefined;
-        if (inst.assignedRoomId) {
-          for (const floor of floors) {
-            const room = floor.rooms.find(
-              (r) => r.id === inst.assignedRoomId,
-            );
-            if (room) {
-              roomName = roomGetDisplayName(room);
-              floorName = floor.name;
-              break;
-            }
-          }
-        }
-
-        return { instance: inst, def, roomName, floorName } as RosterEntry;
+        return { instance: inst, def } as InhabitantListEntry;
       })
-      .filter((e): e is RosterEntry => e !== undefined);
+      .filter((e): e is InhabitantListEntry => e !== undefined);
     return sortBy(entries, [(e) => e.def.name]);
-  });
-
-  public allCount = computed(() => this.allEntries().length);
-
-  public assignedCount = computed(
-    () =>
-      this.allEntries().filter((e) => e.instance.assignedRoomId !== undefined)
-        .length,
-  );
-
-  public unassignedCount = computed(
-    () =>
-      this.allEntries().filter((e) => e.instance.assignedRoomId === undefined)
-        .length,
-  );
-
-  public travelingCount = computed(
-    () =>
-      this.allEntries().filter((e) => inhabitantIsTraveling(e.instance)).length,
-  );
-
-  public filteredEntries = computed(() => {
-    const filter = this.activeFilter();
-    const entries = this.allEntries();
-    if (filter === 'assigned')
-      return entries.filter((e) => e.instance.assignedRoomId !== undefined);
-    if (filter === 'unassigned')
-      return entries.filter((e) => e.instance.assignedRoomId === undefined);
-    if (filter === 'traveling')
-      return entries.filter((e) => inhabitantIsTraveling(e.instance));
-    return entries;
   });
 
   public selectedEntry = computed<RosterEntry | undefined>(() => {
     const id = this.selectedInhabitantId();
     if (!id) return undefined;
-    return this.allEntries().find((e) => e.instance.instanceId === id) ?? undefined;
+
+    const state = gamestate();
+    const inst = state.world.inhabitants.find((i) => i.instanceId === id);
+    if (!inst) return undefined;
+
+    const def = contentGetEntry<InhabitantContent>(inst.definitionId);
+    if (!def) return undefined;
+
+    let roomName: string | undefined = undefined;
+    let floorName: string | undefined = undefined;
+    if (inst.assignedRoomId) {
+      for (const floor of state.world.floors) {
+        const room = floor.rooms.find((r) => r.id === inst.assignedRoomId);
+        if (room) {
+          roomName = roomGetDisplayName(room);
+          floorName = floor.name;
+          break;
+        }
+      }
+    }
+
+    return { instance: inst, def, roomName, floorName };
   });
 
   public availableRooms = computed(() => {
@@ -161,9 +131,7 @@ export class PanelRosterComponent {
 
     for (const floor of floors) {
       for (const room of floor.rooms) {
-        const roomDef = contentGetEntry<RoomContent>(
-          room.roomTypeId,
-        );
+        const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
         if (!roomDef || roomDef.maxInhabitants === 0) continue;
 
         const validation = assignmentCanAssignToRoom(room.id);
@@ -180,17 +148,11 @@ export class PanelRosterComponent {
     return rooms;
   });
 
-  public setFilter(filter: RosterFilter): void {
-    const filterLabels: Record<RosterFilter, string> = { all: 'All', assigned: 'Assigned', unassigned: 'Idle', traveling: 'Traveling' };
-    analyticsSendDesignEvent('Roster:Filter:' + filterLabels[filter]);
-    this.activeFilter.set(filter);
-  }
-
-  public selectInhabitant(instanceId: string): void {
+  public onSelectInhabitant(entry: InhabitantListEntry): void {
     analyticsSendDesignEvent('Roster:Select');
     const current = this.selectedInhabitantId();
     this.selectedInhabitantId.set(
-      current === instanceId ? undefined : instanceId,
+      current === entry.instance.instanceId ? undefined : entry.instance.instanceId,
     );
   }
 
@@ -207,7 +169,6 @@ export class PanelRosterComponent {
     const entry = this.selectedEntry();
     if (!entry) return;
 
-    // If already assigned, unassign first
     if (entry.instance.assignedRoomId !== undefined) {
       await inhabitantUnassignFromRoom(instanceId);
     }
@@ -216,7 +177,6 @@ export class PanelRosterComponent {
     if (!result.success && result.error) {
       notifyError(result.error);
     } else if (result.success) {
-      // Check if the inhabitant is now traveling
       const updated = gamestate().world.inhabitants.find(
         (i) => i.instanceId === instanceId,
       );
@@ -295,5 +255,4 @@ export class PanelRosterComponent {
       notifySuccess(`${instanceName} has been released`);
     }
   }
-
 }

@@ -1,70 +1,14 @@
-@if (allCount() > 0) {
+@if (allEntries().length > 0) {
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-4">
-      <!-- Filter tabs -->
-      <div class="flex gap-2 mt-1">
-        <button
-          class="btn btn-xs"
-          appSfx="ui-click"
-          [sfxOffset]="0"
-          [class.btn-primary]="activeFilter() === 'all'"
-          [class.btn-ghost]="activeFilter() !== 'all'"
-          (click)="setFilter('all')"
-        >
-          All ({{ allCount() | number: '1.0-0' }})
-        </button>
-        <button
-          class="btn btn-xs"
-          appSfx="ui-click"
-          [sfxOffset]="1"
-          [class.btn-primary]="activeFilter() === 'assigned'"
-          [class.btn-ghost]="activeFilter() !== 'assigned'"
-          (click)="setFilter('assigned')"
-        >
-          Assigned ({{ assignedCount() | number: '1.0-0' }})
-        </button>
-        <button
-          class="btn btn-xs"
-          appSfx="ui-click"
-          [sfxOffset]="2"
-          [class.btn-primary]="activeFilter() === 'unassigned'"
-          [class.btn-ghost]="activeFilter() !== 'unassigned'"
-          (click)="setFilter('unassigned')"
-        >
-          Idle ({{ unassignedCount() | number: '1.0-0' }})
-        </button>
-        @if (travelingCount() > 0) {
-          <button
-            class="btn btn-xs"
-            appSfx="ui-click"
-            [sfxOffset]="3"
-            [class.btn-info]="activeFilter() === 'traveling'"
-            [class.btn-ghost]="activeFilter() !== 'traveling'"
-            (click)="setFilter('traveling')"
-          >
-            Traveling ({{ travelingCount() | number: '1.0-0' }})
-          </button>
-        }
-      </div>
-
-      <!-- Roster list -->
-      <div class="roster-list mt-2">
-        @for (entry of filteredEntries(); track entry.instance.instanceId) {
-          <div
-            class="roster-entry"
-            [class.selected]="
-              selectedInhabitantId() === entry.instance.instanceId
-            "
-            (click)="selectInhabitant(entry.instance.instanceId)"
-          >
-            <app-inhabitant-card
-              [instance]="entry.instance"
-              [definition]="entry.def"
-              [showHunger]="true"
-            />
-          </div>
-        }
-      </div>
+      <app-inhabitant-list
+        [entries]="allEntries()"
+        [(activeFilter)]="activeFilter"
+        [selectedId]="selectedInhabitantId()"
+        [showHunger]="true"
+        emptyMessage="No inhabitants match."
+        (selected)="onSelectInhabitant($event)"
+      />
 
       <!-- Detail view -->
       @if (selectedEntry(); as entry) {

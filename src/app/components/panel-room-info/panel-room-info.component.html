@@ -577,38 +577,17 @@
   <app-modal [(visible)]="showInhabitantSelect">
     <span title>Add Inhabitant</span>
     <div body>
-      @if (eligibleUnassigned().length === 0) {
-        <p class="text-sm opacity-50">No eligible inhabitants available.</p>
-      } @else {
-        <div class="flex flex-col gap-2 max-h-64 overflow-y-auto">
-          @for (inh of eligibleUnassigned(); track inh.instance.instanceId) {
-            <div class="card card-compact bg-base-200">
-              <div class="card-body p-3">
-                <div class="flex items-start justify-between gap-2">
-                  <app-inhabitant-card
-                    class="flex-1 min-w-0"
-                    [instance]="inh.instance"
-                    [definition]="inh.def"
-                    [showHunger]="true"
-                    [showAssignment]="false"
-                    [synergyRoomId]="selectedRoom()?.id"
-                  />
-                  <button
-                    class="btn btn-xs btn-primary flex-shrink-0"
-                    appSfx="ui-click"
-                    (click)="
-                      onAssignInhabitant(inh.instance.instanceId);
-                      showInhabitantSelect.set(false)
-                    "
-                  >
-                    Choose
-                  </button>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
+      <app-inhabitant-list
+        [entries]="eligibleUnassigned()"
+        [showFilters]="false"
+        [showHunger]="true"
+        [showAssignment]="false"
+        [synergyRoomId]="selectedRoom()?.id"
+        actionLabel="Choose"
+        maxHeight="256px"
+        emptyMessage="No eligible inhabitants available."
+        (action)="onAssignInhabitantFromList($event)"
+      />
     </div>
     <div actions>
       <button

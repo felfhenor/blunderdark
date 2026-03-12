@@ -1,0 +1,34 @@
+:host {
+  @apply block;
+}
+
+.inhabitant-scroll-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inhabitant-list-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.1s ease;
+
+  &:hover {
+    background-color: var(--color-base-200);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background-color: color-mix(
+      in oklch,
+      var(--color-primary) 15%,
+      transparent
+    );
+  }
+}
