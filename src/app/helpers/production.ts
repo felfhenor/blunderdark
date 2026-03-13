@@ -405,6 +405,7 @@ export function productionCalculateTotal(
   const totalProduction: RoomProduction = {};
   const activeSynergies = synergyEvaluateAll(floors);
   const allInhabitants = collectUniqueInhabitants(floors);
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -483,6 +484,7 @@ export function productionCalculateTotal(
       let roomProduction: RoomProduction = {};
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
+        if (resourceType === 'corruption' && sealedRoomIds.has(room.id)) continue;
         const depthModifier = floorModifierGetMultiplier(
           floor.depth,
           resourceType,
@@ -688,9 +690,12 @@ export function productionCalculateSingleRoom(
     room.id,
   );
 
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors ?? [floor]);
+
   let production: RoomProduction = {};
   for (const [resourceType, baseAmount] of Object.entries(base)) {
     if (!baseAmount) continue;
+    if (resourceType === 'corruption' && sealedRoomIds.has(room.id)) continue;
     const depthModifier = floorModifierGetMultiplier(floor.depth, resourceType);
     const dayNightResourceMod =
       hour !== undefined
@@ -818,6 +823,7 @@ export function productionCalculateBreakdowns(
   const breakdowns: Record<string, ResourceProductionBreakdown> = {};
   const activeSynergies = synergyEvaluateAll(floors);
   const allInhabitantsForAura = collectUniqueInhabitants(floors);
+  const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -897,6 +903,7 @@ export function productionCalculateBreakdowns(
 
       for (const [resourceType, baseAmount] of Object.entries(base)) {
         if (!baseAmount) continue;
+        if (resourceType === 'corruption' && sealedRoomIds.has(room.id)) continue;
 
         const depthModifier = floorModifierGetMultiplier(
           floor.depth,
@@ -1124,6 +1131,7 @@ export function productionCalculateDetailedBreakdown(
   const details: RoomProductionDetail[] = [];
   const activeSynergies = synergyEvaluateAll(floors);
   const allInhabitantsForAura = collectUniqueInhabitants(floors);
+  const sealedRoomIds = resourceType === 'corruption' ? featureGetCorruptionSealedRoomIds(floors) : new Set<string>();
 
   for (const floor of floors) {
     const connectedIds = connectivityGetConnectedRoomIds(floor, floors);
@@ -1191,6 +1199,9 @@ export function productionCalculateDetailedBreakdown(
       );
 
       const baseAmount = base[resourceType] ?? 0;
+
+      // Corruption seal blocks room-based corruption production
+      if (sealedRoomIds.has(room.id)) continue;
 
       // Check if this room has resource conversion
       const hasConversion =
