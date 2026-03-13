@@ -23,16 +23,15 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: 'app-grid',
     title: 'Your Dungeon',
     description:
-      'This is your dungeon grid. Rooms are placed here and connected by hallways. Try clicking any room to see its details on the right side!',
+      'This is your dungeon grid. Rooms are placed here and connected together or by hallways.',
     tooltipPosition: 'bottom',
-    allowInteraction: true,
   },
   {
     id: 'connecting-rooms',
     targetSelector: 'app-grid',
     title: 'Connecting Rooms',
     description:
-      'Rooms must be connected by hallways to function! An unconnected room cannot receive workers or produce resources. Always build hallways between your rooms or connect your rooms directly to keep everything running smoothly.',
+      'Rooms must be connected by hallways or directly to each other to function! An unconnected room cannot receive workers or produce resources. Always build hallways between your rooms or connect your rooms directly to keep everything running smoothly.',
     tooltipPosition: 'bottom',
   },
   {
