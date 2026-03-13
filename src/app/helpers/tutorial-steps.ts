@@ -14,7 +14,7 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: 'app-resource-bar-top',
     title: 'Resources',
     description:
-      'This bar shows your resources. Gold, Mana, Stone, and more are earned over time and spent to build and recruit. Click any resource for a detailed breakdown.',
+      'This bar shows your resources. Crystals, Food, Gold, and more are earned over time and spent to build and recruit. Click any resource for a detailed breakdown.',
     tooltipPosition: 'bottom',
   },
   {

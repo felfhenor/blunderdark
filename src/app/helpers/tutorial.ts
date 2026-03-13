@@ -4,6 +4,7 @@ import { TUTORIAL_STEPS } from '@helpers/tutorial-steps';
 
 const _tutorialActive = signal(false);
 const _tutorialStepIndex = signal(0);
+let _wasPausedBeforeTutorial = false;
 
 export const tutorialIsActive = computed(() => _tutorialActive());
 export const tutorialStepIndex = computed(() => _tutorialStepIndex());
@@ -13,6 +14,8 @@ export const tutorialCurrentStep = computed(() =>
 export const tutorialTotalSteps = TUTORIAL_STEPS.length;
 
 export function tutorialStart(): void {
+  _wasPausedBeforeTutorial = optionsGet('gameloopPaused');
+  optionsSet('gameloopPaused', true);
   _tutorialStepIndex.set(0);
   _tutorialActive.set(true);
 }
@@ -41,6 +44,9 @@ export function tutorialComplete(): void {
   _tutorialActive.set(false);
   _tutorialStepIndex.set(0);
   optionsSet('tutorialCompleted', true);
+  if (!_wasPausedBeforeTutorial) {
+    optionsSet('gameloopPaused', false);
+  }
 }
 
 export function tutorialAutoStart(): void {
