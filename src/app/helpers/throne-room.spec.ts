@@ -24,6 +24,11 @@ const VAULT_ADJACENCY_GOLD_BONUS = 0.05;
 const mockFloors: Floor[] = [];
 const mockContent = new Map<string, unknown>();
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+  connectivityIsRoomConnected: () => true,
+}));
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
 }));

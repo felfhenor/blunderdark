@@ -15,6 +15,10 @@ import type { FeatureContent } from '@interfaces/content-feature';
 
 const mockContent = new Map<string, unknown>();
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+}));
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
   contentGetEntriesByType: vi.fn(() => []),

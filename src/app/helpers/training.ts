@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -170,10 +171,12 @@ export function trainingProcess(state: GameState, numTicks = 1): void {
   const trainingGroundsId = roomRoleFindById('trainingGrounds');
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     const tileMap = buildRoomTilesMap(floor);
 
     for (const room of floor.rooms) {
       if (room.roomTypeId !== trainingGroundsId) continue;
+      if (disconnected.has(room.id)) continue;
 
       const adjacentTypes = trainingGetAdjacentRoomTypeIds(room, floor, tileMap);
       const targetTicks = trainingGetTicksForRoom(room, adjacentTypes);

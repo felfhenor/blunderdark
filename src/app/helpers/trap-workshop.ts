@@ -1,4 +1,5 @@
 import { Subject } from 'rxjs';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
@@ -43,8 +44,10 @@ export function trapWorkshopGetBonusDamage(state: GameState): number {
 
   let bonus = 0;
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== workshopTypeId) continue;
+      if (disconnected.has(room.id)) continue;
       const effects = roomUpgradeGetAppliedEffects(room);
       for (const effect of effects) {
         if (effect.type === 'craftingBonusDamage') {
@@ -181,8 +184,10 @@ export function trapWorkshopCanQueue(
 
 export function trapWorkshopProcess(state: GameState, numTicks = 1): void {
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== roomRoleFindById('trapWorkshop')) continue;
+      if (disconnected.has(room.id)) continue;
       if (!room.trapJobs || room.trapJobs.length === 0) continue;
 
       // Only the first job in the queue progresses

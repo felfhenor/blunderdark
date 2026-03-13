@@ -59,6 +59,10 @@ const darkSpawningPath: RoomUpgradeContent = {
 const mockContent = new Map<string, unknown>();
 let mockMaxInhabitantCount = 999;
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+}));
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: (id: string) => mockContent.get(id) ?? undefined,
   contentGetEntriesByType: () => mockContent.get('__allInhabitants') ?? [],

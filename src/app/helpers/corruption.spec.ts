@@ -17,6 +17,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let mockResources: ResourceMap;
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+}));
+
 vi.mock('@helpers/state-game', () => {
   return {
     gamestate: () => ({

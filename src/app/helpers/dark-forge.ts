@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { craftingQueueGetMaxSize } from '@helpers/crafting-queue';
@@ -407,10 +408,12 @@ export function darkForgeProcess(state: GameState, numTicks = 1): void {
   if (!darkForgeTypeId) return;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     let floorHasForge = false;
 
     for (const room of floor.rooms) {
       if (room.roomTypeId !== darkForgeTypeId) continue;
+      if (disconnected.has(room.id)) continue;
       floorHasForge = true;
       if (!room.forgeJobs || room.forgeJobs.length === 0) continue;
 

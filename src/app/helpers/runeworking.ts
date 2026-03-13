@@ -1,3 +1,4 @@
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { findRoomOnFloor } from '@helpers/floor';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
 import { reputationAwardInPlace } from '@helpers/reputation';
@@ -78,8 +79,10 @@ export function runeworkingProcess(state: GameState, numTicks = 1): void {
   if (!runeworkingTypeId) return;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== runeworkingTypeId) continue;
+      if (disconnected.has(room.id)) continue;
       if (!room.runeworkingJob) continue;
 
       const hasWorker = state.world.inhabitants.some(

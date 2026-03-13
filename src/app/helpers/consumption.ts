@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { featureGetAllForRoom } from '@helpers/features';
 import { roomGetDisplayName } from '@helpers/room-upgrades';
@@ -67,9 +68,11 @@ export function consumptionCalculateBreakdowns(
     }
   }
 
-  // 3. Feature maintenance costs (only when maintenance is active)
+  // 3. Feature maintenance costs (only when maintenance is active, connected rooms only)
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {
@@ -140,9 +143,11 @@ export function consumptionCalculateDetailedBreakdown(
     });
   }
 
-  // 3. Feature maintenance costs (only when maintenance is active)
+  // 3. Feature maintenance costs (only when maintenance is active, connected rooms only)
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {
@@ -189,9 +194,11 @@ export function consumptionCalculateNonFoodTotals(
     }
   }
 
-  // Feature maintenance (only when maintenance is active)
+  // Feature maintenance (only when maintenance is active, connected rooms only)
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       if (room.maintenanceActive !== true) continue;
       const features = featureGetAllForRoom(room);
       for (const feature of features) {

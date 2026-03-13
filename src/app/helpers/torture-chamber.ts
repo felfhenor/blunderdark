@@ -1,3 +1,4 @@
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { currencyUnlockInPlace } from '@helpers/currency-unlock';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -236,10 +237,12 @@ export async function tortureSetBreakAction(
 export function prisonerEscapeProcess(state: GameState): string[] {
   const currentDay = state.clock.day;
 
-  // Collect prisoner IDs currently being processed
+  // Collect prisoner IDs currently being processed (connected rooms only)
   const processingPrisonerIds = new Set<string>();
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       if (room.tortureJob) {
         processingPrisonerIds.add(room.tortureJob.prisonerId);
       }
@@ -281,8 +284,10 @@ export function tortureChamberProcess(state: GameState, numTicks = 1): void {
   let inhabitantsChanged = false;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== tortureChamberTypeId) continue;
+      if (disconnected.has(room.id)) continue;
       if (!room.tortureJob) continue;
 
       // Skip rooms without assigned workers

@@ -14,6 +14,10 @@ import type {
 
 const RUNEWORKING_ROOM_TYPE_ID = 'test-runeworking-type' as RoomId;
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+}));
+
 vi.mock('@helpers/room-roles', () => ({
   roomRoleFindById: vi.fn((role: string) =>
     role === 'runeworking' ? RUNEWORKING_ROOM_TYPE_ID : undefined,

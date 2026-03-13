@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { floorModifierGetObjectiveCorruptionRate } from '@helpers/floor-modifiers';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -162,7 +163,9 @@ export function corruptionCalculateDeepObjectiveRate(
 ): number {
   let totalPerMinute = 0;
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       const roomDef = contentGetEntry<RoomContent>(room.roomTypeId);
       if (roomDef?.objectiveTypes && roomDef.objectiveTypes.length > 0) {
         totalPerMinute += floorModifierGetObjectiveCorruptionRate(floor.depth);

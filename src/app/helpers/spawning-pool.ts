@@ -1,3 +1,4 @@
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { corruptionEffectGetRecruitmentTraitChance } from '@helpers/corruption-effects';
 import { GAME_TIME_TICKS_PER_MINUTE } from '@helpers/game-time';
@@ -161,8 +162,10 @@ export function spawningPoolProcess(state: GameState, numTicks = 1): void {
   let inhabitantsChanged = false;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== spawningPoolTypeId) continue;
+      if (disconnected.has(room.id)) continue;
 
       // Count assigned workers (excluding travelers)
       const workerCount = spawningPoolGetWorkerCount(

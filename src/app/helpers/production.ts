@@ -169,9 +169,11 @@ function productionCalculateNonRoomCorruption(
   const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
   let featurePerTick = 0;
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
+    const connectedRooms = floor.rooms.filter((r) => !disconnected.has(r.id));
     const unsealedRooms = sealedRoomIds.size > 0
-      ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
-      : floor.rooms;
+      ? connectedRooms.filter((r) => !sealedRoomIds.has(r.id))
+      : connectedRooms;
     featurePerTick += featureCalculateCorruptionGenerationPerTick(
       unsealedRooms,
       GAME_TIME_TICKS_PER_MINUTE,
@@ -1550,9 +1552,11 @@ export function productionCalculateDetailedBreakdown(
     const sealedRoomIds = featureGetCorruptionSealedRoomIds(floors);
     let featurePerTick = 0;
     for (const floor of floors) {
+      const disconnectedIds = connectivityGetDisconnectedRoomIds(floor, floors);
+      const connectedRooms = floor.rooms.filter((r) => !disconnectedIds.has(r.id));
       const unsealedRooms = sealedRoomIds.size > 0
-        ? floor.rooms.filter((r) => !sealedRoomIds.has(r.id))
-        : floor.rooms;
+        ? connectedRooms.filter((r) => !sealedRoomIds.has(r.id))
+        : connectedRooms;
       featurePerTick += featureCalculateCorruptionGenerationPerTick(
         unsealedRooms,
         GAME_TIME_TICKS_PER_MINUTE,

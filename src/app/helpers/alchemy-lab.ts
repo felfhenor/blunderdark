@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import {
   currencyIsUnlocked,
   currencyUnlockInPlace,
@@ -257,8 +258,10 @@ export function alchemyLabCalculateBreakdown(
   if (!labTypeId) return { production, consumption };
 
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== labTypeId) continue;
+      if (disconnected.has(room.id)) continue;
 
       const conversion = alchemyConversions.find((c) => c.roomId === room.id);
       if (!conversion) continue;
@@ -367,8 +370,10 @@ export function alchemyLabProcess(state: GameState, numTicks = 1): void {
   if (!labTypeId) return;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== labTypeId) continue;
+      if (disconnected.has(room.id)) continue;
 
       const conversionIndex = state.world.alchemyConversions.findIndex(
         (c) => c.roomId === room.id,

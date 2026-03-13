@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { findRoomOnFloor } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
@@ -320,8 +321,10 @@ export function summoningCircleProcess(state: GameState, numTicks = 1): void {
   let inhabitantsChanged = false;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== summoningCircleTypeId) continue;
+      if (disconnected.has(room.id)) continue;
 
       // Process active summon queue (first job only)
       if (room.summonJobs && room.summonJobs.length > 0) {

@@ -36,6 +36,10 @@ import type { RoomId } from '@interfaces/content-room';
 import type { RoomShapeId } from '@interfaces/content-roomshape';
 import type { ResourceMap } from '@interfaces/resource';
 
+vi.mock('@helpers/connectivity', () => ({
+  connectivityGetDisconnectedRoomIds: () => new Set(),
+}));
+
 vi.mock('@helpers/content', () => ({
   contentGetEntry: vi.fn(),
 }));

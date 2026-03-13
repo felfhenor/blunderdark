@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityIsRoomConnected } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { roomRoleFindById } from '@helpers/room-roles';
 import {
@@ -68,6 +69,9 @@ export function throneRoomGetRulerDefinition(
 export function throneRoomGetActiveRulerBonuses(floors: Floor[]): RulerBonuses {
   const throne = throneRoomFind(floors);
   if (!throne) return {};
+
+  // Disconnected throne room provides no bonuses
+  if (!connectivityIsRoomConnected(throne.room.id, throne.floor, floors)) return {};
 
   const ruler = throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
   if (!ruler) return {};
@@ -144,6 +148,9 @@ export function throneRoomGetFearLevel(floors: Floor[]): number | undefined {
   const throne = throneRoomFind(floors);
   if (!throne) return undefined;
 
+  // Disconnected throne room has no fear effect
+  if (!connectivityIsRoomConnected(throne.room.id, throne.floor, floors)) return undefined;
+
   const ruler = throneRoomGetSeatedRulerInstance(throne.floor, throne.room.id);
   if (!ruler) return THRONE_ROOM_EMPTY_FEAR_LEVEL;
 
@@ -202,6 +209,9 @@ export function throneRoomGetPositionalBonuses(
 
   const throne = throneRoomFind(floors);
   if (!throne) return defaultBonuses;
+
+  // Disconnected throne room provides no positional bonuses
+  if (!connectivityIsRoomConnected(throne.room.id, throne.floor, floors)) return defaultBonuses;
 
   const throneShape = contentGetEntry<RoomShapeContent>(throne.room.shapeId);
   if (!throneShape) return defaultBonuses;

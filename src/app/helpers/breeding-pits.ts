@@ -1,4 +1,5 @@
 import { adjacencyAreRoomsAdjacent } from '@helpers/adjacency';
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { updateGamestate } from '@helpers/state-game';
 import { contentGetEntriesByType, contentGetEntry } from '@helpers/content';
 import { reputationAwardInPlace } from '@helpers/reputation';
@@ -461,8 +462,10 @@ export function breedingPitsProcess(state: GameState, numTicks = 1): void {
   let inhabitantsChanged = false;
 
   for (const floor of state.world.floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, state.world.floors);
     for (const room of floor.rooms) {
       if (room.roomTypeId !== breedingPitsTypeId) continue;
+      if (disconnected.has(room.id)) continue;
 
       // Process breeding job
       if (room.breedingJob) {

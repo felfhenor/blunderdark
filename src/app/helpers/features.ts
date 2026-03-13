@@ -1,3 +1,4 @@
+import { connectivityGetDisconnectedRoomIds } from '@helpers/connectivity';
 import { contentGetEntry } from '@helpers/content';
 import { findRoomOnFloor } from '@helpers/floor';
 import { updateGamestate } from '@helpers/state-game';
@@ -217,7 +218,9 @@ export function featureCalculateStorageFlatBonus(
 ): number {
   let totalBonus = 0;
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       const bonuses = featureGetBonuses(room, 'storage_bonus');
       for (const b of bonuses) {
         if (!b.targetType || !resourceType || b.targetType === resourceType) {
@@ -238,7 +241,9 @@ export function featureGetCorruptionSealedRoomIds(
 ): Set<string> {
   const sealed = new Set<string>();
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) continue;
       const bonuses = featureGetBonuses(room, 'corruption_seal');
       if (bonuses.length > 0) {
         sealed.add(room.id);
@@ -281,7 +286,12 @@ export function featureMaintenanceProcess(
   ticksPerMinute: number,
 ): void {
   for (const floor of floors) {
+    const disconnected = connectivityGetDisconnectedRoomIds(floor, floors);
     for (const room of floor.rooms) {
+      if (disconnected.has(room.id)) {
+        room.maintenanceActive = undefined;
+        continue;
+      }
       const features = featureGetAllForRoom(room);
       const totalCostPerTick: Record<string, number> = {};
       let hasMaintenance = false;
