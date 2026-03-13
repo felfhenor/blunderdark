@@ -14,16 +14,18 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: 'app-resource-bar-top',
     title: 'Resources',
     description:
-      'This bar shows your resources. Crystals, Food, Gold, and more are earned over time and spent to build and recruit. Click any resource for a detailed breakdown.',
+      'This bar shows your resources. Crystals, Food, Gold, and more are earned over time and spent to build and recruit. Try clicking any resource for a detailed breakdown!',
     tooltipPosition: 'bottom',
+    allowInteraction: true,
   },
   {
     id: 'dungeon',
     targetSelector: 'app-grid',
     title: 'Your Dungeon',
     description:
-      'This is your dungeon grid. Rooms are placed here and connected by hallways. Click any room to see its details on the right side.',
+      'This is your dungeon grid. Rooms are placed here and connected by hallways. Try clicking any room to see its details on the right side!',
     tooltipPosition: 'bottom',
+    allowInteraction: true,
   },
   {
     id: 'connecting-rooms',
@@ -54,45 +56,50 @@ export const TUTORIAL_STEPS: TutorialStepDefinition[] = [
     targetSelector: '.panel-overlay',
     title: 'Build Panel',
     description:
-      'The Build panel lets you construct new rooms and hallways. Each room type has a unique role - from resource production to creature training.',
+      'The Build panel lets you construct new rooms and hallways. Each room type has a unique role - from resource production to creature training. Feel free to browse!',
     tooltipPosition: 'right',
     panelToOpen: 'build',
+    allowInteraction: true,
   },
   {
     id: 'altar-panel',
     targetSelector: '.panel-overlay',
     title: 'Altar Panel',
     description:
-      'The Altar is where you recruit new creatures for your dungeon. Spend currency to summon inhabitants with unique traits and abilities.',
+      'The Altar is where you recruit new creatures for your dungeon. Spend currency to summon inhabitants with unique traits and abilities. Take a look around!',
     tooltipPosition: 'right',
     panelToOpen: 'altar',
+    allowInteraction: true,
   },
   {
     id: 'roster-panel',
     targetSelector: '.panel-overlay',
     title: 'Roster Panel',
     description:
-      'The Roster shows all your recruited creatures. Assign them to rooms to boost production or unlock special crafting stations.',
+      'The Roster shows all your recruited creatures. Assign them to rooms to boost production or unlock special crafting stations. Try clicking a creature for details!',
     tooltipPosition: 'right',
     panelToOpen: 'roster',
+    allowInteraction: true,
   },
   {
     id: 'research',
     targetSelector: 'app-game-research .modal-box',
     title: 'Research',
     description:
-      'Research unlocks new rooms, upgrades, and abilities. Spend research points to progress through the tech trees and power up your dungeon.',
+      'Research unlocks new rooms, upgrades, and abilities. Spend research points to progress through the tech trees and power up your dungeon. Try exploring the trees!',
     tooltipPosition: 'bottom',
     modalToOpen: 'research',
+    allowInteraction: true,
   },
   {
     id: 'victory',
     targetSelector: 'app-victory-menu .modal-box',
     title: 'Victory Paths',
     description:
-      'There are multiple ways to win! Each victory path has unique conditions - hoard gold, terrorize heroes, master research, and more. Track your progress here and claim victory when all conditions are met.',
+      'There are multiple ways to win! Each victory path has unique conditions - hoard gold, terrorize heroes, master research, and more. Browse your options!',
     tooltipPosition: 'bottom',
     modalToOpen: 'victory',
+    allowInteraction: true,
   },
   {
     id: 'invasions',

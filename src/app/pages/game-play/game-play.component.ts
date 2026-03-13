@@ -63,6 +63,7 @@ import {
   tutorialAutoStart,
   tutorialCurrentStep,
   tutorialIsActive,
+  tutorialNext,
   uiIsAnyModalOpen,
   uiIsInputFocused,
   rosterNavigateToInhabitant,
@@ -388,6 +389,9 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
       if (!tutorialIsActive() || !step) return;
 
       untracked(() => {
+        // Close any open resource breakdown when changing steps
+        this.showResourceBreakdown.set(false);
+
         if (step.panelToOpen) {
           this.activePanel.set(step.panelToOpen);
         } else if (step.modalToOpen) {
@@ -404,6 +408,23 @@ export class GamePlayComponent extends OptionsBaseComponent implements OnInit {
           this.showVictoryMenu.set(false);
         }
       });
+    });
+
+    // Auto-advance tutorial when user closes a modal that the tutorial opened
+    effect(() => {
+      if (!tutorialIsActive()) return;
+      const step = tutorialCurrentStep();
+      if (!step?.modalToOpen || !step.allowInteraction) return;
+
+      const modalOpen =
+        (step.modalToOpen === 'research' && this.showResearch()) ||
+        (step.modalToOpen === 'victory' && this.showVictoryMenu()) ||
+        (step.modalToOpen === 'merchant' && this.showMerchant()) ||
+        (step.modalToOpen === 'fusion' && this.showFusion());
+
+      if (!modalOpen) {
+        untracked(() => tutorialNext());
+      }
     });
 
     // Pause CSS animations when game is paused to reduce idle CPU

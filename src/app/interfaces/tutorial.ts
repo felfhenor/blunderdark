@@ -8,4 +8,5 @@ export type TutorialStepDefinition = {
   tooltipPosition: TutorialTooltipPosition;
   panelToOpen?: string;
   modalToOpen?: string;
+  allowInteraction?: boolean;
 };

@@ -31,6 +31,7 @@ import { sortBy } from 'es-toolkit/compat';
   imports: [ModalComponent, CurrencyNameComponent, TabBarComponent],
   templateUrl: './resource-breakdown-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { style: 'position: relative; z-index: 1002' },
 })
 export class ResourceBreakdownModalComponent {
   public visible = model<boolean>(false);

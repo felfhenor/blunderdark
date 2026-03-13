@@ -9,6 +9,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import {
   tutorialBack,
   tutorialCurrentStep,
+  tutorialCurrentStepAllowsInteraction,
   tutorialIsActive,
   tutorialNext,
   tutorialSkip,
@@ -39,6 +40,10 @@ const VIEWPORT_MARGIN = 12;
       pointer-events: auto;
     }
 
+    .tutorial-backdrop-interactive {
+      pointer-events: none;
+    }
+
     .tutorial-backdrop-full {
       background: rgba(0, 0, 0, 0.75);
     }
@@ -64,6 +69,7 @@ const VIEWPORT_MARGIN = 12;
       <div
         class="tutorial-backdrop"
         [class.tutorial-backdrop-full]="useFullBackdrop()"
+        [class.tutorial-backdrop-interactive]="allowInteraction()"
         (click)="$event.stopPropagation()"
       >
         @if (!useFullBackdrop()) {
@@ -85,6 +91,11 @@ const VIEWPORT_MARGIN = 12;
       >
         <h3 class="text-lg font-bold mb-2">{{ currentStep()?.title }}</h3>
         <p class="text-sm mb-4">{{ currentStep()?.description }}</p>
+        @if (allowInteraction()) {
+          <p class="text-xs opacity-50 mb-2 italic">
+            You can interact with the highlighted area. Click Next when ready.
+          </p>
+        }
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-2">
             <span class="text-xs opacity-60">
@@ -117,6 +128,7 @@ export class TutorialOverlayComponent {
   public currentStep = tutorialCurrentStep;
   public stepIndex = tutorialStepIndex;
   public totalSteps = tutorialTotalSteps;
+  public allowInteraction = tutorialCurrentStepAllowsInteraction;
   public isLastStep = computed(
     () => tutorialStepIndex() === tutorialTotalSteps - 1,
   );
@@ -146,6 +158,17 @@ export class TutorialOverlayComponent {
     const pos: TutorialTooltipPosition = step?.tooltipPosition ?? 'bottom';
     const vw = window.innerWidth;
     const vh = window.innerHeight;
+
+    // For interactive modal steps, pin the tooltip at the bottom-center
+    // so it doesn't get pushed off-screen by large modal content.
+    // Use a taller estimate since the interaction hint adds extra height.
+    if (step?.modalToOpen && step.allowInteraction) {
+      const interactiveH = TOOLTIP_H_EST + 60;
+      return {
+        top: vh - interactiveH - VIEWPORT_MARGIN,
+        left: Math.max(VIEWPORT_MARGIN, (vw - TOOLTIP_W) / 2),
+      };
+    }
 
     // For large targets (full backdrop mode), center the tooltip
     if (this.useFullBackdrop()) {

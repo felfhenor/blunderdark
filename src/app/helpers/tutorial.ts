@@ -12,6 +12,9 @@ export const tutorialCurrentStep = computed(() =>
   _tutorialActive() ? TUTORIAL_STEPS[_tutorialStepIndex()] : undefined,
 );
 export const tutorialTotalSteps = TUTORIAL_STEPS.length;
+export const tutorialCurrentStepAllowsInteraction = computed(
+  () => tutorialCurrentStep()?.allowInteraction ?? false,
+);
 
 export function tutorialStart(): void {
   _wasPausedBeforeTutorial = optionsGet('gameloopPaused');
